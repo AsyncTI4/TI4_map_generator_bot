@@ -64,7 +64,7 @@ class SystemInfo extends GameStateSubcommand {
             if (tileOption == null || tileOption.getName().equals(Constants.EXTRA_RINGS)) {
                 continue;
             }
-            String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
+            String tileID = tileOption.getAsString().toLowerCase();
             Tile tile = TileHelper.getTile(event, tileID, game);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
@@ -196,7 +196,7 @@ class SystemInfo extends GameStateSubcommand {
             String colorID = tokenMatch.group("color");
             String color = Mapper.getColorName(colorID);
             Player player = game.getPlayerFromColorOrFaction(color);
-            if (privateGame != null && privateGame) {
+            if ((privateGame != null && privateGame) || player == null) {
                 sb.append(" (").append(color).append(") ");
             } else {
                 sb.append(player.getFactionEmoji()).append(" ").append(" (").append(color).append(") ");

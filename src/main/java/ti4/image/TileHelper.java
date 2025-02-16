@@ -13,8 +13,11 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.CollectionUtils;
+
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 import ti4.map.Game;
 import ti4.map.Tile;
@@ -192,17 +195,22 @@ public class TileHelper {
         return planetIdsToPlanetModels.containsKey(planetID);
     }
 
-    public static Tile getTile(SlashCommandInteractionEvent event, String tileID, Game game) {
-        if (game.isTileDuplicated(tileID)) {
-            MessageHelper.replyToMessage(event, "Duplicate tile name `" + tileID + "` found, please use position coordinates");
+    public static Tile getTile(GenericInteractionCreateEvent event, String tileNameOrPos, Game game) {
+        String tileAlias = AliasHandler.resolveTile(tileNameOrPos);
+        if (game.isTileDuplicated(tileAlias)) {
+            if (event != null)
+                MessageHelper.replyToMessage(event, "Duplicate tile name `" + tileAlias + "` found, please use position coordinates");
             return null;
         }
-        Tile tile = game.getTile(tileID);
-        if (tile == null) {
-            tile = game.getTileByPosition(tileID);
+
+        if (game.getTileByPosition(tileNameOrPos) != null) {
+            return game.getTileByPosition(tileNameOrPos);
         }
+
+        Tile tile = game.getTile(tileAlias);
         if (tile == null) {
-            MessageHelper.replyToMessage(event, "Tile in map not found: " + tileID);
+            if (event != null)
+                MessageHelper.replyToMessage(event, "Tile in map not found: " + tileNameOrPos);
             return null;
         }
         return tile;

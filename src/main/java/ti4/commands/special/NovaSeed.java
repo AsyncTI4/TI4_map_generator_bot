@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -24,7 +23,7 @@ class NovaSeed extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
+        String tileID = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
         Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");

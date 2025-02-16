@@ -5,6 +5,7 @@
         "phase": "Agenda",
         "window": "When an agenda is revealed",
         "text": "Choose 1 player. Exhaust each cultural planet owned by that player.",
+        "automationID": "abs",
         "source": "project_pi"
     },
     {
@@ -13,6 +14,7 @@
         "phase": "Agenda",
         "window": "After the speaker votes on an agenda",
         "text": "Spend any number of trade goods. For each trade good spent, cast 2 additional votes for the outcome on which you voted.",
+        "automationID": "bribery",
         "source": "project_pi"
     },
     {
@@ -29,6 +31,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 planet another player controls with 1 or more PDS units on it. Destroy each PDS on that planet.",
+        "automationID": "cripple",
         "source": "project_pi"
     },
     {
@@ -37,6 +40,7 @@
         "phase": "Action",
         "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
+        "automationID": "direct_hit",
         "source": "project_pi"
     },
     {
@@ -45,6 +49,7 @@
         "phase": "Action",
         "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
+        "automationID": "direct_hit",
         "source": "project_pi"
     },
     {
@@ -53,6 +58,7 @@
         "phase": "Action",
         "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
+        "automationID": "direct_hit",
         "source": "project_pi"
     },
     {
@@ -61,6 +67,7 @@
         "phase": "Action",
         "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
         "text": "Destroy that unit.",
+        "automationID": "direct_hit",
         "source": "project_pi"
     },
     {
@@ -76,6 +83,7 @@
         "name": "Lost Star Chart",
         "phase": "Action",
         "window": "After you activate a system",
+        "automationID": "experimental",
         "text": "During this tactical action, systems that contain non-delta wormholes are adjacent to each other.",
         "source": "project_pi"
     },
@@ -85,6 +93,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Destroy another player's dreadnought, cruiser, or destroyer in a system that contains a planet you control.",
+        "automationID": "lucky",
         "source": "project_pi"
     },
     {
@@ -93,6 +102,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Destroy another player's space dock in a non-home system.",
+        "automationID": "meltdown",
         "source": "project_pi"
     },
     {
@@ -117,6 +127,7 @@
         "phase": "Action",
         "window": "Action",
         "text": "Choose 1 hazardous planet another player controls. Exhaust that planet and destroy up to 3 infantry on it.",
+        "automationID": "unstable",
         "source": "project_pi"
     },
     {
@@ -125,6 +136,7 @@
         "phase": "Action",
         "window": "After you move ships into a system that does not contain another player's ships",
         "text": "Replace 1 of your cruisers in the active system with 1 dreadnought from your reinforcements.",
+        "automationID": "upgrade",
         "source": "project_pi"
     }
 ]

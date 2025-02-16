@@ -52,8 +52,13 @@ public class CombatTempModHelper {
         }
     }
 
-    public static List<NamedCombatModifierModel> BuildCurrentRoundTempNamedModifiers(Player player, TileModel tile,
-        UnitHolder holder, Boolean isApplyToOpponent, CombatRollType rollType) {
+    public static List<NamedCombatModifierModel> BuildCurrentRoundTempNamedModifiers(
+        Player player,
+        TileModel tile,
+        UnitHolder holder,
+        Boolean isApplyToOpponent,
+        CombatRollType rollType
+    ) {
         EnsureValidTempMods(player, tile, holder);
         List<TemporaryCombatModifierModel> tempMods = new ArrayList<>(player.getTempCombatModifiers());
         List<NamedCombatModifierModel> currentRoundResults = new ArrayList<>();
@@ -66,13 +71,12 @@ public class CombatTempModHelper {
         }
         currentRoundResults = currentRoundResults.stream()
             .filter(mod -> mod.getModifier().getApplyToOpponent().equals(isApplyToOpponent))
-            .filter(mod -> mod.getModifier().getForCombatAbility().equals(rollType.toString())).toList();
+            .filter(mod -> mod.getModifier().getForCombatAbility().equals(rollType)).toList();
 
         return currentRoundResults;
     }
 
-    public static TemporaryCombatModifierModel getPossibleTempModifier(String relatedType, String relatedID,
-        int currentTurnCount) {
+    public static TemporaryCombatModifierModel getPossibleTempModifier(String relatedType, String relatedID, int currentTurnCount) {
         TemporaryCombatModifierModel result = null;
         var combatModifiers = Mapper.getCombatModifiers();
         Optional<CombatModifierModel> relevantMod = combatModifiers.values().stream()

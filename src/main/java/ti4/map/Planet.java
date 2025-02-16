@@ -2,6 +2,7 @@ package ti4.map;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +23,7 @@ import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.TechSpecialtyModel;
 import ti4.model.UnitModel;
+import ti4.model.TechnologyModel.TechnologyType;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -272,12 +274,20 @@ public class Planet extends UnitHolder {
     }
 
     @JsonIgnore
+    public boolean hasTechSpecialty(TechnologyType type) {
+        return techSpeciality.contains(type.toString().toLowerCase())
+            || techSpeciality.contains(type.toString().toUpperCase());
+    }
+
+    @JsonIgnore
     public Set<String> getTechSpecialities() {
         Set<String> specialties = new HashSet<>();
         if (isNotBlank(originalTechSpeciality)) {
             specialties.add(originalTechSpeciality);
         }
         specialties.addAll(techSpeciality);
+        specialties.removeAll(Collections.singleton(null));
+        specialties.removeAll(Collections.singleton(""));
         return specialties;
     }
 
@@ -298,6 +308,18 @@ public class Planet extends UnitHolder {
                 return true;
         }
         return hasAbility;
+    }
+
+    @JsonIgnore
+    public boolean isHomePlanet() {
+        return getPlanetModel().getFactionHomeworld() != null;
+    }
+
+    @JsonIgnore
+    public boolean isHomePlanet(Game game) {
+        Tile t = game.getTileFromPlanet(getName());
+        if (t != null) return t.isHomeSystem(game);
+        return false;
     }
 
     public int getSpaceCannonDieCount() {
