@@ -1435,7 +1435,7 @@ public class TileGenerator {
     }
 
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
-        if (unitHolder.getTokenList().contains(Constants.WORLD_DESTROYED_PNG)) {
+        if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
             return false;
         }
 

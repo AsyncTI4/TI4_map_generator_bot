@@ -36,7 +36,7 @@ public class StellarConverterService {
             return;
         }
 
-        String message1 = (RandomHelper.isOneInX(20) ? "# _Hey, Stellar!_" : "There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
+        String message1 = (RandomHelper.isOneInX(20) ? "# _Hey, Stellar!_" : "# There is a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced.");
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, "Moments before disaster in game " + game.getName() + ".");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), message1);
 

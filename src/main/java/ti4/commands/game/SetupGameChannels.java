@@ -43,11 +43,12 @@ class SetupGameChannels extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.ROLE, Constants.ROLE6, "Community Mode role"));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL6, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Main player for Community/Fog mode"));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Private channel for player/role"));
+        //7th and 8th are missing ROLE and subcommand doesn't have space for them
+        //addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Main player for Community/Fog mode"));
+        //addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Main player for Community/Fog mode"));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Private channel for player/role"));
+        //addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Main player for Community/Fog mode"));
+        //addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Private channel for player/role"));
     }
 
     @Override
@@ -77,8 +78,8 @@ class SetupGameChannels extends GameStateSubcommand {
             setRoleAndChannel(event, game, Constants.PLAYER4, Constants.ROLE4, Constants.CHANNEL4);
             setRoleAndChannel(event, game, Constants.PLAYER5, Constants.ROLE5, Constants.CHANNEL5);
             setRoleAndChannel(event, game, Constants.PLAYER6, Constants.ROLE6, Constants.CHANNEL6);
-            setRoleAndChannel(event, game, Constants.PLAYER7, Constants.ROLE7, Constants.CHANNEL7);
-            setRoleAndChannel(event, game, Constants.PLAYER8, Constants.ROLE8, Constants.CHANNEL8);
+            //setRoleAndChannel(event, game, Constants.PLAYER7, Constants.ROLE7, Constants.CHANNEL7);
+            //setRoleAndChannel(event, game, Constants.PLAYER8, Constants.ROLE8, Constants.CHANNEL8);
         }
     }
 
