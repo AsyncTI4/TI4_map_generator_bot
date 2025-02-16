@@ -175,12 +175,5 @@
         "spaceOrPlanet": "space",
         "wormholes": ["ZETA"],
         "source": "other"
-    },
-    {
-        "id": "vortex",
-        "imagePath": "token_vortex.png",
-        "spaceOrPlanet": "space",
-        "wormholes": ["VORTEX"],
-        "source": "eronous"
     }
 ]
