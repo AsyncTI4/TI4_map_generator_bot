@@ -421,7 +421,6 @@ public class DrawingUtil {
                 for (int j = 0; j < faction.getHeight(); j++) {
                     long argb = Integer.toUnsignedLong(faction.getRGB(i, j));
                     long alpha = (argb & 0xFF000000l) >> 24;
-                    System.out.println(Long.toHexString(argb) + " -> " + Long.toHexString(alpha));
                     if (alpha > 127) {
                         underlay.setRGB(i, j, 0xFF000000);
                     }
