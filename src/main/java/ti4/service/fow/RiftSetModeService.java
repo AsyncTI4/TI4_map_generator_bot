@@ -2,6 +2,7 @@ package ti4.service.fow;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,13 +14,11 @@ import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.RandomHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.StellarConverterService;
@@ -42,12 +41,12 @@ import ti4.service.emoji.CardEmojis;
  *   - Recycles itself back to the deck instantly
  * - /special swap_systems to support RANDOM options
  * AFTER CUSTODIANS IS SCORED:
- * - When concluding tactical action, tile has a 1/10 chance of placing a gravity rift
- * - When concluding tactical action, tile has a 1/25 chance of placing Vortex (gravity rift wormhole)
- * - Exploring a planet has 1/100 chance of Stellar Converting it (with a custom token)
+ * - When concluding tactical action, tile has a 1/10 chance of having a gravity rift placed in it
+ * - Exploring a planet has 1/100 chance of Stellar Converting it
  * 
  * TODO
   * A way to see what _own_ units Cabal has captured
+  * After you activate a tile it has a 1/25 chance of placing Vortex token. These are adjacent to each other and you can go through them like wormholes
   * Change frontier token image to a special one after custodians is taken
   */
 public class RiftSetModeService {
@@ -56,9 +55,8 @@ public class RiftSetModeService {
     private static final String RIFTSET_INVASION_EXPLORE = "riftset_invasion";
 
     private static final int CHANCE_TO_SPAWN_RIFT = 10;
-    private static final int CHANCE_TO_SPAWN_VORTEX = 25;
+    //private static final int CHANCE_TO_SPAWN_VORTEX = 25;
     private static final int CHANCE_TO_STELLAR_CONVERT = 101; //- Math.pow(roundNmbr, 2);
-    private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 50; //Don't reduce chance lower than this
 
     public static boolean activate(GenericInteractionCreateEvent event, Game game) {
         if (game.getPlayer(Constants.eronousId) == null && AsyncTI4DiscordBot.guildFogOfWar != null) {
@@ -74,7 +72,8 @@ public class RiftSetModeService {
         if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_riftset"))) return false;
         if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_riftset"))) return false;
         game.discardSpecificAgenda(CRUCIBLE_AGENDA);
-        game.setStrategyCardSet("riftset");
+        game.setScSetID("riftset");
+        game.addSC(9);
         game.addTag("RiftSet");
         game.setFowOption(Constants.RIFTSET_MODE, "true");
         return true;
@@ -141,37 +140,24 @@ public class RiftSetModeService {
         if (!isActive(game) || !game.isCustodiansScored()) return;
 
         Tile tile = game.getTileByPosition(game.getActiveSystem());
-        if (tile.getTileModel().isGravityRift() || tile.hasCabalSpaceDockOrGravRiftToken()) {
-            return;
-        }
 
-        if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
+        if (new Random().nextInt(CHANCE_TO_SPAWN_RIFT) == 0
+            && !tile.getTileModel().isGravityRift()
+            && !tile.hasCabalSpaceDockOrGravRiftToken()) {
             AddTokenCommand.addToken(event, tile, "gravityrift", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition());
-        } else if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_VORTEX)) {
-            AddTokenCommand.addToken(event, tile, "vortex", game);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition());
         }
     }
 
     public static boolean willPlanetGetStellarConverted(String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
         if (!isActive(game) || !game.isCustodiansScored()) return false;
 
-        if (RandomHelper.isOneInX(CHANCE_TO_STELLAR_CONVERT - Math.max((int)Math.pow(game.getRound(), 2), CHANCE_TO_STELLAR_CONVERT_MIN))) {
+        if (new Random().nextInt(CHANCE_TO_STELLAR_CONVERT - (int)Math.pow(game.getRound(), 2)) == 0) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous...");
             StellarConverterService.secondHalfOfStellar(game, planetName, event);
-            Tile tile = game.getTileFromPlanet(planetName);
-            UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
-            unitHolder.removeAllTokens();
-            unitHolder.addToken("token_worlddestroyed_riftset.png");
             return true;
         }
 
         return false;
-    }
-
-    public static void swappedSystems(Game game) {
-        if (!isActive(game)) return;
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "# Time and space begin to unravel.");
     }
 }
