@@ -2080,7 +2080,7 @@ public class ButtonHelper {
 
         if ("warfare".equalsIgnoreCase(whatIsItFor)) {
             List<Button> redistributeButton = new ArrayList<>();
-            Button redistribute = Buttons.green(player.finChecker() + "_redistributeCCButtonsdeleteThisMessage", "Redistribute & Gain Command Tokens");
+            Button redistribute = Buttons.green(player.finChecker() + "redistributeCCButtons_deleteThisMessage", "Redistribute & Gain Command Tokens");
             redistributeButton.add(redistribute);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                 player.getRepresentation() + ", you may redistribute command tokens with these buttons after picking up a command token from the game board.",
