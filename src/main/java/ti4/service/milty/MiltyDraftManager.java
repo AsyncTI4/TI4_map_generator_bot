@@ -3,9 +3,7 @@ package ti4.service.milty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,34 +11,22 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.function.Consumers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Message.Attachment;
-import net.dv8tion.jda.api.entities.MessageHistory.MessageRetrieveAction;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.helpers.MapTemplateHelper;
 import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
@@ -49,14 +35,9 @@ import ti4.model.TileModel;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.TI4Emoji;
-import ti4.service.map.AddTileListService;
 
 @Data
 public class MiltyDraftManager {
-
-    private static final String SLICES = "**__Slices:__**";
-    private static final String FACTIONS = "**__Factions:__**";
-    private static final String POSITION = "**__Speaker Order:__**";
     private static final String SUMMARY_START = "# **__Draft Picks So Far__**:";
 
     private final List<MiltyDraftTile> all = new ArrayList<>();
@@ -323,7 +304,7 @@ public class MiltyDraftManager {
         String userId = player.getUserID();
         MessageChannel mainGameChannel = game.getMainGameChannel();
         if (draftIndex >= draftOrder.size()) {
-            finishDraft(game, event);
+            FinishDraftService.finishDraft(event, this, game);
             return;
         }
         if (getCurrentDraftPlayer() == null || !userId.equals(getCurrentDraftPlayer())) {
@@ -381,7 +362,7 @@ public class MiltyDraftManager {
         } catch (Exception e) {
             BotLogger.log("err", e);
         }
-        clearOldPing(event, game);
+
         setNextPlayerInDraft();
         if (draftIndex < draftOrder.size()) {
             game.updateActivePlayer(getCurrentDraftPlayer(game));
@@ -401,11 +382,12 @@ public class MiltyDraftManager {
             if (fauxPlayerPick != null) {
                 doMiltyPick(event, game, fauxPlayerPick, nextDrafter);
             } else {
-                editPreviousDraftInfo(event, game, category);
+                DraftDisplayService.updateDraftInformation(event, this, game, category);
+                DraftDisplayService.pingCurrentDraftPlayer(event, this, game, false);
             }
         } else {
             MessageHelper.sendMessageToChannel(mainGameChannel, game.getPing() + " the draft is finished! Ping jazz if there are any issues with the map.");
-            finishDraft(game, event);
+            FinishDraftService.finishDraft(event, this, game);
             game.updateActivePlayer(null);
         }
     }
@@ -413,64 +395,6 @@ public class MiltyDraftManager {
     private String getAutoButtonID(List<Button> buttons) {
         if (buttons.size() == 1) return buttons.getFirst().getId().replaceFirst("milty_", "miltyAuto_");
         return null;
-    }
-
-    private void finishDraft(Game game, GenericInteractionCreateEvent event) {
-        MessageChannel mainGameChannel = game.getMainGameChannel();
-        try {
-            MiltyDraftHelper.buildPartialMap(game, event);
-            boolean keleresExists = false;
-            for (String playerId : players) {
-                Player player = game.getPlayer(playerId);
-                PlayerDraft picks = getPlayerDraft(playerId);
-                String color = player.getNextAvailableColour();
-                if (playerId.equals(Constants.chassitId) && game.getUnusedColorsPreferringBase().contains(Mapper.getColor("lightgray"))) {
-                    color = "lightgray";
-                }
-                String faction = picks.getFaction();
-                String pos = MapTemplateHelper.getPlayerHomeSystemLocation(picks, mapTemplate);
-                boolean speaker = picks.getPosition() == 1;
-
-                if (faction.startsWith("keleres")) {
-                    keleresExists = true;
-                    Set<String> allowed = new HashSet<>(Set.of("mentak", "xxcha", "argent"));
-                    for (PlayerDraft pd : getDraft().values()) {
-                        allowed.remove(pd.faction);
-                    }
-                    List<Button> buttons = new ArrayList<>();
-                    String message = player.getPing() + " choose a flavor of keleres:";
-                    for (String flavor : allowed) {
-                        String emoji = Mapper.getFaction(flavor).getFactionEmoji();
-                        String keleres = "keleres" + flavor.charAt(0);
-                        String id = String.format("setupStep5_%s_%s_%s_%s_%s", player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
-                        String msg = "Keleres (" + flavor + ")";
-                        Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
-                        buttons.add(butt);
-                    }
-                    MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, buttons);
-                } else {
-                    MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
-                }
-            }
-            game.setPhaseOfGame("playerSetup");
-            AddTileListService.finishSetup(game, event);
-            if (keleresExists) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing()
-                    + " be sure to wait for Keleres to choose their flavour and starting tech before dealing out secret objectives.");
-            }
-            game.getMiltyDraftManager().setFinished(true);
-        } catch (Exception e) {
-            StringBuilder error = new StringBuilder("Something went wrong and the map could not be built automatically. Here are the slice strings if you wish to try doing it manually: ");
-            List<PlayerDraft> speakerOrdered = getDraft().values().stream()
-                .sorted(Comparator.comparing(PlayerDraft::getPosition))
-                .toList();
-            int index = 1;
-            for (PlayerDraft d : speakerOrdered) {
-                error.append("\n").append(index).append(". ").append(d.getSlice().ttsString());
-            }
-            MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
-            BotLogger.log(e.getMessage(), e);
-        }
     }
 
     private String draftSlice(String player, String sliceName) {
@@ -512,66 +436,7 @@ public class MiltyDraftManager {
         return null;
     }
 
-    private static MessageRetrieveAction getMessages(GenericInteractionCreateEvent event) {
-        if (event == null) return null;
-        long latest = event.getMessageChannel().getLatestMessageIdLong();
-        return event.getMessageChannel().getHistoryBefore(latest + 1, 100);
-    }
-
-    private static boolean messageIsSliceImg(Message m, Game game) {
-        if (!m.getAttachments().isEmpty()) {
-            for (Attachment atch : m.getAttachments()) {
-                if (atch.getFileName().startsWith(game.getName() + "_miltydraft")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private void clearOldPing(GenericInteractionCreateEvent event, Game game) {
-        MessageRetrieveAction action = getMessages(event);
-        if (action == null) return;
-
-        try {
-            action.queue(history -> {
-                boolean notfirst = false;
-                for (Message m : history.getRetrievedHistory()) {
-                    String txt = m.getContentRaw();
-                    if (txt.endsWith(" is up to draft!")) {
-                        if (notfirst)
-                            m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-                        else
-                            notfirst = true;
-                    }
-                }
-            }, BotLogger::catchRestError);
-        } catch (Exception e) {
-            BotLogger.log("Unable to clear out old buttons and messages.", e);
-        }
-    }
-
-    private static void clearOldButtons(GenericInteractionCreateEvent event, Game game) {
-        MessageRetrieveAction action = getMessages(event);
-        if (action == null) return;
-
-        try {
-            action.queue(history -> {
-                for (Message m : history.getRetrievedHistory()) {
-                    if (!m.getAuthor().getId().equals(AsyncTI4DiscordBot.getBotId())) continue;
-
-                    String txt = m.getContentRaw();
-                    if (txt.equals(SLICES) || txt.equals(FACTIONS) || txt.equals(POSITION) || txt.startsWith(SUMMARY_START) || messageIsSliceImg(m, game)) {
-                        m.delete().queue(Consumers.nop(), BotLogger::catchRestError);
-                    }
-                }
-            }, BotLogger::catchRestError);
-        } catch (Exception e) {
-            BotLogger.log("Unable to clear out old buttons and messages.", e);
-        }
-    }
-
-    private List<Button> getSliceButtons() {
+    public List<Button> getSliceButtons() {
         List<Button> sliceButtons = new ArrayList<>();
         for (MiltyDraftSlice slice : getSlices()) {
             if (isSliceTaken(slice.getName())) continue;
@@ -580,7 +445,7 @@ public class MiltyDraftManager {
         return sliceButtons;
     }
 
-    private List<Button> getFactionButtons() {
+    public List<Button> getFactionButtons() {
         List<Button> factionButtons = new ArrayList<>();
         for (String faction : getFactionDraft()) {
             FactionModel model = Mapper.getFaction(faction);
@@ -594,7 +459,7 @@ public class MiltyDraftManager {
         return factionButtons;
     }
 
-    private List<Button> getPositionButtons() {
+    public List<Button> getPositionButtons() {
         List<Button> orderButtons = new ArrayList<>();
         for (int speakerOrder = 1; speakerOrder <= players.size(); speakerOrder++) {
             if (isOrderTaken(speakerOrder)) continue;
@@ -603,7 +468,7 @@ public class MiltyDraftManager {
         return orderButtons;
     }
 
-    private String getOverallSummaryString(Game game) {
+    public String getOverallSummaryString(Game game) {
         int padding = String.format("%s", getPlayers().size()).length() + 1;
         String goodDogOfTheDay = TI4Emoji.getRandomGoodDog().toString();
         StringBuilder sb = new StringBuilder(SUMMARY_START);
@@ -627,98 +492,6 @@ public class MiltyDraftManager {
             pickNum++;
         }
         return sb.toString();
-    }
-
-    @JsonIgnore
-    public void repostDraftInformation(GenericInteractionCreateEvent event, Game game) {
-        clearOldButtons(event, game);
-        MiltyDraftHelper.generateAndPostSlices(game);
-        MessageChannel chan = game.getMainGameChannel();
-        String summary = getOverallSummaryString(game);
-
-        MessageHelper.sendMessageToChannel(chan, summary);
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(chan, SLICES, getSliceButtons());
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(chan, FACTIONS, getFactionButtons());
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(chan, POSITION, getPositionButtons());
-        ping(event, game);
-        GameManager.save(game, "Milty");
-    }
-
-    public void ping(GenericInteractionCreateEvent event, Game game) {
-        clearOldPing(event, game);
-        String ping = "Nobody is up to draft!";
-        if (getCurrentDraftPlayer() != null) {
-            Player p = getCurrentDraftPlayer(game);
-            ping = p.getPing() + " is up to draft!";
-        }
-        List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.gray("showMiltyDraft", "Show draft again"));
-        buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));
-        buttons.add(Buttons.blue("miltyFactionInfo_picked", "Picked faction info"));
-        buttons.add(Buttons.blue("miltyFactionInfo_all", "All faction info"));
-        MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), ping, buttons);
-    }
-
-    @JsonIgnore
-    public void editPreviousDraftInfo(GenericInteractionCreateEvent event, Game game, String category) {
-        MessageRetrieveAction action = getMessages(event);
-        if (action != null) {
-            String summary = getOverallSummaryString(game);
-            try {
-                action.queue(history -> {
-                    boolean summaryDone = false, categoryDone = false, sliceImgDone = false;
-                    for (Message m : history.getRetrievedHistory()) {
-                        if (!m.getAuthor().getId().equals(AsyncTI4DiscordBot.getBotId())) continue;
-                        String txt = m.getContentRaw();
-                        if (!summaryDone && txt.startsWith(SUMMARY_START)) {
-                            summaryDone = true;
-                            editMessage(game, m, summary, null);
-                        }
-
-                        if (!categoryDone && category.equals("slice") && txt.equals(SLICES)) {
-                            categoryDone = true;
-                            editMessage(game, m, null, getSliceButtons());
-                        }
-
-                        if (!categoryDone && category.equals("faction") && txt.equals(FACTIONS)) {
-                            categoryDone = true;
-                            editMessage(game, m, null, getFactionButtons());
-                        }
-
-                        if (!categoryDone && category.equals("order") && txt.equals(POSITION)) {
-                            categoryDone = true;
-                            editMessage(game, m, null, getPositionButtons());
-                        }
-
-                        if (!sliceImgDone && messageIsSliceImg(m, game)) {
-                            sliceImgDone = true;
-                            FileUpload newImg = MiltyDraftHelper.generateImage(game);
-                            m.editMessageAttachments(newImg).queue();
-                        }
-                    }
-                }, BotLogger::catchRestError);
-            } catch (Exception e) {
-                BotLogger.log("Unable to edit old buttons and messages.", e);
-            }
-        }
-
-        ping(event, game);
-    }
-
-    private void editMessage(Game game, Message msg, String newMessage, List<Button> newButtons) {
-        List<LayoutComponent> newComponents = new ArrayList<>();
-        if (newButtons != null) {
-            List<List<Button>> partitioned = new ArrayList<>(ListUtils.partition(newButtons, 5));
-            List<ActionRow> newRows = partitioned.stream().map(ActionRow::of).toList();
-            newComponents.addAll(newRows);
-        }
-
-        if (newMessage != null && newButtons != null)
-            msg.editMessage(newMessage).setComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
-        else if (newMessage != null)
-            msg.editMessage(newMessage).queue(Consumers.nop(), BotLogger::catchRestError);
-        else if (newButtons != null)
-            msg.editMessageComponents(newComponents).queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
     //SAVE AND LOAD
@@ -784,7 +557,8 @@ public class MiltyDraftManager {
 
         if (!ignoreMessageIDs) {
             // DEPRECATED
-            StringTokenizer messageIds = new StringTokenizer(bigTokenizer.nextToken(), ",");
+            //StringTokenizer messageIds = 
+            new StringTokenizer(bigTokenizer.nextToken(), ",");
         }
 
         // Map Template

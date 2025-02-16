@@ -107,6 +107,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public TI4Emoji getUnitEmoji() {
+        if (getUnitType() == null)
+            return TI4Emoji.getRandomGoodDog();
         return getUnitType().getUnitTypeEmoji();
     }
 
@@ -323,12 +325,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getProductionText() {
-        if ("res".equals(getBasicProduction()))
-        {
+        if ("res".equals(getBasicProduction())) {
             return "PRODUCTION: " + MiscEmojis.resources + "+" + getProductionValue() + "\n";
         }
-        if (getBasicProduction() != null)
-        {
+        if (getBasicProduction() != null) {
             return "PRODUCTION: *️⃣+" + getProductionValue() + "\n";
         }
         if (getProductionValue() > 0) {
@@ -376,7 +376,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String getSpaceCannonText() {
         if (getSpaceCannonDieCount() == 1) {
             return "SPACE CANNON " + getSpaceCannonHitsOn() + "\n";
-        } else  if (getSpaceCannonDieCount() >= 2) {
+        } else if (getSpaceCannonDieCount() >= 2) {
             return "SPACE CANNON " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
         }
         return "";

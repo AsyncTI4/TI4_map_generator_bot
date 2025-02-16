@@ -1587,6 +1587,7 @@ public class Player {
 
     public void initLeaders() {
         leaders.clear();
+        if (game != null && game.isBaseGameMode()) return;
         for (String leaderID : getFactionStartingLeaders()) {
             Leader leader = new Leader(leaderID);
             leaders.add(leader);
@@ -1938,14 +1939,9 @@ public class Player {
                 }
                 game.setStoredValue("endTurnWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
-                EndTurnService.pingNextPlayer(event, game, p2);
-                if (!game.isFowMode()) {
-                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getInRoundTurnCount() + ", Round "
-                        + game.getRound() + " for " + p2.getRepresentationNoPing() + ".");
-                }
+                EndTurnService.endTurnAndUpdateMap(event, game, p2);
             }
-            if (game.getStoredValue("fleetLogWhenSCFinished")
-                .equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
+            if (game.getStoredValue("fleetLogWhenSCFinished").equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (!p2.hasFollowedSC(sc)) {
                         return;
@@ -2089,6 +2085,11 @@ public class Player {
 
     public DraftBag getDraftQueue() {
         return draftItemQueue;
+    }
+
+    @JsonIgnore
+    public boolean hasIIHQ() {
+        return hasTech("iihq");
     }
 
     public boolean hasTech(String techID) {

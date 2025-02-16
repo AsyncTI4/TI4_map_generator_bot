@@ -16,6 +16,7 @@ public class MapCommand implements ParentCommand {
         new RemoveTile(),
         new AddBorderAnomaly(),
         new RemoveBorderAnomaly(),
+        new InteractiveBuilder(),
         new Preset(),
         new ShowMapSetup(),
         new ShowMapString(),
@@ -28,9 +29,7 @@ public class MapCommand implements ParentCommand {
         new AddAdjacencyOverride(),
         new AddAdjacencyOverrideList(),
         new RemoveAdjacencyOverride(),
-        new RemoveCustomAdjacentTile()
-    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
+        new RemoveCustomAdjacentTile()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

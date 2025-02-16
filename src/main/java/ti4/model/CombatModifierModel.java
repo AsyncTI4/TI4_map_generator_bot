@@ -24,7 +24,7 @@ public class CombatModifierModel implements ModelInterface {
     private String scope;
     private String scopeExcept;
     private String condition;
-    private String forCombatAbility;
+    private CombatRollType forCombatAbility;
     private Boolean applyEachForQuantity = false;
     private Boolean applyToOpponent = false;
 
@@ -32,7 +32,8 @@ public class CombatModifierModel implements ModelInterface {
         return type != null
             && value != null
             && persistenceType != null
-            && related != null;
+            && related != null
+            && forCombatAbility != null;
     }
 
     public boolean isRelevantTo(String relatedType, String relatedAlias) {

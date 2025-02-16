@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -38,8 +37,6 @@ class CombatRoll extends GameStateSubcommand {
 
         Player player = getPlayer();
 
-
-
         String unitHolderName = Constants.SPACE;
         if (planetOption != null) {
             unitHolderName = planetOption.getAsString();
@@ -47,8 +44,7 @@ class CombatRoll extends GameStateSubcommand {
 
         // Get tile info
         String tileOption = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
-        String tileID = AliasHandler.resolveTile(tileOption);
-        Tile tile = TileHelper.getTile(event, tileID, game);
+        Tile tile = TileHelper.getTile(event, tileOption, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Tile " + tileOption + " not found");

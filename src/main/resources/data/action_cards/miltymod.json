@@ -1,146 +1,158 @@
 [
-  {
-    "alias": "miltymod_abs",
-    "name": "Ancient Burial Sites",
-    "phase": "Agenda",
-    "window": "When an agenda is revealed",
-    "text": "Choose 1 player. Exhaust each cultural planet owned by that player.",
-    "flavorText": "The images depicted a race that Rin had never seen before. Curious. Could it be that this was a race that was exterminated by the Lazax?",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_bribery",
-    "name": "Bribery",
-    "phase": "Agenda",
-    "window": "After the speaker votes on an agenda",
-    "text": "Spend any number of trade goods. For each trade good spent, cast 2 additional votes for the outcome on which you voted.",
-    "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_const_rider",
-    "name": "Construction Rider",
-    "phase": "Agenda",
-    "window": "After an agenda is revealed",
-    "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 structure from your reinforcements on a planet you control.",
-    "flavorText": "The vote was nearly unanimous. The council would provide funding for the restoration. Ciel was furious.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_cripple",
-    "name": "Cripple Defenses",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Choose 1 planet another player controls with 1 or more PDS units on it. Destroy each PDS on that planet.",
-    "flavorText": "Titanic vines burst forth from the ground, wrapping themselves around the system's primary firing cylinder, breaking it free from its moorings, and bringing it crashing down upon the installation below.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_dh1",
-    "name": "Direct Hit",
-    "phase": "Action",
-    "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
-    "text": "Destroy that unit.",
-    "flavorText": "There it was! An opening! Neekuaq gestured wildly, a rare display for one normally quite reserved. \"Fire the main battery!\"",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_dh2",
-    "name": "Direct Hit",
-    "phase": "Action",
-    "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
-    "text": "Destroy that unit.",
-    "flavorText": "The Loncara Ssodu's main battery flared to life, firing a volley directly into the flickering starboard shield of the Letnev dreadnought.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_dh3",
-    "name": "Direct Hit",
-    "phase": "Action",
-    "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
-    "text": "Destroy that unit.",
-    "flavorText": "For a moment, it looked as if the dreadnought's shield would hold, but a moment later, the ship began to come apart where the attack had pierced its hull.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_dh4",
-    "name": "Direct Hit",
-    "phase": "Action",
-    "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
-    "text": "Destroy that unit.",
-    "flavorText": "Neekuaq watched, satisfied, as the ship was wracked by a series of explosions from within, huge armored plates and other debris hurtling off into the darkness.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_experimental",
-    "name": "Experimental Battlestation",
-    "phase": "Action",
-    "window": "When you roll Space Cannon Offense",
-    "text": "Choose 1 of your space docks that is either in or adjacent to the active system. That space dock gains SPACE CANNON 5(x3) and can use the ability against ships in adjacent systems during this roll.",
-    "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_lost_star",
-    "name": "Lost Star Chart",
-    "phase": "Action",
-    "window": "After you activate a system",
-    "text": "During this tactical action, systems that contain non-delta wormholes are adjacent to each other.",
-    "flavorText": "The ship's sensors showed that the ancient star-map had somehow led them beyond the Mahact plateau.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_lucky",
-    "name": "Lucky Shot",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Destroy another player's dreadnought, cruiser, or destroyer in a system that contains a planet you control.",
-    "flavorText": "The missile - an insignificant spark against the darkness - struck the hull of the dreadnought. Moments later, the starboard flank erupted in flames.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_meltdown",
-    "name": "Reactor Meltdown",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Destroy another player's space dock in a non-home system.",
-    "flavorText": "Flames engulfed the shipyard, a vortex of fire and shrapnel that left nothing untouched.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_salvage",
-    "name": "Salvage",
-    "phase": "Action",
-    "window": "After you win a space combat",
-    "text": "You may take up to 3 of your opponent's trade goods or commodities.",
-    "flavorText": "When the Coalition raiders had finally returned to their ships, scarcely a bolt remained to salvage from the destroyed vessel.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_tactical",
-    "name": "Tactical Bombardment",
-    "phase": "Action",
-    "window": "When you roll BOMBARDMENT",
-    "text": "Choose 1 of your ships with BOMBARDMENT in the active system. That ship may roll 2 additional dice.",
-    "flavorText": "A6's red eyes flickered with activity, and a string of numbers flashed briefly across the screen before he spoke. \"Bombardment complete. All enemy installations have been neutralized.\"",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_unstable",
-    "name": "Unstable Planet",
-    "phase": "Action",
-    "window": "Action",
-    "text": "Choose 1 hazardous planet another player controls. Exhaust that planet and destroy up to 3 infantry on it.",
-    "flavorText": "Another quake shook the planet, and a wave of dirt and rock rose up to swallow the Tekklar legion.",
-    "source": "miltymod"
-  },
-  {
-    "alias": "miltymod_upgrade",
-    "name": "Upgrade",
-    "phase": "Action",
-    "window": "After you move ships into a system that does not contain another player's ships",
-    "text": "Replace 1 of your cruisers in the active system with 1 dreadnought from your reinforcements.",
-    "flavorText": "More guns? Connor shook his head. \"Not more guns. Let's try something bigger.\"",
-    "source": "miltymod"
-  }
+    {
+        "alias": "miltymod_abs",
+        "name": "Ancient Burial Sites",
+        "phase": "Agenda",
+        "window": "When an agenda is revealed",
+        "text": "Choose 1 player. Exhaust each cultural planet owned by that player.",
+        "automationID": "abs",
+        "flavorText": "The images depicted a race that Rin had never seen before. Curious. Could it be that this was a race that was exterminated by the Lazax?",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_bribery",
+        "name": "Bribery",
+        "phase": "Agenda",
+        "window": "After the speaker votes on an agenda",
+        "text": "Spend any number of trade goods. For each trade good spent, cast 2 additional votes for the outcome on which you voted.",
+        "automationID": "bribery",
+        "flavorText": "We think that this initiative would spell disaster for the galaxy, not just the Creuss. Taivra said, quietly slipping Z'eu an envelope. \"Don't you agree?\"",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_const_rider",
+        "name": "Construction Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 structure from your reinforcements on a planet you control.",
+        "flavorText": "The vote was nearly unanimous. The council would provide funding for the restoration. Ciel was furious.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_cripple",
+        "name": "Cripple Defenses",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose 1 planet another player controls with 1 or more PDS units on it. Destroy each PDS on that planet.",
+        "automationID": "cripple",
+        "flavorText": "Titanic vines burst forth from the ground, wrapping themselves around the system's primary firing cylinder, breaking it free from its moorings, and bringing it crashing down upon the installation below.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_dh1",
+        "name": "Direct Hit",
+        "phase": "Action",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "automationID": "direct_hit",
+        "flavorText": "There it was! An opening! Neekuaq gestured wildly, a rare display for one normally quite reserved. \"Fire the main battery!\"",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_dh2",
+        "name": "Direct Hit",
+        "phase": "Action",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "automationID": "direct_hit",
+        "flavorText": "The Loncara Ssodu's main battery flared to life, firing a volley directly into the flickering starboard shield of the Letnev dreadnought.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_dh3",
+        "name": "Direct Hit",
+        "phase": "Action",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "automationID": "direct_hit",
+        "flavorText": "For a moment, it looked as if the dreadnought's shield would hold, but a moment later, the ship began to come apart where the attack had pierced its hull.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_dh4",
+        "name": "Direct Hit",
+        "phase": "Action",
+        "window": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities",
+        "text": "Destroy that unit.",
+        "automationID": "direct_hit",
+        "flavorText": "Neekuaq watched, satisfied, as the ship was wracked by a series of explosions from within, huge armored plates and other debris hurtling off into the darkness.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_experimental",
+        "name": "Experimental Battlestation",
+        "phase": "Action",
+        "window": "When you roll Space Cannon Offense",
+        "text": "Choose 1 of your space docks that is either in or adjacent to the active system. That space dock gains SPACE CANNON 5(x3) and can use the ability against ships in adjacent systems during this roll.",
+        "automationID": "experimental",
+        "flavorText": "Arm the relay! Mendosa bared his fangs. \"The Saar will not submit!\"",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_lost_star",
+        "name": "Lost Star Chart",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "During this tactical action, systems that contain non-delta wormholes are adjacent to each other.",
+        "flavorText": "The ship's sensors showed that the ancient star-map had somehow led them beyond the Mahact plateau.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_lucky",
+        "name": "Lucky Shot",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Destroy another player's dreadnought, cruiser, or destroyer in a system that contains a planet you control.",
+        "automationID": "lucky",
+        "flavorText": "The missile - an insignificant spark against the darkness - struck the hull of the dreadnought. Moments later, the starboard flank erupted in flames.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_meltdown",
+        "name": "Reactor Meltdown",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Destroy another player's space dock in a non-home system.",
+        "automationID": "meltdown",
+        "flavorText": "Flames engulfed the shipyard, a vortex of fire and shrapnel that left nothing untouched.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_salvage",
+        "name": "Salvage",
+        "phase": "Action",
+        "window": "After you win a space combat",
+        "text": "You may take up to 3 of your opponent's trade goods or commodities.",
+        "flavorText": "When the Coalition raiders had finally returned to their ships, scarcely a bolt remained to salvage from the destroyed vessel.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_tactical",
+        "name": "Tactical Bombardment",
+        "phase": "Action",
+        "window": "When you roll BOMBARDMENT",
+        "text": "Choose 1 of your ships with BOMBARDMENT in the active system. That ship may roll 2 additional dice.",
+        "flavorText": "A6's red eyes flickered with activity, and a string of numbers flashed briefly across the screen before he spoke. \"Bombardment complete. All enemy installations have been neutralized.\"",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_unstable",
+        "name": "Unstable Planet",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Choose 1 hazardous planet another player controls. Exhaust that planet and destroy up to 3 infantry on it.",
+        "automationID": "unstable",
+        "flavorText": "Another quake shook the planet, and a wave of dirt and rock rose up to swallow the Tekklar legion.",
+        "source": "miltymod"
+    },
+    {
+        "alias": "miltymod_upgrade",
+        "name": "Upgrade",
+        "phase": "Action",
+        "window": "After you move ships into a system that does not contain another player's ships",
+        "text": "Replace 1 of your cruisers in the active system with 1 dreadnought from your reinforcements.",
+        "automationID": "upgrade",
+        "flavorText": "More guns? Connor shook his head. \"Not more guns. Let's try something bigger.\"",
+        "source": "miltymod"
+    }
 ]

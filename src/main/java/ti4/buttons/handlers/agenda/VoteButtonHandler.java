@@ -10,20 +10,17 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
-import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
-import ti4.service.emoji.ApplicationEmojiCacheService.CachedEmoji;
-import ti4.service.emoji.ApplicationEmojiService;
+import ti4.service.tech.ListTechService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.PlanetEmojis;
@@ -137,8 +134,7 @@ public class VoteButtonHandler {
         String againstEmojiString = "👎";
         try {
             agendaInt = Integer.valueOf(agendaID);
-        } catch (NumberFormatException e) {
-        }
+        } catch (NumberFormatException e) {}
         if (agendaInt != null) {
             String agendaAlias = "";
             for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
@@ -149,16 +145,14 @@ public class VoteButtonHandler {
             }
             AgendaModel agendaDetails = Mapper.getAgenda(agendaAlias);
             forEmojiString = agendaDetails.getForEmoji();
-            for (TI4Emoji emoji: TI4Emoji.allEmojiEnums())
-            {
+            for (TI4Emoji emoji : TI4Emoji.allEmojiEnums()) {
                 if (forEmojiString.equals(emoji.name())) {
                     forEmojiString = emoji.toString();
                     break;
                 }
             }
             againstEmojiString = agendaDetails.getAgainstEmoji();
-            for (TI4Emoji emoji: TI4Emoji.allEmojiEnums())
-            {
+            for (TI4Emoji emoji : TI4Emoji.allEmojiEnums()) {
                 if (againstEmojiString.equals(emoji.name())) {
                     againstEmojiString = emoji.toString();
                     break;
@@ -172,10 +166,10 @@ public class VoteButtonHandler {
             buttonFor = Buttons.green(prefix + "rider_fa;for_" + rider, "For");
             buttonAgainst = Buttons.red(prefix + "rider_fa;against_" + rider, "Against");
         }
-        
+
         buttonFor = buttonFor.withEmoji(Emoji.fromFormatted(forEmojiString));
         buttonAgainst = buttonAgainst.withEmoji(Emoji.fromFormatted(againstEmojiString));
-        
+
         voteButtons.add(buttonFor);
         voteButtons.add(buttonAgainst);
         return voteButtons;
@@ -192,8 +186,7 @@ public class VoteButtonHandler {
                 } else {
                     button = Buttons.blue(prefix + "rider_so;" + so.getKey() + "_" + rider, soName);
                 }
-                if (!game.isFowMode())
-                {
+                if (!game.isFowMode()) {
                     String colorEmojiString = ColorEmojis.getColorEmoji(player.getColor()).toString();
                     button = button.withEmoji(Emoji.fromFormatted(colorEmojiString));
                 }
@@ -206,7 +199,7 @@ public class VoteButtonHandler {
     public static List<Button> getUnitUpgradeOutcomeButtons(Game game, String rider, String prefix) {
         List<Button> buttons = new ArrayList<>();
         for (Player player : game.getPlayers().values()) {
-            for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(game, player)) {
+            for (TechnologyModel tech : ListTechService.getAllNonFactionUnitUpgradeTech(game, player)) {
                 Button button;
                 if (rider == null) {
                     button = Buttons.blue(prefix + "_" + tech.getAlias(), tech.getName());
@@ -221,7 +214,7 @@ public class VoteButtonHandler {
 
     public static List<Button> getUnitOutcomeButtons(Game game, String rider, String prefix) {
         List<Button> buttons = new ArrayList<>();
-        for (TechnologyModel tech : Helper.getAllNonFactionUnitUpgradeTech(game)) {
+        for (TechnologyModel tech : ListTechService.getAllNonFactionUnitUpgradeTech(game)) {
             Button button;
             if (rider == null) {
                 button = Buttons.blue(prefix + "_" + tech.getAlias(), tech.getName());

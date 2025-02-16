@@ -285,7 +285,6 @@ public class FoWHelper {
     }
 
     public static Set<String> getAdjacentTilesAndNotThisTile(Game game, String position, Player player, boolean toShow) {
-
         return getAdjacentTiles(game, position, player, toShow, false);
     }
 
@@ -416,8 +415,7 @@ public class FoWHelper {
                         break;
                     }
                 }
-                if (tokenName.contains("sigma_weirdway"))
-                {
+                if (tokenName.contains("sigma_weirdway")) {
                     wormholeIDs.add(Constants.ALPHA);
                     wormholeIDs.add(Constants.BETA);
                 }
@@ -451,8 +449,7 @@ public class FoWHelper {
                         break;
                     }
                 }
-                if (tokenName.contains("sigma_weirdway"))
-                {
+                if (tokenName.contains("sigma_weirdway")) {
                     wormholeIDs.add(Constants.ALPHA);
                     wormholeIDs.add(Constants.BETA);
                 }
@@ -482,8 +479,7 @@ public class FoWHelper {
                         break;
                     }
                 }
-                if (tokenName.contains("sigma_weirdway"))
-                {
+                if (tokenName.contains("sigma_weirdway")) {
                     wormholeIDs.add(Constants.ALPHA);
                     wormholeIDs.add(Constants.BETA);
                 }
@@ -510,8 +506,7 @@ public class FoWHelper {
                         break;
                     }
                 }
-                if (tokenName.contains("sigma_weirdway"))
-                {
+                if (tokenName.contains("sigma_weirdway")) {
                     wormholeIDs.add(Constants.ALPHA);
                     wormholeIDs.add(Constants.BETA);
                 }
@@ -559,8 +554,7 @@ public class FoWHelper {
                         break;
                     }
                 }
-                if (tokenName.contains("sigma_weirdway"))
-                {
+                if (tokenName.contains("sigma_weirdway")) {
                     wormholeIDs.add(Constants.ALPHA);
                     wormholeIDs.add(Constants.BETA);
                 }
@@ -603,8 +597,7 @@ public class FoWHelper {
                             adjacentPositions.add(position_);
                         }
                     }
-                    if (token.contains("sigma_weirdway") && (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA)))
-                    {
+                    if (token.contains("sigma_weirdway") && (wormholeIDs.contains(Constants.ALPHA) || wormholeIDs.contains(Constants.BETA))) {
                         adjacentPositions.add(position_);
                     }
                 }
@@ -663,7 +656,7 @@ public class FoWHelper {
         }
         if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
             return true;
-        } else if (tile.isMecatol() && player.hasTech("iihq")) {
+        } else if (tile.isMecatol() && player.hasIIHQ()) {
             return true;
         } else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(game, "cabal", player)) {
             return true;

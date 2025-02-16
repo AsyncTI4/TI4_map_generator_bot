@@ -18,8 +18,9 @@ public class UnlockLeaderService {
     public static void unlockLeader(String leaderID, Game game, Player player) {
         Leader playerLeader = player.unsafeGetLeader(leaderID);
         MessageChannel channel = game.getMainGameChannel();
-        if (game.isFowMode())
+        if (game.isFowMode()) {
             channel = player.getPrivateChannel();
+        }
 
         if (playerLeader == null) {
             MessageHelper.sendMessageToChannel(channel, "Leader not found");
@@ -38,17 +39,18 @@ public class UnlockLeaderService {
             String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
             MessageHelper.sendMessageToChannel(channel, message);
         }
+
         if (leaderID.contains("bentorcommander")) {
             player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
             MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + ", your commodity value has been set to " + player.getCommoditiesTotal() + ".");
         }
+
         if (leaderID.contains("naalucommander")) {
-            //PNInfo.sendPromissoryNoteInfo(game, player, false);
             CardsInfoService.sendVariousAdditionalButtons(game, player);
             MessageHelper.sendMessageToChannel(channel, player.getRepresentationUnfogged() + ", you may use M'aban, the Naalu Commander, via button in your `#cards-info` thread.");
-
         }
-        if (leaderID.contains("xxchahero")) {
+
+        if (leaderID.equals("xxchahero")) {
             if (game.getPhaseOfGame().contains("status")) {
                 MessageHelper.sendMessageToChannel(channel,
                     "Reminder, " + player.getRepresentationUnfogged() + ", that officially Xxekir Grom remains locked until after both objectives have been scored;"
@@ -58,7 +60,6 @@ public class UnlockLeaderService {
                     "Reminder, " + player.getRepresentationUnfogged() + ", that officially Xxekir Grom remains locked until after the objective has been scored;"
                         + " you cannot use the ability to pay for any requirements of the unlocking objective (if it's a spendie).");
             }
-
         }
 
         if (playerLeader.isExhausted()) {

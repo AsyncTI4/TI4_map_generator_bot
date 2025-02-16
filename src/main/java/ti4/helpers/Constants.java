@@ -98,6 +98,7 @@ public class Constants {
     public static final String PROMISES_PROMISES = "promises_promises";
     public static final String FLAGSHIPPING = "flagshipping";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
+    public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";

@@ -123,14 +123,6 @@ public class ButtonProcessor {
             UnfiledButtonHandlers.strategicAction(event, player, buttonID, game, mainGameChannel);
         } else if (buttonID.startsWith("getSwapButtons_")) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Swap", ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, game, true));
-        } else if (buttonID.startsWith("milty_")) {
-            game.getMiltyDraftManager().doMiltyPick(event, game, buttonID, player);
-        } else if (buttonID.startsWith("showMiltyDraft")) {
-            game.getMiltyDraftManager().repostDraftInformation(event, game);
-        } else if (player != null && buttonID.startsWith("miltyFactionInfo_")) {
-            UnfiledButtonHandlers.miltyFactionInfo(player, buttonID, game);
-        } else if (buttonID.startsWith("jmfA_") || buttonID.startsWith("jmfN_")) {
-            game.initializeMiltySettings().parseButtonInput(event);
             // Don't add anymore if/else startWith statements - use @ButtonHandler
         } else {
             switch (buttonID) { // TODO Convert all switch case to use @ButtonHandler
