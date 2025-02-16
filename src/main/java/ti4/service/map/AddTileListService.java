@@ -130,7 +130,7 @@ public class AddTileListService {
         Modal modal = Modal.create(modalId, "Add Map String for " + game.getName()).addActionRow(tags).build();
         return modal;
     }
-
+    
     @ModalHandler("addMapString")
     public static void addMapStringFromModal(ModalInteractionEvent event, Game game) {
         ModalMapping mapping = event.getValue("mapString");

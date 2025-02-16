@@ -20,7 +20,7 @@ import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class OtherHeroButtonHandler {
-
+    
     @ButtonHandler("purgeHacanHero")
     public static void purgeHacanHero(ButtonInteractionEvent event, Player player) { // TODO: add service
         Leader playerLeader = player.unsafeGetLeader("hacanhero");
@@ -91,11 +91,13 @@ public class OtherHeroButtonHandler {
         }
         if (!game.isNaaluAgent()) {
             player.setTacticalCC(player.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()));
+            CommandCounterHelper.addCC(event, player.getColor(),
+                game.getTileByPosition(game.getActiveSystem()));
             game.setStoredValue("vaylerianHeroActive", "true");
         }
         for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(game)) {
-            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
+            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event,
+                "vaylerianhero");
             if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     "Use buttons to remove a command token from the game board.", buttons);
@@ -189,4 +191,6 @@ public class OtherHeroButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + " select which unit you'd like to replace", buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
+
+
 }

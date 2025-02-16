@@ -33,7 +33,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
@@ -299,7 +298,8 @@ public class MapGenerator implements AutoCloseable {
                 Tile setupTile = null;
                 if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
                     setupTile = new Tile("0gray", position);
-                } else if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
+                }
+                else if (tileRingNumber > -1 && tileRingNumber <= ringCount + 1 && !tileMap.containsKey(position)) {
                     setupTile = new Tile("0border", position);
                 }
                 if (setupTile != null) {
@@ -1279,7 +1279,7 @@ public class MapGenerator implements AutoCloseable {
             if (relicID.equals("emelpar") || relicModel.getHomebrewReplacesID().orElse("").equals("emelpar")) {
                 String empelar = RelicHelper.sillySpelling();
                 int spaceIndex = empelar.lastIndexOf(' ');
-                empelar = empelar.substring(0, spaceIndex) + "\n" + empelar.substring(spaceIndex);
+                empelar = empelar.substring(0,spaceIndex) + "\n" + empelar.substring(spaceIndex);
                 graphics.setFont(Storage.getFont18());
                 drawOneOrTwoLinesOfTextVertically(g2, empelar, x + deltaX + 7, y + 30, 120, true);
             } else if (relicModel.getShrinkName()) {
@@ -1524,6 +1524,13 @@ public class MapGenerator implements AutoCloseable {
         return x + deltaX + 10;
     }
 
+    @SuppressWarnings("unused") // TODO (Jazz): figure out why I added this function
+    private static void drawControlToken(Graphics graphics, Player p, int x, int y, boolean hideFactionIcon, float scale) {
+        String colorID = p == null ? "gray" : p.getColor();
+        BufferedImage controlToken = ImageHelper.readScaled(Mapper.getCCPath(Mapper.getControlID(colorID)), scale);
+        DrawingUtil.drawControlToken(graphics, controlToken, p, x, y, hideFactionIcon, scale);
+    }
+
     private int abilityInfo(Player player, int x, int y) {
         int deltaX = 10;
 
@@ -1558,27 +1565,23 @@ public class MapGenerator implements AutoCloseable {
             }
 
             AbilityModel abilityModel = Mapper.getAbility(abilityID);
-            if (abilityModel == null) {
-                System.out.println("Ability null: " + abilityID);
+            if (abilityFileName != null) {
+                String status = isExhaustedLocked ? "_exh" : "_rdy";
+                abilityFileName += status + ".png";
+                String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
+
+                BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
+                graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
             } else {
-                if (abilityFileName != null) {
-                    String status = isExhaustedLocked ? "_exh" : "_rdy";
-                    abilityFileName += status + ".png";
-                    String resourcePath = ResourceHelper.getInstance().getPAResource(abilityFileName);
-
-                    BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
-                    graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
-                    drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
-                } else {
-                    drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
-                    g2.setFont(Storage.getFont18());
-                    drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 7, y + 144, 130);
-                    drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
-                }
-
-                deltaX += 48;
-                addedAbilities = true;
+                drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
+                g2.setFont(Storage.getFont18());
+                drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 7, y + 144, 130);
+                drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
             }
+
+            deltaX += 48;
+            addedAbilities = true;
         }
         return x + deltaX + (addedAbilities ? 20 : 0);
     }
@@ -1699,7 +1702,6 @@ public class MapGenerator implements AutoCloseable {
                     }
                     if (onlyPaintOneUnit) break;
                 }
-
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (numInReinforcements < 0 && game.isCcNPlasticLimit()) {
                     String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
@@ -2176,7 +2178,7 @@ public class MapGenerator implements AutoCloseable {
                 planetDisplayIcon = "none";
             }
             if (originalPlanetTypes != null && originalPlanetTypes.contains(PlanetType.FACTION)) {
-                planetDisplayIcon = Mapper.getPlanet(planetName).getFactionHomeworld();
+                planetDisplayIcon = TileHelper.getPlanetById(planetName).getFactionHomeworld();
                 if (planetDisplayIcon == null) // fallback to current player's faction
                     planetDisplayIcon = player.getFaction();
             }
@@ -2727,7 +2729,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         }
-
+        
         UnitModel flagship = player.getUnitByBaseType("flagship");
         if (flagship != null && flagship.getId().startsWith("sigma_")) {
             Coord unitOffset = getUnitTechOffsets(flagship.getAsyncId(), false);
@@ -2801,8 +2803,10 @@ public class MapGenerator implements AutoCloseable {
             if (isPurged) {
                 DrawingUtil.superDrawString(graphics, "X", deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, Color.RED, null, null, stroke2, Color.BLACK);
             }
+
             // Unit Overlays
             addWebsiteOverlay(unit, deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32);
+            // graphics.drawRect(deltaX + x + unitFactionOffset.x, y + unitFactionOffset.y, 32, 32); //debug
         }
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 252, 152);
@@ -3327,9 +3331,6 @@ public class MapGenerator implements AutoCloseable {
         }
 
         ColorModel playerColor = Mapper.getColor(player.getColor());
-        float bgAlpha = 0.10f;
-        Color bgColor = player.isActivePlayer() ? Color.green : (player.isPassed() ? Color.red : Color.BLACK);
-        BufferedImage tint = DrawingUtil.tintedBackground(bgColor, bgAlpha);
         for (String pos : statTiles) {
             Point p = points.get(pos);
             List<Integer> adjDir = new ArrayList<>();
@@ -3338,7 +3339,6 @@ public class MapGenerator implements AutoCloseable {
                 if (statTiles.contains(adjPos.get(i)))
                     adjDir.add(i);
             BufferedImage hex = DrawingUtil.hexBorder(game.getHexBorderStyle(), playerColor, adjDir);
-            graphics.drawImage(tint, p.x, p.y, null);
             graphics.drawImage(hex, p.x, p.y, null);
         }
 
@@ -3350,7 +3350,6 @@ public class MapGenerator implements AutoCloseable {
             point = PositionMapper.getPlayerStats("factionicon");
             int size = 275;
             point.translate(statTileMid.x - (size / 2), statTileMid.y - (size / 2));
-            DrawingUtil.drawPlayerFactionIconImageUnderlay(graphics, player, point.x, point.y, size, size);
             DrawingUtil.drawPlayerFactionIconImageOpaque(graphics, player, point.x, point.y, size, size, 0.40f);
         }
 
@@ -4177,7 +4176,7 @@ public class MapGenerator implements AutoCloseable {
                 && game.getPlayerFromColorOrFaction(optionalText) == null) {
                 agendaTitle += "   [" + optionalText + "]";
             }
-            graphics.drawString(agendaTitle, x + 95, y + 33);
+            graphics.drawString(agendaTitle, x + 95, y + 30);
             graphics.setFont(Storage.getFont26());
             graphics.setColor(Color.WHITE);
             String agendaText = Mapper.getAgendaText(lawID);
@@ -4388,8 +4387,7 @@ public class MapGenerator implements AutoCloseable {
         Map<String, Player> players,
         Map<String, String> publicObjectivesState,
         Set<String> po,
-        Map<String, Integer> customPublicVP
-    ) {
+        Map<String, Integer> customPublicVP) {
 
         Set<String> keysToRemove = new HashSet<>();
         for (Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
@@ -4427,8 +4425,7 @@ public class MapGenerator implements AutoCloseable {
         Map<String, Player> players,
         List<String> scoredPlayerID,
         boolean multiScoring,
-        boolean fixedColumn
-    ) {
+        boolean fixedColumn) {
         try {
             int tempX = 0;
             for (Map.Entry<String, Player> playerEntry : players.entrySet()) {

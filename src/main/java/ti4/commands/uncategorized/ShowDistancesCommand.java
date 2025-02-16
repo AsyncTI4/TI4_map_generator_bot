@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateCommand;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.CheckDistanceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -49,7 +50,7 @@ public class ShowDistancesCommand extends GameStateCommand {
         }
         Game game = getGame();
         Player player = getPlayer();
-        String tileID = tileOption.getAsString().toLowerCase();
+        String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
@@ -60,6 +61,6 @@ public class ShowDistancesCommand extends GameStateCommand {
         game.setTileDistances(CheckDistanceHelper.getTileDistances(game, player, tile.getPosition(), maxDistance, true));
 
         MapRenderPipeline.queue(game, event, DisplayType.map,
-            fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
+                fileUpload -> MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload));
     }
 }

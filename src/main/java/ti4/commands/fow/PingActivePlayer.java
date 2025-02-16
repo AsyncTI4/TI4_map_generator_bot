@@ -22,14 +22,14 @@ class PingActivePlayer extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
-        Player activePlayer = game.getPlayer(playerID);
-        if (activePlayer == null) {
+        Player player = game.getPlayer(playerID);
+        if (player == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
 
         Player playerThatRanCommand = getPlayer();
-        boolean samePlayer = playerThatRanCommand.getUserID().equalsIgnoreCase(activePlayer.getUserID());
+        boolean samePlayer = playerThatRanCommand.getUserID().equalsIgnoreCase(player.getUserID());
 
         long latestPingMilliseconds = 0;
         AutoPingMetadataManager.AutoPing autoPing = AutoPingMetadataManager.getLatestAutoPing(game.getName());
@@ -43,10 +43,10 @@ class PingActivePlayer extends GameStateSubcommand {
         if (!game.getPlayersWithGMRole().contains(playerThatRanCommand) && milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
-            String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
+            String ping = player.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
-                MessageHelper.sendPrivateMessageToPlayer(activePlayer, game, ping);
+                MessageHelper.sendPrivateMessageToPlayer(player, game, ping);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }

@@ -3,6 +3,7 @@ package ti4.buttons.handlers;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.function.Consumers;
+import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -22,7 +23,9 @@ class TurnEndButtonHandler {
             return;
         }
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
-        EndTurnService.endTurnAndUpdateMap(event, game, player);
+        EndTurnService.pingNextPlayer(event, game, player);
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+
+        ButtonHelper.updateMap(game, event, "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
     }
 }

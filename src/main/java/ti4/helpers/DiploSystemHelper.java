@@ -3,7 +3,6 @@ package ti4.helpers;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.image.Mapper;
-import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -13,9 +12,14 @@ import ti4.message.MessageHelper;
 public class DiploSystemHelper {
 
     public static boolean diploSystem(GenericInteractionCreateEvent event, Game game, Player player, String tileToResolve) {
-        Tile tile = TileHelper.getTile(event, tileToResolve, game);
+        String tileID = AliasHandler.resolveTile(tileToResolve);
+
+        Tile tile = game.getTile(tileID);
         if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileToResolve + "`. Tile not found");
+            tile = game.getTileByPosition(tileID);
+        }
+        if (tile == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return false;
         }
 

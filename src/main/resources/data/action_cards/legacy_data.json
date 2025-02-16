@@ -77,7 +77,6 @@
         "phase": "Action",
         "window": "After you gain control of a planet",
         "text": "Ready that planet and gain 2 commodities.",
-        "automationID": "brutal_occupation",
         "flavorText": "Cabal cultists were known to quell threats of rebellion with stories of their penal colonies on the other side of the rift.",
         "source": "action_deck_2_old"
     },
@@ -213,7 +212,6 @@
         "phase": "Action",
         "window": "Before you roll dice for ANTI-FIGHTER BARRAGE",
         "text": "Each of your non-fighter ships in the active system that do not have ANTI-FIGHTER BARRAGE gain ANTI-FIGHTER BARRAGE 9(x2) until the end of the combat.",
-        "automationID": "shrapnel_turrets",
         "flavorText": "Mendosa grinned widely. \"Ye say we're out of munitions, yet look at all this junk lyin' around. Get it movin' fast enough, and it'll shred them up just fine.\"",
         "source": "action_deck_2_old"
     },
@@ -322,7 +320,6 @@
         "phase": "Strategy",
         "window": "At the start of the strategy phase",
         "text": "Choose 1 strategy card. Other players must spend 1 strategy token and 3 resources to choose that strategy card during this strategy phase, if they have another choice.",
-        "automationID": "deflection",
         "flavorText": "The Tribe elder's eyes flickered in the light of the campfire. \"The greatest form of persuasion lies in coercing another to believe the course of action you wish for them to take was their idea all along.\"",
         "source": "action_deck_2_old"
     },
@@ -620,7 +617,6 @@
         "phase": "Agenda",
         "window": "Before the \"Ready Planets\" step of the agenda phase",
         "text": "Exhaust each of your readied planets to explore up to 2 of those planets.",
-        "automationID": "data_archive",
         "flavorText": "Xuange was practically beaming with pleasure, though none would ever know it. Their research had paid off—the vault was exactly where they had expected it to be.",
         "source": "action_deck_2_old"
     },
@@ -765,7 +761,6 @@
         "phase": "Action",
         "window": "Action",
         "text": "Spend 1 token from your strategy pool to research a technology that has no prerequisites.",
-        "automationID": "side_project",
         "flavorText": "As the council meeting drew to a close, Suffi stood up. \"Before we adjourn, I'd like to announce that our neural enhancement project has entered the final phase of clinical trials.\"",
         "source": "action_deck_2_old"
     },
@@ -775,7 +770,6 @@
         "phase": "Action",
         "window": "Action",
         "text": "Exhaust 1 planet you control to place 1 PDS from your reinforcements on that planet.",
-        "automationID": "defense_installation",
         "flavorText": "Tellurian had heard rumors of their kind roaming to the far corners of the galaxy. However, many such tales had led them to nothing more than decrepit defense systems. Alas, no stone could be left unturned.",
         "source": "action_deck_2_old"
     },

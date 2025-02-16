@@ -32,7 +32,7 @@ class ZelianHero extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String tileID = event.getOption(Constants.TILE_NAME).getAsString().toLowerCase();
+        String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
         Tile tile = TileHelper.getTile(event, tileID, getGame());
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
@@ -64,7 +64,7 @@ class ZelianHero extends GameStateSubcommand {
             resourcesSum += p.getResources();
         }
         String tgGainMsg = player.getFactionEmoji() + " gained " + resourcesSum + " trade goods" + (resourcesSum == 1 ? "" : "s") + " from _Celestial Impact_ (" +
-            player.getTg() + "->" + (player.getTg() + resourcesSum) + ").";
+                player.getTg() + "->" + (player.getTg() + resourcesSum) + ").";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), tgGainMsg);
         player.gainTG(resourcesSum);
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -78,8 +78,8 @@ class ZelianHero extends GameStateSubcommand {
 
         //After shot to disaster channel
         String message2 = tile.getRepresentation() +
-            " has been celestially impacted by " +
-            player.getRepresentation();
+                " has been celestially impacted by " +
+                player.getRepresentation();
         DisasterWatchHelper.postTileInDisasterWatch(game, event, asteroidTile, 1, message2);
 
         if (player.hasLeaderUnlocked("zelianhero")) {

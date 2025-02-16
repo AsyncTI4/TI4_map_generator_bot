@@ -31,7 +31,6 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -142,10 +141,8 @@ public class MessageHelper {
 		sendMessageToChannelWithEmbedsAndFactionReact(channel, messageText, game, player, null, buttons, saboable);
 	}
 
-	public static void sendMessageToChannelWithEmbedsAndFactionReact(
-		MessageChannel channel, String messageText, Game game, Player player,
-		List<MessageEmbed> embeds, List<Button> buttons, boolean saboable
-	) {
+	public static void sendMessageToChannelWithEmbedsAndFactionReact(MessageChannel channel, String messageText, Game game, Player player,
+																	List<MessageEmbed> embeds, List<Button> buttons, boolean saboable) {
 		MessageFunction addFactionReact = (message) -> {
 			if (saboable) {
 				GameMessageManager.add(game.getName(), message.getId(), GameMessageType.ACTION_CARD, game.getLastModifiedDate());
@@ -161,7 +158,7 @@ public class MessageHelper {
 				addFactionReactToMessage(game, p2, message);
 			}
 			ReactionService.progressGameIfAllPlayersHaveReacted(message.getId(), game);
-		};
+        };
 		splitAndSentWithAction(messageText, channel, addFactionReact, embeds, buttons);
 	}
 
@@ -231,29 +228,12 @@ public class MessageHelper {
 			error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error)));
 	}
 
-	public static void sendEphemeralFileInResponseToButtonPress(FileUpload fileUpload, GenericInteractionCreateEvent event) {
+	public static void sendEphemeralFileInResponseToButtonPress(FileUpload fileUpload, ButtonInteractionEvent event) {
 		if (fileUpload == null) {
 			BotLogger.log("FileUpload null");
 			return;
 		}
-		if (event instanceof ButtonInteractionEvent button)
-			button.getHook().sendMessage("Here is your requested image").addFiles(fileUpload).setEphemeral(true).queue();
-		else if (event instanceof SlashCommandInteractionEvent slash)
-			slash.getHook().sendMessage("Here is your requested image").addFiles(fileUpload).setEphemeral(true).queue();
-	}
-
-	public static void sendFileToChannelAndAddLinkToButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
-		if (fileUpload == null) {
-			BotLogger.log("FileUpload null");
-			return;
-		}
-		final List<Button> realButtons = new ArrayList<>();
-		channel.sendFiles(fileUpload).queue(msg -> {
-			String link = msg.getAttachments().getFirst().getUrl();
-			realButtons.add(Button.link(link, "Open in browser"));
-			realButtons.addAll(buttons);
-			splitAndSent(message, channel, null, realButtons);
-		}, BotLogger::catchRestError);
+		event.getHook().sendMessage("Here is your requested image").addFiles(fileUpload).setEphemeral(true).queue();
 	}
 
 	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
@@ -490,10 +470,8 @@ public class MessageHelper {
 		return privatelyPingPlayerList(players, game, null, message, null, null);
 	}
 
-	public static boolean privatelyPingPlayerList(
-		List<Player> players, Game game, MessageChannel feedbackChannel,
-		String message, String failText, String successText
-	) {
+	public static boolean privatelyPingPlayerList(List<Player> players, Game game, MessageChannel feedbackChannel,
+		String message, String failText, String successText) {
 		int count = 0;
 		for (Player player : players) {
 			String playerRepresentation = player.getRepresentationUnfogged();
@@ -555,10 +533,11 @@ public class MessageHelper {
 				index += nextChars.length();
 			}
 			texts.add(textToAdd);
-			if (index + maxLength > messageLength) {
-				texts.add(messageText.substring(index));
-				break;
-			}
+            if (index + maxLength > messageLength)
+            {
+                texts.add(messageText.substring(index));
+                break;
+            }
 		}
 		return texts;
 	}
@@ -746,7 +725,8 @@ public class MessageHelper {
 		webhook.setContent(message);
 		try {
 			webhook.execute();
-		} catch (Exception ignored) {}
+		} catch (Exception ignored) {
+		}
 	}
 
 	/**
@@ -783,14 +763,14 @@ public class MessageHelper {
 			goodButtonIDs.add(button.getId());
 
 			// REMOVE EMOJIS IF BOT CAN'T SEE IT
-			if (button.getEmoji() instanceof CustomEmoji emoji && !ApplicationEmojiService.isValidAppEmoji(emoji) && AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
-				String label = button.getLabel();
-				if (label.isBlank()) {
-					label = String.format(":%s:", emoji.getName());
-				}
-				badButtonIDsAndReason.add("Button:  " + ButtonHelper.getButtonRepresentation(button) + "\n Error:  Emoji Not Found in Cache: " + emoji.getName() + " " + emoji.getId());
-				button = Button.of(button.getStyle(), button.getId(), label);
-			}
+            if (button.getEmoji() instanceof CustomEmoji emoji && !ApplicationEmojiService.isValidAppEmoji(emoji) && AsyncTI4DiscordBot.jda.getEmojiById(emoji.getId()) == null) {
+                String label = button.getLabel();
+                if (label.isBlank()) {
+                    label = String.format(":%s:", emoji.getName());
+                }
+                badButtonIDsAndReason.add("Button:  " + ButtonHelper.getButtonRepresentation(button) + "\n Error:  Emoji Not Found in Cache: " + emoji.getName() + " " + emoji.getId());
+                button = Button.of(button.getStyle(), button.getId(), label);
+            }
 			if (button.getEmoji() instanceof UnicodeEmoji emoji && StringUtils.countMatches(emoji.getAsCodepoints(), "+") > 4) { //TODO: something better than (plus_sign_count > 4)
 				String label = button.getLabel();
 				if (label.isBlank()) {
@@ -824,8 +804,8 @@ public class MessageHelper {
 			StringBuilder edited = new StringBuilder(message);
 			StringBuilder copy = new StringBuilder(message.toLowerCase());
 			for (String keyWord : AliasHandler.getInjectedRules()) {
-				if (keyWord.equals("bombardment") && message.contains("Tactical Bombardment")) continue;
-				if (keyWord.equals("production") && message.contains("Monopolize Production")) continue;
+                if (keyWord.equals("bombardment") && message.contains("Tactical Bombardment")) continue;
+                if (keyWord.equals("production") && message.contains("Monopolize Production")) continue;
 				if (copy.indexOf(keyWord) > -1) {
 					String replace = "](https://www.tirules.com/" + AliasHandler.getInjectedRule(keyWord) + ")";
 					int firstIndex = copy.indexOf(keyWord);

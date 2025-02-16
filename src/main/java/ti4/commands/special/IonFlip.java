@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -28,7 +29,7 @@ class IonFlip extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
             return;
         }
-        String tileID = tileOption.getAsString().toLowerCase();
+        String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = TileHelper.getTile(event, tileID, game);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");

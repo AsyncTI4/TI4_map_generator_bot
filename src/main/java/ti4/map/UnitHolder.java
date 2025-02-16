@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,7 +22,6 @@ import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
-import ti4.model.UnitModel;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "javaClassType")
 @JsonSubTypes({
@@ -33,6 +31,7 @@ import ti4.model.UnitModel;
 abstract public class UnitHolder {
 
     private final String name;
+
     private final Point holderCenterPosition;
 
     // ID, Count
@@ -48,10 +47,8 @@ abstract public class UnitHolder {
     }
 
     @JsonCreator
-    public UnitHolder(
-        @JsonProperty("name") String name,
-        @JsonProperty("holderCenterPosition") Point holderCenterPosition
-    ) {
+    public UnitHolder(@JsonProperty("name") String name,
+        @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
     }
@@ -285,14 +282,6 @@ abstract public class UnitHolder {
             .map(this::getUnitColor)
             .distinct()
             .collect(Collectors.toList());
-    }
-
-    @JsonIgnore
-    public int countPlayersUnitsWithModelCondition(Player p, Predicate<? super UnitModel> condition) {
-        return getUnits().entrySet().stream()
-            .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
-            .filter(e -> Optional.ofNullable(p.getUnitFromUnitKey(e.getKey())).map(condition::test).orElse(false))
-            .collect(Collectors.summingInt(Entry::getValue));
     }
 
     @JsonIgnore

@@ -118,7 +118,7 @@ public class CommandHelper {
         factionColor = AliasHandler.resolveFaction(factionColor);
         for (Player player_ : game.getPlayers().values()) {
             if (Objects.equals(factionColor, player_.getFaction()) ||
-                Objects.equals(factionColor, player_.getColor())) {
+                    Objects.equals(factionColor, player_.getColor())) {
                 return player_;
             }
         }
@@ -197,7 +197,7 @@ public class CommandHelper {
         factionColor = AliasHandler.resolveFaction(factionColor);
         for (Player player_ : game.getPlayers().values()) {
             if (Objects.equals(factionColor, player_.getFaction()) ||
-                Objects.equals(factionColor, player_.getColor())) {
+                    Objects.equals(factionColor, player_.getColor())) {
                 return player_.getColor();
             }
         }
@@ -206,11 +206,13 @@ public class CommandHelper {
 
     public Tile getTile(SlashCommandInteractionEvent event, Game game) {
         String tileName = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
-        return TileHelper.getTile(event, tileName, game);
+        String tileId = AliasHandler.resolveTile(tileName);
+        return TileHelper.getTile(event, tileId, game);
     }
 
     public Tile getTile(SlashCommandInteractionEvent event, Game game, String tileName) {
         tileName = StringUtils.substringBefore(tileName.toLowerCase(), " ");
-        return TileHelper.getTile(event, tileName, game);
+        String tileId = AliasHandler.resolveTile(tileName);
+        return TileHelper.getTile(event, tileId, game);
     }
 }

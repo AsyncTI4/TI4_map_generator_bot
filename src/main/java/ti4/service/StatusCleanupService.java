@@ -74,7 +74,8 @@ public class StatusCleanupService {
                     }
                 }
             }
-            if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber")) {
+            if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber"))
+            {        
                 for (String planet : game.getPlanets()) {
                     game.getPlanetsInfo().get(planet).removeToken("attachment_sigma_cyber.png");
                 }

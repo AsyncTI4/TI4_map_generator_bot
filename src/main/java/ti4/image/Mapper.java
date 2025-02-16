@@ -18,7 +18,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -102,6 +101,7 @@ public class Mapper {
 
     public static void init() {
         try {
+            colors.clear();
             loadData();
         } catch (Exception e) {
             BotLogger.log("Could not load data", e);
@@ -755,17 +755,6 @@ public class Mapper {
         return acNameList;
     }
 
-    private static <T> Map<String, T> getGenericHomebrewReplaceMap(List<T> models, Function<T, Optional<String>> getHomebrewID) {
-        return new HashMap<>(models.stream()
-            .filter(model -> getHomebrewID.apply(model).isPresent())
-            .collect(Collectors.toMap(m -> getHomebrewID.apply(m).get(), Function.identity())));
-    }
-
-    public static Map<String, TechnologyModel> getHomebrewTechReplaceMap(String deckID) {
-        List<TechnologyModel> models = getDeck(deckID).getNewDeck().stream().map(Mapper::getTech).toList();
-        return getGenericHomebrewReplaceMap(models, TechnologyModel::getHomebrewReplacesID);
-    }
-
     public static Map<String, TechnologyModel> getTechs() {
         return technologies;
     }
@@ -779,7 +768,7 @@ public class Mapper {
     }
 
     public static MapTemplateModel getMapTemplate(String id) {
-        return mapTemplates.getOrDefault(id, null);
+        return mapTemplates.get(id);
     }
 
     public static List<MapTemplateModel> getMapTemplates() {

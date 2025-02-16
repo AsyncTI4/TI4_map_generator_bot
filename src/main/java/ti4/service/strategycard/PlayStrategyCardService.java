@@ -72,8 +72,8 @@ public class PlayStrategyCardService {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     game.setStoredValue("Coup", "");
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                        + " you have been Coup'd due to attempting to play **" + stratCardName
-                        + "**. If this is a mistake or the _Coup D'etat_ is Sabo'd, feel free to play **" + stratCardName
+                        + " you have been Coup'd due to attempting to play **" + stratCardName 
+                        + "**. If this is a mistake or the _Coup D'etat_ is Sabo'd, feel free to play **" + stratCardName 
                         + "**. Otherwise, please end turn after doing any end of turn abilities you wish to perform.");
                     return;
                 }
@@ -146,8 +146,9 @@ public class PlayStrategyCardService {
         // set the action rows
         baseMessageObject.addComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons));
         AutoPingMetadataManager.setupQuickPing(game.getName());
+      
         sendAndHandleMessageResponse(baseMessageObject.build(), game, player, event, scToPlay, scModel, scButtons);
-
+        
         // Trade Primary
         if (scModel.usesAutomationForSCID("pok5trade")) {
             TradeStrategyCardService.doPrimary(game, event, player);
@@ -211,12 +212,12 @@ public class PlayStrategyCardService {
                             String message3 = "Heads up, " + p3.getRepresentationUnfogged()
                                 + ", **Trade** has just been played and this is a reminder that you hold the _Trade Agreement_ of "
                                 + p2.getColor() + ". ";
-                            if (p3 == player) {
-                                message3 += "If you force that player to replenish commodities, then you will be prompted to play the _Trade Agreemnt_.";
-                            } else {
-                                message3 += "If you work out a deal with the **Trade** holder,"
-                                    + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreemnt_.";
-                            }
+                                if (p3 == player) {
+                                    message3 += "If you force that player to replenish commodities, then you will be prompted to play the _Trade Agreemnt_.";
+                                } else {
+                                    message3 += "If you work out a deal with the **Trade** holder,"
+                                        + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreemnt_.";
+                                }
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }
                     }
@@ -265,8 +266,8 @@ public class PlayStrategyCardService {
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
         if (!game.isHomebrewSCMode() && player.hasAbility("grace")
-            && !player.getExhaustedAbilities().contains("grace")
-            && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
+                && !player.getExhaustedAbilities().contains("grace")
+                && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
             List<Button> graceButtons = new ArrayList<>();
             graceButtons.add(Buttons.green("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Buttons.red("deleteButtons", "Decline"));
@@ -292,7 +293,8 @@ public class PlayStrategyCardService {
         }
     }
 
-    private static void sendAndHandleMessageResponse(MessageCreateData toSend, Game game, Player player, GenericInteractionCreateEvent event, int scToPlay, StrategyCardModel scModel, List<Button> scButtons) {
+    private static void sendAndHandleMessageResponse(MessageCreateData toSend, Game game, Player player, GenericInteractionCreateEvent event, int scToPlay,
+                                                        StrategyCardModel scModel, List<Button> scButtons) {
         var mainGameChannel = game.getMainGameChannel();
         Message message = mainGameChannel.sendMessage(toSend).complete();
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
@@ -307,9 +309,9 @@ public class PlayStrategyCardService {
                     continue;
                 }
                 if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
-                    && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
-                    && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
-                    && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                        && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
+                        && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
+                        && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
                         message.addReaction(reactionEmoji2).queue();
@@ -363,13 +365,17 @@ public class PlayStrategyCardService {
 
                 // Trade Neighbour Message
                 if (scModel.usesAutomationForSCID("pok5trade")) {
-                    if (player.hasAbility("guild_ships")) {
+                    if (player.hasAbility("guild_ships"))
+                    {
                         MessageHelper.sendMessageToChannel(m5,
                             "The **Trade** player has the **Guild Ships** ability, and thus may perform transactions with all players.");
-                    } else if (player.getPromissoryNotesInPlayArea().contains("convoys")) {
+                    }
+                    else if (player.getPromissoryNotesInPlayArea().contains("convoys"))
+                    {
                         MessageHelper.sendMessageToChannel(m5,
                             "The **Trade** player has _Trade Convoys_, and thus may perform transactions with all players.");
-                    } else {
+                    }
+                    else {
                         StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");
                         StringBuilder notNeighborsMsg = new StringBuilder("__Not__ neighbors with the **Trade** holder:");
                         boolean anyNeighbours = false;
@@ -478,7 +484,7 @@ public class PlayStrategyCardService {
 
     private static List<Button> getDiplomacyButtons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
-        Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo a System");
+        Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix()+"diploSystem", "Diplo a System");
         Button refreshButton = Buttons.green("diploRefresh2", "Ready 2 Planets");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");

@@ -23,7 +23,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
-import ti4.helpers.Units.UnitType;
+import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -132,7 +132,7 @@ public class PlayHeroService {
                 int dieResult = player.getLowestSC();
                 game.setStoredValue("kyroHeroSC", dieResult + "");
                 game.setStoredValue("kyroHeroPlayer", player.getFaction());
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game)
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getSCName(dieResult, game) 
                     + " has been with Speygh, the Kyro hero"
                     + (game.isFrankenGame() ? ", and the faction that played the hero as " + player.getFaction() : "") + ".");
                 ListTurnOrderService.turnOrder(event, game);
@@ -223,10 +223,13 @@ public class PlayHeroService {
             }
             case "saarhero" -> {
                 List<Button> buttons = ButtonHelperHeroes.getSaarHeroButtons(game, player);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation(true, showFlavourText) + " use the buttons to select the system to remove all opposing fighters and infantry from", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                    player.getRepresentation(true, showFlavourText)
+                        + " use the buttons to select the system to remove all opposing fighters and infantry from",
+                    buttons);
             }
             case "edynhero" -> {
-                int size = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech).size();
+                int size = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Mech).size();
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
                     .getFactionEmoji() + " may resolve " + size
                     + " agenda" + (size == 1 ? "" : "s") + " because that's how many Sigils they got."
@@ -267,7 +270,7 @@ public class PlayHeroService {
                 if (!removeCCs.isEmpty()) {
                     for (int x = 0; x < ButtonHelperAgents.getGloryTokenTiles(game).size(); x++) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                            "Use buttons to remove 1 of your command tokens from the game board.", removeCCs);
+                        "Use buttons to remove 1 of your command tokens from the game board.", removeCCs);
                     }
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -284,13 +287,16 @@ public class PlayHeroService {
             case "veldyrhero" -> {
                 game.setComponentAction(true);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
-                    + ", for each planet with a _Branch Office_, you may copy 1 unit upgrade technology from the player that controls that planet.");
+                                + ", for each planet with a _Branch Office_, you may copy 1 unit upgrade technology from the player that controls that planet.");
                 for (Player p2 : ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player)) {
-                    if (ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) == 1) {
+                    if (ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) == 1)
+                    {
                         String msg = p2.getFactionEmojiOrColor() + " owns 1 _Branch Office_. You may copy 1 of these unit upgrade technologies.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
                             ButtonHelperHeroes.getPossibleTechForVeldyrToGainFromPlayer(player, p2, game));
-                    } else {
+                    }
+                    else
+                    {
                         String msg = p2.getFactionEmojiOrColor() + " owns " + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2)
                             + " _Branch Offices_. You may copy " + ButtonHelperFactionSpecific.getNumberOfBranchOffices(game, p2) + " of these unit upgrade technologies.";
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
@@ -389,13 +395,16 @@ public class PlayHeroService {
                     if (p2 == player || p2.getAc() == 0) {
                         continue;
                     }
-                    List<Button> buttons = new ArrayList<>(getYssarilHeroActionCardButtons(player, p2));
+                    List<Button> buttons = new ArrayList<>(
+                        getYssarilHeroActionCardButtons(player, p2));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                         p2.getRepresentationUnfogged()
                             + " Kyver, Blade and Key, the Yssaril hero, has been played. Please buttons to select which action card you will offer to them.",
                         buttons);
                 }
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(true, showFlavourText) + " sent everyone a ping in their `#cards-info` thread with buttons to choose an action card to offer you.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    player.getRepresentation(true, showFlavourText)
+                        + " sent everyone a ping in their `#cards-info` thread with buttons to choose an action card to offer you.");
             }
             case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }

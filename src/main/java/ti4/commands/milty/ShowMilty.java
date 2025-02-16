@@ -3,7 +3,6 @@ package ti4.commands.milty;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.map.Game;
-import ti4.service.milty.DraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
 
 class ShowMilty extends GameStateSubcommand {
@@ -18,6 +17,6 @@ class ShowMilty extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         MiltyDraftManager manager = game.getMiltyDraftManager();
-        DraftDisplayService.repostDraftInformation(event, manager, game);
+        manager.repostDraftInformation(event, game);
     }
 }

@@ -21,7 +21,6 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String text;
     private String flavorText;
     private String imageURL;
-    private String automationID;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
@@ -52,12 +51,6 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false, false);
-    }
-
-    public String getAutomationID() {
-        if (automationID == null)
-            return alias;
-        return automationID;
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {

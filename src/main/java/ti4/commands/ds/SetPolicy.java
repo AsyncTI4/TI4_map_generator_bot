@@ -23,11 +23,10 @@ class SetPolicy extends GameStateSubcommand {
     public SetPolicy() {
         super(Constants.SET_POLICY, "Set Policies for Olradin Faction Abilities to their + or - side", true, true);
         List<Choice> people = CommandHelper.toChoices("Connect", "Control", "+", "-");
-        List<Choice> economy = CommandHelper.toChoices("Empower", "Exploit", "+", "-");
-        List<Choice> environment = CommandHelper.toChoices("Preserve", "Plunder", "+", "-");
-
         addOptions(new OptionData(OptionType.STRING, Constants.SET_PEOPLE, "Policy - The People: \"Connect ➕\" or \"Control ➖\"").addChoices(people));
+        List<Choice> environment = CommandHelper.toChoices("Preserve", "Plunder", "+", "-");
         addOptions(new OptionData(OptionType.STRING, Constants.SET_ENVIRONMENT, "Policy - The Environment: \"Preserve ➕\" or \"Plunder ➖\"").addChoices(environment));
+        List<Choice> economy = CommandHelper.toChoices("Empower", "Exploit", "+", "-");
         addOptions(new OptionData(OptionType.STRING, Constants.SET_ECONOMY, "Policy - The Economy: \"Empower ➕\" or \"Exploit ➖\"").addChoices(economy));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to set Olradin Policies").setAutoComplete(true));
     }

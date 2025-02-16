@@ -656,7 +656,6 @@
         ],
         "requirements": "YY",
         "faction": "cabal",
-        "baseUpgrade": "sd2",
         "source": "pok",
         "text": "PRODUCTION 7\nThis system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 12 fighters in this system do not count against your ships' capacity.",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/dimensional_tear_2.jpg?raw=true"

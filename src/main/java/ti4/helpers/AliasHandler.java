@@ -179,9 +179,6 @@ public class AliasHandler {
         if ("mirage".equalsIgnoreCase(name)) {
             return name;
         }
-        if (TileHelper.getTileById(name) != null) { // name is already an ID
-            return name;
-        }
         String tileId = allTileAliases.get(name.toLowerCase());
         if (tileId != null) {
             return tileId;

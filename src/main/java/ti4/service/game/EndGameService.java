@@ -58,10 +58,6 @@ public class EndGameService {
             deleteRole = false;
         }
 
-        // Do not publish games that are FOW or never really took off
-        if (game.getRealPlayers().isEmpty() || game.isFowMode() || game.getRound() <= 2)
-            publish = false;
-
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), gameName);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -165,7 +161,7 @@ public class EndGameService {
 
         GameMessageManager.remove(List.of(game.getName()));
 
-        if (!game.getRealPlayers().isEmpty() && !game.isFowMode() && !game.islandMode()) {
+        if (!game.isFowMode()) {
             PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
         }
 
@@ -301,8 +297,8 @@ public class EndGameService {
                 int playerVP = player.getTotalVictoryPoints();
                 sb.append(playerVP).append("VP* ");
             }
-            if (game.hasWinner()) {
-                for (Player winner2 : game.getWinners()) {
+            if (game.hasWinner()){
+                for(Player winner2 : game.getWinners()){
                     if (winner2 == player) sb.append(" **👑WINNER👑**");
                 }
             }

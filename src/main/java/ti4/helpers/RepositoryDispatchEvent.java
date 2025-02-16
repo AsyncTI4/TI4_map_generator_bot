@@ -27,8 +27,6 @@ public class RepositoryDispatchEvent {
     }
 
     public void sendEvent() {
-        if (System.getenv("TESTING") != null || REPO_DISPATCH_TOKEN == null || REPO_DISPATCH_TOKEN.isEmpty())
-            return;
         try {
             OkHttpClient client = new OkHttpClient().newBuilder().build();
             MediaType mediaType = MediaType.parse("application/json");

@@ -65,11 +65,11 @@ import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.ColorModel;
 import ti4.model.LeaderModel;
-import ti4.model.MapTemplateModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
@@ -585,14 +585,6 @@ public class Helper {
         return Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planetID));
     }
 
-    public static String getUnitHolderRepresentation(Tile tile, String planetOrSpace, Game game, Player player) {
-        if (planetOrSpace.equals("space")) {
-            return tile.getRepresentationForButtons(game, player);
-        } else {
-            return getPlanetRepresentation(planetOrSpace, game);
-        }
-    }
-
     public static String getPlanetRepresentationNoResInf(String planetID, Game game) {
         planetID = planetID.toLowerCase().replace(" ", "");
         planetID = planetID.replace("'", "");
@@ -815,7 +807,8 @@ public class Helper {
         return planetButtons;
     }
 
-    public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
+    public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Game game, String unit,
+        String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
@@ -827,7 +820,8 @@ public class Helper {
         return planetButtons;
     }
 
-    public static List<Button> getTileWithTrapsPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
+    public static List<Button> getTileWithTrapsPlaceUnitButtons(Player player, Game game, String unit,
+        String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesWithTrapsInTheSystem(game);
         for (Tile tile : tiles) {
@@ -841,7 +835,8 @@ public class Helper {
         return planetButtons;
     }
 
-    public static List<Button> getTileForCheiranHeroPlaceUnitButtons(Player player, Game game, String unit, String prefix) {
+    public static List<Button> getTileForCheiranHeroPlaceUnitButtons(Player player, Game game, String unit,
+        String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesForCheiranHero(player, game);
         for (Tile tile : tiles) {
@@ -855,7 +850,8 @@ public class Helper {
         return planetButtons;
     }
 
-    public static List<Button> getTileWithShipsNTokenPlaceUnitButtons(Player player, Game game, String unit, String prefix, @Nullable ButtonInteractionEvent event) {
+    public static List<Button> getTileWithShipsNTokenPlaceUnitButtons(Player player, Game game, String unit,
+        String prefix, @Nullable ButtonInteractionEvent event) {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
@@ -1009,9 +1005,9 @@ public class Helper {
             }
             if (!found && !thing.contains("tg_") && !thing.contains("boon") && !thing.contains("warmachine")
                 && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")) {
-                Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
+                Planet unitHolder = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
-                if (planet == null) {
+                if (unitHolder == null) {
                     if (thing.contains("reduced commodities")) {
                         String comms = StringUtils.substringAfter(thing, "by ");
                         comms = StringUtils.substringBefore(comms, " (");
@@ -1019,43 +1015,43 @@ public class Helper {
                     }
                     msg.append(thing).append("\n");
                 } else {
-                    Tile t = game.getTileFromPlanet(planet.getName());
+                    Tile t = game.getTileFromPlanet(unitHolder.getName());
                     if (t != null && !t.isHomeSystem()) {
-                        if (planet.getResources() > bestRes) {
-                            bestRes = planet.getResources();
+                        if (unitHolder.getResources() > bestRes) {
+                            bestRes = unitHolder.getResources();
                         }
                     }
                     if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
-                            res += planet.getSumResourcesInfluence();
+                            res += unitHolder.getSumResourcesInfluence();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game)).append("\n");
-                            res += planet.getResources();
+                            res += unitHolder.getResources();
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
-                            inf += planet.getSumResourcesInfluence();
+                            inf += unitHolder.getSumResourcesInfluence();
                         } else {
                             msg.append(getPlanetRepresentationPlusEmojiPlusInfluence(thing, game)).append("\n");
-                            inf += planet.getInfluence();
+                            inf += unitHolder.getInfluence();
                         }
                     } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
                         msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
                         if (xxchaHero) {
-                            res += planet.getSumResourcesInfluence();
+                            res += unitHolder.getSumResourcesInfluence();
                         } else {
-                            res += planet.getMaxResInf();
+                            res += unitHolder.getMaxResInf();
                         }
                     } else {
                         msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
                         if (xxchaHero) {
-                            inf += planet.getSumResourcesInfluence();
-                            res += planet.getSumResourcesInfluence();
+                            inf += unitHolder.getSumResourcesInfluence();
+                            res += unitHolder.getSumResourcesInfluence();
                         } else {
-                            inf += planet.getInfluence();
-                            res += planet.getResources();
+                            inf += unitHolder.getInfluence();
+                            res += unitHolder.getResources();
                         }
                     }
                 }
@@ -1238,7 +1234,7 @@ public class Helper {
         if (!player.getPlanets().contains(uH.getName())) {
             return productionValueTotal;
         }
-        if (Constants.MECATOLS.contains(planet) && player.hasIIHQ() && player.controlsMecatol(true)) {
+        if (Constants.MECATOLS.contains(planet) && player.hasTech("iihq") && player.controlsMecatol(true)) {
             productionValueTotal += 3;
             planetUnitVal = 3;
         }
@@ -1400,7 +1396,8 @@ public class Helper {
 
     }
 
-    public static List<Button> getPlaceUnitButtonsForSaarCommander(Player player, Tile origTile, Game game, String placePrefix) {
+    public static List<Button> getPlaceUnitButtonsForSaarCommander(Player player, Tile origTile, Game game,
+        String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "saarcommander")) {
@@ -1629,7 +1626,8 @@ public class Helper {
             || player.getActionCards().containsKey("war_machine4_acd2");
     }
 
-    public static List<Button> getPlanetSystemDiploButtons(Player player, Game game, boolean ac, Player mahact) {
+    public static List<Button> getPlanetSystemDiploButtons(Player player, Game game, boolean ac,
+        Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
@@ -1710,7 +1708,8 @@ public class Helper {
         return representation.toString();
     }
 
-    public static String getLeaderRepresentation(Player player, String leaderID, boolean includeTitle, boolean includeAbility) {
+    public static String getLeaderRepresentation(Player player, String leaderID, boolean includeTitle,
+        boolean includeAbility) {
         return getLeaderRepresentation(player.getLeader(leaderID).orElse(null), includeTitle, includeAbility, false);
     }
 
@@ -2055,6 +2054,211 @@ public class Helper {
         }
     }
 
+    public static List<Button> getTechButtons(List<TechnologyModel> techs, Player player) {
+        return getTechButtons(techs, player, "normal");
+    }
+
+    public static boolean isTechResearchable(TechnologyModel tech, Player player) {
+        Game game = player.getGame();
+        String requirements = tech.getRequirements().orElse("");
+        int wilds = 0;
+        if (ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, false).contains(tech.getAlias())) {
+            wilds++;
+        }
+        if (player.getPurgedTechs().contains(tech.getAlias())) {
+            return false;
+        }
+        if (ButtonHelperCommanders.getVeldyrCommanderTechs(player, game, true).contains(tech.getAlias())) {
+            return true;
+        }
+        for (String techID : player.getTechs()) {
+            TechnologyModel playerTech = Mapper.getTech(techID);
+            if (playerTech != null) {
+                for (TechnologyType type : playerTech.getTypes()) {
+                    if (type == TechnologyType.BIOTIC) {
+                        requirements = requirements.replaceFirst("G", "");
+                    }
+                    if (type == TechnologyType.WARFARE) {
+                        requirements = requirements.replaceFirst("R", "");
+                    }
+                    if (type == TechnologyType.PROPULSION) {
+                        requirements = requirements.replaceFirst("B", "");
+                    }
+                    if (type == TechnologyType.CYBERNETIC) {
+                        requirements = requirements.replaceFirst("Y", "");
+                    }
+                    if (type == TechnologyType.UNITUPGRADE && game.playerHasLeaderUnlockedOrAlliance(player, "kjalengardcommander")) {
+                        wilds++;
+                    }
+                }
+            }
+        }
+        for (String planet : player.getPlanets()) {
+            if (player.getExhaustedPlanets().contains(planet) && !(player.hasTech("pa") || player.hasTech("absol_pa"))) {
+                continue;
+            }
+            if (ButtonHelper.checkForTechSkips(game, planet)) {
+                Planet unitHolder = game.getPlanetsInfo().get(planet);
+                Set<String> techTypes = unitHolder.getTechSpecialities();
+                for (String type : techTypes) {
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
+                        wilds++;
+                    } else {
+                        if (type.equalsIgnoreCase("propulsion")) {
+                            requirements = requirements.replaceFirst("B", "");
+                            if (player.hasAbility("ancient_knowledge")) {
+                                requirements = requirements.replaceFirst("B", "");
+                            }
+                        }
+                        if (type.equalsIgnoreCase("biotic")) {
+                            requirements = requirements.replaceFirst("G", "");
+                            if (player.hasAbility("ancient_knowledge")) {
+                                requirements = requirements.replaceFirst("G", "");
+                            }
+                        }
+                        if (type.equalsIgnoreCase("warfare")) {
+                            requirements = requirements.replaceFirst("R", "");
+                            if (player.hasAbility("ancient_knowledge")) {
+                                requirements = requirements.replaceFirst("R", "");
+                            }
+                        }
+                        if (type.equalsIgnoreCase("cybernetic")) {
+                            requirements = requirements.replaceFirst("Y", "");
+                            if (player.hasAbility("ancient_knowledge")) {
+                                requirements = requirements.replaceFirst("Y", "");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
+            requirements = requirements.replaceFirst("G", "");
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "kollecccommander")) {
+            requirements = requirements.replaceFirst("B", "");
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "dihmohncommander")) {
+            requirements = requirements.replaceFirst("R", "");
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
+            requirements = requirements.replaceFirst("Y", "");
+        }
+        //"augerscommander"
+        if (tech.getFirstType() == TechnologyType.UNITUPGRADE) {
+            if (player.hasTechReady("aida") || player.hasTechReady("absol_aida")) {
+                wilds++;
+            }
+        } else {
+            if (player.hasAbility("analytical")) {
+                wilds++;
+            }
+        }
+        if (player.hasRelicReady("prophetstears") || player.hasRelicReady("absol_prophetstears")) {
+            wilds++;
+        }
+
+        return requirements.length() <= wilds;
+    }
+
+    public static List<Button> getTechButtons(List<TechnologyModel> techs, Player player, String buttonPrefixType) {
+        List<Button> techButtons = new ArrayList<>();
+
+        techs.sort(TechnologyModel.sortByTechRequirements);
+
+        for (TechnologyModel tech : techs) {
+            String techName = tech.getName();
+            String techID = tech.getAlias();
+            String buttonID;
+            if ("normal".equalsIgnoreCase(buttonPrefixType) || "res".equalsIgnoreCase(buttonPrefixType)) { // default
+                buttonID = player.finChecker() + "getTech_" + techID;
+            } else if ("nekro".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = player.finChecker() + "getTech_" + techID + "__noPay";
+            } else if ("noPay".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = player.finChecker() + "getTech_" + techID + "__noPay";
+            } else if ("free".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = player.finChecker() + "getTech_" + techID + "__noPay!comp";
+            } else if ("inf".equalsIgnoreCase(buttonPrefixType)) {
+                buttonID = player.finChecker() + "getTech_" + techID + "__inf";
+            } else {
+                buttonID = player.finChecker() + "swapTechs__" + buttonPrefixType + "__" + techID;
+            }
+
+            ButtonStyle style;
+            String requirementsEmoji = tech.getCondensedReqsEmojis(true);
+            if (tech.isPropulsionTech()) {
+                style = ButtonStyle.PRIMARY;
+            } else if (tech.isBioticTech()) {
+                style = ButtonStyle.SUCCESS;
+            } else if (tech.isWarfareTech()) {
+                style = ButtonStyle.DANGER;
+            } else {
+                style = ButtonStyle.SECONDARY;
+            }
+
+            techButtons.add(Button.of(style, buttonID, techName, Emoji.fromFormatted(requirementsEmoji)));
+        }
+        return techButtons;
+    }
+
+    public static List<TechnologyModel> getAllTechOfAType(Game game, String techType, Player player) {
+        return getAllTechOfAType(game, techType, player, false);
+    }
+
+    public static List<TechnologyModel> getAllTechOfAType(Game game, String techType, Player player, boolean hasToBeResearchable) {
+        List<TechnologyModel> techs = new ArrayList<>();
+        Mapper.getTechs().values().stream()
+            .filter(tech -> !hasToBeResearchable || isTechResearchable(tech, player))
+            .filter(tech -> game.getTechnologyDeck().contains(tech.getAlias()))
+            .filter(tech -> tech.isType(techType) || game.getStoredValue("colorChange" + tech.getAlias()).equalsIgnoreCase(techType))
+            .filter(tech -> !player.getPurgedTechs().contains(tech.getAlias()))
+            .filter(tech -> !player.hasTech(tech.getAlias()))
+            .filter(tech -> tech.getFaction().isEmpty() || "".equalsIgnoreCase(tech.getFaction().get()) || player.getNotResearchedFactionTechs().contains(tech.getAlias()))
+            .forEach(techs::add);
+
+        List<TechnologyModel> techs2 = new ArrayList<>();
+        for (TechnologyModel tech : techs) {
+            boolean addTech = true;
+            if (tech.isUnitUpgrade()) {
+                List<String> researchedTechs = new ArrayList<>();
+                researchedTechs.addAll(player.getTechs());
+                researchedTechs.addAll(player.getNotResearchedFactionTechs());
+                for (String factionTech : researchedTechs) {
+                    TechnologyModel fTech = Mapper.getTech(factionTech);
+                    if (fTech != null && !fTech.getAlias().equalsIgnoreCase(tech.getAlias())
+                        && fTech.isUnitUpgrade()
+                        && fTech.getBaseUpgrade().orElse("bleh").equalsIgnoreCase(tech.getAlias())) {
+                        addTech = false;
+                    }
+                }
+            }
+            if (addTech) {
+                techs2.add(tech);
+            }
+        }
+        return techs2;
+    }
+
+    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Game game, Player player) {
+        List<TechnologyModel> techs = new ArrayList<>();
+        for (TechnologyModel tech : getAllNonFactionUnitUpgradeTech(game)) {
+            if (player.hasTech(tech.getAlias())) {
+                techs.add(tech);
+            }
+        }
+        return techs;
+    }
+
+    public static List<TechnologyModel> getAllNonFactionUnitUpgradeTech(Game game) {
+        List<TechnologyModel> techs = new ArrayList<>();
+        for (TechnologyModel tech : Mapper.getTechs().values()) {
+            if (tech.isUnitUpgrade() && tech.getFaction().isEmpty() && game.getTechnologyDeck().contains(tech.getAlias())) {
+                techs.add(tech);
+            }
+        }
+        return techs;
+    }
+
     /**
      * DEPRECATED - Use TechnologyModel.getRepresentation() instead
      */
@@ -2119,7 +2323,6 @@ public class Helper {
                 unsortedPlayers.put(parsedLocation, player);
             }
         }
-        MapTemplateModel template = Mapper.getMapTemplate(game.getMapTemplateID());
         Collections.sort(hsLocations);
         int ringWithHomes = 0;
         for (int location : hsLocations) {
@@ -2132,17 +2335,12 @@ public class Helper {
             }
             ringWithHomes = ringNum;
         }
-        if (different && template != null) {
-            hsLocations = template.getSortedHomeSystemLocations();
-        }
-
         StringBuilder msg = new StringBuilder(game.getPing() + " set order in the following way: \n");
-        if (!different || template != null) {
+        if (!different) {
             List<Player> sortedPlayers = new ArrayList<>();
             for (Integer location : hsLocations) {
                 sortedPlayers.add(unsortedPlayers.get(location));
             }
-
             Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
             Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
             Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
