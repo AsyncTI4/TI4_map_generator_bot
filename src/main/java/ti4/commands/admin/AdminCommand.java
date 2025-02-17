@@ -9,7 +9,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.ParentCommand;
 import ti4.commands.Subcommand;
-import ti4.commands.bothelper.ReloadGame;
 import ti4.helpers.Constants;
 
 public class AdminCommand implements ParentCommand {
@@ -19,6 +18,7 @@ public class AdminCommand implements ParentCommand {
                     new DisableBot(),
                     new ReloadMapperObjects(),
                     new RestoreGame(),
+                    new DeletePersistenceManagerFile(),
                     new CardsInfoForPlayer(),
                     new UpdateThreadArchiveTime())
             .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
