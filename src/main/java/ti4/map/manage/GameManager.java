@@ -79,7 +79,6 @@ public class GameManager {
     @Nullable
     public static Game undo(Game game) {
         Game undo = GameUndoService.undo(game);
-
         return handleUndo(undo);
     }
 
