@@ -79,6 +79,7 @@ public class GameManager {
     @Nullable
     public static Game undo(Game game) {
         Game undo = GameUndoService.undo(game);
+
         return handleUndo(undo);
     }
 
@@ -100,7 +101,12 @@ public class GameManager {
 
     @Nullable
     public static Game reload(String gameName) {
-        return load(gameName);
+        Game game = load(gameName);
+        if (game == null) {
+            game = GameUndoService.loadUndoForMissingGame(gameName);
+            handleUndo(game);
+        }
+        return game;
     }
 
     public static List<String> getGameNames() {
