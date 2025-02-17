@@ -691,8 +691,7 @@ public class AgendaHelper {
             resolveIxthianRoll(futureGame, publish && watchParty != null);
             return false;
         };
-        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, watchPartyPing, resolve,
-                watchPartyList, List.of(watchPartyPing));
+        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), game.getName(), rand, watchPartyPing, resolve, watchPartyList, List.of(watchPartyPing));
     }
 
     private static void resolveIxthianRoll(Game game, boolean publish) {
