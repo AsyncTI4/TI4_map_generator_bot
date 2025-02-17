@@ -164,4 +164,16 @@ class GameUndoService {
             BotLogger.log("Error trying to delete file: " + path, e);
         }
     }
+
+    public static Game loadUndoForMissingGame(String gameName) {
+        int latestUndoIndex = GameUndoNameService.getSortedUndoNumbers(gameName).getLast();
+        File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
+        try {
+            replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
+            return GameLoadService.load(gameName);
+        } catch (IOException e) {
+            BotLogger.log("Error trying to undo for missing game: " + gameName, e);
+        }
+        return null;
+    }
 }
