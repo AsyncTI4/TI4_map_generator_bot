@@ -1304,11 +1304,11 @@ public class TileGenerator {
                     continue;
                 }
                 float scale = 0.85f;
+                List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna");
+                boolean isLegendary = Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null;
                 if (tokenPath.contains(Constants.DMZ_LARGE)) {
                     scale = 0.3f;
-                    List<String> smallLegendaries = List.of("mirage", "mallice", "mallicelocked", "eko", "domna");
-                    if (Mapper.getPlanet(unitHolder.getName()).getLegendaryAbilityText() != null
-                        && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
+                    if (isLegendary && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                         scale = 0.53f;
                     }
                     if (unitHolder.getName().equalsIgnoreCase("elysium")) {
@@ -1316,9 +1316,12 @@ public class TileGenerator {
                     }
                     if (Constants.MECATOLS.contains(unitHolder.getName())) {
                         scale = 0.61f;
-                    }
+                    } 
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     scale = 1.32f;
+                    if (isLegendary && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
+                        scale = 2.33f;
+                    }
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     scale = 0.5f; // didn't previous get changed for custodians
                 }
