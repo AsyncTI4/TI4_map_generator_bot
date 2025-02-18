@@ -257,23 +257,23 @@ public class PlayStrategyCardService {
 
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
-        Button deleteButton = Buttons.red("doAnotherAction", "Do Another Action");
+        Button deleteButton = Buttons.red(player.getFinsFactionCheckerPrefix()+"doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
 
         if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
-            conclusionButtons.add(Buttons.blue("endOfTurnAbilities", "Do End Of Turn Ability (" + (ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1) + ")"));
+            conclusionButtons.add(Buttons.blue(player.getFinsFactionCheckerPrefix()+"endOfTurnAbilities", "Do End Of Turn Ability (" + (ButtonHelper.getEndOfTurnAbilities(player, game).size() - 1) + ")"));
         }
         conclusionButtons.add(deleteButton);
-        conclusionButtons.add(Buttons.red("endTurnWhenAllReactedTo_" + scToPlay, "End Turn When All Have Reacted"));
+        conclusionButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix()+"endTurnWhenAllReactedTo_" + scToPlay, "End Turn When All Have Reacted"));
         if (player.hasTech("fl")) {
-            conclusionButtons.add(Buttons.red("fleetLogWhenAllReactedTo_" + scToPlay, "Use Fleet Logistics When All Have Reacted"));
+            conclusionButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix()+"fleetLogWhenAllReactedTo_" + scToPlay, "Use Fleet Logistics When All Have Reacted"));
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
         if (!game.isHomebrewSCMode() && player.hasAbility("grace")
             && !player.getExhaustedAbilities().contains("grace")
             && ButtonHelperAbilities.getGraceButtons(game, player, scToPlay).size() > 2) {
             List<Button> graceButtons = new ArrayList<>();
-            graceButtons.add(Buttons.green("resolveGrace_" + scToPlay, "Resolve Grace Ability"));
+            graceButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix()+"resolveGrace_" + scToPlay, "Resolve Grace Ability"));
             graceButtons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you may resolve **Grace** with the buttons.",
