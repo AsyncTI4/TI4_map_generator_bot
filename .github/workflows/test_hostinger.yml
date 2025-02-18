@@ -14,7 +14,7 @@ jobs:
           AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
         with:
           host: ${{ secrets.HOSTINGER_SSH_HOST }}
-          username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
           password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           envs: AWS_KEY, AWS_SECRET
