@@ -1,0 +1,28 @@
+on: workflow_dispatch
+name: TestHostinger
+concurrency:
+  group: "TestHostinger"
+jobs:
+  save:
+    name: TestHostinger
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        env:
+          AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
+          AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USERNAME }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          envs: AWS_KEY, AWS_SECRET
+          script: |
+            whoami
+            hostname
+            uptime
+            df -h
+            free -h
+            docker version
+            docker ps
