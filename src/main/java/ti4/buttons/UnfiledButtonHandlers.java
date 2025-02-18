@@ -1779,7 +1779,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                         "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
-                            + " Please press the \"Flip Agenda\" button after they have finished redistributing tokens.",
+                            + " Please press the \"Flip Agenda\" button after they have finished redistributing tokens and you have fully resolved all other status phase effects.",
                         buttons);
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
@@ -1787,7 +1787,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                         "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
                             + " As the Custodians token is still on Mecatol Rex, there will be no agenda phase this round."
-                            + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens.",
+                            + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens and you have fully resolved all other status phase effects.",
                         buttons);
                 }
             }

@@ -698,7 +698,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit makes a combat or ability roll, it rolls 1 additional die for each of your mechs in or adjacent to this system.",
+        "ability": "When this unit makes a combat or ability roll, it rolls 1 additional die for each mech in or adjacent to this system.",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/flagships/beg_bersha.png?raw=true"
     },
     {

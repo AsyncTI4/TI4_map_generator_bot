@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +19,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -825,6 +826,9 @@ public class ButtonHelper {
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
         ButtonHelperActionCards.checkForPlayingSummit(game, player);
+        if(game.isCustodiansScored()){
+            AgendaHelper.offerPlayerPassOnWhensNAfters(player);
+        }
     }
 
     public static void resolveMinisterOfCommerceCheck(Game game, Player player, GenericInteractionCreateEvent event) {
@@ -2291,7 +2295,7 @@ public class ButtonHelper {
             Planet planetReal = game.getPlanetsInfo().get(plan);
             if (planetReal != null && isNotBlank(planetReal.getOriginalPlanetType())
                 && !player.getExhaustedPlanets().contains(planetReal.getName())) {
-                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player);
+                List<Button> planetButtons = getPlanetExplorationButtons(game, planetReal, player, true);
                 buttons.addAll(planetButtons);
             }
         }
@@ -3775,8 +3779,11 @@ public class ButtonHelper {
         }
         return buttons;
     }
-
     public static List<Button> getPlanetExplorationButtons(Game game, Planet planet, Player player) {
+        return getPlanetExplorationButtons(game, planet, player, false);
+    }
+
+    public static List<Button> getPlanetExplorationButtons(Game game, Planet planet, Player player, boolean impressment) {
         if (planet == null || game == null)
             return null;
 
@@ -3794,6 +3801,9 @@ public class ButtonHelper {
         for (String trait : explorationTraits) {
             if (List.of("cultural", "industrial", "hazardous").contains(trait)) {
                 String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
+                if(impressment){
+                    buttonId = "movedNExplored_dsdihmy_" + planetId + "_" + trait;
+                }
                 String buttonMessage = "Explore " + planetRepresentation
                     + (explorationTraits.size() > 1 ? " as " + trait : "");
                 buttons.add(Buttons.gray(buttonId, buttonMessage, ExploreEmojis.getTraitEmoji(trait)));
