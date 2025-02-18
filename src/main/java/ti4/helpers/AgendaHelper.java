@@ -1064,10 +1064,10 @@ public class AgendaHelper {
             String realIdentity2 = nextInLine.getRepresentationUnfogged();
 
             int[] voteInfo = getVoteTotal(nextInLine, game);
-
+            boolean willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
             while ((voteInfo[0] < 1 && !nextInLine.getColor().equalsIgnoreCase(player.getColor()))
                     || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
-                    || !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty()) {
+                    || willPrevote) {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
                         + ", you are being skipped because you cannot vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
@@ -1078,7 +1078,7 @@ public class AgendaHelper {
                             .getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (!game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0")) {
+                if (willPrevote) {
                     skippedMessage = realIdentity2
                             + " had logged a pre-vote";
                     votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
@@ -1127,6 +1127,7 @@ public class AgendaHelper {
                 Button ForcedAbstain = Buttons.gray("forceAbstainForPlayer_" + nextInLine.getFaction(),
                         "(For Others) Abstain for this player");
                 game.updateActivePlayer(nextInLine);
+                game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
                 List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
                 if (game.isFowMode()) {
                     if (nextInLine.getPrivateChannel() != null) {
@@ -1498,9 +1499,10 @@ public class AgendaHelper {
             String realIdentity = nextInLine.getRepresentationUnfogged();
             int[] voteInfo = getVoteTotal(nextInLine, game);
             int counter = 0;
+            boolean willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
             while ((voteInfo[0] < 1
                     || game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())
-                    || !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty())
+                    || willPrevote)
                     && counter < game.getRealPlayers().size()) {
                 String skippedMessage = nextInLine.getRepresentation(true, false)
                         + ", you are being skipped because the bot thinks you can't vote.";
@@ -1511,7 +1513,7 @@ public class AgendaHelper {
                             .getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (!game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0")) {
+                if (willPrevote) {
                     skippedMessage = realIdentity
                             + " had logged a pre-vote";
                     String votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
@@ -1552,6 +1554,7 @@ public class AgendaHelper {
                     "(For Others) Abstain For This Player");
             try {
                 game.updateActivePlayer(nextInLine);
+                game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
             } catch (Exception e) {
                 BotLogger.log("Could not update active player", e);
             }
@@ -3300,13 +3303,7 @@ public class AgendaHelper {
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_WHEN);
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_AFTER);
         
-        if (!action) {
-            // offerEveryonePrepassOnShenanigans(game);
-            // offerEveryonePreAbstain(game);
-            offerEveryoneWhensQueue(game);
-            checkForAssigningGeneticRecombination(game);
-            checkForPoliticalSecret(game);
-        }
+        
 
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
         String revealMessage = game.getPing() + "\nAn agenda has been revealed";
@@ -3342,6 +3339,13 @@ public class AgendaHelper {
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
         eraseAgendaQueues(event,game);
+        if (!action) {
+            // offerEveryonePrepassOnShenanigans(game);
+            // offerEveryonePreAbstain(game);
+            offerEveryoneWhensQueue(game);
+            checkForAssigningGeneticRecombination(game);
+            checkForPoliticalSecret(game);
+        }
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
                     "# " + game.getPing() + " the agenda target is " + agendaTarget
