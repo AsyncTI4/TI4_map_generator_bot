@@ -432,7 +432,7 @@ public class TransactionHelper {
         switch (thingToTrans) {
             case "TGs" -> {
                 message += " Click the amount of trade goods you wish to " + requestOrOffer + ".";
-                for (int x = 1; x < p1.getTg() + 1; x++) {
+                for (int x = 1; x < p1.getTg() + 1 && x < 21; x++) {
                     Button transact = Buttons.green(
                         "offerToTransact_TGs_" + p1.getFaction() + "_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
@@ -780,7 +780,7 @@ public class TransactionHelper {
         switch (thingToTrans) {
             case "TGs" -> {
                 String message = "Click the number of trade goods you wish to send.";
-                for (int x = 1; x < p1.getTg() + 1; x++) {
+                for (int x = 1; x < p1.getTg() + 1 && x < 21; x++) {
                     Button transact = Buttons.green(finChecker + "send_TGs_" + p2.getFaction() + "_" + x, "" + x);
                     stuffToTransButtons.add(transact);
                 }

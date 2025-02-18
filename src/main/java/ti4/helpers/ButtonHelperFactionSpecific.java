@@ -1775,13 +1775,11 @@ public class ButtonHelperFactionSpecific {
                         channel = sender.getPrivateChannel();
                     }
                     String message = sender.getRepresentationUnfogged()
-                        + " _Dark Pact_ triggered, your trade goods have increased by 1 (" + sender.getTg() + "->"
-                        + (sender.getTg() + 1) + ").";
+                        + " _Dark Pact_ triggered, your trade goods have increased by 1.";
                     sender.setTg(sender.getTg() + 1);
                     MessageHelper.sendMessageToChannel(channel, message);
                     message = receiver.getRepresentationUnfogged()
-                        + " _Dark Pact_ triggered, your trade goods have increased by 1 (" + receiver.getTg() + "->"
-                        + (receiver.getTg() + 1) + ").";
+                        + " _Dark Pact_ triggered, your trade goods have increased by 1.";
                     receiver.setTg(receiver.getTg() + 1);
                     if (game.isFowMode()) {
                         channel = receiver.getPrivateChannel();

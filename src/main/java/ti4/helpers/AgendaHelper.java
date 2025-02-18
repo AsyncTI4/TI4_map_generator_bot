@@ -113,7 +113,7 @@ public class AgendaHelper {
         }
     }
 
-    public static void eraseAgendaQueues(Game game) {
+    public static void eraseAgendaQueues(GenericInteractionCreateEvent event, Game game) {
         game.setStoredValue("queuedAgendasMode", "Yes");
         game.removeStoredValue("aftersResolved");
         game.removeStoredValue("whensResolved");
@@ -127,7 +127,54 @@ public class AgendaHelper {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
             game.removeStoredValue("queuedAftersLockedFor" + player.getFaction());
+            if(!game.getStoredValue("passOnAllWhensNAfters"+player.getFaction()).isEmpty() && !game.getPhaseOfGame().equalsIgnoreCase("action")){
+                game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.red("queueAWhen", "Play A When"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                        "You have declined to queue a \"when\". You can change your mind with this button.", buttons);
+                game.setStoredValue("declinedAfters", game.getStoredValue("declinedAfters") + player.getFaction() + "_");
+                game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "Yes");
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.red("queueAnAfter", "Play An \"After\""));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                "You have declined to queue an \"after\". You can change your mind with this button.", buttons);
+                offerPreVote(player);
+            }
         }
+        if(event instanceof ButtonInteractionEvent bevent){
+            resolveWhenQueue(bevent, game);
+        }
+       
+    }
+
+    public static void offerPlayerPassOnWhensNAfters(Player player){
+        List<String> whens = getPossibleWhenNames(player);
+        List<String> afters = getPossibleAfterNames(player);
+        String msg = player.getRepresentation()
+                + " if you wish, to speed up the agenda phase, you can choose now to secretly pass on all \"whens\" and \"afters\" for both agendas in the upcoming agenda phase. You may currently"
+                + " play " + whens.size() + " \"whens\" and " + afters.size()+ " \"afters\". You will be able to change your mind during the agendas themselves if something unexpected occurs. ";
+        if (!whens.isEmpty()) {
+            msg += "\nThe possible \"whens\" you may play are:";
+            for (String when : whens) {
+                msg += "\n" + when;
+            }
+        }
+        if (!afters.isEmpty()) {
+            msg += "\nThe possible \"afters\" you may play are:";
+            for (String after : afters) {
+                msg += "\n" + after;
+            }
+        }
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("passOnEverythingWhensNAfters", "Pass On Whens/Afters"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),msg, buttons);
+    }
+    @ButtonHandler("passOnEverythingWhensNAfters")
+    public static void passOnEverythingWhensNAfters(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),player.getRepresentation()+" You have successfully passed on all whens/afters for the entire agenda phase. You can undo this during the agenda if necessary");
+        game.setStoredValue("passOnAllWhensNAfters"+player.getFaction(), "Yes");
     }
 
     public static List<String> getPossibleWhenNames(Player player) {
@@ -626,7 +673,7 @@ public class AgendaHelper {
         game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "Yes");
         if (!getPossibleAfterNames(player).isEmpty()) {
             buttons = new ArrayList<>();
-            buttons.add(Buttons.red("unlockQueuedAfters", "Be Asked Again")); // Code This Button
+            buttons.add(Buttons.red("unlockQueuedAfters", "Be Asked Again"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     "You will not be asked again by default if someone else plays an \"after\". You can change that " +
                             " and be asked to decide on afters again when someone else plays an \"after\" by pressing this button.",
@@ -1032,7 +1079,7 @@ public class AgendaHelper {
                             .getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (!game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty()) {
+                if (!game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0")) {
                     skippedMessage = realIdentity2
                             + " had logged a pre-vote";
                     votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
@@ -1465,7 +1512,7 @@ public class AgendaHelper {
                             .getStoredValue("Abstain On Agenda").replace(nextInLine.getFaction(), ""));
                     nextInLine.resetSpentThings();
                 }
-                if (!game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty()) {
+                if (!game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0")) {
                     skippedMessage = realIdentity
                             + " had logged a pre-vote";
                     String votes = game.getStoredValue("preVoting" + nextInLine.getFaction());
@@ -3253,7 +3300,7 @@ public class AgendaHelper {
         }
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_WHEN);
         GameMessageManager.remove(game.getName(), GameMessageType.AGENDA_AFTER);
-        eraseAgendaQueues(game);
+        
         if (!action) {
             // offerEveryonePrepassOnShenanigans(game);
             // offerEveryonePreAbstain(game);
@@ -3295,6 +3342,7 @@ public class AgendaHelper {
             proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, msg, proceedButtons);
+        eraseAgendaQueues(event,game);
         if (cov) {
             MessageHelper.sendMessageToChannel(channel,
                     "# " + game.getPing() + " the agenda target is " + agendaTarget
