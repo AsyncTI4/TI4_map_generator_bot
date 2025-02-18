@@ -730,7 +730,7 @@ public class AgendaHelper {
         String watchPartyPing = watchPartyPing(game);
         List<MessageChannel> watchPartyList = publish && watchParty != null ? List.of(watchParty) : null;
 
-        int rand = 4 + ThreadLocalRandom.current().nextInt(4);
+        int rand = 6 + ThreadLocalRandom.current().nextInt(6);
         if (ThreadLocalRandom.current().nextInt(5) == 0) { // random chance for an extra long wait
             rand += 8 + ThreadLocalRandom.current().nextInt(14);
         }
@@ -738,8 +738,7 @@ public class AgendaHelper {
             resolveIxthianRoll(futureGame, publish && watchParty != null);
             return false;
         };
-        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, watchPartyPing, resolve,
-                watchPartyList, List.of(watchPartyPing));
+        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, List.of(watchPartyPing));
     }
 
     private static void resolveIxthianRoll(Game game, boolean publish) {
