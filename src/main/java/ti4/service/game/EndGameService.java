@@ -58,8 +58,8 @@ public class EndGameService {
             deleteRole = false;
         }
 
-        // Do not publish games that are FOW or never really took off
-        if (game.getRealPlayers().isEmpty() || game.isFowMode() || game.getRound() <= 2)
+        // Do not publish games that never really took off
+        if (game.getRealPlayers().isEmpty() || game.getRound() <= 2)
             publish = false;
 
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
