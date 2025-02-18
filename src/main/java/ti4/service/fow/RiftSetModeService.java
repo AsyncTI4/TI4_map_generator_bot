@@ -11,6 +11,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RandomHelper;
@@ -23,7 +24,9 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.StellarConverterService;
+import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.SourceEmojis;
 
 /*
  * For Eronous to run fow300
@@ -41,15 +44,13 @@ import ti4.service.emoji.CardEmojis;
  * - Custom frontier explore Unstable Rifts (tells player to ping GM to resolve)
  *   - Recycles itself back to the deck instantly
  * - /special swap_systems to support RANDOM options
+ * - A way to see what _own_ units Cabal has captured (button in Cards Thread)
  * AFTER CUSTODIANS IS SCORED:
  * - When concluding tactical action, tile has a 1/10 chance of placing a gravity rift
  * - When concluding tactical action, tile has a 1/25 chance of placing Vortex (gravity rift wormhole)
  * - Exploring a planet has 1/100 chance of Stellar Converting it (with a custom token)
  * 
- * TODO
-  * A way to see what _own_ units Cabal has captured
-  * Change frontier token image to a special one after custodians is taken
-  */
+ */
 public class RiftSetModeService {
     private static final String CRUCIBLE_PN = "crucible";
     private static final String CRUCIBLE_AGENDA = "riftset_crucible";
@@ -91,10 +92,10 @@ public class RiftSetModeService {
     public static void includeCrucibleAgendaButton(List<Button> buttons, Game game) {
         if (!isActive(game)) return;
 
-        buttons.add(Buttons.blue("flip_" + CRUCIBLE_AGENDA, "Flip Crucible Reallocation"));
+        buttons.add(Buttons.blue("riftsetflip_" + CRUCIBLE_AGENDA, "Flip Crucible Reallocation"));
     }
 
-    @ButtonHandler("flip_" + CRUCIBLE_AGENDA)
+    @ButtonHandler("riftsetflip_" + CRUCIBLE_AGENDA)
     public static void flipRiftSetCrucible(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(CRUCIBLE_AGENDA);
@@ -141,7 +142,7 @@ public class RiftSetModeService {
         if (!isActive(game) || !game.isCustodiansScored()) return;
 
         Tile tile = game.getTileByPosition(game.getActiveSystem());
-        if (tile.getTileModel().isGravityRift() || tile.hasCabalSpaceDockOrGravRiftToken()) {
+        if (tile.getTileModel().isGravityRift() || tile.hasCabalSpaceDockOrGravRiftToken() || tile.isHomeSystem()) {
             return;
         }
 
@@ -157,7 +158,7 @@ public class RiftSetModeService {
     public static boolean willPlanetGetStellarConverted(String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
         if (!isActive(game) || !game.isCustodiansScored()) return false;
 
-        if (RandomHelper.isOneInX(CHANCE_TO_STELLAR_CONVERT - Math.max((int)Math.pow(game.getRound(), 2), CHANCE_TO_STELLAR_CONVERT_MIN))) {
+        if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int)Math.pow(game.getRound(), 2), CHANCE_TO_STELLAR_CONVERT_MIN))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous...");
             StellarConverterService.secondHalfOfStellar(game, planetName, event);
             Tile tile = game.getTileFromPlanet(planetName);
@@ -173,5 +174,70 @@ public class RiftSetModeService {
     public static void swappedSystems(Game game) {
         if (!isActive(game)) return;
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "# Time and space begin to unravel.");
+    }
+
+    public static void addCapturedUnitsButton(List<Button> buttons, Game game) {
+        if (!isActive(game)) return;
+        buttons.add(Buttons.gray("riftsetshowcaptured", "Show captured units", SourceEmojis.Eronous));
+    }
+
+    @ButtonHandler("riftsetshowcaptured")
+    public static void showCapturedUnits(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        if (!isActive(game)) return;
+
+        String capturedUnits = getCapturedUnitsAsEmojis(game, player);
+        MessageHelper.sendMessageToChannel(event.getChannel(), 
+            "Following units of " + player.getRepresentation(false, false) + " are currently held captive:\n" 
+            + (capturedUnits.isEmpty() ? "None" : capturedUnits));
+    }
+
+    private static String getCapturedUnitsAsEmojis(Game game, Player player) {
+        Player cabal = getCabalPlayer(game);
+        UnitHolder nombox = cabal.getNomboxTile().getSpaceUnitHolder();
+        return nombox.getPlayersUnitListEmojisOnHolder(player);
+    }
+
+    public static List<Button> getSacrificeButtons() {
+        Button followButton = Buttons.green("resolveSacrificeSecondary", "Follow Sacrifice");  
+        Button noFollowButton = Buttons.blue("sc_no_follow_9", "Not Following");
+        return List.of(followButton, noFollowButton);
+    }
+
+    @ButtonHandler("resolveSacrificeSecondary")
+    public static void resolveSacrificeSecondary(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        if (!isActive(game)) return;
+
+        boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
+        if (used) {
+            return;
+        }
+
+        player.addFollowedSC(9, event);
+        ReactionService.addReaction(event, game, player, "is following **Sacrifice**.");
+
+        StringBuffer sb = new StringBuffer(player.getRepresentation(true, true));
+        sb.append(", to resolve Sacrifce Secondary:\n");
+        sb.append(" 1. Choose a system that contains your non-fighter ships. Use `/special system_info` for that system.\n");
+        sb.append(" 2. Use `/roll roll_command:Xd10` replacing X with the number of your non-fighter ships.\n");
+        sb.append(" 3. For each result of 1-3, order of the die matches the order of your ships in system_info list to be captured.\n");
+        sb.append(" 4. Use `/capture add_units unit_names:X target_faction_or_color:");
+        sb.append(player.getColor()).append(" faction_or_color:").append(getCabalPlayer(game).getColor()).append("`");
+        sb.append(" to have Cabal capture those units.\n");
+        sb.append(" 5. Use `/player stats trade_goods:+X` to give yourself Trade Goods equal to the combined value of what was captured.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+    }
+
+    public static void resolveSacrifice(GenericInteractionCreateEvent event, Game game, Player player) {
+        if (!isActive(game)) return;
+
+        String capturedUnits = getCapturedUnitsAsEmojis(game, player);
+        StringBuffer sb = new StringBuffer(player.getRepresentation(true, true));
+        sb.append(", to resolve Sacrifce Primary:\n");
+        sb.append("Following units are currently captured: ").append(capturedUnits.isEmpty() ? "None" : capturedUnits);
+        sb.append("\n 1. Use `/capture remove_units unit_names:X target_faction_or_color:");
+        sb.append(player.getColor()).append(" faction_or_color:").append(getCabalPlayer(game).getColor()).append("`");
+        sb.append(" to release up to 3 of your units from the Cabal.\n");
+        sb.append(" 2. Use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
     }
 }
