@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -470,7 +471,9 @@ public class CombatModHelper {
                     for (String pos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
                         Tile tile = game.getTileByPosition(pos);
                         for (UnitHolder uH : tile.getUnitHolders().values()) {
-                            scalingCount += uH.getUnitCount(UnitType.Mech, player);
+                            for(Player p2 : game.getRealPlayers()){
+                                scalingCount += uH.getUnitCount(UnitType.Mech, p2);
+                            }
                         }
                     }
                 }

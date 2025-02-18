@@ -54,6 +54,7 @@ public class StatusCleanupService {
             player.setInRoundTurnCount(0);
             player.clearFollowedSCs();
             player.cleanExhaustedTechs();
+            game.removeStoredValue("passOnAllWhensNAfters"+player.getFaction());
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();

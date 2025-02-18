@@ -37,7 +37,7 @@
     {
         "alias": "throne_of_the_false_emperor",
         "name": "Forgotten Throne",
-        "text": "ACTION: Purge this card to either gain 1 relic or immediately score 1 scored secret objective, or 1 of your unscored secret objectives, if you fulfill its requirements. [Note, this does not allow you to score the same secret twice, or to have more than 3 scored secrets]",
+        "text": "ACTION: Purge this card to either gain 1 relic or immediately score 1 scored secret objective, or 1 of your unscored secret objectives, if you fulfill its requirements. [Note, this does not enable you to score the same secret twice, or to have more than 3 scored secrets]",
         "source": "ds",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/ds/forgotten_throne.png?raw=true"
     },
