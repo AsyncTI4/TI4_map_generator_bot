@@ -228,7 +228,7 @@
     },
     {
         "ItemCategory": "COMMANDER",
-        "ItemId": "creusscommander",
+        "ItemId": "ghostcommander",
         "AdditionalComponents": [
             "ABILITY:quantum_entanglement"
         ],
