@@ -215,7 +215,7 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "spawning_grounds",
-        "OptionalComponents": [
+        "OptionalSwaps": [
             "ABILITY:mobile_command"
         ],
         "source": "ds"
