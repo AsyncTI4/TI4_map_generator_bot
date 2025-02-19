@@ -124,6 +124,14 @@ public class AutoPingCron {
             agendaPhasePing(game, milliSinceLastPing);
             return;
         }
+        if("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())){
+            scoringPhasePing(game, milliSinceLastPing);
+            return;
+        }
+        if("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())){
+            statusHomeworkPing(game, milliSinceLastPing);
+            return;
+        }
 
         Player player = game.getActivePlayer();
         if (player == null || player.isAFK()) {
@@ -205,6 +213,54 @@ public class AutoPingCron {
     private static void agendaPhasePing(Game game, long milliSinceLastPing) {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 3 * game.getAutoPingSpacer())) {
             pingMissingAgendaPlayers(game);
+            AutoPingMetadataManager.addPing(game.getName());
+        }
+    }
+
+    private static void scoringPhasePing(Game game, long milliSinceLastPing) {
+        if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
+            String poMsg = "";
+            String soMsg = "";
+            for(Player player : ti4.helpers.Helper.getInitativeOrder(game)){
+                String po = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"PO");
+                String so = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"SO");
+                if(po.isEmpty()){
+                    if(game.isFowMode()){
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a public objective");
+                    }
+                    poMsg += player.getRepresentation() + " ";
+                }
+                if(so.isEmpty()){
+                    if(game.isFowMode()){
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a secret objective");
+                    }
+                    soMsg  += player.getRepresentation() +" ";
+                }
+            }
+            if(!game.isFowMode()&& !poMsg.isEmpty()){
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(),poMsg+ "please indicate if you are scoring a public objective");
+            }
+            if(!game.isFowMode()&& !soMsg.isEmpty()){
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(),poMsg+ "please indicate if you are scoring a secret objective");
+            }
+            AutoPingMetadataManager.addPing(game.getName());
+        }
+    }
+    private static void statusHomeworkPing(Game game, long milliSinceLastPing) {
+        if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
+            String msg = "";
+            for(Player player : game.getRealPlayers()){
+                if(!game.getCurrentACDrawStatusInfo().contains(player.getFaction())){
+                    if(game.isFowMode()){
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please draw ACs and allocate command tokens");
+                    }
+                    msg += player.getRepresentation() + " ";
+                }
+                
+            }
+            if(!game.isFowMode() && !msg.isEmpty()){
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(),msg+"please draw ACs and allocate command tokens\n");
+            }
             AutoPingMetadataManager.addPing(game.getName());
         }
     }

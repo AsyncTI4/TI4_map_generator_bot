@@ -367,8 +367,12 @@ public class EndTurnService {
             if (scorables.size() == 0) {
                 messageText = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
             } else {
-                messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objectives: ";
-                messageText += String.join(", ", scorables);
+                if(Helper.canPlayerScorePOs(game, player)){
+                    messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objectives: ";
+                    messageText += String.join(", ", scorables);
+                }else{
+                    messageText = player.getRepresentation() + ", you cannot score public objectives because you do not control your home system.";
+                }
             }
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
 
