@@ -182,7 +182,16 @@ public class RiftSetModeService {
 
     public static void swappedSystems(Game game) {
         if (!isActive(game)) return;
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "# Time and space begin to unravel.");
+
+        String msg = "T##m% & sp¿c€ ß̶e̷g̷i̵n̸ T0øøø U̴̪̖͒͛͗̏N̸̻̦̜̊͒̈́̄R̵͎̅͆͘Ȧ̵̳̔̚V̴̹̜̽̾̄̓L̶̥̩̎.̷̨͕̻͑̄̓̕.̸̙̏̄̄͜.̷̼̝̲̩̆́̕";
+        switch (game.getRound()) {
+          case 1 -> { msg = "Time and space begin to unravel."; }
+          case 2 -> { msg = "Tíme and space bégin tto unravl..."; }
+          case 3 -> { msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl.."; }
+          case 4 -> { msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~"; }
+          case 5 -> { msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l..."; }
+        }
+        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "# " + msg);
     }
 
     public static void addCapturedUnitsButton(List<Button> buttons, Game game) {
@@ -251,14 +260,14 @@ public class RiftSetModeService {
     }
 
     public static boolean canPickSacrifice(Player player, Game game) {
-        if (isActive(game) && game.isCustodiansScored()) return true;
+        if (!isActive(game) || game.isCustodiansScored()) return true;
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
         return false;
     }
 
     public static boolean deckInfoAvailable(Player player, Game game) {
-        if (!isActive(game) || Constants.eronousId.equals(player.getUserID())) return true;
+        if (!isActive(game) || Constants.eronousId.equals(player.getUserID()) || game.getPlayersWithGMRole().contains(player)) return true;
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
         return false;
