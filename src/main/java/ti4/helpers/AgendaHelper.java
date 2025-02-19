@@ -72,6 +72,7 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowConstants;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.unit.AddUnitService;
 
@@ -3462,6 +3463,9 @@ public class AgendaHelper {
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
+        if (!RiftSetModeService.deckInfoAvailable(game.getPlayer(event.getUser().getId()), game)) {
+            return;
+        }
         StringBuilder sb2 = new StringBuilder();
         String sb = "### __**Discarded Agendas:**__";
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
