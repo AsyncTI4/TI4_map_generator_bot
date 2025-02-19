@@ -308,6 +308,59 @@ public class Helper {
         }
     }
 
+    public static String getNewStatusScoringRepresentation(Game game){
+        String rep = "# __Scoring Summary__\n";
+        for(Player player : getInitativeOrder(game)){
+            int sc = player.getLowestSC();
+            rep +=  CardEmojis.getSCBackFromInteger(sc)+player.getRepresentation(false, false)+"\n";
+            String poMessage = "";
+            String soMessage = CardEmojis.SecretObjective +" ";
+            String po = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"PO");
+            String so = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"SO");
+            if(po.isEmpty() || po.equalsIgnoreCase("Queued") || po.equalsIgnoreCase("None")){
+                poMessage += CardEmojis.Public1 +" "+ CardEmojis.Public2 +" ";
+                if(po.isEmpty()){
+                    poMessage += "❓";
+                }
+                if(po.equalsIgnoreCase("Queued")){
+                    poMessage += "Queued";
+                }
+                if(po.equalsIgnoreCase("None")){
+                    poMessage += "❎";
+                }
+            }else{
+                poMessage = CardEmojis.Public1 +" ✅ ";
+                for(String poObj : game.getRevealedPublicObjectives().keySet()){
+                    if(Mapper.getPublicObjective(poObj) != null){
+                        if(Mapper.getPublicObjective(poObj).getName().equalsIgnoreCase(po)){
+                            if(Mapper.getPublicObjective(poObj).getPoints() == 2){
+                                poMessage =CardEmojis.Public2 +" ✅ ";
+                            }
+                        }
+                    }
+                }
+                poMessage += po;
+            }
+            if(so.isEmpty() || so.equalsIgnoreCase("Queued") || so.equalsIgnoreCase("None")){
+                if(so.isEmpty()){
+                    soMessage += "❓";
+                }
+                if(so.equalsIgnoreCase("Queued")){
+                    soMessage += "Queued";
+                }
+                if(so.equalsIgnoreCase("None")){
+                    soMessage += "❎";
+                }
+            }else{
+                soMessage += " ✅ "+so ;
+            }
+            rep += "> "+poMessage+"\n";
+            rep += "> "+soMessage+"\n";
+        }
+
+        return rep;
+    }
+
     public static void resolvePOScoringQueue(Game game, GenericInteractionCreateEvent event) {
         String key2 = "queueToScorePOs";
         String key3 = "potentialScorePOBlockers";

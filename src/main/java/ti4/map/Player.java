@@ -2741,8 +2741,9 @@ public class Player {
         return false;
     }
 
+    
     @JsonIgnore
-    public Set<Player> getNeighbouringPlayers() {
+    public Set<Player> getNeighbouringPlayers(boolean checkEquiv) {
         Game game = getGame();
         Set<Player> adjacentPlayers = new HashSet<>();
         Set<Player> realPlayers = new HashSet<>(
@@ -2761,16 +2762,23 @@ public class Player {
                 break;
         }
         adjacentPlayers.remove(this);
+        if(checkEquiv){
+            for(Player p2 : realPlayers){
+                if(!adjacentPlayers.contains(p2) && p2.getNeighbouringPlayers(false).contains(this)){
+                    adjacentPlayers.add(p2);
+                }
+            }
+        }
         return adjacentPlayers;
     }
 
     public boolean isNeighboursWith(Player player) {
-        return getNeighbouringPlayers().contains(player);
+        return getNeighbouringPlayers(true).contains(player);
     }
 
     @JsonIgnore
     public int getNeighbourCount() {
-        return getNeighbouringPlayers().size();
+        return getNeighbouringPlayers(true).size();
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unit) {

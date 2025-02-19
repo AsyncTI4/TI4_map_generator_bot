@@ -50,12 +50,15 @@ public class ScorePublicObjectiveService {
             }
         }
         boolean scored = game.scorePublicObjective(player.getUserID(), poID);
+        if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
+            game.setStoredValue(player.getFaction() + "round"+game.getRound()+"PO", poName);
+        }
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel,
                 player.getFactionEmoji() + "No such public objective ID found, or already scored, please retry.");
         } else {
             informAboutScoring(event, channel, game, player, poID);
-            for (Player p2 : player.getNeighbouringPlayers()) {
+            for (Player p2 : player.getNeighbouringPlayers(true)) {
                 if (p2.hasLeaderUnlocked("syndicatecommander")) {
                     p2.setTg(p2.getTg() + 1);
                     String msg = p2.getRepresentationUnfogged() + " you gained 1 trade good"
