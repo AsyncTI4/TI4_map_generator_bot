@@ -381,7 +381,7 @@ public class PlayStrategyCardService {
                         boolean allNeighbours = true;
                         for (Player p2 : game.getRealPlayers()) {
                             if (player != p2) {
-                                if (player.getNeighbouringPlayers().contains(p2)) {
+                                if (player.getNeighbouringPlayers(true).contains(p2)) {
                                     neighborsMsg.append(" ").append(p2.getFactionEmoji());
                                     anyNeighbours = true;
                                 } else {

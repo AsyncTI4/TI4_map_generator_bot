@@ -45,7 +45,7 @@ public class WhisperService {
                 success = player1 + "(You) said: \"" + msg + "\" to " + player2;
             }
             MessageHelper.sendPrivateMessageToPlayer(player_, game, feedbackChannel, message, fail, success);
-            if (!player.getNeighbouringPlayers().contains(player_)) {
+            if (!player.getNeighbouringPlayers(true).contains(player_)) {
                 MessageHelper.sendMessageToChannel(feedbackChannel, "In FoW, communicate only to your neighbours, which " + player2 + " isn't.");
             }
         } else {
