@@ -61,6 +61,14 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "imperia",
+        "OptionalSwaps": [
+            "COMMANDER:mahactcommander"
+        ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "indoctrination",
         "OptionalSwaps": [
             "MECH:yin_mech"
@@ -146,18 +154,6 @@
         "source": "pok"
     },
     {
-        "ItemCategory": "AGENT",
-        "ItemId": "nomadagentartuno",
-        "Undraftable": true,
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "AGENT",
-        "ItemId": "nomadagentthundarian",
-        "Undraftable": true,
-        "source": "pok"
-    },
-    {
         "ItemCategory": "ABILITY",
         "ItemId": "the_company",
         "AdditionalComponents": [
@@ -179,20 +175,32 @@
         "source": "pok"
     },
     {
-        "ItemCategory": "HOMESYSTEM",
-        "ItemId": "keleresa",
-        "Undraftable": true,
-        "source": "pok"
-    },
-    {
         "ItemCategory": "AGENT",
         "ItemId": "mentakagent",
         "Undraftable": true,
         "source": "pok"
     },
     {
+        "ItemCategory": "AGENT",
+        "ItemId": "nomadagentartuno",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "nomadagentthundarian",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
         "ItemCategory": "COMMANDER",
         "ItemId": "cabalcommander",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "mahactcommander",
         "Undraftable": true,
         "source": "pok"
     },
@@ -212,13 +220,13 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "keleresheroodlynn",
+        "ItemId": "keleresheroharka",
         "AlwaysAddToPool": true,
         "source": "pok"
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "keleresheroharka",
+        "ItemId": "keleresheroodlynn",
         "AlwaysAddToPool": true,
         "source": "pok"
     },
@@ -228,6 +236,18 @@
         "AdditionalComponents": [
             "ABILITY:creuss_gate"
         ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "keleresa",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "jolnar_mech",
+        "Undraftable": true,
         "source": "pok"
     },
     {
@@ -256,13 +276,13 @@
     },
     {
         "ItemCategory": "PN",
-        "ItemId": "dark_pact",
+        "ItemId": "antivirus",
         "Undraftable": true,
         "source": "pok"
     },
     {
         "ItemCategory": "PN",
-        "ItemId": "pop",
+        "ItemId": "dark_pact",
         "Undraftable": true,
         "source": "pok"
     },
@@ -274,7 +294,7 @@
     },
     {
         "ItemCategory": "PN",
-        "ItemId": "antivirus",
+        "ItemId": "pop",
         "Undraftable": true,
         "source": "pok"
     },
@@ -309,26 +329,6 @@
         "ItemCategory": "TECH",
         "ItemId": "vay",
         "Undraftable": true,
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "MECH",
-        "ItemId": "jolnar_mech",
-        "Undraftable": true,
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "COMMANDER",
-        "ItemId": "mahactcommander",
-        "Undraftable": true,
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "imperia",
-        "OptionalSwaps": [
-            "COMMANDER:mahactcommander"
-        ],
         "source": "pok"
     }
 ]
