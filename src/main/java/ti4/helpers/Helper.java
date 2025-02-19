@@ -308,6 +308,25 @@ public class Helper {
         }
     }
 
+    public static boolean canPlayerScorePOs(Game game, Player player){
+        if(player.hasAbility("nomadic")){
+            return true;
+        }
+        if(player.hasAbility("mobile_command") && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Flagship).isEmpty()){
+            return false;
+        }
+        Tile hs = player.getHomeSystemTile();
+        if(hs != null){
+            for(Planet planet : hs.getPlanetUnitHolders()){
+                if(!player.getPlanets().contains(planet.getName())){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public static String getNewStatusScoringRepresentation(Game game){
         String rep = "# __Scoring Summary__\n";
         for(Player player : getInitativeOrder(game)){
@@ -326,7 +345,7 @@ public class Helper {
                     poMessage += "Queued";
                 }
                 if(po.equalsIgnoreCase("None")){
-                    poMessage += "❎";
+                    poMessage += "🙅";
                 }
             }else{
                 poMessage = CardEmojis.Public1 +" ✅ ";
@@ -349,7 +368,7 @@ public class Helper {
                     soMessage += "Queued";
                 }
                 if(so.equalsIgnoreCase("None")){
-                    soMessage += "❎";
+                    soMessage += "🙅";
                 }
             }else{
                 soMessage += " ✅ "+so ;
