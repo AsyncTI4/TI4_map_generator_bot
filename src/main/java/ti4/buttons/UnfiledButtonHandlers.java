@@ -985,6 +985,21 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("reveal_stage_")
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
         String stage = buttonID.replace("reveal_stage_", "");
+        if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
+            if(!game.getStoredValue("newStatusScoringMode").isEmpty() && game.getPhaseOfGame().equalsIgnoreCase("statusScoring")){
+                String missingPeople = "";
+                for(Player player : game.getRealPlayers()){
+                    String so = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"SO");
+                    if(so.isEmpty()){
+                        missingPeople += player.getRepresentation(false,true);
+                    }
+                }
+                if(!missingPeople.isEmpty()){
+                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), missingPeople + " need to indicate if they are scoring a secret objective before the next PO can be flipped");
+                    return;
+                }
+            }
+        }
         if (!game.isRedTapeMode()) {
             if ("2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealS2(game, event, event.getChannel());
@@ -1097,8 +1112,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 break;
             }
             if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
-                message = "wishes to score a public objective but has people ahead of them in initiative order who need to resolve first."
-                    + " They have been queued and will automatically score their public objective when everyone ahead of them is clear. ";
+                message = " has been queued to score a public objective. ";
                 if (!game.isFowMode()) {
                     message += player2.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on";
@@ -1241,8 +1255,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     }
                     if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                         message = player.getRepresentation()
-                            + " wishes to score a secret objective but has people ahead of them in initiative order who need to resolve first."
-                            + " They have been queued and will automatically score their secret objective when everyone ahead of them is clear. ";
+                            + "  has been queued to score a secret objective. ";
                         if (!game.isFowMode()) {
                             message += player2.getRepresentationUnfogged()
                                 + " is the one the game is currently waiting on";
@@ -1746,7 +1759,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             case "no_after", "no_after_persistent" -> ReactionService.handleAllPlayersReactingNoAfters(event.getInteraction().getMessage(), game);
             case "no_sabotage" -> ReactionService.handleAllPlayersReactingNoSabotage(event.getInteraction().getMessage(), game);
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
-                String message2 = "All players have indicated scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
+                String message2 = "All players have indicated public scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
                 Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
                 Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
                 Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
@@ -1755,15 +1768,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     message2 = "All players have indicated scoring. This game is Red Tape mode, which means no objective is revealed at this stage."
                         + " Please press one of the buttons below anyways though -- don't worry, it won't reveal anything, it will just run cleanup.";
                 }
-                if (game.getRound() < 4) {
+                if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
                     buttons.add(drawStage1);
                 }
-                if (game.getRound() > 2 || game.getPublicObjectives1Peakable().isEmpty()) {
-                    if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
-                        buttons.add(draw2Stage2);
-                    } else {
-                        buttons.add(drawStage2);
-                    }
+                if (game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty() || "456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
+                    buttons.add(drawStage2);
                 }
                 if (game.getRound() > 7 || game.getPublicObjectives2Peakable().isEmpty()) {
                     message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
