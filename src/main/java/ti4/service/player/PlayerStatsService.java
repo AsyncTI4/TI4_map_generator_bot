@@ -22,6 +22,7 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 @UtilityClass
@@ -106,6 +107,9 @@ public class PlayerStatsService {
             if (playerStats.getSCs().contains(scNumber)) {
                 MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
                     Helper.getSCName(scNumber, game) + " is already picked.");
+                return false;
+            }
+            if (scNumber == 9 && !RiftSetModeService.canPickSacrifice(player, game)) {
                 return false;
             }
         }

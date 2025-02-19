@@ -14,6 +14,18 @@ import ti4.service.fow.FowCommunicationThreadService;
 
 @UtilityClass
 public class SpinRingsHelper {
+    private static final String DEFAULT_MSG = "Spun the rings";
+    private static final List<String> STATUS_MSGS = Arrays.asList(
+      "Shifted the cosmic rings",
+        "Aligned the stellar orbits",
+        "Twisted the galactic core",
+        "Rearranged the celestial dance",
+        "Tilted the astral axis",
+        "Rotated the planetary rings",
+        "Adjusted the star-bound gyroscope",
+        "Spiraled the galactic arms",
+        "Warped the orbital paths"
+    );
 
     private static final String CW = "cw";
     private static final String CCW = "ccw";
@@ -67,7 +79,7 @@ public class SpinRingsHelper {
      */
     public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
         List<String> customSpins = Arrays.asList(customSpinString.toLowerCase().split(" "));
-        StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## Spun the rings");
+        StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## " + randomStatusMessage());
         List<Tile> tilesToSet = new ArrayList<>();
 
         for (String spinString : customSpins) {
@@ -115,7 +127,9 @@ public class SpinRingsHelper {
                     updateHomeSystem(game, tile);
                 }
             }
-            spunMessage(sb, ring, direction, steps);
+            if (!game.isFowMode()) {
+                spunMessage(sb, ring, direction, steps);
+            }
         }
 
         for (Tile tile : tilesToSet) {
@@ -190,10 +204,12 @@ public class SpinRingsHelper {
         }
         game.rebuildTilePositionAutoCompleteList();
 
-        StringBuffer sb = new StringBuffer("## Spun the rings");
-        spunMessage(sb, 1, CW, 1);
-        spunMessage(sb, 2, CCW, 2);
-        spunMessage(sb, 3, CW, 3);
+        StringBuffer sb = new StringBuffer("## " + randomStatusMessage());
+        if (!game.isFowMode()) {
+            spunMessage(sb, 1, CW, 1);
+            spunMessage(sb, 2, CCW, 2);
+            spunMessage(sb, 3, CW, 3);
+        }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
     }
 
@@ -212,5 +228,13 @@ public class SpinRingsHelper {
                 return;
             }
         }
+    }
+
+    private static String randomStatusMessage() {
+        Random random = new Random();
+        if (random.nextBoolean()) {
+            return DEFAULT_MSG;
+        }
+        return STATUS_MSGS.get(random.nextInt(STATUS_MSGS.size()));
     }
 }
