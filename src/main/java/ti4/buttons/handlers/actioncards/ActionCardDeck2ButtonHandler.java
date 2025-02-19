@@ -207,7 +207,7 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
 
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
+            if (p2 == player || !player.getNeighbouringPlayers(true).contains(p2)) {
                 continue;
             }
             if (game.isFowMode()) {

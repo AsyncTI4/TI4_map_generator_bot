@@ -1150,8 +1150,8 @@ public class TransactionHelper {
             || player.hasAbility("guild_ships") || player.getPromissoryNotesInPlayArea().contains("convoys")
             || player2.getPromissoryNotesInPlayArea().contains("convoys") || player2.hasAbility("guild_ships")
             || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys") || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
-            || player2.getNeighbouringPlayers().contains(player)
-            || player.getNeighbouringPlayers().contains(player2);
+            || player2.getNeighbouringPlayers(true).contains(player)
+            || player.getNeighbouringPlayers(true).contains(player2);
     }
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
