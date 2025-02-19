@@ -26,6 +26,7 @@ import ti4.model.PromissoryNoteModel;
 import ti4.service.StellarConverterService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 
 /*
@@ -48,7 +49,7 @@ import ti4.service.emoji.SourceEmojis;
  * AFTER CUSTODIANS IS SCORED:
  * - When concluding tactical action, tile has a 1/10 chance of placing a gravity rift
  * - When concluding tactical action, tile has a 1/25 chance of placing Vortex (gravity rift wormhole)
- * - Exploring a planet has 1/100 chance of Stellar Converting it (with a custom token)
+ * - Exploring a planet has chance of Stellar Converting it (with a custom token)
  * 
  */
 public class RiftSetModeService {
@@ -58,8 +59,8 @@ public class RiftSetModeService {
 
     private static final int CHANCE_TO_SPAWN_RIFT = 10;
     private static final int CHANCE_TO_SPAWN_VORTEX = 25;
-    private static final int CHANCE_TO_STELLAR_CONVERT = 101; //- Math.pow(roundNmbr, 2);
-    private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 50; //Don't reduce chance lower than this
+    private static final int CHANCE_TO_STELLAR_CONVERT = 100; // 1/100
+    private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 25; // 1/25
 
     public static boolean activate(GenericInteractionCreateEvent event, Game game) {
         if (game.getPlayer(Constants.eronousId) == null && AsyncTI4DiscordBot.guildFogOfWar != null) {
@@ -155,10 +156,18 @@ public class RiftSetModeService {
         }
     }
 
+    /* Round	Probability (%)
+     *  1     1.00%
+     *  2     1.19%
+     *  3     1.47%
+     *  4     1.92%
+     *  5     2.78%
+     *  6     4.00% (capped)
+     */
     public static boolean willPlanetGetStellarConverted(String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
         if (!isActive(game) || !game.isCustodiansScored()) return false;
 
-        if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int)Math.pow(game.getRound(), 2), CHANCE_TO_STELLAR_CONVERT_MIN))) {
+        if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int)(16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)), CHANCE_TO_STELLAR_CONVERT_MIN))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous...");
             StellarConverterService.secondHalfOfStellar(game, planetName, event);
             Tile tile = game.getTileFromPlanet(planetName);
@@ -239,5 +248,19 @@ public class RiftSetModeService {
         sb.append(" to release up to 3 of your units from the Cabal.\n");
         sb.append(" 2. Use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+    }
+
+    public static boolean canPickSacrifice(Player player, Game game) {
+        if (isActive(game) && game.isCustodiansScored()) return true;
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
+        return false;
+    }
+
+    public static boolean deckInfoAvailable(Player player, Game game) {
+        if (!isActive(game) || Constants.eronousId.equals(player.getUserID())) return true;
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
+        return false;
     }
 }

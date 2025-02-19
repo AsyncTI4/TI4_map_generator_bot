@@ -883,6 +883,9 @@ public class ExploreService {
     }
 
     public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide, boolean fullText) {
+        if (!RiftSetModeService.deckInfoAvailable(player, game)) {
+            return;
+        }
         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             List<String> deck = game.getExploreDeck(currentType);
