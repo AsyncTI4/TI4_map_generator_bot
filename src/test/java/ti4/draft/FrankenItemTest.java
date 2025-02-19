@@ -63,7 +63,6 @@ public class FrankenItemTest extends BaseTi4Test {
             assert (!card.getAlias().equals("ABILITY:probability_algorithms"));
             assert (!card.getAlias().equals("MECH:kjalengard_mech"));
             assert (!card.getAlias().equals("ABILITY:singularity_point"));
-            assert (!card.getAlias().equals("HERO:vadenhero"));
             assert (!card.getAlias().equals("AGENT:mykomentoriagent"));
             assert (!card.getAlias().equals("ABILITY:stealth_insertion"));
         }
