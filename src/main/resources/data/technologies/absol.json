@@ -250,7 +250,7 @@
         ],
         "requirements": "R",
         "source": "absol",
-        "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit per structure and assign them to your opponent's ground forces.\nAfter you perform a tactical action, you may exhaust this card and spend 4 resources to place a structure on a planet you control in the active system.",
+        "text": "At the start of ground combat on a planet you control that contains 1 or more of your structures, you may produce 1 hit per structure and assign them to your opponent's ground forces.\nAfter you perform a tactical action, you may exhaust this card and spend 4 resources to place a structure on a planet you control in the active system.",
         "homebrewReplacesID": "md",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/MagenDefenseGrid.png?raw=true"
     },
