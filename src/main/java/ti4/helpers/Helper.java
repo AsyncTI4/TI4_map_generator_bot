@@ -329,6 +329,9 @@ public class Helper {
 
     public static String getNewStatusScoringRepresentation(Game game){
         String rep = "# __Scoring Summary__\n";
+        if(game.getRealPlayers().size() > 10){
+            return "This game is too large to display a scoring summary";
+        }
         for(Player player : getInitativeOrder(game)){
             int sc = player.getLowestSC();
             rep +=  CardEmojis.getSCBackFromInteger(sc)+player.getRepresentation(false, false)+"\n";
