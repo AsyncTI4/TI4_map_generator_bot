@@ -1042,7 +1042,9 @@ class AgendaResolveButtonHandler {
 
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
+            if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
+            }
         } else {
             game.removeLaw(winner);
             game.putAgendaBackIntoDeckOnTop(winner);

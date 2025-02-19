@@ -792,13 +792,13 @@ public class MapGenerator implements AutoCloseable {
                 if (!game.isFowMode()) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.RED);
-                    if (player.getNeighbouringPlayers().isEmpty()) {
+                    if (player.getNeighbouringPlayers(true).isEmpty()) {
                         graphics.drawString("No Neighbors", x + 9 + xSpacer, y + 125 + yDelta);
                         xSpacer += 115;
                     } else {
                         graphics.drawString("Neighbors: ", x + 9 + xSpacer, y + 125 + yDelta);
                         xSpacer += 115;
-                        for (Player p2 : player.getNeighbouringPlayers()) {
+                        for (Player p2 : player.getNeighbouringPlayers(true)) {
                             String faction2 = p2.getFaction();
                             if (faction2 != null) {
                                 DrawingUtil.drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 + yDelta - 20, 26, 26);

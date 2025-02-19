@@ -1048,7 +1048,7 @@ public class ButtonHelperAbilities {
         if (Helper.getPlayerFromAbility(game, "pillage") != null && !Helper
             .getPlayerFromAbility(game, "pillage").getFaction().equalsIgnoreCase(player.getFaction())) {
             Player pillager = Helper.getPlayerFromAbility(game, "pillage");
-            return tg > 2 && player.getNeighbouringPlayers().contains(pillager);
+            return tg > 2 && player.getNeighbouringPlayers(true).contains(pillager);
         }
         return false;
     }

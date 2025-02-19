@@ -1060,6 +1060,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 int poIndex = Integer.parseInt(poID);
                 ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
                 ReactionService.addReaction(event, game, player);
+                if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+                    String msg = "Please score objectives.";
+                    msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+                    event.getMessage().editMessage(msg).queue();
+                }
             } catch (Exception e) {
                 BotLogger.log(event, "Could not parse PO ID: " + poID, e);
                 event.getChannel().sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
@@ -1101,6 +1106,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 try {
                     int poIndex = Integer.parseInt(poID);
+                    if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
+                        game.setStoredValue(player.getFaction() + "round"+game.getRound()+"PO", "Queued");
+                    }
                     game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse PO ID: " + poID, e);
@@ -1112,6 +1120,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 ReactionService.addReaction(event, game, player, message);
                 break;
             }
+        }
+        if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+            String msg = "Please score objectives.";
+            msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+            event.getMessage().editMessage(msg).queue();
         }
     }
 
@@ -1233,6 +1246,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         if (!game.isFowMode()) {
                             message += player2.getRepresentationUnfogged()
                                 + " is the one the game is currently waiting on";
+                        }
+                        if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
+                            game.setStoredValue(player.getFaction() + "round"+game.getRound()+"SO", "Queued");
                         }
                         MessageHelper.sendMessageToChannel(channel, message);
                         int soIndex = Integer.parseInt(soID);
@@ -2632,7 +2648,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler(Constants.SO_NO_SCORING)
     public static void soNoScoring(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.getRepresentation() + " has opted not to score a secret objective at this point in time.";
-
+        
+        game.setStoredValue(player.getFaction() + "round"+game.getRound()+"SO", "None");
+        
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         String key2 = "queueToScoreSOs";
         String key3 = "potentialScoreSOBlockers";
@@ -2649,8 +2667,19 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 // Helper.resolveSOScoringQueue(game, event);
             }
         }
+        if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+            String msg = "Please score objectives.";
+            msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+            event.getMessage().editMessage(msg).queue();
+        }
     }
 
+    @ButtonHandler("refreshStatusSummary")
+    public static void refreshStatusSummary(ButtonInteractionEvent event, Player player, Game game) {
+        String msg = "Please score objectives.";
+        msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+        event.getMessage().editMessage(msg).queue();
+    }
     @ButtonHandler("acquireAFreeTech") // Buttons.GET_A_FREE_TECH
     public static void acquireAFreeTech(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
@@ -2673,6 +2702,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
+        game.setStoredValue(player.getFaction() + "round"+game.getRound()+"PO", "None");
         String reply = game.isFowMode() ? "No public objective scored" : null;
         ReactionService.addReaction(event, game, player, reply);
         String key2 = "queueToScorePOs";
@@ -2687,6 +2717,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (!game.getStoredValue(key3b).contains(player.getFaction() + "*")) {
                 Helper.resolvePOScoringQueue(game, event);
             }
+        }
+        if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+            String msg = "Please score objectives.";
+            msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+            event.getMessage().editMessage(msg).queue();
         }
     }
 

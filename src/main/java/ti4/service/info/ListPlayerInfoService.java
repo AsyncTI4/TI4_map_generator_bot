@@ -207,7 +207,7 @@ public class ListPlayerInfoService {
         switch (objID) {
             case "push_boundaries" -> {
                 int aboveN = 0;
-                for (Player p2 : player.getNeighbouringPlayers()) {
+                for (Player p2 : player.getNeighbouringPlayers(true)) {
                     int p1count = player.getPlanets().size();
                     int p2count = p2.getPlanets().size();
                     if (p1count > p2count) {

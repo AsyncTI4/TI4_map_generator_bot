@@ -681,7 +681,7 @@ public class ButtonHelperActionCards {
     public static void resolveSeizeArtifactStep1(Player player, Game game, ButtonInteractionEvent event, String kolleccTech) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
+            if (p2 == player || !player.getNeighbouringPlayers(true).contains(p2)) {
                 continue;
             }
             if (game.isFowMode()) {
@@ -1957,7 +1957,7 @@ public class ButtonHelperActionCards {
 
     public static List<Button> getPlagiarizeButtons(Game game, Player player) {
         List<String> techToGain = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers()) {
+        for (Player p2 : player.getNeighbouringPlayers(true)) {
             techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain,
                 game);
         }

@@ -222,6 +222,11 @@ public class EndTurnService {
         }
         String messageText = "Please score objectives, " + game.getPing() + ".";
 
+        if(!game.isFowMode()){
+            game.setStoredValue("newStatusScoringMode", "Yes");
+            messageText += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+        }
+
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         for (Player player : game.getRealPlayers()) {
@@ -235,7 +240,7 @@ public class EndTurnService {
         }
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
-            for (Player p2 : vaden.getNeighbouringPlayers()) {
+            for (Player p2 : vaden.getNeighbouringPlayers(true)) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
                     String msg = p2.getRepresentationUnfogged() + " you have the opportunity to pay off **Binding Debts** here."
                         + " You may pay 1 trade good to get 2 debt tokens forgiven.";
@@ -251,6 +256,9 @@ public class EndTurnService {
         Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
+        if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+            poButtons.add( Buttons.gray("refreshStatusSummary", "Refresh Summary"));
+        }
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
             && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).isEmpty()) {
             poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
@@ -397,7 +405,7 @@ public class EndTurnService {
         String key3 = "potentialScorePOBlockers";
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
-
+        
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
         game.setStoredValue(key2b, "");
