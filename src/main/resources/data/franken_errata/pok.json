@@ -29,7 +29,8 @@
         "ItemCategory": "ABILITY",
         "ItemId": "dark_whispers",
         "OptionalSwaps": [
-            "PN:dark_pact"
+            "PN:dark_pact",
+            "PN:blood_pact"
         ],
         "source": "pok"
     },
@@ -51,6 +52,12 @@
         "OptionalSwaps": [
             "TECH:vay"
         ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "gashlai_physiology",
+        "Undraftable": true,
         "source": "pok"
     },
     {
@@ -100,6 +107,12 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "propagation",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "quantum_entanglement",
         "Undraftable": true,
         "source": "pok"
     },
@@ -160,6 +173,9 @@
             "AGENT:nomadagentartuno",
             "AGENT:nomadagentthundarian"
         ],
+        "OptionalSwaps": [
+            "AGENT:nomadagentmercer"
+        ],
         "source": "pok"
     },
     {
@@ -182,7 +198,19 @@
     },
     {
         "ItemCategory": "AGENT",
+        "ItemId": "muaatagent",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "AGENT",
         "ItemId": "nomadagentartuno",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "nomadagentmercer",
         "Undraftable": true,
         "source": "pok"
     },
@@ -200,7 +228,21 @@
     },
     {
         "ItemCategory": "COMMANDER",
+        "ItemId": "creusscommander",
+        "AdditionalComponents": [
+            "ABILITY:quantum_entanglement"
+        ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "COMMANDER",
         "ItemId": "mahactcommander",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "creuss_flagship",
         "Undraftable": true,
         "source": "pok"
     },
@@ -258,6 +300,12 @@
     },
     {
         "ItemCategory": "MECH",
+        "ItemId": "nekro_mech",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "MECH",
         "ItemId": "sol_mech",
         "Undraftable": true,
         "source": "pok"
@@ -282,6 +330,12 @@
     },
     {
         "ItemCategory": "PN",
+        "ItemId": "blood_pact",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "PN",
         "ItemId": "dark_pact",
         "Undraftable": true,
         "source": "pok"
@@ -296,6 +350,14 @@
         "ItemCategory": "PN",
         "ItemId": "pop",
         "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "STARTINGTECH",
+        "ItemId": "muaat",
+        "OptionalSwaps": [
+            "AGENT:muaatagent"
+        ],
         "source": "pok"
     },
     {
@@ -315,8 +377,24 @@
     },
     {
         "ItemCategory": "TECH",
+        "ItemId": "lw2",
+        "AdditionalComponents": [
+            "ABILITY:mitosis"
+        ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "TECH",
         "ItemId": "m2",
         "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "mr",
+        "AdditionalComponents": [
+            "ABILITY:gashlai_physiology"
+        ],
         "source": "pok"
     },
     {
