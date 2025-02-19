@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
 import ti4.image.Mapper;
@@ -577,7 +578,9 @@ public class MiltyDraftManager {
 
     private void loadSliceFromString(String str, int index) {
         List<String> tiles = Arrays.asList(str.split(","));
-        List<MiltyDraftTile> draftTiles = tiles.stream().map(this::findTile).toList();
+        List<MiltyDraftTile> draftTiles = tiles.stream()
+            .map(AliasHandler::resolveTile)
+            .map(this::findTile).toList();
         MiltyDraftSlice slice = new MiltyDraftSlice();
         slice.setTiles(draftTiles);
         slice.setName(Character.toString(index - 1 + 'A'));

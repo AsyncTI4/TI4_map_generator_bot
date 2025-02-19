@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.AsyncTI4DiscordBot;
 import ti4.executors.ExecutorManager;
 import ti4.listeners.annotations.AnnotationHandler;
@@ -85,5 +86,15 @@ public class ModalListener extends ListenerAdapter {
         if (modalID.startsWith("jmfA_")) {
             game.initializeMiltySettings().parseInput(context);
         }
+    }
+
+    public static String getModalDebugText(ModalInteractionEvent event) {
+        String output = "INPUT:\n```\n" +
+            "MenuID: " + event.getModalId();
+        for (ModalMapping field : event.getValues()) {
+            output += "\n> Field: " + field.getId() + " => " + field.getAsString();
+        }
+        output += "\n```";
+        return output;
     }
 }

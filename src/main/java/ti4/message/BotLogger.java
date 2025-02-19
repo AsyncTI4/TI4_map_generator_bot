@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -17,6 +18,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.ThreadGetter;
+import ti4.listeners.ModalListener;
 import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
@@ -146,6 +148,22 @@ public class BotLogger {
                 String channelMention = event.getChannel().getAsMention();
 
                 String menuInfo = SelectionMenuProcessor.getSelectionMenuDebugText(sEvent);
+                String logMsg = channelMention + "\n" + channelName + ". " + menuInfo + "\n" + msg;
+                if (e == null) {
+                    botLogChannel.sendMessage(logMsg).queue();
+                } else {
+                    ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
+                    botLogChannel.sendMessage(logMsg).queue(m -> m.createThreadChannel("Stack Trace").setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queue(t -> {
+                        MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e));
+                        t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                    }));
+                }
+            }
+            case ModalInteractionEvent mEvent -> { // MODAL EVENT LOGS
+                String channelName = event.getChannel().getName();
+                String channelMention = event.getChannel().getAsMention();
+
+                String menuInfo = ModalListener.getModalDebugText(mEvent);
                 String logMsg = channelMention + "\n" + channelName + ". " + menuInfo + "\n" + msg;
                 if (e == null) {
                     botLogChannel.sendMessage(logMsg).queue();
