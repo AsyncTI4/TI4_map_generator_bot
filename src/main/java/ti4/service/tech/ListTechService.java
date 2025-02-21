@@ -70,13 +70,14 @@ public class ListTechService {
                 String message = ButtonHelperSCs.deductCC(game, player, scNum);
                 ReactionService.addReaction(event, game, player, message);
             }
-        }
-        if (first) {
-            ButtonHelperCommanders.yinCommanderSummary(player, game);
-            ButtonHelperCommanders.veldyrCommanderSummary(player, game);
-            String getAllButtonSpoof = "getAllTechOfType_allTechResearchable";
-            getAllTechOfType(event, player, getAllButtonSpoof, game, player.getCardsInfoThread());
-            return;
+        
+            if (first) {
+                ButtonHelperCommanders.yinCommanderSummary(player, game);
+                ButtonHelperCommanders.veldyrCommanderSummary(player, game);
+                String getAllButtonSpoof = "getAllTechOfType_allTechResearchable";
+                getAllTechOfType(event, player, getAllButtonSpoof, game, player.getCardsInfoThread());
+                return;
+            }
         }
 
         List<Button> buttons = new ArrayList<>();
