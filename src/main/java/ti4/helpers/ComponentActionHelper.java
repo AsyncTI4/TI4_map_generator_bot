@@ -62,16 +62,7 @@ public class ComponentActionHelper {
             compButtons.add(tButton);
         }
 
-        // Legendary Planets
-        List<String> implementedLegendaryPlanets = new ArrayList<>();
-        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1721048723431L)) > 0)
-            implementedLegendaryPlanets.add("prism");
-        for (String planet : implementedLegendaryPlanets) {
-            String prettyPlanet = Mapper.getPlanet(planet).getName();
-            if (p1.getPlanets().contains(planet) && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
-                compButtons.add(Buttons.green(finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
-            }
-        }
+        
 
         // Leaders
         for (Leader leader : p1.getLeaders()) {

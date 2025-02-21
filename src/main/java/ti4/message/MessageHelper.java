@@ -87,6 +87,13 @@ public class MessageHelper {
 		splitAndSent(messageText, channel, null, Collections.singletonList(button));
 	}
 
+	public static void sendMessageToEventChannelWithEphemeralButtons(ButtonInteractionEvent event, String message, List<Button> buttons) {
+		List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
+        for (MessageCreateData messageD : messageList) {
+            event.getHook().setEphemeral(true).sendMessage(messageD).queue();
+        }
+	}
+
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		String gameName = GameNameService.getGameNameFromChannel(channel);
 		if (GameManager.isValid(gameName) && buttons instanceof ArrayList && !(channel instanceof ThreadChannel) && channel.getName().contains("actions")) {
