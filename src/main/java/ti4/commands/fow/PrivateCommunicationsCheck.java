@@ -23,18 +23,13 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         if (!FowCommunicationThreadService.isActive(getGame())) {
             MessageHelper.replyToMessage(event, "Bot managed communication threads are not enabled.\nEnable them with `/fow fow_options`");
+            return;
         }
 
-        String target = event.getOption(Constants.FACTION_COLOR).getAsString();
-        if ("ALL".equalsIgnoreCase(target)) {
-            FowCommunicationThreadService.checkAllCommThreads(getGame());
-            MessageHelper.replyToMessage(event, "All communication threads checked.");
-        } else {
-            Player player = getPlayer();
-            List<Button> buttons = new ArrayList<>();
-            FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(getGame(), player, buttons);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Communication threads with neighbors checked."
-                + (buttons.isEmpty() ? " No new neighbors found." : ""), buttons);
-        }
+        Player player = getPlayer();
+        List<Button> buttons = new ArrayList<>();
+        FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(getGame(), player, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Communication threads with neighbors checked."
+            + (buttons.isEmpty() ? " No new neighbors found." : ""), buttons);
     }
 }

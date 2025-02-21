@@ -83,8 +83,9 @@ public class RoundSummaryHelper {
         game.setStoredValue(roundKey, previousThoughts + thoughts);
 
         MessageChannel playerChannel = player.isRealPlayer() ? player.getCardsInfoThread() : eventChannel;
-        MessageHelper.sendMessageToChannelWithButton(playerChannel, resolvePlayerEmoji(player) + " stored an end of round summary", Buttons.EDIT_SUMMARIES);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "A player has stored an end of round summary.");
+        MessageHelper.sendMessageToChannelWithButton(playerChannel, resolvePlayerEmoji(player) + " stored a round summary", Buttons.EDIT_SUMMARIES);
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), 
+          (game.getPlayersWithGMRole().contains(player) ? "GM" : "A player") + " has stored a round summary.");
     }
 
     public static String resolveRoundSummaryKey(Player player, String roundNum) {
