@@ -33,6 +33,14 @@ public class FowCommunicationThreadService {
         return game.isFowMode() && Boolean.parseBoolean(game.getFowOption(FowConstants.MANAGED_COMMS));
     }
 
+    public static void checkAllCommThreads(Game game) {
+        if (!isActive(game)) return;
+
+        for (Player player : game.getRealPlayers()) {
+            checkCommThreads(game, player);
+        }
+    }
+
     public static void checkCommThreads(Game game, Player player) {
         //Just check the validity of threads and ignore the buttons
         checkCommThreadsAndNewNeighbors(game, player, new ArrayList<>());
