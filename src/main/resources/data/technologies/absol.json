@@ -765,7 +765,7 @@
         "baseUpgrade": "absol_sd2",
         "source": "absol",
         "text": "Move 2, Capacity 6\nPRODUCTION 7\nThis unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed. 1 non-fighter ship in this system does not count against your fleet pool.",
-        "homebrewReplacesID": "ff2",
+        "homebrewReplacesID": "ffac2",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/FloatingFactoryII.png?raw=true"
     },
     {
