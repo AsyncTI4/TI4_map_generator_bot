@@ -1,7 +1,5 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 
@@ -2504,10 +2503,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     @ButtonHandler("diploSystem")
-    public static void diploSystem(Player player, Game game) {
-        String message = player.getRepresentationUnfogged() + " Click the name of the planet whose system you wish to diplo";
+    public static void diploSystem(ButtonInteractionEvent event,Player player, Game game) {
+        String message = player.getRepresentationUnfogged() + " Choose the system you wish to diplo";
         List<Button> buttons = Helper.getPlanetSystemDiploButtons(player, game, false, null);
-        ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", buttons);
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+        
     }
 
     @ButtonHandler("redistributeCCButtons") // Buttons.REDISTRIBUTE_CCs
