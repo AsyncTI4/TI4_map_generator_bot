@@ -302,12 +302,14 @@ public class AutoPingCron {
             return;
         }
         for(Player p2 : game.getRealPlayers()){
+            if (p2.isAFK()) continue;
+
             if(!game.getStoredValue("queuedWhens").contains(p2.getFaction()) && !game.getStoredValue("declinedWhens").contains(p2.getFaction())){
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + ", this is a reminder to play (or pass on) your \"whens\".");
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"whens\".");
                 continue;
             }
             if(!game.getStoredValue("queuedAfters").contains(p2.getFaction()) && !game.getStoredValue("declinedAfters").contains(p2.getFaction()) && !game.getStoredValue("queuedWhens").contains(p2.getFaction())){
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + ", this is a reminder to play (or pass on) your \"afters\".");
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"afters\".");
             }
         }
 

@@ -2258,9 +2258,11 @@ public class Helper {
     public static void checkEndGame(Game game, Player player) {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("gameEnd", "End Game"));
             if (!game.isFowMode()) {
+                buttons.add(Buttons.green("gameEnd", "End Game"));
                 buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+            } else {
+                buttons.add(Buttons.green("gameEndConfirmation", "End and Delete Game"));
             }
             buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),

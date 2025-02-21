@@ -14,6 +14,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.RiftSetModeService;
 
 class SwapTwoSystems extends GameStateSubcommand {
@@ -53,6 +54,7 @@ class SwapTwoSystems extends GameStateSubcommand {
         game.setTile(tileFrom);
 
         game.rebuildTilePositionAutoCompleteList();
+        FowCommunicationThreadService.checkAllCommThreads(game);
         MessageHelper.replyToMessage(event, "Swapped " + tileTo.getPosition() + " and " + tileFrom.getPosition());
         RiftSetModeService.swappedSystems(game);
     }
