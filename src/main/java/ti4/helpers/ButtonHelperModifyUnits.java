@@ -1441,7 +1441,7 @@ public class ButtonHelperModifyUnits {
                             + " has B-Unit 205643a, the Roh'Dhna Commander, and is thus doing the primary ability of **Construction**, which does not place a command token.";
                     }
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                     } else {
                         ButtonHelper.sendMessageToRightStratThread(player, game, msg, "construction");
                     }
