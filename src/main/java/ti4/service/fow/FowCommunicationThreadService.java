@@ -21,7 +21,6 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.emoji.ColorEmojis;
 
 public class FowCommunicationThreadService {
 
@@ -31,6 +30,14 @@ public class FowCommunicationThreadService {
 
     public static boolean isActive(Game game) {
         return game.isFowMode() && Boolean.parseBoolean(game.getFowOption(FowConstants.MANAGED_COMMS));
+    }
+
+    public static void checkAllCommThreads(Game game) {
+        if (!isActive(game)) return;
+
+        for (Player player : game.getRealPlayers()) {
+            checkCommThreads(game, player);
+        }
     }
 
     public static void checkCommThreads(Game game, Player player) {
@@ -58,18 +65,27 @@ public class FowCommunicationThreadService {
     }
 
     private static Map<ThreadChannel, Player> findCommThreads(Game game, Player player) {
-        Map<ThreadChannel, Player> threads = new HashMap<>();
-        for (ThreadChannel threadChannel : game.getMainGameChannel().getThreadChannels()) {
-            Matcher matcher = THREAD_NAME_PATTERN.matcher(threadChannel.getName());
-            if (matcher.find()) {
-                Player p1 = game.getPlayerFromColorOrFaction(matcher.group(1));
-                Player p2 = game.getPlayerFromColorOrFaction(matcher.group(2));
-                if (p1 != null && p2 != null && (player.equals(p1) || player.equals(p2))) {
-                    threads.put(threadChannel, player.equals(p1) ? p2 : p1);
-                }
+        Map<ThreadChannel, Player> threadMap = new HashMap<>();
+        game.getMainGameChannel().getThreadChannels().forEach(thread -> {
+            checkThread(threadMap, thread, game, player);
+        });
+
+        game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().forEach(thread -> {
+            checkThread(threadMap, thread, game, player);
+        });
+
+        return threadMap;
+    }
+
+    private static void checkThread(Map<ThreadChannel, Player> threadMap, ThreadChannel thread, Game game, Player player) {
+        Matcher matcher = THREAD_NAME_PATTERN.matcher(thread.getName());
+        if (matcher.find()) {
+            Player p1 = game.getPlayerFromColorOrFaction(matcher.group(1));
+            Player p2 = game.getPlayerFromColorOrFaction(matcher.group(2));
+            if (p1 != null && p2 != null && (player.equals(p1) || player.equals(p2))) {
+                threadMap.put(thread, player.equals(p1) ? p2 : p1);
             }
         }
-        return threads;
     }
 
     private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads) {
@@ -84,14 +100,14 @@ public class FowCommunicationThreadService {
             String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
             if (areNeighbors && threadLocked) {
                 //Allow talking
-                threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR)).queue(success -> {
-                    MessageHelper.sendMessageToChannel(threadChannel,  notice + " are neighbors again and **may** communicate.");
+                threadChannel.sendMessage(notice + " are neighbors again and **may** communicate.").queue(success -> {
+                    threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR)).queue();
                 });
 
             } else if (!areNeighbors && !threadLocked) {
                 //Deny talking
-                threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR)).queue(success -> {
-                    MessageHelper.sendMessageToChannel(threadChannel, notice + " are no longer neighbors and should **not** communicate.");
+                threadChannel.sendMessage(notice + " are no longer neighbors and should **not** communicate.").queue(success -> {
+                    threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR)).queue();
                 });
             }
         }
@@ -126,10 +142,12 @@ public class FowCommunicationThreadService {
         Player inviteePlayer = game.getPlayerFromColorOrFaction(color);
 
         String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + YES_CHAR + " " + StringUtils.capitalize(player.getColor());
-        game.getMainGameChannel().createThreadChannel(threadName, true).queue(t -> {
+        game.getMainGameChannel().createThreadChannel(threadName, true)
+            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+            .queue(t -> {
             MessageHelper.sendMessageToChannel(t, "## Private communications thread opened\n"
-                + "Players: " + ColorEmojis.getColorEmojiWithName(inviteePlayer.getColor()) + " " + inviteePlayer.getPing() 
-                + " " + ColorEmojis.getColorEmojiWithName(player.getColor()) + " " + player.getPing() + "\n"
+                + "Players: " + inviteePlayer.getRepresentation(true, true, false, true)
+                + " " + player.getRepresentation(true, true, false, true) + "\n"
                 + "GM ping: " + game.getPlayersWithGMRole().stream().map(gm -> gm.getPing()).collect(Collectors.joining(" ")));
         });
 

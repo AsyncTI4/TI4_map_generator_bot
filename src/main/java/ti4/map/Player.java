@@ -1444,7 +1444,7 @@ public class Player {
         if (game != null && game.isCommunityMode()) {
             Role roleForCommunity = getRoleForCommunity();
             if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
-                StringBuilder sb = new StringBuilder(getFactionEmoji());
+                StringBuilder sb = new StringBuilder((noFactionIcon ? "" : getFactionEmoji()));
                 for (String userID : getTeamMateIDs()) {
                     User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
                     if (userById == null) {
@@ -1460,14 +1460,14 @@ public class Player {
                 return sb.toString();
             } else if (roleForCommunity != null) {
                 if (ping) {
-                    return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
+                    return (noFactionIcon ? "" : getFactionEmoji() + " ") + roleForCommunity.getAsMention() + " "
                         + ColorEmojis.getColorEmojiWithName(getColor());
                 } else {
-                    return getFactionEmoji() + " " + roleForCommunity.getName() + " "
+                    return (noFactionIcon ? "" : getFactionEmoji() + " ") + roleForCommunity.getName() + " "
                         + ColorEmojis.getColorEmojiWithName(getColor());
                 }
             } else {
-                return getFactionEmoji() + " " + ColorEmojis.getColorEmojiWithName(getColor());
+                return (noFactionIcon ? "" : getFactionEmoji() + " ") + ColorEmojis.getColorEmojiWithName(getColor());
             }
         }
 

@@ -57,8 +57,8 @@ public class RiftSetModeService {
     private static final String CRUCIBLE_AGENDA = "riftset_crucible";
     private static final String RIFTSET_INVASION_EXPLORE = "riftset_invasion";
 
-    private static final int CHANCE_TO_SPAWN_RIFT = 10;
-    private static final int CHANCE_TO_SPAWN_VORTEX = 25;
+    private static final int CHANCE_TO_SPAWN_RIFT = 8; // 1/8
+    private static final int CHANCE_TO_SPAWN_VORTEX = 16; // 1/16
     private static final int CHANCE_TO_STELLAR_CONVERT = 100; // 1/100
     private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 25; // 1/25
 

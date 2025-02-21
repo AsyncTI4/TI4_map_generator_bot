@@ -23,7 +23,9 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         if (!FowCommunicationThreadService.isActive(getGame())) {
             MessageHelper.replyToMessage(event, "Bot managed communication threads are not enabled.\nEnable them with `/fow fow_options`");
+            return;
         }
+
         Player player = getPlayer();
         List<Button> buttons = new ArrayList<>();
         FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(getGame(), player, buttons);
