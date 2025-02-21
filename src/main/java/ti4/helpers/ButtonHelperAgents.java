@@ -1979,12 +1979,12 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("exhaustAgent_nomadagentartuno_" + tg,
-                "Exhaust Artuno the Betrayer With " + tg + " Trade Good" + (tg == 1 ? "" : "s")));
+                "Exhaust Artuno With " + tg + " TG" + (tg == 1 ? "" : "s")));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
                     + " you have the opportunity to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Artuno the Betrayer the Betrayer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                    + "Artuno the Betrayer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent, and place " + tg + " trade good" + (tg == 1 ? "" : "s") + " on her.",
                 buttons);
         }
