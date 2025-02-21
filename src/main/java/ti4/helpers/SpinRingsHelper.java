@@ -137,12 +137,7 @@ public class SpinRingsHelper {
         }
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
-
-        if (game.isFowMode()) {
-            for (Player player : game.getRealPlayers()) {
-                FowCommunicationThreadService.checkCommThreads(game, player);
-            }
-        }
+        FowCommunicationThreadService.checkAllCommThreads(game);
     }
 
     private static int parseInt(String number) {

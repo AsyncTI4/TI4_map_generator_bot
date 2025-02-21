@@ -581,7 +581,7 @@
         "baseUpgrade": "absol_dn2",
         "source": "absol",
         "text": "Cost 4, Combat 4, Move 2, Capacity 2\nSUSTAIN DAMAGE, BOMBARDMENT 4\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
-        "homebrewReplacesID": "sd2",
+        "homebrewReplacesID": "sdn2",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/superdreadnought_2.jpg?raw=true"
     },
     {
