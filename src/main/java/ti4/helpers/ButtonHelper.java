@@ -4079,7 +4079,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice.");
             return new ArrayList<Button>();
         }
-        if (player == game.getActivePlayer()) {
+        if (game.isNaaluAgent() || player == game.getActivePlayer()) {
             if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
                 && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
                 if (!game.getStoredValue("absolLux").isEmpty()) {
@@ -4119,7 +4119,7 @@ public class ButtonHelper {
         }
         List<Button> buttons = ButtonHelper.getLandingTroopsButtons(player, game, event, tile);
         Button concludeMove;
-        if (player == game.getActivePlayer()) {
+        if (game.isNaaluAgent() || player == game.getActivePlayer()) {
             concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done Landing Troops");
         } else {
             concludeMove = Buttons.red(finChecker + "deleteButtons", "Done Resolving");
