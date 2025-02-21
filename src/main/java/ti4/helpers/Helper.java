@@ -862,6 +862,12 @@ public class Helper {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
             }
+            if(unit.equalsIgnoreCase("spacedock")){
+                UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+                if(uH == null || uH.getUnitCount(UnitType.Spacedock, player) > 0){
+                    continue;
+                }
+            }
             Button button = Buttons.red("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, game));
             if (unit.equalsIgnoreCase("2gf") || unit.equalsIgnoreCase("3gf")) {
                 button = button.withEmoji(UnitEmojis.infantry.asEmoji());
@@ -1068,7 +1074,6 @@ public class Helper {
         int keleresAgent = 0;
         for (String thing : spentThings) {
             boolean found = false;
-            System.out.println("Spent thing: " + thing);
             switch (thing) {
                 case "sarween" -> {
                     msg.append("> Used _Sarween Tools_ " + TechEmojis.CyberneticTech + "\n");
@@ -1706,6 +1711,7 @@ public class Helper {
 
     public static List<Button> getPlanetSystemDiploButtons(Player player, Game game, boolean ac, Player mahact) {
         List<Button> planetButtons = new ArrayList<>();
+        List<String> tilePos = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         if (mahact == null) {
@@ -1713,10 +1719,14 @@ public class Helper {
                 if (planet.equalsIgnoreCase("ghoti") || planet.contains("custodia")) {
                     continue;
                 }
+                Tile tile = game.getTileFromPlanet(planet);
                 if (!getPlanetRepresentation(planet, game).toLowerCase().contains("mecatol") || ac) {
-                    Button button = Buttons.gray(finsFactionCheckerPrefix + "diplo_" + planet + "_" + "diploP",
-                        getPlanetRepresentation(planet, game) + " System");
-                    planetButtons.add(button);
+                    if(tile != null && !tilePos.contains(tile.getPosition())){
+                        tilePos.add(tile.getPosition());
+                        Button button = Buttons.gray(finsFactionCheckerPrefix + "diplo_" + planet + "_" + "diploP",
+                            tile.getRepresentationForButtons());
+                        planetButtons.add(button);
+                    }
                 }
             }
         } else {

@@ -5,16 +5,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
-import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -65,11 +66,12 @@ public class ButtonHelperSCs {
         List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
         Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
         buttons.add(doneRefreshing);
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-        }
+        // if (!game.isFowMode()) {
+        //     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        // } else {
+        //     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+        // }
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         if (player.hasAbility("peace_accords")) {
             List<Button> buttons2 = ButtonHelperAbilities.getXxchaPeaceAccordsButtons(game, player,
                 event, player.getFinsFactionCheckerPrefix());
@@ -432,12 +434,15 @@ public class ButtonHelperSCs {
         String unit = buttonID.replace("construction_", "");
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
-            + unitKey.unitName() + " on for **Construction**. If you are resolving the secondary, it will place a command token in the system as well.";
+            + unitKey.unitName() + " on for **Construction**.";
+        if(!player.getSCs().contains(4)){
+            message += "\n## __It will place a command token in the system as well.__ ";
+        }
         List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
+        for (MessageCreateData messageD : messageList) {
+            event.getHook().setEphemeral(true).sendMessage(messageD).queue();
         }
 
     }
@@ -469,11 +474,12 @@ public class ButtonHelperSCs {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
         }
         message += "\nYou have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.";
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-        }
+        // if (!game.isFowMode()) {
+        //     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        // } else {
+        //     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+        // }
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         ReactionService.addReaction(event, game, player);
         message = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -483,11 +489,12 @@ public class ButtonHelperSCs {
         Button doneGainingCC = Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons_leadership", "Done Gaining Command Tokens");
         Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
         List<Button> buttons2 = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
-        if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons2);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons2);
-        }
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons2);
+        // if (!game.isFowMode()) {
+        //     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons2);
+        // } else {
+        //     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons2);
+        // }
 
     }
 

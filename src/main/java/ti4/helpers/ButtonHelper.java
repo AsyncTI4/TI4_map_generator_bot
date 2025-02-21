@@ -2991,7 +2991,7 @@ public class ButtonHelper {
 
         List<String> implementedLegendaryPlanets = List.of(
             "mallice", "hexmallice", "mirage", "hopesend", "primor", // PoK
-            "silence", "tarrock", "prism", "echo", "domna"); // DS
+            "silence", "prism", "echo", "domna"); // DS
 
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
@@ -6342,7 +6342,8 @@ public class ButtonHelper {
             }
             String message = player.getFactionEmoji() + " chose to Diplo the system containing "
                 + Helper.getPlanetRepresentation(planet, game) + ".";
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy",null);
         }
         deleteMessage(event);
     }

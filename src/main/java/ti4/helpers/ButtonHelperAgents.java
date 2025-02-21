@@ -1276,7 +1276,7 @@ public class ButtonHelperAgents {
         List<String> legendaries = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             for (String planet : player.getPlanets()) {
-                if (planet.contains("custodia")) {
+                if (planet.contains("custodia") || planet.contains("ghoti")) {
                     continue;
                 }
                 PlanetModel model = Mapper.getPlanet(planet);
