@@ -675,8 +675,8 @@
         "alias": "patronage",
         "name": "Patronage",
         "phase": "Any",
-        "window": "After the speaker reveals a public objective",
-        "text": "Look at the top 2 cards of the matching public objective deck; you may reveal 1 of those cards and purge the objective the speaker revealed.",
+        "window": "When a public objective is revealed",
+        "text": "Look at the top 2 cards of the deck that matches that objective; replace that objective with 1 of these cards and shuffle that deck.",
         "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
         "source": "action_deck_2"
     },
@@ -793,7 +793,7 @@
         "name": "Renegotiation",
         "phase": "Any",
         "window": "After another player resolves an effect of 1 of your promissory notes",
-        "text": "That player must give you 1 action card and 1 promissory note from their hand.",
+        "text": "Exhaust 1 planet that player controls and ready 1 planet you control.",
         "automationID": "renegotiation",
         "flavorText": "The Creuss merchants were overwhelmed by the bazaar's wares: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
         "source": "action_deck_2"
@@ -884,7 +884,7 @@
         "name": "Short-lived Clone",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose 1 of your readied agents. During this turn, that agent has the text ability of each player's agent, even if their agent is exhausted. At the end of this turn, ready your chosen agent.",
+        "text": "Choose 1 agent. Ready or exhaust that agent.",
         "flavorText": "\"Damn thing tried to kill me,\" Suffi grunted as she heaved the corpse onto the floor. \"Best we destroy that spinner after all. This galaxy can barely handle one of me.\"",
         "source": "action_deck_2"
     },
