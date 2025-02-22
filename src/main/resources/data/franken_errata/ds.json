@@ -177,7 +177,7 @@
     },
     {
         "ItemCategory": "FLAGSHIP",
-        "ItemId": "ghemina_flagship_lady",
+        "ItemId": "ghemina_flagship_lord",
         "Undraftable": true,
         "source": "ds"
     },
@@ -190,7 +190,7 @@
             "HERO:gheminaherolady"
         ],
         "AdditionalComponents": [
-            "FLAGSHIP:ghemina_flagship_lady"
+            "FLAGSHIP:ghemina_flagship_lord"
         ],
         "source": "ds"
     },
