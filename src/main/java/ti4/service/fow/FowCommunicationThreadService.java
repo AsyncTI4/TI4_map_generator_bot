@@ -35,29 +35,25 @@ public class FowCommunicationThreadService {
     public static void checkAllCommThreads(Game game) {
         if (!isActive(game)) return;
 
+        Set<Set<Player>> checkedPairs = new HashSet<>();
         for (Player player : game.getRealPlayers()) {
-            checkCommThreads(game, player);
+            Set<Player> neighbors = player.getNeighbouringPlayers(true);
+            Map<ThreadChannel, Player> commThreadsWithPlayer = findCommThreads(game, player);
+            validateNeighbors(player, neighbors, commThreadsWithPlayer, checkedPairs);
         }
-    }
-
-    public static void checkCommThreads(Game game, Player player) {
-        //Just check the validity of threads and ignore the buttons
-        checkCommThreadsAndNewNeighbors(game, player, new ArrayList<>());
     }
 
     public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> buttons) {
-        if (!isActive(game)) {
-            return;
-        }
+        if (!isActive(game)) return;
 
         Set<Player> neighbors = player.getNeighbouringPlayers(true);
-        Map<ThreadChannel, Player> commThreads = findCommThreads(game, player);
+        Map<ThreadChannel, Player> commThreadsWithPlayer = findCommThreads(game, player);
         
         //Check existing threads
-        validateNeighbors(player, neighbors, commThreads);
+        validateNeighbors(player, neighbors, commThreadsWithPlayer, new HashSet<>());
 
         //Check if can find neighbors without a comm thread
-        Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreads);
+        Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreadsWithPlayer);
         
         if (!newNeighbors.isEmpty()) {
             buttons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
@@ -88,11 +84,17 @@ public class FowCommunicationThreadService {
         }
     }
 
-    private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads) {
+    private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<Set<Player>> checkedPairs) {
         for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
             ThreadChannel threadChannel = thread.getKey();
             String threadName = thread.getKey().getName();
             Player otherPlayer = thread.getValue();
+
+            Set<Player> playerPair = Set.of(player, otherPlayer);
+            if (checkedPairs.contains(playerPair)) {
+                continue; // Skip if we already checked this pair
+            }
+            checkedPairs.add(playerPair);
 
             boolean areNeighbors = neighbors.contains(otherPlayer);
             boolean threadLocked = threadName.contains(NO_CHAR);
@@ -100,14 +102,20 @@ public class FowCommunicationThreadService {
             String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
             if (areNeighbors && threadLocked) {
                 //Allow talking
-                threadChannel.sendMessage(notice + " are neighbors again and **may** communicate.").queue(success -> {
-                    threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR)).queue();
+                threadChannel.getManager().setArchived(false).queue(success -> {
+                    threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
+                        .queue(nameUpdated -> {
+                            threadChannel.sendMessage(notice + " are neighbors again and **may** communicate.").queue();
+                        });
                 });
 
             } else if (!areNeighbors && !threadLocked) {
                 //Deny talking
-                threadChannel.sendMessage(notice + " are no longer neighbors and should **not** communicate.").queue(success -> {
-                    threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR)).queue();
+                threadChannel.getManager().setArchived(false).queue(success -> {
+                    threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR))
+                        .queue(nameUpdated -> {
+                            threadChannel.sendMessage(notice + " are no longer neighbors and should **not** communicate.").queue();
+                        });
                 });
             }
         }

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
@@ -59,6 +60,10 @@ public class FoWHelper {
         if (channel == null) {
             return game.isFowMode();
         }
+        if (channel != null && channel instanceof ThreadChannel) {
+            channel = ((ThreadChannel)channel).getParentChannel();
+        }
+
         if (game == null) {
             String gameName = GameNameService.getGameNameFromChannel(channel);
             if (!GameManager.isValid(gameName)) {
