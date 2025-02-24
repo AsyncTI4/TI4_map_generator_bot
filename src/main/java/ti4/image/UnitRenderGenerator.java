@@ -1,6 +1,11 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -24,6 +29,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
 public class UnitRenderGenerator {
@@ -113,6 +119,10 @@ public class UnitRenderGenerator {
             if (shouldHideJailUnit(frogPlayer, unitKey)) continue;
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
+            if(player == null){
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),"Could not find owner for "+unitKey.toString() +" in tile "+tile.getRepresentation());
+                continue;
+            }
             Integer unitCount = unitEntry.getValue();
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
             String unitPath = getUnitPath(unitKey);

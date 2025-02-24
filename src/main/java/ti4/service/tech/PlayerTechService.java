@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.AliasHandler;
@@ -30,7 +31,6 @@ import ti4.helpers.Units;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -177,24 +177,8 @@ public class PlayerTechService {
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CCdeletethismessage", "Gain Command Tokens"));
-                if (player.getStrategicCC() > 0) {
-                    for (Leader leader : player.getLeaders()) {
-                        if (leader.isExhausted() && leader.getId().contains("agent")) {
-                            buttons.add(Buttons.blue(
-                                player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + leader.getId(),
-                                "Ready " + leader.getId()));
-                        }
-                    }
-                    for (String relic : player.getExhaustedRelics()) {
-                        if ("titanprototype".equalsIgnoreCase(relic) || "absol_jr".equalsIgnoreCase(relic)) {
-                            buttons.add(Buttons.blue(
-                                player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + relic,
-                                "Ready JR-SX455-O"));
-                        }
-                    }
-                }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor()
-                    + " use button to gain 1 command token, or spend 1 command token from your strategy pool to ready your agent.", buttons);
+                    + " use button to gain 1 command token.", buttons);
             }
             case "aida", "sar", "htp", "absol_aida" -> {
                 if (event instanceof ButtonInteractionEvent buttonEvent) {
