@@ -44,7 +44,7 @@
     {
         "alias": "baldrick_herostriumph",
         "name": "Hero's Triumph",
-        "text": "At the end of your turn, you may purge this card to score 1 public or secret objective if you fulfill its requirements.",
+        "text": "At the end of your turn, you may purge this card to score 1 public objective or 1 scored secret objective, if you fulfill its requirements.",
         "source": "ignis_aurora"
     },
     {
@@ -68,7 +68,7 @@
     {
         "alias": "baldrick_voiceofarvid",
         "name": "The Voice of Arvid",
-        "text": "At the start of the agenda phase, you may reveal the top 5 cards of the agenda deck. Choose 1 of the revealed agendas. Resolve it as if you had case 1 vote for an outcome of your choice; discard the rest. ",
+        "text": "At the start of the agenda phase, you may reveal the top 5 cards of the agenda deck. Choose 1 of the revealed agendas. Resolve it as if you had case 1 vote for an outcome of your choice; discard the rest. Then, purge this card.",
         "source": "ignis_aurora"
     }
 ]
