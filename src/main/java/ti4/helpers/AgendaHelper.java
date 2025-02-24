@@ -141,6 +141,7 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "You have declined to queue an \"after\". You can change your mind with this button.", buttons);
                 offerPreVote(player);
+                
             }
         }
         if(event instanceof ButtonInteractionEvent bevent){
@@ -176,6 +177,22 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),player.getRepresentation()+" You have successfully passed on all whens/afters for the entire agenda phase. You can undo this during the agenda if necessary");
         game.setStoredValue("passOnAllWhensNAfters"+player.getFaction(), "Yes");
+
+        if(game.getPhaseOfGame().equalsIgnoreCase("agendawaiting")){
+            game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("queueAWhen", "Play A When"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                    "You have declined to queue a \"when\". You can change your mind with this button.", buttons);
+            game.setStoredValue("declinedAfters", game.getStoredValue("declinedAfters") + player.getFaction() + "_");
+            game.setStoredValue("queuedAftersLockedFor" + player.getFaction(), "Yes");
+            buttons = new ArrayList<>();
+            buttons.add(Buttons.red("queueAnAfter", "Play An \"After\""));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+            "You have declined to queue an \"after\". You can change your mind with this button.", buttons);
+            offerPreVote(player);
+            resolveWhenQueue(event, game);
+        }
     }
 
     public static List<String> getPossibleWhenNames(Player player) {
