@@ -73,6 +73,7 @@ public class EndTurnService {
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
         pingNextPlayer(event, game, player);
+        CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getRepresentationNoPing() + ".");
         }

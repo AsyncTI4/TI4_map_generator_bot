@@ -2,10 +2,11 @@ package ti4.buttons.handlers.explore;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -57,6 +58,7 @@ class ExploreButtonHandler {
             String pF = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
         }
+        CommanderUnlockCheckService.checkPlayer(player, "naaz");
     }
 
     @ButtonHandler("resolveVolatile_")

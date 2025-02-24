@@ -84,6 +84,9 @@ public class ListTechService {
         String techPrefix = player.finChecker() + "getAllTechOfType_";
         for (TechnologyType type : techTypes) {
             String id = techPrefix + type.toString();
+            if(techTypes.size() == 1 && type == TechnologyType.UNITUPGRADE){
+                id +="_inf";
+            }
             String label = "Get a " + type.readableName() + " Technology";
             switch (type) {
                 case PROPULSION -> buttons.add(Buttons.blue(id, label, type.emoji()));
@@ -266,7 +269,7 @@ public class ListTechService {
         techs.sort(TechnologyModel.sortByTechRequirements);
 
         String idPrefix = player.finChecker() + switch (buttonPrefixType.toLowerCase()) {
-            case "normal", "res", "nekro", "nopay", "free" -> "getTech_";
+            case "normal", "res", "nekro", "nopay", "free","inf" -> "getTech_";
             default -> "swapTechs__" + buttonPrefixType + "__";
         };
         String idSuffix = switch (buttonPrefixType.toLowerCase()) {

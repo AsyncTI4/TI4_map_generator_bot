@@ -93,6 +93,9 @@ public class MessageHelper {
             event.getHook().setEphemeral(true).sendMessage(messageD).queue();
         }
 	}
+	public static void sendEphemeralMessageToEventChannel(ButtonInteractionEvent event, String message) {
+        event.getHook().setEphemeral(true).sendMessage(message).queue();
+	}
 
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		String gameName = GameNameService.getGameNameFromChannel(channel);
