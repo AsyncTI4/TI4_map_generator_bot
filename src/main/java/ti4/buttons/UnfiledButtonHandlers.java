@@ -1,5 +1,7 @@
 package ti4.buttons;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +11,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 
@@ -1479,6 +1480,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     playerRep + ", your initial command token allocation was " + shortCCs + ". Your final command token allocation is " + finalCCs + ".");
             } else {
                 if ("leadership".equalsIgnoreCase(buttonID)) {
+                    game.setStoredValue("ledSpend"+player.getFaction(), "");
                     String message = playerRep + ", your initial command token allocation was " + shortCCs + ". Your final command tokens allocation is "
                         + finalCCs + ".";
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "leadership");
