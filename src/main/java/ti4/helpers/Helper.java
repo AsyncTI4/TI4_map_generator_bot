@@ -815,8 +815,10 @@ public class Helper {
     public static List<Button> getPlanetExhaustButtons(Player player, Game game, String whatIsItFor) {
         if (game.getStoredValue("resetSpend").isEmpty()) {
             player.resetSpentThings();
+            game.setStoredValue("ledSpend"+player.getFaction(), "");
         } else {
             game.setStoredValue("resetSpend", "");
+
         }
         player.resetOlradinPolicyFlags();
         List<Button> planetButtons = new ArrayList<>();
@@ -1680,9 +1682,9 @@ public class Helper {
             unitButtons.addAll(getPlaceUnitButtonsForSaarCommander(player, tile, game, placePrefix));
         }
         if ("place".equalsIgnoreCase(placePrefix)) {
-            Button DoneProducingUnits = Buttons.red("deleteButtons_" + warfareNOtherstuff + "_" + tile.getPosition(), "Done Producing Units");
+            Button DoneProducingUnits = Buttons.red(player.getFinsFactionCheckerPrefix()+"deleteButtons_" + warfareNOtherstuff + "_" + tile.getPosition(), "Done Producing Units");
             unitButtons.add(DoneProducingUnits);
-            unitButtons.add(Buttons.gray("resetProducedThings", "Reset Build"));
+            unitButtons.add(Buttons.gray(player.getFinsFactionCheckerPrefix()+"resetProducedThings", "Reset Build"));
         }
         if (player.hasTech("yso")) {
             if ("sling".equalsIgnoreCase(warfareNOtherstuff) || "freelancers".equalsIgnoreCase(warfareNOtherstuff) || "chaosM".equalsIgnoreCase(warfareNOtherstuff)) {

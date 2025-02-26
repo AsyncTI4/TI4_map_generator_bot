@@ -412,7 +412,7 @@ public class ButtonHelperAgents {
             int oldTg = p2.getTg();
             p2.setTg(oldTg + 2);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                player.getFactionEmojiOrColor() + " gained 2 trade goods from " + ssruuClever + "Clodho, the Ilyxum" + ssruuSlash + " agent, being used ("
+                p2.getFactionEmojiOrColor() + " gained 2 trade goods from " + ssruuClever + "Clodho, the Ilyxum" + ssruuSlash + " agent, being used ("
                     + oldTg + "->" + p2.getTg() + ").");
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

@@ -314,6 +314,8 @@ public class ButtonHelperSCs {
         player.addFollowedSC(tradeInitiative, event);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(tradeInitiative) && p2.getCommodities() > 0) {
+                int ogComms = p2.getCommodities();
+                int ogTG = p2.getTg();
                 if (p2.getCommodities() > washedCommsPower) {
                     p2.setTg(p2.getTg() + washedCommsPower);
                     p2.setCommodities(p2.getCommodities() - washedCommsPower);
@@ -330,6 +332,13 @@ public class ButtonHelperSCs {
                         p2.getRepresentationUnfogged()
                             + ", your commodities got washed in the process of washing "
                             + player.getFactionEmojiOrColor() + ".");
+                }
+                if(p2.getPromissoryNotesInPlayArea().contains("dark_pact") && !player.getPromissoryNotesOwned().contains("dark_pact")){
+                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                        p2.getRepresentationUnfogged()
+                            + ", due to you having dark pact in play, we are undoing the recent wash of your comms as it may not be desired.");
+                    p2.setTg(ogTG);
+                    p2.setCommodities(ogComms);
                 }
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, player, p2,
                     player.getCommoditiesTotal());
@@ -455,6 +464,11 @@ public class ButtonHelperSCs {
                 scModel = game.getStrategyCardModelByInitiative(scNum).get();
             }
         }
+        boolean unfinished = false;
+        if(!game.getStoredValue("ledSpend"+player.getFaction()).isEmpty() && !player.getSpentThingsThisWindow().isEmpty()){
+            unfinished = true;
+            game.setStoredValue("resetSpend", "yes");
+        }
         if (scModel == null) {
             scModel = game.getStrategyCardModelByName("leadership").orElse(null);
         }
@@ -466,6 +480,11 @@ public class ButtonHelperSCs {
         player.addFollowedSC(leadershipInitiative, event);
         String message = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+        if(unfinished){
+            message = Helper.buildSpentThingsMessage(player, game, "inf");
+        }else{
+            game.setStoredValue("ledSpend"+player.getFaction(), "Yes");
+        }
         Button doneExhausting = Buttons.red("deleteButtons_leadership", "Done Exhausting Planets");
         buttons.add(doneExhausting);
         int ccCount = Helper.getCCCount(game, player.getColor());
@@ -473,12 +492,12 @@ public class ButtonHelperSCs {
         if (!game.getStoredValue("ccLimit").isEmpty()) {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
         }
-        message += "\nYou have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.";
         // if (!game.isFowMode()) {
         //     MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         // } else {
         //     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         // }
+        MessageHelper.sendEphemeralMessageToEventChannel(event, "You have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.");
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         ReactionService.addReaction(event, game, player);
         message = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
