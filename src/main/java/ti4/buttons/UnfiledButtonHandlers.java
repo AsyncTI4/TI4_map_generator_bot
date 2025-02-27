@@ -1135,10 +1135,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 break;
             }
         }
-        if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+        if(!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.getPhaseOfGame().equalsIgnoreCase("action")){
             String msg = "Please score objectives.";
             msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
+        }
+        if(game.getPhaseOfGame().equalsIgnoreCase("action")){
+            event.getMessage().delete().queue();
         }
     }
 
@@ -1730,6 +1733,21 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (matchingFactionReactions >= numberOfPlayers) {
             respondAllPlayersReacted(event, game);
             GameMessageManager.remove(game.getName(), messageId);
+        }else{
+            
+            if(buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring"))){
+                boolean allReacted = true;
+                for(Player player : game.getRealPlayers()){
+                    String po = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"PO");
+                    if(po.isEmpty()){
+                        allReacted = false;
+                    }
+                }
+                if(allReacted){
+                    respondAllPlayersReacted(event, game);
+                }
+            }
+            
         }
     }
 
@@ -1860,6 +1878,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             CommandCounterHelper.addCC(event, color, tile);
         }
         String message = player.getFactionEmojiOrColor() + " Placed 1 command token from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system.";
+        ButtonHelper.updateMap(game, event);
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
         ButtonHelper.deleteMessage(event);
     }
@@ -1891,6 +1910,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent on **Construction**.";
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
+        ButtonHelper.updateMap(game, event);
         ButtonHelper.deleteMessage(event);
     }
 
