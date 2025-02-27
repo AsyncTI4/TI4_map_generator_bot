@@ -124,13 +124,13 @@ public class EndGameService {
                 threadChannel.getManager().setArchived(true).queue();
             }
         }
-        if (actionsChannel != null) {
-            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-                if (!threadChannel.getName().contains("Cards Info")) {
-                    threadChannel.getManager().setArchived(true).queue();
-                }
-            }
-        }
+        // if (actionsChannel != null) {
+        //     for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+        //         if (!threadChannel.getName().contains("Cards Info")) {
+        //             threadChannel.getManager().setArchived(true).queue();
+        //         }
+        //     }
+        // }
 
         // GET BOTHELPER LOUNGE
         List<TextChannel> bothelperLoungeChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true);

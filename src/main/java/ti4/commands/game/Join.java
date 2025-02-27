@@ -20,6 +20,10 @@ public class Join extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         User user = event.getUser();
+        if(game.getPlayer(user.getId()) != null){
+            MessageHelper.replyToMessage(event, "You are already a member of the game and do not need to join it again");
+            return;
+        }
         game.addPlayer(user.getId(), user.getName());
 
         MessageHelper.replyToMessage(event, getResponseMessage(game));
