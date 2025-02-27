@@ -243,7 +243,7 @@ public class MapGenerator implements AutoCloseable {
         final int columnsOfLaws = 2;
         final int lawHeight = 115;
         int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
-        lawsY += (game.getEvents().size()/ columnsOfLaws + 1) * lawHeight;
+        lawsY += (game.getEventsInEffect().size()/ columnsOfLaws + 1) * lawHeight;
         return playerY + lawsY + objectivesY + EXTRA_Y * 3;
     }
 
