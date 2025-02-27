@@ -715,7 +715,7 @@ public class TransactionHelper {
         if (event.getTimeCreated().getMonth() == Month.APRIL && event.getTimeCreated().getDayOfMonth() == 1)
             return true;
         if ("pbd100two".equals(game.getName()))
-            return RandomHelper.isOneInX(20);
+            return RandomHelper.isOneInX(5);
         return RandomHelper.isOneInX(1000);
     }
 
