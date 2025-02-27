@@ -215,6 +215,9 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "spawning_grounds",
+        "AdditionalComponents": [
+            "HOMESYSTEM:ghoti"
+        ],
         "OptionalSwaps": [
             "ABILITY:mobile_command"
         ],
@@ -436,7 +439,7 @@
         ],
         "source": "ds"
     },
-    {   
+    {
         "ItemCategory": "STARTINGFLEET",
         "ItemId": "khrask",
         "Undraftable": true,
@@ -729,7 +732,10 @@
         "OptionalSwaps": [
             "HERO:veldyrhero",
             "COMMANDER:veldyrcommander",
-            "PN:dspnveld1"
+            "PN:dspnveld1",
+            "PN:dspnveld2",
+            "PN:dspnveld3",
+            "PN:dspnveld4"
         ],
         "source": "ds"
     },
