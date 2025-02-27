@@ -1967,7 +1967,7 @@ public class ButtonHelperAgents {
                 player.getFactionEmoji() + " Chose to place 1 destroyer with their ships from " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                     + "Shipmonger Zsknck, the Axis" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             buttons.addAll(
-                Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
+                Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
             message = " Use buttons to put 1 destroyer with your ships";
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),

@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
@@ -449,10 +448,10 @@ public class ButtonHelperSCs {
         }
         List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
-        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
-        for (MessageCreateData messageD : messageList) {
-            event.getHook().setEphemeral(true).sendMessage(messageD).queue();
-        }
+        // List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
+        // for (MessageCreateData messageD : messageList) {
+        //     event.getHook().setEphemeral(true).sendMessage(messageD).queue();
+        // }
 
     }
 
