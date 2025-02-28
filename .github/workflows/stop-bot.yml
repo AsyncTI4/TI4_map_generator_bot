@@ -13,20 +13,20 @@ jobs:
         AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
         AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
       with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        password: ${{ secrets.SSH_PASSWORD }}
-        port: ${{ secrets.SSH_PORT }}
+        host: ${{ secrets.HOSTINGER_SSH_HOST }}
+        username: ${{ secrets.HOSTINGER_SSH_USER }}
+        password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+        port: ${{ secrets.HOSTINGER_SSH_PORT }}
         envs: AWS_KEY, AWS_SECRET
         script: |
-          cd /root/ti4bot
+          cd ${{ vars.HOST_TI4_SAVES_DIR }}
           ./scheduled_upload.sh
-          cd /root/ti4bot/TI4_map_generator_bot
+          cd ${{ vars.HOST_TI4_REPO_DIR }}
           echo "Building docker image..."
           docker version
           docker build --build-arg BOT_KEY=$DISCORD_BOT_KEY --build-arg USER=$DISCORD_USER --build-arg SERVER=$DISCORD_SERVER --build-arg SERVER2=$DISCORD_SERVER2 --build-arg AWS_SECRET=$AWS_SECRET --build-arg AWS_KEY=$AWS_KEY -t tibot .
           echo "Shutting Down TIBot... giving 600 seconds to shutdown"
           docker stop $(docker ps -q) --time 600
-          cd /root/ti4bot
+          cd ${{ vars.HOST_TI4_SAVES_DIR }}
           ./scheduled_upload.sh
           echo "DONE!"
