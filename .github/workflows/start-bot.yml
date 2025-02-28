@@ -12,12 +12,15 @@ jobs:
       env:
         AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
         AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+        DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        DISCORD_BOT_USERID: ${{ secrets.DISCORD_BOT_USERID }}
+        REPO_DISPATCH_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
-        envs: AWS_KEY, AWS_SECRET
+        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN
         script: |
           cd ${{ vars.HOST_TI4_REPO_DIR }}
           echo "Building docker image..."
