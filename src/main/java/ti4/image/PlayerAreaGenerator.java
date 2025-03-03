@@ -486,7 +486,7 @@ public class PlayerAreaGenerator {
         DrawingUtil.superDrawStringCentered(graphics, Integer.toString(sc), pt.x, pt.y, scColor, stroke4, Color.black);
         if (scColor.equals(Color.GRAY)) {
             int off = big ? 15 : 8;
-            DrawingUtil.drawRedX((Graphics2D) graphics, pt.x + off, pt.y + off, 2 * off, false);
+            DrawingUtil.drawRedX((Graphics2D) graphics, pt.x + off, pt.y + off, 2 * off, big);
         }
 
         // Add the overlay
