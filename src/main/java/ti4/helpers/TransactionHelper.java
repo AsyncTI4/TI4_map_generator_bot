@@ -1370,7 +1370,7 @@ public class TransactionHelper {
         Player p2 = game.getPlayerFromColorOrFaction(player2Color);
         if (p2 != null) {
             List<Button> buttons = TransactionHelper.getStuffToTransButtonsOld(game, p2, player);
-            String message = p2.getRepresentation()
+            String message = p2.getRepresentationUnfogged()
                 + " you have been given something on the condition that you give something in return. Hopefully the player explained what."
                 + " If you don't hand it over, please return what they sent. Use buttons to send something to "
                 + player.getRepresentationNoPing();
