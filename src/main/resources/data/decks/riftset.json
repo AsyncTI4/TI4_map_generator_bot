@@ -66,6 +66,8 @@
       "description": "All PoK explore cards + A special Cabal event",
       "cardIDs": [
           "riftset_invasion",
+          "riftset_invasion2",
+          "riftset_invasion3",
           "aw1",
           "aw2",
           "aw3",
