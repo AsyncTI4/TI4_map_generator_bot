@@ -67,7 +67,7 @@ public class ShowGameService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Map Image sent to " + game.getBotMapUpdatesThread().getJumpUrl());
         } else if (game.isFowMode()) {
             Player player = game.getPlayer(event.getUser().getId());
-            MessageChannel privateChannel = player.getPrivateChannel();
+            MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
             if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class)
                 && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
                 && privateChannel != null && !channel.equals(privateChannel)) {
