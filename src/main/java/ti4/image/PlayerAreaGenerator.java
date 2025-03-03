@@ -459,7 +459,7 @@ public class PlayerAreaGenerator {
 
         Point center = new Point(tl.x + 30, tl.y + 42);
         if (player.hasTheZeroToken()) {
-            drawSC(0, center, false);
+            drawSC(0, center, true);
         }
 
         boolean big = playerSCs.size() == 1 && !player.hasTheZeroToken();
