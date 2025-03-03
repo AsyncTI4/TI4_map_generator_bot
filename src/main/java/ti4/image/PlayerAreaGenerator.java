@@ -485,8 +485,8 @@ public class PlayerAreaGenerator {
         if (sc == ButtonHelper.getKyroHeroSC(game)) sc = 9;
         DrawingUtil.superDrawStringCentered(graphics, Integer.toString(sc), pt.x, pt.y, scColor, stroke4, Color.black);
         if (scColor.equals(Color.GRAY)) {
-            int off = big ? 20 : 8;
-            DrawingUtil.drawRedX((Graphics2D) graphics, pt.x + off, pt.y + off, 15, false);
+            int off = big ? 15 : 8;
+            DrawingUtil.drawRedX((Graphics2D) graphics, pt.x + off, pt.y + off, 2 * off, big);
         }
 
         // Add the overlay
