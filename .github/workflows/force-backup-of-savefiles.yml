@@ -26,6 +26,7 @@ jobs:
           script: |
             cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
+            rm -f ${{ vars.HOST_TI4_SAVES_DIR }}/.git/index.lock
             git add . -A
             git commit -m "save files"
             git push
