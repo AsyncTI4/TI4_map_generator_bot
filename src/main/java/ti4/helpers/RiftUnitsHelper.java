@@ -151,12 +151,11 @@ public class RiftUnitsHelper {
             var parsedUnit = new ParsedUnit(unitKey);
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             msg += " and failed. Condolences for your loss.";
-            if(cabal == null){
-                cabal = RiftSetModeService.getCabalPlayer(game);
-            }
             if (cabal != null && cabal != player
                 && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
+            } else if (RiftSetModeService.isActive(game)) {
+                msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
             }
         }
 
