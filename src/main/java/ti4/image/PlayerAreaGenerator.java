@@ -459,7 +459,7 @@ public class PlayerAreaGenerator {
 
         Point center = new Point(tl.x + 30, tl.y + 42);
         if (player.hasTheZeroToken()) {
-            drawSC(0, center, false);
+            drawSC(0, center, true);
         }
 
         boolean big = playerSCs.size() == 1 && !player.hasTheZeroToken();
@@ -483,7 +483,7 @@ public class PlayerAreaGenerator {
 
         // Draw the SC number
         if (sc == ButtonHelper.getKyroHeroSC(game)) sc = 9;
-        DrawingUtil.superDrawStringCentered(graphics, Integer.toString(sc), pt.x, pt.y, scColor, stroke2, Color.black);
+        DrawingUtil.superDrawStringCentered(graphics, Integer.toString(sc), pt.x, pt.y, scColor, stroke4, Color.black);
         if (scColor.equals(Color.GRAY)) {
             int off = big ? 20 : 8;
             DrawingUtil.drawRedX((Graphics2D) graphics, pt.x + off, pt.y + off, 15, false);
