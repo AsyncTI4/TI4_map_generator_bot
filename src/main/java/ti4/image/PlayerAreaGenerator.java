@@ -483,7 +483,7 @@ public class PlayerAreaGenerator {
 
         // Draw the SC number
         if (sc == ButtonHelper.getKyroHeroSC(game)) sc = 9;
-        DrawingUtil.superDrawStringCentered(graphics, Integer.toString(sc), pt.x, pt.y, scColor, stroke2, Color.black);
+        DrawingUtil.superDrawStringCentered(graphics, Integer.toString(sc), pt.x, pt.y, scColor, stroke4, Color.black);
         if (scColor.equals(Color.GRAY)) {
             int off = big ? 20 : 8;
             DrawingUtil.drawRedX((Graphics2D) graphics, pt.x + off, pt.y + off, 15, false);
