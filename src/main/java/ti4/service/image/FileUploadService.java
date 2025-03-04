@@ -9,7 +9,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Storage;
-import ti4.helpers.WebHelper;
 import ti4.image.ImageHelper;
 import ti4.message.BotLogger;
 
