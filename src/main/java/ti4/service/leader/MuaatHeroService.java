@@ -36,9 +36,7 @@ public class MuaatHeroService {
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
         game.setTile(novaTile);
 
-        String message2 = tile.getRepresentation() +
-            " has been _Nova Seed_'d by " +
-            player.getRepresentation() + ".";
+        String message2 = tile.getRepresentation() + " has been _Nova Seed_'d by " + player.getRepresentation() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, novaTile, 1, message2);
 
         if (player.hasLeaderUnlocked("muaathero")) {

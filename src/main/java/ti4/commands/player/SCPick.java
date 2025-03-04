@@ -206,7 +206,7 @@ class SCPick extends GameStateSubcommand {
         if (isFowPrivateGame) {
             if (allPicked) {
                 BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
-                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             }
             String fail = "User for next faction not found. Report to ADMIN";
@@ -255,7 +255,7 @@ class SCPick extends GameStateSubcommand {
                 if (game.isShowBanners()) {
                     BannerGenerator.drawFactionBanner(privatePlayer);
                 }
-                String text = player.getRepresentationUnfogged() + ", it is now your turn (your " 
+                String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
                 Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
                 if (nextPlayer != null && !game.isFowMode()) {
