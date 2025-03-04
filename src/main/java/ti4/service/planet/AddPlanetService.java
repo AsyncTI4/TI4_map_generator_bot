@@ -197,10 +197,8 @@ public class AddPlanetService {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
                 if (event != null && buttons != null && !buttons.isEmpty()) {
-                    String message = player.getFactionEmoji() + " Click button to explore "
-                        + Helper.getPlanetRepresentation(planet, game);
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        message, buttons);
+                    String message = player.getFactionEmoji() + " Click button to explore " + Helper.getPlanetRepresentation(planet, game);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 }
             }
             alreadyOwned = false;
@@ -318,12 +316,11 @@ public class AddPlanetService {
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode()) {
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (event != null && buttons != null && !buttons.isEmpty()) {
-                String message = player.getFactionEmoji() + " Click button to explore "
-                    + Helper.getPlanetRepresentation(planet, game) + ".";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    message, buttons);
+                String message = player.getFactionEmoji() + " Click button to explore " + Helper.getPlanetRepresentation(planet, game) + ".";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             }
         }
+
         if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
             || game.getPhaseOfGame().contains("agenda")) && player.hasUnit("saar_mech")
             && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {

@@ -14,36 +14,36 @@ import ti4.service.leader.ExhaustLeaderService;
 
 class ExhaustLeader extends GameStateSubcommand {
 
-	public ExhaustLeader() {
-		super(Constants.EXHAUST_LEADER, "Exhaust leader", true, true);
-		addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setRequired(true).setAutoComplete(true));
-		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count to add to leader"));
-	}
+    public ExhaustLeader() {
+        super(Constants.EXHAUST_LEADER, "Exhaust leader", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count to add to leader"));
+    }
 
-	@Override
-	public void execute(SlashCommandInteractionEvent event) {
-		Game game = getGame();
-		Player player = getPlayer();
-		String leaderID = event.getOption(Constants.LEADER, null, OptionMapping::getAsString);
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+        Player player = getPlayer();
+        String leaderID = event.getOption(Constants.LEADER, null, OptionMapping::getAsString);
 
-		Leader playerLeader = player.unsafeGetLeader(leaderID);
-		if (playerLeader == null) {
-			MessageHelper.sendMessageToEventChannel(event, "Leader '" + leaderID + "'' not found");
-			return;
-		}
+        Leader playerLeader = player.unsafeGetLeader(leaderID);
+        if (playerLeader == null) {
+            MessageHelper.sendMessageToEventChannel(event, "Leader '" + leaderID + "'' not found");
+            return;
+        }
 
-		if (playerLeader.isLocked()) {
-			MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is locked");
-			return;
-		}
+        if (playerLeader.isLocked()) {
+            MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is locked");
+            return;
+        }
 
-		if (playerLeader.isExhausted()) {
-			MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is exhausted already");
-			return;
-		}
+        if (playerLeader.isExhausted()) {
+            MessageHelper.sendMessageToEventChannel(event, "Leader '" + playerLeader.getId() + "' is exhausted already");
+            return;
+        }
 
-		Integer tgCount = event.getOption(Constants.TG, null, OptionMapping::getAsInt);
-		ExhaustLeaderService.exhaustLeader(game, player, playerLeader, tgCount);
-	}
+        Integer tgCount = event.getOption(Constants.TG, null, OptionMapping::getAsInt);
+        ExhaustLeaderService.exhaustLeader(game, player, playerLeader, tgCount);
+    }
 }

@@ -385,7 +385,8 @@ public class TransactionHelper {
         "_Nullam Rem Natam_",
         "A Jubba Cloak",
         "The Pretence That Your Secrets Are Unscorable",
-        "Double Nothing");
+        "Double Nothing",
+        "The opportunity to be your own boss");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {

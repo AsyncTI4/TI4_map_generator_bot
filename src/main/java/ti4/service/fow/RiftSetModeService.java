@@ -134,7 +134,7 @@ public class RiftSetModeService {
 
         winner.setPromissoryNote(CRUCIBLE_PN);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, winner, false);
-        
+
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(CRUCIBLE_PN);
         MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you recieved " + CardEmojis.PN + pnModel.getName());
     }
@@ -143,7 +143,7 @@ public class RiftSetModeService {
         if (!isActive(game)) return;
 
         if (exploreCardId.startsWith(RIFTSET_INVASION_EXPLORE)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "**GM ping:** " + getGMs(game) + " Unstable Rifts Event waiting for resolving!");
         }
     }
@@ -163,15 +163,15 @@ public class RiftSetModeService {
         if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
             AddTokenCommand.addToken(event, tile, "gravityrift", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition()
-               + "\n^ " + getGMs(game));
+                + "\n^ " + getGMs(game));
         } else if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_VORTEX)) {
             AddTokenCommand.addToken(event, tile, "vortex", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition()
-               + "\n^ " + getGMs(game));
+                + "\n^ " + getGMs(game));
         }
     }
 
-    /* Round	Probability (%)
+    /* Round  Probability (%)
      *  1     1.00%
      *  2     1.19%
      *  3     1.47%
@@ -182,7 +182,7 @@ public class RiftSetModeService {
     public static boolean willPlanetGetStellarConverted(String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
         if (!isActive(game) || !game.isCustodiansScored()) return false;
 
-        if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int)(16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)), CHANCE_TO_STELLAR_CONVERT_MIN))) {
+        if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int) (16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)), CHANCE_TO_STELLAR_CONVERT_MIN))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous..."
                 + "\n^ " + getGMs(game));
             StellarConverterService.secondHalfOfStellar(game, planetName, event);
@@ -201,11 +201,21 @@ public class RiftSetModeService {
 
         String msg = "T##m% & sp¿c€ ß̶e̷g̷i̵n̸ T0øøø U̴̪̖͒͛͗̏N̸̻̦̜̊͒̈́̄R̵͎̅͆͘Ȧ̵̳̔̚V̴̹̜̽̾̄̓L̶̥̩̎.̷̨͕̻͑̄̓̕.̸̙̏̄̄͜.̷̼̝̲̩̆́̕";
         switch (game.getRound()) {
-          case 1 -> { msg = "Time and space begin to unravel."; }
-          case 2 -> { msg = "Tíme and space bégin tto unravl..."; }
-          case 3 -> { msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl.."; }
-          case 4 -> { msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~"; }
-          case 5 -> { msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l..."; }
+            case 1 -> {
+                msg = "Time and space begin to unravel.";
+            }
+            case 2 -> {
+                msg = "Tíme and space bégin tto unravl...";
+            }
+            case 3 -> {
+                msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl..";
+            }
+            case 4 -> {
+                msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~";
+            }
+            case 5 -> {
+                msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l...";
+            }
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "# " + msg);
     }
@@ -220,9 +230,9 @@ public class RiftSetModeService {
         if (!isActive(game)) return;
 
         String capturedUnits = getCapturedUnitsAsEmojis(game, player);
-        MessageHelper.sendMessageToChannel(event.getChannel(), 
-            "Following units of " + player.getRepresentation(false, false) + " are currently held captive:\n" 
-            + (capturedUnits.isEmpty() ? "None" : capturedUnits));
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Following units of " + player.getRepresentation(false, false) + " are currently held captive:\n"
+                + (capturedUnits.isEmpty() ? "None" : capturedUnits));
     }
 
     private static String getCapturedUnitsAsEmojis(Game game, Player player) {
@@ -232,7 +242,7 @@ public class RiftSetModeService {
     }
 
     public static List<Button> getSacrificeButtons() {
-        Button followButton = Buttons.green("resolveSacrificeSecondary", "Follow Sacrifice");  
+        Button followButton = Buttons.green("resolveSacrificeSecondary", "Follow Sacrifice");
         Button noFollowButton = Buttons.blue("sc_no_follow_9", "Not Following");
         return List.of(followButton, noFollowButton);
     }

@@ -768,8 +768,10 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveDeveloperCommandAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-        @NotNull String optionName) {
+    private static void resolveDeveloperCommandAutoComplete(
+        @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
+        @NotNull String optionName
+    ) {
         if (!subCommandName.equals(Constants.SET_SETTING)) return;
         switch (optionName) {
             case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
@@ -782,8 +784,10 @@ public class AutoCompleteProvider {
         }
     }
 
-    private static void resolveSearchCommandAutoComplete(@NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-        @NotNull String optionName) {
+    private static void resolveSearchCommandAutoComplete(
+        @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
+        @NotNull String optionName
+    ) {
         if (!optionName.equals(Constants.SEARCH)) return;
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         List<Command.Choice> options = null;

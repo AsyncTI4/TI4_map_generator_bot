@@ -320,21 +320,14 @@ public class ButtonHelper {
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
                 if (player.getPlanets().contains(unitHolder.getName())) {
-                    buttons.add(Buttons.green("statusInfRevival_" + unitHolder.getName() + "_1",
-                        "Place 1 infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
+                    String prefixID = player.finChecker() + "statusInfRevival_" + unitHolder.getName() + "_";
+                    String msgSuffix = " Infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                    buttons.add(Buttons.green(prefixID + "1", "Place 1" + msgSuffix));
                     if (middleVal > 1) {
-                        buttons.add(Buttons.green(
-                            "statusInfRevival_" + unitHolder.getName() + "_" + middleVal,
-                            "Place " + middleVal + " Infantry on "
-                                + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
-
+                        buttons.add(Buttons.green(prefixID + middleVal, "Place " + middleVal + msgSuffix));
                     }
                     if (infCount > 1) {
-                        buttons.add(Buttons.green(
-                            "statusInfRevival_" + unitHolder.getName() + "_" + infCount,
-                            "Place " + infCount + " Infantry on "
-                                + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
-
+                        buttons.add(Buttons.green(prefixID + infCount, "Place " + infCount + msgSuffix));
                     }
                 }
 
@@ -2307,11 +2300,11 @@ public class ButtonHelper {
 
     @ButtonHandler("editMessage_") // editMessage_{Optional String to edit the message to}
     public static void editMessage(GenericInteractionCreateEvent event) {
-        if (event instanceof ButtonInteractionEvent bevent) {
-            bevent.getMessage();
-            bevent.getButton();
-            String message = bevent.getButton().getId().replace("editMessage_", "");
-        }
+        // if (event instanceof ButtonInteractionEvent bevent) {
+        //     // bevent.getMessage();
+        //     // bevent.getButton();
+        //     // String message = bevent.getButton().getId().replace("editMessage_", "");
+        // }
     }
 
     public static void deleteAllButtons(ButtonInteractionEvent event) {
