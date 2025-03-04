@@ -1,6 +1,5 @@
 package ti4.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
@@ -10,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
@@ -31,19 +31,11 @@ public class ShowGameService {
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
             if (includeButtons(displayType)) {
-                List<Button> buttons = new ArrayList<>();
-                if (!game.isFowMode()) {
-                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View");
-                    buttons.add(linkToWebsite);
-                    buttons.add(Buttons.green("gameInfoButtons", "Player Info"));
-                }
-                buttons.add(Buttons.green("cardsInfo", "Cards Info"));
-                buttons.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                buttons.add(Buttons.gray("showGameAgain", "Show Game"));
+                List<Button> buttons = Buttons.mapImageButtons(game);
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
-                MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, null, buttons);
+                ButtonHelper.sendFileWithCorrectButtons(channel, fileUpload, null, buttons);
             } else {
                 MessageChannel channel = sendMessage(game, event);
                 MessageHelper.sendFileUploadToChannel(channel, fileUpload);
