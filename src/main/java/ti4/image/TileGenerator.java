@@ -1316,7 +1316,7 @@ public class TileGenerator {
                     }
                     if (Constants.MECATOLS.contains(unitHolder.getName())) {
                         scale = 0.61f;
-                    } 
+                    }
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     scale = 1.32f;
                     if (isLegendary && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {

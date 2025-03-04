@@ -39,8 +39,8 @@ public class CardsInfoService {
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player,
             "You may whisper to people from here by starting a message with `to[color]` or `to[faction]`."
-            + "\nYou may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`."
-            + "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.");
+                + "\nYou may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`."
+                + "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.");
 
     }
 
@@ -155,10 +155,10 @@ public class CardsInfoService {
             buttons.add(Buttons.red("revealTrapStep1", "Reveal a Trap"));
             buttons.add(Buttons.gray("removeTrapStep1", "Remove a Trap"));
         }
-        if(player.hasTech("absol_vw")){
-            buttons.add(Buttons.gray("resolveExp_Look_frontier", "Top Of Frontier Deck",FactionEmojis.Empyrean));
+        if (player.hasTech("absol_vw")) {
+            buttons.add(Buttons.gray("resolveExp_Look_frontier", "Top Of Frontier Deck", FactionEmojis.Empyrean));
         }
-        if(game.getPhaseOfGame().toLowerCase().contains("agendawaiting")){
+        if (game.getPhaseOfGame().toLowerCase().contains("agendawaiting")) {
             buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
         }
 

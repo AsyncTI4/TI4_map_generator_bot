@@ -44,8 +44,8 @@ public class ButtonHelperSCs {
             scModel = game.getStrategyCardModelByName("pok2diplomacy").orElse(null);
         }
         if (!used && scModel != null && scModel.usesAutomationForSCID("pok2diplomacy")
-                && !player.getFollowedSCs().contains(scModel.getInitiative())
-                && game.getPlayedSCs().contains(scModel.getInitiative())) {
+            && !player.getFollowedSCs().contains(scModel.getInitiative())
+            && game.getPlayedSCs().contains(scModel.getInitiative())) {
             int scNum = scModel.getInitiative();
             player.addFollowedSC(scNum, event);
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
@@ -228,8 +228,7 @@ public class ButtonHelperSCs {
                 if (!game.isFowMode()) {
                     message += "\n" + player2.getRepresentationUnfogged()
                         + " is the one the game is currently waiting on.";
-                    if (player2.getSecretsScored().size() + player2.getSecretsUnscored().size() >= player2.getMaxSOCount())
-                    {
+                    if (player2.getSecretsScored().size() + player2.getSecretsUnscored().size() >= player2.getMaxSOCount()) {
                         message += " Remember it is not enough to simply draw a secret objective, they will also need to discard one.";
                     }
                 }
@@ -332,7 +331,7 @@ public class ButtonHelperSCs {
                             + ", your commodities got washed in the process of washing "
                             + player.getFactionEmojiOrColor() + ".");
                 }
-                if(p2.getPromissoryNotesInPlayArea().contains("dark_pact") && !player.getPromissoryNotesOwned().contains("dark_pact")){
+                if (p2.getPromissoryNotesInPlayArea().contains("dark_pact") && !player.getPromissoryNotesOwned().contains("dark_pact")) {
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                         p2.getRepresentationUnfogged()
                             + ", due to you having dark pact in play, we are undoing the recent wash of your comms as it may not be desired.");
@@ -443,7 +442,7 @@ public class ButtonHelperSCs {
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
             + unitKey.unitName() + " on for **Construction**.";
-        if(!player.getSCs().contains(4)){
+        if (!player.getSCs().contains(4)) {
             message += "\n## __It will place a command token in the system as well.__ ";
         }
         List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
@@ -464,7 +463,7 @@ public class ButtonHelperSCs {
             }
         }
         boolean unfinished = false;
-        if(!game.getStoredValue("ledSpend"+player.getFaction()).isEmpty() && !player.getSpentThingsThisWindow().isEmpty()){
+        if (!game.getStoredValue("ledSpend" + player.getFaction()).isEmpty() && !player.getSpentThingsThisWindow().isEmpty()) {
             unfinished = true;
             game.setStoredValue("resetSpend", "yes");
         }
@@ -479,10 +478,10 @@ public class ButtonHelperSCs {
         player.addFollowedSC(leadershipInitiative, event);
         String message = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        if(unfinished){
+        if (unfinished) {
             message = Helper.buildSpentThingsMessage(player, game, "inf");
-        }else{
-            game.setStoredValue("ledSpend"+player.getFaction(), "Yes");
+        } else {
+            game.setStoredValue("ledSpend" + player.getFaction(), "Yes");
         }
         Button doneExhausting = Buttons.red("deleteButtons_leadership", "Done Exhausting Planets");
         buttons.add(doneExhausting);
@@ -674,11 +673,10 @@ public class ButtonHelperSCs {
         if (strategicCC == 0) {
             return " have 0 command tokens in strategy pool, can't follow.";
         }
-        
+
         strategicCC--;
         player.setStrategicCC(strategicCC);
-        if (scNum == -1)
-        {
+        if (scNum == -1) {
             return " performing the secondary ability of a strategy card with **Grace**."
                 + "1 command token has been spent from strategy pool.";
         }
