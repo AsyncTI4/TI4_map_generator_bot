@@ -226,6 +226,8 @@ public class MapGenerator implements AutoCloseable {
         game.incrementMapImageGenerationCount();
         FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
         if (debug) debugDiscordTime.stop();
+        if (debug && !WebHelper.sendingToWeb())
+            FileUploadService.saveLocalPng(mainImage, "MapDebug");
         return fileUpload;
     }
 

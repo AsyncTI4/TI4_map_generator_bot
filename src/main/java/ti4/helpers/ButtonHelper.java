@@ -826,7 +826,7 @@ public class ButtonHelper {
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
         ButtonHelperActionCards.checkForPlayingSummit(game, player);
-        if(game.isCustodiansScored()){
+        if (game.isCustodiansScored()) {
             AgendaHelper.offerPlayerPassOnWhensNAfters(player);
         }
     }
@@ -1418,24 +1418,12 @@ public class ButtonHelper {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
             boolean foundSomething = false;
+            List<Button> buttonsWeb = Buttons.mapImageButtons(game);
             if (!game.isFowMode()) {
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         foundSomething = true;
-
-                        List<Button> buttonsWeb = new ArrayList<>();
-                        if (!game.isFowMode()) {
-                            Button linkToWebsite = Button.link(
-                                "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
-                                "Website View");
-                            buttonsWeb.add(linkToWebsite);
-                            buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
-                        }
-                        buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
-                        buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                        buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
-
-                        MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, fileUpload, message, buttonsWeb);
+                        sendFileWithCorrectButtons(threadChannel_, fileUpload, message, buttonsWeb);
                     }
                 }
             } else {
@@ -1443,20 +1431,17 @@ public class ButtonHelper {
                 foundSomething = true;
             }
             if (!foundSomething) {
-                List<Button> buttonsWeb = new ArrayList<>();
-                if (!game.isFowMode()) {
-                    Button linkToWebsite = Button.link(
-                        "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
-                        "Website View");
-                    buttonsWeb.add(linkToWebsite);
-                    buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
-                }
-                buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
-                buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
-                MessageHelper.sendFileToChannelAndAddLinkToButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb);
+                sendFileWithCorrectButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb);
             }
         });
+    }
+
+    public static void sendFileWithCorrectButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
+        if (WebHelper.sendingToWeb()) {
+            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);
+        } else {
+            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);
+        }
     }
 
     public static boolean nomadHeroAndDomOrbCheck(Player player, Game game) {
@@ -3779,6 +3764,7 @@ public class ButtonHelper {
         }
         return buttons;
     }
+
     public static List<Button> getPlanetExplorationButtons(Game game, Planet planet, Player player) {
         return getPlanetExplorationButtons(game, planet, player, false);
     }
@@ -3801,7 +3787,7 @@ public class ButtonHelper {
         for (String trait : explorationTraits) {
             if (List.of("cultural", "industrial", "hazardous").contains(trait)) {
                 String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
-                if(impressment){
+                if (impressment) {
                     buttonId = "movedNExplored_dsdihmy_" + planetId + "_" + trait;
                 }
                 String buttonMessage = "Explore " + planetRepresentation
@@ -6343,7 +6329,7 @@ public class ButtonHelper {
             String message = player.getFactionEmoji() + " chose to Diplo the system containing "
                 + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy",null);
+            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", null);
         }
         deleteMessage(event);
     }

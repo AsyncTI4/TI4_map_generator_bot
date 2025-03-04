@@ -1,5 +1,6 @@
 package ti4.buttons;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -7,6 +8,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
+import ti4.helpers.WebHelper;
+import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -53,6 +56,20 @@ public class Buttons {
         REFRESH_TECH_INFO,
         REFRESH_PLANET_INFO,
         FACTION_EMBED);
+
+    public static List<Button> mapImageButtons(Game game) {
+        List<Button> buttonsWeb = new ArrayList<>();
+        if (game != null && !game.isFowMode()) {
+            if (WebHelper.sendingToWeb()) {
+                buttonsWeb.add(Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View"));
+            }
+            buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
+        }
+        buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
+        buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
+        buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
+        return buttonsWeb;
+    }
 
     /** A blue button (primary style) */
     public static Button blue(String buttonID, String buttonLabel) {
