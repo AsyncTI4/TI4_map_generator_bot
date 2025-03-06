@@ -16,9 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
@@ -34,6 +32,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
 class GameSaveService {
@@ -333,7 +332,7 @@ class GameSaveService {
         writer.write(Constants.FOW_MODE + " " + game.isFowMode());
         writer.write(System.lineSeparator());
         StringBuilder fowOptions = new StringBuilder();
-        for (Map.Entry<String, String> entry : game.getFowOptions().entrySet()) {
+        for (Map.Entry<FOWOption, Boolean> entry : game.getFowOptions().entrySet()) {
             fowOptions.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.FOW_OPTIONS + " " + fowOptions);

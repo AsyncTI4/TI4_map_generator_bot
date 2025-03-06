@@ -166,15 +166,17 @@ class Replace extends GameStateSubcommand {
 
             //Update private threads
             if (oldMember != null) {
-                for (ThreadChannel thread : game.getMainGameChannel().getThreadChannels()) {
-                    if (thread.getThreadMember(oldMember) != null) {
-                        thread.removeThreadMember(oldMember).queue(success -> {
-                            thread.addThreadMember(newMember).queue(success2 -> {
-                                accessMessage(thread, newMember);
-                            });
+                game.getMainGameChannel().getThreadChannels().forEach(thread -> {
+                    updateThread(thread, oldMember, newMember);
+                });
+
+                game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().queue(archivedThreads -> {
+                    archivedThreads.forEach(thread -> {
+                        thread.getManager().setArchived(false).queue(success -> {
+                            updateThread(thread, oldMember, newMember);
                         });
-                    }
-                }
+                    });
+                });
             }
         }
 
@@ -197,6 +199,19 @@ class Replace extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
+    }
+
+    private void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
+        thread.retrieveThreadMemberById(oldMember.getId()).queue(
+            oldThreadMember -> { 
+                thread.removeThreadMember(oldMember).queue(success -> {
+                    thread.addThreadMember(newMember).queue(success2 -> {
+                        accessMessage(thread, newMember);
+                    });
+                });
+            },
+            failure -> { /* Old member is not in the thread -> Do nothing */  }
+        );
     }
 
     private void accessMessage(MessageChannel channel, Member member) {

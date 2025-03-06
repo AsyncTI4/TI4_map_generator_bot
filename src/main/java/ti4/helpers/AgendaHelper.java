@@ -71,9 +71,10 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
-import ti4.service.fow.FowConstants;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 
 public class AgendaHelper {
@@ -3192,6 +3193,7 @@ public class AgendaHelper {
         boolean action = false;
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
+            FowCommunicationThreadService.checkAllCommThreads(game);
         } else {
             action = true;
         }
@@ -3412,13 +3414,14 @@ public class AgendaHelper {
         for (Player player : orderList) {
             votes += getTotalVoteCount(game, player);
         }
-        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: "
-            + (Boolean.parseBoolean(game.getFowOption(FowConstants.HIDE_TOTAL_VOTES)) ? "???" : votes));
+        boolean hideTotalVotes = game.getFowOption(FOWOption.HIDE_TOTAL_VOTES);
+        boolean hideVoteOrder = game.getFowOption(FOWOption.HIDE_VOTE_ORDER);
+        StringBuilder sb = new StringBuilder("**__Vote Count (Total votes: " + (hideTotalVotes ? "???" : votes));
         sb.append("):__**\n");
         int itemNo = 1;
         for (Player player : orderList) {
             sb.append("`").append(itemNo).append(".` ");
-            sb.append(player.getRepresentation(false, false));
+            sb.append(hideVoteOrder ? "???" : player.getRepresentation(false, false));
             if (player.getUserID().equals(game.getSpeakerUserID()))
                 sb.append(MiscEmojis.SpeakerToken);
             sb.append(getPlayerVoteText(game, player));

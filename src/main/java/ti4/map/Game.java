@@ -90,9 +90,9 @@ import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
-import ti4.service.fow.FowConstants;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 public class Game extends GameProperties {
 
@@ -101,7 +101,7 @@ public class Game extends GameProperties {
     private Map<String, Player> players = new LinkedHashMap<>();
 
     private final @JsonIgnore Map<String, Planet> planets = new HashMap<>();
-    private final Map<String, String> fowOptions = new HashMap<>();
+    private final Map<FOWOption, Boolean> fowOptions = new HashMap<>();
     private final Map<Integer, Boolean> scPlayed = new HashMap<>();
     private final Map<String, String> checkingForAllReacts = new HashMap<>();
     private List<String> listOfTilePinged = new ArrayList<>();
@@ -509,20 +509,20 @@ public class Game extends GameProperties {
         return super.getActiveSystem();
     }
 
-    public Map<String, String> getFowOptions() {
+    public Map<FOWOption, Boolean> getFowOptions() {
         return fowOptions;
     }
 
-    public String getFowOption(String optionName) {
-        return fowOptions.get(optionName);
+    public boolean getFowOption(FOWOption option) {
+        return fowOptions.containsKey(option) ? fowOptions.get(option) : false;
     }
 
-    public void setFowOption(String optionName, String value) {
-        fowOptions.put(optionName, value);
+    public void setFowOption(FOWOption option, boolean value) {
+        fowOptions.put(option, value);
     }
 
     public boolean hideUserNames() {
-        return Boolean.parseBoolean(getFowOption(FowConstants.HIDE_NAMES));
+        return getFowOption(FOWOption.HIDE_PLAYER_NAMES);
     }
 
     @JsonIgnore

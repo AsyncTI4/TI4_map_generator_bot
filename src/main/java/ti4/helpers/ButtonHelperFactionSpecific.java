@@ -2358,6 +2358,7 @@ public class ButtonHelperFactionSpecific {
                     tile.getRepresentationForButtons(game, player)));
             }
         }
+        SortHelper.sortButtonsByTitle(buttons);
         return buttons;
     }
 

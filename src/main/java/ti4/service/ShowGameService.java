@@ -35,7 +35,7 @@ public class ShowGameService {
 
                 // Divert map image to the botMapUpdatesThread event channel is actions channel is the same
                 MessageChannel channel = sendMessage(game, event);
-                ButtonHelper.sendFileWithCorrectButtons(channel, fileUpload, null, buttons);
+                ButtonHelper.sendFileWithCorrectButtons(channel, fileUpload, null, buttons, game);
             } else {
                 MessageChannel channel = sendMessage(game, event);
                 MessageHelper.sendFileUploadToChannel(channel, fileUpload);

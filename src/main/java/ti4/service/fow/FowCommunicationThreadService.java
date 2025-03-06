@@ -21,6 +21,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 public class FowCommunicationThreadService {
 
@@ -29,7 +30,7 @@ public class FowCommunicationThreadService {
     private static final Pattern THREAD_NAME_PATTERN = Pattern.compile("^(\\w+)\\s*(?:"+YES_CHAR+"|"+NO_CHAR+")\\s*(\\w+)");
 
     public static boolean isActive(Game game) {
-        return game.isFowMode() && Boolean.parseBoolean(game.getFowOption(FowConstants.MANAGED_COMMS));
+        return game.isFowMode() && game.getFowOption(FOWOption.MANAGED_COMMS);
     }
 
     public static void checkAllCommThreads(Game game) {
@@ -37,20 +38,20 @@ public class FowCommunicationThreadService {
 
         Set<Set<Player>> checkedPairs = new HashSet<>();
         for (Player player : game.getRealPlayers()) {
-            Set<Player> neighbors = player.getNeighbouringPlayers(true);
+            Set<Player> neighbors = getNeighbors(game, player);
             Map<ThreadChannel, Player> commThreadsWithPlayer = findCommThreads(game, player);
-            validateNeighbors(player, neighbors, commThreadsWithPlayer, checkedPairs);
+            validateNeighbors(player, neighbors, commThreadsWithPlayer, checkedPairs, game);
         }
     }
 
     public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> buttons) {
         if (!isActive(game)) return;
 
-        Set<Player> neighbors = player.getNeighbouringPlayers(true);
+        Set<Player> neighbors = getNeighbors(game, player);
         Map<ThreadChannel, Player> commThreadsWithPlayer = findCommThreads(game, player);
         
         //Check existing threads
-        validateNeighbors(player, neighbors, commThreadsWithPlayer, new HashSet<>());
+        validateNeighbors(player, neighbors, commThreadsWithPlayer, new HashSet<>(), game);
 
         //Check if can find neighbors without a comm thread
         Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreadsWithPlayer);
@@ -58,6 +59,19 @@ public class FowCommunicationThreadService {
         if (!newNeighbors.isEmpty()) {
             buttons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
         }
+    }
+
+    private static boolean areAllowedToTalkInAgenda(Game game) {
+        return game.getPhaseOfGame().startsWith("agenda") && game.getFowOption(FOWOption.ALLOW_AGENDA_COMMS);
+    }
+
+    private static Set<Player> getNeighbors(Game game, Player player) {
+        if (areAllowedToTalkInAgenda(game)) {
+            Set<Player> allPlayers = new HashSet<>(game.getRealPlayers());
+            allPlayers.remove(player);
+            return allPlayers;
+        }
+        return player.getNeighbouringPlayers(true);
     }
 
     private static Map<ThreadChannel, Player> findCommThreads(Game game, Player player) {
@@ -84,7 +98,8 @@ public class FowCommunicationThreadService {
         }
     }
 
-    private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<Set<Player>> checkedPairs) {
+    private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<Set<Player>> checkedPairs, Game game) {
+        boolean areAllowedToTalkInAgenda = areAllowedToTalkInAgenda(game);
         for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
             ThreadChannel threadChannel = thread.getKey();
             String threadName = thread.getKey().getName();
@@ -105,7 +120,9 @@ public class FowCommunicationThreadService {
                 threadChannel.getManager().setArchived(false).queue(success -> {
                     threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
                         .queue(nameUpdated -> {
-                            threadChannel.sendMessage(notice + " are neighbors again and **may** communicate.").queue();
+                            threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda
+                                ? " **may** communicate in Agenda phase."
+                                : " are neighbors again and **may** communicate.")).queue();
                         });
                 });
 
