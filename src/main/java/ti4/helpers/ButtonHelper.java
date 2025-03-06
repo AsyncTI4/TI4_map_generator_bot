@@ -1416,7 +1416,7 @@ public class ButtonHelper {
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         foundSomething = true;
-                        sendFileWithCorrectButtons(threadChannel_, fileUpload, message, buttonsWeb);
+                        sendFileWithCorrectButtons(threadChannel_, fileUpload, message, buttonsWeb, game);
                     }
                 }
             } else {
@@ -1424,16 +1424,16 @@ public class ButtonHelper {
                 foundSomething = true;
             }
             if (!foundSomething) {
-                sendFileWithCorrectButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb);
+                sendFileWithCorrectButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb, game);
             }
         });
     }
 
-    public static void sendFileWithCorrectButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
-        if (WebHelper.sendingToWeb()) {
-            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);
+    public static void sendFileWithCorrectButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons, Game game) {
+        if (!WebHelper.sendingToWeb() || game.isFowMode()) {
+            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);  
         } else {
-            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);
+            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);            
         }
     }
 
