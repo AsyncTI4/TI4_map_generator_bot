@@ -138,7 +138,7 @@ public class PickStrategyCardService {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             }
             String fail = "User for next faction not found. Report to ADMIN";
@@ -187,7 +187,7 @@ public class PickStrategyCardService {
                 if (game.isShowBanners()) {
                     BannerGenerator.drawFactionBanner(privatePlayer);
                 }
-                String text = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                String text = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
                 Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, privatePlayer);
                 if (nextPlayer == privatePlayer) {
@@ -232,10 +232,10 @@ public class PickStrategyCardService {
         }
     }
 
-    public static void checkForForcePickLastStratCard(GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra){
+    public static void checkForForcePickLastStratCard(GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra) {
         List<Button> scButtons = Helper.getRemainingSCButtons(game, privatePlayer);
-        if (scButtons.size() == 1){ // if there is only one SC left to pick (4p/8p games), force pick last SC
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), privatePlayer.getRepresentation() + 
+        if (scButtons.size() == 1) { // if there is only one SC left to pick (4p/8p games), force pick last SC
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), privatePlayer.getRepresentation() +
                 ", you have only one available Strategy Card to pick. Bot will force pick for you.");
             int unpickedStrategyCard = 0;
             for (Integer sc : game.getSCList()) {
@@ -254,7 +254,7 @@ public class PickStrategyCardService {
                 if (held)
                     continue;
                 unpickedStrategyCard = sc;
-            }    
+            }
             PlayerStatsService.secondHalfOfPickSC(event, game, privatePlayer, unpickedStrategyCard);
             secondHalfOfSCPick(event, privatePlayer, game, unpickedStrategyCard);
         } else {

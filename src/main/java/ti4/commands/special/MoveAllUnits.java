@@ -61,7 +61,7 @@ class MoveAllUnits extends GameStateSubcommand {
 
         OptionMapping optionCC = event.getOption(Constants.CC_USE);
         if (optionCC != null) {
-          String value = optionCC.getAsString().toLowerCase();
+            String value = optionCC.getAsString().toLowerCase();
             if ("t".equals(value) || "tactic".equals(value) || "t/tactic".equals(value)) {
                 RemoveCommandCounterService.fromTacticsPool(event, player.getColor(), tileTo, game);
             }

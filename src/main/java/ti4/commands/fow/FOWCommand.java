@@ -11,18 +11,16 @@ import ti4.helpers.Constants;
 public class FOWCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new AddFogTile(),
-                    new RemoveFogTile(),
-                    new CheckChannels(),
-                    new PingActivePlayer(),
-                    new PingSystem(),
-                    new Whisper(),
-                    new Announce(),
-                    new FOWOptions(),
-                    new ShowGameAsPlayer(),
-                    new PrivateCommunicationsCheck())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
+        new AddFogTile(),
+        new RemoveFogTile(),
+        new CheckChannels(),
+        new PingActivePlayer(),
+        new PingSystem(),
+        new Whisper(),
+        new Announce(),
+        new FOWOptions(),
+        new ShowGameAsPlayer(),
+        new PrivateCommunicationsCheck()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

@@ -119,8 +119,8 @@ public class UnitRenderGenerator {
             if (shouldHideJailUnit(frogPlayer, unitKey)) continue;
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
-            if(player == null){
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),"Could not find owner for "+unitKey.toString() +" in tile "+tile.getRepresentation());
+            if (player == null) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey.toString() + " in tile " + tile.getRepresentation());
                 continue;
             }
             Integer unitCount = unitEntry.getValue();
@@ -495,6 +495,7 @@ public class UnitRenderGenerator {
         Point centerPosition = posCtx.centerPosition;
         int unitWidth = posCtx.unitImage.getWidth();
         int unitHeight = posCtx.unitImage.getHeight();
+
         rectangles.add(
             new Rectangle(
                 centerPosition.x + position.x - (unitWidth / 2),

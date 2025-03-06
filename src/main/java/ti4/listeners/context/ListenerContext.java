@@ -108,7 +108,7 @@ public abstract class ListenerContext {
         componentID = componentID.replace("FFCC_", "");
         String factionWhoPressedButton = player == null ? "nullPlayer" : player.getFaction();
         if (player != null && !componentID.startsWith(factionWhoPressedButton + "_")) {
-            String message = "To " + player.getFactionEmoji() + ": these buttons are for someone else";
+            String message = "To " + player.fogSafeEmoji() + ": these buttons are for someone else";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             return false;
         }
