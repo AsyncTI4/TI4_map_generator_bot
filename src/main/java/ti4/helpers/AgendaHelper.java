@@ -1203,6 +1203,12 @@ public class AgendaHelper {
         }
         String summary2 = getSummaryOfVotes(game, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
+        if (game.isFowMode()) {
+            Player gm = game.getPlayersWithGMRole().getFirst();
+            if (gm != null) {
+                MessageHelper.sendMessageToChannel(gm.getCardsInfoThread(), getSummaryOfVotes(game, true, true));
+            }
+        }
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
@@ -2549,6 +2555,10 @@ public class AgendaHelper {
     }
 
     public static String getSummaryOfVotes(Game game, boolean capitalize) {
+        return getSummaryOfVotes(game, capitalize, false);
+    }
+    
+    public static String getSummaryOfVotes(Game game, boolean capitalize, boolean overwriteFog) {
         String summary;
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         String agendaDetails = game.getCurrentAgendaInfo();
@@ -2598,7 +2608,7 @@ public class AgendaHelper {
                         if (p2 != null) {
                             faction = p2.getFactionEmoji();
                         }
-                        if (game.isFowMode()) {
+                        if (game.isFowMode() && !overwriteFog) {
                             faction = "Someone";
                         }
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);

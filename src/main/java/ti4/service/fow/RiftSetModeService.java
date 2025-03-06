@@ -243,9 +243,8 @@ public class RiftSetModeService {
     }
 
     public static List<Button> getSacrificeButtons() {
-        Button followButton = Buttons.green("resolveSacrificeSecondary", "Follow Sacrifice");
-        Button noFollowButton = Buttons.blue("sc_no_follow_9", "Not Following");
-        return List.of(followButton, noFollowButton);
+        Button followButton = Buttons.green("resolveSacrificeSecondary", "SACRIFICE");
+        return List.of(followButton);
     }
 
     @ButtonHandler("resolveSacrificeSecondary")
@@ -258,10 +257,10 @@ public class RiftSetModeService {
         }
 
         player.addFollowedSC(9, event);
-        ReactionService.addReaction(event, game, player, "is following **Sacrifice**.");
+        ReactionService.addReaction(event, game, player, "IS PERFORMING A **SACRIFICE**.");
 
         StringBuffer sb = new StringBuffer(player.getRepresentation(true, true));
-        sb.append(", to resolve Sacrifce Secondary:\n");
+        sb.append(", to perform a Sacrifce:\n");
         sb.append(" 1. Choose a system that contains your non-fighter ships. Use `/special system_info` for that system.\n");
         sb.append(" 2. Use `/roll roll_command:Xd10` replacing X with the number of your non-fighter ships.\n");
         sb.append(" 3. For each result of 1-3, order of the die matches the order of your ships in system_info list to be captured.\n");
