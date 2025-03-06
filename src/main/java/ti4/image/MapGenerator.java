@@ -340,9 +340,8 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private boolean isFowModeActive() {
-        return game.isFowMode() && event != null &&
-            (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
-                event instanceof UserOverridenSlashCommandInteractionEvent);
+        return game.isFowMode() && event != null && 
+            (FoWHelper.isPrivateGame(game, event) || event instanceof UserOverridenSlashCommandInteractionEvent);
     }
 
     public boolean shouldConvertToGeneric(Player player) {

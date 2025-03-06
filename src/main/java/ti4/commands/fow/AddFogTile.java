@@ -17,7 +17,7 @@ class AddFogTile extends GameStateSubcommand {
         super(Constants.ADD_FOG_TILE, "Add a Fog of War tile to the map.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.LABEL, "How you want the tile to be labeled").setMaxLength(10));
+        addOptions(new OptionData(OptionType.STRING, Constants.LABEL, "How you want the tile to be labeled").setMaxLength(30));
     }
 
     @Override
