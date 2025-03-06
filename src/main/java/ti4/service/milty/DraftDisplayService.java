@@ -65,7 +65,7 @@ public class DraftDisplayService {
         buttons.add(Buttons.blue("miltyFactionInfo_remaining", "Remaining faction info"));
         buttons.add(Buttons.blue("miltyFactionInfo_picked", "Picked faction info"));
         buttons.add(Buttons.blue("miltyFactionInfo_all", "All faction info"));
-        buttons = addUndoButtonToList(buttons, game.getName());
+        buttons = MessageHelper.addUndoButtonToList(buttons, game.getName());
 
         MessageChannel channel = game.getMainGameChannel();
         if (channel == null) return;
