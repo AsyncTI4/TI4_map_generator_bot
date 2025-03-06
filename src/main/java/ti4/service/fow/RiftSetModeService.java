@@ -29,6 +29,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 /*
  * For Eronous to run fow300
@@ -78,12 +79,12 @@ public class RiftSetModeService {
         game.discardSpecificAgenda(CRUCIBLE_AGENDA);
         game.setStrategyCardSet("riftset");
         game.addTag("RiftSet");
-        game.setFowOption(Constants.RIFTSET_MODE, "true");
+        game.setFowOption(FOWOption.RIFTSET_MODE, true);
         return true;
     }
 
     public static boolean isActive(Game game) {
-        return Boolean.valueOf(game.getFowOption(Constants.RIFTSET_MODE));
+        return game.getFowOption(FOWOption.RIFTSET_MODE);
     }
 
     private static Player getCabalPlayer(Game game) {
@@ -144,7 +145,7 @@ public class RiftSetModeService {
 
         if (exploreCardId.startsWith(RIFTSET_INVASION_EXPLORE)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "**GM ping:** " + getGMs(game) + " Unstable Rifts Event waiting for resolving!");
+                "-# GM ping: " + getGMs(game) + " Unstable Rifts Event waiting for resolving!");
         }
     }
 
@@ -163,11 +164,11 @@ public class RiftSetModeService {
         if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
             AddTokenCommand.addToken(event, tile, "gravityrift", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition()
-                + "\n^ " + getGMs(game));
+                + "\n-#" + getGMs(game));
         } else if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_VORTEX)) {
             AddTokenCommand.addToken(event, tile, "vortex", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition()
-                + "\n^ " + getGMs(game));
+                + "\n-#" + getGMs(game));
         }
     }
 
@@ -184,7 +185,7 @@ public class RiftSetModeService {
 
         if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int) (16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)), CHANCE_TO_STELLAR_CONVERT_MIN))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous..."
-                + "\n^ " + getGMs(game));
+                + "\n-#" + getGMs(game));
             StellarConverterService.secondHalfOfStellar(game, planetName, event);
             Tile tile = game.getTileFromPlanet(planetName);
             UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
