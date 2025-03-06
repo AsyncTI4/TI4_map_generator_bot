@@ -11,6 +11,7 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
@@ -43,7 +44,6 @@ import ti4.service.emoji.SourceEmojis;
  * - One additional agenda, Crucible Reallocation
  *   - Removed from the deck at setup. Can be flipped with a button in every agenda phase.
  * - Custom frontier explore Unstable Rifts (tells player to ping GM to resolve)
- *   - Recycles itself back to the deck instantly
  * - /special swap_systems to support RANDOM options
  * - A way to see what _own_ units Cabal has captured (button in Cards Thread)
  * AFTER CUSTODIANS IS SCORED:
@@ -86,12 +86,22 @@ public class RiftSetModeService {
         return Boolean.valueOf(game.getFowOption(Constants.RIFTSET_MODE));
     }
 
-    public static Player getCabalPlayer(Game game) {
+    private static Player getCabalPlayer(Game game) {
         return isActive(game) ? game.getPlayerFromColorOrFaction("cabal") : null;
     }
 
+    public static String riftSetCabalEatsUnit(String msg, Player player, Game game, String unit, GenericInteractionCreateEvent event) {
+        if (!isActive(game)) return msg;
+
+        Player cabal = getCabalPlayer(game);
+        ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
+        msg = msg.replace("Condolences for your loss.", "");
+        msg += "Mysteriously, not even debris was left behind...";
+        return msg;
+    }
+
     public static void includeCrucibleAgendaButton(List<Button> buttons, Game game) {
-        if (!isActive(game)) return;
+        if (!isActive(game) || !"2".equals(game.getStoredValue("agendaCount"))) return;
 
         buttons.add(Buttons.blue("riftsetflip_" + CRUCIBLE_AGENDA, "Flip Crucible Reallocation"));
     }
@@ -124,7 +134,7 @@ public class RiftSetModeService {
 
         winner.setPromissoryNote(CRUCIBLE_PN);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, winner, false);
-        
+
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(CRUCIBLE_PN);
         MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you recieved " + CardEmojis.PN + pnModel.getName());
     }
@@ -132,11 +142,14 @@ public class RiftSetModeService {
     public static void resolveExplore(String exploreCardId, Player player, Game game) {
         if (!isActive(game)) return;
 
-        if (RIFTSET_INVASION_EXPLORE.equals(exploreCardId)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
-                "**GM ping:** " + game.getPlayersWithGMRole().stream().map(p -> p.getPing()).collect(Collectors.joining(", ")) + " Unstable Rifts Event waiting for resolving!");
-            game.addExplore(RIFTSET_INVASION_EXPLORE);
+        if (exploreCardId.startsWith(RIFTSET_INVASION_EXPLORE)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                "**GM ping:** " + getGMs(game) + " Unstable Rifts Event waiting for resolving!");
         }
+    }
+
+    private static String getGMs(Game game) {
+        return game.getPlayersWithGMRole().stream().map(p -> p.getPing()).collect(Collectors.joining(", "));
     }
 
     public static void concludeTacticalAction(Player player, Game game, GenericInteractionCreateEvent event) {
@@ -149,14 +162,16 @@ public class RiftSetModeService {
 
         if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
             AddTokenCommand.addToken(event, tile, "gravityrift", game);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition()
+                + "\n^ " + getGMs(game));
         } else if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_VORTEX)) {
             AddTokenCommand.addToken(event, tile, "vortex", game);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition());
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition()
+                + "\n^ " + getGMs(game));
         }
     }
 
-    /* Round	Probability (%)
+    /* Round  Probability (%)
      *  1     1.00%
      *  2     1.19%
      *  3     1.47%
@@ -167,8 +182,9 @@ public class RiftSetModeService {
     public static boolean willPlanetGetStellarConverted(String planetName, Player player, Game game, GenericInteractionCreateEvent event) {
         if (!isActive(game) || !game.isCustodiansScored()) return false;
 
-        if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int)(16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)), CHANCE_TO_STELLAR_CONVERT_MIN))) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous...");
+        if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int) (16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)), CHANCE_TO_STELLAR_CONVERT_MIN))) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous..."
+                + "\n^ " + getGMs(game));
             StellarConverterService.secondHalfOfStellar(game, planetName, event);
             Tile tile = game.getTileFromPlanet(planetName);
             UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
@@ -185,11 +201,21 @@ public class RiftSetModeService {
 
         String msg = "T##m% & sp¿c€ ß̶e̷g̷i̵n̸ T0øøø U̴̪̖͒͛͗̏N̸̻̦̜̊͒̈́̄R̵͎̅͆͘Ȧ̵̳̔̚V̴̹̜̽̾̄̓L̶̥̩̎.̷̨͕̻͑̄̓̕.̸̙̏̄̄͜.̷̼̝̲̩̆́̕";
         switch (game.getRound()) {
-          case 1 -> { msg = "Time and space begin to unravel."; }
-          case 2 -> { msg = "Tíme and space bégin tto unravl..."; }
-          case 3 -> { msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl.."; }
-          case 4 -> { msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~"; }
-          case 5 -> { msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l..."; }
+            case 1 -> {
+                msg = "Time and space begin to unravel.";
+            }
+            case 2 -> {
+                msg = "Tíme and space bégin tto unravl...";
+            }
+            case 3 -> {
+                msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl..";
+            }
+            case 4 -> {
+                msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~";
+            }
+            case 5 -> {
+                msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l...";
+            }
         }
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "# " + msg);
     }
@@ -204,9 +230,9 @@ public class RiftSetModeService {
         if (!isActive(game)) return;
 
         String capturedUnits = getCapturedUnitsAsEmojis(game, player);
-        MessageHelper.sendMessageToChannel(event.getChannel(), 
-            "Following units of " + player.getRepresentation(false, false) + " are currently held captive:\n" 
-            + (capturedUnits.isEmpty() ? "None" : capturedUnits));
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            "Following units of " + player.getRepresentation(false, false) + " are currently held captive:\n"
+                + (capturedUnits.isEmpty() ? "None" : capturedUnits));
     }
 
     private static String getCapturedUnitsAsEmojis(Game game, Player player) {
@@ -216,7 +242,7 @@ public class RiftSetModeService {
     }
 
     public static List<Button> getSacrificeButtons() {
-        Button followButton = Buttons.green("resolveSacrificeSecondary", "Follow Sacrifice");  
+        Button followButton = Buttons.green("resolveSacrificeSecondary", "Follow Sacrifice");
         Button noFollowButton = Buttons.blue("sc_no_follow_9", "Not Following");
         return List.of(followButton, noFollowButton);
     }

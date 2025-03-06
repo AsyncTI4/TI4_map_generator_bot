@@ -62,8 +62,6 @@ public class ComponentActionHelper {
             compButtons.add(tButton);
         }
 
-        
-
         // Leaders
         for (Leader leader : p1.getLeaders()) {
             if (!leader.isExhausted() && !leader.isLocked() && !leader.isActive()) {
@@ -286,7 +284,9 @@ public class ComponentActionHelper {
                     return;
                 }
                 if (buttonID.contains("agent")) {
-                    List<String> leadersThatNeedSpecialSelection = List.of("naaluagent", "muaatagent", "kolumeagent", "arborecagent", "bentoragent", "xxchaagent", "axisagent");
+                    List<String> leadersThatNeedSpecialSelection = List.of(
+                        "arborecagent", "naaluagent", "muaatagent", "xxchaagent",
+                        "axisagent", "bentoragent", "kolumeagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + " Use buttons to select the user of the agent";

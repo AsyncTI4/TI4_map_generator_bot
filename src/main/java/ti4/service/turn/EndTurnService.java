@@ -223,9 +223,9 @@ public class EndTurnService {
         }
         String messageText = "Please score objectives, " + game.getPing() + ".";
 
-        if(!game.isFowMode()){
+        if (!game.isFowMode()) {
             game.setStoredValue("newStatusScoringMode", "Yes");
-            messageText += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+            messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
         }
 
         game.setPhaseOfGame("statusScoring");
@@ -257,8 +257,8 @@ public class EndTurnService {
         Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
-        if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
-            poButtons.add( Buttons.gray("refreshStatusSummary", "Refresh Summary"));
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
+            poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
         }
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
             && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).isEmpty()) {
@@ -368,10 +368,10 @@ public class EndTurnService {
             if (scorables.size() == 0) {
                 messageText = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
             } else {
-                if(Helper.canPlayerScorePOs(game, player)){
+                if (Helper.canPlayerScorePOs(game, player)) {
                     messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objectives: ";
                     messageText += String.join(", ", scorables);
-                }else{
+                } else {
                     messageText = player.getRepresentation() + ", you cannot score public objectives because you do not control your home system.";
                 }
             }
@@ -410,7 +410,7 @@ public class EndTurnService {
         String key3 = "potentialScorePOBlockers";
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
-        
+
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
         game.setStoredValue(key2b, "");

@@ -61,7 +61,7 @@ public class FoWHelper {
             return game.isFowMode();
         }
         if (channel != null && channel instanceof ThreadChannel) {
-            channel = ((ThreadChannel)channel).getParentChannel();
+            channel = ((ThreadChannel) channel).getParentChannel();
         }
 
         if (game == null) {

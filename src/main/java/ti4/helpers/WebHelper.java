@@ -47,9 +47,13 @@ public class WebHelper {
         }
     }
 
+    public static boolean sendingToWeb() {
+        boolean isUpload = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
+        return isUpload;
+    }
+
     public static void putData(String gameName, Game game) {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        if (!sendingToWeb()) return;
 
         try {
             Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
@@ -71,8 +75,7 @@ public class WebHelper {
     }
 
     public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        if (!sendingToWeb()) return;
 
         try {
             String json = objectMapper.writeValueAsString(overlays);
@@ -95,8 +98,7 @@ public class WebHelper {
     }
 
     public static void putStats() {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        if (!sendingToWeb()) return;
 
         List<GameStatsDashboardPayload> payloads = new ArrayList<>();
         List<String> badGames = new ArrayList<>();
@@ -145,8 +147,7 @@ public class WebHelper {
     }
 
     public static void putMap(String gameName, byte[] imageBytes, boolean frog, Player player) {
-        if (!GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false))
-            return;
+        if (!sendingToWeb()) return;
 
         try {
             String mapPath;
