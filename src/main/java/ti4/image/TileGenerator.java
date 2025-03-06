@@ -243,9 +243,24 @@ public class TileGenerator {
                 if (isFoWPrivate && tile.hasFog(fowPlayer)) {
                     BufferedImage frogOfWar = ImageHelper.read(tile.getFowTilePath(fowPlayer));
                     tileGraphics.drawImage(frogOfWar, TILE_PADDING, TILE_PADDING, null);
-                    int labelX = TILE_PADDING + LABEL_POSITION_POINT.x;
-                    int labelY = TILE_PADDING + LABEL_POSITION_POINT.y;
-                    DrawingUtil.superDrawString(tileGraphics, tile.getFogLabel(fowPlayer), labelX, labelY, Color.WHITE, null, null, null, null);
+                    String label = tile.getFogLabel(fowPlayer);
+                    //Rnd number label at the bottom
+                    if (label.startsWith("Rnd")) {
+                        int labelX = TILE_PADDING + LABEL_POSITION_POINT.x;
+                        int labelY = TILE_PADDING + LABEL_POSITION_POINT.y;
+                        DrawingUtil.superDrawString(tileGraphics, label, labelX, labelY, Color.WHITE, null, null, null, null);
+                    //Any other custom label wordwrapped in the middle
+                    } else {
+                        int labelX = TILE_PADDING + (TILE_WIDTH / 2);
+                        int labelY = TILE_PADDING + (TILE_HEIGHT / 2);
+                        int lineHeight = tileGraphics.getFontMetrics().getHeight();
+                        List<String> toDraw = DrawingUtil.layoutText((Graphics2D)tileGraphics, label, TILE_WIDTH - TILE_PADDING);
+                        int deltaY = 0;
+                        for (String line : toDraw) {
+                            DrawingUtil.superDrawString(tileGraphics, line, labelX, labelY + deltaY, Color.WHITE, MapGenerator.HorizontalAlign.Center, null, null, null);
+                            deltaY += lineHeight;
+                        }
+                    }
                 }
 
                 if (TileHelper.isDraftTile(tile.getTileModel())) {

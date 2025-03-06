@@ -3,7 +3,9 @@ package ti4.service.franken;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -137,8 +139,10 @@ public class FrankenDraftBagService {
         draftables.removeIf(draftItem -> !draftItem.isDraftable(player));
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
 
-        String bagString = getCurrentBagRepresentation(draftables, undraftables);
-        MessageHelper.sendMessageToChannel(bagChannel, bagString);
+        Set<String> bagStringLines = getCurrentBagRepresentation(draftables, undraftables);
+        for (String line : bagStringLines) {
+            MessageHelper.sendMessageToChannel(bagChannel, line);
+        }
 
         int draftQueueCount = player.getDraftQueue().Contents.size();
         boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
@@ -174,22 +178,29 @@ public class FrankenDraftBagService {
         updateDraftStatusMessage(game);
     }
 
-    public static String getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("# __Draftable:__\n");
+    public static Set<String> getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
+        Set<String> bagRepresentationLines = new LinkedHashSet<>();
+        StringBuffer sb = new StringBuffer("# __Draftable:__\n");
+        
         draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
         for (DraftItem item : draftables) {
-            buildItemDescription(item, sb);
+            String nextItemDescrption = buildItemDescription(item);
+            if (sb.length() + nextItemDescrption.length() > 2000) { //Split to max 2000 message lines
+                bagRepresentationLines.add(sb.toString());
+                sb = new StringBuffer(nextItemDescrption);
+            } else {
+                sb.append(nextItemDescrption);
+            }
             sb.append("\n");
         }
+        bagRepresentationLines.add(sb.toString());
 
         if (!undraftables.isEmpty()) {
-            sb.append("# __Undraftable:__\n");
+            sb = new StringBuffer("# __Undraftable:__\n");
             sb.append("> The following items are in your bag but may not be drafted, either because you:\n");
             sb.append("> - are at your hand limit\n");
             sb.append("> - just drafted a similar item\n");
             sb.append("> - have not drafted one of each item type yet\n");
-
             undraftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
             for (DraftItem item : undraftables) {
                 sb.append("> ");
@@ -201,9 +212,10 @@ public class FrankenDraftBagService {
                 }
                 sb.append("\n");
             }
+            bagRepresentationLines.add(sb.toString());
         }
 
-        return sb.toString();
+        return bagRepresentationLines;
     }
 
     public static String getLongCategoryRepresentation(BagDraft draft, DraftBag bag, DraftItem.Category cat) {
@@ -229,14 +241,15 @@ public class FrankenDraftBagService {
         StringBuilder sb = new StringBuilder();
         DraftBag currentBag = player.getDraftQueue();
         for (DraftItem item : currentBag.Contents) {
-            buildItemDescription(item, sb);
+            sb.append(buildItemDescription(item));
             sb.append("\n");
         }
 
         return sb.toString();
     }
 
-    private static void buildItemDescription(DraftItem item, StringBuilder sb) {
+    private static String buildItemDescription(DraftItem item) {
+        StringBuffer sb = new StringBuffer();
         try {
             sb.append("### ").append(item.getItemEmoji()).append(" ");
             sb.append(item.getShortDescription()).append("\n> ");
@@ -244,6 +257,7 @@ public class FrankenDraftBagService {
         } catch (Exception e) {
             sb.append("ERROR BUILDING DESCRIPTION FOR ").append(item.getAlias());
         }
+        return sb.toString();
     }
 
     public static void clearPlayerHands(Game game) {
