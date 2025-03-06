@@ -151,7 +151,7 @@ public class RiftUnitsHelper {
             var parsedUnit = new ParsedUnit(unitKey);
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             msg += " and failed. Condolences for your loss.";
-            if(cabal == null){
+            if(cabal == null && RiftSetModeService.isActive(game)){
                 cabal = RiftSetModeService.getCabalPlayer(game);
             }
             if (cabal != null && cabal != player
