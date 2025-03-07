@@ -305,7 +305,7 @@ class AgendaResolveButtonHandler {
                 if (game.getCurrentAgendaInfo().contains("Secret")) {
                     game.addLaw(aID, Mapper.getSecretObjectivesJustNames().get(winner));
                     Player playerWithSO = null;
-
+                    int soID = 0;
                     for (Map.Entry<String, Player> playerEntry : game.getPlayers().entrySet()) {
                         Player player_ = playerEntry.getValue();
                         Map<String, Integer> secretsScored = new LinkedHashMap<>(
@@ -313,6 +313,7 @@ class AgendaResolveButtonHandler {
                         for (Map.Entry<String, Integer> soEntry : secretsScored.entrySet()) {
                             if (soEntry.getKey().equals(winner)) {
                                 playerWithSO = player_;
+                                soID = soEntry.getValue();
                                 break;
                             }
                         }
@@ -327,6 +328,7 @@ class AgendaResolveButtonHandler {
                         return;
                     }
                     game.addToSoToPoList(winner);
+                    playerWithSO.removeSecretScored(soID);
                     Integer poIndex = game.addCustomPO(Mapper.getSecretObjectivesJustNames().get(winner), 1);
                     game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 

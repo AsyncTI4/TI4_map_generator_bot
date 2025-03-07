@@ -2280,7 +2280,7 @@ public class Player {
         }
 
         // Add Custodia Vigilia when researching IIHQ
-        if ("iihq".equalsIgnoreCase(techID)) {
+        if (techID != null && techID.toLowerCase().contains("iihq")) {
             addPlanet("custodiavigilia");
             exhaustPlanet("custodiavigilia");
 
@@ -2318,7 +2318,7 @@ public class Player {
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
     private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
-        if ("iihq".equalsIgnoreCase(techID)) {
+        if (techID != null && techID.toLowerCase().contains("iihq")) {
             removePlanet("custodiavigilia");
             if (getPlanets().contains(Constants.MR)) {
                 Planet mecatolRex = getGame().getPlanetsInfo().get(Constants.MR);

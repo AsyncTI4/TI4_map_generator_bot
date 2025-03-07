@@ -49,6 +49,7 @@ class MakeSecretIntoPO extends GameStateSubcommand {
             return;
         }
         game.addToSoToPoList(soName);
+        playerWithSO.removeSecretScored(soID);
         Integer poIndex = game.addCustomPO(soName, 1);
         game.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
