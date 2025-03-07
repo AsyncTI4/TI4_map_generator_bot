@@ -566,7 +566,7 @@ public class Player {
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
 
-            if (isGM()) {
+            if (!isRealPlayer() && isGM()) {
                 List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
                 actionsChannel = channels.isEmpty() ? null : channels.getFirst();
             }

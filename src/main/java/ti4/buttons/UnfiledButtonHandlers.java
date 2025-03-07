@@ -1786,8 +1786,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
                     buttons.add(drawStage1);
                 }
-                if (game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty() || "456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
-                    buttons.add(drawStage2);
+                if (game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) {
+                    if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
+                        buttons.add(draw2Stage2);
+                    } else {
+                        buttons.add(drawStage2);
+                    }
                 }
                 if (game.getRound() > 7 || game.getPublicObjectives2Peakable().isEmpty()) {
                     message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";

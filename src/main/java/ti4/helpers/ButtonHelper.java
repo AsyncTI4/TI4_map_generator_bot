@@ -1416,7 +1416,7 @@ public class ButtonHelper {
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         foundSomething = true;
-                        sendFileWithCorrectButtons(threadChannel_, fileUpload, message, buttonsWeb);
+                        sendFileWithCorrectButtons(threadChannel_, fileUpload, message, buttonsWeb, game);
                     }
                 }
             } else {
@@ -1424,16 +1424,16 @@ public class ButtonHelper {
                 foundSomething = true;
             }
             if (!foundSomething) {
-                sendFileWithCorrectButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb);
+                sendFileWithCorrectButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb, game);
             }
         });
     }
 
-    public static void sendFileWithCorrectButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
-        if (WebHelper.sendingToWeb()) {
-            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);
+    public static void sendFileWithCorrectButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons, Game game) {
+        if (!WebHelper.sendingToWeb() || game.isFowMode()) {
+            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);  
         } else {
-            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);
+            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);            
         }
     }
 
@@ -5276,7 +5276,8 @@ public class ButtonHelper {
     public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         game.setHomebrew(false);
-        buttons.add(Buttons.green("setupHomebrew_444", "4 stage 1s, 4 stage 2s, 4 secrets, 12 VP"));
+        buttons.add(Buttons.green("setupHomebrew_444", "4/4/4: 4 stage 1s, 4 stage 2s, 4 secrets, 12 VP"));
+        buttons.add(Buttons.green("setupHomebrew_456", "4/5/6: 5 Stage 1s, 6 Stage 2s, 4 Secrets, 14 VP"));
         buttons.add(Buttons.green("setupHomebrew_absolRelicsNAgendas", "Absol Relics And Agendas", SourceEmojis.Absol));
         buttons.add(Buttons.green("setupHomebrew_absolTechsNMechs", "Absol Techs and Mechs", SourceEmojis.Absol));
         buttons.add(
@@ -5284,7 +5285,6 @@ public class ButtonHelper {
         buttons.add(Buttons.green("setupHomebrew_dsexplores", "Uncharted Space Explores/Relics/Action Cards",
             SourceEmojis.UnchartedSpace));
         buttons.add(Buttons.green("setupHomebrew_acDeck2", "Action Cards Deck 2", SourceEmojis.ActionDeck2));
-        buttons.add(Buttons.green("setupHomebrew_456", "5 Stage 1s, 6 Stage 2s, 4 Secrets, 14 VP"));
         buttons.add(Buttons.green("setupHomebrew_redTape", "Red Tape"));
         buttons.add(Buttons.green("setupHomebrew_removeSupports", "Remove Supports"));
         buttons.add(Buttons.green("setupHomebrew_homebrewSCs", "Homebrew Strategy Cards"));
