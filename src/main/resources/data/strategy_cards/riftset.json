@@ -10,7 +10,7 @@
         ],
         "secondaryTexts": 
         [
-            "Choose 1 system that contains only your units. Roll 1 die for each non-fighter ship in that system. On a 1-3 the Cabal captures that unit. Then gain a number of Trade Goods equal to the combined value of what was captured."
+            "Select a system with at least one of your non-fighter ships. For each non-fighter ship, roll a die; on a 3 or lower, it is captured. Gain Trade Goods equal to the total value of captured units."
         ],
         "imageFileName": "riftset_9",
         "source": "riftset"
