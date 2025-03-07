@@ -2,10 +2,8 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -637,6 +635,10 @@ public class ActionCardHelper {
             if (automationID.equals("insub")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveInsubStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+            if (automationID.equals("parley")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveParleyStep1", buttonLabel));
+                //MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
 
             if (automationID.equals("f_deployment")) {

@@ -1214,7 +1214,7 @@ public class ButtonHelperAbilities {
             successMessage = "Produced 2 " + UnitEmojis.fighter + " in tile "
                 + tile.getRepresentationForButtons(game, player) + ".";
         }
-        if ((player.ownsUnit("muaat_mech") || player.ownsUnit("sigma_muaat_mech")) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
+        if ((player.ownsUnit("muaat_mech") || player.ownsUnit("sigma_muaat_mech") || player.ownsUnit("absol_muaat_mech")) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
             successMessage = ButtonHelper.putInfWithMechsForStarforge(pos, successMessage, game, player, event);
         }
 

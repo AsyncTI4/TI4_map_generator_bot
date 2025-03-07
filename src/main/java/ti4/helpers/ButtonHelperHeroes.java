@@ -1489,13 +1489,17 @@ public class ButtonHelperHeroes {
         String num = buttonID.split("_")[1];
         int n = Integer.parseInt(num);
         List<Button> buttons = new ArrayList<>();
+        MessageChannel channel = player.getCorrectChannel();
+        if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
+            channel = player.getCardsInfoThread();
+        }
         for (int x = 0; x < n; x++) {
             String acID = game.drawActionCardAndDiscard();
             String sb = Mapper.getActionCard(acID).getRepresentation() + "\n";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
+            MessageHelper.sendMessageToChannel(channel , sb);
             buttons.add(Buttons.green("cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(channel,
             player.getRepresentation() + ", please use the buttons to give out action cards to players.", buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -1504,6 +1508,10 @@ public class ButtonHelperHeroes {
     public static void resolveCymiaeHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String acID = buttonID.replace("cymiaeHeroStep2_", "");
         List<Button> buttons = new ArrayList<>();
+        MessageChannel channel = player.getCorrectChannel();
+        if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
+            channel = player.getCardsInfoThread();
+        }
         for (Player p2 : game.getRealPlayers()) {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("cymiaeHeroStep3_" + p2.getFaction() + "_" + acID, p2.getColor()));
@@ -1515,7 +1523,7 @@ public class ButtonHelperHeroes {
             }
         }
         ButtonHelper.deleteTheOneButton(event);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+        MessageHelper.sendMessageToChannelWithButtons(channel,
             player.getRepresentationUnfogged() + ", please tell the bot who you wish to give "
                 + Mapper.getActionCard(acID).getName() + " to.",
             buttons);
@@ -1531,11 +1539,17 @@ public class ButtonHelperHeroes {
             return;
         }
         ActionCardHelper.sendActionCardInfo(game, p2, event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " has given " + Mapper.getActionCard(acID).getName() + " to "
+        if(game.getPhaseOfGame().equalsIgnoreCase("action")){
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentation() + " has given " + Mapper.getActionCard(acID).getName() + " to "
+                    + p2.getRepresentation() + ".");
+        }else{
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentation() + " has given an action card to "
                 + p2.getRepresentation() + ".");
+        }
         ButtonHelper.deleteMessage(event);
-        if (p2 != player) {
+        if (p2 != player && game.getPhaseOfGame().equalsIgnoreCase("action")) {
             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                 "The Voice United, the Cymiae hero, has given " + Mapper.getActionCard(acID).getName()
                     + " to you and you now have to discard 1 action card.");

@@ -126,10 +126,12 @@ public class PlayStrategyCardService {
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder();
 
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
-        if (scModel.hasImageFile()) {
-            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, game));
-        } else {
-            baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
+        if (!winnuHero) {
+            if (scModel.hasImageFile()) {
+                MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, game));
+            } else {
+                baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
+            }
         }
         baseMessageObject.addContent(message.toString());
 

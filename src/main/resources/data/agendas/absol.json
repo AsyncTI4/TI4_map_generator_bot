@@ -456,7 +456,7 @@
         "name": "Representative Government",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: The player who cast the most votes \"For\" takes the speaker token. Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead, except for the player who controls Mecatol Rex, who may cast 2 votes on each agenda. Players cannot cast additional votes.",
+        "text1": "For: The player who cast the most votes \"For\" takes the speaker token. When casting votes, players cast votes equal to the number of planets exhausted, instead of the planets' combined influence value.  A player that exhausts Mecatol Rex casts 1 additional vote. Players cannot cast additional votes from other sources.",
         "text2": "Against: At the start of the next strategy phase, each player who voted \"Against\" or abstained exhausts all of their cultural planets and cannot choose the Politics strategy card unless it is the only unchosen strategy card.",
         "mapText": "Cannot exhaust planets to cast votes. Player can cast 1 vote on each agenda. Mecatol Rex owner may cast 2 votes on each agenda. Cannot cast additional votes.",
         "source": "absol"

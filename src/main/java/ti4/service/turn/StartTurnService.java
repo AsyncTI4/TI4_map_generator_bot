@@ -364,7 +364,7 @@ public class StartTurnService {
             .remove(game.getName(), GameMessageType.TURN)
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
-            startButtons.add(Buttons.gray("showGameAgain", "Show Game"));
+            startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
             FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
         }
 

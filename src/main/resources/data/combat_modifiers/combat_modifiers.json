@@ -1310,6 +1310,51 @@
         "forCombatAbility": "combatround"
     },
     {
+        "alias": "roll_1_for_every_adjacent_asteroid_comb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_asteroid",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "zelian_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "roll_1_for_every_adjacent_asteroid_bomb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_asteroid",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "zelian_flagship"
+            }
+        ],
+        "forCombatAbility": "bombardment"
+    },
+    {
+        "alias": "roll_1_for_every_adjacent_asteroid_afb",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "adjacent_asteroid",
+        "scope": "fs",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "zelian_flagship"
+            }
+        ],
+        "forCombatAbility": "AFB"
+    },
+    {
         "alias": "roll_1_for_every_adjacent_mech_bomb",
         "type": "extrarolls",
         "value": "+1",

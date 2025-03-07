@@ -477,6 +477,15 @@ public class CombatModHelper {
                         }
                     }
                 }
+                case "adjacent_asteroid" -> {
+                    for (String pos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                        Tile tile = game.getTileByPosition(pos);
+                        if(tile.isAsteroidField()){
+                            scalingCount += 1;
+                        }
+                        
+                    }
+                }
                 case "damaged_units_same_type" -> {
                     UnitHolder space = activeSystem.getUnitHolders()
                         .get("space");
