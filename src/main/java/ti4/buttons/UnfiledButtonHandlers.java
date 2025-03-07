@@ -986,15 +986,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            if(!game.getStoredValue("newStatusScoringMode").isEmpty() && game.getPhaseOfGame().equalsIgnoreCase("statusScoring")){
+            if (!game.getStoredValue("newStatusScoringMode").isEmpty() && game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
                 String missingPeople = "";
-                for(Player player : game.getRealPlayers()){
-                    String so = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"SO");
-                    if(so.isEmpty()){
-                        missingPeople += player.getRepresentation(false,true);
+                for (Player player : game.getRealPlayers()) {
+                    String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+                    if (so.isEmpty()) {
+                        missingPeople += player.getRepresentation(false, true);
                     }
                 }
-                if(!missingPeople.isEmpty()){
+                if (!missingPeople.isEmpty()) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), missingPeople + " need to indicate if they are scoring a secret objective before the next PO can be flipped");
                     return;
                 }
@@ -1075,9 +1075,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 int poIndex = Integer.parseInt(poID);
                 ScorePublicObjectiveService.scorePO(event, privateChannel, game, player, poIndex);
                 ReactionService.addReaction(event, game, player);
-                if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+                if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
                     String msg = "Please score objectives.";
-                    msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+                    msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
                     event.getMessage().editMessage(msg).queue();
                 }
             } catch (Exception e) {
@@ -1120,8 +1120,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 try {
                     int poIndex = Integer.parseInt(poID);
-                    if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
-                        game.setStoredValue(player.getFaction() + "round"+game.getRound()+"PO", "Queued");
+                    if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+                        game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "Queued");
                     }
                     game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
                 } catch (Exception e) {
@@ -1135,12 +1135,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 break;
             }
         }
-        if(!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.getPhaseOfGame().equalsIgnoreCase("action")){
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty() && !game.getPhaseOfGame().equalsIgnoreCase("action")) {
             String msg = "Please score objectives.";
-            msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+            msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
-        if(game.getPhaseOfGame().equalsIgnoreCase("action")){
+        if (game.getPhaseOfGame().equalsIgnoreCase("action")) {
             event.getMessage().delete().queue();
         }
     }
@@ -1263,8 +1263,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                             message += player2.getRepresentationUnfogged()
                                 + " is the one the game is currently waiting on";
                         }
-                        if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
-                            game.setStoredValue(player.getFaction() + "round"+game.getRound()+"SO", "Queued");
+                        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
+                            game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "Queued");
                         }
                         MessageHelper.sendMessageToChannel(channel, message);
                         int soIndex = Integer.parseInt(soID);
@@ -1483,7 +1483,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     playerRep + ", your initial command token allocation was " + shortCCs + ". Your final command token allocation is " + finalCCs + ".");
             } else {
                 if ("leadership".equalsIgnoreCase(buttonID)) {
-                    game.setStoredValue("ledSpend"+player.getFaction(), "");
+                    game.setStoredValue("ledSpend" + player.getFaction(), "");
                     String message = playerRep + ", your initial command token allocation was " + shortCCs + ". Your final command tokens allocation is "
                         + finalCCs + ".";
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, "leadership");
@@ -1733,21 +1733,17 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (matchingFactionReactions >= numberOfPlayers) {
             respondAllPlayersReacted(event, game);
             GameMessageManager.remove(game.getName(), messageId);
-        }else{
-            
-            if(buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring"))){
-                boolean allReacted = true;
-                for(Player player : game.getRealPlayers()){
-                    String po = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"PO");
-                    if(po.isEmpty()){
-                        allReacted = false;
-                    }
-                }
-                if(allReacted){
-                    respondAllPlayersReacted(event, game);
+        } else if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring"))) {
+            boolean allReacted = true;
+            for (Player player : game.getRealPlayers()) {
+                String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
+                if (po.isEmpty()) {
+                    allReacted = false;
                 }
             }
-            
+            if (allReacted) {
+                respondAllPlayersReacted(event, game);
+            }
         }
     }
 
@@ -1790,8 +1786,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
                     buttons.add(drawStage1);
                 }
-                if (game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty() || "456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
-                    buttons.add(drawStage2);
+                if (game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) {
+                    if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
+                        buttons.add(draw2Stage2);
+                    } else {
+                        buttons.add(drawStage2);
+                    }
                 }
                 if (game.getRound() > 7 || game.getPublicObjectives2Peakable().isEmpty()) {
                     message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
@@ -2525,11 +2525,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     @ButtonHandler("diploSystem")
-    public static void diploSystem(ButtonInteractionEvent event,Player player, Game game) {
+    public static void diploSystem(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.getRepresentationUnfogged() + " Choose the system you wish to diplo";
         List<Button> buttons = Helper.getPlanetSystemDiploButtons(player, game, false, null);
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
-        
     }
 
     @ButtonHandler("redistributeCCButtons") // Buttons.REDISTRIBUTE_CCs
@@ -2679,9 +2678,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler(Constants.SO_NO_SCORING)
     public static void soNoScoring(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.getRepresentation() + " has opted not to score a secret objective at this point in time.";
-        
-        game.setStoredValue(player.getFaction() + "round"+game.getRound()+"SO", "None");
-        
+        game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         String key2 = "queueToScoreSOs";
         String key3 = "potentialScoreSOBlockers";
@@ -2698,9 +2695,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 // Helper.resolveSOScoringQueue(game, event);
             }
         }
-        if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
             String msg = "Please score objectives.";
-            msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+            msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
     }
@@ -2708,9 +2705,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("refreshStatusSummary")
     public static void refreshStatusSummary(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Please score objectives.";
-        msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+        msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
         event.getMessage().editMessage(msg).queue();
     }
+
     @ButtonHandler("acquireAFreeTech") // Buttons.GET_A_FREE_TECH
     public static void acquireAFreeTech(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
@@ -2733,7 +2731,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
-        game.setStoredValue(player.getFaction() + "round"+game.getRound()+"PO", "None");
+        game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "None");
         String reply = game.isFowMode() ? "No public objective scored" : null;
         ReactionService.addReaction(event, game, player, reply);
         String key2 = "queueToScorePOs";
@@ -2749,9 +2747,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 Helper.resolvePOScoringQueue(game, event);
             }
         }
-        if(!game.getStoredValue("newStatusScoringMode").isEmpty()){
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
             String msg = "Please score objectives.";
-            msg += "\n\n"+Helper.getNewStatusScoringRepresentation(game);
+            msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
     }

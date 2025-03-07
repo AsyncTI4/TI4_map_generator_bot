@@ -320,21 +320,14 @@ public class ButtonHelper {
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet) {
                 if (player.getPlanets().contains(unitHolder.getName())) {
-                    buttons.add(Buttons.green("statusInfRevival_" + unitHolder.getName() + "_1",
-                        "Place 1 infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
+                    String prefixID = player.finChecker() + "statusInfRevival_" + unitHolder.getName() + "_";
+                    String msgSuffix = " Infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game);
+                    buttons.add(Buttons.green(prefixID + "1", "Place 1" + msgSuffix));
                     if (middleVal > 1) {
-                        buttons.add(Buttons.green(
-                            "statusInfRevival_" + unitHolder.getName() + "_" + middleVal,
-                            "Place " + middleVal + " Infantry on "
-                                + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
-
+                        buttons.add(Buttons.green(prefixID + middleVal, "Place " + middleVal + msgSuffix));
                     }
                     if (infCount > 1) {
-                        buttons.add(Buttons.green(
-                            "statusInfRevival_" + unitHolder.getName() + "_" + infCount,
-                            "Place " + infCount + " Infantry on "
-                                + Helper.getPlanetRepresentation(unitHolder.getName(), game)));
-
+                        buttons.add(Buttons.green(prefixID + infCount, "Place " + infCount + msgSuffix));
                     }
                 }
 
@@ -826,7 +819,7 @@ public class ButtonHelper {
         ButtonHelperActionCards.checkForAssigningPublicDisgrace(game, player);
         ButtonHelperActionCards.checkForPlayingManipulateInvestments(game, player);
         ButtonHelperActionCards.checkForPlayingSummit(game, player);
-        if(game.isCustodiansScored()){
+        if (game.isCustodiansScored()) {
             AgendaHelper.offerPlayerPassOnWhensNAfters(player);
         }
     }
@@ -1418,24 +1411,12 @@ public class ButtonHelper {
         List<ThreadChannel> threadChannels = game.getActionsChannel().getThreadChannels();
         MapRenderPipeline.queue(game, event, DisplayType.all, fileUpload -> {
             boolean foundSomething = false;
+            List<Button> buttonsWeb = Buttons.mapImageButtons(game);
             if (!game.isFowMode()) {
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
                         foundSomething = true;
-
-                        List<Button> buttonsWeb = new ArrayList<>();
-                        if (!game.isFowMode()) {
-                            Button linkToWebsite = Button.link(
-                                "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
-                                "Website View");
-                            buttonsWeb.add(linkToWebsite);
-                            buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
-                        }
-                        buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
-                        buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                        buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
-
-                        MessageHelper.sendFileToChannelWithButtonsAfter(threadChannel_, fileUpload, message, buttonsWeb);
+                        sendFileWithCorrectButtons(threadChannel_, fileUpload, message, buttonsWeb, game);
                     }
                 }
             } else {
@@ -1443,20 +1424,17 @@ public class ButtonHelper {
                 foundSomething = true;
             }
             if (!foundSomething) {
-                List<Button> buttonsWeb = new ArrayList<>();
-                if (!game.isFowMode()) {
-                    Button linkToWebsite = Button.link(
-                        "https://ti4.westaddisonheavyindustries.com/game/" + game.getName(),
-                        "Website View");
-                    buttonsWeb.add(linkToWebsite);
-                    buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
-                }
-                buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
-                buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-                buttonsWeb.add(Buttons.gray("showGameAgain", "Show Game"));
-                MessageHelper.sendFileToChannelAndAddLinkToButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb);
+                sendFileWithCorrectButtons(event.getMessageChannel(), fileUpload, message, buttonsWeb, game);
             }
         });
+    }
+
+    public static void sendFileWithCorrectButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons, Game game) {
+        if (!WebHelper.sendingToWeb() || game.isFowMode()) {
+            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);  
+        } else {
+            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);            
+        }
     }
 
     public static boolean nomadHeroAndDomOrbCheck(Player player, Game game) {
@@ -2322,11 +2300,11 @@ public class ButtonHelper {
 
     @ButtonHandler("editMessage_") // editMessage_{Optional String to edit the message to}
     public static void editMessage(GenericInteractionCreateEvent event) {
-        if (event instanceof ButtonInteractionEvent bevent) {
-            bevent.getMessage();
-            bevent.getButton();
-            String message = bevent.getButton().getId().replace("editMessage_", "");
-        }
+        // if (event instanceof ButtonInteractionEvent bevent) {
+        //     // bevent.getMessage();
+        //     // bevent.getButton();
+        //     // String message = bevent.getButton().getId().replace("editMessage_", "");
+        // }
     }
 
     public static void deleteAllButtons(ButtonInteractionEvent event) {
@@ -3779,6 +3757,7 @@ public class ButtonHelper {
         }
         return buttons;
     }
+
     public static List<Button> getPlanetExplorationButtons(Game game, Planet planet, Player player) {
         return getPlanetExplorationButtons(game, planet, player, false);
     }
@@ -3801,7 +3780,7 @@ public class ButtonHelper {
         for (String trait : explorationTraits) {
             if (List.of("cultural", "industrial", "hazardous").contains(trait)) {
                 String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
-                if(impressment){
+                if (impressment) {
                     buttonId = "movedNExplored_dsdihmy_" + planetId + "_" + trait;
                 }
                 String buttonMessage = "Explore " + planetRepresentation
@@ -5297,7 +5276,8 @@ public class ButtonHelper {
     public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         game.setHomebrew(false);
-        buttons.add(Buttons.green("setupHomebrew_444", "4 stage 1s, 4 stage 2s, 4 secrets, 12 VP"));
+        buttons.add(Buttons.green("setupHomebrew_444", "4/4/4: 4 stage 1s, 4 stage 2s, 4 secrets, 12 VP"));
+        buttons.add(Buttons.green("setupHomebrew_456", "4/5/6: 5 Stage 1s, 6 Stage 2s, 4 Secrets, 14 VP"));
         buttons.add(Buttons.green("setupHomebrew_absolRelicsNAgendas", "Absol Relics And Agendas", SourceEmojis.Absol));
         buttons.add(Buttons.green("setupHomebrew_absolTechsNMechs", "Absol Techs and Mechs", SourceEmojis.Absol));
         buttons.add(
@@ -5305,7 +5285,6 @@ public class ButtonHelper {
         buttons.add(Buttons.green("setupHomebrew_dsexplores", "Uncharted Space Explores/Relics/Action Cards",
             SourceEmojis.UnchartedSpace));
         buttons.add(Buttons.green("setupHomebrew_acDeck2", "Action Cards Deck 2", SourceEmojis.ActionDeck2));
-        buttons.add(Buttons.green("setupHomebrew_456", "5 Stage 1s, 6 Stage 2s, 4 Secrets, 14 VP"));
         buttons.add(Buttons.green("setupHomebrew_redTape", "Red Tape"));
         buttons.add(Buttons.green("setupHomebrew_removeSupports", "Remove Supports"));
         buttons.add(Buttons.green("setupHomebrew_homebrewSCs", "Homebrew Strategy Cards"));
@@ -6343,7 +6322,7 @@ public class ButtonHelper {
             String message = player.getFactionEmoji() + " chose to Diplo the system containing "
                 + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy",null);
+            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", null);
         }
         deleteMessage(event);
     }

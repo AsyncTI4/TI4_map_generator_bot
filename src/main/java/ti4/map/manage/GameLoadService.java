@@ -51,6 +51,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
@@ -603,7 +604,7 @@ class GameLoadService {
                         StringTokenizer dataInfo = new StringTokenizer(fowOptions.nextToken(), ",");
                         String optionName = dataInfo.nextToken();
                         String optionValue = dataInfo.nextToken();
-                        game.setFowOption(optionName, optionValue);
+                        game.setFowOption(FOWOption.fromString(optionName), Boolean.parseBoolean(optionValue));
                     }
                 }
                 case Constants.GAME_CUSTOM_NAME -> game.setCustomName(info);

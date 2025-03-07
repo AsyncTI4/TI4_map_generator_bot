@@ -60,24 +60,11 @@
         "startingFleet": "3 inf t,2 ff,cv,2 dd,sd t",
         "commodities": 3,
         "factionTech": [],
-        "startingTech": [
-            "sar",
-            "gd"
-        ],
-        "homePlanets": [
-            "somna",
-            "tera",
-            "hospoona"
-        ],
+        "startingTech": ["sar", "gd"],
+        "homePlanets": ["somna", "tera", "hospoona"],
         "abilities": [],
-        "leaders": [
-            "adminsagent",
-            "adminscommander",
-            "adminshero"
-        ],
-        "promissoryNotes": [
-            "adminspn"
-        ],
+        "leaders": ["adminsagent", "adminscommander", "adminshero"],
+        "promissoryNotes": ["adminspn"],
         "units": [
             "fighter",
             "destroyer",

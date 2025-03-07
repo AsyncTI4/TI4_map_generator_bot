@@ -366,7 +366,6 @@ public class ActionCardHelper {
                     + ", you have _Instinct Training_ readied and a command token available in your strategy pool."
                     + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.", xxchaButtons);
             }
-
         }
         MessageEmbed acEmbed = actionCard.getRepresentationEmbed();
         if (acID.contains("sabo")) {
@@ -635,7 +634,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if (automationID.equals("insubordination")) {
+            if (automationID.equals("insub")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveInsubStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
             }
@@ -900,8 +899,8 @@ public class ActionCardHelper {
                 }
                 if (automationID.equals("hack")) {
                     game.setHasHackElectionBeenPlayed(true);
-                    Button setHack = Buttons.red("hack_election", "Set the Voting Order as Normal");
-                    List<Button> hackButtons = List.of(setHack);
+                    Button resetHack = Buttons.red("hack_election", "Set the Voting Order as Normal");
+                    List<Button> hackButtons = List.of(resetHack);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Voting order has been reversed."
                         + " Please hit this button if _Hack Election_ is Sabo'd.", game, player, hackButtons);
                 }
@@ -913,7 +912,6 @@ public class ActionCardHelper {
                     codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAssRepsStep1", buttonLabel));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
                 }
-
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
                 AutoPingMetadataManager.delayPing(game.getName());
@@ -1095,8 +1093,7 @@ public class ActionCardHelper {
     public static String actionCardListCondensedNoIds(List<String> discards, String title) {
         StringBuilder sb = new StringBuilder();
         if (title != null) sb.append("__").append(title).append("__:");
-        Map<String, List<String>> cardsByName = discards.stream()
-            .collect(Collectors.groupingBy(ac -> Mapper.getActionCard(ac).getName()));
+        Map<String, List<String>> cardsByName = discards.stream().collect(Collectors.groupingBy(ac -> Mapper.getActionCard(ac).getName()));
         int index = 1;
 
         List<Map.Entry<String, List<String>>> displayOrder = new ArrayList<>(cardsByName.entrySet());

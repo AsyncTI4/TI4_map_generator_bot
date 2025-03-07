@@ -7,7 +7,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
@@ -16,17 +15,25 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+
 import ti4.ResourceHelper;
 import ti4.helpers.Storage;
+import ti4.image.MapGenerator.HorizontalAlign;
+import ti4.image.MapGenerator.VerticalAlign;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.ColorModel;
 import ti4.service.emoji.TI4Emoji;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 @UtilityClass
 public class DrawingUtil {
 
-    private static final BasicStroke stroke2 = new BasicStroke(2.0f);
+    private static BasicStroke stroke(int size) {
+        return new BasicStroke(size);
+    }
+
     private static final int DELTA_Y = 26;
 
     public static void superDrawString(Graphics g, String txt, int x, int y, Color textColor, MapGenerator.HorizontalAlign h, MapGenerator.VerticalAlign v, Stroke outlineSize, Color outlineColor) {
@@ -78,7 +85,7 @@ public class DrawingUtil {
             }
         }
 
-        if (outlineSize == null) outlineSize = stroke2;
+        if (outlineSize == null) outlineSize = stroke(2);
         if (outlineColor == null && textColor == null) {
             outlineColor = Color.BLACK;
             textColor = Color.WHITE;
@@ -112,6 +119,43 @@ public class DrawingUtil {
         g2.setColor(origColor);
         g2.setStroke(origStroke);
         g2.setTransform(originalTileTransform);
+        g2.setRenderingHints(origHints);
+    }
+
+    public static void superDrawStringCenteredDefault(Graphics2D g2, String txt, int x, int y) {
+        superDrawString(g2, txt, x, y, Color.white, HorizontalAlign.Center, VerticalAlign.Center, stroke(2), Color.black);
+    }
+
+    public static void superDrawStringCenteredDefault(Graphics graphics, String txt, int x, int y) {
+        superDrawString((Graphics2D) graphics, txt, x, y, Color.white, HorizontalAlign.Center, VerticalAlign.Center, stroke(2), Color.black);
+    }
+
+    public static void superDrawStringCentered(Graphics g, String txt, int x, int y, Color textColor, Stroke outlineSize, Color outlineColor) {
+        superDrawString((Graphics2D) g, txt, x, y, textColor, HorizontalAlign.Center, VerticalAlign.Center, outlineSize, outlineColor);
+    }
+
+    public static void superDrawStringCentered(Graphics2D g2, String txt, int x, int y, Color textColor, Stroke outlineSize, Color outlineColor) {
+        superDrawString(g2, txt, x, y, textColor, HorizontalAlign.Center, VerticalAlign.Center, outlineSize, outlineColor);
+    }
+
+    public static void drawRedX(Graphics2D g2, int x, int y, int size, boolean thick) {
+        int offset = size / 2;
+        int strokeSize = thick ? 6 : 4;
+        RenderingHints origHints = g2.getRenderingHints();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // draw outline
+        g2.setStroke(stroke(strokeSize));
+        g2.setColor(Color.black);
+        g2.drawLine(x - offset, y - offset, x + offset, y + offset);
+        g2.drawLine(x - offset, y + offset, x + offset, y - offset);
+
+        // draw overline
+        g2.setStroke(stroke(strokeSize - 2));
+        g2.setColor(Color.red);
+        g2.drawLine(x - offset, y - offset, x + offset, y + offset);
+        g2.drawLine(x - offset, y + offset, x + offset, y - offset);
+
         g2.setRenderingHints(origHints);
     }
 
@@ -213,7 +257,7 @@ public class DrawingUtil {
             }
         }
         if (factionFile == null) {
-            if (factionID.equalsIgnoreCase("fogalliance")) {
+            if (factionID.equalsIgnoreCase("fogalliance") || factionID.equalsIgnoreCase("generic")) {
                 return null;
             }
             BotLogger.log("Could not find image file for faction icon: " + factionID);
@@ -235,20 +279,15 @@ public class DrawingUtil {
         return null;
     }
 
-    // use {@link MapGenerator#DrawingUtil.superDrawString()}
-    @Deprecated
     public static void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
-        // Get the FontMetrics
-        FontMetrics metrics = g.getFontMetrics(font);
-        // Determine the X coordinate for the text
-        int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
-        // Determine the Y coordinate for the text (note we add the ascent, as in java
-        // 2d 0 is top of the screen)
-        int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
-        // Set the font
+        int x = (int) Math.round(rect.getCenterX());
+        int y = (int) Math.round(rect.getCenterY());
+        drawCenteredString(g, text, x, y, font);
+    }
+
+    public static void drawCenteredString(Graphics g, String text, int x, int y, Font font) {
         g.setFont(font);
-        // Draw the String
-        g.drawString(text, x, y);
+        superDrawString(g, text, x, y, null, HorizontalAlign.Center, VerticalAlign.Center, null, null);
     }
 
     public static void getAndDrawControlToken(Graphics graphics, Player player, int x, int y, boolean hideFactionIcon, float scale) {
@@ -447,32 +486,173 @@ public class DrawingUtil {
     public static List<String> layoutText(Graphics2D g2, String inputText, int maxWidth) {
         List<String> initialSplit = new ArrayList<>(Arrays.asList(inputText.split("[\\n\n]")));
         List<String> finalSplit = new ArrayList<>();
-        for (String lineCheck : initialSplit) {
-            String line = lineCheck.trim(); // idk maybe it matters
-            int width = width(g2, line);
-            if (width > maxWidth) {
-                int iter = 0;
-                while (iter++ < 10) {
-                    int splitSpace = 0;
-                    int nextSpace = line.indexOf(" ");
-                    while (width(g2, line.substring(0, nextSpace).trim()) < maxWidth) {
-                        splitSpace = nextSpace;
-                        nextSpace = line.indexOf(" ", splitSpace + 1);
-                        if (nextSpace == -1)
+        for (String line : initialSplit) {
+            line = line.trim();
+            while (width(g2, line) > maxWidth) {
+                int splitIndex = -1;
+                int nextSpace = line.indexOf(" ");
+    
+                // Prefer splitting at spaces
+                while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
+                    splitIndex = nextSpace;
+                    nextSpace = line.indexOf(" ", splitIndex + 1);
+                }
+    
+                // If no space is found or no valid split, break at max width
+                if (splitIndex == -1) {
+                    for (int i = 1; i < line.length(); i++) {
+                        if (width(g2, line.substring(0, i)) > maxWidth) {
+                            splitIndex = i - 1;
                             break;
-                    }
-                    finalSplit.add(line.substring(0, splitSpace).trim());
-                    line = line.substring(splitSpace).trim();
-
-                    if (width(g2, line) < maxWidth) {
-                        finalSplit.add(line);
-                        break;
+                        }
                     }
                 }
-            } else {
+    
+                finalSplit.add(line.substring(0, splitIndex).trim());
+                line = line.substring(splitIndex).trim();
+            }
+    
+            if (!line.isEmpty()) {
                 finalSplit.add(line);
             }
         }
         return finalSplit;
+    }
+
+    public static void drawRectWithTwoColorGradient(Graphics2D g2, Color mainColor, Color accentColor, int x, int y, int width, int height) {
+        Rectangle rect = new Rectangle(x, y, width, height);
+        Paint gradient = ColorUtil.gradient(mainColor, accentColor, rect);
+        Paint old = g2.getPaint();
+        g2.setPaint(gradient);
+        g2.draw(rect);
+        g2.setPaint(old);
+    }
+
+    public static void drawRectWithTwoColorGradient(Graphics2D g2, Color mainColor, Color accentColor, Rectangle rect) {
+        Paint gradient = ColorUtil.gradient(mainColor, accentColor, rect);
+        Paint old = g2.getPaint();
+        g2.setPaint(gradient);
+        g2.draw(rect);
+        g2.setPaint(old);
+    }
+
+    /**
+     * @param graphics
+     * @param text text to draw vertically
+     * @param x left
+     * @param y bottom
+     * @param font
+     */
+    public static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font) {
+        drawTextVertically(graphics, text, x, y, font, false);
+    }
+
+    public static void drawTextVertically(Graphics graphics, String text, int x, int y, Font font, boolean rightAlign) {
+        Graphics2D graphics2D = (Graphics2D) graphics;
+        AffineTransform originalTransform = graphics2D.getTransform();
+        graphics2D.rotate(Math.toRadians(-90));
+        graphics2D.setFont(font);
+
+        if (rightAlign) {
+            y += graphics.getFontMetrics().stringWidth(text);
+        }
+
+        // DRAW A 1px BLACK BORDER AROUND TEXT
+        Color originalColor = graphics2D.getColor();
+        graphics2D.setColor(Color.BLACK);
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                graphics2D.drawString(
+                    text,
+                    (y + j) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+                    x + graphics2D.getFontMetrics().getHeight() / 2 + i);
+            }
+        }
+        graphics2D.setColor(originalColor);
+
+        graphics2D.drawString(
+            text,
+            (y) * -1, // See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+            x + graphics2D.getFontMetrics().getHeight() / 2);
+        graphics2D.setTransform(originalTransform);
+    }
+
+    public static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, false);
+
+    }
+
+    public static void drawTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign) {
+        int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+        String firstRow = StringUtils.substringBefore(text, "\n");
+        firstRow = trimTextToPixelWidth(graphics, firstRow, maxWidth);
+        String secondRow = text.substring(firstRow.length()).replace("\n", "");
+        secondRow = trimTextToPixelWidth(graphics, secondRow, maxWidth);
+        drawTextVertically(graphics, firstRow, x, y, graphics.getFont(), rightAlign);
+        if (isNotBlank(secondRow)) {
+            drawTextVertically(graphics, secondRow, x + spacing, y, graphics.getFont(), rightAlign);
+        }
+    }
+
+    public static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth) {
+        drawOneOrTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, false);
+    }
+
+    public static void drawOneOrTwoLinesOfTextVertically(Graphics graphics, String text, int x, int y, int maxWidth, boolean rightAlign) {
+        // vertically prints text on one line, centred horizontally, if it fits,
+        // otherwise prints it over two lines
+
+        // if the text contains a linebreak, print it over two lines
+        if (text.contains("\n")) {
+            drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
+            return;
+        }
+
+        int spacing = graphics.getFontMetrics().getAscent() + graphics.getFontMetrics().getLeading();
+        text = text.toUpperCase();
+
+        // if the text is short enough to fit on one line, print it on one
+        if (text.equals(trimTextToPixelWidth(graphics, text, maxWidth))) {
+            drawTextVertically(graphics, text, x + spacing / 2, y, graphics.getFont(), rightAlign);
+            return;
+        }
+
+        // if there's a space in the text, try to split it
+        // as close to the centre as possible
+        if (text.contains(" ")) {
+            float center = text.length() / 2.0f + 0.5f;
+            String front = text.substring(0, (int) center);
+            //String back = text.substring((int) (center - 0.5f));
+            int before = front.lastIndexOf(" ");
+            int after = text.indexOf(" ", (int) (center - 0.5f));
+
+            // if there's only a space in the back half, replace the first space with a newline
+            if (before == -1) {
+                text = text.substring(0, after) + "\n" + text.substring(after + 1);
+            }
+            // if there's only a space in the front half, or if the last space in the
+            // front half is closer to the centre than the first space in the back half,
+            // replace the last space in the front half with a newline
+            else if (after == -1 || (center - before - 1 <= after - center + 1)) {
+                text = text.substring(0, before) + "\n" + text.substring(before + 1);
+            }
+            // otherwise, the first space in the back half is closer to the centre
+            // than the last space in the front half, so replace
+            // the first space in the back half with a newline
+            else {
+                text = text.substring(0, after) + "\n" + text.substring(after + 1);
+            }
+        }
+        drawTwoLinesOfTextVertically(graphics, text, x, y, maxWidth, rightAlign);
+    }
+
+    public static String trimTextToPixelWidth(Graphics graphics, String text, int pixelLength) {
+        for (int i = 0; i < text.length(); i++) {
+            if (graphics.getFontMetrics().stringWidth(text.substring(0, i + 1)) > pixelLength) {
+                return text.substring(0, i);
+            }
+        }
+        return text;
     }
 }

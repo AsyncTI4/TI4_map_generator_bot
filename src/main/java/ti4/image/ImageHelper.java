@@ -14,6 +14,8 @@ import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.message.BotLogger;
 import ti4.service.emoji.TI4Emoji;
@@ -104,8 +106,12 @@ public class ImageHelper {
         return outputImage;
     }
 
-    public static BufferedImage square(BufferedImage originalImage) {
+    public static BufferedImage square(@NotNull BufferedImage originalImage) {
         int newSize = Math.max(originalImage.getWidth(), originalImage.getHeight());
+        return square(originalImage, newSize);
+    }
+
+    public static BufferedImage square(@NotNull BufferedImage originalImage, int newSize) {
         BufferedImage outputImage = new BufferedImage(newSize, newSize, BufferedImage.TYPE_INT_ARGB);
         int newX = (newSize - originalImage.getWidth()) / 2;
         int newY = (newSize - originalImage.getHeight()) / 2;

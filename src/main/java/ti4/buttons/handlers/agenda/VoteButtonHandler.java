@@ -144,14 +144,16 @@ public class VoteButtonHandler {
                 }
             }
             AgendaModel agendaDetails = Mapper.getAgenda(agendaAlias);
-            forEmojiString = agendaDetails.getForEmoji();
+            if (agendaDetails != null) {
+                forEmojiString = agendaDetails.getForEmoji();
+                againstEmojiString = agendaDetails.getAgainstEmoji();
+            }
             for (TI4Emoji emoji : TI4Emoji.allEmojiEnums()) {
                 if (forEmojiString.equals(emoji.name())) {
                     forEmojiString = emoji.toString();
                     break;
                 }
             }
-            againstEmojiString = agendaDetails.getAgainstEmoji();
             for (TI4Emoji emoji : TI4Emoji.allEmojiEnums()) {
                 if (againstEmojiString.equals(emoji.name())) {
                     againstEmojiString = emoji.toString();

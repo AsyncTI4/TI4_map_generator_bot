@@ -36,7 +36,7 @@ class CommandGameState {
         var player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
             throw new IllegalArgumentException("Unable to determine player while attempting to run event " + event.getName() +
-                    " in channel " + event.getChannel().getName() + " for game " + gameName);
+                " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
         this.player.set(player);
     }
