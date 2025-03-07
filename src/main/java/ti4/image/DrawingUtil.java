@@ -486,29 +486,33 @@ public class DrawingUtil {
     public static List<String> layoutText(Graphics2D g2, String inputText, int maxWidth) {
         List<String> initialSplit = new ArrayList<>(Arrays.asList(inputText.split("[\\n\n]")));
         List<String> finalSplit = new ArrayList<>();
-        for (String lineCheck : initialSplit) {
-            String line = lineCheck.trim(); // idk maybe it matters
-            int width = width(g2, line);
-            if (width > maxWidth) {
-                int iter = 0;
-                while (iter++ < 10) {
-                    int splitSpace = 0;
-                    int nextSpace = line.indexOf(" ");
-                    while (width(g2, line.substring(0, nextSpace).trim()) < maxWidth) {
-                        splitSpace = nextSpace;
-                        nextSpace = line.indexOf(" ", splitSpace + 1);
-                        if (nextSpace == -1)
+        for (String line : initialSplit) {
+            line = line.trim();
+            while (width(g2, line) > maxWidth) {
+                int splitIndex = -1;
+                int nextSpace = line.indexOf(" ");
+    
+                // Prefer splitting at spaces
+                while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
+                    splitIndex = nextSpace;
+                    nextSpace = line.indexOf(" ", splitIndex + 1);
+                }
+    
+                // If no space is found or no valid split, break at max width
+                if (splitIndex == -1) {
+                    for (int i = 1; i < line.length(); i++) {
+                        if (width(g2, line.substring(0, i)) > maxWidth) {
+                            splitIndex = i - 1;
                             break;
-                    }
-                    finalSplit.add(line.substring(0, splitSpace).trim());
-                    line = line.substring(splitSpace).trim();
-
-                    if (width(g2, line) < maxWidth) {
-                        finalSplit.add(line);
-                        break;
+                        }
                     }
                 }
-            } else {
+    
+                finalSplit.add(line.substring(0, splitIndex).trim());
+                line = line.substring(splitIndex).trim();
+            }
+    
+            if (!line.isEmpty()) {
                 finalSplit.add(line);
             }
         }

@@ -25,7 +25,7 @@ import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
-import ti4.service.fow.FowConstants;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 class CreateFOWGameChannels extends Subcommand {
 
@@ -143,8 +143,8 @@ class CreateFOWGameChannels extends Subcommand {
             .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
         MessageHelper.sendMessageToChannel(gmChannel, roleGM.getAsMention() + " - gm room");
         CreateGameService.offerGameHomebrewButtons(gmChannel);
-        newGame.setFowOption(FowConstants.MANAGED_COMMS, "true");
-        MessageHelper.sendMessageToChannel(gmChannel, "Set bot managed player-to-player communication threads to 'TRUE'.\nUse `/fow fow_options` to turn off.");
+        newGame.setFowOption(FOWOption.MANAGED_COMMS, true);
+        newGame.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, true);
 
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
