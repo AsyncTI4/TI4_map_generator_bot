@@ -81,6 +81,18 @@ class EliminatePlayer extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 return;
             }
+            if (game.getSpeakerUserID().equalsIgnoreCase(player.getUserID())) {
+                boolean foundSpeaker = false;
+                for (Player p4 : Helper.getSpeakerOrderFromThisPlayer(player,game)) {
+                    if (foundSpeaker) {
+                        game.setSpeakerUserID(p4.getUserID());
+                        break;
+                    }
+                    if (p4 == player) {
+                        foundSpeaker = true;
+                    }
+                }
+            }
             // send back all the PNs of others that the player was holding
             Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());
             for (String pnID : pns) {

@@ -479,10 +479,10 @@ public class TransactionHelper {
             }
             case "starCharts" -> {
                 message += " Click the _Star Chart_ you wish to " + requestOrOffer + ".";
-                for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
+                for (String starChart : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
-                        "offerToTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction() + "_" + shipOrder,
-                        Mapper.getRelic(shipOrder).getName());
+                        "offerToTransact_starCharts_" + p1.getFaction() + "_" + p2.getFaction() + "_" + starChart,
+                        Mapper.getRelic(starChart).getName());
                     stuffToTransButtons.add(transact);
                 }
             }
@@ -824,10 +824,10 @@ public class TransactionHelper {
             }
             case "starCharts" -> {
                 String message = "Click the _Star Chart_ you wish to send.";
-                for (String shipOrder : ButtonHelper.getPlayersStarCharts(p1)) {
+                for (String starChart : ButtonHelper.getPlayersStarCharts(p1)) {
                     Button transact = Buttons.green(
-                        finChecker + "send_starCharts_" + p2.getFaction() + "_" + shipOrder,
-                        Mapper.getRelic(shipOrder).getName());
+                        finChecker + "send_starCharts_" + p2.getFaction() + "_" + starChart,
+                        Mapper.getRelic(starChart).getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, stuffToTransButtons);
@@ -1006,6 +1006,15 @@ public class TransactionHelper {
             }
             case "shipOrders", "starCharts" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
+                if(!p1.hasRelic(amountToTrans)){
+                    if(amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans.replace("duplicate", ""))){
+                        amountToTrans = amountToTrans.replace("duplicate", "");
+                    }else{
+                        if(!amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans+"duplicate")){
+                            amountToTrans = amountToTrans+"duplicate";
+                        }
+                    }
+                }
                 p1.removeRelic(amountToTrans);
                 p2.addRelic(amountToTrans);
             }

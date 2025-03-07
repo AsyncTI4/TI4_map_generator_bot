@@ -5,7 +5,7 @@
         "color": "<color>",
         "playArea": false,
         "source": "absol",
-        "text": "When you cast votes: You may exhaust up to 3 of the <color> player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the <color> player.",
+        "text": "When you cast votes: You may exhaust up to 3 of the <color> player's planets and cast votes as if you controlled the exhausted planets. Then return this card to the <color> player.",
         "homebrewReplacesID": "<color>_ps"
     }
 ]

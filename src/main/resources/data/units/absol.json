@@ -63,8 +63,25 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit may be committed to planets from space areas and planets in or adjacent to the active system.",
+        "ability": "This unit can be committed from planets in the active system and from planets and space areas in adjacent systems that do not contain 1 of your command tokens.",
         "homebrewReplacesID": "yssaril_mech",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/absol/BlackshadeInfiltrator.png?raw=true"
+    },
+    {
+        "id": "absol_muaat_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Ember Colossus",
+        "source": "absol",
+        "faction": "muaat",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "When you use your STAR FORGE faction ability or your flagship component action in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
+        "homebrewReplacesID": "muaat_mech",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/absol/BlackshadeInfiltrator.png?raw=true"
     },
     {

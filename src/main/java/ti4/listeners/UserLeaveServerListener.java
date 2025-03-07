@@ -144,11 +144,20 @@ public class UserLeaveServerListener extends ListenerAdapter {
         StringBuilder msg = new StringBuilder("### __" + player.getName() + "__ left " + guild.getName() + " with in-progress games:");
         String separator = "\n-# > --------------------------------------------------";
         msg.append(separator);
+        boolean foundOne = false;
         for (Game g : games) {
+            Player p = g.getPlayer(player.getId());
+            float value = p.getTotalResourceValueOfUnits("space") + p.getTotalResourceValueOfUnits("ground");
+            if(!foundOne && value > 0 && Helper.getDateDifference(g.getLastActivePlayerChange().toString(), Helper.getDateRepresentation(System.currentTimeMillis())) < 15 ){
+                foundOne = true;
+            }
             msg.append("\n").append(generateSingleGameReport(player, g));
             msg.append(separator);
         }
         msg.append("\nUser has **__").append(userTotalGames(player)).append("__** in-progress games and **__").append(player.getGames().size()).append("__** lifetime games across all servers.");
+        if(!foundOne){
+            return "dud";
+        }
         return msg.toString();
     }
 
@@ -158,6 +167,8 @@ public class UserLeaveServerListener extends ListenerAdapter {
 
         String threadName = "in-progress-games-left";
         String msg = generateBothelperReport(guild, player, games);
-        ThreadGetter.getThreadInChannel(staffLounge, threadName, tc -> MessageHelper.sendMessageToChannel(tc, msg));
+        if(!msg.equalsIgnoreCase("dud")){
+            ThreadGetter.getThreadInChannel(staffLounge, threadName, tc -> MessageHelper.sendMessageToChannel(tc, msg));
+        }
     }
 }
