@@ -18,15 +18,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "anti-gravity_platforms",
-        "name": "Anti-gravity Platforms",
-        "phase": "Action",
-        "window": "At the start of a ground combat",
-        "text": "Choose 1 of your non-fighter ships in the active system. That ship participates in the \"Roll Dice\" step of this combat as if it were a ground force on the planet.",
-        "flavorText": "The battle seemed to freeze as the J.N.S. Hylarim entered low orbit, its shadow eclipsing the conflict—and the hopes of its enemies.",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "armament_rider",
         "name": "Armament Rider",
         "phase": "Agenda",
@@ -139,7 +130,7 @@
         "name": "Classified Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, look at the top 3 cards of the secret objective deck. Draw 1 of those cards and shuffle the rest back into the deck.",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, look at the top 3 cards of the secret objective deck; draw 1 of those cards and shuffle that deck.",
         "flavorText": "The din of the council chamber faded as the speaker called for order. Qanoj smiled. A new chapter in his career would begin today.",
         "source": "action_deck_2"
     },
@@ -205,6 +196,15 @@
         "window": "When you win a space combat after the end of its first round",
         "text": "Remove your command token from that system.",
         "flavorText": "\"Now, now, Unlenn,\" Evelyn smirked as she hailed the Viscount's heavy cruiser. \"Looking to bring history to life, are we?\" She gave the signal and the Benthic's railguns whirred to life.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "defectors",
+        "name": "Defectors",
+        "phase": "Action",
+        "window": "After another player produces ships",
+        "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any system that contains your ships.",
+        "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
         "source": "action_deck_2"
     },
     {
@@ -373,7 +373,7 @@
         "alias": "final_mission",
         "name": "Final Mission",
         "phase": "Action",
-        "window": "After 1 of your units is destroyed during combat",
+        "window": "After 1 of your units is destroyed during combat, if you are the attacker",
         "text": "Choose and destroy 1 of your opponent's units that has a cost equal to or lower than than your destroyed unit's cost.",
         "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_deck_2"
@@ -422,7 +422,7 @@
         "alias": "flawless_strategy",
         "name": "Flawless Strategy",
         "phase": "Action",
-        "window": "After you exhaust your strategy card",
+        "window": "After you exhaust a strategy card",
         "text": "Resolve the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
         "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
         "source": "action_deck_2"
@@ -455,11 +455,20 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "graviton_negators",
+        "name": "Graviton Negators",
+        "phase": "Action",
+        "window": "At the start of a ground combat",
+        "text": "Choose 1 of your non-fighter ships in the active system. That ship participates in the \"Roll Dice\" step of this combat as if it were a ground force on the planet.",
+        "flavorText": "The battle seemed to freeze as the J.N.S. Hylarim entered low orbit, its shadow eclipsing the conflict—and the hopes of its enemies.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "heist",
         "name": "Heist",
         "phase": "Action",
         "window": "After you gain control of a planet that was controlled by another player",
-        "text": "Take up to 2 of that player's relic fragments. Then, for each of those relic fragments, you may discard that card to gain 2 trade goods.",
+        "text": "Take or discard up to 2 of that player's relic fragments. For each relic fragment discarded, gain 2 trade goods.",
         "flavorText": "Mot awoke in a pool of his own blood. S'ula had the courtesy to let him live—just barely—but he was too weak to stand. So, he lay in front of the empty vault and wept.",
         "source": "action_deck_2"
     },
@@ -468,8 +477,8 @@
         "name": "Hidden Initiatives",
         "phase": "Action",
         "window": "Action",
-        "text": "Draw 1 secret objective and shuffle 1 of your unscored secret objectives into the secret objective deck. [Note: Do not discard due to exceeding your maximum number of secrets in the middle of this effect. You may discard the card you drew.]",
-        "flavorText": "M'aban sighed at the man's pleas. How many others could mask their intentions so well? The hunt for this spy had filled her with exhilaration, but seeing him now, bathed in the stench of fear and utterly devoid of composure, disgusted her.",
+        "text": "Look at the top 2 cards of the secret objective deck; you may replace 1 of your unscored secret objectives with 1 of those cards. Then, shuffle the secret objective deck.",
+        "flavorText": "M'aban sighed at the man's pleas. The lengthy hunt for this spy had filled her with exhilaration, but seeing him now, bathed in the stench of fear and utterly devoid of composure, disgusted her.",
         "source": "action_deck_2"
     },
     {
@@ -694,7 +703,7 @@
         "name": "Project Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, choose and take up to 2 action cards that have a component action from the action card discard pile.",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, take up to 2 action cards from the discard pile.",
         "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of governments and favors owed in many more.",
         "source": "action_deck_2"
     },
@@ -786,16 +795,6 @@
         "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's units",
         "text": "Remove your command token from that system and end your turn.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "renegotiation_acd2",
-        "name": "Renegotiation",
-        "phase": "Any",
-        "window": "After another player resolves an effect of 1 of your promissory notes",
-        "text": "Exhaust 1 planet that player controls and ready 1 planet you control.",
-        "automationID": "renegotiation",
-        "flavorText": "The Creuss merchants were overwhelmed by the bazaar's wares: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
         "source": "action_deck_2"
     },
     {
