@@ -1,5 +1,7 @@
 package ti4.service.fow;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,22 +13,29 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RandomHelper;
+import ti4.helpers.RiftUnitsHelper;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.UnitModel;
 import ti4.service.StellarConverterService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -243,7 +252,7 @@ public class RiftSetModeService {
     }
 
     public static List<Button> getSacrificeButtons() {
-        Button followButton = Buttons.green("resolveSacrificeSecondary", "SACRIFICE");
+        Button followButton = Buttons.red("resolveSacrificeSecondary", "SACRIFICE");
         return List.of(followButton);
     }
 
@@ -251,38 +260,99 @@ public class RiftSetModeService {
     public static void resolveSacrificeSecondary(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         if (!isActive(game)) return;
 
-        boolean used = ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
-        if (used) {
-            return;
-        }
-
+        ButtonHelperSCs.addUsedSCPlayer(event.getMessageId(), game, player);
         player.addFollowedSC(9, event);
         ReactionService.addReaction(event, game, player, "IS PERFORMING A **SACRIFICE**.");
 
-        StringBuffer sb = new StringBuffer(player.getRepresentation(true, true));
-        sb.append(", to perform a Sacrifce:\n");
-        sb.append(" 1. Choose a system that contains your non-fighter ships. Use `/special system_info` for that system.\n");
-        sb.append(" 2. Use `/roll roll_command:Xd10` replacing X with the number of your non-fighter ships.\n");
-        sb.append(" 3. For each result of 1-3, order of the die matches the order of your ships in system_info list to be captured.\n");
-        sb.append(" 4. Use `/capture add_units unit_names:X target_faction_or_color:");
-        sb.append(player.getColor()).append(" faction_or_color:").append(getCabalPlayer(game).getColor()).append("`");
-        sb.append(" to have Cabal capture those units.\n");
-        sb.append(" 5. Use `/player stats trade_goods:+X` to give yourself Trade Goods equal to the combined value of what was captured.");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+        List<Button> buttonsWithTilesWithShips = new LinkedList<>();
+        for (Tile tile : ButtonHelper.getTilesWithShipsInTheSystem(player, game)) {
+            if (ButtonHelper.checkNumberNonFighterShips(player, tile) > 0) {
+                buttonsWithTilesWithShips.add(Buttons.red("rollSacrifice_" + tile.getPosition(), tile.getRepresentationForButtons(), FactionEmojis.Cabal));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), player.getRepresentation(true, true) 
+            + " choose a system to Sacrifice.", buttonsWithTilesWithShips);
+    }
+
+    @ButtonHandler("rollSacrifice_")
+    public static void resolveSacrificeSecondaryPart2(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
+        String pos = buttonID.replace("rollSacrifice_", "");
+        Tile tile = game.getTileByPosition(pos);
+        String ident = player.getFactionEmoji();
+        int totalTGsGained = 0;
+        for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            UnitHolder unitHolder = entry.getValue();
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            if (!(unitHolder instanceof Planet)) {
+                Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
+                for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
+                    UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                    UnitKey key = unitEntry.getKey();
+                    if (unitModel == null
+                        || key.getUnitType() == UnitType.Infantry
+                        || key.getUnitType() == UnitType.Mech
+                        || key.getUnitType() == UnitType.Fighter
+                        || key.getUnitType() == UnitType.Spacedock) {
+                        continue;
+                    }
+
+                    int sacrificedUnits = 0;
+                    int totalUnits = unitEntry.getValue();
+                    String unitAsyncID = unitModel.getAsyncId();
+                    int damagedUnits = 0;
+                    if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
+                        damagedUnits = unitHolder.getUnitDamage().get(key);
+                    }
+                    for (int x = 1; x < damagedUnits + 1; x++) {
+                        String msg = RiftUnitsHelper.riftUnit(unitAsyncID + "damaged", tile, game, event, player, null);
+                        if (msg.contains("failed")) {
+                            sacrificedUnits++;
+                        } 
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "A " + ident + msg);
+                    }
+                    totalUnits -= damagedUnits;
+                    for (int x = 1; x < totalUnits + 1; x++) {
+                        String msg = RiftUnitsHelper.riftUnit(unitAsyncID, tile, game, event, player, null);
+                        if (msg.contains("failed")) {
+                            sacrificedUnits++;
+                        } 
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "A " + ident + msg);
+                    }
+
+                    totalTGsGained += sacrificedUnits * unitModel.getCost();
+                }
+            }
+        }
+        
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Sacrifice was performed. "
+            + player.getRepresentation() + " gained " + (totalTGsGained == 0 ? "0" : MiscEmojis.tg(totalTGsGained) + " " + player.gainTG(totalTGsGained)) + " trade goods.");
+        ButtonHelper.deleteMessage(event);
     }
 
     public static void resolveSacrifice(GenericInteractionCreateEvent event, Game game, Player player) {
         if (!isActive(game)) return;
 
-        String capturedUnits = getCapturedUnitsAsEmojis(game, player);
+        Player cabal = getCabalPlayer(game);
+        UnitHolder nombox = cabal.getNomboxTile().getSpaceUnitHolder();
         StringBuffer sb = new StringBuffer(player.getRepresentation(true, true));
-        sb.append(", to resolve Sacrifce Primary:\n");
-        sb.append("Following units are currently captured: ").append(capturedUnits.isEmpty() ? "None" : capturedUnits);
-        sb.append("\n 1. Use `/capture remove_units unit_names:X target_faction_or_color:");
-        sb.append(player.getColor()).append(" faction_or_color:").append(getCabalPlayer(game).getColor()).append("`");
-        sb.append(" to release up to 3 of your units from the Cabal.\n");
-        sb.append(" 2. Use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.");
+        sb.append(" is resolving Sacrifce.\n\n");
+        sb.append("Following units are currently captured: ").append(nombox.getPlayersUnitListEmojisOnHolder(player));
+        sb.append("\nAfter releasing, use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+
+        List<Button> buttonsToReleaseUnits = new LinkedList<>();
+        for (Map.Entry<String,Integer> unit : nombox.getUnitAsyncIdsOnHolder(player.getColorID()).entrySet()) {
+            UnitModel model = player.getUnitFromAsyncID(unit.getKey());
+            buttonsToReleaseUnits.add(Buttons.gray("riftsetCabalRelease_" + player.getFaction() + "_" + model.getBaseType(), model.getBaseType(), model.getUnitEmoji()));
+        }
+        buttonsToReleaseUnits.add(Buttons.red("deleteButtons", "Done"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+            "Use buttons to release up to 3 of your non-fighter units from the Cabal", buttonsToReleaseUnits);
+    }
+
+    @ButtonHandler("riftsetCabalRelease")
+    public static void resolveReleaseButton(Player cabal, Game game, String buttonID, ButtonInteractionEvent event) {
+        ButtonHelperFactionSpecific.resolveReleaseButton(getCabalPlayer(game), game, buttonID, event);
     }
 
     public static boolean canPickSacrifice(Player player, Game game) {
