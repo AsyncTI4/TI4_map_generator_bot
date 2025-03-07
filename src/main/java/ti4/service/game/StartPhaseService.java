@@ -20,7 +20,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.migration.MigrationHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
@@ -213,21 +212,21 @@ public class StartPhaseService {
                 }
                 if (exhausted.size() >= 2) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
-                        ", because _New Constitution_ resolved \"Against\", " +
+                        ", because _New Constitution_ resolved \"For\", " +
                         String.join(", ", exhausted.subList(0, exhausted.size() - 1)) + " and "
                         + exhausted.getLast() + " have been exhausted.");
                 } else if (exhausted.size() == 1) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
-                        ", because _New Constitution_ resolved \"Against\", "
+                        ", because _New Constitution_ resolved \"For\", "
                         + exhausted.getFirst() + " has been exhausted.");
                 } else {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
-                        ", though _New Constitution_ resolved \"Against\"," +
+                        ", though _New Constitution_ resolved \"For\"," +
                         " you control no planets in your home system to exhaust.");
                 }
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "Exhausted all home system planets due _New Constitution_ resolving \"Against\".");
+                "Exhausted all home system planets due _New Constitution_ resolving \"For\".");
         }
         if (!game.getStoredValue("agendaArmsReduction").isEmpty()) {
             game.setStoredValue("agendaArmsReduction", "");
@@ -498,6 +497,11 @@ public class StartPhaseService {
         for (Player player : game.getRealPlayers()) {
             if (ButtonHelper.isPlayerElected(game, player, "minister_policy") && player.hasAbility("scheming")) {
                 yssarilPolicy = Buttons.gray(player.getFinsFactionCheckerPrefix() + "yssarilMinisterOfPolicy", "Draw Minister of Policy Action Card", FactionEmojis.Yssaril);
+            }
+            if(ButtonHelper.isLawInPlay(game, "absol_minspolicy") && ButtonHelper.isPlayerElected(game, player, "absol_minspolicy")){
+                List<Button> absButtons = new ArrayList<>();
+                absButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix()+"cymiaeHeroStep1_"+(game.getRealPlayers().size()+1),"Resolve Absol Minister Of Policy"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +" please resolve Absol Minister Of Policy", absButtons);
             }
         }
         boolean custodiansTaken = game.isCustodiansScored();

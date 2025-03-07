@@ -125,6 +125,7 @@ public class AgendaHelper {
         game.removeStoredValue("declinedAfters");
         game.removeStoredValue("queuedWhens");
         game.removeStoredValue("queuedAfters");
+        game.removeStoredValue("CommFormPreset");
         for (Player player : game.getRealPlayers()) {
             game.removeStoredValue("queuedWhensFor" + player.getFaction());
             game.removeStoredValue("queuedAftersFor" + player.getFaction());
@@ -175,12 +176,14 @@ public class AgendaHelper {
     @ButtonHandler("passOnEverythingWhensNAfters")
     public static void passOnEverythingWhensNAfters(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " You have successfully passed on all whens/afters for the entire agenda phase. You can undo this during the agenda if necessary");
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You have successfully passed on all whens/afters for the entire agenda phase. You can undo this during the agenda if necessary, or with this button",buttons);
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
 
         if (game.getPhaseOfGame().equalsIgnoreCase("agendawaiting")) {
             game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + player.getFaction() + "_");
-            List<Button> buttons = new ArrayList<>();
+            buttons = new ArrayList<>();
             buttons.add(Buttons.red("queueAWhen", "Play A When"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "You have declined to queue a \"when\". You can change your mind with this button.", buttons);
@@ -193,6 +196,14 @@ public class AgendaHelper {
             offerPreVote(player);
             resolveWhenQueue(event, game);
         }
+    }
+    @ButtonHandler("undoPassOnAllWhensNAfters")
+    public static void undoPassOnEverythingWhensNAfters(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " You have successfully undone passing on all whens and afters for the agenda phase. You may still need to handle whens/afters for any currently ongoing agenda");
+        game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "");
+
+        
     }
 
     public static List<String> getPossibleWhenNames(Player player) {
@@ -314,9 +325,9 @@ public class AgendaHelper {
         if (player.hasTechReady("dsedyng")) {
             names.add("Unity Algorithm");
         }
-        if (ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
-            names.add("Committee Formation (technically resolves after all afters)");
-        }
+        // if (ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
+        //     names.add("Committee Formation (technically resolves after all afters)");
+        // }
         return names;
     }
 
@@ -358,9 +369,9 @@ public class AgendaHelper {
         if (player.hasTechReady("dsedyng")) {
             buttons.add(Buttons.red("queueAfter_tech_dsedyng", "Unity Algorithm"));
         }
-        if (ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
-            buttons.add(Buttons.red("queueAfter_agenda_committee", "Committee Formation"));
-        }
+        // if (ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
+        //     buttons.add(Buttons.red("queueAfter_agenda_committee", "Committee Formation"));
+        // }
 
         return buttons;
     }
@@ -1496,6 +1507,11 @@ public class AgendaHelper {
 
     public static void startTheVoting(Game game) {
         game.setPhaseOfGame("agendaVoting");
+        if(!game.getStoredValue("CommFormPreset").isEmpty()){
+            autoResolve(null, game.getPlayerFromColorOrFaction(game.getStoredValue("CommFormPreset")), "autoresolve_manualcommittee", game);
+            game.removeStoredValue("CommFormPreset");
+            return;
+        }
         if (game.getCurrentAgendaInfo() != null) {
             String message = " up to vote! Resolve using buttons. \n \n" + getSummaryOfVotes(game, true);
 
@@ -2176,7 +2192,21 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation()
                     + " this is a reminder that you don't currently hold your _Political Secret_. Any \"whens\" or \"afters\" that you queue will be automatically cancelled if it is played by another player.");
             }
+            if (game.getCurrentAgendaInfo().contains("Player") && ButtonHelper.isPlayerElected(game, player, "committee")) {
+                List<Button> buttons = new ArrayList();
+                buttons.add(Buttons.green("presetCommitteeFormation","Preset Committee Formation"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() +" You can use this button to preset Committee Formation to resolve after all the afters",buttons);
+
+            }
         }
+    }
+
+    @ButtonHandler("presetCommitteeFormation")
+    public static void presetCommitteeFormation(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() +" you successfully preset a play of Committee Formation");
+        game.setStoredValue("CommFormPreset",player.getFaction());
     }
 
     @ButtonHandler("exhaustForVotes_")
@@ -2966,7 +2996,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("autoresolve_")
-    public static void autoResolve(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void autoResolve(@Nullable ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String result = buttonID.substring(buttonID.indexOf("_") + 1);
         if (result.contains("manual")) {
             if (result.contains("committee")) {
@@ -3007,7 +3037,9 @@ public class AgendaHelper {
             deadlyActionRow3.add(Buttons.red("resolveWithNoEffect", "Resolve With No Result"));
             MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), resMessage3, deadlyActionRow3);
         }
-        ButtonHelper.deleteMessage(event);
+        if(event != null){
+            ButtonHelper.deleteMessage(event);
+        }
     }
 
     @ButtonHandler("play_after_")

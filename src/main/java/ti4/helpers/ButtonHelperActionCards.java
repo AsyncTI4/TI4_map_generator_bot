@@ -517,7 +517,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveReparationsStep1")
     public static void resolveReparationsStep1(Player player, Game game, ButtonInteractionEvent event) {
-        String message = player.getRepresentationUnfogged() + " Click the names of the planet you wish to ready.";
+        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to ready.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             buttons.add(Buttons.gray("khraskHeroStep4Ready_" + player.getFaction() + "_" + planet,
@@ -540,6 +540,57 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who took the planet from you.", buttons);
+    }
+    @ButtonHandler("resolveParleyStep1")
+    public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
+        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to resolve parleey on.";
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getExhaustedPlanets()) {
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix()+"resolveParleyStep2_" + planet,
+                Helper.getPlanetRepresentation(planet, game)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+    @ButtonHandler("resolveParleyStep2")
+    public static void resolveParleyStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String message = player.getRepresentationUnfogged() + " parleyed the planet of "+Helper.getPlanetRepresentationNoResInf(planet, game);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        Tile tile = game.getTileFromPlanet(planet);
+        if(tile != null){
+            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
+            UnitHolder planetUnitHolder = unitHolders.get(planet);
+            UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
+            if (planetUnitHolder != null && spaceUnitHolder != null) {
+                Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
+                for (Player player_ : game.getPlayers().values()) {
+                    if(player_== player || player.getAllianceMembers().contains(player_.getFaction())){
+                        continue;
+                    }
+                    String color = player_.getColor();
+                    planetUnitHolder.removeAllUnits(color);
+                }
+                Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
+                for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    UnitKey key = unitEntry.getKey();
+                    Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
+                    if(player_== player || player.getAllianceMembers().contains(player_.getFaction())){
+                        continue;
+                    }
+                    if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
+                        Integer count = spaceUnits.get(key);
+                        if (count == null) {
+                            count = unitEntry.getValue();
+                        } else {
+                            count += unitEntry.getValue();
+                        }
+                        spaceUnits.put(key, count);
+                    }
+                }
+            }
+        }
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolveDiplomaticPressureStep1")

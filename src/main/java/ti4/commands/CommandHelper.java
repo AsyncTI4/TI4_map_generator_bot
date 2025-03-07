@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -15,8 +18,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
@@ -151,7 +152,7 @@ public class CommandHelper {
         return false;
     }
 
-    private static boolean hasRole(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
+   public static boolean hasRole(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
         Member member = event.getMember();
         if (member == null) {
             return false;

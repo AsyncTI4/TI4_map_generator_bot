@@ -771,7 +771,13 @@ public class ButtonHelper {
             }
             message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
         } else {
-            game.drawActionCard(player.getUserID());
+            if(ButtonHelper.isLawInPlay(game, "absol_minspolicy")){
+                amount -=1;
+                message = " Absol Minister of policy has been accounted for, causing everyone to draw 1 less AC.";
+            }else{
+                game.drawActionCard(player.getUserID());
+            }
+            
             if (player.hasTech("nm")) {
                 message = " _Neural Motivator_ has been accounted for.";
                 game.drawActionCard(player.getUserID());
@@ -802,7 +808,7 @@ public class ButtonHelper {
             }
             amount += 1;
         }
-
+        
         if (!player.hasAbility("autonetic_memory")) {
             message = " drew " + amount + " action card" + (amount == 1 ? "" : "s") + "." + message;
         }
@@ -875,6 +881,9 @@ public class ButtonHelper {
 
     public static int resolveOnActivationEnemyAbilities(Game game, Tile activeSystem, Player player, boolean justChecking, ButtonInteractionEvent event) {
         int numberOfAbilities = 0;
+        if(activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")){
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),"# "+player.getRepresentation()+" this is a __friendly__ reminder that you do not have antimass deflectors");
+        }
         if (game.isL1Hero()) {
             return 0;
         }
@@ -3063,13 +3072,13 @@ public class ButtonHelper {
     }
 
     public static List<String> getPlayersStarCharts(Player player) {
-        List<String> shipOrders = new ArrayList<>();
+        List<String> starCharts = new ArrayList<>();
         for (String relic : player.getRelics()) {
             if (relic.toLowerCase().contains("starchart")) {
-                shipOrders.add(relic);
+                starCharts.add(relic);
             }
         }
-        return shipOrders;
+        return starCharts;
     }
 
     public static void starChartStep0(Player player, List<String> newTileIDs) {
