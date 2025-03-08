@@ -211,19 +211,19 @@ public class RiftSetModeService {
 
         String msg = "T##m% & sp¿c€ ß̶e̷g̷i̵n̸ T0øøø U̴̪̖͒͛͗̏N̸̻̦̜̊͒̈́̄R̵͎̅͆͘Ȧ̵̳̔̚V̴̹̜̽̾̄̓L̶̥̩̎.̷̨͕̻͑̄̓̕.̸̙̏̄̄͜.̷̼̝̲̩̆́̕";
         switch (game.getRound()) {
-            case 1 -> {
+            case 1,2 -> {
                 msg = "Time and space begin to unravel.";
             }
-            case 2 -> {
+            case 3 -> {
                 msg = "Tíme and space bégin tto unravl...";
             }
-            case 3 -> {
+            case 4 -> {
                 msg = "Ti.m.e an d spa-ce bgin t.o u̷nravl..";
             }
-            case 4 -> {
+            case 5 -> {
                 msg = "T!m- ænd sp^ce b...ggn t0 üñr@vl~";
             }
-            case 5 -> {
+            case 6 -> {
                 msg = "T#m% & spa¿c€ ßegi_n tØøø u̘͔͜ń̢͜r̶͙̜a͓͉͟v̷̪͎l...";
             }
         }
@@ -292,7 +292,8 @@ public class RiftSetModeService {
                         || key.getUnitType() == UnitType.Infantry
                         || key.getUnitType() == UnitType.Mech
                         || key.getUnitType() == UnitType.Fighter
-                        || key.getUnitType() == UnitType.Spacedock) {
+                        || key.getUnitType() == UnitType.Spacedock
+                        || key.getUnitType() == UnitType.Pds) {
                         continue;
                     }
 
