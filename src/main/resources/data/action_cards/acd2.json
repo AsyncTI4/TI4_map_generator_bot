@@ -40,7 +40,7 @@
         "name": "Arms Deal",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 of your neighbors. That player places 1 cruiser and/or 1 destroyer from their reinforcements in a system that contains their ships.",
+        "text": "Choose 1 of your neighbors. That player places 1 cruiser and 1 destroyer from their reinforcements in a system that contains their ships.",
         "flavorText": "Ipswitch smirked when the tight-laced broker asked for the ship's documentation. \"Probably burned... with the bodies.\"",
         "source": "action_deck_2"
     },
@@ -68,7 +68,7 @@
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Choose another player. During this turn, that player cannot choose to play action cards or promissory notes.",
-        "flavorText": "The cabin door exploded as they forced it open, sending three of Claire's guards to their graves. Inside, they found neither Ronald nor the documents signed by the Custodian arbiter.",
+        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
         "source": "action_deck_2"
     },
     {
@@ -159,15 +159,6 @@
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome gains 2 trade goods.",
         "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "corruption",
-        "name": "Corruption",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
-        "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
         "source": "action_deck_2"
     },
     {
@@ -313,24 +304,6 @@
         "text": "Destroy that ship.",
         "automationID": "direct_hit",
         "flavorText": "The Loncara Ssodu's secondary batteries made quick work of the escorts as the dreadnought's crew abandoned ship.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "discord",
-        "name": "Discord",
-        "phase": "Action",
-        "window": "When a player performs a strategic action",
-        "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
-        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "early_voting",
-        "name": "Early Voting",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
-        "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
         "source": "action_deck_2"
     },
     {
@@ -594,9 +567,9 @@
         "alias": "opportunists",
         "name": "Opportunists",
         "phase": "Action",
-        "window": "After a space combat you did not participate in ends",
-        "text": "Place 1 cruiser and/or 1 destroyer from your reinforcements in the active system. If that system contains another player's ships, resolve a space combat.",
-        "flavorText": "Nekro ships waited on the periphery like hungering beasts. Soon they would feast on the hulking carrion of the suddenly meaningless battle.",
+        "window": "Action",
+        "text": "Choose 1 system that contains 1 or 2 of another player's ships and no other of that player's units. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
+        "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
         "source": "action_deck_2"
     },
     {
@@ -723,6 +696,24 @@
         "window": "When you would roll a die",
         "text": "Choose the result of that die roll instead.",
         "flavorText": "Ahk-Syl Siven flared, bright red briefly overtaking blue. \"Would I lie to you?\" The flame pulsed, suspended in the air before him. Was it real? Or just an illusion?",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "public_outcry",
+        "name": "Public Outcry",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
+        "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "public_support",
+        "name": "Public Support",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose 1 outcome of this agenda. Each player that votes for that outcome casts 3 additional votes and draws 1 action card.",
+        "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one would support his policies, or it would be gone in the blink of an eye. He'd make sure of it.",
         "source": "action_deck_2"
     },
     {
@@ -1055,6 +1046,15 @@
         "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
         "text": "That command token is not spent and/or placed on the game board. [Note: You can have 0 strategy or reinforcement tokens and use this card.]",
         "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "unstable_gate",
+        "name": "Unstable Gate",
+        "phase": "Action",
+        "window": "After a player activates a system that contains your units",
+        "text": "Choose 1 other system. During this tactical action, treat that system as if it were adjacent to the active system.",
+        "flavorText": "The conduit was tearing itself apart as the space within it melted away to reveal the location of the beacon. Their panic quickly culled their jubilation.",
         "source": "action_deck_2"
     },
     {
