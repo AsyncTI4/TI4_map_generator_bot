@@ -932,5 +932,32 @@
         "automationID": "renegotiation",
         "flavorText": "The Creuss merchants were overwhelmed by the bazaar's wares: wonders from every corner of the galaxy, akin to magic for these curious folk. Gila knew her claws had dug in. She would ensure their every desire was fulfilled, even if they could not afford the price.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "corruption",
+        "name": "Corruption",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
+        "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "early_voting",
+        "name": "Early Voting",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose another player. That player votes first on this agenda. If you and that player cast votes for the same outcome of this agenda, cast 5 additional votes for that outcome. [Note: This ability works like Argent Zeal. Argent votes before the chosen player.]",
+        "flavorText": "Ciel slowly covered his mouth in horror as he realized his mistake. \"Damn these galactic time zones!\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "discord",
+        "name": "Discord",
+        "phase": "Action",
+        "window": "When a player performs a strategic action",
+        "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
+        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
+        "source": "action_deck_2_old"
     }
 ]
