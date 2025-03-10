@@ -347,7 +347,7 @@
         "name": "Final Mission",
         "phase": "Action",
         "window": "After 1 of your units is destroyed during combat, if you are the attacker",
-        "text": "Choose and destroy 1 of your opponent's units that has a cost equal to or lower than than your destroyed unit's cost.",
+        "text": "Choose and destroy 1 of your opponent's participating units that has a cost equal to or lower than than your destroyed unit's cost.",
         "flavorText": "In these white-hot flames, the Gashlai knew only ecstasy.",
         "source": "action_deck_2"
     },
@@ -568,7 +568,7 @@
         "name": "Opportunists",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 system that contains 1 or 2 of another player's ships and no other of that player's units. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
+        "text": "Choose 1 system that contains another player's ships and no other units. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
         "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
         "source": "action_deck_2"
     },
@@ -712,7 +712,7 @@
         "name": "Public Support",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Choose 1 outcome of this agenda. Each player that votes for that outcome casts 3 additional votes and draws 1 action card.",
+        "text": "Choose 1 outcome of this agenda. Each player that casts votes for that outcome casts 3 additional votes and draws 1 action card.",
         "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one would support his policies, or it would be gone in the blink of an eye. He'd make sure of it.",
         "source": "action_deck_2"
     },
@@ -748,7 +748,7 @@
         "name": "Rehashed Debates",
         "phase": "Agenda",
         "window": "When an agenda is revealed",
-        "text": "Choose 1 agenda in play or in the discard pile. Then, discard the revealed agenda. Players vote on the chosen agenda instead, as if it were revealed from the agenda deck.",
+        "text": "Discard this agenda. Then, choose any other agenda from the discard pile or in play. Players vote on that agenda instead.",
         "flavorText": "Perdin was surrounded by a crowd of doomsayers, incensed by his agreements regarding the Ixthian artifact. \"Fools,\" he sighed, \"you will soon understand the providence of Winnaran wisdom.\"",
         "source": "action_deck_2"
     },
