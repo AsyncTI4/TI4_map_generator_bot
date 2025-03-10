@@ -807,24 +807,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "defectors",
-        "name": "Defectors",
-        "phase": "Action",
-        "window": "Action",
-        "text": "Choose 1 system that contains 1 of another player's ships and no other of that player's units. Spend influence equal to the cost of that ship to replace it with a matching ship from your reinforcements.",
-        "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
-        "source": "action_deck_2_old"
-    },
-    {
-        "alias": "public_outcry",
-        "name": "Public Outcry",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome places 1 command token from their reinforcements in a system that contains their units and destroys 3 of their units in that system.",
-        "flavorText": "Ciel laughed as Junn dodged an overripe fruit. \"Agile for your age!\"",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "liberation",
         "name": "Liberation",
         "phase": "Any",
