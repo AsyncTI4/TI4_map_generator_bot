@@ -658,7 +658,7 @@
         "name": "Patronage",
         "phase": "Any",
         "window": "When a public objective is revealed",
-        "text": "Look at the top 2 cards of the deck that matches that objective; replace that objective with 1 of those cards and shuffle that deck.",
+        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
         "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
         "source": "action_deck_2"
     },
