@@ -135,11 +135,11 @@ public abstract class BagDraft {
 
         if (existingChannel != null) {
             // Clear out all messages from the existing thread
-            existingChannel.getHistory().retrievePast(100).queue(m -> {
+            existingChannel.getHistory().retrievePast(100).submit().thenAccept(m -> {
                 if (m.size() > 1) {
-                    existingChannel.deleteMessages(m).queue();
+                    existingChannel.deleteMessages(m).submit().join();
                 }
-            });
+            }).join();
             return existingChannel;
         }
 
