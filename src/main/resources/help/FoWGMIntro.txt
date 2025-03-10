@@ -1,0 +1,13 @@
+This channel is for the GM to set up and manage the game.
+
+__**Getting Started:**__
+> `/game setup` – Set VP amount, game name, auto-ping time, and options
+> `/fow fow_options` – Adjust Fog of War settings
+> `/map` – Import, create, or modify the map
+> `/player setup` – Assign player factions and colors
+> `/game set_order` – Set player turn order
+
+__**Other Useful Commands:**__
+> `/game info` – View current game settings
+> `/fow show_game_as` – See the map from a player's perspective
+> `endofround1` Notes here – Save round summary notes as GM

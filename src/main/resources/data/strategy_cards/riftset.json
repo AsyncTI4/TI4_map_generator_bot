@@ -13,6 +13,7 @@
             "Select a system with at least one of your non-fighter ships. For each non-fighter ship, roll a die; on a 3 or lower, it is captured. Gain Trade Goods equal to the total value of captured units."
         ],
         "imageFileName": "riftset_9",
+        "colourHexCode": "#290b2f",
         "source": "riftset"
     }
 ]
