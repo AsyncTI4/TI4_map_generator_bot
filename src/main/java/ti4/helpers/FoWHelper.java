@@ -825,7 +825,8 @@ public class FoWHelper {
 
     /** Ping the players adjacent to a given system */
     public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message) {
-        if (game.getTileByPosition(position) == null) {
+        Tile tile = game.getTileByPosition(position);
+        if (tile == null) {
             return;
         }
         // get players adjacent
@@ -834,11 +835,11 @@ public class FoWHelper {
         for (Player player_ : players) {
             boolean success = true;
             if (player_.isRealPlayer()) {
-                String playerMessage = player_.getRepresentation() + " - System " + position + " has been pinged:\n>>> "
+                String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentation() + " has been pinged:\n>>> "
                     + message;
                 success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
                 MessageChannel channel = player_.getPrivateChannel();
-                MessageHelper.sendMessageToChannelWithButtons(channel, "Use button to refresh view of system.",
+                MessageHelper.sendMessageToChannelWithButtons(channel, "Use button to view the system.",
                     StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
             }
             successfulCount += success ? 1 : 0;
