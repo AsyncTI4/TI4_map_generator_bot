@@ -4663,13 +4663,13 @@ public class ButtonHelper {
             String tokenFilename = Mapper.getTokenID("ionalpha");
             tile.addToken(tokenFilename, Constants.SPACE);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Added the _Ion Storm_ token to "
-                + tile.getRepresentation() + "on its " + MiscEmojis.WHalpha + "alpha side.");
+                + tile.getRepresentation() + " on its " + MiscEmojis.WHalpha + " alpha side.");
 
         } else {
             String tokenFilename = Mapper.getTokenID("ionbeta");
             tile.addToken(tokenFilename, Constants.SPACE);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Added the _Ion Storm_ token to "
-                + tile.getRepresentation() + "on its " + MiscEmojis.WHbeta + "beta side.");
+                + tile.getRepresentation() + " on its " + MiscEmojis.WHbeta + " beta side.");
         }
         deleteMessage(event);
         CommanderUnlockCheckService.checkPlayer(player, "ghost");
