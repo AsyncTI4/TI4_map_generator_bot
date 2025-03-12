@@ -21,13 +21,13 @@ public class NotepadButtonHandler {
         player.setNotes(StringHelper.escape(notes));
     }
 
-    @ButtonHandler("notepadPost")
+    @ButtonHandler(value = "notepadPost", save = false)
     public static void postNotepad(Player player) {
         String notes = "__Here are your notes:__\n" + getNotes(player);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), notes);
     }
 
-    @ButtonHandler("notepadEdit~MDL")
+    @ButtonHandler(value = "notepadEdit~MDL", save = false)
     public static void editNotepad(ButtonInteractionEvent event, Player player) {
         String modalID = "notepadModal";
         String fieldID = "notes";

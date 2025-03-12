@@ -54,7 +54,7 @@ public class PlayerTitleHelper {
         }
     }
 
-    @ButtonHandler("bestowTitleStep1_")
+    @ButtonHandler(value = "bestowTitleStep1_", save = false)
     public static void resolveBestowTitleStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String title = buttonID.split("_")[1];
         String msg = player.getRepresentation() + " choose the player you wish to give the title of " + title;
@@ -69,7 +69,7 @@ public class PlayerTitleHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("bestowTitleStep2_")
+    @ButtonHandler(value = "bestowTitleStep2_", save = false)
     public static void resolveBestowTitleStep2(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String title = buttonID.split("_")[1];

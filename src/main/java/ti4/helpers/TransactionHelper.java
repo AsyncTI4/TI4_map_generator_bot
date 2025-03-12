@@ -401,7 +401,7 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler("transaction")
+    @ButtonHandler(value = "transaction", save = false)
     public static void transaction(Player player, Game game) {
         List<Button> buttons;
         buttons = TransactionHelper.getPlayersToTransact(game, player);
@@ -409,7 +409,7 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
-    @ButtonHandler("newTransact_")
+    @ButtonHandler(value = "newTransact_", save = false)
     public static void resolveSpecificTransButtonsNew(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         buttonID = buttonID.replace("newTransact_", "");
@@ -629,7 +629,7 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
     }
 
-    @ButtonHandler("offerToTransact_")
+    @ButtonHandler(value = "offerToTransact_", save = false)
     public static void resolveOfferToTransact(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String item = buttonID.split("_")[1];
         String sender = buttonID.split("_")[2];
@@ -689,7 +689,7 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
 
-    @ButtonHandler("getNewTransaction_")
+    @ButtonHandler(value = "getNewTransaction_", save = false)
     public static void getNewTransaction(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String sender = buttonID.split("_")[1];
         String receiver = buttonID.split("_")[2];
@@ -720,7 +720,7 @@ public class TransactionHelper {
         return RandomHelper.isOneInX(1000);
     }
 
-    @ButtonHandler("sendOffer_")
+    @ButtonHandler(value = "sendOffer_", save = false)
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 == null) return;
@@ -765,7 +765,7 @@ public class TransactionHelper {
         checkTransactionLegality(game, p2, player);
     }
 
-    @ButtonHandler("transact_")
+    @ButtonHandler(value = "transact_", save = false)
     public static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
 
@@ -1270,7 +1270,7 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
-    @ButtonHandler("send_")
+    @ButtonHandler(value = "send_", save = false)
     public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
         ButtonHelper.deleteMessage(event);
@@ -1326,7 +1326,7 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
-    @ButtonHandler("rescindOffer_")
+    @ButtonHandler(value = "rescindOffer_", save = false)
     public static void rescindOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 != null) {
@@ -1337,7 +1337,7 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler("rejectOffer_")
+    @ButtonHandler(value = "rejectOffer_", save = false)
     public static void rejectOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p1 != null) {
@@ -1389,8 +1389,8 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler("transactWith_")
-    @ButtonHandler("resetOffer_")
+    @ButtonHandler(value = "transactWith_", save = false)
+    @ButtonHandler(value = "resetOffer_", save = false)
     public static void transactWith(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
