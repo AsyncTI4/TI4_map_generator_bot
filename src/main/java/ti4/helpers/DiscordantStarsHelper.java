@@ -382,7 +382,8 @@ public class DiscordantStarsHelper {
         List<String> tilesWithGloryTokens = ButtonHelperAgents.getGloryTokenTiles(game).stream().map(t -> t.getPosition()).toList();
         for (String planetId : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetId);
-            if (planet.getUnitCount(UnitType.Mech, player) == 0) {
+            int mechsOnPlanet = planet.getUnitCount(UnitType.Mech, player);
+            if (mechsOnPlanet == 0) {
                 continue;
             }
 
@@ -391,13 +392,13 @@ public class DiscordantStarsHelper {
             boolean hasAdjacentGloryToken = tilesAdjacentToMechPlanet.stream().anyMatch(tilesWithGloryTokens::contains);
 
             if (hasAdjacentGloryToken) {
-                AddUnitService.addUnits(event, planetTile, game, player.getColor(), "1 infantry " + planetId);
+                AddUnitService.addUnits(event, planetTile, game, player.getColor(), mechsOnPlanet + " infantry " + planetId);
                 sb.append(player.getRepresentationNoPing())
-                  .append(" added 1 ")
+                  .append(" added " + mechsOnPlanet)
                   .append(UnitEmojis.infantry)
                   .append(" to ")
                   .append(planet.getPlanetModel().getName())
-                  .append(" due to Skald ")
+                  .append(" due to " + mechsOnPlanet + " Skald " )
                   .append(UnitEmojis.mech)
                   .append(" being adjacent to a **Glory** token.\n");
             }
