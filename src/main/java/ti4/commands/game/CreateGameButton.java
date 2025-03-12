@@ -83,13 +83,13 @@ class CreateGameButton extends Subcommand {
                         +". Their number of ongoing games is "+ongoingAmount +" and their number of completed games is "+completedGames);
                         return;
                     }
-                    // Rodrigo, a player we're limiting to 7 games rn
-                    if (member.getId().equalsIgnoreCase("400038967744921612")) {
-                        if (ongoingAmount > 6) {
-                            MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members is currently under a limit and cannot join more games at this time");
-                            return;
-                        }
-                    }
+                    // Used for specific people we are limiting the amount of games of
+                    // if (member.getId().equalsIgnoreCase("400038967744921612")) {
+                    //     if (ongoingAmount > 6) {
+                    //         MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members is currently under a limit and cannot join more games at this time");
+                    //         return;
+                    //     }
+                    // }
                 }
                 if (gameOwner == null)
                     gameOwner = member;

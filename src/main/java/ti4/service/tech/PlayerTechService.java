@@ -85,6 +85,10 @@ public class PlayerTechService {
             tech = "dskortg";
         }
         TechnologyModel techModel = Mapper.getTech(tech);
+        if(!player.getTechs().contains(tech)){
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +" does not have the tech known as "+techModel.getName());
+            return;
+        }
         String exhaustMessage = player.getRepresentation() + " exhausted technology " + techModel.getRepresentation(false) + ".";
         if (game.isShowFullComponentTextEmbeds()) {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
