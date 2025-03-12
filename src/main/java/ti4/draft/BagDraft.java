@@ -134,12 +134,16 @@ public abstract class BagDraft {
         ThreadChannel existingChannel = findExistingBagChannel(player, threadName);
 
         if (existingChannel != null) {
+            if (existingChannel.isArchived()) {
+                existingChannel.getManager().setArchived(false).submit().join();
+            }
+
             // Clear out all messages from the existing thread
-            existingChannel.getHistory().retrievePast(100).queue(m -> {
+            existingChannel.getHistory().retrievePast(100).submit().thenAccept(m -> {
                 if (m.size() > 1) {
-                    existingChannel.deleteMessages(m).queue();
+                    existingChannel.deleteMessages(m).submit().join();
                 }
-            });
+            }).join();
             return existingChannel;
         }
 

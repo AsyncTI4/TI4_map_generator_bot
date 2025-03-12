@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
@@ -20,6 +21,7 @@ class ServerLimitStats extends Subcommand {
 
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
+        boolean isFoWGuild = AsyncTI4DiscordBot.guildFogOfWar.getId().equals(event.getGuild().getId());
 
         int memberCount = guild.getMemberCount();
         int roomForGames;
@@ -31,8 +33,8 @@ class ServerLimitStats extends Subcommand {
         //CHANNELS
         List<GuildChannel> channels = guild.getChannels();
         int channelCount = channels.size(); //500
-        roomForGames = Math.min(roomForGames, (500 - channelCount) / 2);
-        long pbdChannelCount = channels.stream().filter(c -> c.getName().startsWith("pbd")).count();
+        roomForGames = Math.min(roomForGames, (500 - channelCount) / (!isFoWGuild ? 2 : 8));
+        long pbdChannelCount = channels.stream().filter(c -> c.getName().startsWith(!isFoWGuild ? "pbd" : "fow")).count();
         long categoryChannelCount = channels.stream().filter(c -> c.getType() == ChannelType.CATEGORY).count();
 
         //THREADS
@@ -40,7 +42,9 @@ class ServerLimitStats extends Subcommand {
         int threadCount = threadChannels.size(); //1000
         List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream().filter(ThreadChannel::isArchived).toList();
         int threadArchivedCount = threadChannelsArchived.size();
-        long cardsInfoThreadCount = threadChannels.stream().filter(t -> t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX)).count();
+        long cardsInfoThreadCount = threadChannels.stream().filter(t -> !isFoWGuild 
+            ? t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX) 
+            : t.getName().contains("-cards-info")).count();
         long botThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-bot-map-updates")).count();
         long roundThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-round-")).count();
         long privateThreadCount = threadChannels.stream().filter(t -> !t.isPublic()).count();
@@ -60,7 +64,7 @@ class ServerLimitStats extends Subcommand {
             ### Channels:
             - **%d / 500%s - channels**
               - %d   %s  categories
-              - %d   %s  'pbd' channels
+              - %d   %s  '%s' channels
             ### Threads:
             - **%d / 1000%s - threads**
               - %d - loaded archived threads
@@ -78,7 +82,7 @@ class ServerLimitStats extends Subcommand {
             roomForGames,
             channelCount, getPercentage(channelCount, 500),
             categoryChannelCount, getPercentage(categoryChannelCount, channelCount),
-            pbdChannelCount, getPercentage(pbdChannelCount, channelCount),
+            pbdChannelCount, getPercentage(pbdChannelCount, channelCount), (!isFoWGuild ? "pdb" : "fow"),
             threadCount, getPercentage(threadCount, 1000),
             threadArchivedCount,
             privateThreadCount, getPercentage(privateThreadCount, threadCount),
