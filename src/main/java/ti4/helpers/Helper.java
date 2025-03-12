@@ -1596,7 +1596,7 @@ public class Helper {
             && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 
             if (player.hasUnexhaustedLeader("argentagent")) {
-                unitButtons.add(Buttons.green("FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(), "Use Argent Agent", FactionEmojis.Argent));
+                unitButtons.add(Buttons.blue("FFCC_" + player.getFaction() + "_" + "exhaustAgent_argentagent_" + tile.getPosition(), "Use Argent Agent", FactionEmojis.Argent));
             }
             if (player.hasTechReady("sar")) {
                 unitButtons.add(Buttons.green("sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff, "Use Self-Assembly Routines", TechEmojis.WarfareTech));
