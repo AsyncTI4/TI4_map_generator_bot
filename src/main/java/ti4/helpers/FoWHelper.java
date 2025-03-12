@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import ti4.helpers.Units.UnitKey;
@@ -825,6 +824,10 @@ public class FoWHelper {
 
     /** Ping the players adjacent to a given system */
     public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message) {
+        pingSystem(game, event, position, message, true);
+    }
+    
+    public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message, boolean viewSystemButton) {
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
             return;
@@ -835,12 +838,13 @@ public class FoWHelper {
         for (Player player_ : players) {
             boolean success = true;
             if (player_.isRealPlayer()) {
-                String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentation() + " has been pinged:\n>>> "
+                String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentationForButtons() + " has been pinged:\n>>> "
                     + message;
                 success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
-                MessageChannel channel = player_.getPrivateChannel();
-                MessageHelper.sendMessageToChannelWithButtons(channel, "Use button to view the system.",
-                    StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+                if (viewSystemButton) {
+                    MessageHelper.sendMessageToChannelWithButtons(player_.getPrivateChannel(), "Use button to view the system.",
+                        StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event));
+                }
             }
             successfulCount += success ? 1 : 0;
         }
