@@ -10,7 +10,7 @@ import ti4.service.info.CardsInfoService;
 @UtilityClass
 class CardsInfoButtonHandler {
 
-    @ButtonHandler("cardsInfo")
+    @ButtonHandler(value = "cardsInfo", save = false)
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         CardsInfoService.sendCardsInfo(game, player, event);
     }

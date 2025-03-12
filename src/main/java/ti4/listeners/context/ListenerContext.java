@@ -3,6 +3,7 @@ package ti4.listeners.context;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -28,6 +29,9 @@ public abstract class ListenerContext {
     protected Player player;
     protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
     protected final GenericInteractionCreateEvent event;
+    
+    @Setter
+    protected boolean shouldSave = true;
 
     public abstract GenericInteractionCreateEvent getEvent();
 
