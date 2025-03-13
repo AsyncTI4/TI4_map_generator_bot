@@ -2455,6 +2455,9 @@ public class ButtonHelper {
 
     public static void saveButtons(ButtonInteractionEvent event, Game game, Player player) {
         game.setSavedButtons(new ArrayList<>());
+        if(event.getMessage().isEphemeral()){
+            return;
+        }
         String exhaustedMessage = event.getMessage().getContentRaw();
         if ("".equalsIgnoreCase(exhaustedMessage)) {
             exhaustedMessage = "Updated";

@@ -1927,10 +1927,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void componentAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Please choose what kind of component action you wish to do.";
         List<Button> systemButtons = ComponentActionHelper.getAllPossibleCompButtons(game, player, event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        if (!game.isFowMode()) {
-            ButtonHelper.deleteMessage(event);
-        }
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, systemButtons);
+        // if (!game.isFowMode()) {
+        //     ButtonHelper.deleteMessage(event);
+        // }
     }
 
     @ButtonHandler("drawRelicFromFrag")

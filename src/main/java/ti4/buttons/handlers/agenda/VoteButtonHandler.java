@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
@@ -20,11 +21,11 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
-import ti4.service.tech.ListTechService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.tech.ListTechService;
 
 @UtilityClass
 public class VoteButtonHandler {
@@ -54,11 +55,11 @@ public class VoteButtonHandler {
             pfaction2 = player.getFaction();
         }
         if (pfaction2 != null) {
-            String voteMessage = "Chose to Vote. Click buttons for which outcome to vote for.";
+            String voteMessage = player.getRepresentation()+ " Chose to Vote. Click buttons for which outcome to vote for.";
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
             List<Button> outcomeActionRow;
             if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
-                outcomeActionRow = getForAgainstOutcomeButtons(game, null, "outcome", game.getCurrentAgendaInfo().split("_")[2]);
+                outcomeActionRow = getForAgainstOutcomeButtons(game, null, "outcome", game.getCurrentAgendaInfo().split("_")[2], player);
             } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
                 outcomeActionRow = getPlayerOutcomeButtons(game, null, "outcome", null);
             } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
@@ -124,10 +125,14 @@ public class VoteButtonHandler {
         return lawButtons;
     }
 
-    public static List<Button> getForAgainstOutcomeButtons(Game game, String rider, String prefix, String agendaID) {
+    public static List<Button> getForAgainstOutcomeButtons(Game game, String rider, String prefix, String agendaID, Player player) {
         List<Button> voteButtons = new ArrayList<>();
         Button buttonFor;
         Button buttonAgainst;
+        String finChecker = "";
+        if(player != null){
+            finChecker = player.getFinsFactionCheckerPrefix();
+        }
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         Integer agendaInt = null;
         String forEmojiString = "👍";
@@ -162,11 +167,11 @@ public class VoteButtonHandler {
             }
         }
         if (rider == null) {
-            buttonFor = Buttons.green(prefix + "_for", "For");
-            buttonAgainst = Buttons.red(prefix + "_against", "Against");
+            buttonFor = Buttons.green(finChecker+prefix + "_for", "For");
+            buttonAgainst = Buttons.red(finChecker+prefix + "_against", "Against");
         } else {
-            buttonFor = Buttons.green(prefix + "rider_fa;for_" + rider, "For");
-            buttonAgainst = Buttons.red(prefix + "rider_fa;against_" + rider, "Against");
+            buttonFor = Buttons.green(finChecker+prefix + "rider_fa;for_" + rider, "For");
+            buttonAgainst = Buttons.red(finChecker+prefix + "rider_fa;against_" + rider, "Against");
         }
 
         buttonFor = buttonFor.withEmoji(Emoji.fromFormatted(forEmojiString));

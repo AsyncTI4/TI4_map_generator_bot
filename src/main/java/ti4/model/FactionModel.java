@@ -240,7 +240,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             for (String id : getStartingTech()) {
                 TechnologyModel model = Mapper.getTech(id);
                 sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
-                sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+                //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
             }
         }else{
             if(getStartingTechOptions() != null && getStartingTechAmount() != 0 && !getStartingTechOptions().isEmpty()){
@@ -248,16 +248,16 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                 for (String id : getStartingTechOptions()) {
                     TechnologyModel model = Mapper.getTech(id);
                     sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
-                    sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+                    //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
                 }
             }
         }
         if(getFactionName().toLowerCase().contains("keleres")){
             sb = new StringBuilder();
-            sb.append("Choose 2 non-faction technologies owned by other players.");
+            sb.append("Choose 2 tech owned by other players.");
         }
         eb.addField("__Starting Tech__", sb.toString(), false);
-
+        
         return eb.build();
     }
 
