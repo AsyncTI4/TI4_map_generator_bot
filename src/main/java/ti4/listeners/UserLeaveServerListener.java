@@ -167,8 +167,15 @@ public class UserLeaveServerListener extends ListenerAdapter {
 
         String threadName = "in-progress-games-left";
         String msg = generateBothelperReport(guild, player, games);
+        String gs = "";
+        for(Game game : games){
+            gs += game.getActionsChannel().getJumpUrl() +"\n";
+        }
         if(!msg.equalsIgnoreCase("dud")){
             ThreadGetter.getThreadInChannel(staffLounge, threadName, tc -> MessageHelper.sendMessageToChannel(tc, msg));
+        }else{
+            final String gss = gs;
+            ThreadGetter.getThreadInChannel(staffLounge, threadName, tc -> MessageHelper.sendMessageToChannel(tc, player.getName()+" left some games, but the games were ruled to be duds. Games were as follows: "+gss));
         }
     }
 }
