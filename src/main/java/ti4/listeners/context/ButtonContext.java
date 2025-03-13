@@ -51,7 +51,7 @@ public class ButtonContext extends ListenerContext {
             "showGameAgain".equalsIgnoreCase(componentID) ||
             "cardsInfo".equalsIgnoreCase(componentID) ||
             componentID.contains("showDeck") ||
-            componentID.contains("componentAction") || 
+            componentID.equalsIgnoreCase("componentAction") || 
             componentID.contains("FactionInfo") ||
             componentID.contains("searchMyGames") ||
             componentID.contains("decline_explore") ||
