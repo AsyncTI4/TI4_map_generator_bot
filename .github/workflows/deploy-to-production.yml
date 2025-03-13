@@ -41,6 +41,7 @@ jobs:
               echo "Cleaning up docker stuff..."
               docker rm $(docker ps --filter status=exited -q) || true
               docker rmi -f $(docker images --filter "dangling=true" -q) || true
+              docker builder prune
               echo "DONE!"
   saveGamesAfterDeploy:
     needs: [build, saveGamesBeforeDeploy]
