@@ -1,6 +1,7 @@
 package ti4.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -50,6 +51,7 @@ public class ButtonContext extends ListenerContext {
             "showGameAgain".equalsIgnoreCase(componentID) ||
             "cardsInfo".equalsIgnoreCase(componentID) ||
             componentID.contains("showDeck") ||
+            componentID.contains("componentAction") || 
             componentID.contains("FactionInfo") ||
             componentID.contains("searchMyGames") ||
             componentID.contains("decline_explore") ||

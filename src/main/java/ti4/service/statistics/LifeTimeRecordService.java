@@ -7,6 +7,7 @@ import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.helpers.SearchGameHelper;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -27,7 +28,9 @@ public class LifeTimeRecordService {
             User member = event.getOption("player" + i).getAsUser();
             members.add(member);
         }
-        String records = DiceLuckService.getDiceLuck(members) + AverageTurnTimeService.getAverageTurnTime(members);
+        String records = DiceLuckService.getDiceLuck(members) + AverageTurnTimeService.getAverageTurnTime(members) + SearchGameHelper.getTotalCompletedNOngoingGames(members, event);
+
+        
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), records);
     }
 }

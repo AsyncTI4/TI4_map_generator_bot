@@ -23,7 +23,7 @@ public class EventAuditService {
                 boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
                 boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
                 if (cardThread || draftThread || isFow || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
-                    yield username + " pressed button: [CLASSIFIED]";
+                    yield  "someone pressed button: [CLASSIFIED]";
                 }
                 yield username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
             }

@@ -223,8 +223,8 @@ public class Helper {
 
     public static void giveMeBackMyAgendaButtons(Game game) {
         List<Button> proceedButtons = new ArrayList<>();
-        String msg = "Press this button if the last player forgot to react, but verbally said \"no whens\"/\"no afters\".";
-        proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting And Start The Voting For Everyone"));
+        String msg = "These buttons can help with bugs/issues that occur during the agenda phase";
+        proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
         proceedButtons.add(Buttons.red("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
         proceedButtons.add(Buttons.red("eraseMyRiders", "Erase My Riders"));
