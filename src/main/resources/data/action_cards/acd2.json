@@ -521,7 +521,7 @@
         "alias": "malfunction",
         "name": "Malfunction",
         "phase": "Action",
-        "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
+        "window": "After you activate a system",
         "text": "Choose 1 unit in that system. That unit loses its printed abilities during this tactical action.",
         "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
         "source": "action_deck_2"
@@ -721,7 +721,7 @@
         "name": "Reconstruction",
         "phase": "Action",
         "window": "Action",
-        "text": "Ready 1 of your planets that has a trait. Then, reveal the top 3 cards of the exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
+        "text": "Ready 1 of your planets that has a trait. Then, reveal the top 3 cards of an exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
         "flavorText": "Tungstantus collapsed mid-step as their energy depleted. The world was far from its former glory, and they would not rest until it was a paradise once more.",
         "source": "action_deck_2"
     },
