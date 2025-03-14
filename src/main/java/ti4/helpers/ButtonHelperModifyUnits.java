@@ -514,17 +514,13 @@ public class ButtonHelperModifyUnits {
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null) continue;
 
-                // Get damaged units count
                 int damagedUnits = (unitHolder.getUnitDamage() != null) ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
-
-                // If the unit is damaged, add its name to duranium message
                 if (damagedUnits > 0) {
                     repairableUnitsByUnitKey.put(unitKey, damagedUnits);
                 }
             }
         }
 
-        // Process sustains if necessary
         if (numSustains > 0) {
             //just for dread 2s
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
@@ -538,7 +534,6 @@ public class ButtonHelperModifyUnits {
                 String unitName = unitKey.unitName();
                 if (!unitName.equalsIgnoreCase("dreadnought") || !player.hasUpgradedUnit("dn2")) continue;
 
-                // Get damaged units count
                 int damagedUnits = (unitHolder.getUnitDamage() != null) ? unitHolder.getUnitDamage().getOrDefault(unitKey, 0) : 0;
                 int totalUnits = unitEntry.getValue() - damagedUnits;
                 int min = (player.hasTech("nes")) ? Math.min(totalUnits, (hits + 1) / 2) : Math.min(totalUnits, hits);
@@ -547,7 +542,6 @@ public class ButtonHelperModifyUnits {
                     hits -= min * (player.hasTech("nes") ? 2 : 1); // Adjust hits based on technology
                     repairableUnitsByUnitKey.computeIfPresent(unitKey, (key, value) -> value += min);
 
-                    // Message building based on condition
                     if (!justSummarizing) {
                         msg.append("> Sustained ").append(min).append(" ").append(unitModel.getUnitEmoji()).append("\n");
                         tile.addUnitDamage("space", unitKey, min);
@@ -566,6 +560,9 @@ public class ButtonHelperModifyUnits {
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null || !unitModel.getSustainDamage() || ((!unitModel.getIsShip() && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))) && !isNomadMechApplicable(player, (noMechPowers || spaceCannonOffence), unitKey))) continue;
+                if(!unitModel.getIsShip() && spaceCannonOffence){
+                    continue;
+                }
                 if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) continue;
                 String unitName = unitKey.unitName();
 
@@ -1435,6 +1432,7 @@ public class ButtonHelperModifyUnits {
                     if (!game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
                         if (Mapper.isValidColor(color)) {
                             CommandCounterHelper.addCC(event, color, tile);
+                            ButtonHelper.updateMap(game, event);
                         }
                     } else {
                         msg = playerRep

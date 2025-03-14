@@ -170,13 +170,13 @@ public class RiftSetModeService {
             return;
         }
 
-        if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
-            AddTokenCommand.addToken(event, tile, "gravityrift", game);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition()
-                + "\n-#" + getGMs(game));
-        } else if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_VORTEX)) {
+        if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_VORTEX)) {
             AddTokenCommand.addToken(event, tile, "vortex", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition()
+                + "\n-#" + getGMs(game));
+        } else  if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
+            AddTokenCommand.addToken(event, tile, "gravityrift", game);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition()
                 + "\n-#" + getGMs(game));
         }
     }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
 import lombok.experimental.UtilityClass;
@@ -62,6 +63,27 @@ public class SearchGameHelper {
 
     }
 
+
+
+    public static String getTotalCompletedNOngoingGames(List<User> users, GenericInteractionCreateEvent event) {
+        
+
+        StringBuilder sb = new StringBuilder();
+        AtomicInteger index = new AtomicInteger(1);
+        sb.append("## __**Games**__\n");
+        for (User user : users) {
+            int ongoingAmount = SearchGameHelper.searchGames(user, event, false, false, false, true, false, true, true, true);
+            int completedAndOngoingAmount = SearchGameHelper.searchGames(user, event, false, true, false, true, false, true, true, true);
+            int completedGames = completedAndOngoingAmount - ongoingAmount;
+            sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
+            sb.append(completedGames);
+            sb.append("` Completed. `"+ongoingAmount+"` Ongoing --");
+            sb.append(user.getEffectiveName());
+            sb.append("\n");
+            index.getAndIncrement();
+        }
+        return sb.toString();
+    }
     public static String getPlayerMapListRepresentation(Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
         Player player = game.getPlayer(userID);
         if (player == null) return "";

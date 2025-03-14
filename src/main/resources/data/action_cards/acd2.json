@@ -68,7 +68,7 @@
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Choose another player. During this turn, that player cannot choose to play action cards or promissory notes.",
-        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
+        "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand, \"Our dominion knows no border.\"",
         "source": "action_deck_2"
     },
     {
@@ -195,7 +195,7 @@
         "phase": "Action",
         "window": "After another player produces ships",
         "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any system that contains your ships.",
-        "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
+        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their minions had done well.",
         "source": "action_deck_2"
     },
     {
@@ -413,8 +413,8 @@
         "alias": "freedom_fighters",
         "name": "Freedom Fighters",
         "phase": "Action",
-        "window": "During the \"Commit Ground Forces\" substep of your tactical action in a non-home system that contains your ships",
-        "text": "Commit up to 1 infantry from your reinforcements on each planet in that system that is controlled by another player.",
+        "window": "During the \"Commit Ground Forces\" step in a non-home system that contains your ships",
+        "text": "Commit up to 1 infantry from your reinforcements to each planet in that system.",
         "flavorText": "Harrugh had brought them supplies and hope. On the promised day, they would repay him with their determination for liberation.",
         "source": "action_deck_2"
     },
@@ -521,7 +521,7 @@
         "alias": "malfunction",
         "name": "Malfunction",
         "phase": "Action",
-        "window": "After the \"Move Ships\" substep of a tactical action in a system that contains your units",
+        "window": "After you activate a system",
         "text": "Choose 1 unit in that system. That unit loses its printed abilities during this tactical action.",
         "flavorText": "Ba'al watched as, one by one, each of the settlements went offline. He was not some fool to be laughed at. Who was laughing now?",
         "source": "action_deck_2"
@@ -658,7 +658,7 @@
         "name": "Patronage",
         "phase": "Any",
         "window": "When a public objective is revealed",
-        "text": "Look at the top 2 cards of the deck that matches that objective; replace that objective with 1 of those cards and shuffle that deck.",
+        "text": "Look at the top 2 cards of the deck that matches that objective; you may replace that objective with 1 of those cards. Then, shuffle that deck.",
         "flavorText": "The Custodians' proclamation mired Elder Qanoj in anxiety. More support for his enemies, thinly veiled under the guise of tradition.",
         "source": "action_deck_2"
     },
@@ -721,7 +721,7 @@
         "name": "Reconstruction",
         "phase": "Action",
         "window": "Action",
-        "text": "Ready 1 of your planets that has a trait. Then, reveal the top 3 cards of the exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
+        "text": "Ready 1 of your planets that has a trait. Then, reveal the top 3 cards of an exploration deck that matches that planet; attach each attachment that you reveal to that planet and discard the rest.",
         "flavorText": "Tungstantus collapsed mid-step as their energy depleted. The world was far from its former glory, and they would not rest until it was a paradise once more.",
         "source": "action_deck_2"
     },
