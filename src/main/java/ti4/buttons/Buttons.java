@@ -46,6 +46,12 @@ public class Buttons {
 
     public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
+    //Map buttons
+    public static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
+    public static final Button SHOW_DECKS = blue("offerDeckButtons", "Show Decks");
+    public static final Button REFRESH_MAP = gray("showGameAgain", "Refresh Map");
+    public static final Button PLAYER_INFO = green("gameInfoButtons", "Player Info");
+
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
         REFRESH_AC_INFO,
         REFRESH_PN_INFO,
@@ -64,11 +70,11 @@ public class Buttons {
             if (WebHelper.sendingToWeb()) {
                 buttonsWeb.add(Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View"));
             }
-            buttonsWeb.add(Buttons.green("gameInfoButtons", "Player Info"));
+            buttonsWeb.add(PLAYER_INFO);
         }
-        buttonsWeb.add(Buttons.green("cardsInfo", "Cards Info"));
-        buttonsWeb.add(Buttons.blue("offerDeckButtons", "Show Decks"));
-        buttonsWeb.add(Buttons.gray("showGameAgain", "Refresh Map"));
+        buttonsWeb.add(REFRESH_CARDS_INFO);
+        buttonsWeb.add(SHOW_DECKS);
+        buttonsWeb.add(REFRESH_MAP);
         return buttonsWeb;
     }
 
