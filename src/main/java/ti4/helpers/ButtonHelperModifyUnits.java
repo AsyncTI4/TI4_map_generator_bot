@@ -1432,7 +1432,9 @@ public class ButtonHelperModifyUnits {
                     if (!game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
                         if (Mapper.isValidColor(color)) {
                             CommandCounterHelper.addCC(event, color, tile);
-                            ButtonHelper.updateMap(game, event);
+                            if(!game.isFowMode()){
+                                ButtonHelper.updateMap(game, event);
+                            }
                         }
                     } else {
                         msg = playerRep
