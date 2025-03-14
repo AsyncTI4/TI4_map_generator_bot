@@ -68,7 +68,7 @@
         "phase": "Action",
         "window": "At the start of your turn",
         "text": "Choose another player. During this turn, that player cannot choose to play action cards or promissory notes.",
-        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
+        "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand, \"Our dominion knows no border.\"",
         "source": "action_deck_2"
     },
     {
@@ -195,7 +195,7 @@
         "phase": "Action",
         "window": "After another player produces ships",
         "text": "Remove up to 2 of those ships that do not have a capacity value; place matching ships from your reinforcements in any system that contains your ships.",
-        "flavorText": "\"Then she was... assimilated... by the Letani. Now, you want me to... terminate her.\" The operative's words choked her. \"What's left of her,\" said Kuuasi, not unkindly.",
+        "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their minions had done well.",
         "source": "action_deck_2"
     },
     {
@@ -413,8 +413,8 @@
         "alias": "freedom_fighters",
         "name": "Freedom Fighters",
         "phase": "Action",
-        "window": "During the \"Commit Ground Forces\" substep of your tactical action in a non-home system that contains your ships",
-        "text": "Commit up to 1 infantry from your reinforcements on each planet in that system that is controlled by another player.",
+        "window": "During the \"Commit Ground Forces\" step in a non-home system that contains your ships",
+        "text": "Commit up to 1 infantry from your reinforcements to each planet in that system.",
         "flavorText": "Harrugh had brought them supplies and hope. On the promised day, they would repay him with their determination for liberation.",
         "source": "action_deck_2"
     },
