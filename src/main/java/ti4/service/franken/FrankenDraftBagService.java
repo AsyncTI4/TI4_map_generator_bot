@@ -292,6 +292,9 @@ public class FrankenDraftBagService {
 
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
+        if (game.isFowMode()) {
+            players.removeAll(game.getPlayersWithGMRole());
+        }
         int index = 1;
         StringBuilder sb = new StringBuilder("Automatically setting players up as Franken factions:");
         List<Integer> emojiNum = new ArrayList<>(List.of( 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
