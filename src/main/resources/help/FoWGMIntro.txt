@@ -9,5 +9,4 @@ __**Getting Started:**__
 
 __**Other Useful Commands:**__
 > `/game info` – View current game settings
-> `/fow show_game_as` – See the map from a player's perspective
-> `endofround1` Notes here – Save round summary notes as GM
+> `/fow gm` – Some GM buttons

@@ -20,7 +20,8 @@ public class FOWCommand implements ParentCommand {
         new Announce(),
         new FOWOptions(),
         new ShowGameAsPlayer(),
-        new PrivateCommunicationsCheck()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new PrivateCommunicationsCheck(),
+        new GMCommand()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

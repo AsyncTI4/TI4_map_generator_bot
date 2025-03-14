@@ -43,7 +43,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.UnitModel;
-import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
+import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 
 public class TileGenerator {
@@ -90,7 +90,7 @@ public class TileGenerator {
     private boolean isFowModeActive() {
         return game.isFowMode() && event != null &&
             (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
-                event instanceof UserOverridenSlashCommandInteractionEvent);
+                event instanceof UserOverridenGenericInteractionCreateEvent);
     }
 
     public FileUpload createFileUpload() {
