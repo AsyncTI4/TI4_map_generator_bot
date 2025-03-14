@@ -62,10 +62,8 @@ public class GMService {
             ShowGameService.simpleShowGame(game, new UserOverridenGenericInteractionCreateEvent(event, showAs.getUser()));
         } else {
             List<Button> factionButtons = new ArrayList<>();
-            for (Player player : game.getPlayers().values()) {
-                if (player.getFaction() != null) {
-                    factionButtons.add(Buttons.green("gmShowGameAs_" + player.getFaction(), player.getColor() + ", " + player.getUserName(), player.getFactionEmoji()));
-                }
+            for (Player player : game.getRealPlayers()) {
+                factionButtons.add(Buttons.green("gmShowGameAs_" + player.getFaction(), player.getColor() + ", " + player.getUserName(), player.getFactionEmoji()));
             }
             factionButtons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), "Select player who to view the game as:", factionButtons);
