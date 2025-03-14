@@ -22,7 +22,7 @@ class PrismButtonHandler {
         String techOut = buttonID.split("@")[1];
         player.purgeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " purged the technology _" + techM1.getName() + "_.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " purged the technology _" + techM1.getNameRepresentation() + "_.");
         MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation()
             + ", use the button to get a technology that also has " + techM1.getRequirements().orElse("").length() + " prerequisites.", Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();

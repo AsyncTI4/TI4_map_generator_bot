@@ -65,17 +65,17 @@ public class PlayerTechService {
 
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " removed technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void purgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.purgeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " purged technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void refreshTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.refreshTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " readied technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
@@ -86,10 +86,18 @@ public class PlayerTechService {
         }
         TechnologyModel techModel = Mapper.getTech(tech);
         if(!player.getTechs().contains(tech)){
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +" does not have the tech known as "+techModel.getName());
-            return;
+            boolean hasSub = false;
+            for(String tech2 : player.getTechs()){
+                if(tech2.contains(tech)){
+                    hasSub = true;
+                }
+            }
+            if(!hasSub){
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +" does not have the tech known as "+techModel.getName());
+                return;
+            }
         }
-        String exhaustMessage = player.getRepresentation() + " exhausted technology " + techModel.getRepresentation(false) + ".";
+        String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology " + techModel.getRepresentation(false) + ".";
         if (game.isShowFullComponentTextEmbeds()) {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
         } else {

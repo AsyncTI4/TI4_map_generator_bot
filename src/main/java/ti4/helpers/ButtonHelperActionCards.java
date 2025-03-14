@@ -1261,6 +1261,7 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + message);
         game.setStoredValue("AssassinatedReps", game.getStoredValue("AssassinatedReps") + p2.getFaction());
+        game.setStoredValue("preVoting" + p2.getFaction(), "");
     }
 
     @ButtonHandler("signalJammingStep2_")
