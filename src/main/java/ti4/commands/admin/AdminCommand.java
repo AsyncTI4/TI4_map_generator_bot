@@ -14,14 +14,14 @@ import ti4.helpers.Constants;
 public class AdminCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new DeleteGame(),
-                    new DisableBot(),
-                    new ReloadMapperObjects(),
-                    new RestoreGame(),
-                    new ReloadGame(),
-                    new CardsInfoForPlayer(),
-                    new UpdateThreadArchiveTime())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new DeleteGame(),
+        new DisableBot(),
+        new ReloadMapperObjects(),
+        new RestoreGame(),
+        new DeletePersistenceManagerFile(),
+        new CardsInfoForPlayer(),
+        new UpdateThreadArchiveTime()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {

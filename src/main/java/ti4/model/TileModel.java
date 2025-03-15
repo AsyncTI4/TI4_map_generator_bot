@@ -51,16 +51,11 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
-    @JsonProperty("isHyperlane")
-    private boolean hyperlane = false;
-    @JsonProperty("isAsteroidField")
-    private boolean asteroidField = false;
-    @JsonProperty("isSupernova")
-    private boolean supernova = false;
-    @JsonProperty("isNebula")
-    private boolean nebula = false;
-    @JsonProperty("isGravityRift")
-    private boolean gravityRift = false;
+    private @JsonProperty("isHyperlane") boolean hyperlane = false;
+    private @JsonProperty("isAsteroidField") boolean asteroidField = false;
+    private @JsonProperty("isSupernova") boolean supernova = false;
+    private @JsonProperty("isNebula") boolean nebula = false;
+    private @JsonProperty("isGravityRift") boolean gravityRift = false;
     private String imageURL;
     private ComponentSource source;
     private TileBack tileBack = TileBack.BLACK;
@@ -101,7 +96,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
             } else {
                 eb.setThumbnail(customEmoji.getImageUrl());
             }
-        } 
+        }
 
         if (includeAliases) eb.setFooter("Aliases: " + getAliases());
         return eb.build();

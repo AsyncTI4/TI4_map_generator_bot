@@ -2,10 +2,11 @@ package ti4.buttons.handlers.explore;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -14,6 +15,7 @@ import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -22,8 +24,6 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
 import ti4.service.button.ReactionService;
-import ti4.service.emoji.MiscEmojis;
-import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -40,8 +40,7 @@ class ExploreButtonHandler {
         if (player.getCommodities() > 0) {
             player.setCommodities(player.getCommodities() - 1);
             commOrTg = "commodity";
-            if (player.getPromissoryNotesInPlayArea().contains("dark_pact"))
-            {
+            if (player.getPromissoryNotesInPlayArea().contains("dark_pact")) {
                 commOrTg += " (though you may wish to manually spend a trade good instead because of _Dark Pact_)";
             }
         } else if (player.getTg() > 0) {
@@ -51,14 +50,15 @@ class ExploreButtonHandler {
             ReactionService.addReaction(event, game, player, "Didn't have any commodities or trade goods to spend, so no mech has been placed.");
             return;
         }
-        AddUnitService.addUnits(event, game.getTile(AliasHandler.resolveTile(planetName)), game, player.getColor(), "mech " + planetName);
+        AddUnitService.addUnits(event, TileHelper.getTile(event, planetName, game), game, player.getColor(), "mech " + planetName);
         planetName = Mapper.getPlanet(planetName) == null ? "`error?`" : Mapper.getPlanet(planetName).getName();
         ReactionService.addReaction(event, game, player, "Spent a " + commOrTg + " for a mech on " + planetName + ".");
         ButtonHelper.deleteMessage(event);
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName +".");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
         }
+        CommanderUnlockCheckService.checkPlayer(player, "naaz");
     }
 
     @ButtonHandler("resolveVolatile_")
@@ -90,9 +90,9 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
-        
+
         String message = player.getRepresentation() + " is using a mech to resolve _Volatile Fuel Source_."
-            + " Please gain 1 command token. Your current command tokens are "+ player.getCCRepresentation();
+            + " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation();
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -112,14 +112,14 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
-        
+
         String colorID = Mapper.getColorID(player.getColor());
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-        
+
         String message = player.getRepresentation() + " is removing an infantry to resolve _Volatile Fuel Source_."
-            + " Please gain 1 command token. Your current command tokens are "+ player.getCCRepresentation();
+            + " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation();
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -157,7 +157,7 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
-        
+
         PlanetService.refreshPlanet(player, planetID);
         String message = player.getRepresentation() + " is using a mech to resolve _Expedition_. "
             + Helper.getPlanetRepresentation(planetID, game) + " has been readied.";
@@ -172,12 +172,12 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
-        
+
         String colorID = Mapper.getColorID(player.getColor());
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-        
+
         PlanetService.refreshPlanet(player, planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _Expedition_. "
             + Helper.getPlanetRepresentation(planetID, game) + " has been readied.";
@@ -212,7 +212,7 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
-        
+
         String message = player.getRepresentation() + " is using a mech to resolve _Core Mine_."
             + " Gained 1 trade good " + player.gainTG(1, true) + ".";
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -231,12 +231,12 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
-        
+
         String colorID = Mapper.getColorID(player.getColor());
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-        
+
         String message = player.getRepresentation() + " is removing an infantry to resolve _Core Mine_. "
             + " Gained 1 trade good " + player.gainTG(1, true) + ".";
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -278,7 +278,7 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
-        
+
         AddUnitService.addUnits(event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
         String message = player.getRepresentation() + " is using a mech to resolve _War Forge Ruins_."
             + " Placing " + placedUnit + " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
@@ -294,12 +294,12 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
-        
+
         String colorID = Mapper.getColorID(player.getColor());
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-        
+
         AddUnitService.addUnits(event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _War Forge Ruins_."
             + " Placing " + placedUnit + " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
@@ -352,7 +352,7 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
-        
+
         String message = " is using a mech to resolve _Seedy Space Port_.";
         if ("ac".equalsIgnoreCase(agent)) {
             if (player.hasAbility("scheming")) {
@@ -388,12 +388,12 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
-        
+
         String colorID = Mapper.getColorID(player.getColor());
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-        
+
         String message = player.getRepresentation() + " is removing an infantry to resolve _Seedy Space Port_.";
         if ("ac".equalsIgnoreCase(agent)) {
             if (player.hasAbility("scheming")) {

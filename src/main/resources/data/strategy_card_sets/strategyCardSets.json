@@ -363,5 +363,22 @@
         ],
         "description": "Strategy cards for Voices of the Council",
         "source": "voice_of_the_council"
+    },
+    {
+        "name": "RiftSet Strategy Cards",
+        "alias": "riftset",
+        "scIDs": [
+            "pok1leadership",
+            "pok2diplomacy",
+            "pok3politics",
+            "pok4construction",
+            "pok5trade",
+            "pok6warfare",
+            "pok7technology",
+            "pok8imperial",
+            "riftset_9"
+        ],
+        "description": "Strategy cards for RiftSetMode",
+        "source": "riftset"
     }
 ]

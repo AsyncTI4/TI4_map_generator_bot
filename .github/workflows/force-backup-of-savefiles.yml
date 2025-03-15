@@ -16,14 +16,19 @@ jobs:
         env:
           AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
           AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          envs: AWS_KEY, AWS_SECRET
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          envs: AWS_KEY, AWS_SECRET, DISCORD_WEBHOOK_URL
           script: |
-            cd /root/ti4bot
+            cd ${{ vars.HOST_TI4_SAVES_DIR }}
             echo "FORCING BACKUP OF SAVE FILES"
-            ./scheduled_upload.sh
+            rm -f ${{ vars.HOST_TI4_SAVES_DIR }}/.git/index.lock
+            git add . -A
+            git commit -m "save files"
+            git push
+            curl -X POST -H 'Content-Type: application/json' -d '{"content":"Backup Successful"}' $DISCORD_WEBHOOK_URL
             echo "DONE!"

@@ -2,11 +2,12 @@
 - [Setup a Test Server](#setup-a-test-server)
 - [Setup a Test Bot](#setup-a-test-bot)
   - [Run Locally](#run-locally)
+    - [Prerequisites](#prerequisites)
     - [JAVA, IntelliJ, VSCode, or other Java IDE](#java-intellij-vscode-or-other-java-ide)
-    - [Default Formatter](#default-formatter)
+      - [Default Formatter](#default-formatter)
     - [Running from Terminal](#running-from-terminal)
-  - [Run Docker Container](#run-docker-container)
-    - [Windows 10, VS Code, Docker Desktop](#windows-10-vs-code-docker-desktop)
+  - [Run Container](#run-container)
+    - [Windows 10, VS Code, Docker/Podman Desktop](#windows-10-vs-code-dockerpodman-desktop)
 - [Adding New Buttons](#adding-new-buttons)
 - [Adding Homebrew Content](#adding-homebrew-content)
 - [Testing your Changes](#testing-your-changes)
@@ -55,11 +56,10 @@ Add the bot to your server
 
 ### JAVA, IntelliJ, VSCode, or other Java IDE
 
-Ensure your launch.json file includes a configuration like this:
+The first time you attempt to Run/Debug in VSCode, it will ask you if you want it to create a launch configuration. Say yes, it should appear in the .vscode folder. Within the configurations section, add the "args" and "env" sections shown below. For VSCode, the file should look very similar to this:
 
 ```json
 {
-    "version": "0.2.0",
     "configurations": [
         {
             "type": "java",
@@ -67,22 +67,24 @@ Ensure your launch.json file includes a configuration like this:
             "request": "launch",
             "mainClass": "ti4.AsyncTI4DiscordBot",
             "projectName": "TI4_map_generator_discord_bot",
+            ////----vvvvvv COPY THIS INTO YOUR LAUNCH.JSON
             "args": [
               "{DISCORD_BOT_TOKEN}", // Discord Developer Portal -> Applications -> Bot -> Token
-              "{DISCORD USER ID}", //Discord User Settings -> Click 3-dot menu next to username -> "Copy USER ID"
+              "{DISCORD USER ID}", // Discord User Settings -> Click 3-dot menu next to username -> "Copy USER ID"
               "{DISCORD SERVER ID}" // Right-Click Discord Server Name -> "Copy Server ID"
             ],
             "env": {
                 "DB_PATH": "${workspaceFolder}/storage", // Like: "C:/user/repos/TI4_map_generator_bot/storage" - you may need to create this folder
                 "RESOURCE_PATH": "${workspaceFolder}/src/main/resources" // Like: "C:/user/repos/TI4_map_generator_bot/src/main/resources"
-            },
+            }
+            ////----^^^^^^ COPY THIS INTO YOUR LAUNCH.JSON
         }
     ]
 }
 ```
 For vscode, this is in `.vscode/launch.json`.
 
-Set the 5 {VARIABLES} to match your bot, user, server, and system.
+Set the 5 {VARIABLES} to match your Discord App/Bot's Token, UserID, ServerID, and system.
 
 #### Default Formatter
 

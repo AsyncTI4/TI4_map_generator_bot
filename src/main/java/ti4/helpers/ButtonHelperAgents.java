@@ -37,7 +37,6 @@ import ti4.model.UnitModel;
 import ti4.service.PlanetService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
-import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -189,8 +188,7 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static List<Button> getArboAgentReplacementOptions(Player player, Game game,
-        GenericInteractionCreateEvent event, Tile tile, String unit) {
+    public static List<Button> getArboAgentReplacementOptions(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String unit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
 
@@ -352,8 +350,7 @@ public class ButtonHelperAgents {
     }
 
     @ButtonHandler("vaylerianAgent_")
-    public static void resolveVaylerianAgent(String buttonID, ButtonInteractionEvent event, Game game,
-        Player player) {
+    public static void resolveVaylerianAgent(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String message = ButtonHelper.resolveACDraw(p2, game, event);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), message);
@@ -415,7 +412,7 @@ public class ButtonHelperAgents {
             int oldTg = p2.getTg();
             p2.setTg(oldTg + 2);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                player.getFactionEmojiOrColor() + " gained 2 trade goods from " + ssruuClever + "Clodho, the Ilyxum" + ssruuSlash + " agent, being used ("
+                p2.getFactionEmojiOrColor() + " gained 2 trade goods from " + ssruuClever + "Clodho, the Ilyxum" + ssruuSlash + " agent, being used ("
                     + oldTg + "->" + p2.getTg() + ").");
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -549,7 +546,7 @@ public class ButtonHelperAgents {
                 ButtonHelper.deleteTheOneButton(buttonEvent);
             }
             return;
-            
+
         }
         if ("lizhoagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Vasra Ivo, the Li-Zho" + ssruuSlash + " agent.";
@@ -1073,8 +1070,7 @@ public class ButtonHelperAgents {
             buttons);
     }
 
-    public static boolean checkForEdynAgentPreset(Game game, Player passedPlayer, Player upNextPlayer,
-        GenericInteractionCreateEvent event) {
+    public static boolean checkForEdynAgentPreset(Game game, Player passedPlayer, Player upNextPlayer, GenericInteractionCreateEvent event) {
         Player edyn = Helper.getPlayerFromUnlockedLeader(game, "edynagent");
         if (edyn != null && edyn.hasUnexhaustedLeader("edynagent")) {
             String preset = game.getStoredValue("edynAgentPreset");
@@ -1257,8 +1253,7 @@ public class ButtonHelperAgents {
         return legendaries;
     }
 
-    public static List<String> getAllControlledPlanetsInThisSystemAndAdjacent(Game game, Player player,
-        Tile tile) {
+    public static List<String> getAllControlledPlanetsInThisSystemAndAdjacent(Game game, Player player, Tile tile) {
         List<String> legendaries = new ArrayList<>();
         List<String> adjTiles = new ArrayList<>(
             FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false));
@@ -1281,7 +1276,7 @@ public class ButtonHelperAgents {
         List<String> legendaries = new ArrayList<>();
         for (Player player : game.getRealPlayers()) {
             for (String planet : player.getPlanets()) {
-                if (planet.contains("custodia")) {
+                if (planet.contains("custodia") || planet.contains("ghoti")) {
                     continue;
                 }
                 PlanetModel model = Mapper.getPlanet(planet);
@@ -1972,7 +1967,7 @@ public class ButtonHelperAgents {
                 player.getFactionEmoji() + " Chose to place 1 destroyer with their ships from " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                     + "Shipmonger Zsknck, the Axis" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             buttons.addAll(
-                Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
+                Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
             message = " Use buttons to put 1 destroyer with your ships";
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
@@ -1984,12 +1979,12 @@ public class ButtonHelperAgents {
         if (player.hasUnexhaustedLeader("nomadagentartuno")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("exhaustAgent_nomadagentartuno_" + tg,
-                "Exhaust Artuno the Betrayer With " + tg + " Trade Good" + (tg == 1 ? "" : "s")));
+                "Exhaust Artuno With " + tg + " TG" + (tg == 1 ? "" : "s")));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentationUnfogged()
                     + " you have the opportunity to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Artuno the Betrayer the Betrayer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                    + "Artuno the Betrayer, a Nomad" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent, and place " + tg + " trade good" + (tg == 1 ? "" : "s") + " on her.",
                 buttons);
         }

@@ -10,9 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -235,6 +235,29 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         sb.append(Helper.getUnitListEmojis(getStartingFleet())).append("\n");
         eb.addField("__Starting Fleet__", sb.toString(), false);
 
+        sb = new StringBuilder();
+        if(getStartingTech() != null && !getStartingTech().isEmpty()){
+            for (String id : getStartingTech()) {
+                TechnologyModel model = Mapper.getTech(id);
+                sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
+                //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+            }
+        }else{
+            if(getStartingTechOptions() != null && getStartingTechAmount() != 0 && !getStartingTechOptions().isEmpty()){
+                sb.append("\nPick "+ getStartingTechAmount()+ " of the following:\n");
+                for (String id : getStartingTechOptions()) {
+                    TechnologyModel model = Mapper.getTech(id);
+                    sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
+                    //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+                }
+            }
+        }
+        if(getFactionName().toLowerCase().contains("keleres")){
+            sb = new StringBuilder();
+            sb.append("Choose 2 tech owned by other players.");
+        }
+        eb.addField("__Starting Tech__", sb.toString(), false);
+        
         return eb.build();
     }
 

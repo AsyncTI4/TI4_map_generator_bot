@@ -33,6 +33,8 @@ public class StatusCleanupService {
                 unitHolder.removeAllUnitDamage();
             }
         }
+        game.removeStoredValue("galacticThreatUsed");
+        game.removeStoredValue("conspiratorsUsed");
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);
@@ -52,6 +54,7 @@ public class StatusCleanupService {
             player.setInRoundTurnCount(0);
             player.clearFollowedSCs();
             player.cleanExhaustedTechs();
+            game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
@@ -72,8 +75,7 @@ public class StatusCleanupService {
                     }
                 }
             }
-            if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber"))
-            {        
+            if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber")) {
                 for (String planet : game.getPlanets()) {
                     game.getPlanetsInfo().get(planet).removeToken("attachment_sigma_cyber.png");
                 }

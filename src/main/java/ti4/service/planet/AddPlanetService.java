@@ -26,6 +26,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -41,8 +42,7 @@ public class AddPlanetService {
         addPlanet(player, planet, game, null, false);
     }
 
-    public static void addPlanet(Player player, String planet, Game game, GenericInteractionCreateEvent event,
-        boolean setup) {
+    public static void addPlanet(Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
 
@@ -58,7 +58,7 @@ public class AddPlanetService {
         }
 
         List<String> mecatols = Constants.MECATOLS;
-        if (mecatols.contains(planet) && player.hasTech("iihq")) {
+        if (mecatols.contains(planet) && player.hasIIHQ()) {
             PlanetModel custodiaVigilia = Mapper.getPlanet("custodiavigilia");
             unitHolder.setSpaceCannonDieCount(custodiaVigilia.getSpaceCannonDieCount());
             unitHolder.setSpaceCannonHitsOn(custodiaVigilia.getSpaceCannonHitsOn());
@@ -78,8 +78,7 @@ public class AddPlanetService {
                     channel = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored custodians!");
-                String message2 = player.getRepresentationUnfogged()
-                    + " Click the names of the planets you wish to exhaust to spend " + MiscEmojis.Influence_6;
+                String message2 = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust to spend " + MiscEmojis.Influence_6;
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
                 buttons.add(doneExhausting);
@@ -154,7 +153,7 @@ public class AddPlanetService {
                 ButtonHelper.getDacxiveButtons(planet, player));
         }
         if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer()
-            && ("faction".equalsIgnoreCase(unitHolder.getOriginalPlanetType()))) {
+            && (unitHolder.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
             if (!p.getFactionHomeworld().equalsIgnoreCase(player.getFaction())) {
                 unitHolder.addToken("attachment_threetraits.png");
@@ -175,7 +174,7 @@ public class AddPlanetService {
                 if (p != null && p.getFactionHomeworld() != null
                     && !player.hasLeader(p.getFactionHomeworld() + "commander")) {
                     String leaderID = p.getFactionHomeworld() + "commander";
-                    if(leaderID.toLowerCase().contains("keleres")){
+                    if (leaderID.toLowerCase().contains("keleres")) {
                         leaderID = "kelerescommander";
                     }
                     player.addLeader(leaderID);
@@ -198,10 +197,8 @@ public class AddPlanetService {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
                 if (event != null && buttons != null && !buttons.isEmpty()) {
-                    String message = player.getFactionEmoji() + " Click button to explore "
-                        + Helper.getPlanetRepresentation(planet, game);
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        message, buttons);
+                    String message = player.getFactionEmoji() + " Click button to explore " + Helper.getPlanetRepresentation(planet, game);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 }
             }
             alreadyOwned = false;
@@ -225,22 +222,22 @@ public class AddPlanetService {
         if ((game.getPhaseOfGame().contains("agenda")
             || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
             && player.hasTech("absol_dxa") && !doubleCheck && !setup) {
-                String message = "";
-                if (tile != null && planet != null) {
-                    Set<String> tokenList = ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList();
-                    boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
-                    if (!containsDMZ) {
-                        AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planet);
-                        message = player.getFactionEmoji() + ColorEmojis.getColorEmojiWithName(player.getColor()) + UnitEmojis.infantry
-                            + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planet)
-                            + " due to Absol's Daxcive, however this placement is __optional__.";
-                    } else {
-                        message = "Planet has the _Demilitarized Zone_ attached, so no infantry could be placed.";
-                    }
+            String message = "";
+            if (tile != null && planet != null) {
+                Set<String> tokenList = ButtonHelper.getUnitHolderFromPlanetName(planet, game).getTokenList();
+                boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
+                if (!containsDMZ) {
+                    AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planet);
+                    message = player.getFactionEmoji() + ColorEmojis.getColorEmojiWithName(player.getColor()) + UnitEmojis.infantry
+                        + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planet)
+                        + " due to Absol's Daxcive, however this placement is __optional__.";
                 } else {
-                    message = "Tile was null, no infantry placed.";
+                    message = "Planet has the _Demilitarized Zone_ attached, so no infantry could be placed.";
                 }
-                MessageHelper.sendMessageToEventChannel(event, message); 
+            } else {
+                message = "Tile was null, no infantry placed.";
+            }
+            MessageHelper.sendMessageToEventChannel(event, message);
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
@@ -319,12 +316,11 @@ public class AddPlanetService {
         if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode()) {
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (event != null && buttons != null && !buttons.isEmpty()) {
-                String message = player.getFactionEmoji() + " Click button to explore "
-                    + Helper.getPlanetRepresentation(planet, game) + ".";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    message, buttons);
+                String message = player.getFactionEmoji() + " Click button to explore " + Helper.getPlanetRepresentation(planet, game) + ".";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             }
         }
+
         if (((game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID())))
             || game.getPhaseOfGame().contains("agenda")) && player.hasUnit("saar_mech")
             && event != null && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
@@ -348,7 +344,7 @@ public class AddPlanetService {
         }
         CommanderUnlockCheckService.checkPlayer(player, "sol", "vaylerian", "olradin", "xxcha", "sardakk");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "freesystems");
-        if (Constants.MECATOLS.contains(planet.toLowerCase()) && player.controlsMecatol(true)) {
+        if (Constants.MECATOLS.contains(planet) && player.controlsMecatol(true)) {
             CommanderUnlockCheckService.checkPlayer(player, "winnu");
         }
     }

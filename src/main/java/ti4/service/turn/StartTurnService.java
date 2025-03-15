@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
-import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.FoWHelper;
@@ -321,26 +320,26 @@ public class StartTurnService {
         } else {
             game.setJustPlayedComponentAC(false);
             if (player.getTechs().contains("cm")) {
-                startButtons.add(Buttons.gray("startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
+                startButtons.add(Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
             if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
-                startButtons.add(Buttons.gray("exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
+                startButtons.add(Buttons.gray(finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
             if (player.hasUnexhaustedLeader("florzenagent") && !ButtonHelperAgents.getAttachments(game, player).isEmpty()) {
                 startButtons.add(Buttons.green(finChecker + "exhaustAgent_florzenagent_" + player.getFaction(), "Use Florzen Agent", FactionEmojis.florzen));
             }
             if (player.hasUnexhaustedLeader("vadenagent")) {
-                startButtons.add(Buttons.gray("exhaustAgent_vadenagent_" + player.getFaction(), "Use Vaden Agent", FactionEmojis.vaden));
+                startButtons.add(Buttons.gray(finChecker + "exhaustAgent_vadenagent_" + player.getFaction(), "Use Vaden Agent", FactionEmojis.vaden));
             }
             if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
-                startButtons.add(Buttons.gray("useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
+                startButtons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
             }
             if ((player.hasTech("td") && !player.getExhaustedTechs().contains("td")) ||
                 (player.hasTech("absol_td") && !player.getExhaustedTechs().contains("absol_td"))) {
                 startButtons.add(Buttons.gray(finChecker + "exhaustTech_td", "Exhaust Transit Diodes", TechEmojis.CyberneticTech));
             }
             if (player.hasUnexhaustedLeader("kolleccagent")) {
-                startButtons.add(Buttons.gray("exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));
+                startButtons.add(Buttons.gray(finChecker + "exhaustAgent_kolleccagent", "Use Kollecc Agent", FactionEmojis.kollecc));
             }
         }
         if (player.hasTech("pa") && ButtonHelper.getPsychoTechPlanets(game, player).size() > 1) {
@@ -352,20 +351,20 @@ public class StartTurnService {
         Button modify = Buttons.gray("getModifyTiles", "Modify Units");
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
-            startButtons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+            startButtons.add(Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
         if (player.hasRelicReady("e6-g0_network")) {
-            startButtons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
+            startButtons.add(Buttons.green(finChecker + "exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
         }
         if (player.hasUnexhaustedLeader("nekroagent") && player.getAc() > 0) {
-            startButtons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
+            startButtons.add(Buttons.gray(finChecker + "exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }
 
         GameMessageManager
             .remove(game.getName(), GameMessageType.TURN)
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
-            startButtons.add(Buttons.gray("showGameAgain", "Show Game"));
+            startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
             FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
         }
 

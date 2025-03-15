@@ -58,6 +58,10 @@ public class EndGameService {
             deleteRole = false;
         }
 
+        // Do not publish games that never really took off
+        if (game.getRealPlayers().isEmpty() || game.getRound() <= 2)
+            publish = false;
+
         // ADD USER PERMISSIONS DIRECTLY TO CHANNEL
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), gameName);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
@@ -120,13 +124,13 @@ public class EndGameService {
                 threadChannel.getManager().setArchived(true).queue();
             }
         }
-        if (actionsChannel != null) {
-            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-                if (!threadChannel.getName().contains("Cards Info")) {
-                    threadChannel.getManager().setArchived(true).queue();
-                }
-            }
-        }
+        // if (actionsChannel != null) {
+        //     for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+        //         if (!threadChannel.getName().contains("Cards Info")) {
+        //             threadChannel.getManager().setArchived(true).queue();
+        //         }
+        //     }
+        // }
 
         // GET BOTHELPER LOUNGE
         List<TextChannel> bothelperLoungeChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true);
@@ -161,7 +165,7 @@ public class EndGameService {
 
         GameMessageManager.remove(List.of(game.getName()));
 
-        if (!game.isFowMode()) {
+        if (!game.getRealPlayers().isEmpty() && !game.isFowMode() && !game.islandMode()) {
             PlayerTitleHelper.offerEveryoneTitlePossibilities(game);
         }
 
@@ -297,8 +301,8 @@ public class EndGameService {
                 int playerVP = player.getTotalVictoryPoints();
                 sb.append(playerVP).append("VP* ");
             }
-            if (game.hasWinner()){
-                for(Player winner2 : game.getWinners()){
+            if (game.hasWinner()) {
+                for (Player winner2 : game.getWinners()) {
                     if (winner2 == player) sb.append(" **👑WINNER👑**");
                 }
             }

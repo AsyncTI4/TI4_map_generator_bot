@@ -250,7 +250,7 @@
         ],
         "requirements": "R",
         "source": "absol",
-        "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit per structure and assign them to your opponent's ground forces.\nAfter you perform a tactical action, you may exhaust this card and spend 4 resources to place a structure on a planet you control in the active system.",
+        "text": "At the start of ground combat on a planet you control that contains 1 or more of your structures, you may produce 1 hit per structure and assign them to your opponent's ground forces.\nAfter you perform a tactical action, you may exhaust this card and spend 4 resources to place a structure on a planet you control in the active system.",
         "homebrewReplacesID": "md",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/MagenDefenseGrid.png?raw=true"
     },
@@ -262,7 +262,7 @@
         ],
         "requirements": "R",
         "source": "absol",
-        "text": "When you produce mechs, you may produce 1 additional mech for its cost.\nACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
+        "text": "You may produce 1 additional mech for their cost. [Note: think of mechs as now similar to fighters and infantry, buy 2 for the price of 1]\nACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
         "homebrewReplacesID": "sar",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/SelfAssemblyRoutines.png?raw=true"
     },
@@ -581,7 +581,7 @@
         "baseUpgrade": "absol_dn2",
         "source": "absol",
         "text": "Cost 4, Combat 4, Move 2, Capacity 2\nSUSTAIN DAMAGE, BOMBARDMENT 4\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
-        "homebrewReplacesID": "sd2",
+        "homebrewReplacesID": "sdn2",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/superdreadnought_2.jpg?raw=true"
     },
     {
@@ -765,7 +765,7 @@
         "baseUpgrade": "absol_sd2",
         "source": "absol",
         "text": "Move 2, Capacity 6\nPRODUCTION 7\nThis unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed. 1 non-fighter ship in this system does not count against your fleet pool.",
-        "homebrewReplacesID": "ff2",
+        "homebrewReplacesID": "ffac2",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/FloatingFactoryII.png?raw=true"
     },
     {

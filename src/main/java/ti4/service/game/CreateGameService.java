@@ -8,8 +8,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
@@ -27,8 +29,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -268,12 +268,12 @@ public class CreateGameService {
         TextChannel chatChannel = game.getTableTalkChannel();
         String tabletalkGetStartedMessage = game.getPing() + " - table talk channel\n" +
             "This channel is for typical over the table conversation, as you would over the table while playing the game in real life.\n" +
-            "If this group has agreed to whispers (secret conversations), you can create private threads off this channel.\n" +
+            "If this group has agreed to whispers (secret conversations), you can create private threads off this channel, or utilize the bots in built whispers (explained in more detail in your cards info once you're set up).\n" +
             "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n" +
             game.getPing() + " if you are playing with strangers, you should take a few moments at the start here to discuss how you're going handle disputes and take-backs. Async is an odd format, it can get messy " +
             "and takebacks are often not only advisable but necessary. A common standard is no new relevant information, but if you wish to get more specific or do something else (like you can only takeback if the whole table says so) then state that here. \n" +
             "Regarding disputes, playing a diplomatic game with strangers online, with no tone to go off of or human face to empathize with, can often lead to harsh words and hurt feelings. No matter what happens mechanically in the game, you should always " +
-            "strive to treat the other people with respect, patience, and hopefully kindness. If you cannot, you should step away, and if you ever feel the need to leave a game permanently, we do have a replacement system that gets a fair amount of use (ping or dm a bothelper for specifics)";
+            "strive to treat the other people with respect, patience, and hopefully kindness. If you cannot, you should step away, and if you ever feel the need to leave a game permanently, we do have a replacement system that gets a fair amount of use (ping a bothelper for specifics)";
         MessageHelper.sendMessageToChannelAndPin(chatChannel, tabletalkGetStartedMessage);
     }
 

@@ -25,6 +25,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -274,6 +275,7 @@ public class ButtonHelperTacticalAction {
     @ButtonHandler("doneWithTacticalAction")
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         if (!game.isL1Hero()) {
+            RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
             ButtonHelperFactionSpecific.cleanCavUp(game, event);
             if (player.hasAbility("cunning")) {
@@ -509,6 +511,11 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " does not have any command tokens in their tactic pool.");
             return;
         }
+        resetStoredValuesForTacticalAction(game);
+        beginTacticalAction(game, player);
+    }
+
+    public static void resetStoredValuesForTacticalAction(Game game) {
         game.setNaaluAgent(false);
         game.setL1Hero(false);
         game.setStoredValue("vaylerianHeroActive", "");
@@ -516,7 +523,9 @@ public class ButtonHelperTacticalAction {
         game.setStoredValue("planetsTakenThisRound", "");
         game.setStoredValue("fortuneSeekers", "");
         game.resetCurrentMovedUnitsFrom1TacticalAction();
+    }
 
+    public static void beginTacticalAction(Game game, Player player) {
         boolean prefersDistanceBasedTacticalActions = UserSettingsManager.get(player.getUserID()).isPrefersDistanceBasedTacticalActions();
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
             alternateWayOfOfferingTiles(player, game);
@@ -524,7 +533,7 @@ public class ButtonHelperTacticalAction {
             String message = "Doing a tactical action. Please select the ring of the map that the system you wish to activate is located in."
                 + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
         }
     }
 
@@ -544,7 +553,7 @@ public class ButtonHelperTacticalAction {
         }
         for (String pos : initialOffering) {
             Tile tile = game.getTileByPosition(pos);
-            if(!game.isNaaluAgent() || !tile.isHomeSystem()){
+            if (ButtonHelper.canActivateTile(game, player, tile)) {
                 buttons.add(Buttons.green("ringTile_" + pos, tile.getRepresentationForButtons(game, player), tile.getTileEmoji(player)));
             }
         }
@@ -564,7 +573,7 @@ public class ButtonHelperTacticalAction {
         for (String pos : CheckDistanceHelper.getAllTilesACertainDistanceAway(game, player, distances, desiredDistance)) {
             Tile tile = game.getTileByPosition(pos);
             String tileRepresentation = tile.getRepresentationForButtons(game, player);
-            if (!tileRepresentation.contains("Hyperlane")) {
+            if (ButtonHelper.canActivateTile(game, player, tile)) {
                 buttons.add(Buttons.green("ringTile_" + pos, tileRepresentation, tile.getTileEmoji(player)));
             }
         }
@@ -658,7 +667,7 @@ public class ButtonHelperTacticalAction {
                 + "I48S, the L1Z1Z" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, if you so wish.";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
         }
-        
+
         if (tile.isAnomaly() && player.getCommodities() < player.getCommoditiesTotal() && player.getActionCards().containsKey("harness")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 player.getRepresentation() + ", you activated an anomaly, and so could now play _Harness Energy_.");

@@ -13,7 +13,7 @@ public class PlanetModelTest extends BaseTi4Test {
     public void testPlanets() {
         for (PlanetModel model : TileHelper.getAllPlanetModels()) {
             assertTrue(model.isValid(), model.getAlias() + ": invalid");
-            assertTrue(validateTileId(model), model.getAlias() + ": invalid TileID: " + model.getTileId());
+            assertTrue(validateTileId(model), model.getAlias() + ": invalid TileID: (" + model.getTileId() + ")");
             assertTrue(validateTileContainsPlanet(model), model.getAlias() + ": invalid TileID - tile does not contain planet: " + model.getTileId());
             assertTrue(validateFactionHomeworld(model), model.getAlias() + ": invalid Faction Homeworld: " + model.getTileId());
         }

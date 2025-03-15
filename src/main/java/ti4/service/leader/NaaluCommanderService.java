@@ -47,7 +47,7 @@ public class NaaluCommanderService {
 
         sb.setLength(0);
         boolean first = true;
-        for (Player player_ : player.getNeighbouringPlayers()) {
+        for (Player player_ : player.getNeighbouringPlayers(true)) {
             if (!first) sb.append("\n\n");
             first = false;
             sb.append("## ").append(player_.getRepresentation(false, false)).append("'s ");

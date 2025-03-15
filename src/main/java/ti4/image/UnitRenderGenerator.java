@@ -1,6 +1,11 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -19,12 +24,12 @@ import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.image.MapGenerator;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
 
 public class UnitRenderGenerator {
@@ -35,8 +40,8 @@ public class UnitRenderGenerator {
         int originalX,
         int originalY,
         int x,
-        int y) {
-    }
+        int y
+    ) {}
 
     private record SystemContext(
         boolean isSpace,
@@ -50,8 +55,8 @@ public class UnitRenderGenerator {
         int mirageDragY,
         int spaceUnitXOffset,
         int spaceUnitYOffset,
-        UnitTokenPosition unitTokenPosition) {
-    }
+        UnitTokenPosition unitTokenPosition
+    ) {}
 
     private record PositioningContext(
         Point centerPosition,
@@ -60,8 +65,8 @@ public class UnitRenderGenerator {
         String unitId,
         BufferedImage unitImage,
         int planetHolderSize,
-        boolean fighterOrInfantry) {
-    }
+        boolean fighterOrInfantry
+    ) {}
 
     private final Game game;
     private final Tile tile;
@@ -114,6 +119,10 @@ public class UnitRenderGenerator {
             if (shouldHideJailUnit(frogPlayer, unitKey)) continue;
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
+            if (player == null) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey.toString() + " in tile " + tile.getRepresentation());
+                continue;
+            }
             Integer unitCount = unitEntry.getValue();
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
             String unitPath = getUnitPath(unitKey);
@@ -146,43 +155,36 @@ public class UnitRenderGenerator {
                 unitImage,
                 tile.getPlanetUnitHolders().size(),
                 Set.of(UnitType.Infantry, UnitType.Fighter).contains(unitKey.getUnitType()));
-            
+
             // DRAW UNITS
             for (int i = 0; i < unitCount; i++) {
                 Point position = calculateUnitPosition(posCtx, unitKey, i + unitTypeCounts.get(unitKey.getUnitType()));
                 ImagePosition imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
-                
+
                 if (containsDMZ || (isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
                     String badPath = resourceHelper.getPositionFile("badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
-                    BufferedImage badPositionImage = scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);;
-                    tileGraphics.drawImage(badPositionImage, imageX-5, imageY-5, null);
+                    BufferedImage badPositionImage = scale == 1.0f ? ImageHelper.read(badPath) : ImageHelper.readScaled(badPath, scale);
+                    tileGraphics.drawImage(badPositionImage, imageX - 5, imageY - 5, null);
                 }
 
                 tileGraphics.drawImage(unitImage, imageX, imageY, null);
 
                 if (!posCtx.fighterOrInfantry) {
-                    tileGraphics.drawImage(decal, imagePos.x(), imagePos.y(), null);
+                    tileGraphics.drawImage(decal, imageX, imageY, null);
                 }
 
-                if ("81".equals(tile.getTileID()) && "muaat".equals(player.getFaction()) && unitKey.getUnitType() == UnitType.Warsun)
-                {
+                if ("81".equals(tile.getTileID()) && "muaat".equals(player.getFaction()) && unitKey.getUnitType() == UnitType.Warsun) {
                     BufferedImage faceNovaSeed = ImageHelper.read(resourceHelper.getDecalFile("NovaSeed.png"));
-                    tileGraphics.drawImage(faceNovaSeed, imagePos.x(), imagePos.y(), null);
-                }
-                else if (spoopy != null) {
-                    tileGraphics.drawImage(spoopy, imagePos.x(), imagePos.y(), null);
+                    tileGraphics.drawImage(faceNovaSeed, imageX, imageY, null);
+                } else if (spoopy != null) {
+                    tileGraphics.drawImage(spoopy, imageX, imageY, null);
                 }
 
-                // AGENDA DECALS
-                if (isMechWithArticlesOfWar(unitKey)) {
-                    drawMechTearDecal(unitKey, imageX, imageY);
-                }
-                // Handle War Suns with Weapon Schematics
-                else if (isWarsunWithSchematics(unitKey)) {
-                    drawWarsunCrackDecal(unitKey, imageX, imageY);
-                }
+                // INFORMATIONAL DECALS
+                optionallyDrawMechTearDecal(unitKey, imageX, imageY);
+                optionallyDrawWarsunCrackDecal(unitKey, imageX, imageY);
 
                 // UNIT TAGS
                 drawUnitTags(unitKey, player, imagePos, i);
@@ -214,24 +216,15 @@ public class UnitRenderGenerator {
         }
     }
 
-    private boolean isMechWithArticlesOfWar(UnitKey unitKey) {
-        return unitKey.getUnitType() == UnitType.Mech &&
-            (ButtonHelper.isLawInPlay(game, "articles_war") ||
-                ButtonHelper.isLawInPlay(game, "absol_articleswar"));
-    }
-
-    private boolean isWarsunWithSchematics(UnitKey unitKey) {
-        return unitKey.getUnitType() == UnitType.Warsun &&
-            ButtonHelper.isLawInPlay(game, "schematics");
-    }
-
-    private void drawMechTearDecal(UnitKey unitKey, int imageX, int imageY) {
+    private void optionallyDrawMechTearDecal(UnitKey unitKey, int imageX, int imageY) {
+        if (unitKey.getUnitType() != UnitType.Mech || !ButtonHelper.anyLawInPlay(game, "articles_war", "absol_articleswar")) return;
         String imagePath = "agenda_articles_of_war" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID());
         BufferedImage mechTearImage = ImageHelper.read(resourceHelper.getTokenFile(imagePath));
         tileGraphics.drawImage(mechTearImage, imageX, imageY, null);
     }
 
-    private void drawWarsunCrackDecal(UnitKey unitKey, int imageX, int imageY) {
+    private void optionallyDrawWarsunCrackDecal(UnitKey unitKey, int imageX, int imageY) {
+        if (unitKey.getUnitType() != UnitType.Warsun || !ButtonHelper.isLawInPlay(game, "schematics")) return;
         String imagePath = "agenda_publicize_weapon_schematics" + DrawingUtil.getBlackWhiteFileSuffix(unitKey.getColorID());
         BufferedImage wsCrackImage = ImageHelper.read(resourceHelper.getTokenFile(imagePath));
         tileGraphics.drawImage(wsCrackImage, imageX, imageY, null);
@@ -290,8 +283,7 @@ public class UnitRenderGenerator {
         int mirageDragX = Math.round(((float) 345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
         int mirageDragY = Math.round(((float) (3 * 300) / 4 + TILE_PADDING) * (1 - mirageDragRatio));
 
-        Point unitOffset = game.isAllianceMode() ? PositionMapper.getAllianceUnitOffset()
-            : PositionMapper.getUnitOffset();
+        Point unitOffset = game.isAllianceMode() ? PositionMapper.getAllianceUnitOffset() : PositionMapper.getUnitOffset();
 
         int spaceUnitXOffset = unitOffset != null ? unitOffset.x : 10;
         int spaceUnitYOffset = unitOffset != null ? unitOffset.y : -7;
@@ -325,8 +317,13 @@ public class UnitRenderGenerator {
             MapGenerator.HorizontalAlign.Left, MapGenerator.VerticalAlign.Bottom, strokeWidth, stroke);
     }
 
-    private void drawDamageIcon(Point unitPos, ImagePosition imagePos, BufferedImage unitImage,
-        BufferedImage dmgImage, UnitType unitType) {
+    private void drawDamageIcon(
+        Point unitPos,
+        ImagePosition imagePos,
+        BufferedImage unitImage,
+        BufferedImage dmgImage,
+        UnitType unitType
+    ) {
         int imageX = imagePos.x();
         int imageY = imagePos.y();
 
@@ -476,7 +473,8 @@ public class UnitRenderGenerator {
     private Point calculateUnitPosition(
         PositioningContext posCtx,
         UnitKey unitKey,
-        int count) {
+        int count
+    ) {
         Point predefinedPosition = getTokenPosition(unitKey, posCtx);
 
         // Handle space units (non-fighter/infantry units in space with predefined positions)
@@ -494,9 +492,10 @@ public class UnitRenderGenerator {
         Point position = calculateSpiralPosition(posCtx, radius, degree, degreeChange, rectangles);
 
         // add found position to 'rectangles' to prevent any future units from being placed there
-        Point centerPosition = unitHolder.getHolderCenterPosition();
+        Point centerPosition = posCtx.centerPosition;
         int unitWidth = posCtx.unitImage.getWidth();
         int unitHeight = posCtx.unitImage.getHeight();
+
         rectangles.add(
             new Rectangle(
                 centerPosition.x + position.x - (unitWidth / 2),
@@ -517,7 +516,8 @@ public class UnitRenderGenerator {
         int radius,
         int degree,
         int degreeChange,
-        List<Rectangle> rectangles) {
+        List<Rectangle> rectangles
+    ) {
         Point centerPosition = posCtx.centerPosition;
         int unitWidth = posCtx.unitImage.getWidth();
         int unitHeight = posCtx.unitImage.getHeight();

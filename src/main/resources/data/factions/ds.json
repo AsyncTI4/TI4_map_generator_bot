@@ -23,6 +23,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheAugursOfIlyxum_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheAugursOfIlyxum_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheAugursOfIlyxum",
         "source": "ds"
     },
     {
@@ -50,6 +54,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheShipwrightsofAxis_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheShipwrightsofAxis_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheShipwrightsofAxis",
         "source": "ds"
     },
     {
@@ -78,6 +86,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBentorConglomerate_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBentorConglomerate_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheBentorConglomerate",
         "source": "ds"
     },
     {
@@ -105,6 +117,10 @@
             "pds",
             "celdauri_spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheCeldauriTradeConfederation_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheCeldauriTradeConfederation_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheCeldauriTradeConfederation",
         "source": "ds"
     },
     {
@@ -133,6 +149,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheCheiranHordes_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheCheiranHordes_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheCheiranHordes",
         "source": "ds"
     },
     {
@@ -159,6 +179,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheSavagesOfCymiae_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheSavagesOfCymiae_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheSavagesOfCymiae",
         "source": "ds"
     },
     {
@@ -186,6 +210,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheDihMohnFlotilla_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheDihMohnFlotilla_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheDihMohnFlotilla",
         "source": "ds"
     },
     {
@@ -222,6 +250,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEdynMandate_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEdynMandate_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheEdynMandate",
         "source": "ds"
     },
     {
@@ -249,6 +281,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFlorzenProfiteers_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFlorzenProfiteers_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheFlorzenProfiteers",
         "source": "ds"
     },
     {
@@ -280,6 +316,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFreeSystemsCompact_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFreeSystemsCompact_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheFreeSystemsCompact",
         "source": "ds"
     },
     {
@@ -313,6 +353,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGheminaRaiders_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGheminaRaiders_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheGheminaRaiders",
         "source": "ds"
     },
     {
@@ -340,6 +384,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhotiWayfarers_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhotiWayfarers_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheGhotiWayfarers",
         "source": "ds"
     },
     {
@@ -372,6 +420,10 @@
             "gledge_pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGledgeUnion_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGledgeUnion_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheGledgeUnion",
         "source": "ds"
     },
     {
@@ -399,6 +451,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheLTokkKhrask_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheLTokkKhrask_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheLTokkKhrask",
         "source": "ds"
     },
     {
@@ -426,6 +482,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBerserkersOfKjalengard_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBerserkersOfKjalengard_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheBerserkersOfKjalengard",
         "source": "ds"
     },
     {
@@ -453,6 +513,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheKolleccSociety_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheKolleccSociety_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheKolleccSociety",
         "source": "ds"
     },
     {
@@ -481,6 +545,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMonksOfKolume_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMonksOfKolume_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheMonksOfKolume",
         "source": "ds"
     },
     {
@@ -508,6 +576,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheKortaliTribunal_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheKortaliTribunal_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheKortaliTribunal",
         "source": "ds"
     },
     {
@@ -535,6 +607,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheKyroSodality_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheKyroSodality_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheKyroSodality",
         "source": "ds"
     },
     {
@@ -562,6 +638,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheLanefirRemnants_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheLanefirRemnants_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheLanefirRemnants",
         "source": "ds"
     },
     {
@@ -589,6 +669,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheLiZhoDynasty_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheLiZhoDynasty_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheLiZhoDynasty",
         "source": "ds"
     },
     {
@@ -615,6 +699,10 @@
             "mirveda_pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMirvedaProtectorate_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMirvedaProtectorate_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheMirvedaProtectorate",
         "source": "ds"
     },
     {
@@ -642,6 +730,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGlimmerOfMortheus_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGlimmerOfMortheus_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheGlimmerOfMortheus",
         "source": "ds"
     },
     {
@@ -672,6 +764,10 @@
             "pds",
             "mykomentori_spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMykoMentori_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMykoMentori_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheMykoMentori",
         "source": "ds"
     },
     {
@@ -698,6 +794,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNivynStarKings_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNivynStarKings_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheNivynStarKings",
         "source": "ds"
     },
     {
@@ -725,6 +825,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNokarSellships_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNokarSellships_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheNokarSellships",
         "source": "ds"
     },
     {
@@ -751,6 +855,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheOlradinLeague_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheOlradinLeague_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheOlradinLeague",
         "source": "ds"
     },
     {
@@ -779,6 +887,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/RohDhnaMechatronics_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/RohDhnaMechatronics_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=RohDhnaMechatronics",
         "source": "ds"
     },
     {
@@ -810,6 +922,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTnelisSyndicate_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTnelisSyndicate_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheTnelisSyndicate",
         "source": "ds"
     },
     {
@@ -837,6 +953,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVadenBankingClans_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVadenBankingClans_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheVadenBankingClans",
         "source": "ds"
     },
     {
@@ -863,6 +983,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVaylerianScourge_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVaylerianScourge_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheVaylerianScourge",
         "source": "ds"
     },
     {
@@ -893,6 +1017,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVeldyrSovereignty_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVeldyrSovereignty_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheVeldyrSovereignty",
         "source": "ds"
     },
     {
@@ -920,6 +1048,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheZealotsOfRhodun_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheZealotsOfRhodun_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheZealotsOfRhodun",
         "source": "ds"
     },
     {
@@ -946,6 +1078,10 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheZelianPurifier_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheZelianPurifier_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheZelianPurifier",
         "source": "ds"
     }
 ]

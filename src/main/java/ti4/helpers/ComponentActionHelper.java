@@ -62,17 +62,6 @@ public class ComponentActionHelper {
             compButtons.add(tButton);
         }
 
-        // Legendary Planets
-        List<String> implementedLegendaryPlanets = new ArrayList<>();
-        if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(1721048723431L)) > 0)
-            implementedLegendaryPlanets.add("prism");
-        for (String planet : implementedLegendaryPlanets) {
-            String prettyPlanet = Mapper.getPlanet(planet).getName();
-            if (p1.getPlanets().contains(planet) && !p1.getExhaustedPlanetsAbilities().contains(planet)) {
-                compButtons.add(Buttons.green(finChecker + "planetAbilityExhaust_" + planet, "Use " + prettyPlanet + " Ability"));
-            }
-        }
-
         // Leaders
         for (Leader leader : p1.getLeaders()) {
             if (!leader.isExhausted() && !leader.isLocked() && !leader.isActive()) {
@@ -295,7 +284,9 @@ public class ComponentActionHelper {
                     return;
                 }
                 if (buttonID.contains("agent")) {
-                    List<String> leadersThatNeedSpecialSelection = List.of("naaluagent", "muaatagent", "kolumeagent", "arborecagent", "bentoragent", "xxchaagent", "axisagent");
+                    List<String> leadersThatNeedSpecialSelection = List.of(
+                        "arborecagent", "naaluagent", "muaatagent", "xxchaagent",
+                        "axisagent", "bentoragent", "kolumeagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + " Use buttons to select the user of the agent";
@@ -532,16 +523,15 @@ public class ComponentActionHelper {
                 game.setStoredValue("absolMOW", p1.getFaction());
             }
             case "actionCards" -> {
-                String secretScoreMsg = "_ _\nClick a button below to play an action card.";
+                String secretScoreMsg = "Click a button below to play an action card.";
                 List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
+                acButtons.add(Buttons.DONE_DELETE_BUTTONS);
                 if (!acButtons.isEmpty()) {
                     List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-                    ThreadChannel cardsInfoThreadChannel = p1.getCardsInfoThread();
                     for (MessageCreateData message : messageList) {
-                        cardsInfoThreadChannel.sendMessage(message).queue();
+                        event.getHook().setEphemeral(true).sendMessage(message).queue();
                     }
                 }
-
             }
             case "doStarCharts" -> {
                 ButtonHelper.purge2StarCharters(p1);

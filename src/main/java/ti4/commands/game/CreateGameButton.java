@@ -13,7 +13,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
+import ti4.commands.CommandHelper;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.SearchGameHelper;
@@ -68,13 +70,26 @@ class CreateGameButton extends Subcommand {
                 Member member = event.getOption("player" + i).getAsMember();
                 if (member != null)
                     members.add(member);
-                // Rodrigo, a player we're limiting to 7 games rn
-                if (member.getId().equalsIgnoreCase("400038967744921612")) {
-                    int amount = SearchGameHelper.searchGames(member.getUser(), event, false, false, false, true, false, true, false, true);
-                    if (amount > 6) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members is currently under a limit and cannot join more games at this time");
+                else{
+                    continue;
+                }
+
+                if(!member.getUser().isBot() && !CommandHelper.hasRole(event, AsyncTI4DiscordBot.developerRoles)){
+                    int ongoingAmount = SearchGameHelper.searchGames(member.getUser(), event, false, false, false, true, false, true, true, true);
+                    int completedAndOngoingAmount = SearchGameHelper.searchGames(member.getUser(), event, false, true, false, true, false, true, true, true);
+                    int completedGames = completedAndOngoingAmount - ongoingAmount;
+                    if(ongoingAmount > completedGames + 2){
+                        MessageHelper.sendMessageToChannel(event.getChannel(), member.getUser().getAsMention() + " is at the game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games atm"
+                        +". Their number of ongoing games is "+ongoingAmount +" and their number of completed games is "+completedGames);
                         return;
                     }
+                    // Used for specific people we are limiting the amount of games of
+                    // if (member.getId().equalsIgnoreCase("400038967744921612")) {
+                    //     if (ongoingAmount > 6) {
+                    //         MessageHelper.sendMessageToChannel(event.getChannel(), "One of the games proposed members is currently under a limit and cannot join more games at this time");
+                    //         return;
+                    //     }
+                    // }
                 }
                 if (gameOwner == null)
                     gameOwner = member;

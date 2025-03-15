@@ -1,8 +1,9 @@
 package ti4.cron;
 
+import static java.util.function.Predicate.*;
+
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -10,19 +11,14 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.ButtonHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
-import ti4.message.GameMessageManager;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
-
-import static java.util.function.Predicate.not;
 
 @UtilityClass
 public class AutoPingCron {
@@ -128,6 +124,14 @@ public class AutoPingCron {
             agendaPhasePing(game, milliSinceLastPing);
             return;
         }
+        if("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())){
+            scoringPhasePing(game, milliSinceLastPing);
+            return;
+        }
+        if("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())){
+            statusHomeworkPing(game, milliSinceLastPing);
+            return;
+        }
 
         Player player = game.getActivePlayer();
         if (player == null || player.isAFK()) {
@@ -213,6 +217,54 @@ public class AutoPingCron {
         }
     }
 
+    private static void scoringPhasePing(Game game, long milliSinceLastPing) {
+        if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
+            String poMsg = "";
+            String soMsg = "";
+            for(Player player : ti4.helpers.Helper.getInitativeOrder(game)){
+                String po = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"PO");
+                String so = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"SO");
+                if(po.isEmpty()){
+                    if(game.isFowMode()){
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a public objective");
+                    }
+                    poMsg += player.getRepresentation() + " ";
+                }
+                if(so.isEmpty()){
+                    if(game.isFowMode()){
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a secret objective");
+                    }
+                    soMsg  += player.getRepresentation() +" ";
+                }
+            }
+            if(!game.isFowMode()&& !poMsg.isEmpty()){
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(),poMsg+ "please indicate if you are scoring a public objective");
+            }
+            if(!game.isFowMode()&& !soMsg.isEmpty()){
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(),poMsg+ "please indicate if you are scoring a secret objective");
+            }
+            AutoPingMetadataManager.addPing(game.getName());
+        }
+    }
+    private static void statusHomeworkPing(Game game, long milliSinceLastPing) {
+        if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
+            String msg = "";
+            for(Player player : game.getRealPlayers()){
+                if(!game.getCurrentACDrawStatusInfo().contains(player.getFaction())){
+                    if(game.isFowMode()){
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please draw ACs and allocate command tokens");
+                    }
+                    msg += player.getRepresentation() + " ";
+                }
+                
+            }
+            if(!game.isFowMode() && !msg.isEmpty()){
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(),msg+"please draw ACs and allocate command tokens\n");
+            }
+            AutoPingMetadataManager.addPing(game.getName());
+        }
+    }
+
     private static int getPingIntervalInHours(Game game, Player player) {
         int personalPingInterval = UserSettingsManager.get(player.getUserID()).getPersonalPingInterval();
         int gamePingInterval = game.getAutoPingSpacer();
@@ -236,48 +288,62 @@ public class AutoPingCron {
         return realIdentity + PING_MESSAGES.get(pingNumber - 1);
     }
 
-    private static void pingMissingAgendaPlayers(Game game) {
-        List<Player> missingPlayersWhens = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_WHEN)
-            .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
-            .orElse(Collections.emptyList());
-        List<Player> missingPlayersAfters = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_AFTER)
-            .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
-            .orElse(Collections.emptyList());
-        if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
+    public static void pingMissingAgendaPlayers(Game game) {
+        // List<Player> missingPlayersWhens = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_WHEN)
+        //     .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
+        //     .orElse(Collections.emptyList());
+        // List<Player> missingPlayersAfters = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_AFTER)
+        //     .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
+        //     .orElse(Collections.emptyList());
+        // if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
+        //     return;
+        // }
+        if(game.getStoredValue("queuedAgendasMode").isEmpty()){
             return;
         }
+        for(Player p2 : game.getRealPlayers()){
+            if (p2.isAFK()) continue;
 
-        if (game.isFowMode()) {
-            String messageWhens = ", please indicate \"No Whens\".";
-            String messageAfters = ", please indicate \"No Afters\".";
-            for (Player player : missingPlayersWhens) {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
-                    player.getRepresentationUnfogged() + messageWhens);
+            if(!game.getStoredValue("queuedWhens").contains(p2.getFaction()) && !game.getStoredValue("declinedWhens").contains(p2.getFaction())){
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"whens\".");
+                continue;
             }
-            for (Player player : missingPlayersAfters) {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
-                    player.getRepresentationUnfogged() + messageAfters);
-            }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "Sent reminder pings to players who have not yet reacted.");
-        } else {
-            StringBuilder messageBuilder = new StringBuilder();
-            for (Player player : missingPlayersWhens) {
-                messageBuilder.append(player.getRepresentationUnfogged()).append(", ");
-            }
-            if (!missingPlayersWhens.isEmpty()) {
-                messageBuilder.append("please indicate \"No Whens\".\n");
-            }
-
-            for (Player player : missingPlayersAfters) {
-                messageBuilder.append(player.getRepresentationUnfogged()).append(", ");
-            }
-            if (!missingPlayersAfters.isEmpty()) {
-                messageBuilder.append("please indicate \"No Afters\".");
-            }
-            if (messageBuilder.length() > 0) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageBuilder.toString());
+            if(!game.getStoredValue("queuedAfters").contains(p2.getFaction()) && !game.getStoredValue("declinedAfters").contains(p2.getFaction()) && !game.getStoredValue("queuedWhens").contains(p2.getFaction())){
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"afters\".");
             }
         }
+
+        // if (game.isFowMode()) {
+        //     String messageWhens = ", please indicate \"No Whens\".";
+        //     String messageAfters = ", please indicate \"No Afters\".";
+        //     for (Player player : missingPlayersWhens) {
+        //         MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
+        //             player.getRepresentationUnfogged() + messageWhens);
+        //     }
+        //     for (Player player : missingPlayersAfters) {
+        //         MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
+        //             player.getRepresentationUnfogged() + messageAfters);
+        //     }
+        //     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+        //         "Sent reminder pings to players who have not yet reacted.");
+        // } else {
+        //     StringBuilder messageBuilder = new StringBuilder();
+        //     for (Player player : missingPlayersWhens) {
+        //         messageBuilder.append(player.getRepresentationUnfogged()).append(", ");
+        //     }
+        //     if (!missingPlayersWhens.isEmpty()) {
+        //         messageBuilder.append("please indicate \"No Whens\".\n");
+        //     }
+
+        //     for (Player player : missingPlayersAfters) {
+        //         messageBuilder.append(player.getRepresentationUnfogged()).append(", ");
+        //     }
+        //     if (!missingPlayersAfters.isEmpty()) {
+        //         messageBuilder.append("please indicate \"No Afters\".");
+        //     }
+        //     if (messageBuilder.length() > 0) {
+        //     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageBuilder.toString());
+        //     }
+        // }
     }
 }

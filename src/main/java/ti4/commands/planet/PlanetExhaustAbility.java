@@ -15,7 +15,6 @@ import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
 import ti4.model.TechnologyModel;
@@ -49,17 +48,14 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
 
         String output = "blank";
         List<Button> buttons = new ArrayList<>();
-        List<Button> buttons2 = new ArrayList<>();
+        //List<Button> buttons2 = new ArrayList<>();
         switch (planet) {
             // Prophecy of Kings
             case "mallice", "hexmallice" -> {
                 int commCount = player.getCommodities();
-                if (commCount == 0)
-                {
+                if (commCount == 0) {
                     output = "Use buttons to gain 2 trade goods. You have no commodities, but you may pretend to convert them to trade goods if you wish to futilely exhaust Mallice.";
-                }
-                else
-                {
+                } else {
                     output = "Use buttons to gain 2 trade goods or to convert all " + commCount + " of your commodities to trade goods.";
                 }
                 buttons.add(Buttons.green("mallice_2_tg", "Gain 2 Trade Goods"));
@@ -94,11 +90,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
             }
             case "tarrock" -> {
-                    String riderName = "Tarrock Ability";
-                    List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
-                    List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                    MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), "Please select your target.", game, player, riderButtons);
-                    MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+                String riderName = "Tarrock Ability";
+                List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
+                //List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+                MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() + ", please select your target.", game, player, riderButtons);
+                //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
             case "prism" -> {
                 output = player.getFactionEmoji() + " choose a technology to return.";
@@ -138,6 +134,5 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
         }
         return buttons;
     }
-
 
 }

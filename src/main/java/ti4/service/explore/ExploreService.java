@@ -53,6 +53,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
@@ -61,13 +62,20 @@ import ti4.service.unit.AddUnitService;
 @UtilityClass
 public class ExploreService {
 
-    public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Game game, int numExplores,
-        boolean ownerShipOverride) {
+    public void explorePlanet(
+        GenericInteractionCreateEvent event, Tile tile,
+        String planetName, String drawColor, Player player,
+        boolean NRACheck, Game game, int numExplores, boolean ownerShipOverride
+    ) {
         if (!player.getPlanetsAllianceMode().contains(planetName) && !ownerShipOverride) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not control this planet, thus cannot explore it.");
             return;
         }
         game.setStoredValue(player.getFaction() + "planetsExplored", game.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
+
+        if (RiftSetModeService.willPlanetGetStellarConverted(planetName, player, game, event)) {
+            return;
+        }
 
         if (planetName.equalsIgnoreCase("garbozia")) {
             if (player.hasAbility("distant_suns")) {
@@ -269,8 +277,7 @@ public class ExploreService {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetID, String messageText,
-        Player player, Game game) {
+    public static void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetID, String messageText, Player player, Game game) {
         if (player == null) {
             MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
             return;
@@ -802,8 +809,8 @@ public class ExploreService {
                 message = "Card has been added to play area.\nAdded as a relic (not actually a relic)";
                 MessageHelper.sendMessageToEventChannel(event, message);
             }
-
         }
+        RiftSetModeService.resolveExplore(ogID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
@@ -838,7 +845,9 @@ public class ExploreService {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename) || force) {
-            if (space.getTokenList().contains(frontierFilename)) { space.removeToken(frontierFilename); }
+            if (space.getTokenList().contains(frontierFilename)) {
+                space.removeToken(frontierFilename);
+            }
             String cardID = game.drawExplore(Constants.FRONTIER);
             String messageText = player.getRepresentation() + (force ? " force" : "") + " explored the " + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
@@ -874,6 +883,9 @@ public class ExploreService {
     }
 
     public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide, boolean fullText) {
+        if (!RiftSetModeService.deckInfoAvailable(player, game)) {
+            return;
+        }
         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             List<String> deck = game.getExploreDeck(currentType);
@@ -886,12 +898,12 @@ public class ExploreService {
             Collections.sort(discard);
             Integer discardCount = discard.size();
 
-            info.append("__").append(currentType.substring(0,1).toUpperCase()).append(currentType.substring(1)).append(" exploration deck__ (")
-                .append(deckCount).append(" - ").append(formatPercent.format(deckDrawChance)).append(")\n");
+            info.append("__").append(currentType.substring(0, 1).toUpperCase()).append(currentType.substring(1));
+            info.append(" exploration deck__ (").append(deckCount).append(" - ").append(formatPercent.format(deckDrawChance)).append(")\n");
             info.append(listNames(deck, true, fullText, ExploreEmojis.getTraitEmoji(currentType).toString())).append("\n");
 
-            info.append("__").append(currentType.substring(0,1).toUpperCase()).append(currentType.substring(1)).append(" exploration discards__ (")
-                .append(discardCount).append(")\n");
+            info.append("__").append(currentType.substring(0, 1).toUpperCase()).append(currentType.substring(1));
+            info.append(" exploration discards__ (").append(discardCount).append(")\n");
             info.append(listNames(discard, false, fullText, ExploreEmojis.getTraitEmoji(currentType).toString()));
 
             if (types.indexOf(currentType) != types.size() - 1) {

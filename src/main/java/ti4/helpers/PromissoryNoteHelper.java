@@ -16,7 +16,6 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -284,14 +283,17 @@ public class PromissoryNoteHelper {
             if (game.playerHasLeaderUnlockedOrAlliance(owner, "xxchacommander")) {
                 MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
                     + ", due to a play of your _Political Secret_, you can't play action cards or use the abilities on your faction sheet."
-                    + " The bot doesn't enforce these restrictions, but you should abide by them."
-                    + " Because of Elder Qanoj, the Xxcha commander, you can still vote.");
+                    + " You have also been automatically passed on \"whens\" and \"afters\".");
             } else {
                 MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), owner.getRepresentationUnfogged()
                     + ", due to a play of your _Political Secret_, you will be unable to vote in agenda."
-                    + " You also can't play action cards or use the abilities on your faction sheet."
-                    + " The bot doesn't enforce these other restrictions, but you should abide by them.");
+                    + " You have also been automatically passed on \"whens\" and \"afters\".");
             }
+            game.setStoredValue("queuedWhens", game.getStoredValue("queuedWhens").replace(owner.getFaction()+"_",""));
+            game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens")+owner.getFaction()+"_");
+            game.setStoredValue("queuedAfters", game.getStoredValue("queuedAfters").replace(owner.getFaction()+"_",""));
+            game.setStoredValue("declinedAfters", game.getStoredValue("declinedAfters")+owner.getFaction()+"_");
+            game.setStoredValue("queuedAftersLockedFor"+owner.getFaction(),"Yes");
             game.setStoredValue("AssassinatedReps",
                 game.getStoredValue("AssassinatedReps") + owner.getFaction());
         }
@@ -380,10 +382,10 @@ public class PromissoryNoteHelper {
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-            MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(),
+            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),player.getRepresentation()+
                 "Please select your Rider target", game, player, riderButtons);
-            MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-                "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+            //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
+            //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
 
         }
         if ("dspnedyn".equalsIgnoreCase(id)) {
@@ -391,22 +393,22 @@ public class PromissoryNoteHelper {
             String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-            MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(),
+            //List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),player.getRepresentation()+
                 "Please select your Rider target", game, player, riderButtons);
-            MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-                "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+            //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
+            //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         }
         if ("dspnkyro".equalsIgnoreCase(id)) {
             String riderName = "Kyro Rider";
             String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
-            List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-            MessageHelper.sendMessageToChannelWithFactionReact(game.getMainGameChannel(),
+            //List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
+            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),player.getRepresentation()+
                 "Please select your Rider target", game, player, riderButtons);
-            MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
-                "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
+            //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
+            //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
         }
         if ("spynet".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerSpyNetOptions(player);

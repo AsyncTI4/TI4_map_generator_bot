@@ -12,7 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-class PurgePN extends GameStateSubcommand {
+public class PurgePN extends GameStateSubcommand {
 
     public PurgePN() {
         super(Constants.PURGE_PN, "Purge promissory note", true, true);
@@ -39,7 +39,7 @@ class PurgePN extends GameStateSubcommand {
         MessageHelper.sendMessageToEventChannel(event, "Promissory note purged.");
     }
 
-    private static void purgePromissoryFromHand(Game game, Player player, String pn) {
+    public static void purgePromissoryFromHand(Game game, Player player, String pn) {
         game.setPurgedPN(pn);
         player.removePromissoryNote(pn);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);

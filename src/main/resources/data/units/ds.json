@@ -145,7 +145,7 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "DEPLOY: After another player activates a system, you may spend 1 trade good or 1 commodity to place 1 mech on a planet in that system that contains 1 of your space docks.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/mechs/minuteman.png?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/mechs/minuteman.jpg?raw=true"
     },
     {
         "id": "celdauri_spacedock",
@@ -698,7 +698,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit makes a combat or ability roll, it rolls 1 additional die for each of your mechs in or adjacent to this system.",
+        "ability": "When this unit makes a combat or ability roll, it rolls 1 additional die for each mech in or adjacent to this system.",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/flagships/beg_bersha.png?raw=true"
     },
     {
@@ -1380,7 +1380,7 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "After a system is activated, you may have this unit become damaged to place or move the Wound token into this system.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/techs/voidflare_warden_2.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/voidflare_warden_2.jpg?raw=true"
     },
     {
         "id": "nokar_destroyer",
@@ -1488,7 +1488,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "You have not selected your policies yet. This mech's ability depends on your Policies.\nIf you have at least 2 ➕ Policies, and if this planet contains no more than 1 of your mechs, apply +1 to its influence value.\nIf you have at least 2 ➖ Policies, and if this planet contains no more than 1 of your mechs, apply +1 to its resource value."
+        "ability": "You have not selected your policies yet. This mech's ability depends on your Policies.\nIf you have at least 2 ➕ Policies, and if this planet contains no more than 1 of your mechs, apply +1 to its influence value.\nIf you have at least 2 ➖ Policies, and if this planet contains no more than 1 of your mechs, apply +1 to its resource value.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/mechs/exemplar_glitch.png?raw=true"
     },
     {
         "id": "olradin_mech_negative",

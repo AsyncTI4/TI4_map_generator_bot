@@ -28,6 +28,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.milty.DraftDisplayService;
+import ti4.service.milty.MiltyDraftManager;
 
 class Replace extends GameStateSubcommand {
 
@@ -164,15 +166,17 @@ class Replace extends GameStateSubcommand {
 
             //Update private threads
             if (oldMember != null) {
-                for (ThreadChannel thread : game.getMainGameChannel().getThreadChannels()) {
-                    if (thread.getThreadMember(oldMember) != null) {
-                        thread.removeThreadMember(oldMember).queue(success -> {
-                            thread.addThreadMember(newMember).queue(success2 -> {
-                                accessMessage(thread, newMember);
-                            });
+                game.getMainGameChannel().getThreadChannels().forEach(thread -> {
+                    updateThread(thread, oldMember, newMember);
+                });
+
+                game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().queue(archivedThreads -> {
+                    archivedThreads.forEach(thread -> {
+                        thread.getManager().setArchived(false).queue(success -> {
+                            updateThread(thread, oldMember, newMember);
                         });
-                    }
-                }
+                    });
+                });
             }
         }
 
@@ -185,7 +189,8 @@ class Replace extends GameStateSubcommand {
         game.getMiltyDraftManager().replacePlayer(oldPlayerUserId, replacedPlayer.getUserID());
 
         if (game.getMiltyDraftManager().getDraftIndex() < game.getMiltyDraftManager().getDraftOrder().size()) {
-            game.getMiltyDraftManager().repostDraftInformation(event, game);
+            MiltyDraftManager manager = game.getMiltyDraftManager();
+            DraftDisplayService.repostDraftInformation(event, manager, game);
         }
 
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: " + replacementUser.getName();
@@ -194,6 +199,19 @@ class Replace extends GameStateSubcommand {
         } else {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
+    }
+
+    private void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
+        thread.retrieveThreadMemberById(oldMember.getId()).queue(
+            oldThreadMember -> { 
+                thread.removeThreadMember(oldMember).queue(success -> {
+                    thread.addThreadMember(newMember).queue(success2 -> {
+                        accessMessage(thread, newMember);
+                    });
+                });
+            },
+            failure -> { /* Old member is not in the thread -> Do nothing */  }
+        );
     }
 
     private void accessMessage(MessageChannel channel, Member member) {

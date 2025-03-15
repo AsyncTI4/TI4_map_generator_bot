@@ -22,7 +22,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
-import ti4.model.TechnologyModel;
+import ti4.model.TechnologyModel.TechnologyType;
 
 @UtilityClass
 public class ListPlayerInfoService {
@@ -94,8 +94,7 @@ public class ListPlayerInfoService {
         };
     }
 
-    public static void displayerScoringProgression(Game game, boolean onlyThisGameObj,
-        MessageChannel channel, String stage1sOrTwos) {
+    public static void displayerScoringProgression(Game game, boolean onlyThisGameObj, MessageChannel channel, String stage1sOrTwos) {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
@@ -208,7 +207,7 @@ public class ListPlayerInfoService {
         switch (objID) {
             case "push_boundaries" -> {
                 int aboveN = 0;
-                for (Player p2 : player.getNeighbouringPlayers()) {
+                for (Player p2 : player.getNeighbouringPlayers(true)) {
                     int p1count = player.getPlanets().size();
                     int p2count = p2.getPlanets().size();
                     if (p1count > p2count) {
@@ -265,17 +264,10 @@ public class ListPlayerInfoService {
             }
             case "diversify", "master_science" -> {
                 int numAbove1 = 0;
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.WARFARE) > 1) {
-                    numAbove1++;
-                }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.PROPULSION) > 1) {
-                    numAbove1++;
-                }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.BIOTIC) > 1) {
-                    numAbove1++;
-                }
-                if (ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.CYBERNETIC) > 1) {
-                    numAbove1++;
+                for (TechnologyType type : TechnologyType.mainFour) {
+                    if (ButtonHelper.getNumberOfCertainTypeOfTech(player, type) >= 2) {
+                        numAbove1++;
+                    }
                 }
                 return numAbove1;
             }
@@ -542,10 +534,8 @@ public class ListPlayerInfoService {
             }
             case "mlp" -> {//4 techs of a color
                 int maxNum = 0;
-                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.WARFARE));
-                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.PROPULSION));
-                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.CYBERNETIC));
-                maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, TechnologyModel.TechnologyType.BIOTIC));
+                for (TechnologyType type : TechnologyType.mainFour)
+                    maxNum = Math.max(maxNum, ButtonHelper.getNumberOfCertainTypeOfTech(player, type));
                 return maxNum;
             }
             case "mp" -> {

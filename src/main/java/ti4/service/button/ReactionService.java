@@ -26,7 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @UtilityClass
 public class ReactionService {
 
-    private static final Pattern CARDS_PATTERN = Pattern.compile("Card\\s(.*?):");
+    private static final Pattern CARDS_PATTERN = Pattern.compile("card\\s(.*)");
 
     public static void addReaction(ButtonInteractionEvent event, Game game, Player player, boolean skipReaction, boolean sendPublic, String message, String additionalMessage) {
         if (event == null) return;
@@ -157,12 +157,17 @@ public class ReactionService {
 
     private static void handleAllPlayersReactingNoSabotage(Message message, Game game, GameMessageManager.GameMessage gameMessage) {
         Matcher acToReact = CARDS_PATTERN.matcher(message.getContentRaw());
-        String msg2 = "All players have indicated \"No Sabotage\"" + (acToReact.find() ? " to " + acToReact.group(1) : "") + ".";
-        if (!game.isFowMode() && gameMessage != null) {
+        String msg2 = "All players have indicated \"No Sabotage\"" + (acToReact.find() ? " to " + acToReact.group(1) : "");
+        if (gameMessage != null) {
             String factionToPing = gameMessage.factionsThatReacted().getFirst();
             Player playerToPing = game.getPlayerFromColorOrFaction(factionToPing);
             if (playerToPing != null) {
-                msg2 = playerToPing.getRepresentation() + ", a" + msg2.substring(1);
+                String msg3 = playerToPing.getRepresentation(true, true) + ", a" + msg2.substring(1);
+                if (game.isFowMode()) {
+                    MessageHelper.sendMessageToChannel(playerToPing.getPrivateChannel(), msg3);
+                } else {
+                    msg2 = msg3;
+                }
             }
         }
         message.reply(msg2).queueAfter(1, TimeUnit.SECONDS);

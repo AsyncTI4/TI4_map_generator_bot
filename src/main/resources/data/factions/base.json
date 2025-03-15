@@ -347,7 +347,8 @@
         "startingFleet": "2 cv,cr,3 inf q,2 inf t,sd q,pds t",
         "commodities": 3,
         "factionTech": ["exo2", "vpw"],
-        "startingTech": [],
+        "startingTechOptions": [],
+        "startingTechAmount": 0,
         "homePlanets": ["quinarra", "trenlak"],
         "abilities": ["unrelenting"],
         "leaders": ["sardakkagent", "sardakkcommander", "sardakkhero"],
@@ -494,6 +495,7 @@
             "pds",
             "spacedock"
         ],
+        "complexity": "Low",
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYinBrotherhood",

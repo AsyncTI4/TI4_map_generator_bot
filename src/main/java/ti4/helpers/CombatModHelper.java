@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -31,8 +32,13 @@ import ti4.service.emoji.CardEmojis;
 
 public class CombatModHelper {
 
-    public static Boolean IsModInScopeForUnits(List<UnitModel> units, CombatModifierModel modifier,
-        CombatRollType rollType, Game game, Player player) {
+    public static Boolean IsModInScopeForUnits(
+        List<UnitModel> units,
+        CombatModifierModel modifier,
+        CombatRollType rollType,
+        Game game,
+        Player player
+    ) {
         for (UnitModel unit : units) {
             if (modifier.isInScopeForUnit(unit, units, rollType, game, player)) {
                 return true;
@@ -41,16 +47,19 @@ public class CombatModHelper {
         return false;
     }
 
-    public static List<NamedCombatModifierModel> getModifiers(Player player, Player opponent,
+    public static List<NamedCombatModifierModel> getModifiers(
+        Player player,
+        Player opponent,
         Map<UnitModel, Integer> unitsByQuantity,
         TileModel tile,
         Game game,
         CombatRollType rollType,
-        String modifierType) {
+        String modifierType
+    ) {
         List<NamedCombatModifierModel> modifiers = new ArrayList<>();
         HashMap<String, CombatModifierModel> combatModifiers = new HashMap<>(Mapper.getCombatModifiers());
         combatModifiers = new HashMap<>(combatModifiers.entrySet().stream()
-            .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType.toString()))
+            .filter(entry -> entry.getValue().getForCombatAbility().equals(rollType))
             .filter(entry -> entry.getValue().getType().equals(modifierType))
             .filter(entry -> !entry.getValue().getApplyToOpponent())
             .filter(entry -> IsModInScopeForUnits(new ArrayList<>(unitsByQuantity.keySet()), entry.getValue(),
@@ -175,8 +184,17 @@ public class CombatModHelper {
         return new ArrayList<>(set);
     }
 
-    public static Integer getCombinedModifierForUnit(UnitModel unit, Integer numOfUnit, List<NamedCombatModifierModel> modifiers, Player player,
-        Player opponent, Game game, List<UnitModel> playerUnits, CombatRollType rollType, Tile tile) {
+    public static Integer getCombinedModifierForUnit(
+        UnitModel unit,
+        Integer numOfUnit,
+        List<NamedCombatModifierModel> modifiers,
+        Player player,
+        Player opponent,
+        Game game,
+        List<UnitModel> playerUnits,
+        CombatRollType rollType,
+        Tile tile
+    ) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
@@ -192,8 +210,14 @@ public class CombatModHelper {
         return modsValue;
     }
 
-    public static Boolean checkModPassesCondition(CombatModifierModel modifier, TileModel onTile, Player player,
-        Player opponent, Map<UnitModel, Integer> unitsByQuantity, Game game) {
+    public static Boolean checkModPassesCondition(
+        CombatModifierModel modifier,
+        TileModel onTile,
+        Player player,
+        Player opponent,
+        Map<UnitModel, Integer> unitsByQuantity,
+        Game game
+    ) {
         boolean meetsCondition = false;
 
         Tile tile = null;
@@ -266,8 +290,7 @@ public class CombatModHelper {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).getFirst();
                     meetsCondition = unitByQuantity.getValue() == 2
                         && !"fighter".equalsIgnoreCase(unitByQuantity.getKey().getBaseType());
-                }
-                else if (unitsByQuantity.size() == 2) {
+                } else if (unitsByQuantity.size() == 2) {
                     Entry<UnitModel, Integer> unitByQuantity = new ArrayList<>(unitsByQuantity.entrySet()).get(0);
                     Entry<UnitModel, Integer> unitByQuantity2 = new ArrayList<>(unitsByQuantity.entrySet()).get(1);
                     String baseType1 = unitByQuantity.getKey().getBaseType();
@@ -278,12 +301,11 @@ public class CombatModHelper {
                         } else {
                             meetsCondition = unitByQuantity2.getValue() == 2;
                         }
-                    } else if ((baseType1.equalsIgnoreCase("flagship") || baseType1.equalsIgnoreCase("lady")) 
+                    } else if ((baseType1.equalsIgnoreCase("flagship") || baseType1.equalsIgnoreCase("lady"))
                         && (baseType2.equalsIgnoreCase("flagship") || baseType2.equalsIgnoreCase("lady"))) {
                         meetsCondition = true;
                     }
-                }
-                else if (unitsByQuantity.size() == 3) {
+                } else if (unitsByQuantity.size() == 3) {
                     List<Entry<UnitModel, Integer>> entries = new ArrayList<>(unitsByQuantity.entrySet());
                     meetsCondition = entries.stream()
                         .limit(3)
@@ -357,19 +379,16 @@ public class CombatModHelper {
             }
             case "naazFS" -> {
                 if (ButtonHelper.doesPlayerHaveFSHere("naaz_flagship", player, game.getTileByPosition(game.getActiveSystem()))
-                        || ButtonHelper.doesPlayerHaveFSHere("sigma_naazrokha_flagship_2", player, game.getTileByPosition(game.getActiveSystem()))) {
+                    || ButtonHelper.doesPlayerHaveFSHere("sigma_naazrokha_flagship_2", player, game.getTileByPosition(game.getActiveSystem()))) {
                     meetsCondition = true;
                 }
             }
-            case "sigma_argent_flagship_1" ->
-            {
+            case "sigma_argent_flagship_1" -> {
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_1", player, game.getTileByPosition(game.getActiveSystem()));
             }
-            case "sigma_argent_flagship_2" ->
-            {
+            case "sigma_argent_flagship_2" -> {
                 meetsCondition = ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_2", player, tile);
-                for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false))
-                {
+                for (String adjPos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
                     meetsCondition |= ButtonHelper.doesPlayerHaveFSHere("sigma_argent_flagship_2", player, game.getTileByPosition(adjPos));
                 }
             }
@@ -378,8 +397,14 @@ public class CombatModHelper {
         return meetsCondition;
     }
 
-    public static Integer getVariableModValue(CombatModifierModel mod, Player player, Player opponent, Game game,
-        UnitModel origUnit, Tile activeSystem) {
+    public static Integer getVariableModValue(
+        CombatModifierModel mod,
+        Player player,
+        Player opponent,
+        Game game,
+        UnitModel origUnit,
+        Tile activeSystem
+    ) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
         long scalingCount = 0;
@@ -446,8 +471,19 @@ public class CombatModHelper {
                     for (String pos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
                         Tile tile = game.getTileByPosition(pos);
                         for (UnitHolder uH : tile.getUnitHolders().values()) {
-                            scalingCount += uH.getUnitCount(UnitType.Mech, player);
+                            for(Player p2 : game.getRealPlayers()){
+                                scalingCount += uH.getUnitCount(UnitType.Mech, p2);
+                            }
                         }
+                    }
+                }
+                case "adjacent_asteroid" -> {
+                    for (String pos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
+                        Tile tile = game.getTileByPosition(pos);
+                        if(tile.isAsteroidField()){
+                            scalingCount += 1;
+                        }
+                        
                     }
                 }
                 case "damaged_units_same_type" -> {

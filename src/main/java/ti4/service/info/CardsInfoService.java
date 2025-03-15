@@ -19,6 +19,7 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.RiftSetModeService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -38,8 +39,8 @@ public class CardsInfoService {
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player,
             "You may whisper to people from here by starting a message with `to[color]` or `to[faction]`."
-            + "\nYou may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`."
-            + "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.");
+                + "\nYou may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`."
+                + "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.");
 
     }
 
@@ -154,6 +155,12 @@ public class CardsInfoService {
             buttons.add(Buttons.red("revealTrapStep1", "Reveal a Trap"));
             buttons.add(Buttons.gray("removeTrapStep1", "Remove a Trap"));
         }
+        if (player.hasTech("absol_vw")) {
+            buttons.add(Buttons.gray("resolveExp_Look_frontier", "Top Of Frontier Deck", FactionEmojis.Empyrean));
+        }
+        if (game.getPhaseOfGame().toLowerCase().contains("agendawaiting")) {
+            buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On Whens"));
+        }
 
         if (player.hasAbility("divination") && !ButtonHelperAbilities.getAllOmenDie(game).isEmpty()) {
             StringBuilder omenDice = new StringBuilder();
@@ -193,6 +200,7 @@ public class CardsInfoService {
         buttons.add(Buttons.POST_NOTEPAD);
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
+        RiftSetModeService.addCapturedUnitsButton(buttons, game);
 
         String message = "You may use these buttons to do various things:";
 

@@ -25,7 +25,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
@@ -70,14 +71,22 @@ public class EndTurnService {
         }
     }
 
+    public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
+        pingNextPlayer(event, game, player);
+        CommanderUnlockCheckService.checkPlayer(player, "naaz");
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getRepresentationNoPing() + ".");
+        }
+    }
+
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer) {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
     public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         game.setStoredValue("lawsDisabled", "no");
-        game.setStoredValue("endTurnWhenSCFinished", "");
-        game.setStoredValue("fleetLogWhenSCFinished", "");
+        game.removeStoredValue("endTurnWhenSCFinished");
+        game.removeStoredValue("fleetLogWhenSCFinished");
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -110,8 +119,7 @@ public class EndTurnService {
         }
 
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
-            if (mainPlayer.getSecretsUnscored().containsKey("pe"))
-            {
+            if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
                 MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(),
                     "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
@@ -215,6 +223,11 @@ public class EndTurnService {
         }
         String messageText = "Please score objectives, " + game.getPing() + ".";
 
+        if (!game.isFowMode()) {
+            game.setStoredValue("newStatusScoringMode", "Yes");
+            messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
+        }
+
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         for (Player player : game.getRealPlayers()) {
@@ -228,7 +241,7 @@ public class EndTurnService {
         }
         Player vaden = Helper.getPlayerFromAbility(game, "binding_debts");
         if (vaden != null) {
-            for (Player p2 : vaden.getNeighbouringPlayers()) {
+            for (Player p2 : vaden.getNeighbouringPlayers(true)) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
                     String msg = p2.getRepresentationUnfogged() + " you have the opportunity to pay off **Binding Debts** here."
                         + " You may pay 1 trade good to get 2 debt tokens forgiven.";
@@ -244,6 +257,9 @@ public class EndTurnService {
         Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
+        if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
+            poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
+        }
         if (game.getActionCards().size() > 130 && game.getPlayerFromColorOrFaction("hacan") != null
             && !ButtonHelper.getButtonsToSwitchWithAllianceMembers(game.getPlayerFromColorOrFaction("hacan"), game, false).isEmpty()) {
             poButtons.add(Buttons.gray("getSwapButtons_", "Swap"));
@@ -258,8 +274,7 @@ public class EndTurnService {
             .addContent(messageText)
             .addComponents(actionRows).build();
 
-        gameChannel.sendMessage(messageObject).queue(message ->
-            GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_SCORING, game.getLastModifiedDate()));
+        gameChannel.sendMessage(messageObject).queue(message -> GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_SCORING, game.getLastModifiedDate()));
 
         int maxVP = 0;
         for (Player player : game.getRealPlayers()) {
@@ -328,7 +343,7 @@ public class EndTurnService {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                                 player.getRepresentation() + "Reminder this is __not__ the window to use _The Crown of Emphidia_."
-                                + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
+                                    + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
                         } else {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                                 player.getRepresentation() + "Reminder this is the window to use _The Crown of Emphidia_.");
@@ -353,8 +368,12 @@ public class EndTurnService {
             if (scorables.size() == 0) {
                 messageText = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
             } else {
-                messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objectives: ";
-                messageText += String.join(", ", scorables);
+                if (Helper.canPlayerScorePOs(game, player)) {
+                    messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objectives: ";
+                    messageText += String.join(", ", scorables);
+                } else {
+                    messageText = player.getRepresentation() + ", you cannot score public objectives because you do not control your home system.";
+                }
             }
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
 
@@ -407,34 +426,43 @@ public class EndTurnService {
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }
         }
-        Player arborec = Helper.getPlayerFromAbility(game, "mitosis");
-        if (arborec != null) {
-            String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
-            MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
-        }
-        Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");
-        if (veldyr != null) {
-            ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, game);
-        }
-        Player solPlayer = Helper.getPlayerFromUnit(game, "sol_flagship");
 
-        if (solPlayer == null) {
-            return;
-        }
-        String colorID = Mapper.getColorID(solPlayer.getColor());
-        Units.UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-        for (Tile tile : game.getTileMap().values()) {
-            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                if (unitHolder.getUnits() != null) {
-                    if (unitHolder.getUnitCount(Units.UnitType.Flagship, colorID) > 0) {
+        // Optional abilities
+        sendMitosisButtons(game);
+        sendHoldingCompanyButtons(game);
+
+        // Obligatory abilities
+        resolveSolFlagship(game);
+    }
+
+    private static void sendMitosisButtons(Game game) {
+        Player arborec = Helper.getPlayerFromAbility(game, "mitosis");
+        if (arborec == null) return;
+
+        String mitosisMessage = arborec.getRepresentationUnfogged() + ", a reminder to do **Mitosis**.";
+        MessageHelper.sendMessageToChannelWithButtons(arborec.getCardsInfoThread(), mitosisMessage, ButtonHelperAbilities.getMitosisOptions(game, arborec));
+    }
+
+    private static void sendHoldingCompanyButtons(Game game) {
+        Player veldyr = Helper.getPlayerFromAbility(game, "holding_company");
+        if (veldyr == null) return;
+
+        ButtonHelperFactionSpecific.offerHoldingCompanyButtons(veldyr, game);
+    }
+
+    private static void resolveSolFlagship(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            if (!player.hasUnit("sol_flagship")) continue;
+
+            String colorID = Mapper.getColorID(player.getColor());
+            UnitKey infKey = Mapper.getUnitKey("gf", colorID);
+            for (Tile tile : game.getTileMap().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder.getUnits() == null) continue;
+                    if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                         unitHolder.addUnit(infKey, 1);
-                        String genesisMessage = solPlayer.getRepresentationUnfogged()
-                            + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
-                        if (game.isFowMode()) {
-                            MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
-                        } else {
-                            MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
-                        }
+                        String genesisMessage = player.getRepresentationUnfogged() + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), genesisMessage);
                     }
                 }
             }

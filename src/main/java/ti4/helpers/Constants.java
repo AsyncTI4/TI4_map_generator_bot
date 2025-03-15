@@ -98,6 +98,7 @@ public class Constants {
     public static final String PROMISES_PROMISES = "promises_promises";
     public static final String FLAGSHIPPING = "flagshipping";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
+    public static final String UNCHARTED_SPACE_STUFF = "uncharted_space_stuff";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
@@ -493,6 +494,7 @@ public class Constants {
     public static final String GAME = "game";
     public static final String MAP = "map";
     public static final String INFO = "info";
+    public static final String SHUFFLE_EXPLORES = "shuffle_explores";
     public static final String CHANGE_TYPE = "change_type";
     public static final String START_FRANKEN_DRAFT = "start_franken_draft";
 
@@ -1198,6 +1200,7 @@ public class Constants {
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";
     public static final String SEARCH_USERS = "search_users";
+    public static final String EXTRA_SECRET_MODE = "extra_secret_mode";
     public static final String VOTC_MODE = "votc_mode";
     public static final String OPTIONS = "options";
     public static final String SHOW_FULL_TEXT = "show_full_text";

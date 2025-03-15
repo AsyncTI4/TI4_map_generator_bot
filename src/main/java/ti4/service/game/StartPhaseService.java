@@ -20,7 +20,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.migration.MigrationHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
@@ -48,6 +47,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.turn.EndTurnService;
@@ -212,21 +212,21 @@ public class StartPhaseService {
                 }
                 if (exhausted.size() >= 2) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
-                        ", because _New Constitution_ resolved \"Against\", " +
+                        ", because _New Constitution_ resolved \"For\", " +
                         String.join(", ", exhausted.subList(0, exhausted.size() - 1)) + " and "
                         + exhausted.getLast() + " have been exhausted.");
                 } else if (exhausted.size() == 1) {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
-                        ", because _New Constitution_ resolved \"Against\", "
+                        ", because _New Constitution_ resolved \"For\", "
                         + exhausted.getFirst() + " has been exhausted.");
                 } else {
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), player2.getRepresentation() +
-                        ", though _New Constitution_ resolved \"Against\"," +
+                        ", though _New Constitution_ resolved \"For\"," +
                         " you control no planets in your home system to exhaust.");
                 }
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "Exhausted all home system planets due _New Constitution_ resolving \"Against\".");
+                "Exhausted all home system planets due _New Constitution_ resolving \"For\".");
         }
         if (!game.getStoredValue("agendaArmsReduction").isEmpty()) {
             game.setStoredValue("agendaArmsReduction", "");
@@ -322,6 +322,7 @@ public class StartPhaseService {
         String message = speaker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(speaker);
         game.setPhaseOfGame("strategy");
+        FowCommunicationThreadService.checkAllCommThreads(game);
         String pickSCMsg = " Please use the buttons to pick a strategy card.";
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
             pickSCMsg = " Please use the buttons to pick the strategy card you wish to give to someone else.";
@@ -403,7 +404,7 @@ public class StartPhaseService {
 
         if (playersWithSCs > 0) {
             StatusCleanupService.runStatusCleanup(game);
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " **Status Cleanup Run!**");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "### " + game.getPing() + " **Status Cleanup Run!**");
             if (!game.isFowMode()) {
                 MapRenderPipeline.queue(game, event, DisplayType.map,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
@@ -488,7 +489,7 @@ public class StartPhaseService {
                 }
             }
         }
-        String message2 = "Resolve status homework using the buttons. \n ";
+        String message2 = "Resolve status homework using the buttons. \n";
         game.setCurrentACDrawStatusInfo("");
         Button draw1AC = Buttons.green("drawStatusACs", "Draw Status Phase Action Cards", CardEmojis.ActionCard);
         Button getCCs = Buttons.green("redistributeCCButtons", "Redistribute, Gain, & Confirm Command Tokens").withEmoji(Emoji.fromFormatted("🔺"));
@@ -496,6 +497,11 @@ public class StartPhaseService {
         for (Player player : game.getRealPlayers()) {
             if (ButtonHelper.isPlayerElected(game, player, "minister_policy") && player.hasAbility("scheming")) {
                 yssarilPolicy = Buttons.gray(player.getFinsFactionCheckerPrefix() + "yssarilMinisterOfPolicy", "Draw Minister of Policy Action Card", FactionEmojis.Yssaril);
+            }
+            if(ButtonHelper.isLawInPlay(game, "absol_minspolicy") && ButtonHelper.isPlayerElected(game, player, "absol_minspolicy")){
+                List<Button> absButtons = new ArrayList<>();
+                absButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix()+"cymiaeHeroStep1_"+(game.getRealPlayers().size()+1),"Resolve Absol Minister Of Policy"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +" please resolve Absol Minister Of Policy", absButtons);
             }
         }
         boolean custodiansTaken = game.isCustodiansScored();
@@ -506,7 +512,7 @@ public class StartPhaseService {
                 + "Please click the \"Ready For Agenda\" button once you are done resolving these or if you decline to do so.";
         } else {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
-            message2 += "This is the moment when you should resolve: \n-_ Political Stability_ \n- _Summit_ \n- _Manipulate Investments_\n"
+            message2 += "This is the moment when you should resolve: \n-_Political Stability_ \n- _Summit_ \n- _Manipulate Investments_\n"
                 + "Please click the \"Ready For Strategy Phase\" button once you are done resolving these or if you decline to do so.";
         }
         List<Button> buttons = new ArrayList<>();

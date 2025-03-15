@@ -65,18 +65,33 @@ class EliminatePlayer extends GameStateSubcommand {
 
     private void removeUser(SlashCommandInteractionEvent event, Game game, String playerId, StringBuilder stringBuilder) {
         OptionMapping option = event.getOption(playerId);
-        if (option == null) {return;}
+        if (option == null) {
+            return;
+        }
         User extraUser = option.getAsUser();
         Player player = game.getPlayer(extraUser.getId());
         Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
-        if (player == null || player.getColor() == null || player.getFaction() == null || "null".equalsIgnoreCase(player.getFaction()) ||
-                !player.isRealPlayer() || "".equalsIgnoreCase(player.getFaction())) {
+        if (player == null) return;
+        if (player.getColor() == null || player.getFaction() == null || "null".equalsIgnoreCase(player.getFaction()) ||
+            !player.isRealPlayer() || "".equalsIgnoreCase(player.getFaction())) {
             game.removePlayer(player.getUserID());
         } else {
             if (!player.getPlanetsAllianceMode().isEmpty()) {
                 String msg = "This player doesn't meet the elimination conditions. If you wish to replace a player, run `/game replace`. Ping a bothelper for assistance if you need it.";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 return;
+            }
+            if (game.getSpeakerUserID().equalsIgnoreCase(player.getUserID())) {
+                boolean foundSpeaker = false;
+                for (Player p4 : Helper.getSpeakerOrderFromThisPlayer(player,game)) {
+                    if (foundSpeaker) {
+                        game.setSpeakerUserID(p4.getUserID());
+                        break;
+                    }
+                    if (p4 == player) {
+                        foundSpeaker = true;
+                    }
+                }
             }
             // send back all the PNs of others that the player was holding
             Set<String> pns = new HashSet<>(player.getPromissoryNotes().keySet());

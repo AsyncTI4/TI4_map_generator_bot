@@ -1,15 +1,17 @@
 package ti4.service.tech;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.AliasHandler;
@@ -29,7 +31,6 @@ import ti4.helpers.Units;
 import ti4.helpers.ignis_aurora.IgnisAuroraHelperTechs;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
@@ -64,17 +65,17 @@ public class PlayerTechService {
 
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " removed technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void purgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.purgeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " purged technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " purged technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void refreshTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.refreshTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " readied technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
@@ -84,7 +85,19 @@ public class PlayerTechService {
             tech = "dskortg";
         }
         TechnologyModel techModel = Mapper.getTech(tech);
-        String exhaustMessage = player.getRepresentation() + " exhausted technology " + techModel.getRepresentation(false) + ".";
+        if(!player.getTechs().contains(tech)){
+            boolean hasSub = false;
+            for(String tech2 : player.getTechs()){
+                if(tech2.contains(tech)){
+                    hasSub = true;
+                }
+            }
+            if(!hasSub){
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +" does not have the tech known as "+techModel.getName());
+                return;
+            }
+        }
+        String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology " + techModel.getRepresentation(false) + ".";
         if (game.isShowFullComponentTextEmbeds()) {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
         } else {
@@ -176,24 +189,8 @@ public class PlayerTechService {
             case "absol_hm" -> { // MiltyMod Hyper Metabolism (Gain a CC)
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "gain_CCdeletethismessage", "Gain Command Tokens"));
-                if (player.getStrategicCC() > 0) {
-                    for (Leader leader : player.getLeaders()) {
-                        if (leader.isExhausted() && leader.getId().contains("agent")) {
-                            buttons.add(Buttons.blue(
-                                player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + leader.getId(),
-                                "Ready " + leader.getId()));
-                        }
-                    }
-                    for (String relic : player.getExhaustedRelics()) {
-                        if ("titanprototype".equalsIgnoreCase(relic) || "absol_jr".equalsIgnoreCase(relic)) {
-                            buttons.add(Buttons.blue(
-                                player.getFinsFactionCheckerPrefix() + "spendStratNReadyAgent_" + relic,
-                                "Ready JR-SX455-O"));
-                        }
-                    }
-                }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getFactionEmojiOrColor()
-                    + " use button to gain 1 command token, or spend 1 command token from your strategy pool to ready your agent.", buttons);
+                    + " use button to gain 1 command token.", buttons);
             }
             case "aida", "sar", "htp", "absol_aida" -> {
                 if (event instanceof ButtonInteractionEvent buttonEvent) {
@@ -380,10 +377,18 @@ public class PlayerTechService {
 
     public static void getTech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String ident = player.getRepresentationNoPing();
+        boolean isResearch = !buttonID.contains("__comp");
+        boolean isStrat = !buttonID.contains("__comp");
         boolean paymentRequired = !buttonID.contains("__noPay");
-        final String[] buttonIDComponents = buttonID.split("__");
-        buttonID = buttonIDComponents[0];
-        final String paymentType = buttonIDComponents.length > 1 ? buttonIDComponents[1] : "res";
+
+        List<String> buttonIDComponents = Arrays.asList(buttonID.split("__"));
+        buttonID = buttonIDComponents.getFirst();
+        String paymentType = buttonIDComponents.size() > 1 ? buttonIDComponents.get(1) : "res";
+
+        if (buttonIDComponents.contains("comp")) {
+            isResearch = false;
+            isStrat = false;
+        }
 
         String techID = StringUtils.substringAfter(buttonID, "getTech_");
         techID = AliasHandler.resolveTech(techID);
@@ -458,7 +463,9 @@ public class PlayerTechService {
                 buttons);
         }
 
-        ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
+        if (isResearch) {
+            ButtonHelperFactionSpecific.resolveResearchAgreementCheck(player, techID, game);
+        }
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
         if ("iihq".equalsIgnoreCase(techID)) {
             message.append("\n Automatically added the Custodia Vigilia planet");
@@ -490,7 +497,7 @@ public class PlayerTechService {
         }
         CommanderUnlockCheckService.checkPlayer(player, "jolnar", "nekro", "mirveda", "dihmohn");
 
-        if (game.isComponentAction() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
+        if (!isStrat || game.isComponentAction() || !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         } else {
             ButtonHelper.sendMessageToRightStratThread(player, game, message.toString(), "technology");
@@ -523,7 +530,7 @@ public class PlayerTechService {
         String trueIdentity = player.getRepresentationUnfogged();
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
         String payType = payWith != null ? payWith : "res";
-        if (!payType.equals("res") && !payType.equals("inf")) {
+        if (!payType.equals("res") && !payType.equals("inf") && !payType.equals("tgsonly")) {
             payType = "res";
         }
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, payType + "tech");

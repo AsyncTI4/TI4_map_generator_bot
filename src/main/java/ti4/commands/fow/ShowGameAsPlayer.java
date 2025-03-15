@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.service.ShowGameService;
-import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
+import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 
 class ShowGameAsPlayer extends GameStateSubcommand {
 
@@ -17,6 +17,6 @@ class ShowGameAsPlayer extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        ShowGameService.simpleShowGame(getGame(), new UserOverridenSlashCommandInteractionEvent(event, getPlayer().getUser()));
+        ShowGameService.simpleShowGame(getGame(), new UserOverridenGenericInteractionCreateEvent(event, getPlayer().getUser()));
     }
 }

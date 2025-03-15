@@ -18,9 +18,15 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -34,10 +40,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
@@ -515,7 +517,7 @@ public class Player {
     @JsonIgnore
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2") || getTechs().contains("hcf2") || getTechs().contains("dsflorff")
-            || getTechs().contains("dslizhff") || getTechs().contains("absol_ff2") || ownsUnit("florzen_fighter");
+            || getTechs().contains("dslizhff") || getTechs().contains("absol_ff2") || getTechs().contains("absol_hcf2") || ownsUnit("florzen_fighter");
     }
 
     @JsonIgnore
@@ -564,7 +566,7 @@ public class Player {
         if (game.isFowMode() || game.isCommunityMode()) {
             actionsChannel = (TextChannel) getPrivateChannel();
 
-            if (isGM()) {
+            if (!isRealPlayer() && isGM()) {
                 List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
                 actionsChannel = channels.isEmpty() ? null : channels.getFirst();
             }
@@ -1442,7 +1444,7 @@ public class Player {
         if (game != null && game.isCommunityMode()) {
             Role roleForCommunity = getRoleForCommunity();
             if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
-                StringBuilder sb = new StringBuilder(getFactionEmoji());
+                StringBuilder sb = new StringBuilder((noFactionIcon ? "" : getFactionEmoji()));
                 for (String userID : getTeamMateIDs()) {
                     User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
                     if (userById == null) {
@@ -1458,14 +1460,14 @@ public class Player {
                 return sb.toString();
             } else if (roleForCommunity != null) {
                 if (ping) {
-                    return getFactionEmoji() + " " + roleForCommunity.getAsMention() + " "
+                    return (noFactionIcon ? "" : getFactionEmoji() + " ") + roleForCommunity.getAsMention() + " "
                         + ColorEmojis.getColorEmojiWithName(getColor());
                 } else {
-                    return getFactionEmoji() + " " + roleForCommunity.getName() + " "
+                    return (noFactionIcon ? "" : getFactionEmoji() + " ") + roleForCommunity.getName() + " "
                         + ColorEmojis.getColorEmojiWithName(getColor());
                 }
             } else {
-                return getFactionEmoji() + " " + ColorEmojis.getColorEmojiWithName(getColor());
+                return (noFactionIcon ? "" : getFactionEmoji() + " ") + ColorEmojis.getColorEmojiWithName(getColor());
             }
         }
 
@@ -1587,6 +1589,7 @@ public class Player {
 
     public void initLeaders() {
         leaders.clear();
+        if (game != null && game.isBaseGameMode()) return;
         for (String leaderID : getFactionStartingLeaders()) {
             Leader leader = new Leader(leaderID);
             leaders.add(leader);
@@ -1938,14 +1941,9 @@ public class Player {
                 }
                 game.setStoredValue("endTurnWhenSCFinished", "");
                 Player p2 = game.getActivePlayer();
-                EndTurnService.pingNextPlayer(event, game, p2);
-                if (!game.isFowMode()) {
-                    ButtonHelper.updateMap(game, event, "End of Turn " + p2.getInRoundTurnCount() + ", Round "
-                        + game.getRound() + " for " + p2.getRepresentationNoPing() + ".");
-                }
+                EndTurnService.endTurnAndUpdateMap(event, game, p2);
             }
-            if (game.getStoredValue("fleetLogWhenSCFinished")
-                .equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
+            if (game.getStoredValue("fleetLogWhenSCFinished").equalsIgnoreCase(sc + game.getActivePlayer().getFaction())) {
                 for (Player p2 : game.getRealPlayers()) {
                     if (!p2.hasFollowedSC(sc)) {
                         return;
@@ -2089,6 +2087,11 @@ public class Player {
 
     public DraftBag getDraftQueue() {
         return draftItemQueue;
+    }
+
+    @JsonIgnore
+    public boolean hasIIHQ() {
+        return hasTech("iihq");
     }
 
     public boolean hasTech(String techID) {
@@ -2277,7 +2280,7 @@ public class Player {
         }
 
         // Add Custodia Vigilia when researching IIHQ
-        if ("iihq".equalsIgnoreCase(techID)) {
+        if (techID != null && techID.toLowerCase().contains("iihq")) {
             addPlanet("custodiavigilia");
             exhaustPlanet("custodiavigilia");
 
@@ -2315,7 +2318,7 @@ public class Player {
     // Provided because people make mistakes, also nekro exists, also weird homebrew exists
     private void doAdditionalThingsWhenRemovingTech(String techID) {
         // Remove Custodia Vigilia when un-researching IIHQ
-        if ("iihq".equalsIgnoreCase(techID)) {
+        if (techID != null && techID.toLowerCase().contains("iihq")) {
             removePlanet("custodiavigilia");
             if (getPlanets().contains(Constants.MR)) {
                 Planet mecatolRex = getGame().getPlanetsInfo().get(Constants.MR);
@@ -2740,8 +2743,9 @@ public class Player {
         return false;
     }
 
+    
     @JsonIgnore
-    public Set<Player> getNeighbouringPlayers() {
+    public Set<Player> getNeighbouringPlayers(boolean checkEquiv) {
         Game game = getGame();
         Set<Player> adjacentPlayers = new HashSet<>();
         Set<Player> realPlayers = new HashSet<>(
@@ -2760,16 +2764,23 @@ public class Player {
                 break;
         }
         adjacentPlayers.remove(this);
+        if(checkEquiv){
+            for(Player p2 : realPlayers){
+                if(!adjacentPlayers.contains(p2) && p2.getNeighbouringPlayers(false).contains(this)){
+                    adjacentPlayers.add(p2);
+                }
+            }
+        }
         return adjacentPlayers;
     }
 
     public boolean isNeighboursWith(Player player) {
-        return getNeighbouringPlayers().contains(player);
+        return getNeighbouringPlayers(true).contains(player);
     }
 
     @JsonIgnore
     public int getNeighbourCount() {
-        return getNeighbouringPlayers().size();
+        return getNeighbouringPlayers(true).size();
     }
 
     public UnitModel getUnitFromUnitKey(UnitKey unit) {

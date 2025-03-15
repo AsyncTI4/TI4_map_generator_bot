@@ -1,12 +1,16 @@
 package ti4.buttons;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
+import ti4.helpers.WebHelper;
+import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -42,6 +46,12 @@ public class Buttons {
 
     public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
+    //Map buttons
+    public static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
+    public static final Button SHOW_DECKS = blue("offerDeckButtons", "Show Decks");
+    public static final Button REFRESH_MAP = gray("showGameAgain", "Refresh Map");
+    public static final Button PLAYER_INFO = green("gameInfoButtons", "Player Info");
+
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
         REFRESH_AC_INFO,
         REFRESH_PN_INFO,
@@ -53,6 +63,20 @@ public class Buttons {
         REFRESH_TECH_INFO,
         REFRESH_PLANET_INFO,
         FACTION_EMBED);
+
+    public static List<Button> mapImageButtons(Game game) {
+        List<Button> buttonsWeb = new ArrayList<>();
+        if (game != null && !game.isFowMode()) {
+            if (WebHelper.sendingToWeb()) {
+                buttonsWeb.add(Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View"));
+            }
+            buttonsWeb.add(PLAYER_INFO);
+        }
+        buttonsWeb.add(REFRESH_CARDS_INFO);
+        buttonsWeb.add(SHOW_DECKS);
+        buttonsWeb.add(REFRESH_MAP);
+        return buttonsWeb;
+    }
 
     /** A blue button (primary style) */
     public static Button blue(String buttonID, String buttonLabel) {

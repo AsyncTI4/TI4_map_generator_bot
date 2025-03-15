@@ -58,6 +58,9 @@ public class SecretObjectiveHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
+            if(!game.getPhaseOfGame().equalsIgnoreCase("action") && Mapper.getSecretObjective(entry.getKey()) != null){
+                game.setStoredValue(player.getFaction() + "round"+game.getRound()+"SO", Mapper.getSecretObjective(entry.getKey()).getName());
+            }
             if (entry.getKey().equalsIgnoreCase("dhw")) { // destroy heretical works
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
                     List<String> playerFragments = player.getFragments();
