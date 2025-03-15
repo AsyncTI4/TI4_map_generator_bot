@@ -22,24 +22,22 @@ import ti4.service.emoji.TI4Emoji;
 public class HomebrewService {
   
     public enum Homebrew {
-        HB_444("444", "4/4/4", "4 secrets, 4 stage 1s, 4 stage 2s, 12 VP", null),
-        HB_456("456", "4/5/6", "4 Secrets, 5 stage 1s, 6 stage2 (revealed 2 at a time), 14 VP", null),
-        HB_ABSOL_RELICS_AGENDAS("absolRelicsNAgendas", "Absol Relics/Agendas", "Use Absol Relics and Agendas", SourceEmojis.Absol),
-        HB_ABSOL_TECHS_MECHS("absolTechsNMechs", "Absol Techs/Mechs", "Use Absol Techs and Mechs", SourceEmojis.Absol),
-        HB_DSFACTIONS("dsfactions", "DS Factions", "Discordant Stars Factions", SourceEmojis.DiscordantStars),
-        HB_DSEXPLORES("dsexplores", "US Explores/Relics/ACs", "Uncharted Space Explores, Relics and Action Cards", SourceEmojis.UnchartedSpace),
-        HB_ACDECK2("acDeck2", "AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2),
-        HB_REDTAPE("redTape", "Red Tape", "Red Tape mode", null),
-        HB_REMOVESFTT("removeSupports", "No Supports", "Remove Support for the Thrones", null),
-        HB_HBSC("homebrewSCs", "Homebrew SCs", "Indicate game uses homebrew Strategy Cards", CardEmojis.SCBackBlank);
+        HB444("4/4/4", "4 secrets, 4 stage 1s, 4 stage 2s, 12 VP", null),
+        HB456("4/5/6", "4 Secrets, 5 stage 1s, 6 stage2 (revealed 2 at a time), 14 VP", null),
+        HBABSOLRELICSAGENDAS("Absol Relics/Agendas", "Use Absol Relics and Agendas", SourceEmojis.Absol),
+        HBABSOLTECHSMECHS("Absol Techs/Mechs", "Use Absol Techs and Mechs", SourceEmojis.Absol),
+        HBDSFACTIONS("DS Factions", "Discordant Stars Factions", SourceEmojis.DiscordantStars),
+        HBDSEXPLORES("US Explores/Relics/ACs", "Uncharted Space Explores, Relics and Action Cards", SourceEmojis.UnchartedSpace),
+        HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2),
+        HBREDTAPE("Red Tape", "Red Tape mode", null),
+        HBREMOVESFTT("No Supports", "Remove Support for the Thrones", null),
+        HBHBSC("Homebrew SCs", "Indicate game uses homebrew Strategy Cards", CardEmojis.SCBackBlank);
 
-        final String id;
         final String name;
         final String description;
         final TI4Emoji emoji;
 
-        Homebrew(String id, String name, String description, TI4Emoji emoji) {
-            this.id = id;
+        Homebrew(String name, String description, TI4Emoji emoji) {
             this.name = name;
             this.description = description;
             this.emoji = emoji;
@@ -62,7 +60,7 @@ public class HomebrewService {
         StringBuffer sb = new StringBuffer("### Choose the homebrew you'd like in the game\n");
         for (Homebrew hb : Homebrew.values()) {
             sb.append("**").append(hb.name).append("**: ").append(hb.description).append("\n");
-            buttons.add(Buttons.green("setupHomebrew_" + hb.id, hb.name));
+            buttons.add(Buttons.green("setupHomebrew_" + hb, hb.name));
         }
         buttons.add(Buttons.red("setupHomebrewNone", "Remove All Homebrews"));
         buttons.add(Buttons.DONE_DELETE_BUTTONS);
@@ -87,16 +85,16 @@ public class HomebrewService {
         ButtonHelper.deleteTheOneButton(event);
         game.setHomebrew(true);
 
-        String type = buttonID.split("_")[1];
+        Homebrew type = Homebrew.valueOf(buttonID.split("_")[1]);
         switch (type) {
-            case "444" -> {
+            case HB444 -> {
                 game.setMaxSOCountPerPlayer(4);
                 game.setUpPeakableObjectives(4, 1);
                 game.setUpPeakableObjectives(4, 2);
                 game.setVp(12);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/4/4.");
             }
-            case "456" -> {
+            case HB456 -> {
                 game.setMaxSOCountPerPlayer(4);
                 game.setUpPeakableObjectives(5, 1);
                 game.setUpPeakableObjectives(6, 2);
@@ -104,14 +102,14 @@ public class HomebrewService {
                 game.setStoredValue("homebrewMode", "456");
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/5/6/14VP.");
             }
-            case "removeSupports" -> {
+            case HBREMOVESFTT -> {
                 for (Player p2 : game.getRealPlayers()) {
                     p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
                     p2.removePromissoryNote(p2.getColor() + "_sftt");
                 }
                 game.setStoredValue("removeSupports", "true");
             }
-            case "absolRelicsNAgendas" -> {
+            case HBABSOLRELICSAGENDAS -> {
                 game.setAbsolMode(true);
                 game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
                 if (game.isDiscordantStarsMode() && game.getRelicDeckID().contains("ds")) {
@@ -122,7 +120,7 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Set the relics and agendas to Absol stuff");
             }
-            case "absolTechsNMechs" -> {
+            case HBABSOLTECHSMECHS -> {
                 game.setAbsolMode(true);
                 if (game.isDiscordantStarsMode()) {
                     game.setTechnologyDeckID("techs_ds_absol");
@@ -133,7 +131,7 @@ public class HomebrewService {
                 game.swapInVariantTechs();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the techs & mechs to Absol stuff.");
             }
-            case "dsexplores" -> {
+            case HBDSEXPLORES -> {
                 game.setDiscordantStarsMode(true);
                 game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
@@ -153,12 +151,12 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Set the explores/action cards/relics to Discordant Stars stuff.");
             }
-            case "acDeck2" -> {
+            case HBACDECK2 -> {
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_deck_2"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Set the action card deck to Action Card Deck 2.");
             }
-            case "dsfactions" -> {
+            case HBDSFACTIONS -> {
                 game.setDiscordantStarsMode(true);
                 if (game.getTechnologyDeckID().contains("absol")) {
                     game.setTechnologyDeckID("techs_ds_absol");
@@ -168,12 +166,12 @@ public class HomebrewService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Set game to Discordant Stars mode. Only includes factions and planets unless you also click/clicked the Discordant Stars Explores button.");
             }
-            case "homebrewSCs" -> {
+            case HBHBSC -> {
                 game.setHomebrewSCMode(true);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Set game to homebrew strategy card mode.");
             }
-            case "redTape" -> {
+            case HBREDTAPE -> {
                 game.setRedTapeMode(true);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to red tape mode.");
             }
