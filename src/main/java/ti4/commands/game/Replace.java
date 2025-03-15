@@ -172,9 +172,7 @@ class Replace extends GameStateSubcommand {
 
                 game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().queue(archivedThreads -> {
                     archivedThreads.forEach(thread -> {
-                        thread.getManager().setArchived(false).queue(success -> {
-                            updateThread(thread, oldMember, newMember);
-                        });
+                        updateThread(thread, oldMember, newMember);
                     });
                 });
             }
@@ -204,9 +202,11 @@ class Replace extends GameStateSubcommand {
     private void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
         thread.retrieveThreadMemberById(oldMember.getId()).queue(
             oldThreadMember -> { 
-                thread.removeThreadMember(oldMember).queue(success -> {
-                    thread.addThreadMember(newMember).queue(success2 -> {
-                        accessMessage(thread, newMember);
+                thread.getManager().setArchived(false).queue(success -> {
+                    thread.removeThreadMember(oldMember).queue(success2 -> {
+                        thread.addThreadMember(newMember).queue(success3 -> {
+                            accessMessage(thread, newMember);
+                        });
                     });
                 });
             },
