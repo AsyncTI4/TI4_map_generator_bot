@@ -227,7 +227,7 @@ public class CreateGameService {
         String botGetStartedMessage = game.getPing() + " - bot/map channel\n" +
             "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n" +
             "### __Use the following commands to get started:__\n" +
-            "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
+            "> `/map add_tile_list` and insert your TTPG map string\n" +
             "> `/player setup` to set player faction and color\n" +
             "> `/game setup` to set player count and additional options\n" +
             "> `/game set_order` to set the starting speaker order if you're using a weird map\n" +
