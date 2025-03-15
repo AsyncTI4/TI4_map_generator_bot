@@ -11,7 +11,7 @@ import ti4.service.info.TechInfoService;
 @UtilityClass
 class TechInfoButtonHandler {
 
-    @ButtonHandler(Constants.REFRESH_TECH_INFO)
+    @ButtonHandler(value = Constants.REFRESH_TECH_INFO, save = false)
     public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         TechInfoService.sendTechInfo(game, player, event);
     }

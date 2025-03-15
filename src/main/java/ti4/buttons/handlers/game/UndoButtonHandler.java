@@ -24,7 +24,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 class UndoButtonHandler {
 
-    @ButtonHandler("ultimateUndo_")
+    @ButtonHandler(value = "ultimateUndo_", save = false)
     public static void ultimateUndo_(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!game.getSavedButtons().isEmpty()) {
             String buttonString = game.getSavedButtons().getFirst();

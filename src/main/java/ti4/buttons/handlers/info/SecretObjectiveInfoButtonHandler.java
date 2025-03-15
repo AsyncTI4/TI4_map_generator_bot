@@ -10,7 +10,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 @UtilityClass
 class SecretObjectiveInfoButtonHandler {
 
-    @ButtonHandler("refreshSOInfo")
+    @ButtonHandler(value = "refreshSOInfo", save = false)
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
     }

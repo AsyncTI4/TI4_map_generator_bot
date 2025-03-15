@@ -47,15 +47,7 @@ public class ButtonContext extends ListenerContext {
 
     @Override
     public void save() {
-        boolean skip = componentID.contains("ultimateUndo") ||
-            "showGameAgain".equalsIgnoreCase(componentID) ||
-            "cardsInfo".equalsIgnoreCase(componentID) ||
-            componentID.contains("showDeck") ||
-            componentID.contains("FactionInfo") ||
-            componentID.contains("searchMyGames") ||
-            componentID.contains("decline_explore") ||
-            componentID.contains("offerDeckButtons");
-        if (skip) {
+        if (!shouldSave) {
             return;
         }
         if (game != null) {

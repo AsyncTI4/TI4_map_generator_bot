@@ -50,7 +50,7 @@ class GameOptionButtonHandler {
         event.editButton(GameOptionService.showOwnedPNs_OFF).queue();
     }
 
-    @ButtonHandler("anonDeclare_")
+    @ButtonHandler(value = "anonDeclare_", save = false)
     public static void handleEnvironmentChoice(ButtonInteractionEvent event, String buttonId, Game game, Player player) {
         String declaration = buttonId.split("_")[1];
         String old = game.getStoredValue(player.getUserID() + "anonDeclare");

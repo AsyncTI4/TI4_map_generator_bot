@@ -11,7 +11,7 @@ import ti4.service.info.RelicInfoService;
 @UtilityClass
 class RelicInfoButtonHandler {
 
-    @ButtonHandler(Constants.REFRESH_RELIC_INFO)
+    @ButtonHandler(value = Constants.REFRESH_RELIC_INFO, save = false)
     public static void sendRelicInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         RelicInfoService.sendRelicInfo(game, player, event);
     }

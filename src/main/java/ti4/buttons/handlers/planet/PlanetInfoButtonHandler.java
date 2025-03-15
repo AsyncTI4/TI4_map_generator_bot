@@ -9,7 +9,7 @@ import ti4.service.planet.PlanetInfoService;
 @UtilityClass
 class PlanetInfoButtonHandler {
 
-    @ButtonHandler(Constants.REFRESH_PLANET_INFO)
+    @ButtonHandler(value = Constants.REFRESH_PLANET_INFO, save = false)
     public static void sendPlanetInfo(Player player) {
         PlanetInfoService.sendPlanetInfo(player);
     }

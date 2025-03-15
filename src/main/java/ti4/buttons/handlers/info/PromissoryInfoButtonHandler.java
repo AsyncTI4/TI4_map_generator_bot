@@ -9,7 +9,7 @@ import ti4.map.Player;
 @UtilityClass
 class PromissoryInfoButtonHandler {
 
-    @ButtonHandler("refreshPNInfo")
+    @ButtonHandler(value = "refreshPNInfo", save = false)
     public static void sendPromissoryNoteInfoLongForm(Game game, Player player) {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, true);
     }

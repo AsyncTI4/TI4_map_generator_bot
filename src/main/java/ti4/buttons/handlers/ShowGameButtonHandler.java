@@ -13,22 +13,22 @@ import ti4.service.ShowGameService;
 @UtilityClass
 class ShowGameButtonHandler {
 
-    @ButtonHandler("showGameAgain")
+    @ButtonHandler(value = "showGameAgain", save = false)
     public static void simpleShowGame(Game game, GenericInteractionCreateEvent event) {
         ShowGameService.simpleShowGame(game, event);
     }
 
-    @ButtonHandler("showGameEphemeral")
+    @ButtonHandler(value = "showGameEphemeral", save = false)
     public static void simpleEphemeralShowGame(Game game, ButtonInteractionEvent event) {
         ShowGameService.simpleEphemeralShowGame(game, event);
     }
 
-    @ButtonHandler("showMap")
+    @ButtonHandler(value = "showMap", save = false)
     public static void showMap(Game game, ButtonInteractionEvent event) {
         MapRenderPipeline.queue(game, event, DisplayType.map, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
-    @ButtonHandler("showPlayerAreas")
+    @ButtonHandler(value = "showPlayerAreas", save = false)
     public static void showPlayArea(Game game, ButtonInteractionEvent event) {
         MapRenderPipeline.queue(game, event, DisplayType.stats, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
