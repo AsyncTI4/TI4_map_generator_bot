@@ -101,20 +101,7 @@ public class PickStrategyCardService {
                 game.setScTradeGood(sc, 0);
             }
 
-            Player nextPlayer = null;
-            int lowestSC = 100;
-            for (Player player_ : activePlayers) {
-                int playersLowestSC = player_.getLowestSC();
-                String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
-                if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                    nextPlayer = player_; //no further processing, this player has the 0 token
-                    break;
-                }
-                if (playersLowestSC < lowestSC) {
-                    lowestSC = playersLowestSC;
-                    nextPlayer = player_;
-                }
-            }
+            Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {

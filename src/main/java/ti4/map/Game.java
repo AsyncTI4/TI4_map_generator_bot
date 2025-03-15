@@ -775,7 +775,6 @@ public class Game extends GameProperties {
                 orderedSCs.add(sc);
             }
         }
-
         return orderedSCs;
     }
 
@@ -796,12 +795,10 @@ public class Game extends GameProperties {
     }
 
     public List<Player> getActionPhaseTurnOrder() {
-        return players.values().stream()
+        return new ArrayList<>(players.values().stream()
             .filter(player -> !player.getSCs().isEmpty())
-            .map(player -> new ImmutablePair<>(player, Collections.min(player.getSCs())))
-            .sorted((p1, p2) -> p1.getLeft().hasTheZeroToken() ? -1 : p2.getLeft().hasTheZeroToken() ? 1 : Integer.compare(p1.getRight(), p2.getRight()))
-            .map(ImmutablePair::getLeft)
-            .toList();
+            .sorted(Player.comparingInitiative())
+            .toList());
     }
 
     public int getRingCount() {
@@ -3779,12 +3776,6 @@ public class Game extends GameProperties {
     @JsonIgnore
     public int getFrontierExploreFullDeckSize() {
         return getExploreDeckFullSize(Constants.FRONTIER);
-    }
-
-    public int getPlayersTurnSCInitiative(Player player) {
-        if (player.hasTheZeroToken())
-            return 0;
-        return player.getLowestSC();
     }
 
     @JsonIgnore

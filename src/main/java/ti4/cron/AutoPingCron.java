@@ -80,8 +80,7 @@ public class AutoPingCron {
         " You ever read Malazan? You should check it out, since, you know, you have all this free time from not playing async.",
         " When people talk about a slow burn, I think they were expecting around 4 pings in between turns, not 40.",
         " ||Can I do spoiler tag pings? Guess you'll never know.||",
-        " They say money can't buy happiness, but I hear that trade goods may buy a war sun, which is basically the same thing."
-    );
+        " They say money can't buy happiness, but I hear that trade goods may buy a war sun, which is basically the same thing.");
 
     public static void register() {
         CronManager.schedulePeriodically(AutoPingCron.class, AutoPingCron::autoPingGames, 5, 10, TimeUnit.MINUTES);
@@ -124,11 +123,11 @@ public class AutoPingCron {
             agendaPhasePing(game, milliSinceLastPing);
             return;
         }
-        if("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())){
+        if ("statusScoring".equalsIgnoreCase(game.getPhaseOfGame())) {
             scoringPhasePing(game, milliSinceLastPing);
             return;
         }
-        if("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())){
+        if ("statusHomework".equalsIgnoreCase(game.getPhaseOfGame())) {
             statusHomeworkPing(game, milliSinceLastPing);
             return;
         }
@@ -198,7 +197,7 @@ public class AutoPingCron {
             buttons.add(Buttons.red("temporaryPingDisable", "Disable Pings For Turn"));
             buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + " if the game is not waiting on you, you may disable the" +
-                    " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
+                " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                 buttons);
         }
     }
@@ -221,45 +220,46 @@ public class AutoPingCron {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
             StringBuilder poMsg = new StringBuilder();
             StringBuilder soMsg = new StringBuilder();
-            for(Player player : ti4.helpers.Helper.getInitativeOrder(game)){
-                String po = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"PO");
-                String so = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"SO");
-                if(po.isEmpty()){
-                    if(game.isFowMode()){
+            for (Player player : game.getActionPhaseTurnOrder()) {
+                String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
+                String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+                if (po.isEmpty()) {
+                    if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a public objective");
                     }
                     poMsg.append(player.getRepresentation()).append(" ");
                 }
-                if(so.isEmpty()){
-                    if(game.isFowMode()){
+                if (so.isEmpty()) {
+                    if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a secret objective");
                     }
                     soMsg.append(player.getRepresentation()).append(" ");
                 }
             }
-            if(!game.isFowMode()&& (poMsg.length() > 0)){
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(),poMsg+ "please indicate if you are scoring a public objective");
+            if (!game.isFowMode() && (poMsg.length() > 0)) {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), poMsg + "please indicate if you are scoring a public objective");
             }
-            if(!game.isFowMode()&& (soMsg.length() > 0)){
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(),poMsg+ "please indicate if you are scoring a secret objective");
+            if (!game.isFowMode() && (soMsg.length() > 0)) {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), poMsg + "please indicate if you are scoring a secret objective");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
     }
+
     private static void statusHomeworkPing(Game game, long milliSinceLastPing) {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
             StringBuilder msg = new StringBuilder();
-            for(Player player : game.getRealPlayers()){
-                if(!game.getCurrentACDrawStatusInfo().contains(player.getFaction())){
-                    if(game.isFowMode()){
+            for (Player player : game.getRealPlayers()) {
+                if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
+                    if (game.isFowMode()) {
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please draw ACs and allocate command tokens");
                     }
                     msg.append(player.getRepresentation()).append(" ");
                 }
-                
+
             }
-            if(!game.isFowMode() && (msg.length() > 0)){
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(),msg+"please draw ACs and allocate command tokens\n");
+            if (!game.isFowMode() && (msg.length() > 0)) {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please draw ACs and allocate command tokens\n");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
@@ -298,17 +298,17 @@ public class AutoPingCron {
         // if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
         //     return;
         // }
-        if(game.getStoredValue("queuedAgendasMode").isEmpty()){
+        if (game.getStoredValue("queuedAgendasMode").isEmpty()) {
             return;
         }
-        for(Player p2 : game.getRealPlayers()){
+        for (Player p2 : game.getRealPlayers()) {
             if (p2.isAFK()) continue;
 
-            if(!game.getStoredValue("queuedWhens").contains(p2.getFaction()) && !game.getStoredValue("declinedWhens").contains(p2.getFaction())){
+            if (!game.getStoredValue("queuedWhens").contains(p2.getFaction()) && !game.getStoredValue("declinedWhens").contains(p2.getFaction())) {
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"whens\".");
                 continue;
             }
-            if(!game.getStoredValue("queuedAfters").contains(p2.getFaction()) && !game.getStoredValue("declinedAfters").contains(p2.getFaction()) && !game.getStoredValue("queuedWhens").contains(p2.getFaction())){
+            if (!game.getStoredValue("queuedAfters").contains(p2.getFaction()) && !game.getStoredValue("declinedAfters").contains(p2.getFaction()) && !game.getStoredValue("queuedWhens").contains(p2.getFaction())) {
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"afters\".");
             }
         }

@@ -230,40 +230,6 @@ public class Helper {
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
     }
 
-    public static List<Player> getInitativeOrder(Game game) {
-        // TODO: Can we use game.getActionPhaseTurnOrder instead?
-        HashMap<Integer, Player> order = new HashMap<>();
-        int naaluSC = 0;
-        for (Player player : game.getRealPlayers()) {
-            int sc = player.getLowestSC();
-            String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
-            if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                naaluSC = sc;
-            }
-            order.put(sc, player);
-        }
-        List<Player> initiativeOrder = new ArrayList<>();
-        Integer max = Collections.max(game.getScTradeGoods().keySet());
-        if (ButtonHelper.getKyroHeroSC(game) != 1000) {
-            max += 1;
-        }
-        if (naaluSC != 0) {
-            Player p3 = order.get(naaluSC);
-            initiativeOrder.add(p3);
-        }
-        for (int i = 1; i <= max; i++) {
-            if (naaluSC != 0 && i == naaluSC) {
-                continue;
-            }
-            Player p2 = order.get(i);
-            if (p2 != null) {
-                initiativeOrder.add(p2);
-            }
-        }
-        return initiativeOrder;
-
-    }
-
     public static void resolveQueue(Game game) {
         Player imperialHolder = getPlayerWithThisSC(game, 8);
         if (game.getPhaseOfGame().contains("agenda")) {
@@ -331,7 +297,7 @@ public class Helper {
         if (game.getRealPlayers().size() > 10) {
             return "This game is too large to display a scoring summary";
         }
-        for (Player player : getInitativeOrder(game)) {
+        for (Player player : game.getActionPhaseTurnOrder()) {
             int sc = player.getLowestSC();
             rep.append(CardEmojis.getSCBackFromInteger(sc)).append(player.getRepresentation(false, false)).append("\n");
             String poMessage = "";
@@ -391,7 +357,7 @@ public class Helper {
             || game.getHighestScore() + 1 > game.getVp()) {
             return;
         }
-        for (Player player : getInitativeOrder(game)) {
+        for (Player player : game.getActionPhaseTurnOrder()) {
             if (game.getHighestScore() + 1 > game.getVp()) {
                 return;
             }

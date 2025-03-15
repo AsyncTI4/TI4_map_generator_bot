@@ -561,7 +561,7 @@ public class StartPhaseService {
             }
         }
 
-        Player nextPlayer = activePlayers.stream().min(Player.comparingInitiative()).orElse(null);
+        Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
         game.setPhaseOfGame("action");
         if (nextPlayer == null) {
             return;

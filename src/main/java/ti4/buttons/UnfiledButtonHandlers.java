@@ -1090,7 +1090,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String key3 = "potentialScorePOBlockers";
         String key3b = "potentialScoreSOBlockers";
         String message;
-        for (Player player2 : Helper.getInitativeOrder(game)) {
+        for (Player player2 : game.getActionPhaseTurnOrder()) {
             if (player2 == player) {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     game.setStoredValue(key2, game.getStoredValue(key2)
@@ -1245,7 +1245,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String key3 = "potentialScoreSOBlockers";
                 String key3b = "potentialScorePOBlockers";
                 String message;
-                for (Player player2 : Helper.getInitativeOrder(game)) {
+                for (Player player2 : game.getActionPhaseTurnOrder()) {
                     if (player2 == player) {
                         int soIndex = Integer.parseInt(soID);
                         SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
