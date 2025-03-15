@@ -279,7 +279,7 @@ public class MiltyService {
         }
 
         player.setColor(color);
-        player.setFaction(faction);
+        player.setFaction(game, faction);
         player.setFactionEmoji(null);
         player.getPlanets().clear();
         player.getTechs().clear();

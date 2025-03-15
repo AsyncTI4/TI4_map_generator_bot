@@ -400,7 +400,7 @@ public class PlayHeroService {
             case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }
         TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.LEADER,
-            playerLeader.getId(), player.getNumberTurns());
+            playerLeader.getId(), player.getNumberOfTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),

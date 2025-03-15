@@ -23,8 +23,7 @@ class FactionAverageTurnsInGameStatisticsService {
 
         GamesPage.consumeAllGames(
             GameStatisticsFilterer.getGamesFilter(event),
-            game -> averageTurnsInAGameByFaction(game, factionCount, factionTurnCount)
-        );
+            game -> averageTurnsInAGameByFaction(game, factionCount, factionTurnCount));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Average Turns per Faction:").append("\n");
@@ -45,7 +44,7 @@ class FactionAverageTurnsInGameStatisticsService {
     private static void averageTurnsInAGameByFaction(Game game, Map<String, Integer> factionCount, Map<String, Integer> factionTurnCount) {
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
             String faction = player.getFaction();
-            int turnCount = player.getNumberTurns() - game.getDiscardAgendas().size() - game.getRound();
+            int turnCount = player.getNumberOfTurns() - game.getDiscardAgendas().size() - game.getRound();
             if (turnCount < 10 || turnCount > 200) {
                 continue;
             }

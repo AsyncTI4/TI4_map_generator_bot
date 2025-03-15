@@ -85,7 +85,7 @@ public class PlayerPreferenceHelper {
             userSettings.setPrefersDistanceBasedTacticalActions("true".equals(trueOrFalse));
             UserSettingsManager.save(userSettings);
         } else {
-            player.setAutoPassWhensAfters("true".equals(trueOrFalse));
+            player.setAutoPassOnWhensAfters("true".equals(trueOrFalse));
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
         ButtonHelper.deleteMessage(event);

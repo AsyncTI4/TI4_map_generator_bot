@@ -968,12 +968,12 @@ public class Game extends GameProperties {
         String factionsInCombat = getStoredValue("factionsInCombat");
         Player prevPlayer = getActivePlayer();
         String prevFaction = (prevPlayer != null && prevPlayer.getFaction() != null) ? prevPlayer.getFaction() : "jazzwuzhere&p1too";
+        long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
         if (prevPlayer != null && !factionsInCombat.contains(prevFaction) && !isTemporaryPingDisable()) {
-            long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
             prevPlayer.updateTurnStats(elapsedTime);
         } else {
             if (prevPlayer != null) {
-                prevPlayer.updateTurnStatsWithAverage();
+                prevPlayer.updateTurnStatsWithAverage(elapsedTime);
             }
         }
         setStoredValue("factionsInCombat", "");

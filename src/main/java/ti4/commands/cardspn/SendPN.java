@@ -95,7 +95,7 @@ class SendPN extends GameStateSubcommand {
 
         boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();
         if (placeDirectlyInPlayArea && !targetPlayer.equals(pnOwner) && !targetPlayer.isPlayerMemberOfAlliance(pnOwner)) {
-            targetPlayer.setPromissoryNotesInPlayArea(id);
+            targetPlayer.addPromissoryNoteToPlayArea(id);
         }
 
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, targetPlayer, false);

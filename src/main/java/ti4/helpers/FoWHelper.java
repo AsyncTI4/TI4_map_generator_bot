@@ -115,7 +115,7 @@ public class FoWHelper {
     }
 
     private static void initializeFog(Game game, @NotNull Player player, boolean forceRecalculate) {
-        if (player.hasFogInitialized() && !forceRecalculate) {
+        if (player.isFogInitialized() && !forceRecalculate) {
             return;
         }
 
@@ -825,7 +825,7 @@ public class FoWHelper {
     public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message) {
         pingSystem(game, event, position, message, true);
     }
-    
+
     public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message, boolean viewSystemButton) {
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
@@ -951,9 +951,7 @@ public class FoWHelper {
         if (success < total) {
             MessageHelper.replyToMessage(event,
                 "One more more pings failed to send.  Please follow up with game's GM.");
-        }// else {
-        //    MessageHelper.replyToMessage(event, "Successfully sent all pings.");
-        //}
+        }
     }
 
     private static boolean initializeAndCheckStatVisibility(Game game, Player player, Player viewer) {

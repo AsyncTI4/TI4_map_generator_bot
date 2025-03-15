@@ -108,7 +108,7 @@ class AgendaResolveButtonHandler {
                     Helper.checkEndGame(game, player2);
                 }
                 if ("warrant".equalsIgnoreCase(agID)) {
-                    player2.setSearchWarrant();
+                    player2.flipSearchWarrant();
                     game.drawSecretObjective(player2.getUserID());
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {

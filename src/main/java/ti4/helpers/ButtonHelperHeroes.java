@@ -1203,7 +1203,7 @@ public class ButtonHelperHeroes {
         if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(p2.getFaction())
             && !promissoryNoteOwner.equals(p2.getColor())
             && !p2.isPlayerMemberOfAlliance(game.getPlayerFromColorOrFaction(promissoryNoteOwner))) {
-            p2.setPromissoryNotesInPlayArea(id);
+            p2.addPromissoryNoteToPlayArea(id);
             if (id.endsWith("_sftt")) {
                 sendSftT = true;
             } else {
@@ -1489,13 +1489,13 @@ public class ButtonHelperHeroes {
         int n = Integer.parseInt(num);
         List<Button> buttons = new ArrayList<>();
         MessageChannel channel = player.getCorrectChannel();
-        if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
+        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
             channel = player.getCardsInfoThread();
         }
         for (int x = 0; x < n; x++) {
             String acID = game.drawActionCardAndDiscard();
             String sb = Mapper.getActionCard(acID).getRepresentation() + "\n";
-            MessageHelper.sendMessageToChannel(channel , sb);
+            MessageHelper.sendMessageToChannel(channel, sb);
             buttons.add(Buttons.green("cymiaeHeroStep2_" + acID, Mapper.getActionCard(acID).getName()));
         }
         MessageHelper.sendMessageToChannelWithButtons(channel,
@@ -1508,7 +1508,7 @@ public class ButtonHelperHeroes {
         String acID = buttonID.replace("cymiaeHeroStep2_", "");
         List<Button> buttons = new ArrayList<>();
         MessageChannel channel = player.getCorrectChannel();
-        if(!game.getPhaseOfGame().equalsIgnoreCase("action")){
+        if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
             channel = player.getCardsInfoThread();
         }
         for (Player p2 : game.getRealPlayers()) {
@@ -1538,14 +1538,14 @@ public class ButtonHelperHeroes {
             return;
         }
         ActionCardHelper.sendActionCardInfo(game, p2, event);
-        if(game.getPhaseOfGame().equalsIgnoreCase("action")){
+        if (game.getPhaseOfGame().equalsIgnoreCase("action")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " has given " + Mapper.getActionCard(acID).getName() + " to "
                     + p2.getRepresentation() + ".");
-        }else{
+        } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " has given an action card to "
-                + p2.getRepresentation() + ".");
+                player.getRepresentation() + " has given an action card to "
+                    + p2.getRepresentation() + ".");
         }
         ButtonHelper.deleteMessage(event);
         if (p2 != player && game.getPhaseOfGame().equalsIgnoreCase("action")) {

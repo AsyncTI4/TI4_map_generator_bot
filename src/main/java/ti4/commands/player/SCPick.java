@@ -224,19 +224,7 @@ class SCPick extends GameStateSubcommand {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to do turn.",
                     StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
-                if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
-                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                    } else {
-                        privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
-
-                    }
-                }
-
+                StartTurnService.reviveInfantryII(privatePlayer);
             }
 
         } else {
@@ -267,18 +255,7 @@ class SCPick extends GameStateSubcommand {
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);
-                if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
-                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                    } else {
-                        privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
-
-                    }
-                }
+                StartTurnService.reviveInfantryII(privatePlayer);
                 MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Use buttons to do turn.",
                     StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
             }

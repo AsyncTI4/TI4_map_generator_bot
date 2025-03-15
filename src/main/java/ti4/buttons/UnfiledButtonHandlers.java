@@ -1184,7 +1184,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message = player.getRepresentationUnfogged() + " Use below buttons to move any ground forces or conclude retreat.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, pos1, pos2));
         ButtonHelper.deleteMessage(event);
-        if(game.getTileByPosition(pos1).isGravityRift()){
+        if (game.getTileByPosition(pos1).isGravityRift()) {
             Button rift = Buttons.green(player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos2,
                 "Rift Units", MiscEmojis.GravityRift);
             List<Button> buttons = new ArrayList<>();
@@ -1882,7 +1882,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
         CommandCounterHelper.addCC(event, player, tile);
         String message = player.getFactionEmojiOrColor() + " Placed 1 command token from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system.";
-        if(!game.isFowMode()){
+        if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event);
         }
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
@@ -2476,7 +2476,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             for (Player player_ : players.values()) {
-                player_.cleanExhaustedPlanets(false);
+                player_.clearExhaustedPlanets(false);
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), "All planets have been readied at the end of the agenda phase.");
         } else {
@@ -2773,7 +2773,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
         TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC,
             acAlias,
-            player.getNumberTurns());
+            player.getNumberOfTurns());
         if (combatModAC != null) {
             player.addNewTempCombatMod(combatModAC);
             MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -2786,7 +2786,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void applytempcombatmodtech(ButtonInteractionEvent event, Player player) {
         String acAlias = "sc";
         TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier("tech", acAlias,
-            player.getNumberTurns());
+            player.getNumberOfTurns());
         if (combatModAC != null) {
             player.addNewTempCombatMod(combatModAC);
             MessageHelper.sendMessageToChannel(event.getChannel(),
