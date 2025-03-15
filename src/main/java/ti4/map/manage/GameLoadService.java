@@ -32,9 +32,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
@@ -91,7 +89,6 @@ class GameLoadService {
                             BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                             return null;
                         }
-                        updateTransientGameDetails(game);
                         return new ManagedGame(game);
                     } catch (Exception e) {
                         BotLogger.log("Could not load game: " + file.getName(), e);
@@ -108,26 +105,13 @@ class GameLoadService {
 
     @Nullable
     public static Game load(String gameName) {
-        File gameFile = Storage.getGameFile(gameName + Constants.TXT);
-        if (!gameFile.exists()) {
-            return null;
-        }
-        Game game = readGame(gameFile);
-        if (game != null) {
-            updateTransientGameDetails(game);
-        }
-        return game;
-    }
-
-    public static void updateTransientGameDetails(Game game) {
-        try {
-            ButtonHelperFactionSpecific.checkIihqAttachment(game);
-            DiscordantStarsHelper.checkGardenWorlds(game);
-            DiscordantStarsHelper.checkSigil(game);
-            DiscordantStarsHelper.checkOlradinMech(game);
-        } catch (Exception e) {
-            BotLogger.log("Error adding transient attachment tokens for game " + game.getName(), e);
-        }
+        return GameFileLockManager.wrapWithReadLock(gameName, () -> {
+            File gameFile = Storage.getGameFile(gameName + Constants.TXT);
+            if (!gameFile.exists()) {
+                return null;
+            }
+            return readGame(gameFile);
+        });
     }
 
     @Nullable
@@ -196,6 +180,7 @@ class GameLoadService {
                 return null;
             }
             game.setTileMap(tileMap);
+            TransientGameInfoUpdater.update(game);
             return game;
         } catch (Exception e) {
             BotLogger.log("Data read error: " + gameFile.getName(), e);
