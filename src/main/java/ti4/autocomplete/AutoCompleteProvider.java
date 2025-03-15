@@ -596,7 +596,7 @@ public class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                if (subcommandName.equals(Constants.ADD_FOG_TILE) && optionName.equals(Constants.TILE_NAME)) {
+                if (Constants.ADD_FOG_TILE.equals(subcommandName) && optionName.equals(Constants.TILE_NAME)) {
                     var options = searchModels(event, TileHelper.getAllTileModels(), null);
                     event.replyChoices(options).queue();
                 } else if (game.isFowMode()) {
