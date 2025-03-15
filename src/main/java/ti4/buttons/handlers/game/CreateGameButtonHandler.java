@@ -123,9 +123,4 @@ class CreateGameButtonHandler {
         UserSettingsManager.save(userSettings);
         return false;
     }
-
-    @ButtonHandler("offerGameHomebrewButtons")
-    public static void offerGameHomebrewButtons(MessageChannel channel) {
-        CreateGameService.offerGameHomebrewButtons(channel);
-    }
 }
