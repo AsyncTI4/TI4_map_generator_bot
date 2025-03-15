@@ -9,6 +9,11 @@ import ti4.AsyncTI4DiscordBot;
 
 public class ChannelCreationListener extends ListenerAdapter {
 
+    private static final String PBD_MAKING_GAMES_CHANNEL = "making-new-games";
+    private static final String FOW_MAKING_GAMES_CHANNEL = "making-fow-games";
+
+    private static final String FOW_REPLACEMENT_TAG = "1336539499668443229";
+
     @Override
     public void onChannelCreate(ChannelCreateEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
@@ -19,16 +24,31 @@ public class ChannelCreationListener extends ListenerAdapter {
 
     private void handleMakingNewGamesThreadCreation(ChannelCreateEvent event) {
         if (!AsyncTI4DiscordBot.isValidGuild(event.getGuild().getId())
-            || !(event.getChannel() instanceof ThreadChannel channel)
-            || !channel.getParentChannel().getName().equalsIgnoreCase("making-new-games")) {
+            || !(event.getChannel() instanceof ThreadChannel channel)) {
             return;
         }
-        String message =
-            """
-            To launch a new game, please run the command `/game create_game_button`, \
-            filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members \
-            are correct.
-            """;
-        channel.sendMessage(message).queueAfter(5, TimeUnit.SECONDS); // We were having issues where we'd get errors related to the channel having no messages.
+
+        String parentName = channel.getParentChannel().getName();
+        if (parentName.equalsIgnoreCase(PBD_MAKING_GAMES_CHANNEL)) {
+            String message =
+                """
+                To launch a new game, please run the command `/game create_game_button`, \
+                filling in the players and fun game name. This will create a button that you may press to launch the game after confirming the members \
+                are correct.
+                """;
+            channel.sendMessage(message).queueAfter(5, TimeUnit.SECONDS); // We were having issues where we'd get errors related to the channel having no messages.
+
+        } else if (parentName.equalsIgnoreCase(FOW_MAKING_GAMES_CHANNEL) && !hasTag(channel, FOW_REPLACEMENT_TAG)) {
+            String message =
+                """
+                To launch a new game, list your players and the GM, \
+                then ping @Bothelper for them to create the game channels for you.
+                """;
+            channel.sendMessage(message).queueAfter(5, TimeUnit.SECONDS);
+        }
+    }
+
+    private boolean hasTag(ThreadChannel channel, String tagId) {
+        return channel.getAppliedTags().stream().anyMatch(tag -> tag.getId().equals(tagId));
     }
 }
