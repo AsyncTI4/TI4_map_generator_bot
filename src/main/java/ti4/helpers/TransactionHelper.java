@@ -720,7 +720,7 @@ public class TransactionHelper {
         return RandomHelper.isOneInX(1000);
     }
 
-    @ButtonHandler(value = "sendOffer_", save = false)
+    @ButtonHandler(value = "sendOffer_")
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 == null) return;

@@ -198,7 +198,7 @@ public class PlayerPreferenceHelper {
         return buttons;
     }
 
-    @ButtonHandler(value = "riskDirectHit_", save = false)
+    @ButtonHandler(value = "riskDirectHit_")
     public static void resolveRiskDirectHit(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String yesOrNo = buttonID.split("_")[2];
         String unit = buttonID.split("_")[1];

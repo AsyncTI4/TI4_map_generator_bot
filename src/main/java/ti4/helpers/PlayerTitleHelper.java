@@ -69,7 +69,7 @@ public class PlayerTitleHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler(value = "bestowTitleStep2_", save = false)
+    @ButtonHandler(value = "bestowTitleStep2_")
     public static void resolveBestowTitleStep2(Game game, Player player, ButtonInteractionEvent event,
         String buttonID) {
         String title = buttonID.split("_")[1];
