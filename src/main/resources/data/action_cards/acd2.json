@@ -76,7 +76,7 @@
         "name": "Black Market Raid",
         "phase": "Action",
         "window": "Action",
-        "text": "Purge 3 of your relic fragments to gain 1 relic; you may spend any number of resources to reduce the number of relic fragments to be purged by 1 for every 3 resources spent.",
+        "text": "Spend 3 tokens from your command sheet to gain 1 relic; you may purge any number of your relic fragments to reduce the tokens spent by an equal amount.",
         "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
         "source": "action_deck_2"
     },
@@ -1053,7 +1053,7 @@
         "name": "Unstable Gate",
         "phase": "Action",
         "window": "After a player activates a system that contains your units",
-        "text": "Choose 1 other system. During this tactical action, treat that system as if it were adjacent to the active system.",
+        "text": "Choose 1 other system. That system is adjacent to the active system during this tactical action.",
         "flavorText": "The conduit was tearing itself apart as the space within it melted away to reveal the location of the beacon. Their panic quickly culled their jubilation.",
         "source": "action_deck_2"
     },
