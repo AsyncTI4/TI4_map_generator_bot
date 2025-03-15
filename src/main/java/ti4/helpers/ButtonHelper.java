@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -290,7 +289,7 @@ public class ButtonHelper {
         }
         List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
-            if (threadChannel_.getName().equals(threadName)) {
+            if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                 return threadChannel_;
             }
         }
@@ -1351,7 +1350,7 @@ public class ButtonHelper {
         if (buttonID.contains("tech_")) {
             last = buttonID.replace("tech_", "");
             player.refreshTech(last);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false)
                 + " readied technology: " + Mapper.getTech(last).getRepresentation(false) + ".");
             CommanderUnlockCheckService.checkPlayer(player, "kolume");
         } else {
@@ -2455,6 +2454,9 @@ public class ButtonHelper {
 
     public static void saveButtons(ButtonInteractionEvent event, Game game, Player player) {
         game.setSavedButtons(new ArrayList<>());
+        if(event.getMessage().isEphemeral()){
+            return;
+        }
         String exhaustedMessage = event.getMessage().getContentRaw();
         if ("".equalsIgnoreCase(exhaustedMessage)) {
             exhaustedMessage = "Updated";
@@ -4663,13 +4665,13 @@ public class ButtonHelper {
             String tokenFilename = Mapper.getTokenID("ionalpha");
             tile.addToken(tokenFilename, Constants.SPACE);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Added the _Ion Storm_ token to "
-                + tile.getRepresentation() + "on its " + MiscEmojis.WHalpha + "alpha side.");
+                + tile.getRepresentation() + " on its " + MiscEmojis.WHalpha + " alpha side.");
 
         } else {
             String tokenFilename = Mapper.getTokenID("ionbeta");
             tile.addToken(tokenFilename, Constants.SPACE);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Added the _Ion Storm_ token to "
-                + tile.getRepresentation() + "on its " + MiscEmojis.WHbeta + "beta side.");
+                + tile.getRepresentation() + " on its " + MiscEmojis.WHbeta + " beta side.");
         }
         deleteMessage(event);
         CommanderUnlockCheckService.checkPlayer(player, "ghost");

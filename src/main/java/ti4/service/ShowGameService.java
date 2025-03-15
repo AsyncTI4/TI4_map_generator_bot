@@ -15,7 +15,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
+import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 
 @UtilityClass
 public class ShowGameService {
@@ -60,7 +60,7 @@ public class ShowGameService {
         } else if (game.isFowMode()) {
             Player player = game.getPlayer(event.getUser().getId());
             MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
-            if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class)
+            if (!event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
                 && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
                 && privateChannel != null && !channel.equals(privateChannel)) {
                 channel = privateChannel;

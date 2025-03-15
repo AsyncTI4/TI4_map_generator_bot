@@ -259,6 +259,18 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         resolveWhenQueue(event, game);
     }
+    @ButtonHandler("explainQueue")
+    public static void explainQueue(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
+        String msg = "This queue system is basically asking you \"If no-one who was in front of you in speaker order played anything, would you play anything?\". "+
+        "If your answer is yes, then it will play your chosen ability/AC when everyone in front of you officially declines on playing anything. If they do decide to play"+
+        " something, then your answer will be tossed out and you will be asked to reconsider if you want to play something, now that you have more information. If your answer was no "
+        +" then by default the system will assume that your answer will remain no, but after saying no you can tell the system to ask you again if someone else plays something.\n\n"
+        +"I would like to emphasize at this time that there is little benefit in stalling your decision here. You have as much information as you need to answer the bots queuestion, and if others provide more "
+        +"information you will/can just be asked to privately decide again at that later point. The one exception to this is if you can glean information from table chatter, which if you can, by all means wait to decide "
+        +"until you hear all the chatter.";
+
+        MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
+    }
 
     @ButtonHandler("queueAfter_")
     public static void queueAfter(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
@@ -397,6 +409,7 @@ public class AgendaHelper {
 
             buttons.add(Buttons.gray("queueAWhen", "Play A \"When\""));
             buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"Whens\""));
+            buttons.add(Buttons.gray("explainQueue", "How Does This Work?"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
     }
@@ -1625,7 +1638,7 @@ public class AgendaHelper {
         List<Button> outcomeActionRow;
         if (agendaDetails.contains("For")) {
             outcomeActionRow = VoteButtonHandler.getForAgainstOutcomeButtons(game, ridername, prefix,
-                game.getCurrentAgendaInfo().split("_")[2]);
+                game.getCurrentAgendaInfo().split("_")[2], null);
         } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
             outcomeActionRow = VoteButtonHandler.getPlayerOutcomeButtons(game, ridername, prefix, null);
         } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
@@ -3368,7 +3381,7 @@ public class AgendaHelper {
             proceedButtons.add(Buttons.red("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             listVoteCount(game, channel);
-            msg = "Press this button if the last player forgot to react, but verbally said \"no whens\"/\"no afters\".";
+            msg = "These buttons can help with bugs/issues that occur during the agenda phase";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));
             proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
@@ -3701,9 +3714,12 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("proceedToVoting")
-    public static void proceedToVoting(ButtonInteractionEvent event, Game game) {
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Decided to skip waiting for afters and proceed to voting.");
+    public static void proceedToVoting(ButtonInteractionEvent event, Game game, Player player) {
+        String msg = "Decided to skip waiting for afters and proceed to voting. Note that this is not advised unless a bug has occurred. ";
+        if(player != null){
+            msg = player.getRepresentation() + " " +msg;
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
         try {
             AgendaHelper.startTheVoting(game);
         } catch (Exception e) {

@@ -1185,6 +1185,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message = player.getRepresentationUnfogged() + " Use below buttons to move any ground forces or conclude retreat.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, pos1, pos2));
         ButtonHelper.deleteMessage(event);
+        if(game.getTileByPosition(pos1).isGravityRift()){
+            Button rift = Buttons.green(player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos2,
+                "Rift Units", MiscEmojis.GravityRift);
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(rift);
+            String message2 = player.getRepresentationUnfogged() + " if applicable, use this button to rift retreating units.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
+        }
     }
 
     @ButtonHandler("getPsychoButtons")
@@ -1927,10 +1935,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void componentAction(ButtonInteractionEvent event, Player player, Game game) {
         String message = "Please choose what kind of component action you wish to do.";
         List<Button> systemButtons = ComponentActionHelper.getAllPossibleCompButtons(game, player, event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        if (!game.isFowMode()) {
-            ButtonHelper.deleteMessage(event);
-        }
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, systemButtons);
+        // if (!game.isFowMode()) {
+        //     ButtonHelper.deleteMessage(event);
+        // }
     }
 
     @ButtonHandler("drawRelicFromFrag")

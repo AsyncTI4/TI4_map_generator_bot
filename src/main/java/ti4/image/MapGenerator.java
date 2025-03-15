@@ -61,7 +61,7 @@ import ti4.model.EventModel;
 import ti4.model.ModelInterface;
 import ti4.model.PlanetModel;
 import ti4.model.StrategyCardModel;
-import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
+import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
@@ -341,7 +341,7 @@ public class MapGenerator implements AutoCloseable {
 
     private boolean isFowModeActive() {
         return game.isFowMode() && event != null && 
-            (FoWHelper.isPrivateGame(game, event) || event instanceof UserOverridenSlashCommandInteractionEvent);
+            (FoWHelper.isPrivateGame(game, event) || event instanceof UserOverridenGenericInteractionCreateEvent);
     }
 
     public boolean shouldConvertToGeneric(Player player) {
