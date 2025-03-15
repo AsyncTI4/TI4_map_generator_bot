@@ -86,21 +86,21 @@ public class GMService {
                 checkWhoHas("confounding", game);
             }
             case "whens" -> {
-              StringBuffer sbWhens = new StringBuffer("Following players have **whens** in hand:\n");
-              StringBuffer sbAfters = new StringBuffer("Following players have **afters** in hand:\n");
+                StringBuffer sbWhens = new StringBuffer("Following players have **whens** in hand:\n");
+                StringBuffer sbAfters = new StringBuffer("Following players have **afters** in hand:\n");
 
-              for (Player player : game.getRealPlayers()) {
-                  List<String> whens = AgendaHelper.getPossibleWhenNames(player);
-                  if (!whens.isEmpty()) {
-                      sbWhens.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", whens)).append("\n");
-                  }
-                  List<String> afters = AgendaHelper.getPossibleAfterNames(player);
-                  if (!afters.isEmpty()) {
-                      sbAfters.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", afters)).append("\n");
-                  }
-              }
-              MessageHelper.sendMessageToChannel(getGMChannel(game), sbWhens.toString());
-              MessageHelper.sendMessageToChannel(getGMChannel(game), sbAfters.toString());
+                for (Player player : game.getRealPlayers()) {
+                    List<String> whens = AgendaHelper.getPossibleWhenNames(player);
+                    if (!whens.isEmpty()) {
+                        sbWhens.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", whens)).append("\n");
+                    }
+                    List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                    if (!afters.isEmpty()) {
+                        sbAfters.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", afters)).append("\n");
+                    }
+                }
+                MessageHelper.sendMessageToChannel(getGMChannel(game), sbWhens.toString());
+                MessageHelper.sendMessageToChannel(getGMChannel(game), sbAfters.toString());
             }
             default -> {
                 MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), "Select what to look for:", HAND_CHECK_BUTTONS);
