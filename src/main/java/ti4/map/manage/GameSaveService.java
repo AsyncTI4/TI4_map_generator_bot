@@ -1,5 +1,7 @@
 package ti4.map.manage;
 
+import static ti4.map.manage.GamePersistenceKeys.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -11,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
@@ -31,39 +34,16 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 
-import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
-import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLAYER;
-import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.TILE;
-import static ti4.map.manage.GamePersistenceKeys.TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.UNITS;
-
 @UtilityClass
 class GameSaveService {
 
     public static boolean save(Game game, String reason) {
-        return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
-            game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
-            return save(game);
-        });
+        game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
+        return save(game);
     }
 
-    private static boolean save(Game game) {
-        TransientGameInfoUpdater.update(game);
+    public static boolean save(Game game) {
+        GameLoadService.updateTransientGameDetails(game);
         //Ugly fix to update seen tiles data for fog since doing it in 
         //MapGenerator/TileGenerator won't save changes anymore
         if (game.isFowMode()) {
@@ -929,13 +909,11 @@ class GameSaveService {
     }
 
     public static boolean delete(String gameName) {
-        return GameFileLockManager.wrapWithWriteLock(gameName, () -> {
-            File mapStorage = Storage.getGameFile(gameName + Constants.TXT);
-            if (!mapStorage.exists()) {
-                return false;
-            }
-            File deletedMapStorage = Storage.getDeletedGame(gameName + "_" + System.currentTimeMillis() + Constants.TXT);
-            return mapStorage.renameTo(deletedMapStorage);
-        });
+        File mapStorage = Storage.getGameFile(gameName + Constants.TXT);
+        if (!mapStorage.exists()) {
+            return false;
+        }
+        File deletedMapStorage = Storage.getDeletedGame(gameName + "_" + System.currentTimeMillis() + Constants.TXT);
+        return mapStorage.renameTo(deletedMapStorage);
     }
 }
