@@ -1427,7 +1427,7 @@ public class ButtonHelperAgents {
     public static void resolveCheiranAgentStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
-        CommandCounterHelper.addCC(event, player.getColor(), origTile, true);
+        CommandCounterHelper.addCC(event, player, origTile, true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 command token in "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"

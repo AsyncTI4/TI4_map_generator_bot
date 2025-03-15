@@ -1880,10 +1880,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
-        String color = player.getColor();
-        if (Mapper.isValidColor(color)) {
-            CommandCounterHelper.addCC(event, color, tile);
-        }
+        CommandCounterHelper.addCC(event, player, tile);
         String message = player.getFactionEmojiOrColor() + " Placed 1 command token from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system.";
         if(!game.isFowMode()){
             ButtonHelper.updateMap(game, event);
@@ -1904,17 +1901,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
-        String color = player.getColor();
+        Player constructionPlayer = player;
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(4)) {
-                color = p2.getColor();
+                constructionPlayer = p2;
             }
         }
+        CommandCounterHelper.addCC(event, constructionPlayer, tile);
 
-        if (Mapper.isValidColor(color)) {
-            CommandCounterHelper.addCC(event, color, tile);
-        }
-        String message = player.getRepresentation() + " Placed 1 " + StringUtils.capitalize(color) + " command token in the "
+        String colorName = Mapper.getColor(constructionPlayer.getColor()).getDisplayName();
+        String message = player.getRepresentation() + " Placed 1 " + colorName + " command token in the "
             + Helper.getPlanetRepresentation(planet, game)
             + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent on **Construction**.";

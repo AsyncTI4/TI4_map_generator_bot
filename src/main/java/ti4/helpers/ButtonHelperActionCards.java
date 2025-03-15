@@ -1309,7 +1309,7 @@ public class ButtonHelperActionCards {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        CommandCounterHelper.addCC(event, p2.getColor(), tile);
+        CommandCounterHelper.addCC(event, p2, tile);
         ButtonHelper.deleteMessage(event);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

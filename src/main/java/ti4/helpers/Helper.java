@@ -1820,6 +1820,11 @@ public class Helper {
         return getLeaderRepresentation(leader, true, true, true);
     }
 
+    public static void isCCCountCorrect(Player player) {
+        int ccCount = getCCCount(player.getGame(), player.getColor());
+        informUserCCOverLimit(player.getGame(), player.getColor(), ccCount);
+    }
+
     public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game game, String color) {
         int ccCount = getCCCount(game, color);
         informUserCCOverLimit(game, color, ccCount);

@@ -768,13 +768,13 @@ public class ButtonHelper {
             }
             message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
         } else {
-            if(ButtonHelper.isLawInPlay(game, "absol_minspolicy")){
-                amount -=1;
+            if (ButtonHelper.isLawInPlay(game, "absol_minspolicy")) {
+                amount -= 1;
                 message = " Absol Minister of policy has been accounted for, causing everyone to draw 1 less AC.";
-            }else{
+            } else {
                 game.drawActionCard(player.getUserID());
             }
-            
+
             if (player.hasTech("nm")) {
                 message = " _Neural Motivator_ has been accounted for.";
                 game.drawActionCard(player.getUserID());
@@ -805,7 +805,7 @@ public class ButtonHelper {
             }
             amount += 1;
         }
-        
+
         if (!player.hasAbility("autonetic_memory")) {
             message = " drew " + amount + " action card" + (amount == 1 ? "" : "s") + "." + message;
         }
@@ -878,8 +878,8 @@ public class ButtonHelper {
 
     public static int resolveOnActivationEnemyAbilities(Game game, Tile activeSystem, Player player, boolean justChecking, ButtonInteractionEvent event) {
         int numberOfAbilities = 0;
-        if(activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")){
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),"# "+player.getRepresentation()+" this is a __friendly__ reminder that you do not have antimass deflectors");
+        if (activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "# " + player.getRepresentation() + " this is a __friendly__ reminder that you do not have antimass deflectors");
         }
         if (game.isL1Hero()) {
             return 0;
@@ -1437,9 +1437,9 @@ public class ButtonHelper {
 
     public static void sendFileWithCorrectButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons, Game game) {
         if (!WebHelper.sendingToWeb() || game.isFowMode()) {
-            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);  
+            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);
         } else {
-            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);            
+            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);
         }
     }
 
@@ -2083,7 +2083,7 @@ public class ButtonHelper {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
             target.setTacticalCC(target.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, target.getColor(), tile);
+            CommandCounterHelper.addCC(event, target, tile);
         }
 
         MessageHelper.sendMessageToChannel(mahact.getCorrectChannel(),
@@ -2123,7 +2123,7 @@ public class ButtonHelper {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
             target.setTacticalCC(target.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, target.getColor(), tile);
+            CommandCounterHelper.addCC(event, target, tile);
         }
         MessageHelper.sendMessageToChannel(mahact.getCorrectChannel(),
             mahact.getRepresentationUnfogged() + " you have spent a command token from your strategy pool.");
@@ -2173,7 +2173,7 @@ public class ButtonHelper {
                     target.setTacticalCC(target.getTacticalCC() + 1);
                 }
                 target.setTacticalCC(target.getTacticalCC() - 1);
-                CommandCounterHelper.addCC(event, target.getColor(), tile);
+                CommandCounterHelper.addCC(event, target, tile);
             }
         }
         MessageHelper.sendMessageToChannel(minister.getCorrectChannel(),
@@ -2452,7 +2452,7 @@ public class ButtonHelper {
 
     public static void saveButtons(ButtonInteractionEvent event, Game game, Player player) {
         game.setSavedButtons(new ArrayList<>());
-        if(event.getMessage().isEphemeral()){
+        if (event.getMessage().isEphemeral()) {
             return;
         }
         String exhaustedMessage = event.getMessage().getContentRaw();
@@ -2614,7 +2614,7 @@ public class ButtonHelper {
                 highest = Math.max(highest, checkFleetAndCapacity(player, game, tile, event));
             }
         }
-        Helper.isCCCountCorrect(event, game, player.getColor());
+        Helper.isCCCountCorrect(player);
         return highest;
     }
 
@@ -4076,7 +4076,7 @@ public class ButtonHelper {
                 int cc = player.getTacticalCC();
                 cc -= 1;
                 player.setTacticalCC(cc);
-                CommandCounterHelper.addCC(event, player.getColor(), tile, true);
+                CommandCounterHelper.addCC(event, player, tile);
             }
             String thingToAdd = "box";
             for (String unit : displacedUnits.keySet()) {
@@ -6193,11 +6193,11 @@ public class ButtonHelper {
                 return;
             }
             Tile tile = game.getTileByPosition(planet);
-            CommandCounterHelper.addCC(event, color2, tile);
-            Helper.isCCCountCorrect(event, game, color2);
+            CommandCounterHelper.addCC(event, mahactP, tile);
+            Helper.isCCCountCorrect(mahactP);
             for (String color : mahactP.getMahactCC()) {
                 if (Mapper.isValidColor(color) && !color.equalsIgnoreCase(player.getColor())) {
-                    CommandCounterHelper.addCC(event, color, tile);
+                    CommandCounterHelper.addCC(event, game, color, tile);
                     Helper.isCCCountCorrect(event, game, color);
                 }
             }

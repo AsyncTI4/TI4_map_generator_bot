@@ -260,7 +260,7 @@ public class PlayHeroService {
             case "vaylerianhero" -> {
                 if (!game.isNaaluAgent()) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
-                    CommandCounterHelper.addCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()));
+                    CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
                     game.setStoredValue("vaylerianHeroActive", "true");
                 }
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
