@@ -1392,7 +1392,7 @@ public class ButtonHelperAgents {
     @ButtonHandler("freeSystemsAgentStep2_")
     public static void resolveFreeSystemsAgentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        PlanetExhaustAbility.doAction(player, planet, game, false);
+        PlanetExhaustAbility.doAction(event, player, planet, game, false);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationNoPing() + " chose to replicate the " + Helper.getPlanetRepresentation(planet, game)
                 + " legendary ability by exhausting " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
