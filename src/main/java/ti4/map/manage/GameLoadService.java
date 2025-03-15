@@ -89,7 +89,6 @@ class GameLoadService {
                             BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
                             return null;
                         }
-                        updateTransientGameDetails(game);
                         return new ManagedGame(game);
                     } catch (Exception e) {
                         BotLogger.log("Could not load game: " + file.getName(), e);
@@ -181,6 +180,7 @@ class GameLoadService {
                 return null;
             }
             game.setTileMap(tileMap);
+            TransientGameInfoUpdater.update(game);
             return game;
         } catch (Exception e) {
             BotLogger.log("Data read error: " + gameFile.getName(), e);
