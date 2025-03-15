@@ -214,7 +214,7 @@ public class CreateGameService {
         Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
         MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change some options? ", offerOptions);
 
-        offerGameHomebrewButtons(actionsChannel);
+        HomebrewService.offerGameHomebrewButtons(actionsChannel);
 
         MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
     }
@@ -633,13 +633,5 @@ public class CreateGameService {
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }
-    }
-
-    public static void offerGameHomebrewButtons(MessageChannel channel) {
-        List<Button> homebrewButtons = new ArrayList<>();
-        homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, use Homebrew"));
-        homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "If you plan to have a supported homebrew mode in this game, please indicate " +
-            "so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
     }
 }

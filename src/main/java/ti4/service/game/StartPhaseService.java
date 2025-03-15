@@ -78,7 +78,7 @@ public class StartPhaseService {
             case "finSpecialSomnoFix" -> Helper.addBotHelperPermissionsToGameChannels(event);
             case "finSpecialAbsol" -> AgendaHelper.resolveAbsolAgainstChecksNBalances(game);
             case "finFixSecrets" -> game.fixScrewedSOs();
-            case "setupHomebrew" -> CreateGameService.offerGameHomebrewButtons(event.getMessageChannel());
+            case "setupHomebrew" -> HomebrewService.offerGameHomebrewButtons(event.getMessageChannel());
             case "cptiExplores" -> {
                 game.setCptiExploreMode(true);
                 DeckModel deckModel = Mapper.getDeck("explores_cpti");

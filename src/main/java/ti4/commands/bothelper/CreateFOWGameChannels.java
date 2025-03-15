@@ -29,6 +29,7 @@ import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
+import ti4.service.game.HomebrewService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 class CreateFOWGameChannels extends Subcommand {
@@ -151,7 +152,7 @@ class CreateFOWGameChannels extends Subcommand {
         StringBuffer sb = new StringBuffer(roleGM.getAsMention() + " - gm room\n");
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
-        CreateGameService.offerGameHomebrewButtons(gmChannel);
+        HomebrewService.offerGameHomebrewButtons(gmChannel);
 
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)

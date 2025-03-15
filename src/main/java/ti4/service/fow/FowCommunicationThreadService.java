@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -100,6 +101,7 @@ public class FowCommunicationThreadService {
 
     private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<Set<Player>> checkedPairs, Game game) {
         boolean areAllowedToTalkInAgenda = areAllowedToTalkInAgenda(game);
+        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
             ThreadChannel threadChannel = thread.getKey();
             String threadName = thread.getKey().getName();
@@ -166,6 +168,7 @@ public class FowCommunicationThreadService {
         String color = buttonID.replace("fowCommsAccept_", "");
         Player inviteePlayer = game.getPlayerFromColorOrFaction(color);
 
+        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + YES_CHAR + " " + StringUtils.capitalize(player.getColor());
         game.getMainGameChannel().createThreadChannel(threadName, true)
             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
