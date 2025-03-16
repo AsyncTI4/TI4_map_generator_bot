@@ -7,15 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.image.Mapper;
@@ -74,7 +73,7 @@ public class ActionCardHelper {
             } else {
                 for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
                     Integer value = trapCard.getValue();
-                    sb.append("").append(index++).append("\\. ").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    sb.append(index++).append("\\. ").append(Helper.leftpad("(" + value, 4)).append(")`");
                     sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
                 }
             }
@@ -685,7 +684,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if (automationID.equals("rendezvous_point")) {
+            if (automationID.equals("rendezvous_point") || automationID.equals("rendezvous")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRendezvousPoint", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
