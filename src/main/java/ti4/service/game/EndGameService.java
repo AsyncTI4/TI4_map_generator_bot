@@ -96,11 +96,11 @@ public class EndGameService {
             String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName()
                 + "** and will be automatically cleaned up shortly.";
             if (tableTalkChannel != null) { // MOVE TABLETALK CHANNEL
-                tableTalkChannel.getManager().setParent(inLimboCategory).queue();
+                tableTalkChannel.getManager().setParent(inLimboCategory).queueAfter(15, TimeUnit.SECONDS);
                 MessageHelper.sendMessageToChannel(tableTalkChannel, moveMessage);
             }
             if (actionsChannel != null) { // MOVE ACTIONS CHANNEL
-                actionsChannel.getManager().setParent(inLimboCategory).queue();
+                actionsChannel.getManager().setParent(inLimboCategory).queueAfter(15, TimeUnit.SECONDS);
                 MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
             }
         }

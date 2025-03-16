@@ -2,17 +2,7 @@
     "id": "abaddon",
     "tileId": "75",
     "name": "Abaddon",
-    "aliases": [
-        "abaddon",
-        "abadon",
-        "abadd",
-        "abandon",
-        "75_2"
-    ],
-    "positionInTile": {
-        "x": 214.0,
-        "y": 89.0
-    },
+    "aliases": ["abaddon", "abadon", "abadd", "abandon", "75_2"],
     "resources": 1,
     "influence": 0,
     "factionHomeworld": null,
@@ -21,91 +11,10 @@
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
-    "unitPositions": {
+    "planetLayout": {
         "unitHolderName": "abaddon",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 175.0,
-                    "y": 75.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 143.0,
-                    "y": 41.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 180.0,
-                    "y": 102.0
-                },
-                {
-                    "x": 197.0,
-                    "y": 102.0
-                },
-                {
-                    "x": 214.0,
-                    "y": 102.0
-                },
-                {
-                    "x": 189.0,
-                    "y": 113.0
-                },
-                {
-                    "x": 207.0,
-                    "y": 113.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 182.0,
-                    "y": 31.0
-                },
-                {
-                    "x": 200.0,
-                    "y": 31.0
-                },
-                {
-                    "x": 175.0,
-                    "y": 44.0
-                },
-                {
-                    "x": 193.0,
-                    "y": 44.0
-                },
-                {
-                    "x": 211.0,
-                    "y": 44.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 194.0,
-                    "y": 72.0
-                },
-                {
-                    "x": 161.0,
-                    "y": 72.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 232.0,
-                    "y": 53.0
-                },
-                {
-                    "x": 240.0,
-                    "y": 84.0
-                },
-                {
-                    "x": 232.0,
-                    "y": 115.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
+        "resourcesLocation": "TopRight",
+        "centerPosition": { "x": 214, "y": 89 }
     },
     "contrastColor": "orange",
     "flavourText": "*A temperate planet whose low gravity allows for stunningly tall mountain ranges. Serves as a stop-over for trade routes to the nearby Vorish Cluster.*",

@@ -45,7 +45,7 @@ public class ExhaustLeaderService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
 
-        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberTurns());
+        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.LEADER, leader.getId(), player.getNumberOfTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Combat modifier will be applied next time you push the combat roll button.");

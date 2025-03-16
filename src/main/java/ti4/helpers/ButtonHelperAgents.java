@@ -1392,7 +1392,7 @@ public class ButtonHelperAgents {
     @ButtonHandler("freeSystemsAgentStep2_")
     public static void resolveFreeSystemsAgentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        PlanetExhaustAbility.doAction(player, planet, game, false);
+        PlanetExhaustAbility.doAction(event, player, planet, game, false);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationNoPing() + " chose to replicate the " + Helper.getPlanetRepresentation(planet, game)
                 + " legendary ability by exhausting " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
@@ -1427,7 +1427,7 @@ public class ButtonHelperAgents {
     public static void resolveCheiranAgentStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
-        CommandCounterHelper.addCC(event, player.getColor(), origTile, true);
+        CommandCounterHelper.addCC(event, player, origTile, true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 command token in "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"

@@ -44,8 +44,7 @@ public class AverageTurnTimeService {
 
         GamesPage.consumeAllGames(
             endedGamesFilter,
-            game -> getAverageTurnTimeForGame(game, playerTurnTimes, playerAverageTurnTimes)
-        );
+            game -> getAverageTurnTimeForGame(game, playerTurnTimes, playerAverageTurnTimes));
 
         HashMap<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream()
             .map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
@@ -68,7 +67,7 @@ public class AverageTurnTimeService {
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
         int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
-        List<Map.Entry<String, Map.Entry<Integer, Long>>> turnTimes =  playerTurnTimes.entrySet().stream()
+        List<Map.Entry<String, Map.Entry<Integer, Long>>> turnTimes = playerTurnTimes.entrySet().stream()
             .filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow)
             .sorted(comparator)
             .limit(topLimit)
@@ -95,10 +94,12 @@ public class AverageTurnTimeService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", sb.toString());
     }
 
-    private static void getAverageTurnTimeForGame(Game game, Map<String, Map.Entry<Integer, Long>> playerTurnTimes,
-                                                    Map<String, Set<Long>> playerAverageTurnTimes) {
+    private static void getAverageTurnTimeForGame(
+        Game game, Map<String, Map.Entry<Integer, Long>> playerTurnTimes,
+        Map<String, Set<Long>> playerAverageTurnTimes
+    ) {
         for (Player player : game.getRealPlayers()) {
-            Integer totalTurns = player.getNumberTurns();
+            Integer totalTurns = player.getNumberOfTurns();
             Long totalTurnTime = player.getTotalTurnTime();
             Map.Entry<Integer, Long> playerTurnTime = Map.entry(totalTurns, totalTurnTime);
             playerTurnTimes.merge(player.getUserID(), playerTurnTime,

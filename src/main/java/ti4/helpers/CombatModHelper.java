@@ -414,16 +414,16 @@ public class CombatModHelper {
         if (StringUtils.isNotBlank(mod.getValueScalingType())) {
             switch (mod.getValueScalingType()) {
                 case Constants.FRAGMENT -> {
-                    if (player.hasFoundCulFrag()) {
+                    if (player.isHasFoundCulFrag()) {
                         scalingCount += 1;
                     }
-                    if (player.hasFoundHazFrag()) {
+                    if (player.isHasFoundHazFrag()) {
                         scalingCount += 1;
                     }
-                    if (player.hasFoundIndFrag()) {
+                    if (player.isHasFoundIndFrag()) {
                         scalingCount += 1;
                     }
-                    if (player.hasFoundUnkFrag()) {
+                    if (player.isHasFoundUnkFrag()) {
                         scalingCount += 1;
                     }
                 }
@@ -471,7 +471,7 @@ public class CombatModHelper {
                     for (String pos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
                         Tile tile = game.getTileByPosition(pos);
                         for (UnitHolder uH : tile.getUnitHolders().values()) {
-                            for(Player p2 : game.getRealPlayers()){
+                            for (Player p2 : game.getRealPlayers()) {
                                 scalingCount += uH.getUnitCount(UnitType.Mech, p2);
                             }
                         }
@@ -480,10 +480,9 @@ public class CombatModHelper {
                 case "adjacent_asteroid" -> {
                     for (String pos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
                         Tile tile = game.getTileByPosition(pos);
-                        if(tile.isAsteroidField()){
+                        if (tile.isAsteroidField()) {
                             scalingCount += 1;
                         }
-                        
                     }
                 }
                 case "damaged_units_same_type" -> {

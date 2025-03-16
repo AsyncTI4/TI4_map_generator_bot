@@ -68,9 +68,9 @@ class PersonalCleanup extends GameStateSubcommand {
         }
         player.clearSCs();
         player.clearFollowedSCs();
-        player.cleanExhaustedTechs();
-        player.cleanExhaustedPlanets(true);
-        player.cleanExhaustedRelics();
+        player.clearExhaustedTechs();
+        player.clearExhaustedPlanets(true);
+        player.clearExhaustedRelics();
         player.clearExhaustedAbilities();
         List<Leader> leads = new ArrayList<>(player.getLeaders());
         for (Leader leader : leads) {

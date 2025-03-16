@@ -79,20 +79,7 @@ class SCUnpick extends GameStateSubcommand {
             //ADD A TG TO UNPICKED SC
             game.incrementScTradeGoods();
 
-            Player nextPlayer = null;
-            int lowestSC = 100;
-            for (Player player_ : activePlayers) {
-                int playersLowestSC = player_.getLowestSC();
-                String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
-                if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                    nextPlayer = player_; //no further processing, this player has the 0 token
-                    break;
-                }
-                if (playersLowestSC < lowestSC) {
-                    lowestSC = playersLowestSC;
-                    nextPlayer = player_;
-                }
-            }
+            Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
@@ -105,7 +92,7 @@ class SCUnpick extends GameStateSubcommand {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your " 
+                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                     + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             }
             String fail = "User for next faction not found. Report to ADMIN";

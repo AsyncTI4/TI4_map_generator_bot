@@ -2,16 +2,7 @@
     "id": "ashtroth",
     "tileId": "75",
     "name": "Ashtroth",
-    "aliases": [
-        "ashtroth",
-        "ashtros",
-        "ashtrot",
-        "75_3"
-    ],
-    "positionInTile": {
-        "x": 221.0,
-        "y": 229.0
-    },
+    "aliases": ["ashtroth", "ashtros", "ashtrot", "75_3"],
     "resources": 2,
     "influence": 0,
     "factionHomeworld": null,
@@ -20,91 +11,10 @@
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
-    "unitPositions": {
+    "planetLayout": {
         "unitHolderName": "ashtroth",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 187.0,
-                    "y": 217.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 259.0,
-                    "y": 190.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 192.0,
-                    "y": 244.0
-                },
-                {
-                    "x": 209.0,
-                    "y": 244.0
-                },
-                {
-                    "x": 226.0,
-                    "y": 244.0
-                },
-                {
-                    "x": 201.0,
-                    "y": 255.0
-                },
-                {
-                    "x": 219.0,
-                    "y": 255.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 194.0,
-                    "y": 173.0
-                },
-                {
-                    "x": 212.0,
-                    "y": 173.0
-                },
-                {
-                    "x": 187.0,
-                    "y": 186.0
-                },
-                {
-                    "x": 205.0,
-                    "y": 186.0
-                },
-                {
-                    "x": 223.0,
-                    "y": 186.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 206.0,
-                    "y": 214.0
-                },
-                {
-                    "x": 173.0,
-                    "y": 214.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 133.0,
-                    "y": 190.0
-                },
-                {
-                    "x": 125.0,
-                    "y": 221.0
-                },
-                {
-                    "x": 133.0,
-                    "y": 252.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
+        "resourcesLocation": "TopLeft",
+        "centerPosition": { "x": 221, "y": 229 }
     },
     "contrastColor": "orange",
     "flavourText": "*Covered in boggy landmasses and shallow seas. Algal blooms provide rich biomass for processed foods, but create smelly (and often toxic) offgassing.*",

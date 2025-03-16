@@ -84,16 +84,16 @@ public class PlayerTechService {
             tech = "dskortg";
         }
         TechnologyModel techModel = Mapper.getTech(tech);
-        if(!player.getTechs().contains(tech)){
+        if (!player.getTechs().contains(tech)) {
             boolean hasSub = false;
-            for(String tech2 : player.getTechs()){
+            for (String tech2 : player.getTechs()) {
                 if (tech2.contains(tech)) {
                     hasSub = true;
                     break;
                 }
             }
-            if(!hasSub){
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +" does not have the tech known as "+techModel.getName());
+            if (!hasSub) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " does not have the tech known as " + techModel.getName());
                 return;
             }
         }
@@ -349,7 +349,7 @@ public class PlayerTechService {
 
     public static void checkAndApplyCombatMods(GenericInteractionCreateEvent event, Player player, String techID) {
         TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.TECH,
-            techID, player.getNumberTurns());
+            techID, player.getNumberOfTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),

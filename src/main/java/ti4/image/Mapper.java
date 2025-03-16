@@ -938,6 +938,20 @@ public class Mapper {
         return abilities.get(abilityID);
     }
 
+    public static AbilityModel getAbilityOrReplacement(String abilityID, Game game) {
+        if (game != null && game.isMiltyModMode()) {
+            for (AbilityModel replace : getAbilities().values()) {
+                if (replace.getSource() != ComponentSource.miltymod) continue;
+
+                boolean replacesAbility = replace.getHomebrewReplacesID().map(abilityID::equals).orElse(false);
+                if (replacesAbility) {
+                    return replace;
+                }
+            }
+        }
+        return Mapper.getAbility(abilityID);
+    }
+
     public static List<String> getFactionIDs() {
         return factions.keySet().stream()
             .filter(Objects::nonNull)

@@ -880,7 +880,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
 
-            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC, actionCard.getAlias(), player.getNumberTurns());
+            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());
             if (combatModAC != null) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "applytempcombatmod__" + Constants.AC + "__" + actionCard.getAlias(), "Resolve " + actionCard.getName()));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
