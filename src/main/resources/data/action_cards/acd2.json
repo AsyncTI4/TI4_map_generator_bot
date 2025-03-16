@@ -144,15 +144,6 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "continuous_barrage",
-        "name": "Continuous Barrage",
-        "phase": "Action",
-        "window": "At the start of the second round of a space combat",
-        "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
-        "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
-        "source": "action_deck_2"
-    },
-    {
         "alias": "corporate_lobbying",
         "name": "Corporate Lobbying",
         "phase": "Agenda",
@@ -663,8 +654,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "pivoted_plan",
-        "name": "Pivoted Plans",
+        "alias": "pivot",
+        "name": "Pivot",
         "phase": "Action",
         "window": "Action",
         "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
@@ -780,8 +771,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "rendezvous_point",
-        "name": "Rendezvous Point",
+        "alias": "rendezvous",
+        "name": "Rendezvous",
         "phase": "Action",
         "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's units",
         "text": "Remove your command token from that system and end your turn.",
@@ -855,7 +846,7 @@
         "alias": "sensor_jam",
         "name": "Sensor Jam",
         "phase": "Action",
-        "window": "After the \"Move Ships\" substep of a tactical action",
+        "window": "After a player moves ships into the active system",
         "text": "Your cruisers and destroyers in the active system gain SUSTAIN DAMAGE during this tactical action.",
         "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
         "source": "action_deck_2"
