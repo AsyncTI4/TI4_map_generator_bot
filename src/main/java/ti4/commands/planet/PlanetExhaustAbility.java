@@ -31,7 +31,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
     }
 
     public static void doAction(GenericInteractionCreateEvent event, Player player, String planet, Game game, boolean exhaust) {
-        doAction(event, player, planet, game, exhaust);
+        doAction(player, planet, game, exhaust);
     }
 
     public static void doAction(Player player, String planet, Game game, boolean exhaust) {
