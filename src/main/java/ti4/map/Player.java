@@ -1656,7 +1656,7 @@ public class Player extends PlayerProperties {
     @Override
     public List<String> getTeamMateIDs() {
         if (!super.getTeamMateIDs().contains(getUserID())) {
-            super.getTeamMateIDs().add(getUserID()); // a few things depend on the "primary" user being here
+            super.getTeamMateIDs().addFirst(getUserID()); // a few things depend on the "primary" user being here
         }
         return super.getTeamMateIDs();
     }
@@ -1664,8 +1664,8 @@ public class Player extends PlayerProperties {
     @Override
     public void setTeamMateIDs(List<String> teammateIDs) {
         Set<String> nonDuplicates = new HashSet<>(teammateIDs);
-        getTeamMateIDs().clear();
-        getTeamMateIDs().addAll(nonDuplicates);
+        super.getTeamMateIDs().clear();
+        super.getTeamMateIDs().addAll(nonDuplicates);
     }
 
     public void addTeamMateID(String userID) {
