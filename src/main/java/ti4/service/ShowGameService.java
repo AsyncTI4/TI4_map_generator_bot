@@ -47,9 +47,7 @@ public class ShowGameService {
     }
 
     public static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
-            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
-        });
+        MapRenderPipeline.queue(game, event, displayType, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     private static MessageChannel sendMessage(Game game, GenericInteractionCreateEvent event) {

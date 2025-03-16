@@ -57,7 +57,7 @@ public class HomebrewService {
     public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
 
-        StringBuffer sb = new StringBuffer("### Choose the homebrew you'd like in the game\n");
+        StringBuilder sb = new StringBuilder("### Choose the homebrew you'd like in the game\n");
         for (Homebrew hb : Homebrew.values()) {
             sb.append("**").append(hb.name).append("**: ").append(hb.description).append("\n");
             buttons.add(Buttons.green("setupHomebrew_" + hb, hb.name));

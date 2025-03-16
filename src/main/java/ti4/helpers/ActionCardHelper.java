@@ -265,8 +265,8 @@ public class ActionCardHelper {
         if (count < 1) {
             return;
         }
-        String message = player.getRepresentationNoPing()
-            + " discarded " + count + " random action card" + (count == 1 ? "" : "s") + ".\n";
+        StringBuilder message = new StringBuilder(player.getRepresentationNoPing()
+            + " discarded " + count + " random action card" + (count == 1 ? "" : "s") + ".\n");
         while (count > 0 && !player.getActionCards().isEmpty()) {
             Map<String, Integer> actionCards_ = player.getActionCards();
             List<String> cards_ = new ArrayList<>(actionCards_.keySet());
@@ -277,10 +277,10 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such action card with id `" + acID + "` found, please retry.");
                 return;
             }
-            message += Mapper.getActionCard(acID).getRepresentation();
+            message.append(Mapper.getActionCard(acID).getRepresentation());
             count--;
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         sendActionCardInfo(game, player);
     }
 

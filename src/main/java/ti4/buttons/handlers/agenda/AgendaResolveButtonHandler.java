@@ -5,14 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
@@ -468,7 +467,7 @@ class AgendaResolveButtonHandler {
                         }
                         uH.removeAllUnits(player.getColor());
                         if (AgendaHelper.getPlayersWithLeastPoints(game).size() == 1) {
-                            Player p2 = AgendaHelper.getPlayersWithLeastPoints(game).get(0);
+                            Player p2 = AgendaHelper.getPlayersWithLeastPoints(game).getFirst();
                             Tile tile = game.getTileFromPlanet(winner);
                             if (tile != null) {
                                 AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + winner);

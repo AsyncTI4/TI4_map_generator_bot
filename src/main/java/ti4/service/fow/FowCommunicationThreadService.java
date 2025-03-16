@@ -11,11 +11,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -77,13 +76,9 @@ public class FowCommunicationThreadService {
 
     private static Map<ThreadChannel, Player> findCommThreads(Game game, Player player) {
         Map<ThreadChannel, Player> threadMap = new HashMap<>();
-        game.getMainGameChannel().getThreadChannels().forEach(thread -> {
-            checkThread(threadMap, thread, game, player);
-        });
+        game.getMainGameChannel().getThreadChannels().forEach(thread -> checkThread(threadMap, thread, game, player));
 
-        game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().forEach(thread -> {
-            checkThread(threadMap, thread, game, player);
-        });
+        game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().forEach(thread -> checkThread(threadMap, thread, game, player));
 
         return threadMap;
     }
@@ -119,23 +114,15 @@ public class FowCommunicationThreadService {
             String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
             if (areNeighbors && threadLocked) {
                 //Allow talking
-                threadChannel.getManager().setArchived(false).queue(success -> {
-                    threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
-                        .queue(nameUpdated -> {
-                            threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda
-                                ? " **may** communicate in Agenda phase."
-                                : " are neighbors again and **may** communicate.")).queue();
-                        });
-                });
+                threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
+                    .queue(nameUpdated -> threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda
+                        ? " **may** communicate in Agenda phase."
+                        : " are neighbors again and **may** communicate.")).queue()));
 
             } else if (!areNeighbors && !threadLocked) {
                 //Deny talking
-                threadChannel.getManager().setArchived(false).queue(success -> {
-                    threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR))
-                        .queue(nameUpdated -> {
-                            threadChannel.sendMessage(notice + " are no longer neighbors and should **not** communicate.").queue();
-                        });
-                });
+                threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR))
+                    .queue(nameUpdated -> threadChannel.sendMessage(notice + " are no longer neighbors and should **not** communicate.").queue()));
             }
         }
     }
@@ -172,12 +159,10 @@ public class FowCommunicationThreadService {
         String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + YES_CHAR + " " + StringUtils.capitalize(player.getColor());
         game.getMainGameChannel().createThreadChannel(threadName, true)
             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-            .queue(t -> {
-            MessageHelper.sendMessageToChannel(t, "## Private communications thread opened\n"
+            .queue(t -> MessageHelper.sendMessageToChannel(t, "## Private communications thread opened\n"
                 + "Players: " + inviteePlayer.getRepresentation(true, true, false, true)
                 + " " + player.getRepresentation(true, true, false, true) + "\n"
-                + "GM ping: " + game.getPlayersWithGMRole().stream().map(gm -> gm.getPing()).collect(Collectors.joining(" ")));
-        });
+                + "GM ping: " + game.getPlayersWithGMRole().stream().map(Player::getPing).collect(Collectors.joining(" "))));
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() 
                 + "(You) accepted private communications invitation from " + inviteePlayer.getRepresentationNoPing());

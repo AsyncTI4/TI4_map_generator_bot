@@ -1,7 +1,6 @@
 package ti4.commands.user;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
