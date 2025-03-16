@@ -330,7 +330,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private boolean isFowModeActive() {
-        return game.isFowMode() && event != null && 
+        return game.isFowMode() && event != null &&
             (FoWHelper.isPrivateGame(game, event) || event instanceof UserOverridenGenericInteractionCreateEvent);
     }
 
@@ -657,9 +657,7 @@ public class MapGenerator implements AutoCloseable {
 
             Player activePlayer = game.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(game.getRealPlayers());
-
-            Comparator<Player> comparator = Comparator.comparing(game::getPlayersTurnSCInitiative);
-            allPlayers.sort(comparator);
+            allPlayers.sort(Player.comparingInitiative());
 
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
             Collections.rotate(allPlayers, rotationDistance);

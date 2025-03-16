@@ -69,22 +69,23 @@ public class TileGenerator {
     private final String focusTile;
     private final DisplayType displayType;
 
-    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, DisplayType displayType) {
+    public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         this(game, event, displayType, 0, "000", null);
     }
 
-    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile) {
+    public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile) {
         this(game, event, displayType, context, focusTile, null);
     }
 
-    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile, @Nullable Player fowPlayer) {
+    public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile, @Nullable Player fowPlayer) {
         this.game = game;
         this.event = event;
         this.displayType = displayType;
         this.context = context;
         this.focusTile = focusTile;
-        isFoWPrivate = isFowModeActive();
-        this.fowPlayer = fowPlayer != null ? fowPlayer : CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
+        this.isFoWPrivate = isFowModeActive();
+        this.fowPlayer = fowPlayer != null ? fowPlayer
+            : (event != null ? CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId()) : null);
     }
 
     private boolean isFowModeActive() {
@@ -94,6 +95,10 @@ public class TileGenerator {
     }
 
     public FileUpload createFileUpload() {
+        return FileUploadService.createFileUpload(createMainImage(), game.getName());
+    }
+
+    public BufferedImage createMainImage() {
         Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
         Set<String> systemsInRange = getTilesToShow(game, context, focusTile);
         Set<String> keysToRemove = new HashSet<>(tilesToDisplay.keySet());
@@ -103,7 +108,7 @@ public class TileGenerator {
         }
 
         // Resolve fog of war vision limitations
-        if (game.isFowMode() && event != null && event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
+        if (isFoWPrivate) {
             Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
             Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
             keys.removeAll(tilesToShow);
@@ -143,7 +148,7 @@ public class TileGenerator {
             BotLogger.log(game.getName() + ": Could not save generated system info image");
         }
 
-        return FileUploadService.createFileUpload(mainImage, game.getName());
+        return mainImage;
     }
 
     private static Set<String> getTilesToShow(Game game, int context, String focusTile) {
@@ -250,12 +255,12 @@ public class TileGenerator {
                             int labelX = TILE_PADDING + LABEL_POSITION_POINT.x;
                             int labelY = TILE_PADDING + LABEL_POSITION_POINT.y;
                             DrawingUtil.superDrawString(tileGraphics, label, labelX, labelY, Color.WHITE, null, null, null, null);
-                        //Any other custom label wordwrapped in the middle
+                            //Any other custom label wordwrapped in the middle
                         } else {
                             int labelX = TILE_PADDING + (TILE_WIDTH / 2);
                             int labelY = TILE_PADDING + (TILE_HEIGHT / 2);
                             int lineHeight = tileGraphics.getFontMetrics().getHeight();
-                            List<String> toDraw = DrawingUtil.layoutText((Graphics2D)tileGraphics, label, TILE_WIDTH - TILE_PADDING);
+                            List<String> toDraw = DrawingUtil.layoutText((Graphics2D) tileGraphics, label, TILE_WIDTH - TILE_PADDING);
                             int deltaY = 0;
                             for (String line : toDraw) {
                                 DrawingUtil.superDrawString(tileGraphics, line, labelX, labelY + deltaY, Color.WHITE, MapGenerator.HorizontalAlign.Center, null, null, null);

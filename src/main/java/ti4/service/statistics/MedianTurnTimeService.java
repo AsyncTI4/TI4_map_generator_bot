@@ -37,8 +37,7 @@ public class MedianTurnTimeService {
 
         GamesPage.consumeAllGames(
             endedGamesFilter,
-            game -> getMedianTurnTimeForGame(game, playerTurnCount, playerAverageTurnTimes)
-        );
+            game -> getMedianTurnTimeForGame(game, playerTurnCount, playerAverageTurnTimes));
 
         Map<String, Long> playerMedianTurnTimes = playerAverageTurnTimes.entrySet().stream()
             .map(e -> Map.entry(e.getKey(), Helper.median(e.getValue().stream().sorted().toList())))
@@ -74,10 +73,12 @@ public class MedianTurnTimeService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Median Turn Time", sb.toString());
     }
 
-    private static void getMedianTurnTimeForGame(Game game, Map<String, Integer> playerTurnCount,
-                                                    Map<String, Set<Long>> playerAverageTurnTimes) {
+    private static void getMedianTurnTimeForGame(
+        Game game, Map<String, Integer> playerTurnCount,
+        Map<String, Set<Long>> playerAverageTurnTimes
+    ) {
         for (Player player : game.getRealPlayers()) {
-            int totalTurns = player.getNumberTurns();
+            int totalTurns = player.getNumberOfTurns();
             long totalTurnTime = player.getTotalTurnTime();
             if (totalTurns == 0 || totalTurnTime == 0) continue;
 

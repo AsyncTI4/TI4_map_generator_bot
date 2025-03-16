@@ -1006,12 +1006,12 @@ public class TransactionHelper {
             }
             case "shipOrders", "starCharts" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
-                if(!p1.hasRelic(amountToTrans)){
-                    if(amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans.replace("duplicate", ""))){
+                if (!p1.hasRelic(amountToTrans)) {
+                    if (amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans.replace("duplicate", ""))) {
                         amountToTrans = amountToTrans.replace("duplicate", "");
-                    }else{
-                        if(!amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans+"duplicate")){
-                            amountToTrans = amountToTrans+"duplicate";
+                    } else {
+                        if (!amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans + "duplicate")) {
+                            amountToTrans = amountToTrans + "duplicate";
                         }
                     }
                 }
@@ -1089,7 +1089,7 @@ public class TransactionHelper {
                 if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(p2.getFaction())
                     && !promissoryNoteOwner.equals(p2.getColor())
                     && !p2.isPlayerMemberOfAlliance(game.getPlayerFromColorOrFaction(promissoryNoteOwner))) {
-                    p2.setPromissoryNotesInPlayArea(id);
+                    p2.addPromissoryNoteToPlayArea(id);
                     if (id.endsWith("_sftt")) {
                         sendSftT = true;
                     } else {

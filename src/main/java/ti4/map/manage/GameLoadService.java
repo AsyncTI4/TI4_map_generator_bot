@@ -807,7 +807,7 @@ class GameLoadService {
         if (tokenizer.countTokens() == 2) {
             data = tokenizer.nextToken();
             switch (data) {
-                case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
+                case Constants.FACTION -> player.setFaction(game, tokenizer.nextToken());
                 case Constants.FACTION_EMOJI -> player.setFactionEmoji(tokenizer.nextToken());
                 case Constants.FACTION_DISPLAY_NAME -> player.setDisplayName(tokenizer.nextToken().replace("_", " "));
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
@@ -912,7 +912,7 @@ class GameLoadService {
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
-                case Constants.SPENT_THINGS -> player.setSpentThings(getCardList(tokenizer.nextToken()));
+                case Constants.SPENT_THINGS -> player.setSpentThingsThisWindow(getCardList(tokenizer.nextToken()));
                 case Constants.BOMBARD_UNITS -> player.setBombardUnits(getCardList(tokenizer.nextToken()));
                 case Constants.TRANSACTION_ITEMS -> player.setTransactionItems(getCardList(tokenizer.nextToken()));
                 case Constants.TEAMMATE_IDS -> player.setTeamMateIDs(getCardList(tokenizer.nextToken()));
@@ -1014,7 +1014,7 @@ class GameLoadService {
                     }
                 }
 
-                case Constants.NUMBER_OF_TURNS -> player.setNumberTurns(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.NUMBER_OF_TURNS -> player.setNumberOfTurns(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TOTAL_TURN_TIME -> player.setTotalTurnTime(Long.parseLong(tokenizer.nextToken()));
                 case Constants.FOG_FILTER -> {
                     String filter = tokenizer.nextToken();
@@ -1022,7 +1022,7 @@ class GameLoadService {
                 }
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.READY_TO_PASS_BAG -> player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.AUTO_PASS_WHENS_N_AFTERS -> player.setAutoPassWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.AUTO_PASS_WHENS_N_AFTERS -> player.setAutoPassOnWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_CFRAG -> player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));

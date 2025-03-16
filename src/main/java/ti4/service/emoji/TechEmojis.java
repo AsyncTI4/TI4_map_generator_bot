@@ -23,7 +23,7 @@ public enum TechEmojis implements TI4Emoji {
             case "cybernetic" -> CyberneticTech;
             case "warfare" -> WarfareTech;
             case "unitupgrade" -> UnitUpgradeTech;
-            default -> MiscEmojis.Scout;
+            default -> NonUnitTechSkip;
         };
     }
 

@@ -648,25 +648,25 @@ public class PlayerAreaGenerator {
         graphics.setColor(Color.WHITE);
         String bluePrintFileNamePrefix = "pa_ds_bent_blueprint_";
         boolean hasFoundAny = false;
-        if (player.hasFoundCulFrag()) {
+        if (player.isHasFoundCulFrag()) {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "crf.png");
             hasFoundAny = true;
             deltaX += 48;
         }
-        if (player.hasFoundHazFrag()) {
+        if (player.isHasFoundHazFrag()) {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "hrf.png");
             hasFoundAny = true;
             deltaX += 48;
         }
-        if (player.hasFoundIndFrag()) {
+        if (player.isHasFoundIndFrag()) {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "irf.png");
             hasFoundAny = true;
             deltaX += 48;
         }
-        if (player.hasFoundUnkFrag()) {
+        if (player.isHasFoundUnkFrag()) {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "urf.png");
             hasFoundAny = true;
@@ -2129,7 +2129,7 @@ public class PlayerAreaGenerator {
     }
 
     private int techGenSynthesis(int x, int y, int deltaX, Player player, List<String> techs) {
-        int genSynthesisInfantry = player.getGenSynthesisInfantry();
+        int genSynthesisInfantry = player.getStasisInfantry();
         if ((techs == null && genSynthesisInfantry == 0) || !hasInfantryII(techs) && genSynthesisInfantry == 0) {
             return deltaX;
         }

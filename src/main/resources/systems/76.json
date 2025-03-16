@@ -25,29 +25,13 @@
     "imagePath": "76_Rigel.png",
     "shipPositionsType": "TYPE06",
     "spaceTokenLocations": [
-        {
-            "x": 250.0,
-            "y": 90.0
-        },
-        {
-            "x": 80.0,
-            "y": 10.0
-        },
-        {
-            "x": 135.0,
-            "y": 105.0
-        },
-        {
-            "x": 80.0,
-            "y": 185.0
-        }
+        { "x": 250.0, "y": 90.0 },
+        { "x": 80.0, "y": 10.0 },
+        { "x": 135.0, "y": 105.0 },
+        { "x": 80.0, "y": 185.0 }
     ],
     "wormholes": [],
-    "planets": [
-        "rigeliii",
-        "rigelii",
-        "rigeli"
-    ],
+    "planets": ["rigeliii", "rigelii", "rigeli"],
     "source": "pok",
     "tileBack": "blue"
 }

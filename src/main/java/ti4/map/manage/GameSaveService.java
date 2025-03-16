@@ -580,7 +580,7 @@ class GameSaveService {
             writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.doesPlayerAutoPassOnWhensAfters());
+            writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.isAutoPassOnWhensAfters());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.SEARCH_WARRANT + " " + player.isSearchWarrant());
@@ -596,13 +596,13 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             // BENTOR Ancient Blueprints
-            writer.write(Constants.BENTOR_HAS_FOUND_CFRAG + " " + player.hasFoundCulFrag());
+            writer.write(Constants.BENTOR_HAS_FOUND_CFRAG + " " + player.isHasFoundCulFrag());
             writer.write(System.lineSeparator());
-            writer.write(Constants.BENTOR_HAS_FOUND_HFRAG + " " + player.hasFoundHazFrag());
+            writer.write(Constants.BENTOR_HAS_FOUND_HFRAG + " " + player.isHasFoundHazFrag());
             writer.write(System.lineSeparator());
-            writer.write(Constants.BENTOR_HAS_FOUND_IFRAG + " " + player.hasFoundIndFrag());
+            writer.write(Constants.BENTOR_HAS_FOUND_IFRAG + " " + player.isHasFoundIndFrag());
             writer.write(System.lineSeparator());
-            writer.write(Constants.BENTOR_HAS_FOUND_UFRAG + " " + player.hasFoundUnkFrag());
+            writer.write(Constants.BENTOR_HAS_FOUND_UFRAG + " " + player.isHasFoundUnkFrag());
             writer.write(System.lineSeparator());
 
             // LANEFIR ATS Armaments count
@@ -704,7 +704,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
             writer.write(System.lineSeparator());
-            writer.write(Constants.STASIS_INFANTRY + " " + player.getGenSynthesisInfantry());
+            writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
             writer.write(System.lineSeparator());
@@ -732,7 +732,7 @@ class GameSaveService {
             writer.write(Constants.SO_SCORED + " " + getStringRepresentationOfMap(player.getSecretsScored()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberTurns());
+            writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberOfTurns());
             writer.write(System.lineSeparator());
             writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
             writer.write(System.lineSeparator());

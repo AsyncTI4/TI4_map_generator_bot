@@ -88,7 +88,7 @@ class Stats extends GameStateSubcommand {
                         MessageHelper.sendMessageToEventChannel(event, "Not number entered, check command token count again.");
                     }
                 }
-                Helper.isCCCountCorrect(event, game, player.getColor());
+                Helper.isCCCountCorrect(player);
             }
             if (optionT != null) {
                 PlayerStatsService.setValue(event, game, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
@@ -104,7 +104,7 @@ class Stats extends GameStateSubcommand {
                 MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " updated command tokens: " + originalCCString + " -> " + newCCString + ".");
             }
             if (optionT != null || optionF != null || optionS != null) {
-                Helper.isCCCountCorrect(event, game, player.getColor());
+                Helper.isCCCountCorrect(player);
             }
         }
         optionMappings.remove(optionCC);

@@ -177,7 +177,7 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You have successfully passed on all whens/afters for the entire agenda phase. You can undo this during the agenda if necessary, or with this button",buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You have successfully passed on all whens/afters for the entire agenda phase. You can undo this during the agenda if necessary, or with this button", buttons);
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
 
         if (game.getPhaseOfGame().equalsIgnoreCase("agendawaiting")) {
@@ -196,13 +196,13 @@ public class AgendaHelper {
             resolveWhenQueue(event, game);
         }
     }
+
     @ButtonHandler("undoPassOnAllWhensNAfters")
     public static void undoPassOnEverythingWhensNAfters(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " You have successfully undone passing on all whens and afters for the agenda phase. You may still need to handle whens/afters for any currently ongoing agenda");
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "");
 
-        
     }
 
     public static List<String> getPossibleWhenNames(Player player) {
@@ -258,6 +258,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         resolveWhenQueue(event, game);
     }
+
     @ButtonHandler("explainQueue")
     public static void explainQueue(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         String msg = """
@@ -265,7 +266,7 @@ public class AgendaHelper {
             If your answer is yes, then it will play your chosen ability/AC when everyone in front of you officially declines on playing anything. If they do decide to play\
              something, then your answer will be tossed out and you will be asked to reconsider if you want to play something, now that you have more information. If your answer was no \
              then by default the system will assume that your answer will remain no, but after saying no you can tell the system to ask you again if someone else plays something.
-            
+
             I would like to emphasize at this time that there is little benefit in stalling your decision here. You have as much information as you need to answer the bots queuestion, and if others provide more \
             information you will/can just be asked to privately decide again at that later point. The one exception to this is if you can glean information from table chatter, which if you can, by all means wait to decide \
             until you hear all the chatter.""";
@@ -546,7 +547,7 @@ public class AgendaHelper {
                                 PromissoryNoteHelper.resolvePNPlay(after, player, game, event);
                             }
                             case "planet" -> {
-                                PlanetExhaustAbility.doAction(player, "tarrock", game, true);
+                                PlanetExhaustAbility.doAction(event, player, "tarrock", game, true);
                             }
                             case "tech" -> {
                                 player.exhaustTech("dsedyng");
@@ -1519,7 +1520,7 @@ public class AgendaHelper {
 
     public static void startTheVoting(Game game) {
         game.setPhaseOfGame("agendaVoting");
-        if(!game.getStoredValue("CommFormPreset").isEmpty()){
+        if (!game.getStoredValue("CommFormPreset").isEmpty()) {
             autoResolve(null, game.getPlayerFromColorOrFaction(game.getStoredValue("CommFormPreset")), "autoresolve_manualcommittee", game);
             game.removeStoredValue("CommFormPreset");
             return;
@@ -2205,10 +2206,10 @@ public class AgendaHelper {
                     + " this is a reminder that you don't currently hold your _Political Secret_. Any \"whens\" or \"afters\" that you queue will be automatically cancelled if it is played by another player.");
             }
             if (game.getCurrentAgendaInfo().contains("Player") && ButtonHelper.isPlayerElected(game, player, "committee")) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("presetCommitteeFormation","Preset Committee Formation"));
+                List<Button> buttons = new ArrayList();
+                buttons.add(Buttons.green("presetCommitteeFormation", "Preset Committee Formation"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() +" You can use this button to preset Committee Formation to resolve after all the afters",buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " You can use this button to preset Committee Formation to resolve after all the afters", buttons);
 
             }
         }
@@ -2217,8 +2218,8 @@ public class AgendaHelper {
     @ButtonHandler("presetCommitteeFormation")
     public static void presetCommitteeFormation(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() +" you successfully preset a play of Committee Formation");
-        game.setStoredValue("CommFormPreset",player.getFaction());
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " you successfully preset a play of Committee Formation");
+        game.setStoredValue("CommFormPreset", player.getFaction());
     }
 
     @ButtonHandler("exhaustForVotes_")
@@ -2599,7 +2600,7 @@ public class AgendaHelper {
     public static String getSummaryOfVotes(Game game, boolean capitalize) {
         return getSummaryOfVotes(game, capitalize, false);
     }
-    
+
     public static String getSummaryOfVotes(Game game, boolean capitalize, boolean overwriteFog) {
         String summary;
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
@@ -3049,7 +3050,7 @@ public class AgendaHelper {
             deadlyActionRow3.add(Buttons.red("resolveWithNoEffect", "Resolve With No Result"));
             MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), resMessage3, deadlyActionRow3);
         }
-        if(event != null){
+        if (event != null) {
             ButtonHelper.deleteMessage(event);
         }
     }
@@ -3714,8 +3715,8 @@ public class AgendaHelper {
     @ButtonHandler("proceedToVoting")
     public static void proceedToVoting(ButtonInteractionEvent event, Game game, Player player) {
         String msg = "Decided to skip waiting for afters and proceed to voting. Note that this is not advised unless a bug has occurred. ";
-        if(player != null){
-            msg = player.getRepresentation() + " " +msg;
+        if (player != null) {
+            msg = player.getRepresentation() + " " + msg;
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), msg);
         try {

@@ -129,7 +129,7 @@ public class AddPlanetService {
                             && unitHolder.getTokenList().stream().anyMatch(s -> s.contains(pnModel.getAttachment().get()))) {
                             player_.removePromissoryNote(pn);
                             player.setPromissoryNote(pn);
-                            player.setPromissoryNotesInPlayArea(pn);
+                            player.addPromissoryNoteToPlayArea(pn);
                         }
                     }
                     if (Mapper.getPlanet(planet) != null &&

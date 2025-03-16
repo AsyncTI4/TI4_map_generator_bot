@@ -112,16 +112,13 @@ public class JimboHandlers {
         if ((matcher = Pattern.compile(regexPt1).matcher(buttonID)).matches()) {
             String msg = "Choose a tile that you want to place on the map:";
             String type = matcher.group("type");
-            System.out.println("JIMBOta - " + buttonID);
 
             Function<TileModel, Button> toButton = tile -> JimboButtons.tileToButton(tile, JimboConst.tileAdd);
             int rotation = matcher.group("index") != null ? Integer.parseInt(matcher.group("index")) : 0;
             List<Button> bonusButtons = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
-            System.out.println("JIMBOta - rot=" + rotation);
 
             bonusButtons.addAll(getRotateTileButtons(type, matcher.group("page"), rotation));
             List<TileModel> tiles = getTilesForType(type, rotation, 0);
-            System.out.println("JIMBOta - tiles=" + tiles.size());
 
             JimboButtons.jimboPagination(event, msg, tiles, toButton, JimboImageHelper::tilesImage, bonusButtons, 10, buttonID);
 

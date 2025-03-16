@@ -1012,7 +1012,7 @@ public class ButtonHelperAbilities {
     }
 
     public static void offerOrladinPlunderButtons(Player player, Game game, String planet) {
-        if (!player.getHasUsedEnvironmentPlunderAbility() && player.hasAbility("policy_the_environment_plunder")
+        if (!player.isHasUsedEnvironmentPlunderAbility() && player.hasAbility("policy_the_environment_plunder")
             && ButtonHelper.getTypeOfPlanet(game, planet).contains("hazardous")) {
             UnitHolder planetUnit = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             Planet planetReal = (Planet) planetUnit;

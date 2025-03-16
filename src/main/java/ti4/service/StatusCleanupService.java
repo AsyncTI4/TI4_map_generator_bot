@@ -50,14 +50,14 @@ public class StatusCleanupService {
             for (int sc : SCs) {
                 game.setScTradeGood(sc, 0);
             }
-            player.clearSCs();
             player.setInRoundTurnCount(0);
+            player.clearSCs();
             player.clearFollowedSCs();
-            player.cleanExhaustedTechs();
-            game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
-            player.cleanExhaustedPlanets(true);
-            player.cleanExhaustedRelics();
+            player.clearExhaustedTechs();
+            player.clearExhaustedPlanets(true);
+            player.clearExhaustedRelics();
             player.clearExhaustedAbilities();
+            game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
 
             if (player.isRealPlayer() && game.getStoredValue("Pre Pass " + player.getFaction()) != null
                 && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {

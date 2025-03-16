@@ -217,7 +217,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("planetAbilityExhaust_")
     public static void planetAbilityExhaust(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.replace("planetAbilityExhaust_", "");
-        PlanetExhaustAbility.doAction(player, planet, game, true);
+        PlanetExhaustAbility.doAction(event, player, planet, game, true);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1090,7 +1090,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String key3 = "potentialScorePOBlockers";
         String key3b = "potentialScoreSOBlockers";
         String message;
-        for (Player player2 : Helper.getInitativeOrder(game)) {
+        for (Player player2 : game.getActionPhaseTurnOrder()) {
             if (player2 == player) {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     game.setStoredValue(key2, game.getStoredValue(key2)
@@ -1184,7 +1184,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message = player.getRepresentationUnfogged() + " Use below buttons to move any ground forces or conclude retreat.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, pos1, pos2));
         ButtonHelper.deleteMessage(event);
-        if(game.getTileByPosition(pos1).isGravityRift()){
+        if (game.getTileByPosition(pos1).isGravityRift()) {
             Button rift = Buttons.green(player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos2,
                 "Rift Units", MiscEmojis.GravityRift);
             List<Button> buttons = new ArrayList<>();
@@ -1245,7 +1245,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String key3 = "potentialScoreSOBlockers";
                 String key3b = "potentialScorePOBlockers";
                 String message;
-                for (Player player2 : Helper.getInitativeOrder(game)) {
+                for (Player player2 : game.getActionPhaseTurnOrder()) {
                     if (player2 == player) {
                         int soIndex = Integer.parseInt(soID);
                         SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
@@ -1880,12 +1880,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
-        String color = player.getColor();
-        if (Mapper.isValidColor(color)) {
-            CommandCounterHelper.addCC(event, color, tile);
-        }
+        CommandCounterHelper.addCC(event, player, tile);
         String message = player.getFactionEmojiOrColor() + " Placed 1 command token from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system.";
-        if(!game.isFowMode()){
+        if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event);
         }
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
@@ -1904,17 +1901,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
-        String color = player.getColor();
+        Player constructionPlayer = player;
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(4)) {
-                color = p2.getColor();
+                constructionPlayer = p2;
             }
         }
+        CommandCounterHelper.addCC(event, constructionPlayer, tile);
 
-        if (Mapper.isValidColor(color)) {
-            CommandCounterHelper.addCC(event, color, tile);
-        }
-        String message = player.getRepresentation() + " Placed 1 " + StringUtils.capitalize(color) + " command token in the "
+        String colorName = Mapper.getColor(constructionPlayer.getColor()).getDisplayName();
+        String message = player.getRepresentation() + " Placed 1 " + colorName + " command token in the "
             + Helper.getPlanetRepresentation(planet, game)
             + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent on **Construction**.";
@@ -2480,7 +2476,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             for (Player player_ : players.values()) {
-                player_.cleanExhaustedPlanets(false);
+                player_.clearExhaustedPlanets(false);
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), "All planets have been readied at the end of the agenda phase.");
         } else {
@@ -2777,7 +2773,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
         TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC,
             acAlias,
-            player.getNumberTurns());
+            player.getNumberOfTurns());
         if (combatModAC != null) {
             player.addNewTempCombatMod(combatModAC);
             MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -2790,7 +2786,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void applytempcombatmodtech(ButtonInteractionEvent event, Player player) {
         String acAlias = "sc";
         TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier("tech", acAlias,
-            player.getNumberTurns());
+            player.getNumberOfTurns());
         if (combatModAC != null) {
             player.addNewTempCombatMod(combatModAC);
             MessageHelper.sendMessageToChannel(event.getChannel(),

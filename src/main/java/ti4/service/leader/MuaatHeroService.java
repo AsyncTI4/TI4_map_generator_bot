@@ -21,10 +21,12 @@ public class MuaatHeroService {
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
 
         //Remove all other players units from the tile in question
-        for (Player player_ : game.getPlayers().values()) {
-            if (player_ != player) {
-                tile.removeAllUnits(player_.getColor());
-                tile.removeAllUnitDamage(player_.getColor());
+        for (UnitHolder uh : tile.getUnitHolders().values()) {
+            for (Player player_ : game.getPlayers().values()) {
+                if (player_ == player)
+                    continue; // skip muaat
+                uh.removeAllUnits(player_.getColor());
+                uh.removeAllUnitDamage(player_.getColor());
             }
         }
 

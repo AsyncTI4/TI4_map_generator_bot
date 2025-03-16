@@ -215,7 +215,7 @@ public class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        CommandCounterHelper.addCC(event, p2.getColor(), tile);
+        CommandCounterHelper.addCC(event, p2, tile);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " you placed " + p2.getFactionEmojiOrColor()
@@ -458,10 +458,7 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.sendMessageToRightStratThread(player, game, msg, "construction");
         if (!player.getSCs().contains(Integer.parseInt("4"))
             && !game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
-            String color = player.getColor();
-            if (Mapper.isValidColor(color)) {
-                CommandCounterHelper.addCC(event, color, tile);
-            }
+            CommandCounterHelper.addCC(event, player, tile);
             ButtonHelper.sendMessageToRightStratThread(player, game,
                 player.getFactionEmoji() + " Placed 1 command token from reinforcements in the "
                     + Helper.getPlanetRepresentation(planet, game) + " system.",
@@ -504,7 +501,7 @@ public class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        CommandCounterHelper.addCC(event, p2.getColor(), tile);
+        CommandCounterHelper.addCC(event, p2, tile);
         event.getMessage().delete().queue();
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

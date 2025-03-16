@@ -48,7 +48,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String legendaryAbilityFlavourText;
     private String basicAbilityText;
     private String flavourText;
-    private UnitTokenPosition unitPositions;
+    private UnitTokenPosition unitPositions; // phase this out
+    private PlanetLayoutModel planetLayout;
     private int spaceCannonDieCount;
     private int spaceCannonHitsOn;
     private List<String> searchTags = new ArrayList<>();
@@ -81,6 +82,16 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     public boolean getShrinkNamePNAttach() {
         return Optional.ofNullable(shrinkNamePNAttach).orElse(getShrinkName());
+    }
+
+    @Deprecated
+    public Point getPositionInTile() {
+        if (positionInTile != null)
+            return positionInTile;
+        else if (planetLayout != null && planetLayout.getCenterPosition() != null) {
+            return planetLayout.getCenterPosition();
+        }
+        return null;
     }
 
     @Deprecated

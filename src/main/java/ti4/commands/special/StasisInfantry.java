@@ -25,8 +25,7 @@ class StasisInfantry extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
         String count = event.getOption(Constants.COUNT).getAsString();
-        setValue(event, player, player::setStasisInfantry, player::getGenSynthesisInfantry, count);
-
+        setValue(event, player, player::setStasisInfantry, player::getStasisInfantry, count);
     }
 
     public void setValue(SlashCommandInteractionEvent event, Player player, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {

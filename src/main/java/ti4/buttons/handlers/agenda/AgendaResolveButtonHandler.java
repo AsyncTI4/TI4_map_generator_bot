@@ -108,7 +108,7 @@ class AgendaResolveButtonHandler {
                     Helper.checkEndGame(game, player2);
                 }
                 if ("warrant".equalsIgnoreCase(agID)) {
-                    player2.setSearchWarrant();
+                    player2.flipSearchWarrant();
                     game.drawSecretObjective(player2.getUserID());
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {
@@ -192,13 +192,12 @@ class AgendaResolveButtonHandler {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Tile tile : ButtonHelper.getAllWormholeTiles(game)) {
                             for (Player player : game.getRealPlayers()) {
-                                if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                                    CommandCounterHelper.addCC(event, player.getColor(), tile);
-                                }
+                                if (!FoWHelper.playerHasShipsInSystem(player, tile))
+                                    continue;
+                                CommandCounterHelper.addCC(event, player, tile);
                             }
                         }
-                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Each system with a wormhole and a player's ships have had 1 of that player's command tokens placed in that system.");
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Each system with a wormhole and a player's ships have had 1 of that player's command tokens placed in that system.");
                     }
                 }
                 if ("travel_ban".equalsIgnoreCase(agID)) {
@@ -235,7 +234,7 @@ class AgendaResolveButtonHandler {
                         for (Player player : game.getRealPlayers()) {
                             Tile tile = player.getHomeSystemTile();
                             if (tile != null) {
-                                CommandCounterHelper.addCC(event, player.getColor(), tile);
+                                CommandCounterHelper.addCC(event, player, tile);
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),

@@ -23,11 +23,17 @@ public class CheckDistanceHelper {
         return countsRiftsAsNormal || !game.getTileByPosition(tilePosition1).isGravityRift(game) ? 100 : 99;
     }
 
+    private static boolean tileUnlockedForMoving(Game game, Player player, Tile tile) {
+        if (ButtonHelper.nomadHeroAndDomOrbCheck(player, game))
+            return true;
+        return !CommandCounterHelper.hasCC(player, tile);
+    }
+
     public static Map<String, Integer> getTileDistancesRelativeToAllYourUnlockedTiles(Game game, Player player) {
         Map<String, Integer> distances = new HashMap<>();
         List<Tile> originTiles = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (!CommandCounterHelper.hasCC(player, tile) && FoWHelper.playerHasUnitsInSystem(player, tile)) {
+            if (tileUnlockedForMoving(game, player, tile) && FoWHelper.playerHasUnitsInSystem(player, tile)) {
                 distances.put(tile.getPosition(), 0);
                 originTiles.add(tile);
             }
