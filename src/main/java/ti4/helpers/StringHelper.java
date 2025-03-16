@@ -61,7 +61,7 @@ public final class StringHelper {
         id = (index == 0) ? "" : id.substring(0, index);
 
         if (currentChar >= 'a' && currentChar < 'z')
-            return id + String.valueOf((char) (currentChar + 1));
+            return id + (char) (currentChar + 1);
         if (currentChar == 'z') {
             return nextId(id) + "a";
         }

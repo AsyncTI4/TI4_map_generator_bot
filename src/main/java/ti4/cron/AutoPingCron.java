@@ -1,7 +1,5 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.*;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +17,8 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
+
+import static java.util.function.Predicate.not;
 
 @UtilityClass
 public class AutoPingCron {
@@ -219,8 +219,8 @@ public class AutoPingCron {
 
     private static void scoringPhasePing(Game game, long milliSinceLastPing) {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
-            String poMsg = "";
-            String soMsg = "";
+            StringBuilder poMsg = new StringBuilder();
+            StringBuilder soMsg = new StringBuilder();
             for(Player player : ti4.helpers.Helper.getInitativeOrder(game)){
                 String po = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"PO");
                 String so = game.getStoredValue(player.getFaction() + "round"+game.getRound()+"SO");
@@ -228,19 +228,19 @@ public class AutoPingCron {
                     if(game.isFowMode()){
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a public objective");
                     }
-                    poMsg += player.getRepresentation() + " ";
+                    poMsg.append(player.getRepresentation()).append(" ");
                 }
                 if(so.isEmpty()){
                     if(game.isFowMode()){
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a secret objective");
                     }
-                    soMsg  += player.getRepresentation() +" ";
+                    soMsg.append(player.getRepresentation()).append(" ");
                 }
             }
-            if(!game.isFowMode()&& !poMsg.isEmpty()){
+            if(!game.isFowMode()&& (poMsg.length() > 0)){
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(),poMsg+ "please indicate if you are scoring a public objective");
             }
-            if(!game.isFowMode()&& !soMsg.isEmpty()){
+            if(!game.isFowMode()&& (soMsg.length() > 0)){
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(),poMsg+ "please indicate if you are scoring a secret objective");
             }
             AutoPingMetadataManager.addPing(game.getName());
@@ -248,17 +248,17 @@ public class AutoPingCron {
     }
     private static void statusHomeworkPing(Game game, long milliSinceLastPing) {
         if (milliSinceLastPing > (ONE_HOUR_IN_MILLISECONDS / 2 * game.getAutoPingSpacer())) {
-            String msg = "";
+            StringBuilder msg = new StringBuilder();
             for(Player player : game.getRealPlayers()){
                 if(!game.getCurrentACDrawStatusInfo().contains(player.getFaction())){
                     if(game.isFowMode()){
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please draw ACs and allocate command tokens");
                     }
-                    msg += player.getRepresentation() + " ";
+                    msg.append(player.getRepresentation()).append(" ");
                 }
                 
             }
-            if(!game.isFowMode() && !msg.isEmpty()){
+            if(!game.isFowMode() && (msg.length() > 0)){
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(),msg+"please draw ACs and allocate command tokens\n");
             }
             AutoPingMetadataManager.addPing(game.getName());

@@ -1,15 +1,6 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -28,12 +19,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -74,6 +64,8 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.user.AFKService;
 import ti4.website.WebsiteOverlay;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class PlayerAreaGenerator {
 
@@ -216,7 +208,7 @@ public class PlayerAreaGenerator {
                     y += 34;
                     DrawingUtil.superDrawString(graphics, userName.toString(), leftJustified, topOfName + 34, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
                 } else { // can one-line it
-                    String fullText = userName.toString() + (factionText == null ? "" : " " + factionText);
+                    String fullText = userName + (factionText == null ? "" : " " + factionText);
                     DrawingUtil.superDrawString(graphics, fullText, leftJustified, topOfName, Color.WHITE, HorizontalAlign.Left, VerticalAlign.Top, stroke2, Color.BLACK);
                 }
             } else { // 2nd+ row, teammates - one-line it, just username
@@ -261,8 +253,7 @@ public class PlayerAreaGenerator {
             int width = mapWidth - topLeft.x;
             int height = y - topLeft.y;
             DrawingUtil.drawRectWithTwoColorGradient(g2, mainColor, accentColor, tl.x, tl.y, width, height);
-            Rectangle rect = new Rectangle(tl.x, tl.y, width, height);
-            return rect;
+            return new Rectangle(tl.x, tl.y, width, height);
         }
 
         // Unfollowed SCs
@@ -1328,7 +1319,7 @@ public class PlayerAreaGenerator {
         int leftSide = mapWidth - widthOfSection - xDeltaFromRightSide;
         addWebsiteOverlay("Fleet Stats", "- Total Resources\n- Total Hit Points\n- Total Expected Hits", leftSide, y + 10, widthOfSection - 10, verticalSpacing * 4 - 10);
         int imageSize = verticalSpacing - 2;
-        drawPAImageScaled(leftSide, y + verticalSpacing * 1, "pa_resources.png", imageSize);
+        drawPAImageScaled(leftSide, y + verticalSpacing, "pa_resources.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 2, "pa_health.png", imageSize);
         drawPAImageScaled(leftSide, y + verticalSpacing * 3, "pa_hit.png", imageSize);
         leftSide += verticalSpacing + 10;
@@ -1362,7 +1353,7 @@ public class PlayerAreaGenerator {
         graphics.setFont(Storage.getFont18());
         DrawingUtil.superDrawStringCenteredDefault(graphics, StringUtils.capitalize(type), xCenter, yTop + 32);
         graphics.setFont(Storage.getFont24());
-        DrawingUtil.superDrawStringCenteredDefault(graphics, totResValue, xCenter, yTop + verticalSpacing * 1 + 20);
+        DrawingUtil.superDrawStringCenteredDefault(graphics, totResValue, xCenter, yTop + verticalSpacing + 20);
         DrawingUtil.superDrawStringCenteredDefault(graphics, healthValue, xCenter, yTop + verticalSpacing * 2 + 20);
         DrawingUtil.superDrawStringCenteredDefault(graphics, combatValue, xCenter, yTop + verticalSpacing * 3 + 20);
     }
@@ -1536,7 +1527,7 @@ public class PlayerAreaGenerator {
         Point position = textPosition.getPosition(id);
 
         graphics.setFont(Storage.getFont35());
-        Integer offset = 20 - graphics.getFontMetrics().stringWidth("" + reinforcementsCount) / 2;
+        int offset = 20 - graphics.getFontMetrics().stringWidth("" + reinforcementsCount) / 2;
         if (reinforcementsCount <= 0) {
             graphics.setColor(Color.YELLOW);
         } else {

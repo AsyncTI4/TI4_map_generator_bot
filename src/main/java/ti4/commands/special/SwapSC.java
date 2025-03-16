@@ -39,8 +39,8 @@ class SwapSC extends GameStateSubcommand {
             return;
         }
 
-        Integer player1SC = player1.getSCs().stream().findFirst().get();
-        Integer player2SC = player2.getSCs().stream().findFirst().get();
+        int player1SC = player1.getSCs().stream().findFirst().get();
+        int player2SC = player2.getSCs().stream().findFirst().get();
 
         if (player1SC == 0 || player2SC == 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot swap strategy cards because a player has zero strategy cards.");

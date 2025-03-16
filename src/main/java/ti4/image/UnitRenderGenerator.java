@@ -1,11 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -120,7 +115,7 @@ public class UnitRenderGenerator {
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             if (player == null) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey.toString() + " in tile " + tile.getRepresentation());
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation());
                 continue;
             }
             Integer unitCount = unitEntry.getValue();

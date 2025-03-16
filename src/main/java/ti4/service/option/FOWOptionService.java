@@ -69,7 +69,7 @@ public class FOWOptionService {
 
     public static void offerFOWOptionButtons(Game game, MessageChannel channel) {
         List<Button> optionButtons = new ArrayList<>();
-        StringBuffer sb = new StringBuffer("## FoW Options\n");
+        StringBuilder sb = new StringBuilder("## FoW Options\n");
         for (FOWOption option : FOWOption.values()) {
             if (!option.isVisible()) continue;
 

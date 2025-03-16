@@ -1,8 +1,8 @@
 package ti4.helpers;
 
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -174,7 +174,7 @@ public class RelicHelper {
             Collections.sort(allRelics);
             for (String relicId : allRelics) {
                 String relicName = Mapper.getRelic(relicId).getName();
-                text.append("\n1. ").append(ExploreEmojis.Relic.toString()).append(" _").append(relicName).append("_");
+                text.append("\n1. ").append(ExploreEmojis.Relic).append(" _").append(relicName).append("_");
             }
         }
 

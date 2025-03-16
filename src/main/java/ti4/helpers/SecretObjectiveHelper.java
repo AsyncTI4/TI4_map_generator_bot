@@ -65,22 +65,22 @@ public class SecretObjectiveHelper {
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
                     List<String> playerFragments = player.getFragments();
                     List<String> fragmentsToPurge = new ArrayList<>(playerFragments);
-                    String message2 = player.getRepresentation() + " purged";
+                    StringBuilder message2 = new StringBuilder(player.getRepresentation() + " purged");
                     for (String fragid : fragmentsToPurge) {
                         player.removeFragment(fragid);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
                         switch (fragid)
                         {
-                            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message2 += " " + ExploreEmojis.CFrag;
-                            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message2 += " " + ExploreEmojis.HFrag;
-                            case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message2 += " " + ExploreEmojis.IFrag;
-                            case "urf1", "urf2", "urf3" ->  message2 += " " + ExploreEmojis.UFrag;
-                            default ->  message2 += " " + fragid;
+                            case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message2.append(" " + ExploreEmojis.CFrag);
+                            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message2.append(" " + ExploreEmojis.HFrag);
+                            case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message2.append(" " + ExploreEmojis.IFrag);
+                            case "urf1", "urf2", "urf3" ->  message2.append(" " + ExploreEmojis.UFrag);
+                            default ->  message2.append(" ").append(fragid);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
-                    message2 += " relic fragments.";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2);
+                    message2.append(" relic fragments.");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message2.toString());
                 } else {
                     String finChecker = player.getFinsFactionCheckerPrefix();
                     List<Button> purgeFragButtons = new ArrayList<>();

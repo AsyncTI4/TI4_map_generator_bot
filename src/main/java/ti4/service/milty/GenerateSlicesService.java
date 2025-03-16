@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.apache.commons.collections4.ListUtils;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.collections4.ListUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.Helper;
@@ -57,13 +56,13 @@ public class GenerateSlicesService {
 
         // Partition blue tiles to split them up into "tiers" so that slices get 1 good tile, 1 medium tile, and 1 meh tile
         List<MiltyDraftTile> blue = draftManager.getBlue();
-        Collections.sort(blue, Comparator.comparingDouble(MiltyDraftTile::abstractValue));
+        blue.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
         int bluePerPartition = Math.ceilDiv(blue.size(), bluePerPlayer);
         partitionedTiles.addAll(ListUtils.partition(blue, bluePerPartition));
 
         // Partition RED tiles into "tiers" so that slices don't get dumb stuff like 2 supernovae, 2 rifts, etc
         List<MiltyDraftTile> red = draftManager.getRed();
-        Collections.sort(red, Comparator.comparingDouble(MiltyDraftTile::abstractValue));
+        red.sort(Comparator.comparingDouble(MiltyDraftTile::abstractValue));
         int redPerPartition = Math.ceilDiv(red.size(), redPerPlayer);
         partitionedTiles.addAll(ListUtils.partition(red, redPerPartition));
 

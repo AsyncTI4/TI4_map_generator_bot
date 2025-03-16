@@ -10,7 +10,6 @@ import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
-import ti4.service.emoji.ExploreEmojis;
 import ti4.service.info.RelicInfoService;
 
 class RelicPurge extends GameStateSubcommand {

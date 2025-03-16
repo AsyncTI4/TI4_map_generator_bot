@@ -77,7 +77,7 @@ public class SearchGameHelper {
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
             sb.append(completedGames);
-            sb.append("` Completed. `"+ongoingAmount+"` Ongoing --");
+            sb.append("` Completed. `").append(ongoingAmount).append("` Ongoing --");
             sb.append(user.getEffectiveName());
             sb.append("\n");
             index.getAndIncrement();

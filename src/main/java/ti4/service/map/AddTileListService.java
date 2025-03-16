@@ -127,8 +127,7 @@ public class AddTileListService {
             .setValue(game.getMapString().substring(0, game.getMapString().length() > 4000 ? 4000 : game.getMapString().length()))
             .setRequired(true)
             .build();
-        Modal modal = Modal.create(modalId, "Add Map String for " + game.getName()).addActionRow(tags).build();
-        return modal;
+        return Modal.create(modalId, "Add Map String for " + game.getName()).addActionRow(tags).build();
     }
 
     @ModalHandler("addMapString")

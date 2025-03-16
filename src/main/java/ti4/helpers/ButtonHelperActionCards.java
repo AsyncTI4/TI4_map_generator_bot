@@ -2148,14 +2148,14 @@ public class ButtonHelperActionCards {
     public static void miningInitiative(Player player, Game game, ButtonInteractionEvent event) {
         int oldTg = player.getTg();
         int count = 0;
-        String bestPlanet = "";
+        StringBuilder bestPlanet = new StringBuilder();
         for (String planet : player.getPlanetsAllianceMode()) {
             Planet p = game.getPlanetsInfo().get(planet);
             if (p != null && p.getResources() > count) {
                 count = p.getResources();
-                bestPlanet = planet;
-            } else if (p != null && p.getResources() == count && !bestPlanet.endsWith(" or whatever")) {
-                bestPlanet += " or whatever";
+                bestPlanet = new StringBuilder(planet);
+            } else if (p != null && p.getResources() == count && !bestPlanet.toString().endsWith(" or whatever")) {
+                bestPlanet.append(" or whatever");
             }
         }
         player.setTg(oldTg + count);
