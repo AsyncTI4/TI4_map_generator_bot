@@ -8,11 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -24,6 +19,9 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
@@ -89,6 +87,8 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -986,14 +986,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
             if (!game.getStoredValue("newStatusScoringMode").isEmpty() && game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
-                String missingPeople = "";
+                StringBuilder missingPeople = new StringBuilder();
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
                     if (so.isEmpty()) {
-                        missingPeople += player.getRepresentation(false, true);
+                        missingPeople.append(player.getRepresentation(false, true));
                     }
                 }
-                if (!missingPeople.isEmpty()) {
+                if (missingPeople.length() > 0) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), missingPeople + " need to indicate if they are scoring a secret objective before the next PO can be flipped");
                     return;
                 }

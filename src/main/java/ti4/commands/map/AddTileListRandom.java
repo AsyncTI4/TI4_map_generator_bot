@@ -9,11 +9,10 @@ import java.util.StringTokenizer;
 
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.GameStateSubcommand;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-import ti4.service.map.AddTileService.RandomOption;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
@@ -22,6 +21,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.TileModel;
 import ti4.service.map.AddTileListService;
 import ti4.service.map.AddTileService;
+import ti4.service.map.AddTileService.RandomOption;
 
 public class AddTileListRandom extends GameStateSubcommand {
 
@@ -36,7 +36,7 @@ public class AddTileListRandom extends GameStateSubcommand {
         
         //Inject a new action row to the modal
         Modal.Builder newModalBuilder = Modal.create(modal.getId(), modal.getTitle());
-        modal.getComponents().forEach(component -> newModalBuilder.addComponents(component));
+        modal.getComponents().forEach(newModalBuilder::addComponents);
         boolean hasExistingErTiles = game.getTileMap().values().stream().anyMatch(t -> t.getTileID().toLowerCase().startsWith("er"));
         TextInput sourcesInput = TextInput.create(Constants.INCLUDE_ERONOUS_TILES, "Include Eronous tiles", TextInputStyle.SHORT)
             .setPlaceholder("(Y)es / (N)o")

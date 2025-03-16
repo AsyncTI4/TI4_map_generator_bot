@@ -149,7 +149,7 @@ class CreateFOWGameChannels extends Subcommand {
             .addRolePermissionOverride(gameRoleGMID, permission, 0)
             .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
         
-        StringBuffer sb = new StringBuffer(roleGM.getAsMention() + " - gm room\n");
+        StringBuilder sb = new StringBuilder(roleGM.getAsMention() + " - gm room\n");
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
         HomebrewService.offerGameHomebrewButtons(gmChannel);
@@ -159,7 +159,7 @@ class CreateFOWGameChannels extends Subcommand {
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
-        sb = new StringBuffer(role.getAsMention() + " - announcements channel\n");
+        sb = new StringBuilder(role.getAsMention() + " - announcements channel\n");
         sb.append(getInfoTextFromFile("FoWMainChannelIntro.txt"));
         MessageHelper.sendMessageToChannel(actionsChannel, sb.toString());
         newGame.setMainChannelID(actionsChannel.getId());
@@ -177,7 +177,7 @@ class CreateFOWGameChannels extends Subcommand {
                 .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
             Player player_ = newGame.getPlayer(member.getId());
             player_.setPrivateChannelID(memberChannel.getId());
-            sb = new StringBuffer(member.getAsMention() + " - private channel\n");
+            sb = new StringBuilder(member.getAsMention() + " - private channel\n");
             sb.append(privateChannelIntro);
             MessageHelper.sendMessageToChannelWithButton(memberChannel, sb.toString(), Buttons.DONE_DELETE_BUTTONS);
         }

@@ -15,12 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -40,6 +34,10 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -101,6 +99,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -166,23 +166,21 @@ public class ButtonHelper {
                 amount = totalAmount / batches;
             }
 
-            String message = (amount <= 10 ? UnitEmojis.infantry.toString().repeat(amount) : UnitEmojis.infantry + "×" + amount)
-                + " died. Rolling for resurrection.\n";
+            StringBuilder message = new StringBuilder((amount <= 10 ? UnitEmojis.infantry.toString().repeat(amount) : UnitEmojis.infantry + "×" + amount)
+                + " died. Rolling for resurrection.\n");
             int revive = 0;
             for (int x = 0; x < amount; x++) {
                 Die dice = new Die(player.hasTech("so2") ? 5 : 6);
-                message += dice.getGreenDieIfSuccessOrRedDieIfFailure();
+                message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                 revive += dice.isSuccess() ? 1 : 0;
             }
             int failed = amount - revive;
             if (revive == 0) {
-                message += "\nNone of your infantry revived.";
+                message.append("\nNone of your infantry revived.");
             } else {
-                message += "\n" + (failed == 0 ? "All " : "")
-                    + (revive <= 10 ? UnitEmojis.infantry.toString().repeat(revive) : UnitEmojis.infantry + "×" + revive)
-                    + " revived. You will be prompted to place them on a planet in your home system at the start of your next turn.";
+                message.append("\n").append(failed == 0 ? "All " : "").append(revive <= 10 ? UnitEmojis.infantry.toString().repeat(revive) : UnitEmojis.infantry + "×" + revive).append(" revived. You will be prompted to place them on a planet in your home system at the start of your next turn.");
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
             player.setStasisInfantry(player.getGenSynthesisInfantry() + revive);
             totalAmount -= amount;
         }
@@ -4067,7 +4065,7 @@ public class ButtonHelper {
 
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice.");
-            return new ArrayList<Button>();
+            return new ArrayList<>();
         }
         if (game.isNaaluAgent() || player == game.getActivePlayer()) {
             if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)

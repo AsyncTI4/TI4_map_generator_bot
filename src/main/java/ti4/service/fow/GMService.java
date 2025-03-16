@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.FoWHelper;
@@ -57,7 +57,7 @@ public class GMService {
     @ButtonHandler("gmShowGameAs_")
     public static void showGameAs(ButtonInteractionEvent event, String buttonID, Game game) {
         String faction = buttonID.replace("gmShowGameAs_", "");
-        if (!"".equals(faction)) {
+        if (!faction.isEmpty()) {
             Player showAs = game.getPlayerFromColorOrFaction(faction);
             ShowGameService.simpleShowGame(game, new UserOverridenGenericInteractionCreateEvent(event, showAs.getUser()));
         } else {
@@ -86,8 +86,8 @@ public class GMService {
                 checkWhoHas("confounding", game);
             }
             case "whens" -> {
-                StringBuffer sbWhens = new StringBuffer("Following players have **whens** in hand:\n");
-                StringBuffer sbAfters = new StringBuffer("Following players have **afters** in hand:\n");
+                StringBuilder sbWhens = new StringBuilder("Following players have **whens** in hand:\n");
+                StringBuilder sbAfters = new StringBuilder("Following players have **afters** in hand:\n");
 
                 for (Player player : game.getRealPlayers()) {
                     List<String> whens = AgendaHelper.getPossibleWhenNames(player);
@@ -125,7 +125,7 @@ public class GMService {
             return;
         }
 
-        StringBuffer sb = new StringBuffer("Following players can see system **");
+        StringBuilder sb = new StringBuilder("Following players can see system **");
         sb.append(position).append("**:\n");
         for (Player player : FoWHelper.getAdjacentPlayers(game, position, false)) {
             sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append("\n");
@@ -134,7 +134,7 @@ public class GMService {
     }
 
     private static void checkWhoHas(String acId, Game game) {
-        StringBuffer sb = new StringBuffer("Following players have **");
+        StringBuilder sb = new StringBuilder("Following players have **");
         sb.append(acId).append("** in hand:\n");
         for (Player player : game.getRealPlayers()) {
             for (String ac : player.getActionCards().keySet()) {
