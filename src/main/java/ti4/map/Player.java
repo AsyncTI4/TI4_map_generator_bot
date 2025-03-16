@@ -1396,7 +1396,7 @@ public class Player extends PlayerProperties {
     @Override
     public String getColor() {
         String color = super.getColor();
-        return color != null ? Mapper.getColorName(color) : color;
+        return (color != null && !color.equals("null")) ? Mapper.getColorName(color) : "null";
     }
 
     @Override
@@ -1406,7 +1406,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public String getColorID() {
-        return getColor() != null ? Mapper.getColorID(getColor()) : null;
+        return (getColor() != null && !getColor().equals("null")) ? Mapper.getColorID(getColor()) : "null";
     }
 
     public void addAllianceMember(String color) {
@@ -2041,7 +2041,7 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public boolean isRealPlayer() {
-        return !(isDummy() || getFaction() == null || getColor() == null);
+        return !(isDummy() || getFaction() == null || getColor() == null || "null".equals(getColor()));
     }
 
     @Override
