@@ -42,9 +42,9 @@ public class Tile {
     private final Map<String, UnitHolder> unitHolders = new LinkedHashMap<>();
 
     @JsonIgnore
-    private final HashMap<Player, Boolean> fog = new LinkedHashMap<>();
+    private final HashMap<String, Boolean> fog = new LinkedHashMap<>();
     @JsonIgnore
-    private final HashMap<Player, String> fogLabel = new LinkedHashMap<>();
+    private final HashMap<String, String> fogLabel = new LinkedHashMap<>();
 
     public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
         this.tileID = tileID;
@@ -56,8 +56,8 @@ public class Tile {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
         if (player != null) {
-            fog.put(player, fog_);
-            fogLabel.put(player, fogLabel_);
+            fog.put(player.getUserID(), fog_);
+            fogLabel.put(player.getUserID(), fogLabel_);
         }
         initPlanetsAndSpace(tileID);
     }
@@ -279,17 +279,17 @@ public class Tile {
         return tilePath;
     }
 
-    public Map<Player, Boolean> getFog() {
+    public Map<String, Boolean> getFog() {
         return new HashMap<>(fog);
     }
 
-    public Map<Player, String> getFogLabel() {
+    public Map<String, String> getFogLabel() {
         return new HashMap<>(fogLabel);
     }
 
     public boolean hasFog(Player player) {
         if (player == null) return true;
-        Boolean hasFog = fog.get(player);
+        Boolean hasFog = fog.get(player.getUserID());
 
         Game game = player.getGame();
         if (!game.isFowMode()) {
@@ -306,15 +306,15 @@ public class Tile {
     }
 
     public void setTileFog(@NotNull Player player, Boolean fog_) {
-        fog.put(player, fog_);
+        fog.put(player.getUserID(), fog_);
     }
 
     public String getFogLabel(Player player) {
-        return fogLabel.get(player);
+        return fogLabel.get(player.getUserID());
     }
 
     public void setFogLabel(@NotNull Player player, String fogLabel_) {
-        fogLabel.put(player, fogLabel_);
+        fogLabel.put(player.getUserID(), fogLabel_);
     }
 
     @JsonIgnore
