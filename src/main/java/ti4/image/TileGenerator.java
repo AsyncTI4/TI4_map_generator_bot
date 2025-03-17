@@ -670,7 +670,7 @@ public class TileGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
                 String tilePos = tile.getPosition();
-                HashMap<Player, List<Integer>> pdsDice = new HashMap<>();
+                HashMap<String, List<Integer>> pdsDice = new HashMap<>();
 
                 for (Player player : game.getRealPlayers()) {
                     List<Integer> diceCount = new ArrayList<>();
@@ -744,7 +744,7 @@ public class TileGenerator {
                         if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
                             diceCount.addFirst(diceCount.getFirst());
                         }
-                        pdsDice.put(player, diceCount);
+                        pdsDice.put(player.getUserID(), diceCount);
                     }
                 }
 
@@ -782,14 +782,15 @@ public class TileGenerator {
 
                     x += (int) ((345 - 73 * scale) / 2);
                     y += (int) ((300 - pdsDice.size() * 48 * scale) / 2);
-                    for (Player player : pdsDice.keySet()) {
-                        int numberOfDice = pdsDice.get(player).size();
+                    for (String playerID : pdsDice.keySet()) {
+                        Player player = game.getPlayer(playerID);
+                        int numberOfDice = pdsDice.get(playerID).size();
                         boolean rerolls = game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander");
                         float expectedHits;
                         if (rerolls) {
-                            expectedHits = (100.0f * numberOfDice - pdsDice.get(player).stream().mapToInt(value -> (value - 1) * (value - 1)).sum()) / 100;
+                            expectedHits = (100.0f * numberOfDice - pdsDice.get(playerID).stream().mapToInt(value -> (value - 1) * (value - 1)).sum()) / 100;
                         } else {
-                            expectedHits = (11.0f * numberOfDice - pdsDice.get(player).stream().mapToInt(Integer::intValue).sum()) / 10;
+                            expectedHits = (11.0f * numberOfDice - pdsDice.get(playerID).stream().mapToInt(Integer::intValue).sum()) / 10;
                         }
                         if (DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()).equals("_wht.png")) {
                             tileGraphics.setColor(Color.WHITE);
@@ -805,24 +806,24 @@ public class TileGenerator {
                             new Rectangle(Math.round(x + 6 * scale), Math.round(y + 12 * scale + 24 * scale * 2 / 3), Math.round(61 * scale / 2), Math.round(24 * scale / 3)),
                             smallFont);
                         if (numberOfDice >= 5) {
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(0, numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice / 3, 2 * numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(numberOfDice / 3, 2 * numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale + 36 * scale / 3), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(2 * numberOfDice / 3, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(2 * numberOfDice / 3, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale + 36 * scale * 2 / 3), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
                         } else if (numberOfDice >= 3) {
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice / 2).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(0, numberOfDice / 2).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 12 * scale), Math.round(73 * scale / 2), Math.round(24 * scale / 2)),
                                 smallFont);
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice / 2, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(numberOfDice / 2, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 12 * scale + 24 * scale / 2), Math.round(73 * scale / 2), Math.round(24 * scale / 2)),
                                 smallFont);
                         } else {
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).stream().map(Object::toString).collect(Collectors.joining(",")),
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), y, Math.round(73 * scale / 2), Math.round(48 * scale)),
                                 smallFont);
                         }
