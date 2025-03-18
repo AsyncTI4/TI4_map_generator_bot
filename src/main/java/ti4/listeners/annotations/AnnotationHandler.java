@@ -142,11 +142,12 @@ public class AnnotationHandler {
         };
     }
 
-    private static <T extends ListenerContext> Consumer<T> buildConsumer(Method method, Function<T, List<Object>> getArgs) {
+    private static <T extends ListenerContext> Consumer<T> buildConsumer(Method method, Function<T, List<Object>> getArgs, boolean save) {
         return context -> {
             List<Object> args = getArgs.apply(context);
             try {
                 method.setAccessible(true);
+                context.setShouldSave(save);
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
                 BotLogger.log("Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
@@ -225,14 +226,15 @@ public class AnnotationHandler {
                     if (argGetter == null) {
                         continue;
                     }
-
-                    Consumer<C> consumer = buildConsumer(method, argGetter);
+                    
                     for (H handler : handlers) {
                         String val = null;
-                        if (handler instanceof ButtonHandler bh) val = bh.value();
+                        Boolean save = true;
+                        if (handler instanceof ButtonHandler bh) { val = bh.value(); save = bh.save(); };
                         if (handler instanceof SelectionHandler sh) val = sh.value();
                         if (handler instanceof ModalHandler mh) val = mh.value();
                         if (val == null) continue;
+                        Consumer<C> consumer = buildConsumer(method, argGetter, save);
                         consumers.put(val, consumer);
                     }
                 }

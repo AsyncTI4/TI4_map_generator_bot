@@ -23,7 +23,7 @@ import ti4.service.player.PlayerStatsService;
 @UtilityClass
 class ListPlayerInfoButtonHandler {
 
-    @ButtonHandler("gameInfoButtons")
+    @ButtonHandler(value = "gameInfoButtons", save = false)
     public static void offerInfoButtons(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("offerInfoButtonStep2_allFaction", "All Info On A Faction"));
@@ -44,7 +44,7 @@ class ListPlayerInfoButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
-    @ButtonHandler("offerInfoButtonStep2_")
+    @ButtonHandler(value = "offerInfoButtonStep2_", save = false)
     public static void resolveOfferInfoButtonStep2(ButtonInteractionEvent event, String buttonID, Game game) {
         String category = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
@@ -65,7 +65,7 @@ class ListPlayerInfoButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
 
-    @ButtonHandler("offerInfoButtonStep3_")
+    @ButtonHandler(value = "offerInfoButtonStep3_", save = false)
     public static void resolveOfferInfoButtonStep3(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String category = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
@@ -155,7 +155,7 @@ class ListPlayerInfoButtonHandler {
         event.getMessage().delete().queue();
     }
 
-    @ButtonHandler("showObjInfo_")
+    @ButtonHandler(value = "showObjInfo_", save = false)
     public static void showObjInfo(ButtonInteractionEvent event, String buttonID, Game game) {
         String extent = buttonID.split("_")[1];
         if (extent.equalsIgnoreCase("both")) {

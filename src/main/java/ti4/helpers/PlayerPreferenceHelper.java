@@ -19,7 +19,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class PlayerPreferenceHelper {
 
-    @ButtonHandler("offerPlayerPref")
+    @ButtonHandler(value = "offerPlayerPref", save = false)
     public static void offerPlayerPreferences(Player player, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("playerPref_autoSaboReact", "Auto No-Sabo React Time", CardEmojis.ActionCard));
@@ -35,7 +35,7 @@ public class PlayerPreferenceHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
     }
 
-    @ButtonHandler("playerPref_")
+    @ButtonHandler(value = "playerPref_", save = false)
     public static void resolvePlayerPref(Player player, ButtonInteractionEvent event, String buttonID, Game game) {
         String thing = buttonID.split("_")[1];
         switch (thing) {
@@ -76,7 +76,7 @@ public class PlayerPreferenceHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("playerPrefDecision_")
+    @ButtonHandler(value = "playerPrefDecision_", save = false)
     public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID) {
         String trueOrFalse = buttonID.split("_")[1];
         String distanceOrAgenda = buttonID.split("_")[2];
@@ -198,7 +198,7 @@ public class PlayerPreferenceHelper {
         return buttons;
     }
 
-    @ButtonHandler("riskDirectHit_")
+    @ButtonHandler(value = "riskDirectHit_")
     public static void resolveRiskDirectHit(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String yesOrNo = buttonID.split("_")[2];
         String unit = buttonID.split("_")[1];
@@ -217,7 +217,7 @@ public class PlayerPreferenceHelper {
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
-    @ButtonHandler("setHourAsAFK_")
+    @ButtonHandler(value = "setHourAsAFK_", save = false)
     public static void resolveSetAFKTime(Player player, String buttonID, ButtonInteractionEvent event) {
         String time = buttonID.split("_")[1];
 
