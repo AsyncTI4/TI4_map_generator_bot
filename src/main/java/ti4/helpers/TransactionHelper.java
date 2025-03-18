@@ -629,7 +629,7 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
     }
 
-    @ButtonHandler(value = "offerToTransact_", save = false)
+    @ButtonHandler("offerToTransact_")
     public static void resolveOfferToTransact(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String item = buttonID.split("_")[1];
         String sender = buttonID.split("_")[2];
@@ -765,7 +765,7 @@ public class TransactionHelper {
         checkTransactionLegality(game, p2, player);
     }
 
-    @ButtonHandler(value = "transact_", save = false)
+    @ButtonHandler("transact_")
     public static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
 
@@ -1270,7 +1270,7 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
-    @ButtonHandler(value = "send_", save = false)
+    @ButtonHandler("send_")
     public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
         ButtonHelper.deleteMessage(event);
@@ -1326,7 +1326,7 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
-    @ButtonHandler(value = "rescindOffer_", save = false)
+    @ButtonHandler("rescindOffer_")
     public static void rescindOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 != null) {
@@ -1389,8 +1389,8 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler(value = "transactWith_", save = false)
-    @ButtonHandler(value = "resetOffer_", save = false)
+    @ButtonHandler("transactWith_")
+    @ButtonHandler("resetOffer_")
     public static void transactWith(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
