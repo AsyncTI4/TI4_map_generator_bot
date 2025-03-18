@@ -76,7 +76,7 @@ public class PlayerPreferenceHelper {
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler(value = "playerPrefDecision_", save = false)
+    @ButtonHandler("playerPrefDecision_")
     public static void resolvePlayerPrefDecision(Player player, ButtonInteractionEvent event, String buttonID) {
         String trueOrFalse = buttonID.split("_")[1];
         String distanceOrAgenda = buttonID.split("_")[2];
