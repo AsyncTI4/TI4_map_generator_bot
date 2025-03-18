@@ -32,7 +32,7 @@ public class SpinRingsHelper {
     private static final String RND = "rnd";
 
     public static boolean validateSpinSettings(String customSpinSptring) {
-        List<String> customSpins = Arrays.asList(customSpinSptring.toLowerCase().split(" "));
+        String[] customSpins = customSpinSptring.toLowerCase().split(" ");
         for (String spinString : customSpins) {
 
             //Needs to have Ring:Direction:Steps  
@@ -78,7 +78,7 @@ public class SpinRingsHelper {
      * 
      */
     public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
-        List<String> customSpins = Arrays.asList(customSpinString.toLowerCase().split(" "));
+        String[] customSpins = customSpinString.toLowerCase().split(" ");
         StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## " + randomStatusMessage());
         List<Tile> tilesToSet = new ArrayList<>();
 

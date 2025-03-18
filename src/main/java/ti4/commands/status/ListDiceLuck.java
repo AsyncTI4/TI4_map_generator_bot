@@ -33,7 +33,7 @@ class ListDiceLuck extends GameStateSubcommand {
         }
         message.append("__");
         
-        HashMap<String, Double> record = new HashMap<String, Double>();
+        HashMap<String, Double> record = new HashMap<>();
         for (Player player : game.getPlayers().values()) {
             if (!player.isRealPlayer()) continue;
             playerAverageDiceLuck(player, record);

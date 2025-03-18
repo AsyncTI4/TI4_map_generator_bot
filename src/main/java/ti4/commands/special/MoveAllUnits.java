@@ -66,9 +66,9 @@ class MoveAllUnits extends GameStateSubcommand {
                 RemoveCommandCounterService.fromTacticsPool(event, player.getColor(), tileTo, game);
             }
             if (!"no".equals(value)) {
-                CommandCounterHelper.addCC(event, player.getColor(), tileTo, false);
+                CommandCounterHelper.addCC(event, player, tileTo, false);
             }
-            Helper.isCCCountCorrect(event, game, player.getColor());
+            Helper.isCCCountCorrect(player);
         }
     }
 }

@@ -77,6 +77,7 @@ public class AsyncTI4DiscordBot {
     public static JDA jda;
     public static String userID;
     public static String guildPrimaryID;
+    public static boolean testingMode = false;
     public static Guild guildPrimary;
     public static Guild guildSecondary;
     public static Guild guildTertiary;

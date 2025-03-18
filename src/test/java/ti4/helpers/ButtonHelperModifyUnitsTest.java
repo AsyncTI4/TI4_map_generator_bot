@@ -1,23 +1,22 @@
 package ti4.helpers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
 import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.testUtils.BaseTi4Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
     private final Game game = new Game();
-    private Tile tile = new Tile("tile 1", null, null, null, null);
+    private final Tile tile = new Tile("tile 1", null, null, null, null);
 
     @Test
     void testAutoAssignSpaceCombatHits_SpaceCombat_DuraniumArmor() {
@@ -375,7 +374,7 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
     private static Player createPlayerWithDuraniumArmor(Game game, String color) {
         Player player = new Player("101", "testUser", game);
         player.setFactionEmoji("a");
-        player.setTechs(Arrays.asList("da"));
+        player.setTechs(List.of("da"));
         player.setColor(color);
         return player;
     }

@@ -14,14 +14,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.uncategorized.ServerPromoteCommand;
@@ -596,7 +595,10 @@ public class AutoCompleteProvider {
                 if (!GameManager.isValid(gameName)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                if (game.isFowMode()) {
+                if (Constants.ADD_FOG_TILE.equals(subcommandName) && optionName.equals(Constants.TILE_NAME)) {
+                    var options = searchModels(event, TileHelper.getAllTileModels(), null);
+                    event.replyChoices(options).queue();
+                } else if (game.isFowMode()) {
                     var options = mapTo25ChoicesThatContain(game.getTileMap().keySet(), enteredValue);
                     event.replyChoices(options).queue();
                 } else {
@@ -999,7 +1001,7 @@ public class AutoCompleteProvider {
         String enteredValue = event.getFocusedOption().getValue().toLowerCase();
         return models.stream()
             .filter(model -> model.search(enteredValue, source))
-            .filter(model -> (model instanceof ColorableModelInterface cm) ? !cm.isDupe() : true)
+            .filter(model -> !(model instanceof ColorableModelInterface cm) || !cm.isDupe())
             .limit(25)
             .map(model -> new Command.Choice(model.getAutoCompleteName(), model.getAlias()))
             .toList();

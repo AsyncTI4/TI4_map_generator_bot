@@ -14,7 +14,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 
 @Data

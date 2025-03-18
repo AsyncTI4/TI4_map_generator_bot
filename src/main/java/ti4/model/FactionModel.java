@@ -1,15 +1,14 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -244,7 +243,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             }
         }else{
             if(getStartingTechOptions() != null && getStartingTechAmount() != 0 && !getStartingTechOptions().isEmpty()){
-                sb.append("\nPick "+ getStartingTechAmount()+ " of the following:\n");
+                sb.append("\nPick ").append(getStartingTechAmount()).append(" of the following:\n");
                 for (String id : getStartingTechOptions()) {
                     TechnologyModel model = Mapper.getTech(id);
                     sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());

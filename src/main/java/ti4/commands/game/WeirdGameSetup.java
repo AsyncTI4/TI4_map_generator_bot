@@ -250,7 +250,7 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         //For Eronous to run fow300
         if (riftsetMode) {
-            if (!RiftSetModeService.activate(event, game)) return false;
+            return RiftSetModeService.activate(event, game);
         }
 
         return true;

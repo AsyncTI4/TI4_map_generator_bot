@@ -16,8 +16,8 @@ import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.model.TileModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileModel;
 import ti4.service.map.AddTileService;
 import ti4.service.map.AddTileService.RandomOption;
 
@@ -64,7 +64,7 @@ class AddTileRandom extends GameStateSubcommand {
         Set<ComponentSource> sources = AddTileService.getSources(event, game);
 
         List<String> drawnTiles = new ArrayList<>();
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
         for (String position : positions) {
             Set<TileModel> existingTileModels = game.getTileMap().values().stream()
                 .map(Tile::getTileModel).collect(Collectors.toSet());
@@ -81,8 +81,7 @@ class AddTileRandom extends GameStateSubcommand {
                 AddTileService.addTile(getGame(), new Tile(randomTile.getId(), position));
             }
 
-            msg.append((drawOnly ? "Drew " : "Added ") + randomTile.getEmbedTitle() 
-                + " to " + position + " from " + availableTiles.size() + " options\n");
+            msg.append(drawOnly ? "Drew " : "Added ").append(randomTile.getEmbedTitle()).append(" to ").append(position).append(" from ").append(availableTiles.size()).append(" options\n");
         }
 
         MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());

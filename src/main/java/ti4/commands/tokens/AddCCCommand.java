@@ -27,7 +27,7 @@ public class AddCCCommand extends AddRemoveTokenCommand {
                     case "t/tactic", "t", "tactic", "tac", "tact" -> RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
                 }
             }
-            CommandCounterHelper.addCC(event, color, tile);
+            CommandCounterHelper.addCC(event, game, color, tile);
             Helper.isCCCountCorrect(event, game, color);
         }
     }

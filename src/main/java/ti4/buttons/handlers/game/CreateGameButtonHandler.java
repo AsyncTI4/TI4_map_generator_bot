@@ -8,7 +8,6 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -122,10 +121,5 @@ class CreateGameButtonHandler {
         userSettings.setLockedFromCreatingGamesUntil(LocalDateTime.now().plusMinutes(10));
         UserSettingsManager.save(userSettings);
         return false;
-    }
-
-    @ButtonHandler("offerGameHomebrewButtons")
-    public static void offerGameHomebrewButtons(MessageChannel channel) {
-        CreateGameService.offerGameHomebrewButtons(channel);
     }
 }

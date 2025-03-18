@@ -38,9 +38,12 @@ public class CardsInfoService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, player, false);
         sendVariousAdditionalButtons(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player,
-            "You may whisper to people from here by starting a message with `to[color]` or `to[faction]`."
-                + "\nYou may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`."
-                + "\nYou may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.");
+            """
+                You may whisper to people from here by starting a message with `to[color]` or `to[faction]`.\
+                
+                You may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`.\
+                
+                You may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.""");
 
     }
 

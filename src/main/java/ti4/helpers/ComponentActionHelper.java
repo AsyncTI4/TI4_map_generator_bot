@@ -231,7 +231,7 @@ public class ComponentActionHelper {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFS", "Use Flagship Ability", FactionEmojis.Muaat);
             compButtons.add(abilityButton);
         }
-        if ((p1.getUnitsOwned().contains("sigma_muaat_flagship_1") || p1.getUnitsOwned().contains("sigma_muaat_flagship_1")) && p1.getStrategicCC() > 0
+        if (p1.getUnitsOwned().contains("sigma_muaat_flagship_1") && p1.getStrategicCC() > 0
             && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship).isEmpty()) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_muaatFSsigma", "Use Flagship Ability", FactionEmojis.Muaat);
             compButtons.add(abilityButton);

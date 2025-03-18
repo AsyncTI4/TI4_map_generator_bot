@@ -260,7 +260,7 @@ public class PlayHeroService {
             case "vaylerianhero" -> {
                 if (!game.isNaaluAgent()) {
                     player.setTacticalCC(player.getTacticalCC() - 1);
-                    CommandCounterHelper.addCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()));
+                    CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
                     game.setStoredValue("vaylerianHeroActive", "true");
                 }
                 List<Button> removeCCs = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
@@ -400,7 +400,7 @@ public class PlayHeroService {
             case "keleresheroharka" -> resolveKeleresHeroMentak(game, player, event);
         }
         TemporaryCombatModifierModel posssibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.LEADER,
-            playerLeader.getId(), player.getNumberTurns());
+            playerLeader.getId(), player.getNumberOfTurns());
         if (posssibleCombatMod != null) {
             player.addNewTempCombatMod(posssibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),

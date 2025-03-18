@@ -159,7 +159,7 @@ public class RiftSetModeService {
     }
 
     private static String getGMs(Game game) {
-        return game.getPlayersWithGMRole().stream().map(p -> p.getPing()).collect(Collectors.joining(", "));
+        return game.getPlayersWithGMRole().stream().map(Player::getPing).collect(Collectors.joining(", "));
     }
 
     public static void concludeTacticalAction(Player player, Game game, GenericInteractionCreateEvent event) {
@@ -173,11 +173,11 @@ public class RiftSetModeService {
         if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_VORTEX)) {
             AddTokenCommand.addToken(event, tile, "vortex", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition()
-                + "\n-#" + getGMs(game));
+                + "\n-# " + getGMs(game));
         } else  if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
             AddTokenCommand.addToken(event, tile, "gravityrift", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition()
-                + "\n-#" + getGMs(game));
+                + "\n-# " + getGMs(game));
         }
     }
 
@@ -194,7 +194,7 @@ public class RiftSetModeService {
 
         if (RandomHelper.isOneInX(Math.max(CHANCE_TO_STELLAR_CONVERT - (int) (16 * Math.pow(Math.min(game.getRound(), 6) - 1, 2)), CHANCE_TO_STELLAR_CONVERT_MIN))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## While trying to explore the planet, you find something dark and dangerous..."
-                + "\n-#" + getGMs(game));
+                + "\n-# " + getGMs(game));
             StellarConverterService.secondHalfOfStellar(game, planetName, event);
             Tile tile = game.getTileFromPlanet(planetName);
             UnitHolder unitHolder = tile.getUnitHolderFromPlanet(planetName);
@@ -335,11 +335,10 @@ public class RiftSetModeService {
 
         Player cabal = getCabalPlayer(game);
         UnitHolder nombox = cabal.getNomboxTile().getSpaceUnitHolder();
-        StringBuffer sb = new StringBuffer(player.getRepresentation(true, true));
-        sb.append(" is resolving Sacrifce.\n\n");
-        sb.append("Following units are currently captured: ").append(nombox.getPlayersUnitListEmojisOnHolder(player));
-        sb.append("\nAfter releasing, use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
+        String sb = player.getRepresentation(true, true) + " is resolving Sacrifce.\n\n" +
+            "Following units are currently captured: " + nombox.getPlayersUnitListEmojisOnHolder(player) +
+            "\nAfter releasing, use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
 
         List<Button> buttonsToReleaseUnits = new LinkedList<>();
         for (Map.Entry<String,Integer> unit : nombox.getUnitAsyncIdsOnHolder(player.getColorID()).entrySet()) {

@@ -76,7 +76,7 @@
         "name": "Black Market Raid",
         "phase": "Action",
         "window": "Action",
-        "text": "Purge 3 of your relic fragments to gain 1 relic; you may spend any number of resources to reduce the number of relic fragments to be purged by 1 for every 3 resources spent.",
+        "text": "Spend 3 tokens from your command sheet to gain 1 relic; you may purge any number of your relic fragments to reduce the tokens spent by an equal amount.",
         "flavorText": "The black shard dripped with blood—some of it her own. What she had done, she did for the Federation. For all of humankind.",
         "source": "action_deck_2"
     },
@@ -141,15 +141,6 @@
         "window": "When 1 of your units make a combat or unit ability roll",
         "text": "That unit rolls 2 additional dice.",
         "flavorText": "The warnings came too late for the Hylar. When an investigator from the Universities arrived weeks later to survey the carnage, naught was left but smoldering craters. The Gashlai's message was clear.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "continuous_barrage",
-        "name": "Continuous Barrage",
-        "phase": "Action",
-        "window": "At the start of the second round of a space combat",
-        "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
-        "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
         "source": "action_deck_2"
     },
     {
@@ -261,7 +252,7 @@
         "alias": "derelict_station",
         "name": "Derelict Station",
         "phase": "Action",
-        "window": "After your ships move out of, into, or through a system that does not contain a planet",
+        "window": "After your ships move out of, into, or through a system that does not contain planets",
         "text": "Explore a frontier token that is in that system or gain 2 trade goods.",
         "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
         "source": "action_deck_2"
@@ -413,8 +404,8 @@
         "alias": "freedom_fighters",
         "name": "Freedom Fighters",
         "phase": "Action",
-        "window": "During the \"Commit Ground Forces\" step in a non-home system that contains your ships",
-        "text": "Commit up to 1 infantry from your reinforcements to each planet in that system.",
+        "window": "After you commit units to land on a planet you do not control in the active system",
+        "text": "Place up to 1 infantry from your reinforcements on each planet in that system.",
         "flavorText": "Harrugh had brought them supplies and hope. On the promised day, they would repay him with their determination for liberation.",
         "source": "action_deck_2"
     },
@@ -486,7 +477,7 @@
         "name": "Ixthian Gift",
         "phase": "Action",
         "window": "At the end of a turn during which you resolved a transaction with a player",
-        "text": "Commit 1 infantry from your reinforcements on a non-home planet that player controls. If that planet contains their ground forces, resolve a ground combat. [Note: This does not trigger PDS.]",
+        "text": "Commit 1 infantry from your reinforcements to a non-home planet that player controls. If that planet contains their ground forces, resolve a ground combat. [Note: This does not trigger PDS.]",
         "flavorText": "Unlenn had rarely felt so smug after extorting his enemy. However, as he turned to the Mahact emissary, he grew cold—she was smiling.",
         "source": "action_deck_2"
     },
@@ -568,7 +559,7 @@
         "name": "Opportunists",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 system that contains another player's ships and no other units. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
+        "text": "Choose 1 system that contains another player's ships and no planets. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
         "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
         "source": "action_deck_2"
     },
@@ -663,8 +654,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "pivoted_plan",
-        "name": "Pivoted Plans",
+        "alias": "pivot",
+        "name": "Pivot",
         "phase": "Action",
         "window": "Action",
         "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
@@ -780,10 +771,10 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "rendezvous_point",
-        "name": "Rendezvous Point",
+        "alias": "rendezvous",
+        "name": "Rendezvous",
         "phase": "Action",
-        "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's units",
+        "window": "After the \"Movement\" step of your tactical action in a system that does not contain other players' units",
         "text": "Remove your command token from that system and end your turn.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "action_deck_2"
@@ -855,7 +846,7 @@
         "alias": "sensor_jam",
         "name": "Sensor Jam",
         "phase": "Action",
-        "window": "After the \"Move Ships\" substep of a tactical action",
+        "window": "After a player moves ships into the active system",
         "text": "Your cruisers and destroyers in the active system gain SUSTAIN DAMAGE during this tactical action.",
         "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
         "source": "action_deck_2"
@@ -1043,8 +1034,8 @@
         "alias": "unexpected_strategy",
         "name": "Unexpected Strategy",
         "phase": "Any",
-        "window": "When a command token from your strategy pool or reinforcements would be spent and/or placed on the game board",
-        "text": "That command token is not spent and/or placed on the game board. [Note: You can have 0 strategy or reinforcement tokens and use this card.]",
+        "window": "When you would place a token from your strategy pool or reinforcements on the game board",
+        "text": "Gain 1 command token instead.",
         "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
         "source": "action_deck_2"
     },
@@ -1053,7 +1044,7 @@
         "name": "Unstable Gate",
         "phase": "Action",
         "window": "After a player activates a system that contains your units",
-        "text": "Choose 1 other system. During this tactical action, treat that system as if it were adjacent to the active system.",
+        "text": "Choose 1 other system. That system is adjacent to the active system during this tactical action.",
         "flavorText": "The conduit was tearing itself apart as the space within it melted away to reveal the location of the beacon. Their panic quickly culled their jubilation.",
         "source": "action_deck_2"
     },

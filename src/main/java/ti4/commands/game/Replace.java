@@ -114,7 +114,7 @@ class Replace extends GameStateSubcommand {
         replacedPlayer.setUserID(replacementUser.getId());
         replacedPlayer.setUserName(replacementUser.getName());
         replacedPlayer.setTotalTurnTime(0);
-        replacedPlayer.setNumberTurns(0);
+        replacedPlayer.setNumberOfTurns(0);
         replacedPlayer.removeTeamMateID(oldPlayerUserId);
         if (oldPlayerUserId.equals(game.getSpeakerUserID())) {
             game.setSpeakerUserID(replacementUser.getId());
@@ -166,17 +166,9 @@ class Replace extends GameStateSubcommand {
 
             //Update private threads
             if (oldMember != null) {
-                game.getMainGameChannel().getThreadChannels().forEach(thread -> {
-                    updateThread(thread, oldMember, newMember);
-                });
+                game.getMainGameChannel().getThreadChannels().forEach(thread -> updateThread(thread, oldMember, newMember));
 
-                game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().queue(archivedThreads -> {
-                    archivedThreads.forEach(thread -> {
-                        thread.getManager().setArchived(false).queue(success -> {
-                            updateThread(thread, oldMember, newMember);
-                        });
-                    });
-                });
+                game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().queue(archivedThreads -> archivedThreads.forEach(thread -> updateThread(thread, oldMember, newMember)));
             }
         }
 
@@ -203,15 +195,14 @@ class Replace extends GameStateSubcommand {
 
     private void updateThread(ThreadChannel thread, Member oldMember, Member newMember) {
         thread.retrieveThreadMemberById(oldMember.getId()).queue(
-            oldThreadMember -> { 
-                thread.removeThreadMember(oldMember).queue(success -> {
-                    thread.addThreadMember(newMember).queue(success2 -> {
+            oldThreadMember -> thread.getManager().setArchived(false).queue(success -> {
+                thread.removeThreadMember(oldMember).queue(success2 -> {
+                    thread.addThreadMember(newMember).queue(success3 -> {
                         accessMessage(thread, newMember);
                     });
                 });
-            },
-            failure -> { /* Old member is not in the thread -> Do nothing */  }
-        );
+            }),
+            failure -> { /* Old member is not in the thread -> Do nothing */ });
     }
 
     private void accessMessage(MessageChannel channel, Member member) {

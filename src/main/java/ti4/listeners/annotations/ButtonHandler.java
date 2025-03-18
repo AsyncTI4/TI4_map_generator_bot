@@ -35,4 +35,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ ElementType.METHOD })
 public @interface ButtonHandler {
     String value();
+    boolean save() default true;
 }

@@ -63,11 +63,7 @@ public class SearchGameHelper {
 
     }
 
-
-
     public static String getTotalCompletedNOngoingGames(List<User> users, GenericInteractionCreateEvent event) {
-        
-
         StringBuilder sb = new StringBuilder();
         AtomicInteger index = new AtomicInteger(1);
         sb.append("## __**Games**__\n");
@@ -77,13 +73,14 @@ public class SearchGameHelper {
             int completedGames = completedAndOngoingAmount - ongoingAmount;
             sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
             sb.append(completedGames);
-            sb.append("` Completed. `"+ongoingAmount+"` Ongoing --");
+            sb.append("` Completed. `").append(ongoingAmount).append("` Ongoing --");
             sb.append(user.getEffectiveName());
             sb.append("\n");
             index.getAndIncrement();
         }
         return sb.toString();
     }
+
     public static String getPlayerMapListRepresentation(Game game, String userID, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes) {
         Player player = game.getPlayer(userID);
         if (player == null) return "";
@@ -118,7 +115,7 @@ public class SearchGameHelper {
 
     private static String playerAverageMapTurnLength(Player player) {
         long totalMillis = player.getTotalTurnTime();
-        int numTurns = player.getNumberTurns();
+        int numTurns = player.getNumberOfTurns();
         if (numTurns == 0 || totalMillis == 0) {
             return String.format("%02dh:%02dm:%02ds", 0, 0, 0);
         }

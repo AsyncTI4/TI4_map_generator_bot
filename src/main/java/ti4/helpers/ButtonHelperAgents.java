@@ -8,14 +8,13 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
@@ -392,7 +391,7 @@ public class ButtonHelperAgents {
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            Integer tgCount = Integer.parseInt(rest.split("_")[1]);
+            int tgCount = Integer.parseInt(rest.split("_")[1]);
             playerLeader.setTgCount(tgCount);
             String messageText = player.getRepresentation() + " placed " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
                 + " on top of " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
@@ -1393,7 +1392,7 @@ public class ButtonHelperAgents {
     @ButtonHandler("freeSystemsAgentStep2_")
     public static void resolveFreeSystemsAgentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        PlanetExhaustAbility.doAction(player, planet, game, false);
+        PlanetExhaustAbility.doAction(event, player, planet, game, false);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationNoPing() + " chose to replicate the " + Helper.getPlanetRepresentation(planet, game)
                 + " legendary ability by exhausting " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
@@ -1428,7 +1427,7 @@ public class ButtonHelperAgents {
     public static void resolveCheiranAgentStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
-        CommandCounterHelper.addCC(event, player.getColor(), origTile, true);
+        CommandCounterHelper.addCC(event, player, origTile, true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 command token in "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"

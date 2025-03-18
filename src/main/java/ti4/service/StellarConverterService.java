@@ -66,10 +66,10 @@ public class StellarConverterService {
         StringBuilder message2 = new StringBuilder();
         message2.append(Mapper.getPlanet(planetName).getName());
         message2.append(" has been _Stellar Converter_'d");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2.toString() + ".");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2 + ".");
 
         message2.append(" by ");
         message2.append(game.getPlayer(event.getUser().getId()).getRepresentation());
-        DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2.toString() + ".");
+        DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 0, message2 + ".");
     }
 }

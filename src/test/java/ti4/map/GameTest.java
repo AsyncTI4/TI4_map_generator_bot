@@ -23,12 +23,11 @@ class GameTest {
         var game = new Game();
         game.setName("threePlayerGame");
         var naaluPnPlayer = createPlayer("naaluPnPlayer", Set.of(7, 3), game);
-        naaluPnPlayer.setPromissoryNotesInPlayArea(Constants.NAALU_PN);
+        naaluPnPlayer.addPromissoryNoteToPlayArea(Constants.NAALU_PN);
         game.setPlayers(Map.of(
-                "hasThe2", createPlayer("hasThe2", Set.of(2, 5), game),
-                "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game),
-                "naaluPnPlayer", naaluPnPlayer
-        ));
+            "hasThe2", createPlayer("hasThe2", Set.of(2, 5), game),
+            "hasThe1", createPlayer("hasThe1", Set.of(8, 1), game),
+            "naaluPnPlayer", naaluPnPlayer));
         return game;
     }
 

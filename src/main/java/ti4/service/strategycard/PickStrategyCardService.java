@@ -101,20 +101,7 @@ public class PickStrategyCardService {
                 game.setScTradeGood(sc, 0);
             }
 
-            Player nextPlayer = null;
-            int lowestSC = 100;
-            for (Player player_ : activePlayers) {
-                int playersLowestSC = player_.getLowestSC();
-                String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
-                if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                    nextPlayer = player_; //no further processing, this player has the 0 token
-                    break;
-                }
-                if (playersLowestSC < lowestSC) {
-                    lowestSC = playersLowestSC;
-                    nextPlayer = player_;
-                }
-            }
+            Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
@@ -154,20 +141,9 @@ public class PickStrategyCardService {
                 if (game.isShowBanners()) {
                     BannerGenerator.drawFactionBanner(privatePlayer);
                 }
+                StartTurnService.reviveInfantryII(privatePlayer);
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
                     StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
-                if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
-                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                    } else {
-                        privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
-
-                    }
-                }
 
             }
 
@@ -197,20 +173,9 @@ public class PickStrategyCardService {
                     text += "\n-# " + ping + " will start their turn once you've ended yours.";
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);
-                if (privatePlayer.getGenSynthesisInfantry() > 0) {
-                    if (!ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getGenSynthesisInfantry() + " infantry left to revive.",
-                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                    } else {
-                        privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
 
-                    }
-                }
-                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Use buttons to do turn.",
-                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
+                StartTurnService.reviveInfantryII(privatePlayer);
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Use buttons to do turn.", StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
             }
         }
         if (allPicked) {

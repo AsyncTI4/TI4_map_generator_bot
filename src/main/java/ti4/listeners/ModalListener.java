@@ -89,12 +89,12 @@ public class ModalListener extends ListenerAdapter {
     }
 
     public static String getModalDebugText(ModalInteractionEvent event) {
-        String output = "INPUT:\n```\n" +
-            "MenuID: " + event.getModalId();
+        StringBuilder output = new StringBuilder("INPUT:\n```\n" +
+            "MenuID: " + event.getModalId());
         for (ModalMapping field : event.getValues()) {
-            output += "\n> Field: " + field.getId() + " => " + field.getAsString();
+            output.append("\n> Field: ").append(field.getId()).append(" => ").append(field.getAsString());
         }
-        output += "\n```";
-        return output;
+        output.append("\n```");
+        return output.toString();
     }
 }

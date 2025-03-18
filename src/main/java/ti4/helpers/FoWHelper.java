@@ -10,13 +10,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -116,7 +115,7 @@ public class FoWHelper {
     }
 
     private static void initializeFog(Game game, @NotNull Player player, boolean forceRecalculate) {
-        if (player.hasFogInitialized() && !forceRecalculate) {
+        if (player.isFogInitialized() && !forceRecalculate) {
             return;
         }
 
@@ -259,7 +258,7 @@ public class FoWHelper {
 
             //Check that they or their alliance have units in any empty system to be able to see the other empties as adjacencies
             Set<Tile> emptyTiles = getEmptyTiles(game);
-            boolean containsUnits = emptyTiles.stream().anyMatch(tile -> playersToCheck.stream().anyMatch(p -> tile.containsPlayersUnits(p)));
+            boolean containsUnits = emptyTiles.stream().anyMatch(tile -> playersToCheck.stream().anyMatch(tile::containsPlayersUnits));
             if (containsUnits) {
                 adjacentPositions.addAll(emptyTiles.stream()
                     .map(Tile::getPosition)
@@ -826,7 +825,7 @@ public class FoWHelper {
     public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message) {
         pingSystem(game, event, position, message, true);
     }
-    
+
     public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message, boolean viewSystemButton) {
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
@@ -952,9 +951,7 @@ public class FoWHelper {
         if (success < total) {
             MessageHelper.replyToMessage(event,
                 "One more more pings failed to send.  Please follow up with game's GM.");
-        }// else {
-        //    MessageHelper.replyToMessage(event, "Successfully sent all pings.");
-        //}
+        }
     }
 
     private static boolean initializeAndCheckStatVisibility(Game game, Player player, Player viewer) {

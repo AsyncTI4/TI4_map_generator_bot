@@ -941,5 +941,32 @@
         "text": "Choose 1 player. If that player spends a command token during this strategic action, they must spend 1 additional token from their command sheet, if able.",
         "flavorText": "Spittle flew forth from The Stillness's crimson maw as a gurgled laugh escaped it. Their human minions had done well.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "continuous_barrage",
+        "name": "Continuous Barrage",
+        "phase": "Action",
+        "window": "At the start of the second round of a space combat",
+        "text": "You perform the \"Anti-Fighter Barrage\" step during this combat round as if it were the first round of combat.",
+        "flavorText": "Mirik pounded his fist on his command chair. \"We've locked onto the squadron's rendezvous point. Fire with precision!\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "rendezvous_point",
+        "name": "Rendezvous Point",
+        "phase": "Action",
+        "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's units",
+        "text": "Remove your command token from that system and end your turn.",
+        "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "pivoted_plan",
+        "name": "Pivoted Plans",
+        "phase": "Action",
+        "window": "Action",
+        "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
+        "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
+        "source": "action_deck_2_old"
     }
 ]

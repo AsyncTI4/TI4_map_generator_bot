@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
+import ti4.AsyncTI4DiscordBot;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
@@ -53,6 +54,7 @@ public class Units {
 
         @JsonIgnore
         public String getFileName() {
+            if (AsyncTI4DiscordBot.testingMode) return getFileName(false);
             return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
         }
 

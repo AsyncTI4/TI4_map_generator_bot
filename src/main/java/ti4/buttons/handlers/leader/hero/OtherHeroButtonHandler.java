@@ -91,7 +91,7 @@ public class OtherHeroButtonHandler {
         }
         if (!game.isNaaluAgent()) {
             player.setTacticalCC(player.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()));
+            CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
             game.setStoredValue("vaylerianHeroActive", "true");
         }
         for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(game)) {
