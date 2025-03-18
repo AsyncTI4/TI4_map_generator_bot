@@ -989,21 +989,22 @@ public class StartCombatService {
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Yin));
                     }
                     // Letnev Mech
-                    if (p.hasUnit("letnev_mech") && isGroundCombat && unitH.getUnitCount(Units.UnitType.Infantry, p1.getColor()) > 0
-                        && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech") < 4) {
+                    if (p.hasUnit("letnev_mech") && isGroundCombat && unitH.getUnitCount(Units.UnitType.Infantry, p.getColor()) > 0
+                        && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p, "mech") < 4) {
                         String id = p.finChecker() + "letnevMechRes_" + unitH.getName() + "_mech";
                         String label = "Deploy Dunlain Reaper on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Letnev));
                     }
                     // Assimilate
-                    if (p1.hasAbility("assimilate") && isGroundCombat
-                        && (unitH.getUnitCount(Units.UnitType.Spacedock, p2.getColor()) > 0
-                            || unitH.getUnitCount(Units.UnitType.CabalSpacedock, p2.getColor()) > 0
-                            || unitH.getUnitCount(Units.UnitType.Pds, p2.getColor()) > 0)) {
-                        String id = p.finChecker() + "assimilate_" + unitH.getName();
-                        String label = "Assimilate Structures on " + nameOfHolder;
-                        buttons.add(Buttons.gray(id, label, FactionEmojis.L1Z1X));
-                    }
+                    
+                }
+                if (p1.hasAbility("assimilate") && isGroundCombat
+                    && (unitH.getUnitCount(Units.UnitType.Spacedock, p2.getColor()) > 0
+                        || unitH.getUnitCount(Units.UnitType.CabalSpacedock, p2.getColor()) > 0
+                        || unitH.getUnitCount(Units.UnitType.Pds, p2.getColor()) > 0)) {
+                    String id = p1.finChecker() + "assimilate_" + unitH.getName();
+                    String label = "Assimilate Structures on " + nameOfHolder;
+                    buttons.add(Buttons.gray(id, label, FactionEmojis.L1Z1X));
                 }
                 // vaden mechs are asymmetricish
                 if (p1.hasUnit("vaden_mech") && unitH.getUnitCount(Units.UnitType.Mech, p1) > 0 && isGroundCombat && p1.getDebtTokenCount(p2.getColor()) > 0) {
