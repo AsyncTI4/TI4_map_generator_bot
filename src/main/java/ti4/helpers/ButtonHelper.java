@@ -658,7 +658,7 @@ public class ButtonHelper {
         }
     }
 
-    @ButtonHandler("offerDeckButtons")
+    @ButtonHandler(value = "offerDeckButtons", save = false)
     public static void offerDeckButtons(ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("showDeck_frontier", "Frontier", ExploreEmojis.Frontier));
@@ -680,7 +680,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
     }
 
-    @ButtonHandler("showDeck_")
+    @ButtonHandler(value = "showDeck_", save = false)
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String deck = buttonID.replace("showDeck_", "");
         switch (deck) {
@@ -711,7 +711,7 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    @ButtonHandler("showTextOfDeck_")
+    @ButtonHandler(value = "showTextOfDeck_", save = false)
     public static void resolveShowFullTextDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String type = buttonID.split("_")[1];
         List<String> types = new ArrayList<>();

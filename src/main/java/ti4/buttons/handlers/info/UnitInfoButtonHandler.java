@@ -11,12 +11,12 @@ import ti4.service.info.UnitInfoService;
 @UtilityClass
 class UnitInfoButtonHandler {
 
-    @ButtonHandler(Constants.REFRESH_UNIT_INFO)
+    @ButtonHandler(value = Constants.REFRESH_UNIT_INFO, save = false)
     public static void sendUnitInfoSpecial(Game game, Player player, GenericInteractionCreateEvent event) {
         UnitInfoService.sendUnitInfo(game, player, event, false);
     }
 
-    @ButtonHandler(Constants.REFRESH_ALL_UNIT_INFO)
+    @ButtonHandler(value = Constants.REFRESH_ALL_UNIT_INFO, save = false)
     public static void sendUnitInfoAll(Game game, Player player, GenericInteractionCreateEvent event) {
         UnitInfoService.sendUnitInfo(game, player, event, true);
     }

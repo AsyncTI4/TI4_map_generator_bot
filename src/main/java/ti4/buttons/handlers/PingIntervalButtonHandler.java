@@ -17,7 +17,7 @@ import ti4.settings.users.UserSettingsManager;
 @UtilityClass
 class PingIntervalButtonHandler {
 
-    @ButtonHandler("playerPref_personalPingInterval")
+    @ButtonHandler(value = "playerPref_personalPingInterval", save = false)
     public static void offerPersonalPingOptions(GenericInteractionCreateEvent event) {
         List<Button> buttons = getPersonalAutoPingButtons();
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
@@ -36,7 +36,7 @@ class PingIntervalButtonHandler {
         return buttons;
     }
 
-    @ButtonHandler("UserSetPersonalPingIntervalTo")
+    @ButtonHandler(value = "UserSetPersonalPingIntervalTo", save = false)
     public static void set(ButtonInteractionEvent event, String buttonID) {
         String pingIntervalRaw = buttonID.replace("UserSetPersonalPingIntervalTo", "");
         int pingInterval;
