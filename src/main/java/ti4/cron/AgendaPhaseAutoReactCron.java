@@ -55,7 +55,7 @@ public class AgendaPhaseAutoReactCron {
     }
 
     private static boolean shouldRandomlyReact(Player player) {
-        if (player.getAutoSaboPassMedian() == 0 || !player.doesPlayerAutoPassOnWhensAfters()) {
+        if (player.getAutoSaboPassMedian() == 0 || !player.isAutoPassOnWhensAfters()) {
             return false;
         }
         int rollMax = player.getAutoSaboPassMedian() * RUNS_PER_HOUR;

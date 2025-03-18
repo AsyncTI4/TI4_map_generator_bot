@@ -6,14 +6,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -108,7 +107,7 @@ public class FOWCombatThreadMirroring {
 
                     newMessage += "Someone rolled dice for " + combat
                         + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "** " : "s** ")
-                        + ":boom:".repeat(Math.max(0, Integer.valueOf(hits)));
+                        + ":boom:".repeat(Math.max(0, Integer.parseInt(hits)));
                 }
 
                 //Retreat

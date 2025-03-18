@@ -48,8 +48,7 @@ public class WebHelper {
     }
 
     public static boolean sendingToWeb() {
-        boolean isUpload = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
-        return isUpload;
+        return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
     }
 
     public static void putData(String gameName, Game game) {

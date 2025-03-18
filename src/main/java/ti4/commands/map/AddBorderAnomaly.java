@@ -33,19 +33,19 @@ public class AddBorderAnomaly extends GameStateSubcommand {
         BorderAnomalyModel model = new BorderAnomalyModel();
         BorderAnomalyModel.BorderAnomalyType anomalyType = model.getBorderAnomalyTypeFromString(anomalyTypeString);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int amountAdded = 0;
         for (String tile : tiles) {
             for (int d : directions) {
                 if (game.hasBorderAnomalyOn(tile, d)) {
-                    sb.append("Tile " + tile + " already has an anomaly in position " + d + "\n");
+                    sb.append("Tile ").append(tile).append(" already has an anomaly in position ").append(d).append("\n");
                 } else {
                     game.addBorderAnomaly(tile, d, anomalyType);
                     amountAdded++;
                 }
             }
         }
-        sb.append(anomalyType.getName() + " anomalies added: " + amountAdded);
+        sb.append(anomalyType.getName()).append(" anomalies added: ").append(amountAdded);
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 

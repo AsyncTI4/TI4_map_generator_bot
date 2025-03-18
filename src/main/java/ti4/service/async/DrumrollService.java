@@ -33,7 +33,7 @@ public class DrumrollService {
 
     private MessageHelper.MessageFunction drumrollFunction(List<Message> bonusMessages, int seconds, String message, String gameName, Predicate<Game> resolve) {
         long startTime = System.currentTimeMillis();
-        long endTime = startTime + seconds * 1000;
+        long endTime = startTime + seconds * 1000L;
 
         return msg -> {
             int iteration = 1;
@@ -52,7 +52,7 @@ public class DrumrollService {
             if (resolve.test(reloadedGame))
                 GameManager.save(reloadedGame, "Post-Drumroll");
         };
-    };
+    }
 
     public void doDrumroll(MessageChannel main, String msg, int sec, String gameName, Predicate<Game> resolve) {
         doDrumrollMultiChannel(main, msg, sec, gameName, resolve, null, null);

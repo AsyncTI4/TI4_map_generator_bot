@@ -209,7 +209,7 @@ public class ConvertTTPGtoAsync {
             TTPGPlayer ttpgPlayer = ttpgMap.getPlayers().get(index);
 
             //PLAYER STATS
-            asyncPlayer.setFaction(AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
+            asyncPlayer.setFaction(asyncGame, AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
             asyncPlayer.setColor(AliasHandler.resolveColor(ttpgPlayer.getColorActual().toLowerCase()));
             asyncPlayer.setCommodities(ttpgPlayer.getCommodities());
             asyncPlayer.setCommoditiesTotal(ttpgPlayer.getMaxCommodities());
@@ -259,13 +259,13 @@ public class ConvertTTPGtoAsync {
             for (String ttpgLaw : ttpgPlayer.getLaws()) {
                 String asyncLaw = AliasHandler.resolveAgenda(ttpgLaw);
                 electedPlayers.put(asyncLaw, asyncPlayer.getFaction());
-                if ("warrant".equals(asyncLaw)) asyncPlayer.setSearchWarrant();
+                if ("warrant".equals(asyncLaw)) asyncPlayer.flipSearchWarrant();
             }
 
             //PLAYER SUPPORT FOR THE THRONE
             for (String objective : ttpgPlayer.getObjectives()) {
                 if (objective.startsWith("Support for the Throne")) {
-                    asyncPlayer.setPromissoryNotesInPlayArea(AliasHandler.resolvePromissory(objective));
+                    asyncPlayer.addPromissoryNoteToPlayArea(AliasHandler.resolvePromissory(objective));
                 }
             }
 
@@ -353,7 +353,7 @@ public class ConvertTTPGtoAsync {
 
             //PLAYER ALLIANCES
             for (String alliance : ttpgPlayer.getAlliances()) {
-                asyncPlayer.setPromissoryNotesInPlayArea(AliasHandler.resolvePromissory(alliance + "_an"));
+                asyncPlayer.addPromissoryNoteToPlayArea(AliasHandler.resolvePromissory(alliance + "_an"));
             }
 
             //INDEX

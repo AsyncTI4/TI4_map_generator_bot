@@ -10,7 +10,7 @@ import ti4.service.info.AbilityInfoService;
 @UtilityClass
 class AbilityInfoButtonHandler {
 
-    @ButtonHandler("refreshAbilityInfo")
+    @ButtonHandler(value = "refreshAbilityInfo", save = false)
     public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         AbilityInfoService.sendAbilityInfo(game, player, event);
     }

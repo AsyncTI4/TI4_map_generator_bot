@@ -15,7 +15,7 @@ import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
+import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 
 @UtilityClass
 public class ShowGameService {
@@ -47,9 +47,7 @@ public class ShowGameService {
     }
 
     public static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
-        MapRenderPipeline.queue(game, event, displayType, fileUpload -> {
-            MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event);
-        });
+        MapRenderPipeline.queue(game, event, displayType, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     private static MessageChannel sendMessage(Game game, GenericInteractionCreateEvent event) {
@@ -60,7 +58,7 @@ public class ShowGameService {
         } else if (game.isFowMode()) {
             Player player = game.getPlayer(event.getUser().getId());
             MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
-            if (!event.getClass().equals(UserOverridenSlashCommandInteractionEvent.class)
+            if (!event.getClass().equals(UserOverridenGenericInteractionCreateEvent.class)
                 && game.getRealPlayers().contains(player) && !game.getPlayersWithGMRole().contains(player)
                 && privateChannel != null && !channel.equals(privateChannel)) {
                 channel = privateChannel;

@@ -30,11 +30,7 @@ public class ListTechService {
 
     @ButtonHandler("acquireATechWithSC")
     public void acquireATechWithSC(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        if (buttonID.contains("first") || !buttonID.contains("_")) {
-            acquireATechWithResources(event, game, player, true, true);
-        } else {
-            acquireATechWithResources(event, game, player, true, false);
-        }
+        acquireATechWithResources(event, game, player, true, buttonID.contains("first") || !buttonID.contains("_"));
     }
 
     @ButtonHandler("acquireATech")

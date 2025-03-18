@@ -43,7 +43,7 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.UnitModel;
-import ti4.service.fow.UserOverridenSlashCommandInteractionEvent;
+import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 
 public class TileGenerator {
@@ -69,31 +69,36 @@ public class TileGenerator {
     private final String focusTile;
     private final DisplayType displayType;
 
-    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, DisplayType displayType) {
+    public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         this(game, event, displayType, 0, "000", null);
     }
 
-    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile) {
+    public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile) {
         this(game, event, displayType, context, focusTile, null);
     }
 
-    public TileGenerator(@NotNull Game game, @NotNull GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile, @Nullable Player fowPlayer) {
+    public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, @Nullable DisplayType displayType, int context, @NotNull String focusTile, @Nullable Player fowPlayer) {
         this.game = game;
         this.event = event;
         this.displayType = displayType;
         this.context = context;
         this.focusTile = focusTile;
-        isFoWPrivate = isFowModeActive();
-        this.fowPlayer = fowPlayer != null ? fowPlayer : CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
+        this.isFoWPrivate = isFowModeActive();
+        this.fowPlayer = fowPlayer != null ? fowPlayer
+            : (event != null ? CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId()) : null);
     }
 
     private boolean isFowModeActive() {
         return game.isFowMode() && event != null &&
             (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
-                event instanceof UserOverridenSlashCommandInteractionEvent);
+                event instanceof UserOverridenGenericInteractionCreateEvent);
     }
 
     public FileUpload createFileUpload() {
+        return FileUploadService.createFileUpload(createMainImage(), game.getName());
+    }
+
+    public BufferedImage createMainImage() {
         Map<String, Tile> tilesToDisplay = new HashMap<>(game.getTileMap());
         Set<String> systemsInRange = getTilesToShow(game, context, focusTile);
         Set<String> keysToRemove = new HashSet<>(tilesToDisplay.keySet());
@@ -103,7 +108,7 @@ public class TileGenerator {
         }
 
         // Resolve fog of war vision limitations
-        if (game.isFowMode() && event != null && event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
+        if (isFoWPrivate) {
             Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
             Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
             keys.removeAll(tilesToShow);
@@ -143,7 +148,7 @@ public class TileGenerator {
             BotLogger.log(game.getName() + ": Could not save generated system info image");
         }
 
-        return FileUploadService.createFileUpload(mainImage, game.getName());
+        return mainImage;
     }
 
     private static Set<String> getTilesToShow(Game game, int context, String focusTile) {
@@ -250,12 +255,12 @@ public class TileGenerator {
                             int labelX = TILE_PADDING + LABEL_POSITION_POINT.x;
                             int labelY = TILE_PADDING + LABEL_POSITION_POINT.y;
                             DrawingUtil.superDrawString(tileGraphics, label, labelX, labelY, Color.WHITE, null, null, null, null);
-                        //Any other custom label wordwrapped in the middle
+                            //Any other custom label wordwrapped in the middle
                         } else {
                             int labelX = TILE_PADDING + (TILE_WIDTH / 2);
                             int labelY = TILE_PADDING + (TILE_HEIGHT / 2);
                             int lineHeight = tileGraphics.getFontMetrics().getHeight();
-                            List<String> toDraw = DrawingUtil.layoutText((Graphics2D)tileGraphics, label, TILE_WIDTH - TILE_PADDING);
+                            List<String> toDraw = DrawingUtil.layoutText((Graphics2D) tileGraphics, label, TILE_WIDTH - TILE_PADDING);
                             int deltaY = 0;
                             for (String line : toDraw) {
                                 DrawingUtil.superDrawString(tileGraphics, line, labelX, labelY + deltaY, Color.WHITE, MapGenerator.HorizontalAlign.Center, null, null, null);
@@ -665,7 +670,7 @@ public class TileGenerator {
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
                 String tilePos = tile.getPosition();
-                HashMap<Player, List<Integer>> pdsDice = new HashMap<>();
+                HashMap<String, List<Integer>> pdsDice = new HashMap<>();
 
                 for (Player player : game.getRealPlayers()) {
                     List<Integer> diceCount = new ArrayList<>();
@@ -739,7 +744,7 @@ public class TileGenerator {
                         if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
                             diceCount.addFirst(diceCount.getFirst());
                         }
-                        pdsDice.put(player, diceCount);
+                        pdsDice.put(player.getUserID(), diceCount);
                     }
                 }
 
@@ -777,14 +782,15 @@ public class TileGenerator {
 
                     x += (int) ((345 - 73 * scale) / 2);
                     y += (int) ((300 - pdsDice.size() * 48 * scale) / 2);
-                    for (Player player : pdsDice.keySet()) {
-                        int numberOfDice = pdsDice.get(player).size();
+                    for (String playerID : pdsDice.keySet()) {
+                        Player player = game.getPlayer(playerID);
+                        int numberOfDice = pdsDice.get(playerID).size();
                         boolean rerolls = game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander");
                         float expectedHits;
                         if (rerolls) {
-                            expectedHits = (100.0f * numberOfDice - pdsDice.get(player).stream().mapToInt(value -> (value - 1) * (value - 1)).sum()) / 100;
+                            expectedHits = (100.0f * numberOfDice - pdsDice.get(playerID).stream().mapToInt(value -> (value - 1) * (value - 1)).sum()) / 100;
                         } else {
-                            expectedHits = (11.0f * numberOfDice - pdsDice.get(player).stream().mapToInt(Integer::intValue).sum()) / 10;
+                            expectedHits = (11.0f * numberOfDice - pdsDice.get(playerID).stream().mapToInt(Integer::intValue).sum()) / 10;
                         }
                         if (DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()).equals("_wht.png")) {
                             tileGraphics.setColor(Color.WHITE);
@@ -800,24 +806,24 @@ public class TileGenerator {
                             new Rectangle(Math.round(x + 6 * scale), Math.round(y + 12 * scale + 24 * scale * 2 / 3), Math.round(61 * scale / 2), Math.round(24 * scale / 3)),
                             smallFont);
                         if (numberOfDice >= 5) {
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(0, numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice / 3, 2 * numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(numberOfDice / 3, 2 * numberOfDice / 3).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale + 36 * scale / 3), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(2 * numberOfDice / 3, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(2 * numberOfDice / 3, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 6 * scale + 36 * scale * 2 / 3), Math.round(73 * scale / 2), Math.round(36 * scale / 3)),
                                 smallFont);
                         } else if (numberOfDice >= 3) {
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(0, numberOfDice / 2).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(0, numberOfDice / 2).stream().map(Object::toString).collect(Collectors.joining(",")) + ",",
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 12 * scale), Math.round(73 * scale / 2), Math.round(24 * scale / 2)),
                                 smallFont);
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).subList(numberOfDice / 2, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).subList(numberOfDice / 2, numberOfDice).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), Math.round(y + 12 * scale + 24 * scale / 2), Math.round(73 * scale / 2), Math.round(24 * scale / 2)),
                                 smallFont);
                         } else {
-                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(player).stream().map(Object::toString).collect(Collectors.joining(",")),
+                            DrawingUtil.drawCenteredString(tileGraphics, pdsDice.get(playerID).stream().map(Object::toString).collect(Collectors.joining(",")),
                                 new Rectangle(Math.round(x + 73 * scale / 2), y, Math.round(73 * scale / 2), Math.round(48 * scale)),
                                 smallFont);
                         }

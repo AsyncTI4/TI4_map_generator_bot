@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,10 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileHelper;
-import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -221,7 +220,7 @@ public class RegexHelper {
         } else {
             allACs.addAll(Mapper.getActionCards().keySet());
         }
-        allACs.addAll(player.getActionCards().values().stream().map(i -> i.toString()).toList());
+        allACs.addAll(player.getActionCards().values().stream().map(Object::toString).toList());
         return regexBuilder("ac", allACs);
     }
 

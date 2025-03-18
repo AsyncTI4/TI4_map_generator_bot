@@ -53,7 +53,7 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         if (supernovas > 0) {
             List<TileModel> allSupernovas = 
                 AddTileService.availableTiles(AddTileService.getSources(game, true), RandomOption.R, new HashSet<>(), new ArrayList<>())
-                    .stream().filter(s -> s.isSupernova()).collect(Collectors.toList());
+                    .stream().filter(TileModel::isSupernova).collect(Collectors.toList());
             for (int i = 0; i < supernovas; i++) {
                 Collections.shuffle(allSupernovas);
                 TileModel sn = allSupernovas.getFirst();
@@ -86,13 +86,13 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         }
 
         String mapString = "{" + map.removeFirst() + "} " + String.join(" ", map);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("Generated Eronous PainBox with ").append(totalNumberOfTiles).append(" tiles ");
         sb.append("(MR + ").append(blueTiles).append(" blues + ");
         sb.append(redTiles).append(" reds");
         if (hsTiles > 0) sb.append(" + ").append(hsTiles).append(" hs placeholders");
         if (supernovas > 0) sb.append(" + ").append(supernovas).append(" supernovas");
-        if (fixedTilesList.size() > 0) sb.append(" + ").append(fixedTilesList.size()).append(" fixed tiles");
+        if (!fixedTilesList.isEmpty()) sb.append(" + ").append(fixedTilesList.size()).append(" fixed tiles");
         sb.append(") into ").append(rings).append(" rings.\nUse `/map add_tile_list_random` to insert the map string:");
 
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

@@ -9,12 +9,12 @@ import ti4.service.decks.ShowActionCardsService;
 @UtilityClass
 class ShowActionCardsButtonHandler {
 
-    @ButtonHandler("showDeck_unplayedAC")
+    @ButtonHandler(value = "showDeck_unplayedAC", save = false)
     public static void showUnplayedACs(Game game, GenericInteractionCreateEvent event) {
         ShowActionCardsService.showUnplayedACs(game, event);
     }
 
-    @ButtonHandler("ACShowDiscardFullText")
+    @ButtonHandler(value = "ACShowDiscardFullText", save = false)
     public static void showDiscardFullText(GenericInteractionCreateEvent event, Game game) {
         ShowActionCardsService.showDiscard(game, event, true);
     }

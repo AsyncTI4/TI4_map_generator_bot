@@ -40,7 +40,7 @@ class ListTurnStats extends GameStateSubcommand {
 
     private String playerAverageTurnLength(Player player) {
         long totalMillis = player.getTotalTurnTime();
-        int numTurns = player.getNumberTurns();
+        int numTurns = player.getNumberOfTurns();
         if (numTurns == 0 || totalMillis == 0) {
             return "> " + player.getUserName() + " has not taken a turn yet.";
         }

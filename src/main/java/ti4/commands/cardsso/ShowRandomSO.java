@@ -33,23 +33,23 @@ class ShowRandomSO extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "No secret objectives to reveal");
             return;
         }
-        Collections.shuffle(secrets);
-        String soID = secrets.getFirst();
-
-        String sb = "Game: " + game.getName() + "\n" +
-            "Player: " + player.getUserName() + "\n" +
-            "Showed Secret Objectives:" + "\n" +
-            SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID) + "\n";
-
-        player.setSecret(soID);
-
+        
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
             MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "Secret objective shown to player.");
+        Collections.shuffle(secrets);
+        String soID = secrets.getFirst();
+
+        String sb = otherPlayer.getRepresentationUnfogged() + " you were shown the following random Secret Objective:\n" +
+            "> Player: " + player.getRepresentationNoPing() + "\n" +
+            "> " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID) + "\n";
+
+        player.setSecret(soID);
+
+        MessageHelper.sendMessageToEventChannel(event, "Random secret objective shown to " + otherPlayer.getRepresentationNoPing());
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, sb);
     }

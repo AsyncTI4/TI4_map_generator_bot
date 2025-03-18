@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -21,11 +20,8 @@ public class DiploSystemHelper {
 
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player && player_.isRealPlayer() && !player.getAllianceMembers().contains(player_.getFaction())) {
-                String color = player_.getColor();
-                if (Mapper.isValidColor(color)) {
-                    CommandCounterHelper.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, game, color);
-                }
+                CommandCounterHelper.addCC(event, player_, tile);
+                Helper.isCCCountCorrect(player_);
             }
         }
 

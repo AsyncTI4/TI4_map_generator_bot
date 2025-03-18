@@ -167,7 +167,7 @@ public class PromissoryNoteHelper {
         // String pnOwner = Mapper.getPromissoryNoteOwner(id);
         Player owner = game.getPNOwner(id);
         if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
-            player.setPromissoryNotesInPlayArea(id);
+            player.addPromissoryNoteToPlayArea(id);
         } else {
             player.removePromissoryNote(id);
             if (!"dspncymi".equalsIgnoreCase(id)) {
@@ -289,11 +289,11 @@ public class PromissoryNoteHelper {
                     + ", due to a play of your _Political Secret_, you will be unable to vote in agenda."
                     + " You have also been automatically passed on \"whens\" and \"afters\".");
             }
-            game.setStoredValue("queuedWhens", game.getStoredValue("queuedWhens").replace(owner.getFaction()+"_",""));
-            game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens")+owner.getFaction()+"_");
-            game.setStoredValue("queuedAfters", game.getStoredValue("queuedAfters").replace(owner.getFaction()+"_",""));
-            game.setStoredValue("declinedAfters", game.getStoredValue("declinedAfters")+owner.getFaction()+"_");
-            game.setStoredValue("queuedAftersLockedFor"+owner.getFaction(),"Yes");
+            game.setStoredValue("queuedWhens", game.getStoredValue("queuedWhens").replace(owner.getFaction() + "_", ""));
+            game.setStoredValue("declinedWhens", game.getStoredValue("declinedWhens") + owner.getFaction() + "_");
+            game.setStoredValue("queuedAfters", game.getStoredValue("queuedAfters").replace(owner.getFaction() + "_", ""));
+            game.setStoredValue("declinedAfters", game.getStoredValue("declinedAfters") + owner.getFaction() + "_");
+            game.setStoredValue("queuedAftersLockedFor" + owner.getFaction(), "Yes");
             game.setStoredValue("AssassinatedReps",
                 game.getStoredValue("AssassinatedReps") + owner.getFaction());
         }
@@ -335,7 +335,7 @@ public class PromissoryNoteHelper {
                 String reducedMsg = owner.getRepresentationUnfogged() + " your _Trade Agreement_ was played.";
                 String reducedMsg2 = player.getRepresentationUnfogged() + " played the _Trade Agreement_ belonging to "
                     + owner.getRepresentationUnfogged() + ", taking their " + comms + " commodit" + (comms == 1 ? "y" : "ies")
-                    +" ("
+                    + " ("
                     + oldTGs + " tg" + (oldTGs == 1 ? "" : "s") + " -> " + (oldTGs + comms) + "tg"
                     + (oldTGs + comms == 1 ? "" : "s") + ").";
                 player.setTg(oldTGs + comms);
@@ -382,7 +382,7 @@ public class PromissoryNoteHelper {
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),player.getRepresentation()+
+            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() +
                 "Please select your Rider target", game, player, riderButtons);
             //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
             //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
@@ -394,7 +394,7 @@ public class PromissoryNoteHelper {
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             //List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),player.getRepresentation()+
+            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() +
                 "Please select your Rider target", game, player, riderButtons);
             //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
             //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
@@ -405,7 +405,7 @@ public class PromissoryNoteHelper {
 
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, finsFactionCheckerPrefix);
             //List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),player.getRepresentation()+
+            MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() +
                 "Please select your Rider target", game, player, riderButtons);
             //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getMainGameChannel(),
             //    "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
@@ -486,7 +486,7 @@ public class PromissoryNoteHelper {
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         }
-        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberTurns());
+        TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberOfTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Combat modifier will be applied next time you push the combat roll button.");

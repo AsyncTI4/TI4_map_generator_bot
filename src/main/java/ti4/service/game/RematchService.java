@@ -177,7 +177,7 @@ public class RematchService {
         }
     }
 
-    private static Pattern gameNamePattern = Pattern.compile("(?<prefix>[a-zA-Z]+[0-9]+)(?<rematchId>[a-z]*)");
+    private static final Pattern gameNamePattern = Pattern.compile("(?<prefix>[a-zA-Z]+[0-9]+)(?<rematchId>[a-z]*)");
 
     public static String newGameName(String oldName) {
         Matcher matcher = gameNamePattern.matcher(oldName);

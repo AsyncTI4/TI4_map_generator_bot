@@ -8,11 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -24,6 +19,9 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
@@ -90,6 +88,8 @@ import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
  */
@@ -139,7 +139,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelperHeroes.argentHeroStep3(game, player, event, buttonID);
     }
 
-    @ButtonHandler("requestAllFollow_")
+    @ButtonHandler(value = "requestAllFollow_", save = false)
     public static void requestAllFollow(ButtonInteractionEvent event, Game game) {
         if (game.getName().equalsIgnoreCase("fow273")) {
             event.getMessage().reply(event.getUser().getAsMention() + " has requested that everyone resolve this strategy card before play continues." +
@@ -217,7 +217,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("planetAbilityExhaust_")
     public static void planetAbilityExhaust(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String planet = buttonID.replace("planetAbilityExhaust_", "");
-        PlanetExhaustAbility.doAction(player, planet, game, true);
+        PlanetExhaustAbility.doAction(event, player, planet, game, true);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -986,14 +986,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
             if (!game.getStoredValue("newStatusScoringMode").isEmpty() && game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
-                String missingPeople = "";
+                StringBuilder missingPeople = new StringBuilder();
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
                     if (so.isEmpty()) {
-                        missingPeople += player.getRepresentation(false, true);
+                        missingPeople.append(player.getRepresentation(false, true));
                     }
                 }
-                if (!missingPeople.isEmpty()) {
+                if (missingPeople.length() > 0) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), missingPeople + " need to indicate if they are scoring a secret objective before the next PO can be flipped");
                     return;
                 }
@@ -1090,7 +1090,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String key3 = "potentialScorePOBlockers";
         String key3b = "potentialScoreSOBlockers";
         String message;
-        for (Player player2 : Helper.getInitativeOrder(game)) {
+        for (Player player2 : game.getActionPhaseTurnOrder()) {
             if (player2 == player) {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     game.setStoredValue(key2, game.getStoredValue(key2)
@@ -1144,7 +1144,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
-    @ButtonHandler("get_so_discard_buttons")
+    @ButtonHandler(value = "get_so_discard_buttons", save = false)
     public static void getSODiscardButtons(ButtonInteractionEvent event, Player player, Game game) {
         String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
         List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
@@ -1184,7 +1184,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message = player.getRepresentationUnfogged() + " Use below buttons to move any ground forces or conclude retreat.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, pos1, pos2));
         ButtonHelper.deleteMessage(event);
-        if(game.getTileByPosition(pos1).isGravityRift()){
+        if (game.getTileByPosition(pos1).isGravityRift()) {
             Button rift = Buttons.green(player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos2,
                 "Rift Units", MiscEmojis.GravityRift);
             List<Button> buttons = new ArrayList<>();
@@ -1208,7 +1208,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentationUnfogged() + " choose the target of your agent", buttons);
     }
 
-    @ButtonHandler("get_so_score_buttons")
+    @ButtonHandler(value = "get_so_score_buttons", save = false)
     public static void getSoScoreButtons(ButtonInteractionEvent event, Player player) {
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveButtons(player);
@@ -1245,7 +1245,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String key3 = "potentialScoreSOBlockers";
                 String key3b = "potentialScorePOBlockers";
                 String message;
-                for (Player player2 : Helper.getInitativeOrder(game)) {
+                for (Player player2 : game.getActionPhaseTurnOrder()) {
                     if (player2 == player) {
                         int soIndex = Integer.parseInt(soID);
                         SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
@@ -1880,12 +1880,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
-        String color = player.getColor();
-        if (Mapper.isValidColor(color)) {
-            CommandCounterHelper.addCC(event, color, tile);
-        }
+        CommandCounterHelper.addCC(event, player, tile);
         String message = player.getFactionEmojiOrColor() + " Placed 1 command token from reinforcements in the " + Helper.getPlanetRepresentation(planet, game) + " system.";
-        if(!game.isFowMode()){
+        if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event);
         }
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
@@ -1904,17 +1901,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
-        String color = player.getColor();
+        Player constructionPlayer = player;
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(4)) {
-                color = p2.getColor();
+                constructionPlayer = p2;
             }
         }
+        CommandCounterHelper.addCC(event, constructionPlayer, tile);
 
-        if (Mapper.isValidColor(color)) {
-            CommandCounterHelper.addCC(event, color, tile);
-        }
-        String message = player.getRepresentation() + " Placed 1 " + StringUtils.capitalize(color) + " command token in the "
+        String colorName = Mapper.getColor(constructionPlayer.getColor()).getDisplayName();
+        String message = player.getRepresentation() + " Placed 1 " + colorName + " command token in the "
             + Helper.getPlanetRepresentation(planet, game)
             + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent on **Construction**.";
@@ -1963,7 +1959,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
-    @ButtonHandler("pay1tg") // TODO: delete this specific handler after Dec 2024
     @ButtonHandler("pay1tgToAnnounceARetreat")
     public static void pay1tgToAnnounceARetreat(ButtonInteractionEvent event, Player player) {
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor()
@@ -2480,7 +2475,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             for (Player player_ : players.values()) {
-                player_.cleanExhaustedPlanets(false);
+                player_.clearExhaustedPlanets(false);
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), "All planets have been readied at the end of the agenda phase.");
         } else {
@@ -2711,7 +2706,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
-    @ButtonHandler("refreshStatusSummary")
+    @ButtonHandler(value = "refreshStatusSummary", save = false)
     public static void refreshStatusSummary(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "Please score objectives.";
         msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
@@ -2777,7 +2772,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
         TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC,
             acAlias,
-            player.getNumberTurns());
+            player.getNumberOfTurns());
         if (combatModAC != null) {
             player.addNewTempCombatMod(combatModAC);
             MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -2790,7 +2785,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void applytempcombatmodtech(ButtonInteractionEvent event, Player player) {
         String acAlias = "sc";
         TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier("tech", acAlias,
-            player.getNumberTurns());
+            player.getNumberOfTurns());
         if (combatModAC != null) {
             player.addNewTempCombatMod(combatModAC);
             MessageHelper.sendMessageToChannel(event.getChannel(),

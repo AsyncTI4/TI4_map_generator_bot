@@ -86,4 +86,31 @@ public class UnitTokenPosition implements Serializable {
         }
         return new Point(point);
     }
+
+    @Deprecated
+    private static Point offsetToTopLeft(Point p, String purpose) {
+        return switch (purpose) {
+            case "control" -> new Point(p.x - 36, p.y - 24);
+            case "att" -> new Point(p.x - 32, p.y - 17);
+            case "sd" -> new Point(p.x - 21, p.y - 21);
+            case "pd" -> new Point(p.x - 16, p.y - 18);
+            case "tkn_gf" -> new Point(p.x - 35, p.y - 17);
+            case "mf" -> new Point(p.x - 22, p.y - 22);
+            default -> new Point(p.x, p.y);
+        };
+    }
+
+    @Deprecated
+    public void addCntrPosition(String id, Point point) {
+        List<Point> points = coordinateMap.computeIfAbsent(id, key -> new ArrayList<>());
+        points.add(offsetToTopLeft(point, id));
+        coordinateMap.put(id, points);
+    }
+
+    @Deprecated
+    public void addCntrPositions(String id, List<Point> points) {
+        List<Point> existing = coordinateMap.computeIfAbsent(id, key -> new ArrayList<>());
+        existing.addAll(points.stream().map(p -> offsetToTopLeft(p, id)).toList());
+        coordinateMap.put(id, existing);
+    }
 }

@@ -5,14 +5,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
@@ -109,7 +108,7 @@ class AgendaResolveButtonHandler {
                     Helper.checkEndGame(game, player2);
                 }
                 if ("warrant".equalsIgnoreCase(agID)) {
-                    player2.setSearchWarrant();
+                    player2.flipSearchWarrant();
                     game.drawSecretObjective(player2.getUserID());
                     game.drawSecretObjective(player2.getUserID());
                     if (player2.hasAbility("plausible_deniability")) {
@@ -193,13 +192,12 @@ class AgendaResolveButtonHandler {
                     if (!"for".equalsIgnoreCase(winner)) {
                         for (Tile tile : ButtonHelper.getAllWormholeTiles(game)) {
                             for (Player player : game.getRealPlayers()) {
-                                if (FoWHelper.playerHasShipsInSystem(player, tile)) {
-                                    CommandCounterHelper.addCC(event, player.getColor(), tile);
-                                }
+                                if (!FoWHelper.playerHasShipsInSystem(player, tile))
+                                    continue;
+                                CommandCounterHelper.addCC(event, player, tile);
                             }
                         }
-                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Each system with a wormhole and a player's ships have had 1 of that player's command tokens placed in that system.");
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Each system with a wormhole and a player's ships have had 1 of that player's command tokens placed in that system.");
                     }
                 }
                 if ("travel_ban".equalsIgnoreCase(agID)) {
@@ -236,7 +234,7 @@ class AgendaResolveButtonHandler {
                         for (Player player : game.getRealPlayers()) {
                             Tile tile = player.getHomeSystemTile();
                             if (tile != null) {
-                                CommandCounterHelper.addCC(event, player.getColor(), tile);
+                                CommandCounterHelper.addCC(event, player, tile);
                             }
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -468,7 +466,7 @@ class AgendaResolveButtonHandler {
                         }
                         uH.removeAllUnits(player.getColor());
                         if (AgendaHelper.getPlayersWithLeastPoints(game).size() == 1) {
-                            Player p2 = AgendaHelper.getPlayersWithLeastPoints(game).get(0);
+                            Player p2 = AgendaHelper.getPlayersWithLeastPoints(game).getFirst();
                             Tile tile = game.getTileFromPlanet(winner);
                             if (tile != null) {
                                 AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + winner);

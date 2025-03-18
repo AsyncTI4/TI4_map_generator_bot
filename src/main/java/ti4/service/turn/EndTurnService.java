@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.collections4.ListUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -15,6 +13,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -49,26 +48,15 @@ import ti4.service.leader.CommanderUnlockCheckService;
 public class EndTurnService {
 
     public static Player findNextUnpassedPlayer(Game game, Player currentPlayer) {
-        int startingInitiative = game.getPlayersTurnSCInitiative(currentPlayer);
-        //in a normal game, 8 is the maximum number, so we modulo on 9
-        List<Player> unpassedPlayers = game.getRealPlayers().stream().filter(p -> !p.isPassed()).toList();
-        int maxSC = Collections.max(game.getSCList()) + 1;
-        if (ButtonHelper.getKyroHeroSC(game) != 1000) {
-            maxSC += 1;
-        }
-        for (int i = 1; i <= maxSC; i++) {
-            int scCheck = (startingInitiative + i) % maxSC;
-            for (Player p : unpassedPlayers) {
-                if (game.getPlayersTurnSCInitiative(p) == scCheck) {
-                    return p;
-                }
+        List<Player> turnOrder = game.getActionPhaseTurnOrder();
+        while (!turnOrder.getLast().equals(currentPlayer))
+            Collections.rotate(turnOrder, 1);
+        for (Player p : turnOrder) {
+            if (!p.isPassed() && !p.isEliminated()) {
+                return p;
             }
         }
-        if (unpassedPlayers.isEmpty()) {
-            return null;
-        } else {
-            return unpassedPlayers.getFirst();
-        }
+        return null;
     }
 
     public static void endTurnAndUpdateMap(GenericInteractionCreateEvent event, Game game, Player player) {
@@ -365,7 +353,7 @@ public class EndTurnService {
                     }
                 }
             }
-            if (scorables.size() == 0) {
+            if (scorables.isEmpty()) {
                 messageText = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
             } else {
                 if (Helper.canPlayerScorePOs(game, player)) {
@@ -421,7 +409,7 @@ public class EndTurnService {
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
-            for (Player player : Helper.getInitativeOrder(game)) {
+            for (Player player : game.getActionPhaseTurnOrder()) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }

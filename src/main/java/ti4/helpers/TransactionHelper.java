@@ -401,7 +401,7 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler("transaction")
+    @ButtonHandler(value = "transaction", save = false)
     public static void transaction(Player player, Game game) {
         List<Button> buttons;
         buttons = TransactionHelper.getPlayersToTransact(game, player);
@@ -409,7 +409,7 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
-    @ButtonHandler("newTransact_")
+    @ButtonHandler(value = "newTransact_", save = false)
     public static void resolveSpecificTransButtonsNew(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         buttonID = buttonID.replace("newTransact_", "");
@@ -689,7 +689,7 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, p1, p2));
     }
 
-    @ButtonHandler("getNewTransaction_")
+    @ButtonHandler(value = "getNewTransaction_", save = false)
     public static void getNewTransaction(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String sender = buttonID.split("_")[1];
         String receiver = buttonID.split("_")[2];
@@ -720,7 +720,7 @@ public class TransactionHelper {
         return RandomHelper.isOneInX(1000);
     }
 
-    @ButtonHandler("sendOffer_")
+    @ButtonHandler(value = "sendOffer_")
     public static void sendOffer(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 == null) return;
@@ -1006,12 +1006,12 @@ public class TransactionHelper {
             }
             case "shipOrders", "starCharts" -> {
                 message2 = ident + " sent " + Mapper.getRelic(amountToTrans).getName() + " to " + ident2;
-                if(!p1.hasRelic(amountToTrans)){
-                    if(amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans.replace("duplicate", ""))){
+                if (!p1.hasRelic(amountToTrans)) {
+                    if (amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans.replace("duplicate", ""))) {
                         amountToTrans = amountToTrans.replace("duplicate", "");
-                    }else{
-                        if(!amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans+"duplicate")){
-                            amountToTrans = amountToTrans+"duplicate";
+                    } else {
+                        if (!amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans + "duplicate")) {
+                            amountToTrans = amountToTrans + "duplicate";
                         }
                     }
                 }
@@ -1089,7 +1089,7 @@ public class TransactionHelper {
                 if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(p2.getFaction())
                     && !promissoryNoteOwner.equals(p2.getColor())
                     && !p2.isPlayerMemberOfAlliance(game.getPlayerFromColorOrFaction(promissoryNoteOwner))) {
-                    p2.setPromissoryNotesInPlayArea(id);
+                    p2.addPromissoryNoteToPlayArea(id);
                     if (id.endsWith("_sftt")) {
                         sendSftT = true;
                     } else {
@@ -1337,7 +1337,7 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler("rejectOffer_")
+    @ButtonHandler(value = "rejectOffer_", save = false)
     public static void rejectOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p1 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p1 != null) {

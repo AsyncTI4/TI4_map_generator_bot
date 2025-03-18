@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,11 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -44,6 +39,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -231,40 +230,6 @@ public class Helper {
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), msg, proceedButtons);
     }
 
-    public static List<Player> getInitativeOrder(Game game) {
-        // TODO: Can we use game.getActionPhaseTurnOrder instead?
-        HashMap<Integer, Player> order = new HashMap<>();
-        int naaluSC = 0;
-        for (Player player : game.getRealPlayers()) {
-            int sc = player.getLowestSC();
-            String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player, Integer.toString(sc));
-            if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                naaluSC = sc;
-            }
-            order.put(sc, player);
-        }
-        List<Player> initiativeOrder = new ArrayList<>();
-        Integer max = Collections.max(game.getScTradeGoods().keySet());
-        if (ButtonHelper.getKyroHeroSC(game) != 1000) {
-            max += 1;
-        }
-        if (naaluSC != 0) {
-            Player p3 = order.get(naaluSC);
-            initiativeOrder.add(p3);
-        }
-        for (int i = 1; i <= max; i++) {
-            if (naaluSC != 0 && i == naaluSC) {
-                continue;
-            }
-            Player p2 = order.get(i);
-            if (p2 != null) {
-                initiativeOrder.add(p2);
-            }
-        }
-        return initiativeOrder;
-
-    }
-
     public static void resolveQueue(Game game) {
         Player imperialHolder = getPlayerWithThisSC(game, 8);
         if (game.getPhaseOfGame().contains("agenda")) {
@@ -328,13 +293,13 @@ public class Helper {
     }
 
     public static String getNewStatusScoringRepresentation(Game game) {
-        String rep = "# __Scoring Summary__\n";
+        StringBuilder rep = new StringBuilder("# __Scoring Summary__\n");
         if (game.getRealPlayers().size() > 10) {
             return "This game is too large to display a scoring summary";
         }
-        for (Player player : getInitativeOrder(game)) {
+        for (Player player : game.getActionPhaseTurnOrder()) {
             int sc = player.getLowestSC();
-            rep += CardEmojis.getSCBackFromInteger(sc) + player.getRepresentation(false, false) + "\n";
+            rep.append(CardEmojis.getSCBackFromInteger(sc)).append(player.getRepresentation(false, false)).append("\n");
             String poMessage = "";
             String soMessage = CardEmojis.SecretObjective + " ";
             String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
@@ -376,11 +341,11 @@ public class Helper {
             } else {
                 soMessage += " ✅ " + so;
             }
-            rep += "> " + poMessage + "\n";
-            rep += "> " + soMessage + "\n";
+            rep.append("> ").append(poMessage).append("\n");
+            rep.append("> ").append(soMessage).append("\n");
         }
 
-        return rep;
+        return rep.toString();
     }
 
     public static void resolvePOScoringQueue(Game game, GenericInteractionCreateEvent event) {
@@ -392,7 +357,7 @@ public class Helper {
             || game.getHighestScore() + 1 > game.getVp()) {
             return;
         }
-        for (Player player : getInitativeOrder(game)) {
+        for (Player player : game.getActionPhaseTurnOrder()) {
             if (game.getHighestScore() + 1 > game.getVp()) {
                 return;
             }
@@ -1215,7 +1180,7 @@ public class Helper {
             String planetOrSpace2 = uniquePlace.split("_")[1];
             Tile tile = game.getTileByPosition(tilePos2);
             StringBuilder localPlace = new StringBuilder();
-            if (msg.length() == 0) {
+            if (msg.isEmpty()) {
                 localPlace.append(player.getRepresentationNoPing()).append(" is producing units in ").append(tile.getRepresentationForButtons(game, player));
             } else {
                 localPlace.append("And is producing units in ").append(tile.getRepresentationForButtons(game, player));
@@ -1821,6 +1786,11 @@ public class Helper {
         return getLeaderRepresentation(leader, true, true, true);
     }
 
+    public static void isCCCountCorrect(Player player) {
+        int ccCount = getCCCount(player.getGame(), player.getColor());
+        informUserCCOverLimit(player.getGame(), player.getColor(), ccCount);
+    }
+
     public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game game, String color) {
         int ccCount = getCCCount(game, color);
         informUserCCOverLimit(game, color, ccCount);
@@ -2282,10 +2252,11 @@ public class Helper {
                     + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
             if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Note about FoW\n"
-                    + "When you press **End Game** all the game channels will be deleted immediately!\n"
-                    + "A new thread will be generated under the **#fow-war-stories** channel.\n"
-                    + "Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), """
+                    ## Note about FoW
+                    When you press **End Game** all the game channels will be deleted immediately!
+                    A new thread will be generated under the **#fow-war-stories** channel.
+                    Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.""");
                 List<Button> titleButton = new ArrayList<>();
                 titleButton.add(Buttons.blue("offerToGiveTitles", "Offer to bestow a Title"));
                 titleButton.add(Buttons.gray("deleteButtons", "No titles for this game"));

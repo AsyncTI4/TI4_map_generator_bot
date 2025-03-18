@@ -28,7 +28,7 @@ class Cleanup extends GameStateSubcommand {
 
         Map<String, Player> players = getGame().getPlayers();
         for (Player player : players.values()) {
-            player.cleanExhaustedPlanets(false);
+            player.clearExhaustedPlanets(false);
         }
     }
 }

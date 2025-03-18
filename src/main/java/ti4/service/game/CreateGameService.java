@@ -214,7 +214,7 @@ public class CreateGameService {
         Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
         MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change some options? ", offerOptions);
 
-        offerGameHomebrewButtons(actionsChannel);
+        HomebrewService.offerGameHomebrewButtons(actionsChannel);
 
         MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
     }
@@ -227,7 +227,7 @@ public class CreateGameService {
         String botGetStartedMessage = game.getPing() + " - bot/map channel\n" +
             "This channel is for bot slash commands and updating the map, to help keep the actions channel clean.\n" +
             "### __Use the following commands to get started:__\n" +
-            "> `/map add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n" +
+            "> `/map add_tile_list` and insert your TTPG map string\n" +
             "> `/player setup` to set player faction and color\n" +
             "> `/game setup` to set player count and additional options\n" +
             "> `/game set_order` to set the starting speaker order if you're using a weird map\n" +
@@ -633,13 +633,5 @@ public class CreateGameService {
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }
-    }
-
-    public static void offerGameHomebrewButtons(MessageChannel channel) {
-        List<Button> homebrewButtons = new ArrayList<>();
-        homebrewButtons.add(Buttons.green("getHomebrewButtons", "Yes, use Homebrew"));
-        homebrewButtons.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "If you plan to have a supported homebrew mode in this game, please indicate " +
-            "so with these buttons. 4/4/4 is a type of homebrew btw", homebrewButtons);
     }
 }

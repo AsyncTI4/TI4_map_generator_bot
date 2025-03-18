@@ -158,7 +158,7 @@ public class DiscordantStarsHelper {
     }
 
     private static void resolveEconomyExploitAbility(Player player, PlanetModel planetModel, Game game) {
-        if (!player.getHasUsedEconomyExploitAbility() && player.hasAbility("policy_the_economy_exploit")) { //add a fighter with ships
+        if (!player.isHasUsedEconomyExploitAbility() && player.hasAbility("policy_the_economy_exploit")) { //add a fighter with ships
             player.setHasUsedEconomyExploitAbility(true);
             String msg = player.getRepresentation() + " Due to your exhausting of " + planetModel.getAutoCompleteName()
                 + " you may resolve your _Policy - The Economy: Exploit ➖_ ability."
@@ -172,7 +172,7 @@ public class DiscordantStarsHelper {
     private static void resolvePeopleConnectAbility(Player player, PlanetModel planetModel, Game game) {
         UnitHolder uh = ButtonHelper.getUnitHolderFromPlanetName(planetModel.getId(), game);
 
-        if (!player.getHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect") && uh != null && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+        if (!player.isHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect") && uh != null && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
             String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
                 + ", you may resolve your _Policy - The People: Connect ➕_ ability."
                 + " You may move 1 iInfantry on " + planetModel.getName() + " to another planet you control.";
@@ -183,7 +183,7 @@ public class DiscordantStarsHelper {
     }
 
     private static void resolveEconomyEmpowerAbility(Player player, PlanetModel planetModel) {
-        if (!player.getHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
+        if (!player.isHasUsedEconomyEmpowerAbility() && player.hasAbility("policy_the_economy_empower")) {
             player.setHasUsedEconomyEmpowerAbility(true);
             String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
                 + ", you may resolve your _Policy - The Economy: Empower ➕_ ability. You gain 1 commodity.";
@@ -194,7 +194,7 @@ public class DiscordantStarsHelper {
     }
 
     private static void resolveEnvironmentPreserveAbility(Player player, PlanetModel planetModel, Game game) {
-        if (!player.getHasUsedEnvironmentPreserveAbility() && player.hasAbility("policy_the_environment_preserve")) {
+        if (!player.isHasUsedEnvironmentPreserveAbility() && player.hasAbility("policy_the_environment_preserve")) {
             List<Button> buttons = ButtonHelperAbilities.getOlradinPreserveButtons(game, player, planetModel.getId());
             if (!buttons.isEmpty()) {
                 String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
@@ -378,8 +378,8 @@ public class DiscordantStarsHelper {
             return;
         }
 
-        StringBuffer sb = new StringBuffer();
-        List<String> tilesWithGloryTokens = ButtonHelperAgents.getGloryTokenTiles(game).stream().map(t -> t.getPosition()).toList();
+        StringBuilder sb = new StringBuilder();
+        List<String> tilesWithGloryTokens = ButtonHelperAgents.getGloryTokenTiles(game).stream().map(Tile::getPosition).toList();
         for (String planetId : player.getPlanets()) {
             Planet planet = game.getUnitHolderFromPlanet(planetId);
             int mechsOnPlanet = planet.getUnitCount(UnitType.Mech, player);
@@ -394,13 +394,13 @@ public class DiscordantStarsHelper {
             if (hasAdjacentGloryToken) {
                 AddUnitService.addUnits(event, planetTile, game, player.getColor(), mechsOnPlanet + " infantry " + planetId);
                 sb.append(player.getRepresentationNoPing())
-                  .append(" added " + mechsOnPlanet)
-                  .append(UnitEmojis.infantry)
-                  .append(" to ")
-                  .append(planet.getPlanetModel().getName())
-                  .append(" due to " + mechsOnPlanet + " Skald " )
-                  .append(UnitEmojis.mech)
-                  .append(" being adjacent to a **Glory** token.\n");
+                    .append(" added ").append(mechsOnPlanet)
+                    .append(UnitEmojis.infantry)
+                    .append(" to ")
+                    .append(planet.getPlanetModel().getName())
+                    .append(" due to ").append(mechsOnPlanet).append(" Skald ")
+                    .append(UnitEmojis.mech)
+                    .append(" being adjacent to a **Glory** token.\n");
             }
         }
 

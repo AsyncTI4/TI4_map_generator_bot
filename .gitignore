@@ -21,3 +21,4 @@ TI4_map_generator_discord_bot.iml
 /runbot.sh
 .DS_Store
 *.swp
+/src/test/java/ti4/image/static/tileLayout/temp
