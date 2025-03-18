@@ -560,7 +560,7 @@ public class ButtonHelperModifyUnits {
 
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null || !unitModel.getSustainDamage() || ((!unitModel.getIsShip() && !(ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_nekro_flagship_2", player, tile))) && !isNomadMechApplicable(player, (noMechPowers || spaceCannonOffence), unitKey))) continue;
-                if(!unitModel.getIsShip() && spaceCannonOffence){
+                if (!unitModel.getIsShip() && spaceCannonOffence) {
                     continue;
                 }
                 if (unitModel.getBaseType().equalsIgnoreCase("warsun") && ButtonHelper.isLawInPlay(game, "schematics")) continue;
@@ -1178,7 +1178,7 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
                 + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
-            CommandCounterHelper.addCC(event, player.getColor(), tile2, true);
+            CommandCounterHelper.addCC(event, player, tile2, true);
         }
 
         for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {
@@ -1424,14 +1424,12 @@ public class ButtonHelperModifyUnits {
                 if (!hasConstruction && ("action".equalsIgnoreCase(game.getPhaseOfGame())
                     || game.getCurrentAgendaInfo().contains("Strategy"))
                     && !ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
-                    String color = player.getColor();
-
                     tile = TileHelper.getTile(event, planetName, game);
                     String msg = playerRep + " placed 1 command token from reinforcements in the "
                         + Helper.getPlanetRepresentation(planetName, game) + " system.";
                     if (!game.playerHasLeaderUnlockedOrAlliance(player, "rohdhnacommander")) {
-                        if (Mapper.isValidColor(color)) {
-                            CommandCounterHelper.addCC(event, color, tile);
+                        CommandCounterHelper.addCC(event, player, tile);
+                        if (!game.isFowMode()) {
                             ButtonHelper.updateMap(game, event);
                         }
                     } else {

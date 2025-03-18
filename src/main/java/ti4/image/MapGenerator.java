@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -34,7 +27,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
@@ -100,7 +92,6 @@ public class MapGenerator implements AutoCloseable {
     private final int width;
     private final int height;
     private final int heightForGameInfo;
-    private final boolean allEyesOnMe;
 
     private final List<WebsiteOverlay> websiteOverlays = new ArrayList<>();
     private final int mapWidth;
@@ -184,7 +175,6 @@ public class MapGenerator implements AutoCloseable {
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth;
         }
-        allEyesOnMe = this.displayType.equals(DisplayType.googly);
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
     }
@@ -340,7 +330,7 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private boolean isFowModeActive() {
-        return game.isFowMode() && event != null && 
+        return game.isFowMode() && event != null &&
             (FoWHelper.isPrivateGame(game, event) || event instanceof UserOverridenGenericInteractionCreateEvent);
     }
 
@@ -667,9 +657,7 @@ public class MapGenerator implements AutoCloseable {
 
             Player activePlayer = game.getPlayer(activePlayerUserID);
             List<Player> allPlayers = new ArrayList<>(game.getRealPlayers());
-
-            Comparator<Player> comparator = Comparator.comparing(game::getPlayersTurnSCInitiative);
-            allPlayers.sort(comparator);
+            allPlayers.sort(Player.comparingInitiative());
 
             int rotationDistance = allPlayers.size() - allPlayers.indexOf(activePlayer);
             Collections.rotate(allPlayers, rotationDistance);

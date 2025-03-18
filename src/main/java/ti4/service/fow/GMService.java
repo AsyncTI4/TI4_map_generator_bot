@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.FoWHelper;
@@ -33,16 +33,14 @@ public class GMService {
         Buttons.green("gmWhoCanSee~MDL", "Who Can See Position..."),
         Buttons.EDIT_NOTEPAD,
         Buttons.POST_NOTEPAD,
-        Buttons.EDIT_SUMMARIES
-    );
+        Buttons.EDIT_SUMMARIES);
 
     private static final List<Button> HAND_CHECK_BUTTONS = Arrays.asList(
-        Buttons.gray("gmCheckPlayerHands_sabotage", "Sabotages", CardEmojis.ActionCard), 
-        Buttons.gray("gmCheckPlayerHands_whens", "Whens/Afters", CardEmojis.ActionCard), 
-        Buttons.gray("gmCheckPlayerHands_deadly", "Deadly Plots/Briberies", CardEmojis.ActionCard), 
-        Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard), 
-        Buttons.DONE_DELETE_BUTTONS
-    );
+        Buttons.gray("gmCheckPlayerHands_sabotage", "Sabotages", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_whens", "Whens/Afters", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_deadly", "Deadly Plots/Briberies", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
+        Buttons.DONE_DELETE_BUTTONS);
 
     public static void showGMButtons(Game game) {
         MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), "GM Buttons", GMBUTTONS);
@@ -53,19 +51,16 @@ public class GMService {
         return channels.isEmpty() ? null : channels.getFirst();
     }
 
-
     @ButtonHandler("gmShowGameAs_")
     public static void showGameAs(ButtonInteractionEvent event, String buttonID, Game game) {
         String faction = buttonID.replace("gmShowGameAs_", "");
-        if (!"".equals(faction)) {
+        if (!faction.isEmpty()) {
             Player showAs = game.getPlayerFromColorOrFaction(faction);
-            ShowGameService.simpleShowGame(game, new UserOverridenGenericInteractionCreateEvent(event, showAs.getUser()));
+            ShowGameService.simpleShowGame(game, new UserOverridenGenericInteractionCreateEvent(event, showAs.getMember()));
         } else {
             List<Button> factionButtons = new ArrayList<>();
-            for (Player player : game.getPlayers().values()) {
-                if (player.getFaction() != null) {
-                    factionButtons.add(Buttons.green("gmShowGameAs_" + player.getFaction(), player.getColor() + ", " + player.getUserName(), player.getFactionEmoji()));
-                }
+            for (Player player : game.getRealPlayers()) {
+                factionButtons.add(Buttons.green("gmShowGameAs_" + player.getFaction(), player.getColor() + ", " + player.getUserName(), player.getFactionEmoji()));
             }
             factionButtons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), "Select player who to view the game as:", factionButtons);
@@ -78,7 +73,7 @@ public class GMService {
         switch (option) {
             case "sabotage" -> {
                 checkWhoHas("sabo", game);
-            }        
+            }
             case "deadly" -> {
                 checkWhoHas("deadly_plot", game);
                 checkWhoHas("bribery", game);
@@ -88,21 +83,21 @@ public class GMService {
                 checkWhoHas("confounding", game);
             }
             case "whens" -> {
-              StringBuffer sbWhens = new StringBuffer("Following players have **whens** in hand:\n");
-              StringBuffer sbAfters = new StringBuffer("Following players have **afters** in hand:\n");
+                  StringBuilder sbWhens = new StringBuilder("Following players have **whens** in hand:\n");
+                  StringBuilder sbAfters = new StringBuilder("Following players have **afters** in hand:\n");
 
-              for (Player player : game.getRealPlayers()) {
-                  List<String> whens = AgendaHelper.getPossibleWhenNames(player);
-                  if (!whens.isEmpty()) {
-                      sbWhens.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", whens)).append("\n");
+                  for (Player player : game.getRealPlayers()) {
+                      List<String> whens = AgendaHelper.getPossibleWhenNames(player);
+                      if (!whens.isEmpty()) {
+                          sbWhens.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", whens)).append("\n");
+                      }
+                      List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                      if (!afters.isEmpty()) {
+                          sbAfters.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", afters)).append("\n");
+                      }
                   }
-                  List<String> afters = AgendaHelper.getPossibleAfterNames(player);
-                  if (!afters.isEmpty()) {
-                      sbAfters.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", afters)).append("\n");
-                  }
-              }
-              MessageHelper.sendMessageToChannel(getGMChannel(game), sbWhens.toString());
-              MessageHelper.sendMessageToChannel(getGMChannel(game), sbAfters.toString());
+                  MessageHelper.sendMessageToChannel(getGMChannel(game), sbWhens.toString());
+                  MessageHelper.sendMessageToChannel(getGMChannel(game), sbAfters.toString());
             }
             default -> {
                 MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), "Select what to look for:", HAND_CHECK_BUTTONS);
@@ -127,7 +122,7 @@ public class GMService {
             return;
         }
 
-        StringBuffer sb = new StringBuffer("Following players can see system **");
+        StringBuilder sb = new StringBuilder("Following players can see system **");
         sb.append(position).append("**:\n");
         for (Player player : FoWHelper.getAdjacentPlayers(game, position, false)) {
             sb.append("> ").append(player.getRepresentationUnfoggedNoPing()).append("\n");
@@ -136,7 +131,7 @@ public class GMService {
     }
 
     private static void checkWhoHas(String acId, Game game) {
-        StringBuffer sb = new StringBuffer("Following players have **");
+        StringBuilder sb = new StringBuilder("Following players have **");
         sb.append(acId).append("** in hand:\n");
         for (Player player : game.getRealPlayers()) {
             for (String ac : player.getActionCards().keySet()) {

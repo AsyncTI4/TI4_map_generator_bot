@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.AliasHandler;
@@ -85,15 +84,16 @@ public class PlayerTechService {
             tech = "dskortg";
         }
         TechnologyModel techModel = Mapper.getTech(tech);
-        if(!player.getTechs().contains(tech)){
+        if (!player.getTechs().contains(tech)) {
             boolean hasSub = false;
-            for(String tech2 : player.getTechs()){
-                if(tech2.contains(tech)){
+            for (String tech2 : player.getTechs()) {
+                if (tech2.contains(tech)) {
                     hasSub = true;
+                    break;
                 }
             }
-            if(!hasSub){
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +" does not have the tech known as "+techModel.getName());
+            if (!hasSub) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " does not have the tech known as " + techModel.getName());
                 return;
             }
         }
@@ -349,7 +349,7 @@ public class PlayerTechService {
 
     public static void checkAndApplyCombatMods(GenericInteractionCreateEvent event, Player player, String techID) {
         TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.TECH,
-            techID, player.getNumberTurns());
+            techID, player.getNumberOfTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),

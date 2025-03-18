@@ -25,6 +25,7 @@ public final class StringHelper {
         Map<String, String> escape = new LinkedHashMap<>();
         // Do not simply change these values.
         // If you need to change any value, add a line in escape to handle the old value
+        // DO NOT add either { or }. Escaping an already escaped string should ideally do nothing
         escape.put("-", "{dsh}");
         escape.put("_", "{usc}");
         escape.put(":", "{cln}");
@@ -38,6 +39,7 @@ public final class StringHelper {
 
     // Calling .replace over and over like this is actually pretty slow, probably better to iterate character by character
     public static String escape(String input) {
+        if (input == null) return null;
         String output = input;
         for (Entry<String, String> entry : escapables().entrySet())
             output = output.replace(entry.getKey(), entry.getValue());
@@ -45,6 +47,7 @@ public final class StringHelper {
     }
 
     public static String unescape(String input) {
+        if (input == null) return null;
         String output = input;
         for (Entry<String, String> entry : escapables().entrySet())
             output = output.replace(entry.getValue(), entry.getKey());
@@ -61,7 +64,7 @@ public final class StringHelper {
         id = (index == 0) ? "" : id.substring(0, index);
 
         if (currentChar >= 'a' && currentChar < 'z')
-            return id + String.valueOf((char) (currentChar + 1));
+            return id + (char) (currentChar + 1);
         if (currentChar == 'z') {
             return nextId(id) + "a";
         }

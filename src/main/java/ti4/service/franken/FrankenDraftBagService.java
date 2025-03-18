@@ -180,14 +180,14 @@ public class FrankenDraftBagService {
 
     public static Set<String> getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
         Set<String> bagRepresentationLines = new LinkedHashSet<>();
-        StringBuffer sb = new StringBuffer("# __Draftable:__\n");
+        StringBuilder sb = new StringBuilder("# __Draftable:__\n");
         
         draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
         for (DraftItem item : draftables) {
             String nextItemDescrption = buildItemDescription(item);
             if (sb.length() + nextItemDescrption.length() > 2000) { //Split to max 2000 message lines
                 bagRepresentationLines.add(sb.toString());
-                sb = new StringBuffer(nextItemDescrption);
+                sb = new StringBuilder(nextItemDescrption);
             } else {
                 sb.append(nextItemDescrption);
             }
@@ -196,7 +196,7 @@ public class FrankenDraftBagService {
         bagRepresentationLines.add(sb.toString());
 
         if (!undraftables.isEmpty()) {
-            sb = new StringBuffer("# __Undraftable:__\n");
+            sb = new StringBuilder("# __Undraftable:__\n");
             sb.append("> The following items are in your bag but may not be drafted, either because you:\n");
             sb.append("> - are at your hand limit\n");
             sb.append("> - just drafted a similar item\n");
@@ -249,7 +249,7 @@ public class FrankenDraftBagService {
     }
 
     private static String buildItemDescription(DraftItem item) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             sb.append("### ").append(item.getItemEmoji()).append(" ");
             sb.append(item.getShortDescription()).append("\n> ");

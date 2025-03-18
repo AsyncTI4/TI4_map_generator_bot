@@ -101,7 +101,7 @@ public class AddTileService {
               break;
           case HL:
               availableTiles = TileHelper.getAllTileModels().stream()
-                  .filter(tileModel -> tileModel.isHyperlane())
+                  .filter(TileModel::isHyperlane)
                   .collect(Collectors.toList());
               break;
         }
@@ -133,13 +133,13 @@ public class AddTileService {
         HL("Hyperlane"), 
         BR("50/50 for Blue/Red tile");
 
-        private String description;
-        private RandomOption(String description) {
+        private final String description;
+        RandomOption(String description) {
             this.description = description;
         }
       
         public String getAutoCompleteName() {
-            return toString() + ": " + description;
+            return this + ": " + description;
         }
 
         public boolean search(String searchString) {

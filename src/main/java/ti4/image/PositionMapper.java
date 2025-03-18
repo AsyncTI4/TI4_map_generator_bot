@@ -156,8 +156,15 @@ public class PositionMapper {
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
         if ("space".equals(planetName))
             return null;
-        UnitTokenPosition pos = TileHelper.getPlanetById(planetName).getUnitPositions();
-        return SerializationUtils.clone(pos);
+
+        PlanetModel planet = TileHelper.getPlanetById(planetName);
+        if (planet.getUnitPositions() != null) {
+            return SerializationUtils.clone(planet.getUnitPositions());
+        }
+        if (planet.getPlanetLayout() != null) {
+            return planet.getPlanetLayout().generateUnitTokenPosition();
+        }
+        return null;
     }
 
     public static UnitTokenPosition getReinforcementsPosition(String unitId) {

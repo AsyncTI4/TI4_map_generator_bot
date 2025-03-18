@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.ResourceHelper;
 import ti4.helpers.Storage;
 import ti4.image.MapGenerator.HorizontalAlign;
@@ -344,7 +343,7 @@ public class DrawingUtil {
         BufferedImage bgImg = new BufferedImage(345, 299, BufferedImage.TYPE_INT_ARGB);
         Polygon p = new Polygon();
         for (int i = 0; i < 6; i++) {
-            int theta = 0 + i * 60;
+            int theta = i * 60;
             int x = Math.clamp(Math.round(172.0 * Math.cos(Math.toRadians(theta)) + 172.5), 0, 345);
             int y = Math.clamp(Math.round(172.0 * Math.sin(Math.toRadians(theta)) + 149.5), 0, 299);
             p.addPoint(x, y);
@@ -459,7 +458,7 @@ public class DrawingUtil {
             for (int i = 0; i < faction.getWidth(); i++) {
                 for (int j = 0; j < faction.getHeight(); j++) {
                     long argb = Integer.toUnsignedLong(faction.getRGB(i, j));
-                    long alpha = (argb & 0xFF000000l) >> 24;
+                    long alpha = (argb & 0xFF000000L) >> 24;
                     if (alpha > 127) {
                         underlay.setRGB(i, j, 0xFF000000);
                     }

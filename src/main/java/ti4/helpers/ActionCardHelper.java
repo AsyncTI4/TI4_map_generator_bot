@@ -7,15 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.image.Mapper;
@@ -74,7 +73,7 @@ public class ActionCardHelper {
             } else {
                 for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
                     Integer value = trapCard.getValue();
-                    sb.append("").append(index++).append("\\. ").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    sb.append(index++).append("\\. ").append(Helper.leftpad("(" + value, 4)).append(")`");
                     sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
                 }
             }
@@ -265,8 +264,8 @@ public class ActionCardHelper {
         if (count < 1) {
             return;
         }
-        String message = player.getRepresentationNoPing()
-            + " discarded " + count + " random action card" + (count == 1 ? "" : "s") + ".\n";
+        StringBuilder message = new StringBuilder(player.getRepresentationNoPing()
+            + " discarded " + count + " random action card" + (count == 1 ? "" : "s") + ".\n");
         while (count > 0 && !player.getActionCards().isEmpty()) {
             Map<String, Integer> actionCards_ = player.getActionCards();
             List<String> cards_ = new ArrayList<>(actionCards_.keySet());
@@ -277,10 +276,10 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such action card with id `" + acID + "` found, please retry.");
                 return;
             }
-            message += Mapper.getActionCard(acID).getRepresentation();
+            message.append(Mapper.getActionCard(acID).getRepresentation());
             count--;
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         sendActionCardInfo(game, player);
     }
 
@@ -685,7 +684,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if (automationID.equals("rendezvous_point")) {
+            if (automationID.equals("rendezvous_point") || automationID.equals("rendezvous")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveRendezvousPoint", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
@@ -881,7 +880,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "ground forces"), codedButtons);
             }
 
-            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC, actionCard.getAlias(), player.getNumberTurns());
+            TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC, actionCard.getAlias(), player.getNumberOfTurns());
             if (combatModAC != null) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "applytempcombatmod__" + Constants.AC + "__" + actionCard.getAlias(), "Resolve " + actionCard.getName()));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

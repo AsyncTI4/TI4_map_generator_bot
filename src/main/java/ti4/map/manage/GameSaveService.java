@@ -1,7 +1,5 @@
 package ti4.map.manage;
 
-import static ti4.map.manage.GamePersistenceKeys.*;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -13,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
@@ -34,16 +31,39 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 
+import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
+import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
+import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.manage.GamePersistenceKeys.PLAYER;
+import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.manage.GamePersistenceKeys.TILE;
+import static ti4.map.manage.GamePersistenceKeys.TOKENS;
+import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
+import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.manage.GamePersistenceKeys.UNITS;
+
 @UtilityClass
 class GameSaveService {
 
     public static boolean save(Game game, String reason) {
-        game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
-        return save(game);
+        return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
+            game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
+            return save(game);
+        });
     }
 
-    public static boolean save(Game game) {
-        GameLoadService.updateTransientGameDetails(game);
+    private static boolean save(Game game) {
+        TransientGameInfoUpdater.update(game);
         //Ugly fix to update seen tiles data for fog since doing it in 
         //MapGenerator/TileGenerator won't save changes anymore
         if (game.isFowMode()) {
@@ -560,7 +580,7 @@ class GameSaveService {
             writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.doesPlayerAutoPassOnWhensAfters());
+            writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.isAutoPassOnWhensAfters());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.SEARCH_WARRANT + " " + player.isSearchWarrant());
@@ -576,13 +596,13 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             // BENTOR Ancient Blueprints
-            writer.write(Constants.BENTOR_HAS_FOUND_CFRAG + " " + player.hasFoundCulFrag());
+            writer.write(Constants.BENTOR_HAS_FOUND_CFRAG + " " + player.isHasFoundCulFrag());
             writer.write(System.lineSeparator());
-            writer.write(Constants.BENTOR_HAS_FOUND_HFRAG + " " + player.hasFoundHazFrag());
+            writer.write(Constants.BENTOR_HAS_FOUND_HFRAG + " " + player.isHasFoundHazFrag());
             writer.write(System.lineSeparator());
-            writer.write(Constants.BENTOR_HAS_FOUND_IFRAG + " " + player.hasFoundIndFrag());
+            writer.write(Constants.BENTOR_HAS_FOUND_IFRAG + " " + player.isHasFoundIndFrag());
             writer.write(System.lineSeparator());
-            writer.write(Constants.BENTOR_HAS_FOUND_UFRAG + " " + player.hasFoundUnkFrag());
+            writer.write(Constants.BENTOR_HAS_FOUND_UFRAG + " " + player.isHasFoundUnkFrag());
             writer.write(System.lineSeparator());
 
             // LANEFIR ATS Armaments count
@@ -684,7 +704,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
             writer.write(System.lineSeparator());
-            writer.write(Constants.STASIS_INFANTRY + " " + player.getGenSynthesisInfantry());
+            writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
             writer.write(Constants.AUTO_SABO_PASS_MEDIAN + " " + player.getAutoSaboPassMedian());
             writer.write(System.lineSeparator());
@@ -712,7 +732,7 @@ class GameSaveService {
             writer.write(Constants.SO_SCORED + " " + getStringRepresentationOfMap(player.getSecretsScored()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberTurns());
+            writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberOfTurns());
             writer.write(System.lineSeparator());
             writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
             writer.write(System.lineSeparator());
@@ -909,11 +929,13 @@ class GameSaveService {
     }
 
     public static boolean delete(String gameName) {
-        File mapStorage = Storage.getGameFile(gameName + Constants.TXT);
-        if (!mapStorage.exists()) {
-            return false;
-        }
-        File deletedMapStorage = Storage.getDeletedGame(gameName + "_" + System.currentTimeMillis() + Constants.TXT);
-        return mapStorage.renameTo(deletedMapStorage);
+        return GameFileLockManager.wrapWithWriteLock(gameName, () -> {
+            File mapStorage = Storage.getGameFile(gameName + Constants.TXT);
+            if (!mapStorage.exists()) {
+                return false;
+            }
+            File deletedMapStorage = Storage.getDeletedGame(gameName + "_" + System.currentTimeMillis() + Constants.TXT);
+            return mapStorage.renameTo(deletedMapStorage);
+        });
     }
 }

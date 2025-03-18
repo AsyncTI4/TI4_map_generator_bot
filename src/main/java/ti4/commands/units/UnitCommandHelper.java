@@ -36,11 +36,11 @@ class UnitCommandHelper {
         switch (value) {
             case "t/tactic", "t", "tactic", "tac", "tact" -> {
                 RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
-                CommandCounterHelper.addCC(event, color, tile);
+                CommandCounterHelper.addCC(event, game, color, tile);
                 Helper.isCCCountCorrect(event, game, color);
             }
             case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
-                CommandCounterHelper.addCC(event, color, tile);
+                CommandCounterHelper.addCC(event, game, color, tile);
                 Helper.isCCCountCorrect(event, game, color);
             }
         }

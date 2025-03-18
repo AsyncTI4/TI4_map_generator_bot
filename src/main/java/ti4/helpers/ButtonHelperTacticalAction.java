@@ -592,15 +592,15 @@ public class ButtonHelperTacticalAction {
         game.setStoredValue("lastActiveSystem", pos);
         List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
         Tile activeSystem = game.getTileByPosition(pos);
-        String message = player.getRepresentationUnfogged() + " activated "
-            + activeSystem.getRepresentationForButtons(game, player) + ".";
+        StringBuilder message = new StringBuilder(player.getRepresentationUnfogged() + " activated "
+            + activeSystem.getRepresentationForButtons(game, player) + ".");
 
         if (!game.isFowMode()) {
             for (Player player_ : game.getRealPlayers()) {
                 if (!game.isL1Hero() && !player.getFaction().equalsIgnoreCase(player_.getFaction())
                     && !player_.isPlayerMemberOfAlliance(player)
                     && FoWHelper.playerHasUnitsInSystem(player_, activeSystem)) {
-                    message += "\n" + player_.getRepresentation() + " has units in the system.";
+                    message.append("\n").append(player_.getRepresentation()).append(" has units in the system.");
                 }
             }
             for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
@@ -609,7 +609,7 @@ public class ButtonHelperTacticalAction {
                 }
                 for (String attachment : planet.getTokenList()) {
                     if (attachment.contains("sigma_weirdway")) {
-                        message += "\nSystem contains the Weirdway; applying -1 to the move value of your ships.";
+                        message.append("\nSystem contains the Weirdway; applying -1 to the move value of your ships.");
                         break;
                     }
                 }
@@ -643,9 +643,7 @@ public class ButtonHelperTacticalAction {
                 mentions.add(playerWithPds.getRepresentation());
             }
             if (!mentions.isEmpty()) {
-                message += "\n" + player.getRepresentationUnfogged()
-                    + " the selected system is in range of SPACE CANNON units owned by "
-                    + String.join(", ", mentions) + ".";
+                message.append("\n").append(player.getRepresentationUnfogged()).append(" the selected system is in range of SPACE CANNON units owned by ").append(String.join(", ", mentions)).append(".");
             }
         }
 
@@ -659,7 +657,7 @@ public class ButtonHelperTacticalAction {
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
 
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {

@@ -40,7 +40,7 @@ class PlayerPromissoryButtonHandler {
             ButtonHelper.deleteMessage(event);
         }
 
-        var possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberTurns());
+        var possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.PROMISSORY_NOTES, pnID, player.getNumberOfTurns());
         if (possibleCombatMod != null) {
             player.addNewTempCombatMod(possibleCombatMod);
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Combat modifier will be applied next time you push the \"Combat Roll\" button.");

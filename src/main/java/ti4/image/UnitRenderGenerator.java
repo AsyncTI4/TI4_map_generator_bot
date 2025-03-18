@@ -1,12 +1,9 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -120,7 +117,7 @@ public class UnitRenderGenerator {
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             if (player == null) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey.toString() + " in tile " + tile.getRepresentation());
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation());
                 continue;
             }
             Integer unitCount = unitEntry.getValue();
@@ -448,24 +445,48 @@ public class UnitRenderGenerator {
     private Map<UnitKey, Integer> sortUnits(Map<UnitKey, Integer> tempUnits) {
         Map<UnitKey, Integer> sortedUnits = new LinkedHashMap<>();
 
-        // Add mechs first
-        for (Map.Entry<UnitKey, Integer> entry : tempUnits.entrySet()) {
-            UnitKey id = entry.getKey();
-            if (id != null && id.getUnitType() == UnitType.Mech) {
-                sortedUnits.put(id, entry.getValue());
+        List<UnitType> typeOrder = new ArrayList<>();
+        // Token units are drawn first, always
+        typeOrder.addAll(List.of(UnitType.Infantry, UnitType.Fighter));
+        // Ground unit ordering
+        typeOrder.addAll(List.of(UnitType.Spacedock, UnitType.Pds, UnitType.Mech));
+        typeOrder.addAll(List.of(UnitType.CabalSpacedock, UnitType.Monument, UnitType.PlenaryOrbital)); // other misc
+        // Space unit ordering
+        typeOrder.addAll(List.of(UnitType.Flagship, UnitType.Dreadnought, UnitType.Carrier, UnitType.Cruiser, UnitType.Destroyer));
+        typeOrder.addAll(List.of(UnitType.Warsun, UnitType.TyrantsLament, UnitType.Cavalry, UnitType.Lady));
+
+        List<String> playerOrder = unitHolder.getUnitColorsOnHolder();
+        if (game.getActivePlayer() != null && !playerOrder.isEmpty()) {
+            String activePlayerColor = null;
+            if ("space".equals(unitHolder.getName())) {
+                activePlayerColor = game.getActivePlayer().getColorID();
+            } else {
+                for (Player p : game.getPlayers().values()) {
+                    if (p.hasPlanet(unitHolder.getName())) activePlayerColor = p.getColorID();
+                }
+            }
+            if (activePlayerColor != null && playerOrder.contains(activePlayerColor)) {
+                while (!playerOrder.getLast().equals(activePlayerColor)) {
+                    Collections.rotate(playerOrder, 1);
+                }
             }
         }
 
-        // Remove mechs from temp units
-        for (UnitKey key : sortedUnits.keySet()) {
-            tempUnits.remove(key);
+        // Add all units in order
+        for (UnitType type : typeOrder) {
+            for (String colorID : playerOrder) {
+                for (Map.Entry<UnitKey, Integer> entry : tempUnits.entrySet()) {
+                    UnitKey id = entry.getKey();
+                    if (id != null && id.getUnitType() == type && id.getColorID().equals(colorID)) {
+                        sortedUnits.put(id, entry.getValue());
+                    }
+                }
+            }
         }
 
-        // TODO: "active" player should appear on "top" of the stacks
-
-        // TODO: larger units should probably be drawn first
-
         // Add remaining units
+        for (UnitKey key : sortedUnits.keySet())
+            tempUnits.remove(key);
         sortedUnits.putAll(tempUnits);
         return sortedUnits;
     }

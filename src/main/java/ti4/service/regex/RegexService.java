@@ -10,7 +10,7 @@ import ti4.message.BotLogger;
 public class RegexService {
 
     public interface CheckedConsumer<T> {
-        void accept(T m) throws Exception;
+        void accept(T m);
     }
 
     public interface CheckedPredicate<T> {

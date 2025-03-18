@@ -15,6 +15,6 @@ class SearchWarrant extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        getPlayer().setSearchWarrant();
+        getPlayer().flipSearchWarrant();
     }
 }

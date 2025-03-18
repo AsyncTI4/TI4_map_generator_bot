@@ -34,8 +34,8 @@ public class MechDraftItem extends DraftItem {
         UnitModel unit = getUnit();
         StringBuilder sb = new StringBuilder();
         sb.append("Cost: ");
-        Float cost = unit.getCost();
-        sb.append(cost == cost.intValue() ? "" + cost.intValue() : "" + cost); // type shenanigans
+        float cost = unit.getCost();
+        sb.append(cost == (int) cost ? "" + (int) cost : "" + cost); // type shenanigans
         sb.append(" Combat: ");
         sb.append(unit.getCombatHitsOn());
         if (unit.getCombatDieCount() > 1) {

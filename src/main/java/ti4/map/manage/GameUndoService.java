@@ -26,16 +26,18 @@ import ti4.service.info.CardsInfoService;
 class GameUndoService {
 
     public static void createUndoCopy(String gameName) {
-        int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(gameName);
-        if (latestIndex < 0) return;
-        File gameFile = Storage.getGameFile(gameName + Constants.TXT);
-        if (!gameFile.exists()) return;
-        try {
-            Path mapUndoStorage = Storage.getGameUndo(gameName, getUndoFileName(gameName, latestIndex + 1));
-            Files.copy(gameFile.toPath(), mapUndoStorage, StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            BotLogger.log("Error copying undo file for " + gameName, e);
-        }
+        GameFileLockManager.wrapWithReadLock(gameName, () -> {
+            int latestIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(gameName);
+            if (latestIndex < 0) return;
+            File gameFile = Storage.getGameFile(gameName + Constants.TXT);
+            if (!gameFile.exists()) return;
+            try {
+                Path mapUndoStorage = Storage.getGameUndo(gameName, getUndoFileName(gameName, latestIndex + 1));
+                Files.copy(gameFile.toPath(), mapUndoStorage, StandardCopyOption.REPLACE_EXISTING);
+            } catch (Exception e) {
+                BotLogger.log("Error copying undo file for " + gameName, e);
+            }
+        });
     }
 
     private static int cleanUpExcessUndoFilesAndReturnLatestIndex(String gameName) {
@@ -62,14 +64,18 @@ class GameUndoService {
     @Nullable
     public static Game undo(Game game) {
         int latestUndoIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game.getName());
-        return undo(game, latestUndoIndex - 1, latestUndoIndex);
+        return lockAndUndo(game, latestUndoIndex - 1, latestUndoIndex);
     }
 
     @Nullable
     public static Game undo(Game game, int undoIndex) {
         if (undoIndex <= 0) return null;
         int latestUndoIndex = cleanUpExcessUndoFilesAndReturnLatestIndex(game.getName());
-        return undo(game, undoIndex, latestUndoIndex);
+        return lockAndUndo(game, undoIndex, latestUndoIndex);
+    }
+
+    private static Game lockAndUndo(Game gameToUndo, int undoIndex, int latestUndoIndex) {
+        return GameFileLockManager.wrapWithWriteLock(gameToUndo.getName(), () -> undo(gameToUndo, undoIndex, latestUndoIndex));
     }
 
     private static Game undo(Game gameToUndo, int undoIndex, int latestUndoIndex) {

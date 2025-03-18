@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +19,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -40,6 +41,10 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -102,6 +107,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class ButtonHelper {
 
     public static String getButtonRepresentation(Button button) {
@@ -141,7 +148,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 (totalAmount <= 10 ? UnitEmojis.infantry.toString().repeat(totalAmount) : UnitEmojis.infantry + "×" + totalAmount)
                     + " died and auto-revived. You will be prompted to place them on a planet in your home system at the start of your next turn.");
-            player.setStasisInfantry(player.getGenSynthesisInfantry() + totalAmount);
+            player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
         }
 
@@ -151,7 +158,7 @@ public class ButtonHelper {
             message += dice.getGreenDieIfSuccessOrRedDieIfFailure();
             if (dice.isSuccess()) {
                 message += " Success. You will be prompted to place them on a planet in your home system at the start of your next turn.";
-                player.setStasisInfantry(player.getGenSynthesisInfantry() + 1);
+                player.setStasisInfantry(player.getStasisInfantry() + 1);
             } else {
                 message += " Failure.";
             }
@@ -166,24 +173,22 @@ public class ButtonHelper {
                 amount = totalAmount / batches;
             }
 
-            String message = (amount <= 10 ? UnitEmojis.infantry.toString().repeat(amount) : UnitEmojis.infantry + "×" + amount)
-                + " died. Rolling for resurrection.\n";
+            StringBuilder message = new StringBuilder((amount <= 10 ? UnitEmojis.infantry.toString().repeat(amount) : UnitEmojis.infantry + "×" + amount)
+                + " died. Rolling for resurrection.\n");
             int revive = 0;
             for (int x = 0; x < amount; x++) {
                 Die dice = new Die(player.hasTech("so2") ? 5 : 6);
-                message += dice.getGreenDieIfSuccessOrRedDieIfFailure();
+                message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                 revive += dice.isSuccess() ? 1 : 0;
             }
             int failed = amount - revive;
             if (revive == 0) {
-                message += "\nNone of your infantry revived.";
+                message.append("\nNone of your infantry revived.");
             } else {
-                message += "\n" + (failed == 0 ? "All " : "")
-                    + (revive <= 10 ? UnitEmojis.infantry.toString().repeat(revive) : UnitEmojis.infantry + "×" + revive)
-                    + " revived. You will be prompted to place them on a planet in your home system at the start of your next turn.";
+                message.append("\n").append(failed == 0 ? "All " : "").append(revive <= 10 ? UnitEmojis.infantry.toString().repeat(revive) : UnitEmojis.infantry + "×" + revive).append(" revived. You will be prompted to place them on a planet in your home system at the start of your next turn.");
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            player.setStasisInfantry(player.getGenSynthesisInfantry() + revive);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
+            player.setStasisInfantry(player.getStasisInfantry() + revive);
             totalAmount -= amount;
         }
     }
@@ -262,12 +267,12 @@ public class ButtonHelper {
 
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " inf " + planet);
-        player.setStasisInfantry(player.getGenSynthesisInfantry() - Integer.parseInt(amount));
+        player.setStasisInfantry(player.getStasisInfantry() - Integer.parseInt(amount));
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " placed " + amount + " infantry on "
                 + Helper.getPlanetRepresentation(planet, game) + ". You have "
-                + player.getGenSynthesisInfantry() + " infantry left to revive.");
-        if (player.getGenSynthesisInfantry() == 0) {
+                + player.getStasisInfantry() + " infantry left to revive.");
+        if (player.getStasisInfantry() == 0) {
             deleteMessage(event);
         }
     }
@@ -310,7 +315,7 @@ public class ButtonHelper {
 
     public static List<Button> getPlaceStatusInfButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        int infCount = player.getGenSynthesisInfantry();
+        int infCount = player.getStasisInfantry();
         if (infCount == 0) {
             return buttons;
         }
@@ -770,13 +775,13 @@ public class ButtonHelper {
             }
             message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
         } else {
-            if(ButtonHelper.isLawInPlay(game, "absol_minspolicy")){
-                amount -=1;
+            if (ButtonHelper.isLawInPlay(game, "absol_minspolicy")) {
+                amount -= 1;
                 message = " Absol Minister of policy has been accounted for, causing everyone to draw 1 less AC.";
-            }else{
+            } else {
                 game.drawActionCard(player.getUserID());
             }
-            
+
             if (player.hasTech("nm")) {
                 message = " _Neural Motivator_ has been accounted for.";
                 game.drawActionCard(player.getUserID());
@@ -807,7 +812,7 @@ public class ButtonHelper {
             }
             amount += 1;
         }
-        
+
         if (!player.hasAbility("autonetic_memory")) {
             message = " drew " + amount + " action card" + (amount == 1 ? "" : "s") + "." + message;
         }
@@ -880,8 +885,8 @@ public class ButtonHelper {
 
     public static int resolveOnActivationEnemyAbilities(Game game, Tile activeSystem, Player player, boolean justChecking, ButtonInteractionEvent event) {
         int numberOfAbilities = 0;
-        if(activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")){
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),"# "+player.getRepresentation()+" this is a __friendly__ reminder that you do not have antimass deflectors");
+        if (activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "# " + player.getRepresentation() + " this is a __friendly__ reminder that you do not have antimass deflectors");
         }
         if (game.isL1Hero()) {
             return 0;
@@ -1439,9 +1444,9 @@ public class ButtonHelper {
 
     public static void sendFileWithCorrectButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons, Game game) {
         if (!WebHelper.sendingToWeb() || game.isFowMode()) {
-            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);  
+            MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);
         } else {
-            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);            
+            MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);
         }
     }
 
@@ -2085,7 +2090,7 @@ public class ButtonHelper {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
             target.setTacticalCC(target.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, target.getColor(), tile);
+            CommandCounterHelper.addCC(event, target, tile);
         }
 
         MessageHelper.sendMessageToChannel(mahact.getCorrectChannel(),
@@ -2125,7 +2130,7 @@ public class ButtonHelper {
                 target.setTacticalCC(target.getTacticalCC() + 1);
             }
             target.setTacticalCC(target.getTacticalCC() - 1);
-            CommandCounterHelper.addCC(event, target.getColor(), tile);
+            CommandCounterHelper.addCC(event, target, tile);
         }
         MessageHelper.sendMessageToChannel(mahact.getCorrectChannel(),
             mahact.getRepresentationUnfogged() + " you have spent a command token from your strategy pool.");
@@ -2175,7 +2180,7 @@ public class ButtonHelper {
                     target.setTacticalCC(target.getTacticalCC() + 1);
                 }
                 target.setTacticalCC(target.getTacticalCC() - 1);
-                CommandCounterHelper.addCC(event, target.getColor(), tile);
+                CommandCounterHelper.addCC(event, target, tile);
             }
         }
         MessageHelper.sendMessageToChannel(minister.getCorrectChannel(),
@@ -2454,7 +2459,7 @@ public class ButtonHelper {
 
     public static void saveButtons(ButtonInteractionEvent event, Game game, Player player) {
         game.setSavedButtons(new ArrayList<>());
-        if(event.getMessage().isEphemeral()){
+        if (event.getMessage().isEphemeral()) {
             return;
         }
         String exhaustedMessage = event.getMessage().getContentRaw();
@@ -2616,7 +2621,7 @@ public class ButtonHelper {
                 highest = Math.max(highest, checkFleetAndCapacity(player, game, tile, event));
             }
         }
-        Helper.isCCCountCorrect(event, game, player.getColor());
+        Helper.isCCCountCorrect(player);
         return highest;
     }
 
@@ -4067,7 +4072,7 @@ public class ButtonHelper {
 
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice.");
-            return new ArrayList<Button>();
+            return new ArrayList<>();
         }
         if (game.isNaaluAgent() || player == game.getActivePlayer()) {
             if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
@@ -4078,7 +4083,7 @@ public class ButtonHelper {
                 int cc = player.getTacticalCC();
                 cc -= 1;
                 player.setTacticalCC(cc);
-                CommandCounterHelper.addCC(event, player.getColor(), tile, true);
+                CommandCounterHelper.addCC(event, player, tile);
             }
             String thingToAdd = "box";
             for (String unit : displacedUnits.keySet()) {
@@ -5283,126 +5288,6 @@ public class ButtonHelper {
         }
     }
 
-    @ButtonHandler("getHomebrewButtons")
-    public static void offerHomeBrewButtons(Game game, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>();
-        game.setHomebrew(false);
-        buttons.add(Buttons.green("setupHomebrew_444", "4/4/4: 4 stage 1s, 4 stage 2s, 4 secrets, 12 VP"));
-        buttons.add(Buttons.green("setupHomebrew_456", "4/5/6: 5 Stage 1s, 6 Stage 2s, 4 Secrets, 14 VP"));
-        buttons.add(Buttons.green("setupHomebrew_absolRelicsNAgendas", "Absol Relics And Agendas", SourceEmojis.Absol));
-        buttons.add(Buttons.green("setupHomebrew_absolTechsNMechs", "Absol Techs and Mechs", SourceEmojis.Absol));
-        buttons.add(
-            Buttons.green("setupHomebrew_dsfactions", "Discordant Stars Factions", SourceEmojis.DiscordantStars));
-        buttons.add(Buttons.green("setupHomebrew_dsexplores", "Uncharted Space Explores/Relics/Action Cards",
-            SourceEmojis.UnchartedSpace));
-        buttons.add(Buttons.green("setupHomebrew_acDeck2", "Action Cards Deck 2", SourceEmojis.ActionDeck2));
-        buttons.add(Buttons.green("setupHomebrew_redTape", "Red Tape"));
-        buttons.add(Buttons.green("setupHomebrew_removeSupports", "Remove Supports"));
-        buttons.add(Buttons.green("setupHomebrew_homebrewSCs", "Homebrew Strategy Cards"));
-        buttons.add(Buttons.red("deleteButtons", "Done With Buttons"));
-        deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Game has been marked as homebrew; chose which homebrew you'd like in the game, or press \"Done With Buttons\".",
-            buttons);
-    }
-
-    @ButtonHandler("setupHomebrew_")
-    public static void setUpHomebrew(Game game, ButtonInteractionEvent event, String buttonID) {
-        deleteTheOneButton(event);
-        String type = buttonID.split("_")[1];
-
-        switch (type) {
-            case "444" -> {
-                game.setMaxSOCountPerPlayer(4);
-                game.setUpPeakableObjectives(4, 1);
-                game.setUpPeakableObjectives(4, 2);
-                game.setVp(12);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/4/4.");
-            }
-            case "removeSupports" -> {
-                for (Player p2 : game.getRealPlayers()) {
-                    p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
-                    p2.removePromissoryNote(p2.getColor() + "_sftt");
-                }
-                game.setStoredValue("removeSupports", "true");
-            }
-            case "456" -> {
-                game.setMaxSOCountPerPlayer(4);
-                game.setUpPeakableObjectives(5, 1);
-                game.setUpPeakableObjectives(6, 2);
-                game.setVp(14);
-                game.setStoredValue("homebrewMode", "456");
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up 4/5/6/14VP.");
-            }
-            case "absolRelicsNAgendas" -> {
-                game.setAbsolMode(true);
-                game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
-                if (game.isDiscordantStarsMode() && game.getRelicDeckID().contains("ds")) {
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
-                } else {
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
-                }
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Set the relics and agendas to Absol stuff");
-            }
-            case "absolTechsNMechs" -> {
-                game.setAbsolMode(true);
-                if (game.isDiscordantStarsMode()) {
-                    game.setTechnologyDeckID("techs_ds_absol");
-                } else {
-                    game.setTechnologyDeckID("techs_absol");
-                }
-                game.swapInVariantUnits("absol");
-                game.swapInVariantTechs();
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set the techs & mechs to Absol stuff.");
-            }
-            case "dsexplores" -> {
-                game.setDiscordantStarsMode(true);
-                game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
-                if (game.isAbsolMode()) {
-                    if (game.getTechnologyDeckID().contains("absol")) {
-                        game.setTechnologyDeckID("techs_ds_absol");
-                    }
-                    if (game.getRelicDeckID().contains("absol")) {
-                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
-                    }
-
-                } else {
-                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"));
-                    game.setTechnologyDeckID("techs_ds");
-
-                }
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Set the explores/action cards/relics to Discordant Stars stuff.");
-            }
-            case "acDeck2" -> {
-                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_deck_2"));
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Set the action card deck to Action Card Deck 2.");
-            }
-            case "dsfactions" -> {
-                game.setDiscordantStarsMode(true);
-                if (game.getTechnologyDeckID().contains("absol")) {
-                    game.setTechnologyDeckID("techs_ds_absol");
-                } else {
-                    game.setTechnologyDeckID("techs_ds");
-                }
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Set game to Discordant Stars mode. Only includes factions and planets unless you also click/clicked the Discordant Stars Explores button.");
-            }
-            case "homebrewSCs" -> {
-                game.setHomebrewSCMode(true);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    "Set game to homebrew strategy card mode.");
-            }
-            case "redTape" -> {
-                game.setRedTapeMode(true);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to red tape mode.");
-            }
-        }
-    }
-
     @ButtonHandler("startPlayerSetup")
     public static void resolveSetupStep0(Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
@@ -5967,24 +5852,9 @@ public class ButtonHelper {
             MessageHelper.sendPrivateMessageToPlayer(player, game, event, msgExtra, fail, success);
             game.updateActivePlayer(player);
 
-            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(),
-                msgExtra + "\n Use Buttons to do turn.",
+            StartTurnService.reviveInfantryII(player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
                 StartTurnService.getStartOfTurnButtons(player, game, false, event));
-
-            if (player.getGenSynthesisInfantry() > 0) {
-                if (!getPlaceStatusInfButtons(game, player).isEmpty()) {
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + player.getGenSynthesisInfantry()
-                            + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, player));
-                } else {
-                    player.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
-                        .getRepresentation()
-                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether");
-
-                }
-            }
         } else {
             if (game.isShowBanners()) {
                 BannerGenerator.drawFactionBanner(player);
@@ -6001,21 +5871,7 @@ public class ButtonHelper {
                 msgExtra += "\n-# " + ping + " will start their turn once you've ended yours.";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-
-            if (player.getGenSynthesisInfantry() > 0) {
-                if (!getPlaceStatusInfButtons(game, player).isEmpty()) {
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                        "Use buttons to revive infantry. You have " + player.getGenSynthesisInfantry()
-                            + " infantry left to revive.",
-                        getPlaceStatusInfButtons(game, player));
-                } else {
-                    player.setStasisInfantry(0);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player
-                        .getRepresentation()
-                        + ", you had infantry II to be revived, but the bot couldn't find any planets you control in your home system to place them on, so per the rules they now disappear into the ether.");
-
-                }
-            }
+            StartTurnService.reviveInfantryII(player);
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
                 "Use buttons to do turn.", StartTurnService.getStartOfTurnButtons(player, game, false, event));
         }
@@ -6315,11 +6171,11 @@ public class ButtonHelper {
                 return;
             }
             Tile tile = game.getTileByPosition(planet);
-            CommandCounterHelper.addCC(event, color2, tile);
-            Helper.isCCCountCorrect(event, game, color2);
+            CommandCounterHelper.addCC(event, mahactP, tile);
+            Helper.isCCCountCorrect(mahactP);
             for (String color : mahactP.getMahactCC()) {
                 if (Mapper.isValidColor(color) && !color.equalsIgnoreCase(player.getColor())) {
-                    CommandCounterHelper.addCC(event, color, tile);
+                    CommandCounterHelper.addCC(event, game, color, tile);
                     Helper.isCCCountCorrect(event, game, color);
                 }
             }
