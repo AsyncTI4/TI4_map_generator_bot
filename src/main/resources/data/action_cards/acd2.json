@@ -252,7 +252,7 @@
         "alias": "derelict_station",
         "name": "Derelict Station",
         "phase": "Action",
-        "window": "After your ships move out of, into, or through a system that does not contain a planet",
+        "window": "After your ships move out of, into, or through a system that does not contain planets",
         "text": "Explore a frontier token that is in that system or gain 2 trade goods.",
         "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
         "source": "action_deck_2"
@@ -559,7 +559,7 @@
         "name": "Opportunists",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 system that contains another player's ships and no other units. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
+        "text": "Choose 1 system that contains another player's ships and no planets. Place 1 cruiser and 1 destroyer from your reinforcements in that system and resolve a space combat.",
         "flavorText": "The sensors of the lead ship exploded with an array of alarms and damage alerts as a fleet of unmarked ships poured forth from the wormhole. Reports be damned, these were no mere pirates.",
         "source": "action_deck_2"
     },
@@ -774,7 +774,7 @@
         "alias": "rendezvous",
         "name": "Rendezvous",
         "phase": "Action",
-        "window": "After the \"Movement\" step of your tactical action in a system that does not contain another player's units",
+        "window": "After the \"Movement\" step of your tactical action in a system that does not contain other players' units",
         "text": "Remove your command token from that system and end your turn.",
         "flavorText": "\"Frankly, sir, this operation is...\" The Admiral trailed off. Alastair leaned back in his chair and finished her sentence, \"A logistical nightmare? I recommend you get to it then.\"",
         "source": "action_deck_2"
