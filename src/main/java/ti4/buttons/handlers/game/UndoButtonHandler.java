@@ -24,7 +24,7 @@ import ti4.message.MessageHelper;
 @UtilityClass
 class UndoButtonHandler {
 
-    @ButtonHandler(value = "ultimateUndo_", save = false)
+    @ButtonHandler("ultimateUndo_")
     public static void ultimateUndo_(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (!game.getSavedButtons().isEmpty()) {
             String buttonString = game.getSavedButtons().getFirst();
@@ -57,13 +57,13 @@ class UndoButtonHandler {
             BotLogger.log("Error while reading game undo directory: " + gameUndoDirectory, e);
         }
 
-        int maxNumber = numbers.isEmpty() ? 0 :
-            numbers.stream()
+        int maxNumber = numbers.isEmpty() ? 0
+            : numbers.stream()
                 .mapToInt(value -> value)
                 .max()
                 .orElseThrow(NoSuchElementException::new);
 
-        if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber-1))) {
+        if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber - 1))) {
             ButtonHelper.deleteMessage(event);
         }
 
