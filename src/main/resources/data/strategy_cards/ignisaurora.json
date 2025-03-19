@@ -12,11 +12,11 @@
         "secondaryTexts": [
             "Spend 1 token from your strategy pool to draw 2 action cards and one vote token."
         ],
-        "source": "base"
+        "source": "ignis_aurora"
     },
     {
-        "id": "ignisaurora8",
-        "initiative": 8,
+        "id": "ignisaurora2",
+        "initiative": 2,
         "name": "Antiquities",
         "primaryTexts": [
             "Gain a relic.",
@@ -25,20 +25,6 @@
         "secondaryTexts": [
             "Spend 1 token from your strategy pool to gain an unknown fragment."
         ],
-        "source": "base"
-    },
-    {
-        "id": "ignisaurora9",
-        "initiative": 9,
-        "name": "Imperial",
-        "primaryTexts": [
-            "Immediately score 1 public objective if you fulfill its requirements.",
-            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective."
-        ],
-        "secondaryTexts": [
-            "Spend 1 token from your strategy pool to draw 1 secret objective."
-        ],
-        "botSCAutomationID": "pok8imperial",
-        "source": "base"
+        "source": "ignis_aurora"
     }
 ]
