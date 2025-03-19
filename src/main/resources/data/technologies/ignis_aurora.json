@@ -24,7 +24,7 @@
         "types": ["PROPULSION"],
         "requirements": "BB",
         "source": "ignis_aurora",
-        "text": "At the end of your turn you may exhaust this card to remove 1 of your command tokens from a system that does not contain a planet owned by another player or another player's units."
+        "text": "At the end of your turn you may remove 1 of your command tokens from a system that does not contain a planet owned by another player. If you do, return this card to your technology deck."
     },
     {
         "alias": "nexusgrid",
@@ -118,7 +118,7 @@
         "name": "Neural Motivator",
         "types": ["BIOTIC"],
         "source": "ignis_aurora",
-        "text": "ACTION: Exhaust this card to draw one action card.",
+        "text": "During your turn, you may exhaust this card to draw one action card.",
         "homebrewReplacesID": "nm"
     },
     {
