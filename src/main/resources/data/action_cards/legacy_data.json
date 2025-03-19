@@ -968,5 +968,14 @@
         "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "virulent_gas",
+        "name": "Virulent Gas",
+        "phase": "Action",
+        "window": "After you produce a hit against units on a planet",
+        "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your die rolls during this ability and repeat its effect.",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—and Dart ran.",
+        "source": "action_deck_2_old"
     }
 ]
