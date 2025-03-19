@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -403,8 +402,7 @@ public class TransactionHelper {
 
     @ButtonHandler(value = "transaction", save = false)
     public static void transaction(Player player, Game game) {
-        List<Button> buttons;
-        buttons = TransactionHelper.getPlayersToTransact(game, player);
+        List<Button> buttons = TransactionHelper.getPlayersToTransact(game, player);
         String message = player.getRepresentation() + " Use the buttons to select which player you wish to transact with";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
