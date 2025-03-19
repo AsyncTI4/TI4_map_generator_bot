@@ -1,6 +1,5 @@
 package ti4.map.manage;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,12 +23,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -46,11 +49,6 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
-import ti4.model.BorderAnomalyHolder;
-import ti4.model.TemporaryCombatModifierModel;
-import ti4.service.option.FOWOptionService.FOWOption;
-
 import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
 import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
@@ -71,6 +69,10 @@ import static ti4.map.manage.GamePersistenceKeys.TOKENS;
 import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
 import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
 import static ti4.map.manage.GamePersistenceKeys.UNITS;
+import ti4.message.BotLogger;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
 class GameLoadService {
@@ -1030,6 +1032,8 @@ class GameLoadService {
                 case Constants.BENTOR_HAS_FOUND_IFRAG -> player.setHasFoundIndFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.BENTOR_HAS_FOUND_UFRAG -> player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.LANEFIR_ATS_COUNT -> player.setAtsCount(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.SARWEEN_COUNT -> player.setSarweenCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());
                 case Constants.PLAYER_NEW_TEMP_MODS -> {
