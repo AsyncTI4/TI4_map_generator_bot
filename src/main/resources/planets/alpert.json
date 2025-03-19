@@ -16,8 +16,8 @@
     "planetType": "INDUSTRIAL",
     "cardImagePath": null,
     "techSpecialties": null,
-    "legendaryAbilityName": "placeholder",
-    "legendaryAbilityText": "foo bar",
+    "legendaryAbilityName": "Zazu's Petition",
+    "legendaryAbilityText": "This planet has the PRODUCTION 2 ability as if it were a unit. When you produce ships in this planet's system, reduce their combined cost by 1.",
     "unitPositions": {
         "unitHolderName": "alpert",
         "coordinateMap": {

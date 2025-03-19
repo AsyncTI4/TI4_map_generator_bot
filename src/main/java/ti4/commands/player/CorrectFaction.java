@@ -11,9 +11,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -51,22 +51,25 @@ class CorrectFaction extends GameStateSubcommand {
                 }
             }
         }
-
+        
         List<String> laws = new ArrayList<>(game.getLawsInfo().keySet());
         for (String law : laws) {
             if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
                 game.reviseLaw(game.getLaws().get(law), newFaction);
             }
         }
-
-        FactionModel setupInfo = player.getFactionSetupInfo();
         player.setFaction(newFaction);
-        player.getFactionTechs().clear();
-        Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
-        player.setUnitsOwned(playerOwnedUnits);
-
+        FactionModel setupInfo = player.getFactionSetupInfo();
+        
+        if(!player.getFaction().contains("franken")){
+            player.getFactionTechs().clear();
+            Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+            player.setUnitsOwned(playerOwnedUnits);
+            player.setCommoditiesTotal(setupInfo.getCommodities());
+        }
+        
         // STARTING COMMODITIES
-        player.setCommoditiesTotal(setupInfo.getCommodities());
+        
         for (String tech : setupInfo.getFactionTech()) {
             if (tech.trim().isEmpty()) {
                 continue;

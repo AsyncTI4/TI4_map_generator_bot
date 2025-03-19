@@ -276,7 +276,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "After any player activates a system, you may remove this unit from the game board to place or move a Creuss wormhole token into this system.",
+        "ability": "After any player activates a system, you may remove this unit from the game board to place or move a Creuss wormhole token into this system. [Note: this system refers to the system the mech is in. It does not refer to the active system]",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/pok/mechs/icarus_drive.jpg?raw=true"
     },
     {

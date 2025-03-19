@@ -76,6 +76,10 @@ public class PlayerProperties {
 
     // LANEFIR TECH "ATS Armaments"
     private int atsCount;
+    
+    //Stat tracking
+    private int sarweenCounter;
+    private int pillageCounter;
 
     // OLRADIN POLICY ONCE PER ACTION EXHAUST PLANET ABILITIES
     private boolean hasUsedEconomyEmpowerAbility;
