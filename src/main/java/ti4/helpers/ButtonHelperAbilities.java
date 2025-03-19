@@ -615,9 +615,12 @@ public class ButtonHelperAbilities {
             buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         } else {
+            
+            player.setPillageCounter(player.getPillageCounter() + 1);
+            pillaged.setPillageCounter(pillaged.getPillageCounter() + 1);
             String pillagerMessage = player.getRepresentationUnfogged() + " you **Pillage**'d, so your trade goods have gone from "
                 + player.getTg() + " to "
-                + (player.getTg() + 1) + ".";
+                + (player.getTg() + 1) + ". The number of times you have pillaged this game is "+player.getPillageCounter();
             String pillagedMessage = pillaged.getRepresentationUnfogged() + " you have been **Pillage**'d";
 
             if (pillaged.getCommodities() > 0 && checkedStatus.contains("checkedcomm")) {
@@ -629,6 +632,7 @@ public class ButtonHelperAbilities {
                     + (pillaged.getTg() - 1) + ".";
                 pillaged.setTg(pillaged.getTg() - 1);
             }
+            pillagedMessage += " This number of times you have been pillaged this game is "+pillaged.getPillageCounter();
             player.setTg(player.getTg() + 1);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pillagerMessage);
