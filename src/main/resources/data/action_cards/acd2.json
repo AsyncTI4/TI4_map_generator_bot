@@ -159,7 +159,7 @@
         "window": "After an agenda is revealed",
         "text": "Choose 1 player. That player may exhaust up to 4 planets they control to gain an equal number of trade goods.",
         "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
-        "source": "action_deck_2_old"
+        "source": "action_deck_2"
     },
     {
         "alias": "covert_operation",
