@@ -241,14 +241,13 @@
         "alias": "ignis_aurora",
         "scIDs": [
             "pok1leadership",
-            "pok2diplomacy",
+            "ignisaurora2",
             "ignisaurora3",
             "pok4construction",
             "pok5trade",
             "pok6warfare",
             "pok7technology",
-            "ignisaurora8",
-            "ignisaurora9"
+            "pok8imperial"
         ],
         "description": "Strategy Cards for Baldrick's Ignis Aurora expansion",
         "source": "ignis_aurora"
