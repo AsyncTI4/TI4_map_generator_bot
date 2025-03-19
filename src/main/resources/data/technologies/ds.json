@@ -274,7 +274,7 @@
         "requirements": "Y",
         "faction": "ghoti",
         "source": "ds",
-        "text": "When you produce 1 or more units, you may produce 1 additional unit in a system that contains 1 or more of your ships and 1 of your command tokens.",
+        "text": "When you produce 1 or more units, you may produce 1 additional unit in each of 2 systems that contains 1 or more of your ships and 1 of your command tokens.",
         "shrinkName": true,
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/parallel_production.png?raw=true"
     },
@@ -618,7 +618,7 @@
         "requirements": "BRY",
         "faction": "nivyn",
         "source": "ds",
-        "text": "Cost 2, Combat 4\nSUSTAIN DAMAGE\nAfter a system is activated, you may have this unit become damaged to place or move the Wound token into this system.",
+        "text": "Cost 2, Combat 4\nSUSTAIN DAMAGE\nAfter a system is activated, you may have this unit become damaged to place or move the Wound token into this system. [Note: this system refers to the system the mech is in. It does not refer to the active system]",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/voidflare_warden_2.jpg?raw=true"
     },
     {
