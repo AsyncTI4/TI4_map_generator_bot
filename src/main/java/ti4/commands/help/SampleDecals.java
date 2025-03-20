@@ -38,7 +38,7 @@ class SampleDecals extends Subcommand {
             .collect(Collectors.toList());
 
         OptionMapping input = event.getOption(Constants.DECAL_HUE);
-        if (input != null && !input.getAsString().equals("ALL") && !input.getAsString().isEmpty()) {
+        if (input != null && !input.getAsString().equals(Constants.ALL) && !input.getAsString().isEmpty()) {
             if (input.getAsString().equals("Other")) {
                 List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
                 decals = decals.stream()

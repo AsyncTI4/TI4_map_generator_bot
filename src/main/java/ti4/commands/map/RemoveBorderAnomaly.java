@@ -27,7 +27,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
 
         String tilesString = event.getOption(Constants.PRIMARY_TILE).getAsString();
         Set<String> tiles = new HashSet<>();
-        if ("ALL".equals(tilesString)) {
+        if (Constants.ALL.equals(tilesString)) {
             tiles = game.getTileMap().values().stream().map(Tile::getTileID).collect(Collectors.toSet());
         } else {
             tiles = AddBorderAnomaly.resolveTiles(event, game);
@@ -35,7 +35,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
 
         Set<Integer> directions = AddBorderAnomaly.resolveDirections(event);
 
-        if ("ALL".equals(tilesString) && directions.isEmpty()) {
+        if (Constants.ALL.equals(tilesString) && directions.isEmpty()) {
             //No need to loop, just set as empty
             int amountOfBorderAnomalies = game.getBorderAnomalies().size();
             game.setBorderAnomalies(new ArrayList<>());
