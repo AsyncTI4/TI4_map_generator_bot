@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -934,6 +935,7 @@ public class TransactionHelper {
         switch (thingToTrans) {
             case "TGs" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
+                tgAmount = Math.min(p1.getTg(), tgAmount);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
                 CommanderUnlockCheckService.checkPlayer(p2, "hacan");
@@ -946,6 +948,7 @@ public class TransactionHelper {
             }
             case "Comms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
+                tgAmount = Math.min(p1.getCommodities(), tgAmount);
                 p1.setCommodities(p1.getCommodities() - tgAmount);
                 if (!p1.isPlayerMemberOfAlliance(p2)) {
                     int targetTG = p2.getTg();
@@ -1154,12 +1157,15 @@ public class TransactionHelper {
     }
 
     public static boolean canTheseTwoTransact(Game game, Player player, Player player2) {
+        // if(game.getRealPlayers().size() > 26){
+        //     return true;
+        // }
         return player == player2 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
             || player.hasAbility("guild_ships") || player.getPromissoryNotesInPlayArea().contains("convoys")
             || player2.getPromissoryNotesInPlayArea().contains("convoys") || player2.hasAbility("guild_ships")
             || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys") || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
-            || player2.getNeighbouringPlayers(true).contains(player)
-            || player.getNeighbouringPlayers(true).contains(player2);
+            || player2.getNeighbouringPlayers(false).contains(player)
+            || player.getNeighbouringPlayers(false).contains(player2);
     }
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
