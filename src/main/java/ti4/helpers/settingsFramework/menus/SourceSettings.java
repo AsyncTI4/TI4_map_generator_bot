@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
+
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -29,6 +30,7 @@ public class SourceSettings extends SettingsMenu {
     private final BooleanSetting discoStars;
     private final BooleanSetting unchartedSpace;
     private final BooleanSetting absol;
+    private final BooleanSetting ignis;
     // private final BooleanSetting miltymod;
     private final BooleanSetting eronous;
     // private final BooleanSetting cryypter;
@@ -46,6 +48,7 @@ public class SourceSettings extends SettingsMenu {
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
+        ignis = new BooleanSetting("Ignis", "Ignis Aurora Mod", game.getTechnologyDeckID().toLowerCase().contains("baldrick"));
         // miltymod = new BooleanSetting("MiltyMod", "Milty Mod", game.isMiltyModMode());
         eronous = new BooleanSetting("Eronous", "Eronous Tiles", false);
         // cryypter = new BooleanSetting("Cryypter", "Voices of the Council", false);
@@ -96,6 +99,7 @@ public class SourceSettings extends SettingsMenu {
         ls.add(discoStars);
         ls.add(unchartedSpace);
         ls.add(absol);
+        ls.add(ignis);
         //ls.add(miltymod);
         ls.add(eronous);
         // ls.add(cryypter);
@@ -138,6 +142,7 @@ public class SourceSettings extends SettingsMenu {
         if (absol.isVal()) sources.add(ComponentSource.absol);
         //if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
+        if(ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
@@ -164,6 +169,31 @@ public class SourceSettings extends SettingsMenu {
             case "DiscoStars" -> event.getHook()
                 .sendMessage("This setting only controls factions. If you want techs, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                 .setEphemeral(true).queue();
+            case "Ignis" -> {
+                boolean ignis = getIgnis().isVal();
+
+                // Decks with both
+                String relic = ignis ? "relics_baldrick" : "relics_pok";
+                String techs = ignis ? "techs_baldrick" : "techs_pok";
+
+                // Decks for ABSOL
+                String agenda = ignis ? "agendas_baldrick" : "agendas_pok";
+
+                
+                String sc = ignis ? "ignis_aurora" : "pok";
+                
+                game.setStrategyCardSet(sc);
+                game.setEventDeckID("events_baldrick");
+                // set 'em up
+                decks.getRelics().setChosenKey(relic);
+                decks.getTechs().setChosenKey(techs);
+                decks.getAgendas().setChosenKey(agenda);
+                
+
+                String absolDS = "Reset your decks to include all of the Ignis cards.";
+                String pokStr = "Reset your decks to include only PoK cards.";
+                event.getHook().sendMessage((ignis) ? absolDS : pokStr).setEphemeral(true).queue();
+            }
             case "UnchartSpace", "Absol" -> {
                 boolean abs = getAbsol().isVal();
                 boolean ds = getUnchartedSpace().isVal();
