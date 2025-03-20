@@ -382,11 +382,11 @@ public class ActionCardHelper {
                 boolean it = false, watcher = false;
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
-                    if (game.isFowMode() || (!it && p.hasTechReady("it"))) {
+                    if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
                         noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Xxcha + "**Instinct Training**, watch out");
                         it = true;
                     }
-                    if (game.isFowMode() || (!watcher && Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
+                    if (!watcher && (game.isFowMode() || Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
                         noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Empyrean + UnitEmojis.mech + "**Watcher**, 𝓌𝒶𝓉𝒸𝒽 out");
                         watcher = true;
                     }
