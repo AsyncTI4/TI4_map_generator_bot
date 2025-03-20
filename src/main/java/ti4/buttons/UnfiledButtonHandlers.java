@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -429,14 +430,44 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
                 ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
                 player.setSarweenCounter(player.getSarweenCounter()+1);
-                String msg = player.getFactionEmoji()+ " has used Sarween Tools to save "+player.getSarweenCounter() +" resource(s) in this game so far.";
+                String msg = player.getFactionEmoji()+ " has used Sarween Tools to save "+player.getSarweenCounter() +" resource(s) in this game so far. ";
+                int result = ThreadLocalRandom.current().nextInt(0, 5);
                 if(player.getSarweenCounter() < 6){
-                    msg += " Not too impressive.";
+                    
+                    List<String> lameMessages = Arrays.asList(
+                    "Not too impressive.",
+                    "The technology has not yet proven its worth.",
+                    "There better be more savings to come.",
+                    "Your faction's stockholders are so far unimpressed.",
+                    "Perhaps AIDEV or Scanlink might have been more useful.");
+                    msg += lameMessages.get(result);
                 }else{
                     if(player.getSarweenCounter() < 11){
-                        msg += " Not too shabby.";
+                        List<String> lameMessages = Arrays.asList(
+                        "Not too shabby.",
+                        "The tech is finally starting to justify its existence.",
+                        "Hopefully there are still even more savings to come.",
+                        "Your faction's stockholders are satisfied with the results of this technology.",
+                        "Some folks still think Scanlink might have been more useful.");
+                        msg += lameMessages.get(result);
                     }else{
-                        msg += " Very impressive.";
+                        if(player.getSarweenCounter() < 16){
+                            List<String> lameMessages = Arrays.asList(
+                            "Very impressive.",
+                            "If only all technology was this productive.",
+                            "Surely there can't be even more savings to come?",
+                            "Your faction's stockholders are ectatic.",
+                            "The Scanlink stans have been thoroughly shamed.");
+                            msg += lameMessages.get(result);
+                        }else{
+                            List<String> lameMessages = Arrays.asList(
+                            "Words cannot adequately express how impressive this is.",
+                            "Is Sarween the best tech?!",
+                            "Is this much saving even legal? The international IRS will be doing an audit on your paperwork sometime soon.",
+                            "Your faction's stockholders have erected a statue of you in the city center.",
+                            "Keep this up and we'll have to make a new channel, called Sarween Streaks, just for your numbers.");
+                            msg += lameMessages.get(result);
+                        }
                     }
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), msg);
