@@ -149,7 +149,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
             Player p = g.getPlayer(player.getId());
             if(p != null && g.getLastActivePlayerChange().toString() != null){
                 float value = p.getTotalResourceValueOfUnits("space") + p.getTotalResourceValueOfUnits("ground");
-                if(!foundOne && value > 0 && Helper.getDateDifference(g.getLastActivePlayerChange().toString(), Helper.getDateRepresentation(System.currentTimeMillis())) < 15 ){
+                if(!foundOne && value > 0 && Helper.getDateDifference(Helper.getDateRepresentation(g.getLastActivePlayerChange().getTime()), Helper.getDateRepresentation(System.currentTimeMillis())) < 15 ){
                     foundOne = true;
                 }
             }

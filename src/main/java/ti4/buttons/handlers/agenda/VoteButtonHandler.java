@@ -287,7 +287,7 @@ public class VoteButtonHandler {
             } else {
                 if (rider != null) {
                     if (planetRes != null) {
-                        button = Buttons.blue(planetRes + "_" + player.getColor() + "_" + rider, " ");
+                        button = Buttons.blue(planetRes + "_" + player.getColor() + "_" + rider, player.getColor());
                     } else {
                         button = Buttons.blue(prefix + "rider_player;" + player.getColor() + "_" + rider,
                             player.getColor());
