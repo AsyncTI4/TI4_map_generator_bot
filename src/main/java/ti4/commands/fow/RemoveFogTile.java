@@ -1,7 +1,8 @@
 package ti4.commands.fow;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -18,37 +19,37 @@ import ti4.message.MessageHelper;
 class RemoveFogTile extends GameStateSubcommand {
 
     public RemoveFogTile() {
-        super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.", true, false);
+        super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String positionMapping = event.getOption(Constants.POSITION, null, OptionMapping::getAsString);
-        if (positionMapping == null) {
-            MessageHelper.replyToMessage(event, "Specify position");
-            return;
-        }
-        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(getGame(), event);
-        if (targetPlayer == null) {
-            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
-            return;
+        String positionMapping = event.getOption(Constants.POSITION, "", OptionMapping::getAsString);
+
+        List<Player> targetPlayers = CommandHelper.getTargetPlayersFromOption(getGame(), event);
+        if (targetPlayers.isEmpty()) {
+            targetPlayers.add(getPlayer());
         }
 
-        List<String> positions = Helper.getListFromCSV(positionMapping);
-        if ("ALL".equals(positionMapping)) {
-            positions = new ArrayList<>(targetPlayer.getFogTiles().keySet());
-        }
+        Set<String> positions = new HashSet<>(Helper.getListFromCSV(positionMapping));
+        StringBuffer sb = new StringBuffer();
+        for (Player targetPlayer : targetPlayers) {
+            StringBuffer sb2 = new StringBuffer();
+            Set<String> positionsToRemove = Constants.ALL.equals(positionMapping) ? new HashSet<>(targetPlayer.getFogTiles().keySet()) : positions;
+            for (String position : positionsToRemove) {
+                if (!PositionMapper.isTilePositionValid(position)) {
+                    MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
+                    continue;
+                }
 
-        for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
-                MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
-                continue;
+                //remove the custom tile from the player
+                targetPlayer.removeFogTile(position);
+                sb2.append(" ").append(position);
             }
-
-            //remove the custom tile from the player
-            targetPlayer.removeFogTile(position);
+            sb.append(targetPlayer.getRepresentation()).append(" removed fog tiles:").append(sb2.toString()).append("\n");
         }
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 }

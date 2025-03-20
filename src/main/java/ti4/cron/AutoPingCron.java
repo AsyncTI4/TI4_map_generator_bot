@@ -159,7 +159,7 @@ public class AutoPingCron {
         if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 != player && playersInCombat.contains(p2.getFaction())) {
-                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
+                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
                 }
             }
         }
@@ -225,13 +225,13 @@ public class AutoPingCron {
                 String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
                 if (po.isEmpty()) {
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a public objective");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " please indicate if you are scoring a public objective");
                     }
                     poMsg.append(player.getRepresentation()).append(" ");
                 }
                 if (so.isEmpty()) {
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please indicate if you are scoring a secret objective");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " please indicate if you are scoring a secret objective");
                     }
                     soMsg.append(player.getRepresentation()).append(" ");
                 }
@@ -252,7 +252,7 @@ public class AutoPingCron {
             for (Player player : game.getRealPlayers()) {
                 if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " please draw ACs and allocate command tokens");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " please draw ACs and allocate command tokens");
                     }
                     msg.append(player.getRepresentation()).append(" ");
                 }

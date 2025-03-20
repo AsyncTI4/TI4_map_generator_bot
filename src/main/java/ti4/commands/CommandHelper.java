@@ -1,5 +1,6 @@
 package ti4.commands;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -141,6 +143,27 @@ public class CommandHelper {
         }
 
         return null;
+    }
+
+    //Return game.getRealPlayers() if target is ALL, otherwise supports comma separated list
+    public static List<Player> getTargetPlayersFromOption(Game game, SlashCommandInteractionEvent event) {
+        List<Player> targetPlayers = new ArrayList<>();
+        String targetOption = event.getOption(Constants.TARGET_FACTION_OR_COLOR, null, OptionMapping::getAsString);
+        if (targetOption == null) {
+            return targetPlayers;
+        }
+        if (Constants.ALL.equals(targetOption)) {
+            return game.getRealPlayers();
+        }
+        List<String> targets = Helper.getListFromCSV(targetOption);
+        for (String target : targets) {
+            String factionColor = AliasHandler.resolveColor(target.toLowerCase());
+            Player player = getPlayerByFactionColor(factionColor, game);
+            if (player != null) {
+                targetPlayers.add(player);
+            }
+        }
+        return targetPlayers;
     }
 
     public static boolean acceptIfHasRoles(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {

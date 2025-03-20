@@ -47,7 +47,7 @@ class SampleColors extends Subcommand {
 
         OptionMapping input = event.getOption(Constants.HUE);
         List<String> hues = new ArrayList<>();
-        if (input == null || input.getAsString().equals("ALL") || input.getAsString().isEmpty()) {
+        if (input == null || input.getAsString().equals(Constants.ALL) || input.getAsString().isEmpty()) {
             hues = Arrays.asList("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2");
         } else {
             SPACING = 12;
@@ -123,7 +123,7 @@ class SampleColors extends Subcommand {
             return;
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        String fileNamePrefix = "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : "ALL");
+        String fileNamePrefix = "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : Constants.ALL);
         try (var fileUpload = FileUploadService.createFileUpload(coloursImage, fileNamePrefix)) {
             fileUpload.setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
             MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
