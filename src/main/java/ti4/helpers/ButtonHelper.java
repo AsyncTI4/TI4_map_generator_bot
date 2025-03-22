@@ -2482,7 +2482,7 @@ public class ButtonHelper {
             if (button.getEmoji() != null && !"".equalsIgnoreCase(button.getEmoji().toString())) {
                 builder += ";" + button.getEmoji().toString();
             }
-            game.saveButton(builder);
+            game.saveButton(builder.replace(",",""));
         }
     }
 
