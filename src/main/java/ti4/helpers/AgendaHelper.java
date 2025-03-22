@@ -15,6 +15,12 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -27,11 +33,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -627,8 +628,27 @@ public class AgendaHelper {
     @ButtonHandler("pingNonresponders")
     public static void pingNonresponders(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         AutoPingCron.pingMissingAgendaPlayers(game);
+        String alreadyResolved = game.getStoredValue("whensResolved");
+        int num = 0;
+        if (alreadyResolved.isEmpty()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (game.getStoredValue("queuedWhens").contains(p2.getFaction())
+                    || game.getStoredValue("declinedWhens").contains(p2.getFaction())) {
+                    continue;
+                }
+                num++;
+            }
+        }else{
+            for (Player p2 : game.getRealPlayers()) {
+                if (game.getStoredValue("queuedAfters").contains(p2.getFaction())
+                    || game.getStoredValue("declinedAfters").contains(p2.getFaction())) {
+                    continue;
+                }
+                num++;
+            }
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false)
-            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters. They have been pinged in their private thread");
+            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of "+num+" people). They have been pinged in their private thread. ");
 
     }
 

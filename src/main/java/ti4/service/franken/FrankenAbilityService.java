@@ -5,10 +5,11 @@ import java.util.Map;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import ti4.image.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.AbilityModel;
@@ -43,6 +44,18 @@ public class FrankenAbilityService {
                 player.setUnitCap(unitID, 12);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     "Set destroyer max to 12 for " + player.getRepresentation() + " due to the **Private Fleet** ability.");
+            }
+            if (abilityID.equalsIgnoreCase("policies")) {
+                player.removeAbility("policies");
+                player.addAbility("policy_the_people_connect");
+                player.addAbility("policy_the_environment_preserve");
+                player.addAbility("policy_the_economy_empower");
+                player.removeOwnedUnitByID("olradin_mech");
+                player.addOwnedUnitByID("olradin_mech_positive");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),player.getRepresentationUnfogged()+ " automatically set all of your policies to the positive side, but you can flip any of them now with these buttons");
+                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
+                ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
             }
             if (abilityID.equalsIgnoreCase("industrialists")) {
                 String unitID = AliasHandler.resolveUnit("spacedock");

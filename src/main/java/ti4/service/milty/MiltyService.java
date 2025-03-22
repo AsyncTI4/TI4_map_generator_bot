@@ -8,17 +8,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
-
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
@@ -479,6 +480,18 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                     + " due to the **Teeming** ability.");
+        }
+        if (player.hasAbility("policies")) {
+            player.removeAbility("policies");
+            player.addAbility("policy_the_people_connect");
+            player.addAbility("policy_the_environment_preserve");
+            player.addAbility("policy_the_economy_empower");
+            player.removeOwnedUnitByID("olradin_mech");
+            player.addOwnedUnitByID("olradin_mech_positive");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),player.getRepresentationUnfogged()+ " automatically set all of your policies to the positive side, but you can flip any of them now with these buttons");
+            ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
+            ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
+            ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
         }
         if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
             player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
