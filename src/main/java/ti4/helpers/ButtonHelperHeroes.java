@@ -1435,8 +1435,7 @@ public class ButtonHelperHeroes {
                 msg = msg
                     + "removed _Policy - The Environment: Preserve ➕_ and added _Policy - The Environment: Plunder ➖_.";
                 player.addAbility("policy_the_environment_plunder");
-            }
-            if (player.hasAbility("policy_the_environment_plunder")) {
+            }else if (player.hasAbility("policy_the_environment_plunder")) {
                 player.removeAbility("policy_the_environment_plunder");
                 msg = msg
                     + "removed _Policy - The Environment: Plunder ➖_ and added _Policy - The Environment: Preserve ➕_.";

@@ -255,6 +255,16 @@ public class ListTechService {
                 }
             }
         }
+        if (ButtonHelper.isLawInPlay(game, "schematics") && (tech.getAlias().equalsIgnoreCase("ws") || tech.getBaseUpgrade().orElse("beh").equalsIgnoreCase("ws"))) {
+            for(Player p2 : game.getRealPlayers()){
+                for(String t2 : p2.getTechs()){
+                    TechnologyModel tech2 = Mapper.getTech(t2);
+                    if(tech2.getAlias().equalsIgnoreCase("ws") || tech2.getBaseUpgrade().orElse("beh").equalsIgnoreCase("ws")){
+                        return true;
+                    }
+                }
+            }
+        }
 
         return requirements.length() <= wilds;
     }
