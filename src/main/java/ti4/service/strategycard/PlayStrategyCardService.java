@@ -432,7 +432,7 @@ public class PlayStrategyCardService {
             // add your own special button resolutions here as additional cases
             // ignis aurora
             case "ignisaurora3" -> getGenericButtons(sc); //TODO: do it
-            case "ignisaurora8" -> getIgnisAuroraSC8Buttons(sc);
+            case "ignisaurora2" -> getIgnisAuroraSC8Buttons(sc);
 
             // cryypter
             case "cryypter_3" -> CryypterHelper.getCryypterSC3Buttons(sc);
