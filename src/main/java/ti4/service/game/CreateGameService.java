@@ -44,6 +44,7 @@ import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.image.FileUploadService;
+import ti4.service.option.GameOptionService;
 import ti4.settings.GlobalSettings;
 
 @UtilityClass
@@ -211,11 +212,12 @@ public class CreateGameService {
         Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, "How would you like to set up the players and map?", List.of(miltyButton, addMapString));
 
-        Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
-        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change some options? ", offerOptions);
+        //Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
+        GameOptionService.offerGameOptionButtons(game, actionsChannel);
+        //MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change some options? ", offerOptions);
 
         HomebrewService.offerGameHomebrewButtons(actionsChannel);
-
+        ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
         MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
     }
 

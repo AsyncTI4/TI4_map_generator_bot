@@ -1532,7 +1532,7 @@
         "source": "ds",
         "faction": "Rohdhna",
         "productionValue": 5,
-        "capacityValue": 3,
+        "capacityValue": 4,
         "capacityUsed": 1,
         "combatHitsOn": 5,
         "combatDieCount": 2,

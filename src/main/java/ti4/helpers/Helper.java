@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +21,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -39,10 +44,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -439,6 +440,45 @@ public class Helper {
             }
         }
         return players;
+    }
+    public static int getPlayerSpeakerNumber(Player player, Game game) {
+        Player speaker;
+        if (game.getPlayer(game.getSpeakerUserID()) != null) {
+            speaker = game.getPlayers().get(game.getSpeakerUserID());
+        } else {
+            return 1;
+        }
+        List<Player> players = new ArrayList<>();
+        boolean found = false;
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == speaker) {
+                found = true;
+                players.add(speaker);
+            } else {
+                if (found) {
+                    players.add(p2);
+                }
+            }
+        }
+
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == speaker) {
+                found = false;
+            } else {
+                if (found) {
+                    players.add(p2);
+                }
+            }
+        }
+        int count = 1;
+        for(Player p2 : players){
+            if(player == p2){
+                return count;
+            }else{
+                count++;
+            }
+        }
+        return count;
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
