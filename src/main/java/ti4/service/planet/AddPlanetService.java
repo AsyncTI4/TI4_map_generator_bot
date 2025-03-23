@@ -25,8 +25,8 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PlanetModel;
-import ti4.model.PromissoryNoteModel;
 import ti4.model.PlanetTypeModel.PlanetType;
+import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -100,6 +100,20 @@ public class AddPlanetService {
                     }
                     player_.removePlanet(planet);
                     List<String> relics = new ArrayList<>(player_.getRelics());
+                    if(planet.equalsIgnoreCase("mr")){
+                        String customPOName = "Ixthian Rex Point";
+                        if(game.getRevealedPublicObjectives().get(customPOName) != null){
+                            int shardID = game.getRevealedPublicObjectives().get(customPOName);
+                            game.unscorePublicObjective(player_.getUserID(), shardID);
+                            game.scorePublicObjective(player.getUserID(), shardID);
+                            String msg2 = player_.getRepresentation() + " lost rex and lost a victory point. "
+                                + player.getRepresentation()
+                                + " gained rex and a victory point.";
+                            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                                msg2);
+                            Helper.checkEndGame(game, player);
+                        }
+                    }
                     for (String relic : relics) {
                         if (relic.contains("shard")
                             && ButtonHelper.isPlanetLegendaryOrHome(planet, game, true, player_)
