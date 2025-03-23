@@ -58,6 +58,7 @@ public class StatusCleanupService {
             player.clearExhaustedRelics();
             player.clearExhaustedAbilities();
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
+            game.removeStoredValue(player.getFaction()+"scpickqueue");
 
             if (player.isRealPlayer() && game.getStoredValue("Pre Pass " + player.getFaction()) != null
                 && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {

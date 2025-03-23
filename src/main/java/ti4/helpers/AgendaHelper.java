@@ -808,6 +808,9 @@ public class AgendaHelper {
         String watchPartyPing = watchPartyPing(game);
 
         Die d1 = new Die(6);
+        if(game.getAgendaDeckID().toLowerCase().contains("absol")){
+            d1 = new Die(7);
+        }
         String msg = "# Rolled a " + d1.getResult() + " for Ixthian Artifact!";
         if (d1.isSuccess()) {
             msg += TechEmojis.Propulsion3 + " " + TechEmojis.Biotic3 + " " + TechEmojis.Cybernetic3 + " "
