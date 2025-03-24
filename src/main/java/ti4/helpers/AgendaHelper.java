@@ -1027,7 +1027,7 @@ public class AgendaHelper {
         String votes = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         MessageChannel channel;
 
-        boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
+        boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty() && player != game.getActivePlayer();
         if (prevoting) {
             ButtonHelper.deleteMessage(event);
             game.setStoredValue("preVoting" + player.getFaction(), votes);
@@ -1036,6 +1036,8 @@ public class AgendaHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "Successfully stored a pre-vote. You can erase it with this button.", buttonsPV);
             return;
+        }else{
+            game.setStoredValue("preVoting" + player.getFaction(), "");
         }
         if (!buttonID.contains("outcomeTie*")) {
             if ("0".equalsIgnoreCase(votes)) {
@@ -2045,7 +2047,7 @@ public class AgendaHelper {
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null) {
                         if (!losers.contains(loser) && !specificVote.contains("Rider")
-                            && !specificVote.contains("Sanction") && !specificVote.contains("Ability")) {
+                            && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity")&& !specificVote.contains("Ability")) {
                             losers.add(loser);
                         }
 
