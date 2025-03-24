@@ -869,8 +869,13 @@ public class Helper {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
             }
+            UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+            boolean containsDMZ = uH.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
+            if (containsDMZ) {
+                continue;
+            }
             if (unit.equalsIgnoreCase("spacedock")) {
-                UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+                
                 if (uH == null || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
                     continue;
                 }
