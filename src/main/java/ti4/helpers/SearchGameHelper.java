@@ -96,7 +96,9 @@ public class SearchGameHelper {
             sb.append(getPlayerMapListRepresentation(game, userID, showAverageTurnTime, showSecondaries, showGameModes));
             sb.append("\n");
             if(game.isHasEnded()){
-                days.add(Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString()));
+                if(Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString()) > 0){
+                    days.add(Helper.getDateDifference(game.getCreationDate(), game.getEndedDateString()));
+                }
             }
             index++;
         }
