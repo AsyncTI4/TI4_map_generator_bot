@@ -141,6 +141,10 @@ public class StartPhaseService {
         }
         String msg = player.getRepresentation() +" you are #"+number+" pick in this strategy phase and so can queue "+number+" strategy cards (SCs). So "+
         "far you have queued "+numQueued+" cards. ";
+        if(game.isFowMode()){
+            msg = player.getRepresentation() +" you can queue up to 8 cards. So "+
+            "far you have queued "+numQueued+" cards. ";
+        }
         if(numQueued > 0){
             msg += "The queued SCs are as follows (in the order the bot will attempt to select them for you):\n";
             int count = 1;
@@ -368,7 +372,7 @@ public class StartPhaseService {
             if(game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()){
                 for (Player player2 : game.getRealPlayers()) {
                     int number = Helper.getPlayerSpeakerNumber(player2, game);
-                    if(number == 1 || number == 8){
+                    if(number == 1 || (number == 8 && !game.isFowMode())){
                         continue;
                     }
                     String msg = player2.getRepresentation()+" in order to speed up the strategy phase, you can now offer the bot a ranked list of your desired"+
