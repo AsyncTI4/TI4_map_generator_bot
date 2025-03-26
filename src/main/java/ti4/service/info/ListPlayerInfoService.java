@@ -148,7 +148,6 @@ public class ListPlayerInfoService {
         
         String current = planets.get(index);  
         
-        // Try using planet for resources  
         if (!usedPlanets.contains(current)) {  
             // Try using planet for resources  
             usedPlanets.add(current);  
@@ -159,30 +158,30 @@ public class ListPlayerInfoService {
                 resources += influence;
                 influence += planet.getResources();
             }
-            ObjectiveResult resourceResult = backtrack(planets,   
-                      currentResources + resources,   
-                      currentInfluence,   
-                      index + 1,   
-                      usedPlanets,  
-                      remainingTradeGoods, goal, player, game);  
-            if (resourceResult.canFullyMeet()) {  
-                return resourceResult;  
-            }  
-            usedPlanets.remove(current);  
-            
+            if(resources > 0){
+                ObjectiveResult resourceResult = backtrack(planets,   
+                        currentResources + resources,   
+                        currentInfluence,   
+                        index + 1,   
+                        usedPlanets,  
+                        remainingTradeGoods, goal, player, game);  
+                        if (resourceResult.canFullyMeet()) {  
+                            return resourceResult;  
+                        }  
+            }
+             
             // Try using planet for influence  
-            ObjectiveResult influenceResult = backtrack(planets,   
-                      currentResources,   
-                      currentInfluence + influence,   
-                      index + 1,   
-                      usedPlanets,  
-                      remainingTradeGoods,goal, player, game);  
-            if (influenceResult.canFullyMeet()) {  
-                return influenceResult;  
-            }  
-            
-            // Undo the planet addition  
-            usedPlanets.remove(current);  
+            if(influence > 0){
+                ObjectiveResult influenceResult = backtrack(planets,   
+                        currentResources,   
+                        currentInfluence + influence,   
+                        index + 1,   
+                        usedPlanets,  
+                        remainingTradeGoods,goal, player, game);  
+                if (influenceResult.canFullyMeet()) {  
+                    return influenceResult;  
+                }  
+            }
         }  
         
         // Skip this planet  
