@@ -2612,34 +2612,38 @@ public class ButtonHelper {
         int highest = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                highest = Math.max(highest, checkFleetAndCapacity(player, game, tile, event));
+                highest = Math.max(highest, checkFleetAndCapacity(player, game, tile, event)[0]);
             }
         }
         Helper.isCCCountCorrect(player);
         return highest;
     }
 
-    public static int checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
-        return checkFleetAndCapacity(player, game, tile, event, false);
+    public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
+        return checkFleetAndCapacity(player, game, tile, event, false, true);
+    }
+    public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event, boolean ignoreFighters) {
+        return checkFleetAndCapacity(player, game, tile, event, ignoreFighters, true);
     }
 
-    public static int checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event, boolean ignoreFighters) {
+    public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event, boolean ignoreFighters, boolean issuePing) {
         String tileRepresentation = tile.getRepresentation();
+        int[] values = {0,0,0};
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
-            return 0;
+            return values;
         }
         if (tileRepresentation.toLowerCase().contains("nombox")) {
-            return 0;
+            return values;
         }
         if (!game.isCcNPlasticLimit()) {
-            return 0;
+            return values;
         }
         int armadaValue = 0;
         if (player == null) {
-            return 0;
+            return values;
         }
         if (player.getFaction().equals("neutral") && player.getUserID().equals(Constants.dicecordId)) {
-            return 0;
+            return values;
         }
         if (player.hasAbility("armada")) {
             armadaValue = 2;
@@ -2803,11 +2807,13 @@ public class ButtonHelper {
             int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
             if (numInf > ((numOfCapitalShips
                 + tile.getUnitHolders().get("space").getUnitCount(UnitType.Destroyer, player.getColor())) / 2)) {
+                if(issuePing){
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation()
                         + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
                         + "You seem to be violating this in " + tile.getRepresentationForButtons(game, player)
                         + ".");
+                }
             }
         }
         String message = player.getRepresentationUnfogged();
@@ -2845,23 +2851,28 @@ public class ButtonHelper {
                 + (numInfNFightersNMechs - numFighter2s) + " thing"
                 + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + " ). ";
         }
-        if (capacityViolated || fleetSupplyViolated || structuresViolated) {
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
-                "Remove Units in " + tile.getRepresentationForButtons(game, player)));
-            buttons.add(Buttons.red("deleteButtons",
-                "Dismiss These Buttons"));
+        if(issuePing){
+            if (capacityViolated || fleetSupplyViolated || structuresViolated) {
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
+                    "Remove Units in " + tile.getRepresentationForButtons(game, player)));
+                buttons.add(Buttons.red("deleteButtons",
+                    "Dismiss These Buttons"));
 
-            FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player)
-                .createFileUpload();
-            MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message,
-                buttons);
+                FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player)
+                    .createFileUpload();
+                MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message,
+                    buttons);
 
+            }
         }
         if (ignoreFighters) {
-            return (numOfCapitalShips + 1) / 2;
+            int[] capNCap = {((numOfCapitalShips + 1) / 2),numInfNFightersNMechs,capacity};
+            
+            return capNCap;
         }
-        return (numFighter2sFleet + numOfCapitalShips + 1) / 2;
+        int[] capNCap2 = {((numFighter2sFleet + numOfCapitalShips + 1) / 2),numInfNFightersNMechs,capacity};
+        return capNCap2;
     }
 
     public static List<String> getAllPlanetsAdjacentToTileNotOwnedByPlayer(Tile tile, Game game, Player player) {
