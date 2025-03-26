@@ -94,6 +94,106 @@ public class ListPlayerInfoService {
         };
     }
 
+
+    record ObjectiveResult(boolean canFullyMeet, int closenessScore) {}  
+    public ObjectiveResult checkObjective(List<String> planets, int tradeGoods, int goal, Player player, Game game) {  
+        return backtrack(planets, 0, 0, 0, new HashSet<>(), tradeGoods, goal, player, game);  
+    }  
+
+    private ObjectiveResult backtrack(  
+        List<String> planets,   
+        int currentResources,   
+        int currentInfluence,   
+        int index,   
+        Set<String> usedPlanets,  
+        int remainingTradeGoods,
+        int goal,
+        Player player,
+        Game game
+    ) {  
+        // Success condition  
+        if (currentResources >= goal && currentInfluence >= goal) {  
+            return new ObjectiveResult(true, goal*2);  
+        }  
+        
+        // Failure condition - run out of options  
+        if (index >= planets.size() && remainingTradeGoods == 0) {  
+            // Calculate closeness score  
+            int resourceShortfall = Math.max(0, goal - currentResources);  
+            int influenceShortfall = Math.max(0, goal - currentInfluence);  
+            int closenessScore = goal*goal - (resourceShortfall + influenceShortfall);  
+            
+            return new ObjectiveResult(false, Math.max(0, closenessScore));  
+        }  
+        
+        // If we've run out of planets, try using trade goods  
+        if (index >= planets.size()) {  
+            // Try using remaining trade goods for resources  
+            int additionalResources = Math.min(remainingTradeGoods,   
+                                               Math.max(0, goal - currentResources));  
+            int additionalInfluence = Math.min(remainingTradeGoods - additionalResources,   
+                                               Math.max(0, goal - currentInfluence));  
+            
+            int newResources = currentResources + additionalResources;  
+            int newInfluence = currentInfluence + additionalInfluence;  
+            
+            // Calculate closeness score  
+            int resourceShortfall = Math.max(0, goal - newResources);  
+            int influenceShortfall = Math.max(0, goal - newInfluence);  
+            int closenessScore = goal*2 - (resourceShortfall + influenceShortfall);  
+            
+            boolean canMeet = newResources >= goal && newInfluence >= goal;  
+            return new ObjectiveResult(canMeet, canMeet ? goal*2 : Math.max(0, closenessScore));  
+        }  
+        
+        String current = planets.get(index);  
+        
+        // Try using planet for resources  
+        if (!usedPlanets.contains(current)) {  
+            // Try using planet for resources  
+            usedPlanets.add(current);  
+            Planet planet = game.getPlanetsInfo().get(current);
+            int resources = planet.getResources();
+            int influence = planet.getInfluence();
+            if(player.hasLeaderUnlocked("xxchahero")){
+                resources += influence;
+                influence += planet.getResources();
+            }
+            ObjectiveResult resourceResult = backtrack(planets,   
+                      currentResources + resources,   
+                      currentInfluence,   
+                      index + 1,   
+                      usedPlanets,  
+                      remainingTradeGoods, goal, player, game);  
+            if (resourceResult.canFullyMeet()) {  
+                return resourceResult;  
+            }  
+            usedPlanets.remove(current);  
+            
+            // Try using planet for influence  
+            ObjectiveResult influenceResult = backtrack(planets,   
+                      currentResources,   
+                      currentInfluence + influence,   
+                      index + 1,   
+                      usedPlanets,  
+                      remainingTradeGoods,goal, player, game);  
+            if (influenceResult.canFullyMeet()) {  
+                return influenceResult;  
+            }  
+            
+            // Undo the planet addition  
+            usedPlanets.remove(current);  
+        }  
+        
+        // Skip this planet  
+        return backtrack(planets,   
+                         currentResources,   
+                         currentInfluence,   
+                         index + 1,   
+                         usedPlanets,  
+                         remainingTradeGoods,goal, player, game);  
+    } 
+
     public static void displayerScoringProgression(Game game, boolean onlyThisGameObj, MessageChannel channel, String stage1sOrTwos) {
         StringBuilder msg = new StringBuilder();
         int x = 1;
@@ -318,12 +418,16 @@ public class ListPlayerInfoService {
             case "amass_wealth" -> {
                 int forTG = Math.min(3, player.getTg() + comms);
                 int leftOverTg = player.getTg() + comms - forTG;
-                int forResources = Math.min(3, Helper.getPlayerResourcesAvailable(player, game));
-                int forInfluence = Math.min(3, Helper.getPlayerInfluenceAvailable(player, game));
                 if (player.hasTech("mc")) {
                     leftOverTg *= 2;
                 }
-                return forTG + leftOverTg + forInfluence + forResources;
+                if(player.getReadiedPlanets().size() > 15){
+                    int forResources = Math.min(3, Helper.getPlayerResourcesAvailable(player, game));
+                    int forInfluence = Math.min(3, Helper.getPlayerInfluenceAvailable(player, game));
+                    return forTG + leftOverTg + forInfluence + forResources;
+                }else{
+                    return forTG + checkObjective(player.getReadiedPlanets(), leftOverTg, 3, player, game).closenessScore;
+                }
             }
             case "build_defenses", "massive_cities" -> {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
@@ -389,12 +493,16 @@ public class ListPlayerInfoService {
             case "vast_reserves" -> {
                 int forTG = Math.min(6, player.getTg() + comms);
                 int leftOverTg = player.getTg() + comms - forTG;
-                int forResources = Math.min(6, Helper.getPlayerResourcesAvailable(player, game));
-                int forInfluence = Math.min(6, Helper.getPlayerInfluenceAvailable(player, game));
                 if (player.hasTech("mc")) {
                     leftOverTg *= 2;
                 }
-                return forTG + leftOverTg + forInfluence + forResources;
+                if(player.getReadiedPlanets().size() > 15){
+                    int forResources = Math.min(6, Helper.getPlayerResourcesAvailable(player, game));
+                    int forInfluence = Math.min(6, Helper.getPlayerInfluenceAvailable(player, game));
+                    return forTG + leftOverTg + forInfluence + forResources;
+                }else{
+                    return forTG + checkObjective(player.getReadiedPlanets(), leftOverTg, 6, player, game).closenessScore;
+                }
             }
             case "distant_lands" -> {
                 Set<String> planetsAdjToHomes = new HashSet<>();
