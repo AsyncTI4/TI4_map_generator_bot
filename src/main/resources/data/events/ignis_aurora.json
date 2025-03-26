@@ -62,7 +62,7 @@
         "category": "event",
         "categoryDescription": "permanent",
         "text": "During the status phase, if 1 player reaches 10 (14) points, the game does not end. Instead, complete the entire status phase. The player with the most points at the end of the status phase wins the game. If more than 1 player is tied with the most points, the winner is determined by speaker order.",
-        "mapText": "Once you begin the status phase, complete the entire phase. Then, the player with the most points wins (ties broken by speaker order).",
+        "mapText": "Once you begin the status phase, complete the entire phase. Then, the player with the most points wins (ties broken by speaker order). Players may exceed the 10/14 point limit.",
         "source": "ignis_aurora"
     },
     {

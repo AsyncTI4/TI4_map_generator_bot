@@ -15,7 +15,7 @@ class IgnisStrategyCardButtonHandler {
 
     @ButtonHandler("ignisAuroraSC8Primary")
     public static void resolveIgnisAuroraSC8Primary(ButtonInteractionEvent event, Game game, Player player) {
-        if (!player.getSCs().contains(8)) {
+        if (!player.getSCs().contains(2)) {
             MessageHelper.sendMessageToEventChannel(event, "You don't have the Antiquities strategy card.");
             return;
         }
