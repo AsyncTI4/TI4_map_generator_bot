@@ -459,7 +459,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg,
                     buttons);
             }
-            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, true);
+            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, true)[0];
             if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     msg + ", this is a reminder that if you win the combat (or otherwise keep ships in the active system), and you lose "
