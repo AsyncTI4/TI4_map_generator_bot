@@ -480,7 +480,8 @@ public class TileGenerator {
                         // tileGraphics.drawImage(basketImage, TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29+40, TILE_PADDING + TILE_POSITION_POINT.y + yMod - 4+64, null);
                         g2d.setColor(Color.WHITE);  
                         tileGraphics.setFont(Storage.getFont12());
-                        tileGraphics.drawString(capacityUsed + " / "+capacity, gearX + 39 + textModifer, gearY+100);
+                        DrawingUtil.superDrawString(tileGraphics, capacityUsed + " / "+capacity, gearX + 39 + textModifer, gearY+100, Color.WHITE, null, null, stroke4, Color.BLACK);
+                        
                     }
                 }
 
