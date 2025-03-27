@@ -2628,7 +2628,7 @@ public class ButtonHelper {
 
     public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event, boolean ignoreFighters, boolean issuePing) {
         String tileRepresentation = tile.getRepresentation();
-        int[] values = {0,0,0};
+        int[] values = {0,0,0,0};
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
             return values;
         }
@@ -2737,6 +2737,7 @@ public class ButtonHelper {
             }
         }
         // System.out.println(fightersIgnored);
+        int ignoredFs = 0;
         UnitHolder spaceHolder = tile.getSpaceUnitHolder();
         List<String> unitTypesCounted = new ArrayList<>();
         Map<UnitModel, Integer> unitsByQuantity = getAllUnits(spaceHolder, player);
@@ -2752,6 +2753,7 @@ public class ButtonHelper {
                         }
                     }
                     if ("fighter".equalsIgnoreCase(unit.getBaseType())) {
+                        ignoredFs = Math.min(fightersIgnored, unitsByQuantity.get(unit));
                         int numCountedFighters = unit.getCapacityUsed() * unitsByQuantity.get(unit) - fightersIgnored;
                         if (numCountedFighters < 0) {
                             numCountedFighters = 0;
@@ -2866,12 +2868,15 @@ public class ButtonHelper {
 
             }
         }
+        if(numInfNFightersNMechs <= capacity){
+            numFighter2s = 0;
+        }
         if (ignoreFighters) {
-            int[] capNCap = {((numOfCapitalShips + 1) / 2),numInfNFightersNMechs,capacity};
+            int[] capNCap = {((numOfCapitalShips + 1) / 2),numInfNFightersNMechs-numFighter2s+ignoredFs,capacity,fightersIgnored};
             
             return capNCap;
         }
-        int[] capNCap2 = {((numFighter2sFleet + numOfCapitalShips + 1) / 2),numInfNFightersNMechs,capacity};
+        int[] capNCap2 = {((numFighter2sFleet + numOfCapitalShips + 1) / 2),numInfNFightersNMechs-numFighter2s+ignoredFs,capacity,fightersIgnored};
         return capNCap2;
     }
 

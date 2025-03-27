@@ -40,6 +40,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
+import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -385,9 +386,11 @@ public class TileGenerator {
                 int prodInSystem = 0;
                 int capacity = 0;
                 int capacityUsed = 0;
+                int ignoredFs = 0;
                 for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
                     if(capacity == 0 && capacityUsed == 0){
+                        ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[3];
                         capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[2];
                         capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, event,false, false)[1];
                     }
@@ -422,7 +425,7 @@ public class TileGenerator {
                         tileGraphics.drawString(prodInSystem + "", TILE_PADDING + TILE_POSITION_POINT.x + xMod + 15 + textModifer - 25, TILE_PADDING + TILE_POSITION_POINT.y + yMod + 40);
                     }
                     
-                    if( capacityUsed > 0 || capacity > 0){
+                    if( capacityUsed > 0 || capacity > 0 || ignoredFs > 0){
                         int textModifer = 0;
                         if (capacity == 1) {
                             textModifer = 7;
@@ -434,7 +437,7 @@ public class TileGenerator {
                             textModifer = 0;
                         }
                         List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
-                        BufferedImage basketImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("capacity_representation.png"), 64, 64);
+                        
                         int xMod;
                         int yMod = -290;
                         if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
@@ -447,8 +450,8 @@ public class TileGenerator {
 
                         // Calculate water height  
                         double waterHeight;
-                        if(capacity > 0){
-                            waterHeight = 20.0 * capacityUsed /  capacity; 
+                        if(capacity + ignoredFs > 0){
+                            waterHeight = 20.0 * capacityUsed /  (capacity+ignoredFs); 
                         }else{
                             waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
                         } 
@@ -466,7 +469,7 @@ public class TileGenerator {
                         }
                        
                         g2d.setColor(new Color(128, 197, 222));  
-                        g2d.fillRect(gearX+44, gearY+64+17 -(int)(waterHeight), 28, (int)waterHeight);   
+                        g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);   
                         g2d.setColor(new Color(122, 127, 128)); 
 
                 
@@ -480,7 +483,11 @@ public class TileGenerator {
                         // tileGraphics.drawImage(basketImage, TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29+40, TILE_PADDING + TILE_POSITION_POINT.y + yMod - 4+64, null);
                         g2d.setColor(Color.WHITE);  
                         tileGraphics.setFont(Storage.getFont12());
-                        DrawingUtil.superDrawString(tileGraphics, capacityUsed + " / "+capacity, gearX + 39 + textModifer, gearY+100, Color.WHITE, null, null, stroke4, Color.BLACK);
+                        String msg = capacityUsed + " / "+capacity;
+                        if(ignoredFs > 0){
+                            msg = capacityUsed + " / "+(capacity+ignoredFs)+"*";
+                        }
+                        DrawingUtil.superDrawString(tileGraphics, msg, gearX + 39 +17, gearY+100, Color.WHITE, HorizontalAlign.Center, null, stroke4, Color.BLACK);
                         
                     }
                 }
