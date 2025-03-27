@@ -2293,7 +2293,7 @@ public class Helper {
             }
             buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
+                "# " + game.getPing() + fowGmPing(game) + " it appears as though " + player.getRepresentationNoPing()
                     + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
             if (game.isFowMode()) {
@@ -2311,6 +2311,16 @@ public class Helper {
                     titleButton);
             }
         }
+    }
+
+    private static String fowGmPing(Game game) {
+        if (game.isFowMode()) {
+            List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
+            if (!gmRoles.isEmpty()) {
+                return ", " + gmRoles.getFirst().getAsMention();
+            }
+        }
+        return "";
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {

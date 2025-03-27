@@ -360,7 +360,7 @@ public class StartTurnService {
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
-            FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
+            FowCommunicationThreadService.checkAllCommThreads(game);
         }
 
         startButtons.add(Buttons.gray("showMap", "Show Map"));
