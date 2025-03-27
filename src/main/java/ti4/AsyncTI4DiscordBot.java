@@ -200,11 +200,11 @@ public class AsyncTI4DiscordBot {
         }
 
         // Async: FOW Chapter Secondary
-        if (args.length >= 12) {
-            guildFogOfWarSecondary = jda.getGuildById(args[11]);
-            startBot(guildFogOfWarSecondary);
-            fowServers.add(guildFogOfWarSecondary);
-        }
+        //if (args.length >= 12) {
+        //    guildFogOfWarSecondary = jda.getGuildById(args[11]);
+        //    startBot(guildFogOfWarSecondary);
+        //    fowServers.add(guildFogOfWarSecondary);
+        //}
 
         // LOAD DATA
         BotLogger.logWithTimestamp(" LOADING DATA");
