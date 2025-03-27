@@ -3,6 +3,7 @@ package ti4;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -86,9 +87,11 @@ public class AsyncTI4DiscordBot {
     public static Guild guildSenary;
     public static Guild guildSeptenary;
     public static Guild guildFogOfWar;
+    public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
+    public static final List<Guild> fowServers = new LinkedList<>();
 
     private static final List<Class<?>> classes = new ArrayList<>();
 
@@ -151,6 +154,7 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
             startBot(guildFogOfWar);
+            fowServers.add(guildFogOfWar);
         }
 
         // Async: Stroter's Paradise
@@ -194,6 +198,13 @@ public class AsyncTI4DiscordBot {
             startBot(guildSeptenary);
             serversToCreateNewGamesOn.add(guildSeptenary);
         }
+
+        // Async: FOW Chapter Secondary
+        //if (args.length >= 12) {
+        //    guildFogOfWarSecondary = jda.getGuildById(args[11]);
+        //    startBot(guildFogOfWarSecondary);
+        //    fowServers.add(guildFogOfWarSecondary);
+        //}
 
         // LOAD DATA
         BotLogger.logWithTimestamp(" LOADING DATA");

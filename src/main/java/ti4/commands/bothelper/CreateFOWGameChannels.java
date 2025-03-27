@@ -1,36 +1,18 @@
 package ti4.commands.bothelper;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
-import ti4.ResourceHelper;
-import ti4.buttons.Buttons;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.service.game.CreateGameService;
-import ti4.service.game.HomebrewService;
-import ti4.service.option.FOWOptionService.FOWOption;
+import ti4.service.fow.CreateFoWGameService;
 
 class CreateFOWGameChannels extends Subcommand {
 
@@ -50,7 +32,7 @@ class CreateFOWGameChannels extends Subcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         //GAME NAME
-        String gameName = getNextFOWGameName();
+        String gameName = CreateFoWGameService.getNextFOWGameName();
 
         //CHECK IF GIVEN CATEGORY IS VALID
         Guild guild = event.getGuild();
@@ -60,24 +42,11 @@ class CreateFOWGameChannels extends Subcommand {
         }
 
         //PLAYERS
-        List<Member> members = new ArrayList<>();
-        Member gameOwner;
-        if (Objects.nonNull(event.getOption("fowgm"))) {
-            gameOwner = event.getOption("fowgm").getAsMember();
-        } else {
-            gameOwner = event.getMember();
-        }
-        for (int i = 1; i <= 8; i++) {
-            if (Objects.nonNull(event.getOption("player" + i))) {
-                Member member = event.getOption("player" + i).getAsMember();
-                if (member != null) members.add(member);
-            } else {
-                break;
-            }
-        }
+        Member gameOwner = CreateFoWGameService.getGM(event);
+        List<Member> members = CreateFoWGameService.getPlayers(event);
 
         //CHECK IF SERVER CAN SUPPORT A NEW GAME
-        if (!serverCanHostNewGame(guild, members.size())) {
+        if (!CreateFoWGameService.serverCanHostNewGame(guild, members.size() + 1)) {
             MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
@@ -98,171 +67,7 @@ class CreateFOWGameChannels extends Subcommand {
             return;
         }
 
-        //CREATE ROLES
-        Role role = guild.createRole()
-            .setName(gameName)
-            .setMentionable(true)
-            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
-
-        Role roleGM = guild.createRole()
-            .setName(gameName + " GM")
-            .setMentionable(true)
-            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
-
-        guild.addRoleToMember(gameOwner, roleGM).queue();
-        //ADD PLAYERS TO ROLE
-        for (Member member : members) {
-            guild.addRoleToMember(member, role).queue();
-        }
-
-        // CREATE GAME
-        Game newGame = CreateGameService.createNewGame(gameName, gameOwner);
-        newGame.setFowMode(true);
-        newGame.setFowOption(FOWOption.MANAGED_COMMS, true);
-        newGame.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, true);
-
-        //ADD PLAYERS
-        newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
-        for (Member member : members) {
-            newGame.addPlayer(member.getId(), member.getEffectiveName());
-        }
-
-        // CREATE CATEGORY
-        Role everyone = guild.getRolesByName("@everyone", true).getFirst();
-        long permission2 = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue() | Permission.MANAGE_PERMISSIONS.getRawValue() | Permission.MANAGE_THREADS.getRawValue();
-        Category category = guild
-            .createCategory(gameName)
-            .addRolePermissionOverride(everyone.getIdLong(), 0, permission2)
-            .addRolePermissionOverride(roleGM.getIdLong(), permission2, 0)
-            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
-
-        //CREATE CHANNELS
-        String newGMChannelName = gameName + "-gm-room";
-        String newActionsChannelName = gameName + "-anonymous-announcements-private";
-        long gameRoleID = role.getIdLong();
-        long gameRoleGMID = roleGM.getIdLong();
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-
-        // CREATE GM CHANNEL
-        TextChannel gmChannel = guild.createTextChannel(newGMChannelName, category)
-            .syncPermissionOverrides()
-            .addRolePermissionOverride(gameRoleGMID, permission, 0)
-            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
-        
-        StringBuilder sb = new StringBuilder(roleGM.getAsMention() + " - gm room\n");
-        sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
-        MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
-        HomebrewService.offerGameHomebrewButtons(gmChannel);
-
-        // CREATE Anon Announcements CHANNEL
-        TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-            .syncPermissionOverrides()
-            .addRolePermissionOverride(gameRoleID, permission, 0)
-            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
-        sb = new StringBuilder(role.getAsMention() + " - announcements channel\n");
-        sb.append(getInfoTextFromFile("FoWMainChannelIntro.txt"));
-        MessageHelper.sendMessageToChannel(actionsChannel, sb.toString());
-        newGame.setMainChannelID(actionsChannel.getId());
-
-        // Individual player channels
-        String privateChannelIntro = getInfoTextFromFile("FoWPrivateChannelIntro.txt");
-        for (Member member : members) {
-            String name = member.getNickname();
-            if (name == null) {
-                name = member.getEffectiveName();
-            }
-            TextChannel memberChannel = guild.createTextChannel(gameName + "-" + name + "-private", category)
-                .syncPermissionOverrides()
-                .addMemberPermissionOverride(member.getIdLong(), permission, 0)
-                .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
-            Player player_ = newGame.getPlayer(member.getId());
-            player_.setPrivateChannelID(memberChannel.getId());
-            sb = new StringBuilder(member.getAsMention() + " - private channel\n");
-            sb.append(privateChannelIntro);
-            MessageHelper.sendMessageToChannelWithButton(memberChannel, sb.toString(), Buttons.DONE_DELETE_BUTTONS);
-        }
-
-        String message = "Role and Channels have been set up:\n" + "> " + role.getName() + "\n" +
-            "> " + gmChannel.getAsMention() + "\n" +
-            "> " + actionsChannel.getAsMention() + "\n";
-        MessageHelper.sendMessageToEventChannel(event, message);
-
-        GameManager.save(newGame, "Create FOW Game Channels");
+        CreateFoWGameService.executeCreateFoWGame(guild, gameName, "", gameOwner, members, event.getChannel());
     }
 
-    private static String getInfoTextFromFile(String file) {
-        String path = ResourceHelper.getInstance().getHelpFile(file);
-        try {
-            return new String(Files.readAllBytes(Paths.get(path)));
-        } catch (Exception e) {
-            return file + " IS BLANK";
-        }
-    }
-
-    private static String getNextFOWGameName() {
-        ArrayList<Integer> existingNums = getAllExistingFOWNumbers();
-        if (existingNums.isEmpty()) {
-            return "fow1";
-        }
-        int nextPBDNumber = Collections.max(getAllExistingFOWNumbers()) + 1;
-        return "fow" + nextPBDNumber;
-    }
-
-    private static ArrayList<Integer> getAllExistingFOWNumbers() {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
-        ArrayList<Integer> pbdNumbers = new ArrayList<>();
-
-        // GET ALL PBD ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
-            System.out.println(guild.getName());
-            List<Role> pbdRoles = guild.getRoles().stream()
-                .filter(r -> r.getName().startsWith("fow"))
-                .toList();
-
-            //EXISTING ROLE NAMES
-            for (Role role : pbdRoles) {
-                String pbdNum = role.getName().replace("fow", "");
-                if (Helper.isInteger(pbdNum)) {
-                    pbdNumbers.add(Integer.parseInt(pbdNum));
-                }
-            }
-        }
-
-        // GET ALL EXISTING PBD MAP NAMES
-        List<String> gameNames = GameManager.getGameNames().stream()
-            .filter(gameName -> gameName.startsWith("fow"))
-            .toList();
-        for (String gameName : gameNames) {
-            String pbdNum = gameName.replace("fow", "");
-            if (Helper.isInteger(pbdNum)) {
-                pbdNumbers.add(Integer.parseInt(pbdNum));
-            }
-        }
-        return pbdNumbers;
-    }
-
-    private static boolean serverCanHostNewGame(Guild guild, int playerCount) {
-        return guild != null && serverHasRoomForNewRole(guild)
-            && serverHasRoomForNewChannels(guild, playerCount);
-    }
-
-    private static boolean serverHasRoomForNewRole(Guild guild) {
-        int roleCount = guild.getRoles().size();
-        if (roleCount >= 250) {
-            BotLogger.log("`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean serverHasRoomForNewChannels(Guild guild, int playerCount) {
-        int channelCount = guild.getChannels().size();
-        int channelMax = 500;
-        int channelsCountRequiredForNewGame = 2 + playerCount;
-        if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
-            BotLogger.log("`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
-            return false;
-        }
-        return true;
-    }
 }

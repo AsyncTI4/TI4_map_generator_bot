@@ -3,6 +3,7 @@ package ti4.service.game;
 import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,6 +47,7 @@ import ti4.message.MessageHelper;
 import ti4.service.image.FileUploadService;
 import ti4.service.option.GameOptionService;
 import ti4.settings.GlobalSettings;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class CreateGameService {
@@ -635,5 +637,29 @@ public class CreateGameService {
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }
+    }
+
+    public static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
+        Member member = event.getMember();
+        if (member != null) {
+            List<Role> roles = member.getRoles();
+            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+                if (roles.contains(role)) {
+                    return false;
+                }
+            }
+        }
+
+        var userSettings = UserSettingsManager.get(event.getUser().getId());
+        if (userSettings.isLockedFromCreatingGames()) {
+            return true;
+        }
+        userSettings.setLockedFromCreatingGamesUntil(LocalDateTime.now().plusMinutes(10));
+        UserSettingsManager.save(userSettings);
+        return false;
+    }
+
+    public static boolean isGameCreationAllowed() {
+        return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
     }
 }

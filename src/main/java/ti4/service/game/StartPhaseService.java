@@ -575,7 +575,7 @@ public class StartPhaseService {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Strategy Phase");
             message2 += """
                 This is the moment when you should resolve:\s
-                -_Political Stability_\s
+                - _Political Stability_\s
                 - _Summit_\s
                 - _Manipulate Investments_
                 Please click the "Ready For Strategy Phase" button once you are done resolving these or if you decline to do so.""";
