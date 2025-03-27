@@ -126,6 +126,10 @@ public class PickStrategyCardService {
 
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
+            if (allPicked) {
+                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your "
+                    + "1st turn of round " + game.getRound() + ").";
+            }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
