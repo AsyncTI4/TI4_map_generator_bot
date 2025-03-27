@@ -247,8 +247,8 @@ public class MessageListener extends ListenerAdapter {
      * replicate messages in combat threads so that observers can see
      */
     private static void handleFogOfWarCombatThreadMirroring(MessageReceivedEvent event) {
-        if (!AsyncTI4DiscordBot.fowServers.isEmpty() && // fog servers exists
-            !AsyncTI4DiscordBot.fowServers.contains(event.getGuild()) && // event server IS NOT the fog server
+        if (AsyncTI4DiscordBot.guildFogOfWar != null && // fog server exists
+            !AsyncTI4DiscordBot.guildFogOfWar.getId().equals(event.getGuild().getId()) && // event server IS NOT the fog server
             !AsyncTI4DiscordBot.guildCommunityPlays.getId().equals(event.getGuild().getId()) && // NOR the community server
             AsyncTI4DiscordBot.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {// bot is running in production
             return;
