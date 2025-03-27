@@ -8,3 +8,9 @@ These units are not purely intended to rebalance or strengthen/nerf any particul
 
 [Rules Document](https://drive.google.com/file/d/1aTKWtu7kmIHXU2BoS4HYFC8VUnTU6EvD/view)
 [Monuments Google Drive folder](https://drive.google.com/drive/folders/1kqtY943syNMRsM1ijmHfymCxVVWxYUJq)
+
+## Async Setup
+For now, to get started, use the following commands:
+1. `/game set_deck strategyCard_set: monuments`
+2. `/franken unit_add unit_id: your_factions_monument`
+One day, we'll automate this...
