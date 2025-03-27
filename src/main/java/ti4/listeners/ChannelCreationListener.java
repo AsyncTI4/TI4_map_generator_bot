@@ -41,8 +41,9 @@ public class ChannelCreationListener extends ListenerAdapter {
         } else if (parentName.equalsIgnoreCase(FOW_MAKING_GAMES_CHANNEL) && !hasTag(channel, FOW_REPLACEMENT_TAG)) {
             String message =
                 """
-                To launch a new game, list your players and the GM, \
-                then ping @Bothelper for them to create the game channels for you.
+                To launch a new Fog of War game, please run the command `/fow create_fow_game_button`, \
+                filling in the players, GM and fun game name. This will create a button that you may press to launch the game after confirming the members \
+                are correct.
                 """;
             channel.sendMessage(message).queueAfter(5, TimeUnit.SECONDS);
         }

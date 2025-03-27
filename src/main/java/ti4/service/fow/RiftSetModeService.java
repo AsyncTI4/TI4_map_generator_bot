@@ -73,7 +73,7 @@ public class RiftSetModeService {
     private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 25; // 1/25
 
     public static boolean activate(GenericInteractionCreateEvent event, Game game) {
-        if (game.getPlayer(Constants.eronousId) == null && AsyncTI4DiscordBot.guildFogOfWar != null) {
+        if (game.getPlayer(Constants.eronousId) == null && !AsyncTI4DiscordBot.fowServers.isEmpty()) {
             MessageHelper.replyToMessage(event, "Can only use RiftSetMode if Eronous is in the game.");
             return false;
         }

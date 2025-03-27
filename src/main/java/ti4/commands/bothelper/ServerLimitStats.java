@@ -21,7 +21,7 @@ class ServerLimitStats extends Subcommand {
 
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
-        boolean isFoWGuild = AsyncTI4DiscordBot.guildFogOfWar.getId().equals(event.getGuild().getId());
+        boolean isFoWGuild = AsyncTI4DiscordBot.fowServers.contains(event.getGuild());
 
         int memberCount = guild.getMemberCount();
         int roomForGames;
