@@ -1,25 +1,19 @@
 package ti4.buttons.handlers.game;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
-import ti4.settings.GlobalSettings;
-import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 class CreateGameButtonHandler {
@@ -32,14 +26,13 @@ class CreateGameButtonHandler {
     private static void createGameChannels(ButtonInteractionEvent event) {
         MessageHelper.sendMessageToEventChannel(event, event.getUser().getEffectiveName() + " pressed the [Create Game] button");
 
-        boolean gameCreationAllowed = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
-        if (!gameCreationAllowed) {
+        if (!CreateGameService.isGameCreationAllowed()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Admins have temporarily turned off game creation, " +
                 "most likely to contain a bug. Please be patient and they'll get back to you on when it's fixed.");
             return;
         }
 
-        if (isLockedFromCreatingGames(event)) {
+        if (CreateGameService.isLockedFromCreatingGames(event)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "You created a game within the last 10 minutes and thus are being stopped from creating more until some time " +
                     "has passed. You can have someone else in the game press the button instead.");
@@ -103,23 +96,4 @@ class CreateGameButtonHandler {
         }
     }
 
-    private static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
-        Member member = event.getMember();
-        if (member != null) {
-            List<Role> roles = member.getRoles();
-            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
-                if (roles.contains(role)) {
-                    return false;
-                }
-            }
-        }
-
-        var userSettings = UserSettingsManager.get(event.getUser().getId());
-        if (userSettings.isLockedFromCreatingGames()) {
-            return true;
-        }
-        userSettings.setLockedFromCreatingGamesUntil(LocalDateTime.now().plusMinutes(10));
-        UserSettingsManager.save(userSettings);
-        return false;
-    }
 }
