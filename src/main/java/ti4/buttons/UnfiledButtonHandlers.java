@@ -1047,6 +1047,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 RevealPublicObjectiveService.revealS2(game, event, event.getChannel());
             } else if ("2x2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealTwoStage2(game, event, event.getChannel());
+            } else if ("none".equalsIgnoreCase(stage)) {
+                //continue without revealing anything
             } else {
                 RevealPublicObjectiveService.revealS1(game, event, event.getChannel());
             }
@@ -1844,11 +1846,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     }
                 }
                 if (game.getRound() > 7 || game.getPublicObjectives2Peakable().isEmpty()) {
-                    message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
-                    message2 += " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
+                    if (game.isFowMode()) {
+                        message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
+                        message2 += " Or end the game manually.";
+                        buttons.add(Buttons.green("reveal_none", "Continue without revealing"));
+                    } else {
+                        message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
+                        message2 += " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
 
-                    buttons.add(Buttons.red("gameEnd", "End Game"));
-                    if (!game.isFowMode()) {
+                        buttons.add(Buttons.red("gameEnd", "End Game"));
                         buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
                     }
                 }

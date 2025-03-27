@@ -2038,10 +2038,12 @@ public class ButtonHelper {
             String faction = whatIsItFor.replace("mahactAgent", "");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             player = game.getPlayerFromColorOrFaction(faction);
-            msg = player.getRepresentationUnfogged() + " this is a notice that " + msg + " using "
-                + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            msg = player.getRepresentationUnfogged() + " this is a notice that " + msg;
+            if (!game.isFowMode()) {
+                msg += " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent.";
+            }
         }
 
         RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
