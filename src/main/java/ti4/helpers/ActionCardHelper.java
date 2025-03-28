@@ -895,7 +895,7 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, removeRepresentationIfFOW(introMsg, player, game)
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, player.getRepresentation(false,true)
                         + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
                 }
                 if (automationID.equals("hack")) {

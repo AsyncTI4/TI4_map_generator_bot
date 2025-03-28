@@ -366,7 +366,7 @@ public class StartTurnService {
         startButtons.add(Buttons.gray("showMap", "Show Map"));
         startButtons.add(Buttons.gray("showPlayerAreas", "Show Player Areas"));
         if (!confirmed2ndAction && doneActionThisTurn) {
-            startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Peform Another Action"));
+            startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
         }
         return startButtons;
     }
