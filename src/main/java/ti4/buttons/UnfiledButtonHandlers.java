@@ -1,5 +1,7 @@
 package ti4.buttons;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +12,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 
@@ -974,7 +975,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = false;
         if (bID.startsWith("dsdihmy_")) {
-            bID = bID.replace("dsdihmy_", "");
             dsdihmy = true;
         }
         String[] info = bID.split("_");
@@ -1028,7 +1028,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            if (!game.getStoredValue("newStatusScoringMode").isEmpty() && game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
+            if (game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
                 StringBuilder missingPeople = new StringBuilder();
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");

@@ -543,9 +543,9 @@ public class ButtonHelperActionCards {
     }
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
-        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to resolve parleey on.";
+        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to resolve parley on. If it's not present (because the opponent took it already), try pressing UNDO, then /planet add it back to yourself, then try again";
         List<Button> buttons = new ArrayList<>();
-        for (String planet : player.getExhaustedPlanets()) {
+        for (String planet : player.getPlanets()) {
             buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix()+"resolveParleyStep2_" + planet,
                 Helper.getPlanetRepresentation(planet, game)));
         }

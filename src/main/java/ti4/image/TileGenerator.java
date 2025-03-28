@@ -437,7 +437,8 @@ public class TileGenerator {
                             textModifer = 0;
                         }
                         List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
-                        
+                        BufferedImage carrierImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("capacity_representation.png"), 64, 21);
+
                         int xMod;
                         int yMod = -290;
                         if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
@@ -468,26 +469,26 @@ public class TileGenerator {
                             gearY = gearY-55;
                         }
                        
-                        g2d.setColor(new Color(128, 197, 222));  
-                        g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);   
-                        g2d.setColor(new Color(122, 127, 128)); 
+                        //g2d.setColor(new Color(128, 197, 222));  
+                        //g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);   
+                        //g2d.setColor(new Color(122, 127, 128)); 
 
                 
-                        g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);  
+                        //g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);  
                         
                         // Right side  
-                        g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);  
+                        //g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);  
                         
                         // Bottom side  
-                        g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);  
-                        // tileGraphics.drawImage(basketImage, TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29+40, TILE_PADDING + TILE_POSITION_POINT.y + yMod - 4+64, null);
+                        //g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);  
+                        tileGraphics.drawImage(carrierImage, gearX+24, gearY+60, null);
                         g2d.setColor(Color.WHITE);  
                         tileGraphics.setFont(Storage.getFont12());
                         String msg = capacityUsed + " / "+capacity;
                         if(ignoredFs > 0){
                             msg = capacityUsed + " / "+(capacity+ignoredFs)+"*";
                         }
-                        DrawingUtil.superDrawString(tileGraphics, msg, gearX + 39 +17, gearY+100, Color.WHITE, HorizontalAlign.Center, null, stroke4, Color.BLACK);
+                        DrawingUtil.superDrawString(tileGraphics, msg, gearX + 39 +17, gearY+95, Color.WHITE, HorizontalAlign.Center, null, stroke4, Color.BLACK);
                         
                     }
                 }
