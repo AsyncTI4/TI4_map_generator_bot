@@ -2032,8 +2032,8 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
-        String ident = game.isFowMode() ? player.getFactionEmojiOrColor() : player.getRepresentationNoPing();
-        String msg = ident + " removed command token from " + tileRep + ".";
+        String ident = game.isFowMode() ? "someone" : player.getRepresentationNoPing();
+        String msg = ident + " removed your command token from " + tileRep + ".";
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -2065,7 +2065,7 @@ public class ButtonHelper {
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn.",
                 conclusionButtons);
-        } else {
+        } else if (!game.isFowMode() || FoWHelper.playerIsInSystem(game, tile, player, false)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
 
