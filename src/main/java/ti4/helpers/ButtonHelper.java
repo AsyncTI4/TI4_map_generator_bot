@@ -879,8 +879,8 @@ public class ButtonHelper {
 
     public static int resolveOnActivationEnemyAbilities(Game game, Tile activeSystem, Player player, boolean justChecking, ButtonInteractionEvent event) {
         int numberOfAbilities = 0;
-        if (activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "# " + player.getRepresentation() + " this is a __friendly__ reminder that you do not have antimass deflectors");
+        if (!game.isFowMode() && activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + player.getRepresentation() + " this is a __friendly__ reminder that you do not have antimass deflectors");
         }
         if (game.isL1Hero()) {
             return 0;
