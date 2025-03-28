@@ -294,6 +294,9 @@ public class Helper {
     }
 
     public static String getNewStatusScoringRepresentation(Game game) {
+        if(game.getPhaseOfGame().equalsIgnoreCase("action")){
+            return "";
+        }
         StringBuilder rep = new StringBuilder("# __Scoring Summary__\n");
         if (game.getRealPlayers().size() > 10) {
             return "This game is too large to display a scoring summary";
