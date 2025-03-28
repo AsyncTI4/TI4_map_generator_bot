@@ -93,7 +93,7 @@
         "alias": "bounty",
         "name": "Bounty",
         "phase": "Action",
-        "window": "After 1 of your opponent's units with a cost of 2 or more is destroyed",
+        "window": "After 1 of your opponent's units with a cost of 3 or more is destroyed",
         "text": "Gain 4 trade goods.",
         "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
         "source": "action_deck_2"
@@ -320,7 +320,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose another player with the most victory points. Either look at 1 of that player's unscored secret objectives, at random, or their action cards.",
+        "text": "Choose another player. That player shows you either 1 random secret objective from their hand or their hand of action cards.",
         "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
@@ -395,7 +395,7 @@
         "alias": "flawless_strategy",
         "name": "Flawless Strategy",
         "phase": "Action",
-        "window": "After you exhaust a strategy card",
+        "window": "After you exhaust your strategy card",
         "text": "Resolve the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
         "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
         "source": "action_deck_2"
@@ -676,7 +676,7 @@
         "name": "Project Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, take up to 2 action cards from the discard pile.",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose up to 2 action cards in the discard pile. If your prediction is correct, take those cards.",
         "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of governments and favors owed in many more.",
         "source": "action_deck_2"
     },
