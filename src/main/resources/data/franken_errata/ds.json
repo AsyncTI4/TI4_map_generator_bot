@@ -1,234 +1,694 @@
 [
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "military_industrial_complex",
-    "AdditionalComponents": [
-      "Arms Dealer"
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “military_industrial_complex”,
+    “AdditionalComponents”: [
+        “Arms Dealer”
     ],
-    "OptionalSwaps": [
-      "Designer TckVsk",
-      "Demi-Queen Mdcksssk"
+    “OptionalSwaps”: [
+        “Designer TckVsk”,
+        “Demi-Queen Mdcksssk”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "arms_dealers",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "COMMANDER",
-    "ItemID": "axiscommander",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "HERO",
-    "ItemID": "axishero",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "ancient_blueprints",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "FLAGSHIP",
-    "ItemID": "bentor_flagship",
-    "AdditionalComponents": [
-      "Ancient Blueprints"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “arms_dealers”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “COMMANDER”,
+    “ItemID”: “axiscommander”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “axishero”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “ancient_blueprints”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+"{
+    “ItemCategory”: “FLAGSHIP”,
+    “ItemID”: “bentor_flagship”,
+    “AdditionalComponents”: [
+        “Ancient Blueprints”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "AGENT",
-    "ItemID": "bentoragent",
-    "AdditionalComponents": [
-      "Ancient Blueprints"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “AGENT”,
+    “ItemID”: “bentoragent”,
+    “AdditionalComponents”: [
+        “Ancient Blueprints”
     ],
-    "OptionalSwaps": [
-      "C.M.O. Ranc"
+    “OptionalSwaps”: [
+        “C.M.O. Ranc”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "COMMANDER",
-    "ItemID": "bentorcommander",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "MECH",
-    "ItemID": "bentor_mech",
-    "AdditionalComponents": [
-      "Ancient Blueprints"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “COMMANDER”,
+    “ItemID”: “bentorcommander”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “bentor_mech”,
+    “AdditionalComponents”: [
+        “Ancient Blueprints”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "byssus",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "AGENT",
-    "ItemID": "cheiranagent",
-    "OptionalSwaps": [
-      "Byssus"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “byssus”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “AGENT”,
+    “ItemID”: “cheiranagent”,
+    “OptionalSwaps”: [
+        “Byssus”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "autonetic_memory",
-    "AdditionalComponents": [
-      "Cybernetic Madness"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “autonetic_memory”,
+    “AdditionalComponents”: [
+        “Cybernetic Madness”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "cybernetic_madness",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "flotilla",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "decree",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "radiance",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "MECH",
-    "ItemID": "edyn_mech",
-    "OptionalSwaps": [
-      "Radiance",
-      "Decree"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “cybernetic_madness”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “flotilla”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “decree”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “radiance”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “edyn_mech”,
+    “OptionalSwaps”: [
+        “Radiance”,
+        “Decree”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "rally_to_the_cause",
-    "OptionalSwaps": [
-      "Liberator"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “rally_to_the_cause”,
+    “OptionalSwaps”: [
+        “Liberator”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "diplomats",
-    "AdditionalComponents": [
-      "Free People"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “diplomats”,
+    “AdditionalComponents”: [
+        “Free People”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "free_people",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "HOMESYSTEM",
-    "ItemID": "freesystems",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "MECH",
-    "ItemID": "freesystems_mech",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "the_lady_and_the_lord",
-    "AdditionalComponents": [
-      "The Lady"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “free_people”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HOMESYSTEM”,
+    “ItemID”: “freesystems”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “freesystems_mech”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “the_lady_and_the_lord”,
+    “AdditionalComponents”: [
+        “The Lady”
     ],
-    "OptionalSwaps": [
-      "Jarl Vel & Jarl Jotrun",
-      "Raze Order",
-      "Destiny Drive"
+    “OptionalSwaps”: [
+        “Jarl Vel & Jarl Jotrun”,
+        “Raze Order”,
+        “Destiny Drive”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "FLAGSHIP",
-    "ItemID": "ghemina_flagship_lady",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "COMMANDER",
-    "ItemID": "gheminacommander",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "HERO",
-    "ItemID": "gheminaherolady",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "HERO",
-    "ItemID": "gheminaherolord",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "mobile_command",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "abyssal_embrace",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "spawning_grounds",
-    "AdditionalComponents": [
-      "Ghoti Planet Card"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “FLAGSHIP”,
+    “ItemID”: “ghemina_flagship_lady”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “COMMANDER”,
+    “ItemID”: “gheminacommander”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “gheminaherolady”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “gheminaherolord”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “mobile_command”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “abyssal_embrace”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “spawning_grounds”,
+    “AdditionalComponents”: [
+        “Ghoti Planet Card”
     ],
-    "OptionalSwaps": [
-      "Mobile Command"
+    “OptionalSwaps”: [
+        “Mobile Command”
     ],
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "HOMESYSTEM",
-    "ItemID": "ghoti",
-    "Undraftable": true,
-    "source": "ds"
-  },
-  {
-    "ItemCategory": "ABILITY",
-    "ItemID": "mantle_cracking",
-    "AdditionalComponents": [
-      "Celestial Reclamation"
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HOMESYSTEM”,
+    “ItemID”: “ghoti”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “mantle_cracking”,
+    “AdditionalComponents”: [
+        “Celestial Reclamation”
     ],
-    "source": "ds"
-  }
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “celestial_reclamation”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “oracle_ai”,
+    “AdditionalComponents”: [
+        “Limited Vision”,
+        “Probability Algorithms”
+    ],
+    “OptionalSwaps”: [
+        “Read the Fates”,
+        “Synchronicity Algorithm”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “limited_vision”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “probability_algorithms”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “PN”,
+    “ItemID”: “dspnauge”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “augershero”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “glory”,
+    “AdditionalComponents”: [
+        “Valor”
+    ],
+    “OptionalSwaps”: [
+        “Heroism”,
+        “Hulgade’s Hammer”,
+        “Zhrgar Stimulants”,
+        “Merkismathr Asvand”,
+        “Sdallari Tvungovot”,
+        “A Tale of Legends”,
+        “Skald”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “heroism”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “valor”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “FLAGSHIP”,
+    “ItemID”: “kjalengard_flagship”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “TECH”,
+    “ItemID”: “dskjalg”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “AGENT”,
+    “ItemID”: “kjalengardagent”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “COMMANDER”,
+    “ItemID”: “kjalengardcommander”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “kjalengardhero”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “kjalengard_mech”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “cloaked_fleets”,
+    “AdditionalComponents”: [
+        “Shroud of Lith”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “shroud_of_lith”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “contagion”,
+    “AdditionalComponents”: [
+        “Plague Reservoir”,
+        “Subversive”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “plague_reservoir”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “subversive”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “a_new_edifice”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “COMMANDER”,
+    “ItemID”: “lanefircommander”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “cunning”,
+    “AdditionalComponents”: [
+        “Subterfuge”
+    ],
+    “OptionalSwaps”: [
+        “Dhume Tathu”,
+        “Khaz-Rin Li”,
+        “Oro-Zhin Elite”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “subterfuge”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “COMMANDER”,
+    “ItemID”: “lizhocommander”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “lizhohero”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “lizho_mech”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “STARTINGFLEET”,
+    “ItemID”: “3 cr,ff,3 inf b,sd b,pds b”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “privileged_citizenry”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “TECH”,
+    “ItemID”: “dsmirvpds”,
+    “AdditionalComponents”: [
+        “Privileged Citizenry”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “prescient_memories”,
+    “AdditionalComponents”: [
+        “Divination”
+    ],
+    “OptionalSwaps”: [
+        “Lactarius Indigo”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “divination”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “COMMODITIES”,
+    “ItemID”: “1”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “AGENT”,
+    “ItemID”: “mykomentoriagent”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “singularity_point”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HOMESYSTEM”,
+    “ItemID”: “d25”,
+    “OptionalSwaps”: [
+        “Celestial Guides”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “TECH”,
+    “ItemID”: “dsnivymf”,
+    “AdditionalComponents”: [
+        “Singularity Point”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “nivyn_mech”,
+    “OptionalSwaps”: [
+        “Voidflare Warden II”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “hired_guns”,
+    “AdditionalComponents”: [
+        “Desperados”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “desperados”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “olradinhero”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “policies”,
+    “AdditionalComponents”: [
+        “Policy: The People”,
+        “Policy: The Environment”,
+        “Policy: The Economy”
+    ],
+    “OptionalSwaps”: [
+        “Shadow Council”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: ““,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: ““,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: ““,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “recycled_materials”,
+    “OptionalSwaps”: [
+        “Autofabricator”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “orbital_foundries”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “rohdhna_mech”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “stealth_insertion”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “tnelis_mech”,
+    “AdditionalComponents”: [
+        “Stealth Insertion”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “fine_print”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “collateralized_loans”,
+    “AdditionalComponents”: [
+        “Fine Print”
+    ],
+    “OptionalSwaps”: [
+        “Collector”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “binding_debts”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “vadenhero”,
+    “AdditionalComponents”: [
+        “Binding Debts”,
+        “Fine Print”
+    ],
+    “OptionalSwaps”: [
+        “Collector”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “MECH”,
+    “ItemID”: “vaden_mech”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “corporate_entity”,
+    “AdditionalComponents”: [
+        “Holding Company”,
+        “Branch Office Promissory Notes”
+    ],
+    “OptionalSwaps”: [
+        “Auberon Elyrin”,
+        “Vera Khage”
+    ],
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “holding_company”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “targeted_acquisition”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “PN”,
+    “ItemID”: “dspnveld1\”, \”dspnveld2\”, \”dspnveld3\”, \”dspnveld4\”“,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “COMMANDER”,
+    “ItemID”: “veldyrcommander”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HERO”,
+    “ItemID”: “veldyrhero”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “biophobic”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “ABILITY”,
+    “ItemID”: “paranoia”,
+    “Undraftable”: true,
+    “source”: “ds”
+}",
+  "{
+    “ItemCategory”: “HOMESYSTEM”,
+    “ItemID”: “d12”,
+    “AdditionalComponents”: [
+        “Paranoia”
+    ],
+    “source”: “ds”
+}"
+  
+
+
+  
 ]
