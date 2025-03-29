@@ -7,11 +7,6 @@
     },
     {
         "ItemCategory": "TECH",
-        "ItemId": "arborec_infantry",
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "TECH",
         "ItemId": "lw2",
         "AdditionalComponents": [
             "ABILITY:mitosis"
@@ -94,16 +89,6 @@
         "OptionalSwaps": [
             "MECH:sol_mech"
         ],
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "TECH",
-        "ItemId": "sol_carrier",
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "TECH",
-        "ItemId": "sol_infantry",
         "source": "pok"
     },
     {
