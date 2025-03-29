@@ -882,10 +882,10 @@ public class ExploreService {
     }
 
     public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide) {
-        secondHalfOfExpInfo(types, event, player, game, overRide, false);
+        secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, overRide, false);
     }
 
-    public static void secondHalfOfExpInfo(List<String> types, GenericInteractionCreateEvent event, Player player, Game game, boolean overRide, boolean fullText) {
+    public static void secondHalfOfExpInfo(List<String> types, MessageChannel channel, Player player, Game game, boolean overRide, boolean fullText) {
         if (!RiftSetModeService.deckInfoAvailable(player, game)) {
             return;
         }
@@ -914,11 +914,11 @@ public class ExploreService {
             }
 
             if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), info.toString());
+                MessageHelper.sendMessageToChannel(channel, info.toString());
             }
         }
         if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && game.isFowMode() && !overRide) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+            MessageHelper.sendMessageToChannel(channel, "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         }
     }
 

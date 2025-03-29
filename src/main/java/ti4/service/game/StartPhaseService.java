@@ -49,6 +49,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.turn.EndTurnService;
@@ -594,6 +595,7 @@ public class StartPhaseService {
 
         game.getMainGameChannel().sendMessage(messageObject).queue(message -> GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
 
+        GMService.createFOWStatusSummary(game);
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }
 

@@ -41,4 +41,15 @@ class CombatButtonHandler {
             MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), opponent.getRepresentation() + " Your opponent has voted to automate the entire combat. Press to confirm:", automate);
         }
     }
+
+    @ButtonHandler("declinePDSFOW_")
+    public static void declinePDSinFOW(Game game, Player player, String buttonID) {
+        String targetFaction = buttonID.split("_")[1];
+        Player target = game.getPlayerFromColorOrFaction(targetFaction);
+        String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON.";
+        if (target != null) {
+            MessageHelper.sendMessageToChannel(target.getCorrectChannel(), target.getRepresentationUnfogged() + " " + msg);
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+    }
 }

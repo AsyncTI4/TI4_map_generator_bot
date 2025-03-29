@@ -714,10 +714,10 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, false, true);
         } else {
             types.add(type);
-            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, false, true);
         }
         deleteMessage(event);
     }
@@ -879,8 +879,8 @@ public class ButtonHelper {
 
     public static int resolveOnActivationEnemyAbilities(Game game, Tile activeSystem, Player player, boolean justChecking, ButtonInteractionEvent event) {
         int numberOfAbilities = 0;
-        if (activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "# " + player.getRepresentation() + " this is a __friendly__ reminder that you do not have antimass deflectors");
+        if (!game.isFowMode() && activeSystem.isAsteroidField() && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + player.getRepresentation() + " this is a __friendly__ reminder that you do not have antimass deflectors");
         }
         if (game.isL1Hero()) {
             return 0;
@@ -2032,8 +2032,8 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
-        String ident = game.isFowMode() ? player.getFactionEmojiOrColor() : player.getRepresentationNoPing();
-        String msg = ident + " removed command token from " + tileRep + ".";
+        String ident = game.isFowMode() ? "someone" : player.getRepresentationNoPing();
+        String msg = ident + " removed your command token from " + tileRep + ".";
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -2065,7 +2065,7 @@ public class ButtonHelper {
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn.",
                 conclusionButtons);
-        } else {
+        } else if (!game.isFowMode() || FoWHelper.playerIsInSystem(game, tile, player, false)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
 

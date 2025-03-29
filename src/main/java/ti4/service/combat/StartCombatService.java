@@ -143,7 +143,7 @@ public class StartCombatService {
         } else {
             findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
                 threadName, tile, event, "ground", unitHolder.getName());
-            if (player2.isRealPlayer()) {
+            if (player2.getPrivateChannel() != null) {
                 findOrCreateCombatThread(game, player2.getPrivateChannel(), player2, player,
                     threadName, tile, event, "ground", unitHolder.getName());
             }
@@ -368,11 +368,8 @@ public class StartCombatService {
 
     public static void sendSpaceCannonButtonsToThread(MessageChannel threadChannel, Game game, Player activePlayer, Tile tile) {
         StringBuilder pdsMessage = new StringBuilder();
-        if (game.isFowMode()) {
-            pdsMessage.append("In fog, it is the Players' responsibility to check for PDS2\n");
-        }
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition());
-        if (playersWithPds2.isEmpty()) {
+        if (playersWithPds2.isEmpty() || (game.isFowMode() && !playersWithPds2.contains(activePlayer))) {
             return;
         }
         if (!game.isFowMode()) {
@@ -583,7 +580,7 @@ public class StartCombatService {
 
     }
 
-    private static List<Button> getSpaceCannonButtons(Game game, Player activePlayer, Tile tile) {
+    public static List<Button> getSpaceCannonButtons(Game game, Player activePlayer, Tile tile) {
         List<Button> spaceCannonButtons = new ArrayList<>();
         spaceCannonButtons.add(Buttons.gray("combatRoll_" + tile.getPosition() + "_space_spacecannonoffence",
             "Roll Space Cannon Offence"));
