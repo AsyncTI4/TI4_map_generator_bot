@@ -714,10 +714,10 @@ public class ButtonHelper {
             types.add(Constants.INDUSTRIAL);
             types.add(Constants.HAZARDOUS);
             types.add(Constants.FRONTIER);
-            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, false, true);
         } else {
             types.add(type);
-            ExploreService.secondHalfOfExpInfo(types, event, player, game, false, true);
+            ExploreService.secondHalfOfExpInfo(types, event.getMessageChannel(), player, game, false, true);
         }
         deleteMessage(event);
     }
