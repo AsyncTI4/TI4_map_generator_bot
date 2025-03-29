@@ -102,12 +102,7 @@ public class FOWCombatThreadMirroring {
                 
                 //Combat roll
                 if (isBotMessage && isCombatRoll(messageText)) {
-                  String combat = matchPattern(messageText, "rolls for\\s+([^>]+>)");
-                  String hits = matchPattern(messageText, "Total hits (\\d+)");
-
-                    newMessage += "Someone rolled dice for " + combat
-                        + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "** " : "s** ")
-                        + ":boom:".repeat(Math.max(0, Integer.parseInt(hits)));
+                    newMessage += parseCombatRollMessage(messageText);
                 }
 
                 //Retreat
@@ -141,6 +136,15 @@ public class FOWCombatThreadMirroring {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
             event.getMessage().delete().queue();
         }
+    }
+
+    public static String parseCombatRollMessage(String messageText) {
+        String combat = matchPattern(messageText, "rolls for\\s+([^>]+>)");
+        String hits = matchPattern(messageText, "Total hits (\\d+)");
+
+        return "Someone rolled dice for " + combat
+            + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "** " : "s** ")
+            + ":boom:".repeat(Math.max(0, Integer.parseInt(hits)));
     }
 
     private static boolean isAllowedBotMsg(String messageText) {
