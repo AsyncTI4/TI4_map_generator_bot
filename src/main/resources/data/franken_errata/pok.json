@@ -25,16 +25,6 @@
         "source": "pok"
     },
     {
-        "ItemCategory": "TECH",
-        "ItemId": "argent_destroyer",
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "TECH",
-        "ItemId": "saar_spacedock",
-        "source": "pok"
-    },
-    {
         "ItemCategory": "ABILITY",
         "ItemId": "star_forge",
         "OptionalSwaps": [
@@ -266,7 +256,7 @@
         "source": "pok"
     },
     {
-        "ItemCategory": "STARTINGTECH",
+        "ItemCategory": "startingTech",
         "ItemId": "sardakk",
         "Undraftable": true,
         "source": "pok"
