@@ -102,7 +102,12 @@ public class ApplicationEmojiService {
         if (cacheInitialized) return;
 
         List<CachedEmoji> cached = ApplicationEmojiCacheService.readCachedEmojis();
-        cached.forEach(c -> emojis.put(c.getName(), c));
+        if(cached.size() == 0) {
+            BotLogger.log("No cached emojis found. Initializing from Discord.");
+            resetCacheFromDiscord();
+        } else {
+            cached.forEach(c -> emojis.put(c.getName(), c));
+        }
         cacheInitialized = true;
     }
 
