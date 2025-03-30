@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +13,11 @@ public class ShipPositionModel {
 
         public String getPositions() {
             return switch (this) {
-                case TYPE01 -> "dd 208,83; ca 175,230; cv 100,225; dn 40,70; fs 145,3; ws 80,5; sd 250,190; mf 55,210; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
-                case TYPE02 -> "dd 126,138; ca 51,158; cv 186,80; dn 90,227; fs 207,5; ws 24,86; sd 164,5; mf 192,254; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
-                case TYPE03, TYPE06 -> "dd 44,196; ca 55,233; cv 124,129; dn 62,31; fs 115,222; ws 113,71; sd 122,5; mf 259,203; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
-                case TYPE04, TYPE17 -> "dd 200,75; ca 175,230; cv 100,225; dn 40,70; fs 135,10; ws 80,5; sd 250,190; mf 55,210; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
-                case TYPE05 -> "dd 126,138; ca 51,158; cv 186,80; dn 60,227; fs 207,5; ws 24,86; sd 164,5; mf 192,254; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
+                case TYPE01 -> "dd 208,83; ca 175,230; cv 100,225; dn 40,70; fs 20,118; ws 80,5; sd 250,190; mf 55,210; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
+                case TYPE02 -> "dd 126,138; ca 51,158; cv 186,80; dn 90,227; fs 30,170; ws 24,86; sd 164,5; mf 192,234; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
+                case TYPE03, TYPE06 -> "dd 24,86; ca 55,233; cv 124,129; dn 45,200; fs 115,222; ws 113,71; sd 122,5; mf 259,203; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
+                case TYPE04, TYPE17 -> "dd 200,75; ca 175,230; cv 20,150; dn 40,70; fs 135,10; ws 80,5; sd 250,190; mf 55,210; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
+                case TYPE05 -> "dd 126,138; ca 51,158; cv 186,80; dn 60,227; fs 20,150; ws 24,86; sd 164,5; mf 198,234; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE07 -> "dd 115,25; ca 115,85; cv 180,115; dn 210,190; fs 40,85; ws 60,35; sd 210,245; mf 220,55; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE08 -> "dd 140,80; ca 210,195; cv 60,210; dn 115,150; fs 20,110; ws 175,235; sd 130,255; mf 180,15; tkn_gf 270,115; tkn_gf 240,115; tkn_ff 270,150; tkn_ff 240,150";
                 case TYPE09 -> "dd 35,205; ca 65,250; cv 135,295; dn 290,180; fs 160,240; ws 230,235; sd 295,255; mf 65,65; tkn_gf 60,115; tkn_gf 30,115; tkn_ff 60,150; tkn_ff 30,150";
@@ -33,8 +33,8 @@ public class ShipPositionModel {
 
         public List<Point> getSpaceTokenLayout() {
             return switch (this) {
-                case TYPE01, TYPE10, TYPE04, TYPE17 -> List.of(new Point(195, 10), new Point(225, 75), new Point(225, 155), new Point(145, 205));
-                case TYPE02, TYPE05 -> List.of(new Point(180, 0), new Point(220, 60), new Point(45, 120), new Point(95, 170));
+                case TYPE01, TYPE10, TYPE04, TYPE17 -> List.of(new Point(225, 155),new Point(225, 75),new Point(195, 10), new Point(145, 205));
+                case TYPE02, TYPE05 -> List.of(new Point(220, 60),new Point(180, 0), new Point(45, 120), new Point(95, 170));
                 case TYPE03, TYPE06 -> List.of(new Point(250, 90), new Point(80, 10), new Point(135, 105), new Point(80, 185));
                 case TYPE07, TYPE11, TYPE12, TYPE13, TYPE14, TYPE15, TYPE16 -> null;
                 case TYPE08 -> List.of(new Point(190, 30), new Point(215, 110), new Point(185, 205), new Point(100, 90), new Point(60, 130));
