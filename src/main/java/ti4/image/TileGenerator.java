@@ -376,13 +376,13 @@ public class TileGenerator {
                 List<Rectangle> rectangles = new ArrayList<>();
                 Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
                 UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
-
                 if (spaceUnitHolder != null) {
                     addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileGenerator::isValidCustodianToken, game);
                     addToken(tile, tileGraphics, spaceUnitHolder, game);
                     unitHolders.remove(spaceUnitHolder);
                     unitHolders.add(spaceUnitHolder);
                 }
+                
                 int prodInSystem = 0;
                 int capacity = 0;
                 int capacityUsed = 0;
@@ -493,11 +493,13 @@ public class TileGenerator {
                     }
                 }
 
+                
                 if (spaceUnitHolder != null) {
                     addCC(tile, tileGraphics, spaceUnitHolder);
                 }
                 int degree = 180;
                 int degreeChange = 5;
+
                 for (UnitHolder unitHolder : unitHolders) {
                     int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS
                         : Constants.RADIUS;

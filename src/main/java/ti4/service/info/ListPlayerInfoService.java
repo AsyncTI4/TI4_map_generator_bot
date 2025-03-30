@@ -259,7 +259,7 @@ public class ListPlayerInfoService {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
                 if (secret) {
-                    if (game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
+                    if (game.didPlayerScoreThisAlready(player.getUserID(), objID) || game.didPlayerScoreThisAlready(player.getUserID(),Mapper.getSecretObjectivesJustNames().get(objID))) {
                         representation.append("✅  ");
                     } else {
                         if (getObjectiveThreshold(objID, game) > 0) {
