@@ -241,7 +241,7 @@
         "source": "pok"
     },
     {
-        "ItemCategory": "startingTech",
+        "ItemCategory": "STARTINGTECH",
         "ItemId": "sardakk",
         "Undraftable": true,
         "source": "pok"
