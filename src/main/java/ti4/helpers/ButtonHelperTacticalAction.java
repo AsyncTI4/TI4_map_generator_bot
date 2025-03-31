@@ -487,7 +487,7 @@ public class ButtonHelperTacticalAction {
                 + "There are players with Space Cannon Offence coverage in this system.\n"
                 + "Please resolve those before continuing or float the window if unrelevant.");
             List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
-            spaceCannonButtons.add(Buttons.red("declinePDSFOW_" + player.getFaction(), "Decline PDS"));
+            spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
             for (Player playerWithPds : playersWithPds2) {
                 MessageHelper.sendMessageToChannelWithButtons(playerWithPds.getCorrectChannel(), title + playerWithPds.getRepresentationUnfogged() 
                   + " you have PDS coverage in " + tile.getRepresentation() + ", use buttons to resolve:", spaceCannonButtons);

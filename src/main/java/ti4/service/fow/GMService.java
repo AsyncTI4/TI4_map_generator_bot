@@ -16,6 +16,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RelicHelper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -159,7 +160,7 @@ public class GMService {
             for (ThreadChannel thread : archivedThreads) {
                 if (thread.getName().equals(STATUS_SUMMARY_THREAD)) {
                     thread.getManager().setArchived(false).queue(success -> {
-                        sendExploreInfo(game, thread);
+                        sendSummary(game, thread);
                         return;
                     });
                 }
@@ -178,10 +179,10 @@ public class GMService {
         if (summaryThread == null) {
             summaryThread = mainChannel.createThreadChannel(STATUS_SUMMARY_THREAD).complete();
         }
-        sendExploreInfo(game, summaryThread);
+        sendSummary(game, summaryThread);
     }
 
-    private static void sendExploreInfo(Game game, ThreadChannel summaryThread) {
+    private static void sendSummary(Game game, ThreadChannel summaryThread) {
         MessageHelper.sendMessageToChannel(summaryThread, "# Round " + game.getRound() + " Status Summary " + game.getPing());
         List<String> types = new ArrayList<>();
         types.add(Constants.CULTURAL);
@@ -189,5 +190,7 @@ public class GMService {
         types.add(Constants.HAZARDOUS);
         types.add(Constants.FRONTIER);
         ExploreService.secondHalfOfExpInfo(types, summaryThread, null, game, true, false);
+       
+        RelicHelper.showRemaining(summaryThread, true, game, null);
     }
 }
