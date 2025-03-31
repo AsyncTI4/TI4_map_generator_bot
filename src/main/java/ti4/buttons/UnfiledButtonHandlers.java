@@ -1654,7 +1654,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
-            if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare"))) {
+            if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare") ||buttonID.contains("anarchy7Build"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             player.resetSpentThings();
