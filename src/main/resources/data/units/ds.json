@@ -1166,7 +1166,7 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "After each round of space combat in this system, place 1 fighter from your reinforcements in this system.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/flagships/nemsys.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/flagships/nexus.jpg?raw=true"
     },
     {
         "id": "mirveda_mech",
