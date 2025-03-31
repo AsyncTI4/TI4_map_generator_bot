@@ -815,6 +815,28 @@ public class Helper {
         }
         return scButtons;
     }
+    public static List<Integer> getRemainingSCs(Game game) {
+        List<Integer> scButtons = new ArrayList<>();
+
+        for (Integer sc : game.getSCList()) {
+            if (sc <= 0)
+                continue; // some older games have a 0 in the list of SCs
+            boolean held = false;
+            for (Player player : game.getPlayers().values()) {
+                if (player == null || player.getFaction() == null) {
+                    continue;
+                }
+                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFowMode()) {
+                    held = true;
+                    break;
+                }
+            }
+            if (held)
+                continue;
+            scButtons.add(sc);
+        }
+        return scButtons;
+    }
 
     public static List<Button> getPlanetExhaustButtons(Player player, Game game) {
         return getPlanetExhaustButtons(player, game, "both");
@@ -2200,7 +2222,7 @@ public class Helper {
         }
     }
 
-    public static void reverseSpeakerOrder() {
+    public static void reverseSpeakerOrder(Game game) {
         Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
         Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
         List<Player> sortedPlayers1 = game.getRealPlayers();
