@@ -708,51 +708,47 @@ public class StartCombatService {
             }
         }
 
-        Player ghemina = Helper.getPlayerFromUnlockedLeader(game, "gheminaagent");
-        if (!game.isFowMode() && ghemina != null && ghemina.hasUnexhaustedLeader("gheminaagent")) {
-            String finChecker = "FFCC_" + ghemina.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "exhaustAgent_gheminaagent", "Use Ghemina Agents", FactionEmojis.ghemina));
+
+        for(Player agentHolder : game.getRealPlayers()){
+            String finChecker = "FFCC_" + agentHolder.getFaction() + "_";
+
+            if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("titansagent")) {
+                buttons.add(Buttons.gray(finChecker + "exhaustAgent_titansagent", "Use Titans "+(agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")+"Agent", FactionEmojis.Titans));
+            }
+            if ((!game.isFowMode() || agentHolder == p1)  && agentHolder.hasUnexhaustedLeader("gheminaagent")) {
+                buttons.add(Buttons.gray(finChecker + "exhaustAgent_gheminaagent", "Use "+ (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")+"Ghemina Agents", FactionEmojis.ghemina));
+            }
+
+            if ((!game.isFowMode() || agentHolder == p1)  && agentHolder.hasUnexhaustedLeader("kjalengardagent")) {
+                buttons.add(Buttons.gray(finChecker + "exhaustAgent_kjalengardagent", "Use "+ (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")+"Kjalengard Agent", FactionEmojis.kjalengard));
+            }
+
+            if ((!game.isFowMode() || agentHolder == p1)  && agentHolder.hasUnexhaustedLeader("solagent") && isGroundCombat) {
+                buttons.add(Buttons.gray(finChecker + "getAgentSelection_solagent", "Use "+ (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")+"Sol Agent", FactionEmojis.Sol));
+            }
+
+            if ((!game.isFowMode() || agentHolder == p1)  && agentHolder.hasUnexhaustedLeader("kyroagent") && isGroundCombat) {
+                buttons.add(Buttons.gray(finChecker + "getAgentSelection_kyroagent", "Use "+ (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")+"Kyro Agent", FactionEmojis.kyro));
+            }
+
+            if ((!game.isFowMode() || agentHolder == p1)  && agentHolder.hasUnexhaustedLeader("letnevagent") && "space".equalsIgnoreCase(groundOrSpace)) {
+                buttons.add(Buttons.gray(finChecker + "getAgentSelection_letnevagent", "Use "+ (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")+"Letnev Agent", FactionEmojis.Letnev));
+            }
+            
+            if ((!game.isFowMode() || agentHolder == p1)  && agentHolder.hasUnexhaustedLeader("nomadagentthundarian")) {
+                buttons.add(Buttons.gray(finChecker + "exhaustAgent_nomadagentthundarian", "Use "+ (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")+"The Thundarian", FactionEmojis.Nomad));
+            }
+
+            if ((!game.isFowMode() || agentHolder == p1)  && agentHolder.hasUnexhaustedLeader("yinagent")) {
+                buttons.add(Buttons.gray(finChecker + "yinagent_" + pos, "Use "+ (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")+"Yin Agent", FactionEmojis.Yin));
+            }
         }
 
-        Player khal = Helper.getPlayerFromUnlockedLeader(game, "kjalengardagent");
-        if (!game.isFowMode() && khal != null && khal.hasUnexhaustedLeader("kjalengardagent")) {
-            String finChecker = "FFCC_" + khal.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "exhaustAgent_kjalengardagent", "Use Kjalengard Agent", FactionEmojis.kjalengard));
-        }
-
-        Player sol = Helper.getPlayerFromUnlockedLeader(game, "solagent");
-        if (!game.isFowMode() && sol != null && sol.hasUnexhaustedLeader("solagent") && isGroundCombat) {
-            String finChecker = "FFCC_" + sol.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "getAgentSelection_solagent", "Use Sol Agent", FactionEmojis.Sol));
-        }
-
-        Player kyro = Helper.getPlayerFromUnlockedLeader(game, "kyroagent");
-        if (!game.isFowMode() && kyro != null && kyro.hasUnexhaustedLeader("kyroagent") && isGroundCombat) {
-            String finChecker = "FFCC_" + kyro.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "getAgentSelection_kyroagent", "Use Kyro Agent", FactionEmojis.kyro));
-        }
-
-        Player letnev = Helper.getPlayerFromUnlockedLeader(game, "letnevagent");
-        if ((!game.isFowMode() || letnev == p1) && letnev != null && letnev.hasUnexhaustedLeader("letnevagent") && "space".equalsIgnoreCase(groundOrSpace)) {
-            buttons.add(Buttons.gray(letnev.finChecker() + "getAgentSelection_letnevagent", "Use Letnev Agent", FactionEmojis.Letnev));
-        }
         // Exo 2s
         if ("space".equalsIgnoreCase(groundOrSpace) && !game.isFowMode()) {
             if ((tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Dreadnought, p1.getColor()) > 0 && p1.hasTech("exo2")) || (tile.getSpaceUnitHolder().getUnitCount(Units.UnitType.Dreadnought, p2.getColor()) > 0 && p2.hasTech("exo2"))) {
                 buttons.add(Buttons.blue("assCannonNDihmohn_exo_" + tile.getPosition(), "Use Exotrireme II Ability", FactionEmojis.Sardakk));
             }
-        }
-
-        Player nomad = Helper.getPlayerFromUnlockedLeader(game, "nomadagentthundarian");
-        if ((!game.isFowMode() || nomad == p1) && nomad != null && nomad.hasUnexhaustedLeader("nomadagentthundarian")) {
-            String finChecker = "FFCC_" + nomad.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "exhaustAgent_nomadagentthundarian", "Use The Thundarian", FactionEmojis.Nomad));
-        }
-
-        Player yin = Helper.getPlayerFromUnlockedLeader(game, "yinagent");
-        if ((!game.isFowMode() || yin == p1) && yin != null && yin.hasUnexhaustedLeader("yinagent")) {
-            String finChecker = "FFCC_" + yin.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "yinagent_" + pos, "Use Yin Agent", FactionEmojis.Yin));
         }
 
         if ((p2.hasUnexhaustedLeader("kortaliagent")) && !game.isFowMode() && isGroundCombat

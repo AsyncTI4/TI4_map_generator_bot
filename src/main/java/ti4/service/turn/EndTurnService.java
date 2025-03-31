@@ -247,7 +247,9 @@ public class EndTurnService {
         List<Button> poButtons = getScoreObjectiveButtons(game);
         Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No Public Objective Scored");
         Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
+        Button scoreAnObjective =  Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
         poButtons.add(noPOScoring);
+        poButtons.add(scoreAnObjective);
         poButtons.add(noSOScoring);
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
             poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
