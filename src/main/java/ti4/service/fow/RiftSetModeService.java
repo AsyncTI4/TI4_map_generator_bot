@@ -73,7 +73,7 @@ public class RiftSetModeService {
     private static final int CHANCE_TO_STELLAR_CONVERT_MIN = 25; // 1/25
 
     public static boolean activate(GenericInteractionCreateEvent event, Game game) {
-        if (game.getPlayer(Constants.eronousId) == null && AsyncTI4DiscordBot.guildFogOfWar != null) {
+        if (game.getPlayer(Constants.eronousId) == null && !AsyncTI4DiscordBot.fowServers.isEmpty()) {
             MessageHelper.replyToMessage(event, "Can only use RiftSetMode if Eronous is in the game.");
             return false;
         }
@@ -363,7 +363,7 @@ public class RiftSetModeService {
     }
 
     public static boolean deckInfoAvailable(Player player, Game game) {
-        if (!isActive(game) || Constants.eronousId.equals(player.getUserID()) || game.getPlayersWithGMRole().contains(player)) return true;
+        if (!isActive(game) || player == null || Constants.eronousId.equals(player.getUserID()) || game.getPlayersWithGMRole().contains(player)) return true;
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
         return false;

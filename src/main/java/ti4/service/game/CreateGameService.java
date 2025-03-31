@@ -3,6 +3,7 @@ package ti4.service.game;
 import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,7 +45,9 @@ import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.image.FileUploadService;
+import ti4.service.option.GameOptionService;
 import ti4.settings.GlobalSettings;
+import ti4.settings.users.UserSettingsManager;
 
 @UtilityClass
 public class CreateGameService {
@@ -211,11 +214,12 @@ public class CreateGameService {
         Button addMapString = Buttons.green("addMapString~MDL", "Add Prebuilt Map String");
         MessageHelper.sendMessageToChannelWithButtons(actionsChannel, "How would you like to set up the players and map?", List.of(miltyButton, addMapString));
 
-        Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
-        MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change some options? ", offerOptions);
+        //Button offerOptions = Buttons.green("offerGameOptionButtons", "Options");
+        GameOptionService.offerGameOptionButtons(game, actionsChannel);
+        //MessageHelper.sendMessageToChannelWithButton(actionsChannel, "Want to change some options? ", offerOptions);
 
         HomebrewService.offerGameHomebrewButtons(actionsChannel);
-
+        ButtonHelper.offerPlayerSetupButtons(actionsChannel, game);
         MessageHelper.sendMessageToChannel(actionsChannel, "Reminder that all games played on this server must abide by the [AsyncTI4 Code of Conduct](https://discord.com/channels/943410040369479690/1082164664844169256/1270758780367274006)");
     }
 
@@ -633,5 +637,29 @@ public class CreateGameService {
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }
+    }
+
+    public static boolean isLockedFromCreatingGames(GenericInteractionCreateEvent event) {
+        Member member = event.getMember();
+        if (member != null) {
+            List<Role> roles = member.getRoles();
+            for (Role role : AsyncTI4DiscordBot.bothelperRoles) {
+                if (roles.contains(role)) {
+                    return false;
+                }
+            }
+        }
+
+        var userSettings = UserSettingsManager.get(event.getUser().getId());
+        if (userSettings.isLockedFromCreatingGames()) {
+            return true;
+        }
+        userSettings.setLockedFromCreatingGamesUntil(LocalDateTime.now().plusMinutes(10));
+        UserSettingsManager.save(userSettings);
+        return false;
+    }
+
+    public static boolean isGameCreationAllowed() {
+        return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.ALLOW_GAME_CREATION.toString(), Boolean.class, true);
     }
 }

@@ -1,6 +1,11 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -141,6 +146,10 @@ public class UnitRenderGenerator {
             BufferedImage decal = getUnitDecal(player, unitKey);
             BufferedImage spoopy = getSpoopyImage(unitKey, player);
             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+            if(unitModel == null){
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " a unit model could not be found for the unit with an async ID of "+unitKey.asyncID());
+                continue;
+            }
 
             // Contains pre-computed values common to this 'unit class'
             // (e.g. all fighters, all infantry, all mechs, etc.)

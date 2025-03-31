@@ -26,7 +26,7 @@ class RemoveCustomAdjacentTile extends GameStateSubcommand {
             return;
         }
 
-        if ("ALL".equals(primaryTile)) {
+        if (Constants.ALL.equals(primaryTile)) {
             getGame().clearCustomAdjacentTiles();
         } else {
             List<String> primaryTiles = Helper.getListFromCSV(primaryTile);

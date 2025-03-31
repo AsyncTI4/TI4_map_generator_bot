@@ -7,14 +7,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.CommandHelper;
 import ti4.image.Mapper;
@@ -382,11 +383,11 @@ public class ActionCardHelper {
                 boolean it = false, watcher = false;
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
-                    if (game.isFowMode() || (!it && p.hasTechReady("it"))) {
+                    if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
                         noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Xxcha + "**Instinct Training**, watch out");
                         it = true;
                     }
-                    if (game.isFowMode() || (!watcher && Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
+                    if (!watcher && (game.isFowMode() || Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
                         noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Empyrean + UnitEmojis.mech + "**Watcher**, 𝓌𝒶𝓉𝒸𝒽 out");
                         watcher = true;
                     }
@@ -751,7 +752,7 @@ public class ActionCardHelper {
 
             if (automationID.equals("diplo_pressure")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, "Please resolve Diplomatic Pressure now. If any sabo occurs, they will be able to ignore the buttons they are offered.", codedButtons);
             }
 
             if (automationID.equals("renegotiation")) {
@@ -894,9 +895,8 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, removeRepresentationIfFOW(introMsg, player, game)
-                        + " A reminder that you should declare which outcome you are predicting now,"
-                        + " before other players choose whether they will Sabo.", game, player, riderButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, player.getRepresentation(false,true)
+                        + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
                 }
                 if (automationID.equals("hack")) {
                     game.setHasHackElectionBeenPlayed(true);

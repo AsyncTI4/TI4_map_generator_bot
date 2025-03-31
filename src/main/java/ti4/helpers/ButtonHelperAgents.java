@@ -8,13 +8,14 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
@@ -1587,7 +1588,7 @@ public class ButtonHelperAgents {
             return;
         }
         if (tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor()) < 1) {
-            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), "Player did not have any infantry in the active system, no mech placed");
+            MessageHelper.sendMessageToChannel(bentor.getCorrectChannel(), "Player did not have any infantry in the space area of the active system, no mech placed");
             return;
         }
         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 inf");

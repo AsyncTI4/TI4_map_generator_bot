@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.time.ZoneOffset;
@@ -17,12 +24,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
@@ -33,6 +40,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units;
+import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -368,51 +376,130 @@ public class TileGenerator {
                 List<Rectangle> rectangles = new ArrayList<>();
                 Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
                 UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
-
                 if (spaceUnitHolder != null) {
                     addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileGenerator::isValidCustodianToken, game);
                     addToken(tile, tileGraphics, spaceUnitHolder, game);
                     unitHolders.remove(spaceUnitHolder);
                     unitHolders.add(spaceUnitHolder);
                 }
+                
                 int prodInSystem = 0;
+                int capacity = 0;
+                int capacityUsed = 0;
+                int ignoredFs = 0;
                 for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
+                    if(capacity == 0 && capacityUsed == 0){
+                        ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[3];
+                        capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[2];
+                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, event,false, false)[1];
+                    }
                 }
                 for (UnitHolder unitHolder : unitHolders) {
                     addSleeperToken(tile, tileGraphics, unitHolder, TileGenerator::isValidToken, game);
                     addControl(tile, tileGraphics, unitHolder, rectangles);
                 }
-                if (prodInSystem > 0 && game.isShowGears() && !game.isFowMode()) {
-                    int textModifer = 0;
-                    if (prodInSystem == 1) {
-                        textModifer = 7;
+                if(game.isShowGears() && !game.isFowMode()){
+                    if (prodInSystem > 0) {
+                        int textModifer = 0;
+                        if (prodInSystem == 1) {
+                            textModifer = 7;
+                        }
+                        if (prodInSystem > 9) {
+                            textModifer = -5;
+                        }
+                        if (prodInSystem == 11) {
+                            textModifer = 0;
+                        }
+                        List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
+                        BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 64, 64);
+                        int xMod;
+                        int yMod = -290;
+                        if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
+                            xMod = -15;
+                        } else {
+                            xMod = -155;
+                        }
+                        tileGraphics.drawImage(gearImage, TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29, TILE_PADDING + TILE_POSITION_POINT.y + yMod - 4, null);
+                        tileGraphics.setFont(Storage.getFont35());
+                        tileGraphics.drawString(prodInSystem + "", TILE_PADDING + TILE_POSITION_POINT.x + xMod + 15 + textModifer - 25, TILE_PADDING + TILE_POSITION_POINT.y + yMod + 40);
                     }
-                    if (prodInSystem > 9) {
-                        textModifer = -5;
+                    
+                    if( capacityUsed > 0 || capacity > 0 || ignoredFs > 0){
+                        int textModifer = 0;
+                        if (capacity == 1) {
+                            textModifer = 7;
+                        }
+                        if (capacity > 9) {
+                            textModifer = -5;
+                        }
+                        if (capacity == 11) {
+                            textModifer = 0;
+                        }
+                        List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
+                        BufferedImage carrierImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("capacity_representation.png"), 64, 21);
+
+                        int xMod;
+                        int yMod = -290;
+                        if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
+                            xMod = -15;
+                        } else {
+                            xMod = -155;
+                        }
+                        Graphics2D g2d = (Graphics2D) tileGraphics;
+                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  
+
+                        // Calculate water height  
+                        double waterHeight;
+                        if(capacity + ignoredFs > 0){
+                            waterHeight = 20.0 * capacityUsed /  (capacity+ignoredFs); 
+                        }else{
+                            waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
+                        } 
+
+                        // Draw brown box (3 sides)  
+                         
+                        g2d.setStroke(new BasicStroke(6));  
+                        
+                        int gearX = TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29;
+                        int gearY = TILE_PADDING + TILE_POSITION_POINT.y + yMod +5;
+
+                        if(prodInSystem == 0){
+                            gearX = gearX -27;
+                            gearY = gearY-55;
+                        }
+                       
+                        //g2d.setColor(new Color(128, 197, 222));  
+                        //g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);   
+                        //g2d.setColor(new Color(122, 127, 128)); 
+
+                
+                        //g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);  
+                        
+                        // Right side  
+                        //g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);  
+                        
+                        // Bottom side  
+                        //g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);  
+                        tileGraphics.drawImage(carrierImage, gearX+24, gearY+60, null);
+                        g2d.setColor(Color.WHITE);  
+                        tileGraphics.setFont(Storage.getFont12());
+                        String msg = capacityUsed + " / "+capacity;
+                        if(ignoredFs > 0){
+                            msg = capacityUsed + " / "+(capacity+ignoredFs)+"*";
+                        }
+                        DrawingUtil.superDrawString(tileGraphics, msg, gearX + 39 +17, gearY+95, Color.WHITE, HorizontalAlign.Center, null, stroke4, Color.BLACK);
+                        
                     }
-                    if (prodInSystem == 11) {
-                        textModifer = 0;
-                    }
-                    List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
-                    BufferedImage gearImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("production_representation.png"), 64, 64);
-                    int xMod;
-                    int yMod = -290;
-                    if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
-                        xMod = -15;
-                    } else {
-                        xMod = -155;
-                    }
-                    tileGraphics.drawImage(gearImage, TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29, TILE_PADDING + TILE_POSITION_POINT.y + yMod - 4, null);
-                    tileGraphics.setFont(Storage.getFont35());
-                    tileGraphics.drawString(prodInSystem + "", TILE_PADDING + TILE_POSITION_POINT.x + xMod + 15 + textModifer - 25, TILE_PADDING + TILE_POSITION_POINT.y + yMod + 40);
                 }
 
+                
                 if (spaceUnitHolder != null) {
                     addCC(tile, tileGraphics, spaceUnitHolder);
                 }
                 int degree = 180;
                 int degreeChange = 5;
+
                 for (UnitHolder unitHolder : unitHolders) {
                     int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS
                         : Constants.RADIUS;

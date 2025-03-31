@@ -30,6 +30,7 @@ public class HomebrewService {
         HBDSEXPLORES("US Explores/Relics/ACs", "Uncharted Space Explores, Relics and Action Cards", SourceEmojis.UnchartedSpace),
         HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2),
         HBREDTAPE("Red Tape", "Red Tape mode", null),
+        HBIGNISAURORA("Ignis Aurora", "Ignis Aurora decks for SC/agendas/techs/events/relics", null),
         HBREMOVESFTT("No Supports", "Remove Support for the Thrones", null),
         HBHBSC("Homebrew SCs", "Indicate game uses homebrew Strategy Cards", CardEmojis.SCBackBlank);
 
@@ -119,6 +120,15 @@ public class HomebrewService {
                 }
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     "Set the relics and agendas to Absol stuff");
+            }
+            case HBIGNISAURORA -> {
+                game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_baldrick"));
+                game.validateAndSetRelicDeck(Mapper.getDeck("relics_baldrick"));
+                game.setTechnologyDeckID("techs_baldrick");
+                game.setStrategyCardSet("ignis_aurora");
+                game.setEventDeckID("events_baldrick");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Set the stuff (Relic, Agenda, SCs, Tech, Event) to Ignis Aurora stuff");
             }
             case HBABSOLTECHSMECHS -> {
                 game.setAbsolMode(true);

@@ -403,8 +403,7 @@ public class TransactionHelper {
 
     @ButtonHandler(value = "transaction", save = false)
     public static void transaction(Player player, Game game) {
-        List<Button> buttons;
-        buttons = TransactionHelper.getPlayersToTransact(game, player);
+        List<Button> buttons = TransactionHelper.getPlayersToTransact(game, player);
         String message = player.getRepresentation() + " Use the buttons to select which player you wish to transact with";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
@@ -629,7 +628,7 @@ public class TransactionHelper {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
     }
 
-    @ButtonHandler(value = "offerToTransact_", save = false)
+    @ButtonHandler("offerToTransact_")
     public static void resolveOfferToTransact(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String item = buttonID.split("_")[1];
         String sender = buttonID.split("_")[2];
@@ -673,7 +672,10 @@ public class TransactionHelper {
 
         if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("binding_debts")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
-            player.addTransactionItem("sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount);
+            String clear = "sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount;
+            if(!player.getTransactionItems().contains(clear)){
+                player.addTransactionItem(clear);
+            }
         }
         Player opposing = p2;
         if (player == p2) {
@@ -765,7 +767,7 @@ public class TransactionHelper {
         checkTransactionLegality(game, p2, player);
     }
 
-    @ButtonHandler(value = "transact_", save = false)
+    @ButtonHandler("transact_")
     public static void resolveSpecificTransButtonsOld(Game game, Player p1, String buttonID, ButtonInteractionEvent event) {
         String finChecker = "FFCC_" + p1.getFaction() + "_";
 
@@ -936,6 +938,7 @@ public class TransactionHelper {
         switch (thingToTrans) {
             case "TGs" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
+                tgAmount = Math.min(p1.getTg(), tgAmount);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
                 CommanderUnlockCheckService.checkPlayer(p2, "hacan");
@@ -948,6 +951,7 @@ public class TransactionHelper {
             }
             case "Comms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
+                tgAmount = Math.min(p1.getCommodities(), tgAmount);
                 p1.setCommodities(p1.getCommodities() - tgAmount);
                 if (!p1.isPlayerMemberOfAlliance(p2)) {
                     int targetTG = p2.getTg();
@@ -1156,12 +1160,15 @@ public class TransactionHelper {
     }
 
     public static boolean canTheseTwoTransact(Game game, Player player, Player player2) {
+        // if(game.getRealPlayers().size() > 26){
+        //     return true;
+        // }
         return player == player2 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
             || player.hasAbility("guild_ships") || player.getPromissoryNotesInPlayArea().contains("convoys")
             || player2.getPromissoryNotesInPlayArea().contains("convoys") || player2.hasAbility("guild_ships")
             || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys") || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
-            || player2.getNeighbouringPlayers(true).contains(player)
-            || player.getNeighbouringPlayers(true).contains(player2);
+            || player2.getNeighbouringPlayers(false).contains(player)
+            || player.getNeighbouringPlayers(false).contains(player2);
     }
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
@@ -1270,7 +1277,7 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
-    @ButtonHandler(value = "send_", save = false)
+    @ButtonHandler("send_")
     public static void send(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TransactionHelper.resolveSpecificTransButtonPress(game, player, buttonID, event, true);
         ButtonHelper.deleteMessage(event);
@@ -1326,7 +1333,7 @@ public class TransactionHelper {
         return stuffToTransButtons;
     }
 
-    @ButtonHandler(value = "rescindOffer_", save = false)
+    @ButtonHandler("rescindOffer_")
     public static void rescindOffer(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2 != null) {
@@ -1389,8 +1396,8 @@ public class TransactionHelper {
         }
     }
 
-    @ButtonHandler(value = "transactWith_", save = false)
-    @ButtonHandler(value = "resetOffer_", save = false)
+    @ButtonHandler("transactWith_")
+    @ButtonHandler("resetOffer_")
     public static void transactWith(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);

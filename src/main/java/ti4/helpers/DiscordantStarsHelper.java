@@ -284,13 +284,14 @@ public class DiscordantStarsHelper {
             Tile tile = unusedBlueTiles.get(i).getTile();
             TileModel tileModel = tile.getTileModel();
             tileEmbeds.add(tileModel.getRepresentationEmbed(false));
+            ids.add(tile.getTileID());
         }
         String tileString = String.join(",", tileToPullFromUnshuffled.stream().map(t -> t.getTile().getTileID()).toList());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew " + count + " blue back tiles from this list:\n> " + tileString);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use `/map add_tile` to add it to the map.");
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
-        if (ids.size() == 1) { //TODO this is never true, ids isn't updated...
+        if (ids.size() == 1) { 
             if (game.isDiscordantStarsMode()) {
                 ButtonHelper.starChartStep1(game, player, ids.getFirst());
             } else {

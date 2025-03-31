@@ -5,13 +5,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
@@ -750,7 +751,7 @@ class AgendaResolveButtonHandler {
 
                 }
             }
-            if ("artifact".equalsIgnoreCase(agID) || "little_omega_artifact".equalsIgnoreCase(agID)) {
+            if ("absol_artifact".equalsIgnoreCase(agID) ||"artifact".equalsIgnoreCase(agID) || "little_omega_artifact".equalsIgnoreCase(agID)) {
                 TextChannel watchParty = AgendaHelper.watchPartyChannel(game);
                 String watchPartyPing = AgendaHelper.watchPartyPing(game);
                 if (watchParty != null && !game.isFowMode()) {
@@ -771,6 +772,19 @@ class AgendaResolveButtonHandler {
                 } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "Against on _Ixthian Artifact_‽ Disgraceful.");
+                    if("absol_artifact".equalsIgnoreCase(agID)){
+                        Integer poIndex = game.addCustomPO("Ixthian Rex Point", 1);
+                        StringBuilder message = new StringBuilder();
+                        message.append("Custom objective _Ixthian Rex Point_ has been added.\n");
+                        for (Player playerWL : game.getRealPlayers()) {
+                            if(playerWL.getPlanets().contains("mr")){
+                                game.scorePublicObjective(playerWL.getUserID(), poIndex);
+                                message.append(playerWL.getRepresentation()).append(" scored _Ixthian Rex Point_.\n");
+                                Helper.checkEndGame(game, playerWL);
+                            }
+                        }
+                        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
+                    }
                 }
             }
             if ("seed_empire".equalsIgnoreCase(agID)) {

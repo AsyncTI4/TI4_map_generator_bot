@@ -141,7 +141,7 @@ public class AutoCompleteProvider {
                         put("PURPLE", "Purples");
                         put("PINK", "Pinks");
                         put("MULTI", "Multi-Colours");
-                        put("ALL", "ALL COLOURS");
+                        put(Constants.ALL, "ALL COLOURS");
                     }
                 };
                 List<Command.Choice> options = values.entrySet().stream()
@@ -161,7 +161,7 @@ public class AutoCompleteProvider {
                         put("Texture", "Texture");
                         put("Line", "Line");
                         put("Other", "Other");
-                        put("ALL", "ALL DECALS");
+                        put(Constants.ALL, "ALL DECALS");
                     }
                 };
                 List<Command.Choice> options = values.entrySet().stream()

@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +21,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -39,10 +44,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -293,6 +294,9 @@ public class Helper {
     }
 
     public static String getNewStatusScoringRepresentation(Game game) {
+        if(game.getPhaseOfGame().equalsIgnoreCase("action")){
+            return "";
+        }
         StringBuilder rep = new StringBuilder("# __Scoring Summary__\n");
         if (game.getRealPlayers().size() > 10) {
             return "This game is too large to display a scoring summary";
@@ -439,6 +443,45 @@ public class Helper {
             }
         }
         return players;
+    }
+    public static int getPlayerSpeakerNumber(Player player, Game game) {
+        Player speaker;
+        if (game.getPlayer(game.getSpeakerUserID()) != null) {
+            speaker = game.getPlayers().get(game.getSpeakerUserID());
+        } else {
+            return 1;
+        }
+        List<Player> players = new ArrayList<>();
+        boolean found = false;
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == speaker) {
+                found = true;
+                players.add(speaker);
+            } else {
+                if (found) {
+                    players.add(p2);
+                }
+            }
+        }
+
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == speaker) {
+                found = false;
+            } else {
+                if (found) {
+                    players.add(p2);
+                }
+            }
+        }
+        int count = 1;
+        for(Player p2 : players){
+            if(player == p2){
+                return count;
+            }else{
+                count++;
+            }
+        }
+        return count;
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
@@ -772,6 +815,28 @@ public class Helper {
         }
         return scButtons;
     }
+    public static List<Integer> getRemainingSCs(Game game) {
+        List<Integer> scButtons = new ArrayList<>();
+
+        for (Integer sc : game.getSCList()) {
+            if (sc <= 0)
+                continue; // some older games have a 0 in the list of SCs
+            boolean held = false;
+            for (Player player : game.getPlayers().values()) {
+                if (player == null || player.getFaction() == null) {
+                    continue;
+                }
+                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFowMode()) {
+                    held = true;
+                    break;
+                }
+            }
+            if (held)
+                continue;
+            scButtons.add(sc);
+        }
+        return scButtons;
+    }
 
     public static List<Button> getPlanetExhaustButtons(Player player, Game game) {
         return getPlanetExhaustButtons(player, game, "both");
@@ -829,8 +894,13 @@ public class Helper {
             if (planet.contains("ghoti") || planet.contains("custodia")) {
                 continue;
             }
+            UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+            boolean containsDMZ = uH.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
+            if (containsDMZ) {
+                continue;
+            }
             if (unit.equalsIgnoreCase("spacedock")) {
-                UnitHolder uH = game.getUnitHolderFromPlanet(planet);
+                
                 if (uH == null || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
                     continue;
                 }
@@ -2152,6 +2222,30 @@ public class Helper {
         }
     }
 
+    public static void reverseSpeakerOrder(Game game) {
+        Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
+        Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
+        List<Player> sortedPlayers1 = game.getRealPlayers();
+        List<Player> sortedPlayers = new ArrayList<>();
+        for(Player player : sortedPlayers1){
+            sortedPlayers.add(0, player);
+        }
+        Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
+        try {
+            for (Player player : sortedPlayers) {
+                SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
+                
+            }
+            if (!players.isEmpty()) {
+                newPlayerOrder.putAll(players);
+            }
+            game.setPlayers(newPlayerOrder);
+        } catch (Exception e) {
+            game.setPlayers(playersBackup);
+        }
+
+    }
+
     public static void setOrder(Game game) {
         List<Integer> hsLocations = new ArrayList<>();
         LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();
@@ -2248,7 +2342,7 @@ public class Helper {
             }
             buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
+                "# " + game.getPing() + fowGmPing(game) + " it appears as though " + player.getRepresentationNoPing()
                     + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
             if (game.isFowMode()) {
@@ -2266,6 +2360,16 @@ public class Helper {
                     titleButton);
             }
         }
+    }
+
+    private static String fowGmPing(Game game) {
+        if (game.isFowMode()) {
+            List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
+            if (!gmRoles.isEmpty()) {
+                return ", " + gmRoles.getFirst().getAsMention();
+            }
+        }
+        return "";
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {

@@ -57,13 +57,13 @@ class UndoButtonHandler {
             BotLogger.log("Error while reading game undo directory: " + gameUndoDirectory, e);
         }
 
-        int maxNumber = numbers.isEmpty() ? 0 :
-            numbers.stream()
+        int maxNumber = numbers.isEmpty() ? 0
+            : numbers.stream()
                 .mapToInt(value -> value)
                 .max()
                 .orElseThrow(NoSuchElementException::new);
-
-        if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber-1))) {
+        
+        if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber - 1)) || highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber + 1))) {
             ButtonHelper.deleteMessage(event);
         }
 

@@ -8,6 +8,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -15,8 +19,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
@@ -55,8 +57,6 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperFactionSpecific {
 
@@ -2493,8 +2493,8 @@ public class ButtonHelperFactionSpecific {
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
-        String msg = player.getRepresentation() + " used _Salvage Operations_ to gain 1 trade good (you currently have " + player.getTg()
-            + "trade good" + (player.getTg() == 1 ? "" : "s") + ").";
+        String msg = player.getRepresentation() + " used _Salvage Operations_ to gain 1 trade good (you now have " + player.getTg()
+            + " trade good" + (player.getTg() == 1 ? "" : "s") + ").";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

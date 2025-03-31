@@ -247,8 +247,10 @@ public class ComponentActionHelper {
         }
 
         // ACs
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play Action Card with Component Action");
+        List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play AC with Component Action ("+acButtons.size()+")");
         compButtons.add(acButton);
+        compButtons.addAll(acButtons);
 
         // absol
         if (ButtonHelper.isPlayerElected(game, p1, "absol_minswar")

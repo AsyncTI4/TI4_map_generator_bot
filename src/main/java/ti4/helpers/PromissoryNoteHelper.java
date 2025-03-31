@@ -304,6 +304,7 @@ public class PromissoryNoteHelper {
             owner.setFleetCC(owner.getFleetCC() - 1);
             String reducedMsg = owner.getRepresentationUnfogged()
                 + ", 1 command token has been removed from your fleet pool because _Fires of the Gashlai_ was played.";
+            ButtonHelper.checkFleetInEveryTile(owner, game, event);
             MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {

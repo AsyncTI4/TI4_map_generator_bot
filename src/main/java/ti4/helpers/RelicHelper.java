@@ -6,10 +6,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -81,9 +83,6 @@ public class RelicHelper {
         StringBuilder helpMessage = new StringBuilder();
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "nanoforge" -> helpMessage.append("Run the following commands to use _Nano-Forge_:\n")
-                .append("     `/explore relic_purge relic: nanoforge`\n")
-                .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
             case "obsidian" -> {
                 game.drawSecretObjective(player.getUserID());
 
@@ -159,7 +158,7 @@ public class RelicHelper {
         CommanderUnlockCheckService.checkPlayer(receiver, "kollecc");
     }
 
-    public static void showRemaining(GenericInteractionCreateEvent event, boolean over, Game game, Player player) {
+    public static void showRemaining(MessageChannel channel, boolean over, Game game, Player player) {
         List<String> allRelics = new ArrayList<>(game.getAllRelics());
 
         Integer deckCount = allRelics.size();
@@ -179,9 +178,9 @@ public class RelicHelper {
         }
 
         if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && !over && game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
+            MessageHelper.sendMessageToChannel(channel, "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), text.toString());
+            MessageHelper.sendMessageToChannel(channel, text.toString());
         }
     }
 

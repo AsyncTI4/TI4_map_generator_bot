@@ -884,6 +884,7 @@ public class Constants {
     public static final String SERVERPROMOTE = "server_promote";
     public static final String CREATE_GAME_CHANNELS = "create_game_channels";
     public static final String CREATE_GAME_BUTTON = "create_game_button";
+    public static final String CREATE_FOW_GAME_BUTTON = "create_fow_game_button";
     public static final String CREATE_FOW_GAME_CHANNELS = "create_fow_game_channels";
     public static final String IMPORT_TTPG = "import_ttpg";
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
@@ -1013,6 +1014,8 @@ public class Constants {
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
     public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
     public static final String LANEFIR_ATS_COUNT = "ats_count";
+    public static final String PILLAGE_COUNT = "pillage_count";
+    public static final String SARWEEN_COUNT = "sarween_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
     public static final String ZELIAN_HERO = "zelian_hero";
@@ -1211,4 +1214,5 @@ public class Constants {
     public static final String SECONDS = "seconds";
     public static final String MOVE_TILE = "move_tile";
     public static final String TRANSACTION = "transaction";
+    public static final String ALL = "ALL";
 }

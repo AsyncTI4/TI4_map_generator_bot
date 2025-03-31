@@ -232,6 +232,14 @@ public class Player extends PlayerProperties {
         }
         addSpentThing("tg_" + newTgSpent);
     }
+    public void increaseSarweenCount(int amount) {
+        int oldTgSpent = getSpentTgsThisWindow();
+        int newTgSpent = oldTgSpent + amount;
+        if (oldTgSpent != 0) {
+            removeSpentThing("tg_" + oldTgSpent);
+        }
+        addSpentThing("tg_" + newTgSpent);
+    }
 
     public void increaseInfantrySpentThisWindow(int amount) {
         int oldTgSpent = getSpentInfantryThisWindow();
@@ -2184,7 +2192,7 @@ public class Player extends PlayerProperties {
                 break;
         }
         adjacentPlayers.remove(this);
-        if (checkEquiv) {
+        if (checkEquiv && realPlayers.size() < 30) {
             for (Player p2 : realPlayers) {
                 if (!adjacentPlayers.contains(p2) && p2.getNeighbouringPlayers(false).contains(this)) {
                     adjacentPlayers.add(p2);

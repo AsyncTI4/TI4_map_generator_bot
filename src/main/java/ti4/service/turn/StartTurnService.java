@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -228,7 +229,11 @@ public class StartTurnService {
         if (!doneActionThisTurn || confirmed2ndAction) {
             Button tacticalAction = Buttons.green(finChecker + "tacticalAction",
                 "Tactical Action (" + player.getTacticalCC() + ")");
-            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2;
+            List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(player);
+            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2-acButtons.size();
+            if(game.isFowMode()){
+                numOfComponentActions+=acButtons.size();
+            }
             Button componentAction = Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
             startButtons.add(tacticalAction);
@@ -360,13 +365,13 @@ public class StartTurnService {
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
-            FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
+            FowCommunicationThreadService.checkAllCommThreads(game);
         }
 
         startButtons.add(Buttons.gray("showMap", "Show Map"));
         startButtons.add(Buttons.gray("showPlayerAreas", "Show Player Areas"));
         if (!confirmed2ndAction && doneActionThisTurn) {
-            startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Peform Another Action"));
+            startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
         }
         return startButtons;
     }

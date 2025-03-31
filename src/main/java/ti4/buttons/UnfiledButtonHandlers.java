@@ -1,12 +1,19 @@
 package ti4.buttons;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
@@ -19,9 +26,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
@@ -87,8 +91,6 @@ import ti4.service.turn.EndTurnService;
 import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /*
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
@@ -427,6 +429,48 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 player.addSpentThing("sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
                 ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
+                player.setSarweenCounter(player.getSarweenCounter()+1);
+                String msg = player.getFactionEmoji()+ " has used Sarween Tools to save "+player.getSarweenCounter() +" resource(s) in this game so far. ";
+                int result = ThreadLocalRandom.current().nextInt(0, 5);
+                if(player.getSarweenCounter() < 6){
+                    
+                    List<String> lameMessages = Arrays.asList(
+                    "Not too impressive.",
+                    "The technology has not yet proven its worth.",
+                    "There better be more savings to come.",
+                    "Your faction's stockholders are so far unimpressed.",
+                    "Perhaps AIDEV or Scanlink might have been more useful.");
+                    msg += lameMessages.get(result);
+                }else{
+                    if(player.getSarweenCounter() < 11){
+                        List<String> lameMessages = Arrays.asList(
+                        "Not too shabby.",
+                        "The tech is finally starting to justify its existence.",
+                        "Hopefully there are still even more savings to come.",
+                        "Your faction's stockholders are satisfied with the results of this technology.",
+                        "Some folks still think Scanlink might have been more useful.");
+                        msg += lameMessages.get(result);
+                    }else{
+                        if(player.getSarweenCounter() < 16){
+                            List<String> lameMessages = Arrays.asList(
+                            "Very impressive.",
+                            "If only all technology was this productive.",
+                            "Surely there can't be even more savings to come?",
+                            "Your faction's stockholders are ectatic.",
+                            "The Scanlink stans have been thoroughly shamed.");
+                            msg += lameMessages.get(result);
+                        }else{
+                            List<String> lameMessages = Arrays.asList(
+                            "Words cannot adequately express how impressive this is.",
+                            "Is Sarween the best tech?!",
+                            "Is this much saving even legal? The international IRS will be doing an audit on your paperwork sometime soon.",
+                            "Your faction's stockholders have erected a statue of you in the city center.",
+                            "Keep this up and we'll have to make a new channel, called Sarween Streaks, just for your numbers.");
+                            msg += lameMessages.get(result);
+                        }
+                    }
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), msg);
                 event.getMessage().editMessage(exhaustedMessage).queue();
             }
             case "absol_st" -> { // Absol's Sarween Tools
@@ -931,7 +975,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = false;
         if (bID.startsWith("dsdihmy_")) {
-            bID = bID.replace("dsdihmy_", "");
             dsdihmy = true;
         }
         String[] info = bID.split("_");
@@ -985,7 +1028,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     public static void revealPOStage(ButtonInteractionEvent event, String buttonID, Game game) {
         String stage = buttonID.replace("reveal_stage_", "");
         if ("true".equalsIgnoreCase(game.getStoredValue("forcedScoringOrder"))) {
-            if (!game.getStoredValue("newStatusScoringMode").isEmpty() && game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
+            if (game.getPhaseOfGame().equalsIgnoreCase("statusScoring")) {
                 StringBuilder missingPeople = new StringBuilder();
                 for (Player player : game.getRealPlayers()) {
                     String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
@@ -1004,6 +1047,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 RevealPublicObjectiveService.revealS2(game, event, event.getChannel());
             } else if ("2x2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealTwoStage2(game, event, event.getChannel());
+            } else if ("none".equalsIgnoreCase(stage)) {
+                //continue without revealing anything
             } else {
                 RevealPublicObjectiveService.revealS1(game, event, event.getChannel());
             }
@@ -1213,7 +1258,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveButtons(player);
         if (!soButtons.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, soButtons);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
         }
@@ -1609,7 +1654,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
-            if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare"))) {
+            if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare") ||buttonID.contains("anarchy7Build"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             player.resetSpentThings();
@@ -1801,11 +1846,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     }
                 }
                 if (game.getRound() > 7 || game.getPublicObjectives2Peakable().isEmpty()) {
-                    message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
-                    message2 += " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
+                    if (game.isFowMode()) {
+                        message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
+                        message2 += " Or end the game manually.";
+                        buttons.add(Buttons.green("reveal_stage_none", "Continue without revealing"));
+                    } else {
+                        message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
+                        message2 += " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
 
-                    buttons.add(Buttons.red("gameEnd", "End Game"));
-                    if (!game.isFowMode()) {
+                        buttons.add(Buttons.red("gameEnd", "End Game"));
                         buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
                     }
                 }

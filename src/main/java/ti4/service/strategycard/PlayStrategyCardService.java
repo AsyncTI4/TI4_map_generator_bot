@@ -281,6 +281,11 @@ public class PlayStrategyCardService {
                 player.getRepresentationUnfogged() + " you may resolve **Grace** with the buttons.",
                 graceButtons);
         }
+        if(scModel.usesAutomationForSCID("anarchy8")){
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +" to resolve the 3rd primary effect, "+
+            "a tactical action, we advise you just click the do another action button, and when you do the primary of warfare, gain an extra CC "+
+            "into tactics, to account for the tactical action spending from reinforcements");
+        }
         if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
             for (Player player2 : playersToFollow) {
                 if (!player2.getPromissoryNotes().isEmpty()) {
@@ -426,13 +431,20 @@ public class PlayStrategyCardService {
             case "pok4construction" -> getConstructionButtons(sc);
             case "pok5trade" -> getTradeButtons(sc);
             case "pok6warfare" -> getWarfareButtons(sc);
+            case "anarchy1" -> getAnarchy1Buttons(sc);
+            case "anarchy2" -> getAnarchy2Buttons(sc);
+            case "anarchy3" -> getAnarchy3Buttons(sc, player);
+            case "anarchy7" -> getAnarchy7Buttons(sc);
+            case "anarchy8" -> getAnarchy8Buttons(sc);
+            case "anarchy10" -> getAnarchy10Buttons(sc);
+            case "anarchy11" -> getAnarchy11Buttons(sc);
             case "pok7technology" -> getTechnologyButtons(sc);
             case "pok8imperial" -> getImperialButtons(sc);
 
             // add your own special button resolutions here as additional cases
             // ignis aurora
             case "ignisaurora3" -> getGenericButtons(sc); //TODO: do it
-            case "ignisaurora8" -> getIgnisAuroraSC8Buttons(sc);
+            case "ignisaurora2" -> getIgnisAuroraSC8Buttons(sc);
 
             // cryypter
             case "cryypter_3" -> CryypterHelper.getCryypterSC3Buttons(sc);
@@ -486,10 +498,33 @@ public class PlayStrategyCardService {
         return List.of(leadershipGenerateCCButtons, noFollowButton);
     }
 
+    private static List<Button> getAnarchy1Buttons(int sc) {
+        Button leadershipGenerateCCButtons = Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens");
+        Button an1 = Buttons.green("primaryOfAnarchy1", "Resolve a chosen and unexhausted secondary");
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        return List.of(leadershipGenerateCCButtons, an1, noFollowButton);
+    }
+
     private static List<Button> getDiplomacyButtons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo a System");
         Button refreshButton = Buttons.green("diploRefresh2", "Ready 2 Planets");
+
+        Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
+        return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
+    }
+    private static List<Button> getAnarchy2Buttons(int sc) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button diploSystemButton =  Buttons.gray("anarchy2secondary", "Ready a non-SC Card");
+        Button refreshButton = Buttons.green("diploRefresh2", "Ready Planets");
+
+        Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
+        return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
+    }
+    private static List<Button> getAnarchy3Buttons(int sc, Player player) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo a System");
+        Button refreshButton = Buttons.gray("anarchy3secondary", "Perform Unchosen Or Exhausted Secondary");
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
@@ -549,6 +584,23 @@ public class PlayStrategyCardService {
         return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
     }
 
+    private static List<Button> getAnarchy8Buttons(int sc) {
+        Button warfarePrimary = Buttons.blue("primaryOfWarfare", "Do Warfare Primary");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button homeBuild = Buttons.green("resolveAnarchy8Secondary", "Lift a token");
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
+    }
+
+    private static List<Button> getAnarchy7Buttons(int sc) {
+        Button warfarePrimary = Buttons.blue("primaryOfAnarchy7", "Resolve PRODUCTION in a system");
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button homeBuild = Buttons.green("warfareBuild", "Build At Home");
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        return List.of(warfarePrimary, followButton, homeBuild, noFollowButton);
+    }
+    
+
     private static List<Button> getTechnologyButtons(int sc) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
@@ -563,6 +615,24 @@ public class PlayStrategyCardService {
         Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
         Button scoreAnObjective = Buttons.gray("scoreAnObjective", "Score A Public", CardEmojis.Public1);
         return List.of(followButton, noFollowButton, drawSo, scoreImperial, scoreAnObjective);
+    }
+
+    private static List<Button> getAnarchy10Buttons(int sc) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        Button drawSo = Buttons.gray("anarchy10PeekStart", "Peek at Public", CardEmojis.Public1);
+        Button scoreAnObjective = Buttons.gray("scoreAnObjective", "Score A Public", CardEmojis.Public1);
+        return List.of(followButton, noFollowButton, drawSo,  scoreAnObjective);
+    }
+
+    private static List<Button> getAnarchy11Buttons(int sc) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        Button drawSo = Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective);
+        Button scoreImperial = Buttons.gray("score_imperial", "Score Imperial", PlanetEmojis.Mecatol);
+        Button scoreAnObjective =  Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
+        Button reverseOrder = Buttons.gray("reverseSpeakerOrder", "Reverse Speaker Order", MiscEmojis.SpeakerToken);
+        return List.of(followButton, noFollowButton, drawSo, scoreImperial, scoreAnObjective, reverseOrder);
     }
 
     private static List<Button> getGenericButtons(int sc) {

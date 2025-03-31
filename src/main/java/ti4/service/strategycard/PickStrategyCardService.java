@@ -11,8 +11,10 @@ import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.strategycard.PickStrategyCardButtonHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
@@ -126,7 +128,7 @@ public class PickStrategyCardService {
         if (isFowPrivateGame) {
             if (allPicked) {
                 msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your "
-                    + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+                    + "1st turn of round " + game.getRound() + ").";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -135,7 +137,18 @@ public class PickStrategyCardService {
 
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
+                game.updateActivePlayer(privatePlayer);
+                game.setPhaseOfGame("strategy");
+                boolean queuedPick = false;
+                if(event instanceof ButtonInteractionEvent bevent){
+                    queuedPick = checkForQueuedSCPick(bevent,privatePlayer, game, msgExtra);
+                }
+                if(!queuedPick){
+                    checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
+                }else{
+                    return;
+                }
+                //MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
             } else {
                 privatePlayer.setInRoundTurnCount(privatePlayer.getInRoundTurnCount() + 1);
                 if (game.isShowBanners()) {
@@ -151,7 +164,15 @@ public class PickStrategyCardService {
             if (!allPicked) {
                 game.updateActivePlayer(privatePlayer);
                 game.setPhaseOfGame("strategy");
-                checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
+                boolean queuedPick = false;
+                if(event instanceof ButtonInteractionEvent bevent){
+                    queuedPick = checkForQueuedSCPick(bevent,privatePlayer, game, msgExtra);
+                }
+                if(!queuedPick){
+                    checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
+                }else{
+                    return;
+                }
             } else {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
                 if (game.isShowBanners()) {
@@ -200,7 +221,7 @@ public class PickStrategyCardService {
     public static void checkForForcePickLastStratCard(GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra) {
         List<Button> scButtons = Helper.getRemainingSCButtons(game, privatePlayer);
         if (scButtons.size() == 1) { // if there is only one SC left to pick (4p/8p games), force pick last SC
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), privatePlayer.getRepresentation() +
+            MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation() +
                 ", you have only one available Strategy Card to pick. Bot will force pick for you.");
             int unpickedStrategyCard = 0;
             for (Integer sc : game.getSCList()) {
@@ -211,7 +232,7 @@ public class PickStrategyCardService {
                     if (p == null || p.getFaction() == null) {
                         continue;
                     }
-                    if (p.getSCs() != null && p.getSCs().contains(sc) && !game.isFowMode()) {
+                    if (p.getSCs() != null && p.getSCs().contains(sc)) {
                         held = true;
                         break;
                     }
@@ -223,7 +244,39 @@ public class PickStrategyCardService {
             PlayerStatsService.secondHalfOfPickSC(event, game, privatePlayer, unpickedStrategyCard);
             secondHalfOfSCPick(event, privatePlayer, game, unpickedStrategyCard);
         } else {
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra, scButtons);
+            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(), msgExtra, scButtons);
         }
+    }
+    public static boolean checkForQueuedSCPick(ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra) {
+        Player player = privatePlayer;
+        String alreadyQueued = game.getStoredValue(player.getFaction()+"scpickqueue");
+        if (!alreadyQueued.isEmpty()) { 
+            int unpickedStrategyCard = 0;
+            for (String scNum : alreadyQueued.split("_")) {
+                game.setStoredValue(player.getFaction()+"scpickqueue",game.getStoredValue(player.getFaction()+"scpickqueue").replace(scNum+"_",""));
+                int sc = Integer.parseInt(scNum);
+                boolean held = false;
+                for (Player p : game.getRealPlayers()) {
+                    if (p.getSCs() != null && p.getSCs().contains(sc)) {
+                        held = true;
+                        break;
+                    }
+                }
+                if (held)
+                    continue;
+                unpickedStrategyCard = sc;
+                break;
+            }
+            if(unpickedStrategyCard == 0){
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tried to pick your queued SCs, but they were all already taken");
+                return false;
+            }else{
+                MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation(false,false) +
+                " had queued an SC pick.");
+                return PickStrategyCardButtonHandler.scPick(event, game, player, "scPick_"+unpickedStrategyCard);
+            }
+            
+        }
+        return false;
     }
 }

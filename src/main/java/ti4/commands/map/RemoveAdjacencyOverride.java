@@ -26,7 +26,7 @@ class RemoveAdjacencyOverride extends GameStateSubcommand {
             return;
         }
 
-        if ("ALL".equals(primaryTile)) {
+        if (Constants.ALL.equals(primaryTile)) {
             getGame().clearAdjacentTileOverrides();
         } else {
             List<String> primaryTiles = Helper.getListFromCSV(primaryTile);

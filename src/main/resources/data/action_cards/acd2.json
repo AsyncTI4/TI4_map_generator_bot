@@ -93,7 +93,7 @@
         "alias": "bounty",
         "name": "Bounty",
         "phase": "Action",
-        "window": "After 1 of your opponent's units with a cost of 2 or more is destroyed",
+        "window": "After 1 of your opponent's units with a cost of 3 or more is destroyed",
         "text": "Gain 4 trade goods.",
         "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
         "source": "action_deck_2"
@@ -150,6 +150,15 @@
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome gains 2 trade goods.",
         "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "corruption",
+        "name": "Corruption",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose 1 player. That player may exhaust up to 4 planets they control to gain an equal number of trade goods.",
+        "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
         "source": "action_deck_2"
     },
     {
@@ -311,7 +320,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose another player with the most victory points. Either look at 1 of that player's unscored secret objectives, at random, or their action cards.",
+        "text": "Choose another player. That player shows you either 1 random secret objective from their hand or their hand of action cards.",
         "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
@@ -386,7 +395,7 @@
         "alias": "flawless_strategy",
         "name": "Flawless Strategy",
         "phase": "Action",
-        "window": "After you exhaust a strategy card",
+        "window": "After you exhaust your strategy card",
         "text": "Resolve the secondary ability of that strategy card; do not spend or place a command token to resolve that ability.",
         "flavorText": "PROTOCOL SUCCESSFUL<< [ID:NULL] DEFEAT INEVITABLE<< PEERLESS MANY<< INFINITE ONE<< [ID:NIITAKA]<< QUEUED1<< QUEUED2<< QUEUED3...",
         "source": "action_deck_2"
@@ -667,7 +676,7 @@
         "name": "Project Rider",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, take up to 2 action cards from the discard pile.",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose up to 2 action cards in the discard pile. If your prediction is correct, take those cards.",
         "flavorText": "Gil's career at the Civita Planetar was prolific, with friends in hundreds of governments and favors owed in many more.",
         "source": "action_deck_2"
     },
@@ -1046,15 +1055,6 @@
         "window": "After a player activates a system that contains your units",
         "text": "Choose 1 other system. That system is adjacent to the active system during this tactical action.",
         "flavorText": "The conduit was tearing itself apart as the space within it melted away to reveal the location of the beacon. Their panic quickly culled their jubilation.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "virulent_gas",
-        "name": "Virulent Gas",
-        "phase": "Action",
-        "window": "After you produce a hit against units on a planet",
-        "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your die rolls during this ability and repeat its effect.",
-        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—and Dart ran.",
         "source": "action_deck_2"
     },
     {
