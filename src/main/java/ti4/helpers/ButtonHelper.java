@@ -2235,7 +2235,7 @@ public class ButtonHelper {
                 }
             }
             String id = finChecker + "removeCCFromBoard_" + whatIsItFor.replace("_", "") + "_" + tile.getPosition();
-            String label = "Remove Command Token From " + tile.getRepresentationForButtons(game, player);
+            String label = "Remove CC From " + tile.getRepresentationForButtons(game, player);
             buttonsToRemoveCC.add(Buttons.green(id, label));
         }
         return buttonsToRemoveCC;

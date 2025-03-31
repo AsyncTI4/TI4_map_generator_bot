@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -357,6 +358,51 @@ public class ButtonHelperSCs {
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
 
+    }
+
+    @ButtonHandler("anarchy7Build_")
+    public static void anarchy7Build(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        List<Button> buttons;
+        buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos),
+            "anarchy7Build", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+    public static List<Button> getAnarchy7Buttons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        List<Tile> tiles = new ArrayList<>();
+        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Infantry));
+        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech));
+        List<String> poses = new ArrayList<>();
+        for (Tile tile : tiles) {
+            if (!poses.contains(tile.getPosition())) {
+                buttons.add(Buttons.green("anarchy7Build_" + tile.getPosition(),
+                    tile.getRepresentationForButtons(game, player)));
+                poses.add(tile.getPosition());
+            }
+        }
+        return buttons;
+    }
+    @ButtonHandler("reverseSpeakerOrder")
+    public static void reverseSpeakerOrder(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Helper.reverseSpeakerOrder(game);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), " has reversed speaker order"); 
+    }
+    @ButtonHandler("primaryOfAnarchy7")
+    public static void primaryOfAnarchy7(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = ButtonHelperSCs.getAnarchy7Buttons(game, player);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentation(true, true)
+                + " use the buttons to build in the desired system",
+            buttons);
+    }
+
+    @ButtonHandler("resolveAnarchy8Secondary")
+    public static void resolveUnexpectedAction(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpected");
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation()+" Use buttons to remove token.", buttons);
     }
 
     @ButtonHandler("warfareBuild")

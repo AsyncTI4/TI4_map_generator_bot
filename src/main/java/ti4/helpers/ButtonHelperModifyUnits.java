@@ -48,7 +48,7 @@ public class ButtonHelperModifyUnits {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int sustains = 0;
         Player mentak = Helper.getPlayerFromUnit(game, "mentak_mech");
-        if (mentak != null && mentak != player && !space && unitHolder.getUnitCount(UnitType.Mech, mentak.getColor()) > 0) {
+        if (mentak != null && mentak != player && !space && unitHolder.getUnitCount(UnitType.Mech, mentak.getColor()) > 0 && !game.getLaws().containsKey("articles_war")) {
             return 0;
         }
         Player mentakFS = Helper.getPlayerFromUnit(game, "mentak_flagship");
@@ -1422,7 +1422,7 @@ public class ButtonHelperModifyUnits {
                     }
                 }
                 if (!hasConstruction && ("action".equalsIgnoreCase(game.getPhaseOfGame())
-                    || game.getCurrentAgendaInfo().contains("Strategy"))
+                    || game.getCurrentAgendaInfo().contains("Strategy")) && !game.getStrategyCardSet().getAlias().toLowerCase().contains("anarchy")
                     && !ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
                     tile = TileHelper.getTile(event, planetName, game);
                     String msg = playerRep + " placed 1 command token from reinforcements in the "
