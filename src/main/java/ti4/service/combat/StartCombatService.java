@@ -586,7 +586,7 @@ public class StartCombatService {
             "Roll Space Cannon Offence"));
         if (game.isFowMode())
             return spaceCannonButtons;
-        spaceCannonButtons.add(Buttons.red("declinePDS", "Decline PDS"));
+        spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID(), "Decline PDS"));
 
         // Add Graviton Laser System button if applicable
         for (Player playerWithPds : ButtonHelper.tileHasPDS2Cover(activePlayer, game, tile.getPosition())) {

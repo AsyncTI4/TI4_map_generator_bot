@@ -168,6 +168,9 @@ public class CombatMessageHelper {
             if (holderPlanet != null) {
                 combatTypeName += " on " + StringUtils.capitalize(holderName);
             }
+            if (rollType == CombatRollType.SpaceCannonOffence) {
+                combatTypeName += " at " + tile.getRepresentation();
+            }
         } else {
             int round;
             Game game = player.getGame();
