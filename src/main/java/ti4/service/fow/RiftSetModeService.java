@@ -363,7 +363,7 @@ public class RiftSetModeService {
     }
 
     public static boolean deckInfoAvailable(Player player, Game game) {
-        if (!isActive(game) || Constants.eronousId.equals(player.getUserID()) || game.getPlayersWithGMRole().contains(player)) return true;
+        if (!isActive(game) || player == null || Constants.eronousId.equals(player.getUserID()) || game.getPlayersWithGMRole().contains(player)) return true;
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
         return false;

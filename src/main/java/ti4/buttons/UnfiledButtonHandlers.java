@@ -1849,7 +1849,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     if (game.isFowMode()) {
                         message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
                         message2 += " Or end the game manually.";
-                        buttons.add(Buttons.green("reveal_none", "Continue without revealing"));
+                        buttons.add(Buttons.green("reveal_stage_none", "Continue without revealing"));
                     } else {
                         message2 += "\n> - If there are no more objectives to reveal, use the button to end the game.";
                         message2 += " Whoever has the most points is crowned the winner, or whoever has the earliest initiative in the case of ties.";
