@@ -19,5 +19,3 @@ __**Action Card Tips:**__
 __**Combat tips:**__
 > Each participant gets their own combat thread; spectators get a thread to spectate the interraction.
 > Messages in the combat thread relay between threads, so you can talk normally; no need to whisper.
-> PDS2 isn't implemented; please handle it manually when prompted.
-> Use `/combat combat_roll tile_name:{target_system} rolltype:spacecannonoffence` for PDS2 rolls.

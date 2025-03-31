@@ -35,6 +35,7 @@ import ti4.service.explore.AddFrontierTokensService;
 public class AddTileListService {
 
     public static void addTileListToMap(Game game, String tileList, GenericInteractionCreateEvent event) {
+        tileList = tileList.replace("\n", " ");
         tileList = tileList.replace(",", " ");
         tileList = tileList.replace("  ", " ");
 
