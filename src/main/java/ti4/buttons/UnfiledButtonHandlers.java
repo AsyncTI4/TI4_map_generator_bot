@@ -1258,7 +1258,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveButtons(player);
         if (!soButtons.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, soButtons);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
         }
@@ -1654,7 +1654,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
-            if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare"))) {
+            if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare") ||buttonID.contains("anarchy7Build"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             player.resetSpentThings();

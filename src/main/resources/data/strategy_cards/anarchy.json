@@ -5,6 +5,7 @@
         "name": "Leadership",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "anarchy1",
         "imageFileName": "anarchy_1",
         "colourHexCode": "#FFFFFF",
         "source": "asteroid"
@@ -15,6 +16,7 @@
         "name": "Preparation",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "anarchy2",
         "imageFileName": "anarchy_2",
         "source": "asteroid"
     },
@@ -24,6 +26,7 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "anarchy3",
         "imageFileName": "anarchy_3",
         "source": "asteroid"
     },
@@ -53,7 +56,8 @@
         "name": "Trade",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "imageFileName": "anarchy_6",
+        "botSCAutomationID": "pok4trade",
+        "imageFileName": "_6",
         "source": "asteroid"
     },
     {
@@ -62,6 +66,7 @@
         "name": "Fabrication",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "anarchy7",
         "imageFileName": "anarchy_7",
         "source": "asteroid"
     },
@@ -71,7 +76,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "pok6warfare",
+        "botSCAutomationID": "anarchy8",
         "imageFileName": "anarchy_8",
         "source": "asteroid"
     },
@@ -91,6 +96,7 @@
         "name": "Espionage",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "anarchy10",
         "imageFileName": "anarchy_10",
         "source": "asteroid"
     },
@@ -100,6 +106,7 @@
         "name": "Imperial",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "anarchy11",
         "imageFileName": "anarchy_11",
         "source": "asteroid"
     }

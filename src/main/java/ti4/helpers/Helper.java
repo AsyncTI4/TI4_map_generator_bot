@@ -815,6 +815,28 @@ public class Helper {
         }
         return scButtons;
     }
+    public static List<Integer> getRemainingSCs(Game game) {
+        List<Integer> scButtons = new ArrayList<>();
+
+        for (Integer sc : game.getSCList()) {
+            if (sc <= 0)
+                continue; // some older games have a 0 in the list of SCs
+            boolean held = false;
+            for (Player player : game.getPlayers().values()) {
+                if (player == null || player.getFaction() == null) {
+                    continue;
+                }
+                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFowMode()) {
+                    held = true;
+                    break;
+                }
+            }
+            if (held)
+                continue;
+            scButtons.add(sc);
+        }
+        return scButtons;
+    }
 
     public static List<Button> getPlanetExhaustButtons(Player player, Game game) {
         return getPlanetExhaustButtons(player, game, "both");
@@ -2198,6 +2220,30 @@ public class Helper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static void reverseSpeakerOrder(Game game) {
+        Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
+        Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
+        List<Player> sortedPlayers1 = game.getRealPlayers();
+        List<Player> sortedPlayers = new ArrayList<>();
+        for(Player player : sortedPlayers1){
+            sortedPlayers.add(0, player);
+        }
+        Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
+        try {
+            for (Player player : sortedPlayers) {
+                SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
+                
+            }
+            if (!players.isEmpty()) {
+                newPlayerOrder.putAll(players);
+            }
+            game.setPlayers(newPlayerOrder);
+        } catch (Exception e) {
+            game.setPlayers(playersBackup);
+        }
+
     }
 
     public static void setOrder(Game game) {

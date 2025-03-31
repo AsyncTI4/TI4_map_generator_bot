@@ -1,10 +1,11 @@
 package ti4.model;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -128,6 +129,9 @@ public class StrategyCardModel implements ModelInterface, EmbeddableModel {
         if (colourHexCode == null && getId().equals(getBotSCAutomationID())) {
             return "#ffffff";
         } else if (colourHexCode == null) {
+            if(Mapper.getStrategyCard(getBotSCAutomationID()) == null || Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode() == null){
+                return "#ffffff";
+            }
             return Mapper.getStrategyCard(getBotSCAutomationID()).getColourHexCode();
         }
         return Optional.of(colourHexCode).orElse("#ffffff");
