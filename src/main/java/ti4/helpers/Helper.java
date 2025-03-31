@@ -2200,6 +2200,30 @@ public class Helper {
         }
     }
 
+    public static void reverseSpeakerOrder() {
+        Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
+        Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
+        List<Player> sortedPlayers1 = game.getRealPlayers();
+        List<Player> sortedPlayers = new ArrayList<>();
+        for(Player player : sortedPlayers1){
+            sortedPlayers.add(0, player);
+        }
+        Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
+        try {
+            for (Player player : sortedPlayers) {
+                SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
+                
+            }
+            if (!players.isEmpty()) {
+                newPlayerOrder.putAll(players);
+            }
+            game.setPlayers(newPlayerOrder);
+        } catch (Exception e) {
+            game.setPlayers(playersBackup);
+        }
+
+    }
+
     public static void setOrder(Game game) {
         List<Integer> hsLocations = new ArrayList<>();
         LinkedHashMap<Integer, Player> unsortedPlayers = new LinkedHashMap<>();

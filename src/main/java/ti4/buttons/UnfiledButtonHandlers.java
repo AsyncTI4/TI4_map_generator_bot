@@ -1258,7 +1258,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveButtons(player);
         if (!soButtons.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, soButtons);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
         }
