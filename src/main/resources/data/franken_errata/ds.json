@@ -422,7 +422,7 @@
     },
     {
         "ItemCategory": "STARTINGFLEET",
-        "ItemId": "3 cr,ff,3 inf b,sd b,pds b",
+        "ItemId": "khrask",
         "Undraftable": true,
         "source": "ds"
     },
