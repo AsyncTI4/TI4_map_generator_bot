@@ -477,7 +477,7 @@
     },
     {
         "ItemCategory": "HOMESYSTEM",
-        "ItemId": "nivyn",
+        "ItemId": "d25",
         "OptionalSwaps": [
             "ABILITY:celestial_guides"
         ],
@@ -679,7 +679,7 @@
     },
     {
         "ItemCategory": "HOMESYSTEM",
-        "ItemId": "zelian",
+        "ItemId": "d12",
         "AdditionalComponents": [
             "ABILITY:paranoia"
         ],
