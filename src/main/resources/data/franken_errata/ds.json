@@ -161,7 +161,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "the_lady_and_the_lord",
         "AdditionalComponents": [
-            "ABILITY:the_lady_and_the_lord"
+            "FLAGSHIP:ghemina_flagship_lord"
         ],
         "OptionalSwaps": [
             "COMMANDER:gheminacommander",
@@ -172,7 +172,7 @@
     },
     {
         "ItemCategory": "FLAGSHIP",
-        "ItemId": "ghemina_flagship_lady",
+        "ItemId": "ghemina_flagship_lord",
         "Undraftable": true,
         "source": "ds"
     },
@@ -337,6 +337,14 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "MECH",
+        "ItemId": "kollecc_mech",
+        "AdditionalComponents": [
+            "ABILITY:shroud_of_lith"
+        ],
+        "source": "ds"
+    },
+    {
         "ItemCategory": "ABILITY",
         "ItemId": "cloaked_fleets",
         "AdditionalComponents": [
@@ -348,6 +356,14 @@
         "ItemCategory": "ABILITY",
         "ItemId": "shroud_of_lith",
         "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "kollecc_flagship",
+        "AdditionalComponents": [
+            "ABILITY:shroud_of_lith"
+        ],
         "source": "ds"
     },
     {
@@ -459,7 +475,7 @@
     },
     {
         "ItemCategory": "COMMODITIES",
-        "ItemId": "1",
+        "ItemId": "mykomentori",
         "Undraftable": true,
         "source": "ds"
     },
@@ -477,7 +493,7 @@
     },
     {
         "ItemCategory": "HOMESYSTEM",
-        "ItemId": "d25",
+        "ItemId": "nivyn",
         "OptionalSwaps": [
             "ABILITY:celestial_guides"
         ],
@@ -486,14 +502,15 @@
     {
         "ItemCategory": "TECH",
         "ItemId": "dsnivymf",
-        "AdditionalComponents": [
-            "ABILITY:singularity_point"
-        ],
+        "Undraftable": true,
         "source": "ds"
     },
     {
         "ItemCategory": "MECH",
         "ItemId": "nivyn_mech",
+        "AdditionalComponents": [
+            "ABILITY:singularity_point"
+        ],
         "OptionalSwaps": [
             "TECH:dsnivymf"
         ],
@@ -504,6 +521,9 @@
         "ItemId": "hired_guns",
         "AdditionalComponents": [
             "ABILITY:desperados"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:nokarcommander"
         ],
         "source": "ds"
     },
@@ -520,10 +540,17 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "MECH",
+        "ItemId": "olradin_mech",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
         "ItemCategory": "ABILITY",
         "ItemId": "policies",
         "OptionalSwaps": [
-            "HERO:olradinhero"
+            "HERO:olradinhero",
+            "MECH:olradin_mech"
         ],
         "source": "ds"
     },
@@ -539,6 +566,14 @@
         "ItemCategory": "ABILITY",
         "ItemId": "orbital_foundries",
         "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dsrohdws",
+        "AdditionalComponents": [
+            "ABILITY:orbital_foundries"
+        ],
         "source": "ds"
     },
     {
@@ -600,6 +635,14 @@
         "ItemCategory": "MECH",
         "ItemId": "vaden_mech",
         "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "vadencommander",
+        "AdditionalComponents": [
+            "ABILITY:fine_print"
+        ],
         "source": "ds"
     },
     {
@@ -679,7 +722,7 @@
     },
     {
         "ItemCategory": "HOMESYSTEM",
-        "ItemId": "d12",
+        "ItemId": "zelian",
         "AdditionalComponents": [
             "ABILITY:paranoia"
         ],
