@@ -104,7 +104,7 @@ public class Mapper {
         try {
             loadData();
         } catch (Exception e) {
-            BotLogger.log("Could not load data", e);
+            BotLogger.error("Could not load data", e, true);
         }
     }
 
@@ -148,7 +148,7 @@ public class Mapper {
             try (InputStream input = new FileInputStream(propFile)) {
                 properties.load(input);
             } catch (IOException e) {
-                BotLogger.log("Could not read .property file: " + propertyFileName, e);
+                BotLogger.error("Could not read .property file: " + propertyFileName, e, true);
                 throw e;
             }
         }
@@ -165,10 +165,10 @@ public class Mapper {
                 try {
                     importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
                 } catch (InvalidFormatException e) {
-                    BotLogger.log("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
+                    BotLogger.error("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e, true);
                     throw e;
                 } catch (Exception e) {
-                    BotLogger.log("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
+                    BotLogger.error("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e, true);
                 }
             }
         }
@@ -185,7 +185,7 @@ public class Mapper {
                 InputStream input = new FileInputStream(filePath);
                 allObjects = objectMapper.readValue(input, type);
             } catch (Exception e) {
-                BotLogger.log("Could not import JSON Objects from File: " + jsonFileName, e);
+                BotLogger.error("Could not import JSON Objects from File: " + jsonFileName, e, true);
                 throw e;
             }
         }
@@ -193,7 +193,7 @@ public class Mapper {
         List<String> badObjects = new ArrayList<>();
         for (T obj : allObjects) {
             if (objectMap.containsKey(obj.getAlias())) { //duplicate found
-                BotLogger.log("Duplicate **" + target.getSimpleName() + "** found: " + obj.getAlias());
+                BotLogger.warning("Duplicate **" + target.getSimpleName() + "** found: " + obj.getAlias(), false);
             }
             objectMap.put(obj.getAlias(), obj);
             if (!obj.isValid()) {
@@ -201,8 +201,8 @@ public class Mapper {
             }
         }
         if (!badObjects.isEmpty())
-            BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
-                + String.join("\n> ", badObjects));
+            BotLogger.warning("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
+                + String.join("\n> ", badObjects), false);
     }
 
     private static <T extends ColorableModelInterface<T>> void duplicateObjectsForAllColors(Map<String, T> objectMap) {
@@ -223,7 +223,7 @@ public class Mapper {
                 objectMap.put(obj.getAlias(), obj);
             }
         } catch (Exception e) {
-            BotLogger.log("Failed duplicating colors: " + mostRecentObject, e);
+            BotLogger.error("Failed duplicating colors: " + mostRecentObject, e, true);
         }
     }
 
@@ -728,7 +728,7 @@ public class Mapper {
         if (tokenPath == null || !(new File(tokenPath).exists())) {
             tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
             if (tokenPath == null) {
-                BotLogger.log("Could not find token path: " + tokenID);
+                BotLogger.warning("Could not find token path: " + tokenID, false);
                 return null;
             }
         }

@@ -24,7 +24,7 @@ class GiveTheBotABreather extends Subcommand {
         try {
             Thread.sleep(seconds * 1000L);
         } catch (InterruptedException e) {
-            BotLogger.log("Forced Sleep interrupted", e);
+            BotLogger.error("Forced Sleep interrupted", e, true);
         }
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
     }

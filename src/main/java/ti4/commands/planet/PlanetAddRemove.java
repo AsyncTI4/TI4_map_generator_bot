@@ -80,13 +80,12 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
                     return;
                 }
                 String planet = possiblePlanets.getFirst();
-                BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getName() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
+                BotLogger.warning(event, "`PlanetAddRemove.parseParameter - " + getName() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet, false);
                 doAction(event, player, planet, game);
                 MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
-            BotLogger.log(event, "Error parsing planet: " + planetID);
-            BotLogger.log(ExceptionUtils.getStackTrace(e));
+            BotLogger.error(event, "Error parsing planet: " + planetID, e, true);
         }
     }
 

@@ -779,7 +779,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace, event);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } catch (IOException e) {
-            BotLogger.log("Failed to close FileUpload", e);
+            BotLogger.error("Failed to close FileUpload", e, true);
         }
     }
 
@@ -1125,7 +1125,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     event.getMessage().editMessage(msg).queue();
                 }
             } catch (Exception e) {
-                BotLogger.log(event, "Could not parse PO ID: " + poID, e);
+                BotLogger.error(event, "Could not parse PO ID: " + poID, e, true);
                 event.getChannel().sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
                     .queue();
             }
@@ -1169,7 +1169,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     }
                     game.setStoredValue(player.getFaction() + "queuedPOScore", "" + poIndex);
                 } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse PO ID: " + poID, e);
+                    BotLogger.error(event, "Could not parse PO ID: " + poID, e, true);
                     event.getChannel().sendMessage("Could not parse public objective ID: " + poID + ". Please score manually.")
                         .queue();
                 }
@@ -1331,7 +1331,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     int soIndex = Integer.parseInt(soID);
                     SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
                 } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse SO ID: " + soID, e);
+                    BotLogger.error(event, "Could not parse SO ID: " + soID, e, true);
                     event.getChannel().sendMessage("Could not parse secret objective ID: " + soID + ". Please score manually.")
                         .queue();
                     return;
@@ -1426,7 +1426,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
                 ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
             } catch (Exception e) {
-                BotLogger.log(event, "Something went wrong discarding", e);
+                BotLogger.error(event, "Something went wrong discarding", e, true);
             }
         } else {
             event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
@@ -1466,7 +1466,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     event.getChannel().sendMessage(error).queue();
                 }
             } catch (Exception e) {
-                BotLogger.log(event, "Could not parse AC ID: " + acID, e);
+                BotLogger.error(event, "Could not parse AC ID: " + acID, e, true);
                 event.getChannel().asThreadChannel().sendMessage("Could not parse action card ID: " + acID + ". Please play manually.").queue();
             }
         } else {

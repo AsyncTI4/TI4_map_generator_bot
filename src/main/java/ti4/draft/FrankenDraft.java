@@ -115,7 +115,7 @@ public class FrankenDraft extends BagDraft {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
+                        BotLogger.warning("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name(), false);
                     }
                 }
             }

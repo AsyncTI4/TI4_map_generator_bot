@@ -37,7 +37,7 @@ public class FastScFollowCron {
         try {
             handleFastScFollowMode(game);
         } catch (Exception e) {
-            BotLogger.log("FastScFollowCron failed for game: " + game.getName(), e);
+            BotLogger.error("FastScFollowCron failed for game: " + game.getName(), e, true);
         }
     }
 

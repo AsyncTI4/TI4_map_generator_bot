@@ -57,7 +57,7 @@ public class PlayHeroService {
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), LeaderEmojis.getLeaderEmoji(playerLeader).toString());
             sb.append(player.getRepresentation()).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
-            BotLogger.log(event, "Missing LeaderModel: " + playerLeader.getId());
+            BotLogger.warning(event, "Missing LeaderModel: " + playerLeader.getId(), false);
         }
 
         if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())
