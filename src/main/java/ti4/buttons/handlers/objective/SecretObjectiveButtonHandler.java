@@ -9,7 +9,9 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.milty.MiltyDraftManager;
 import ti4.service.objectives.DiscardSecretService;
 import ti4.service.objectives.DrawSecretService;
 
@@ -58,6 +60,30 @@ class SecretObjectiveButtonHandler {
 
     @ButtonHandler("deal2SOToAll")
     public static void deal2SOToAll(ButtonInteractionEvent event, Game game) {
+        MiltyDraftManager manager = game.getMiltyDraftManager();
+        if (manager.isFinished() && manager.isFactionTaken("keleresm") && game.getPlayerFromColorOrFaction("keleres") == null) {
+            Player keleres = null;
+            for (String playerID : manager.getPlayers())
+                if (manager.getPlayerDraft(playerID).getFaction().equals("keleresm"))
+                    keleres = game.getPlayer(playerID);
+            if (keleres != null) {
+                MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), "Keleres is not set up yet!!! " + keleres.getPing() + " the game is waiting for you to set up :)");
+                return;
+            }
+        }
+        boolean allPlayersSetup = true;
+        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting tech. If this is an error, use `/so deal_to_all`:";
+        for (Player p : game.getRealPlayers()) {
+            if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
+                message += "\n> " + p.getRepresentation();
+                allPlayersSetup = false;
+            }
+        }
+        if (!allPlayersSetup) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            return;
+        }
+
         DrawSecretService.dealSOToAll(event, 2, game);
         ButtonHelper.deleteMessage(event);
     }

@@ -79,6 +79,14 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return new ArrayList<>(startingTech);
     }
 
+    public int finalStartingTechAmount() {
+        int amount = 0;
+        if (getStartingTech() != null) amount += getStartingTech().size();
+        if (getStartingTechAmount() != null) amount += getStartingTechAmount();
+        if (getAlias().startsWith("keleres")) amount += 2;
+        return amount;
+    }
+
     public List<String> getHomePlanets() {
         return new ArrayList<>(homePlanets);
     }
@@ -235,14 +243,14 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         eb.addField("__Starting Fleet__", sb.toString(), false);
 
         sb = new StringBuilder();
-        if(getStartingTech() != null && !getStartingTech().isEmpty()){
+        if (getStartingTech() != null && !getStartingTech().isEmpty()) {
             for (String id : getStartingTech()) {
                 TechnologyModel model = Mapper.getTech(id);
                 sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
                 //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
             }
-        }else{
-            if(getStartingTechOptions() != null && getStartingTechAmount() != 0 && !getStartingTechOptions().isEmpty()){
+        } else {
+            if (getStartingTechOptions() != null && getStartingTechAmount() != 0 && !getStartingTechOptions().isEmpty()) {
                 sb.append("\nPick ").append(getStartingTechAmount()).append(" of the following:\n");
                 for (String id : getStartingTechOptions()) {
                     TechnologyModel model = Mapper.getTech(id);
@@ -251,12 +259,12 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
                 }
             }
         }
-        if(getFactionName().toLowerCase().contains("keleres")){
+        if (getFactionName().toLowerCase().contains("keleres")) {
             sb = new StringBuilder();
             sb.append("Choose 2 tech owned by other players.");
         }
         eb.addField("__Starting Tech__", sb.toString(), false);
-        
+
         return eb.build();
     }
 
