@@ -67,7 +67,7 @@ public class MiltyService {
             String id = "draftPresetKeleres_" + f;
             String label = StringUtils.capitalize(f);
             if (manager.getFactionDraft().contains(f)) {
-                keleresPresets.add(Buttons.gray(id, label + "🛑", model.getFactionEmoji()));
+                keleresPresets.add(Buttons.gray(id, label + " 🛑", model.getFactionEmoji()));
                 warn = true;
             } else {
                 keleresPresets.add(Buttons.green(id, label, model.getFactionEmoji()));
@@ -76,7 +76,7 @@ public class MiltyService {
 
         String message = player.getPing() + " Pre-select which flavor of Keleres to play in this game by clicking one of these buttons!";
         message += " You can change your decision later by clicking a different button.";
-        if (warn) message += "\n- Some of these factions are in the draft. If you preset them and they get chosen, then the preset will be cancelled.";
+        if (warn) message += "\n- 🛑 Some of these factions are in the draft! 🛑 If you preset them and they get chosen, then the preset will be cancelled.";
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, keleresPresets);
     }
 
