@@ -2561,17 +2561,16 @@ public class Game extends GameProperties {
 
     @Nullable
     public Map<String, Integer> drawSpecificSecretObjective(String soID, String userID) {
-        if (!getSecretObjectives().isEmpty()) {
-            boolean remove = removeSOFromGame(soID);
-            if (remove) {
-                Player player = getPlayer(userID);
-                if (player != null) {
-                    player.setSecret(soID);
-                    return player.getSecrets();
-                }
-            }
+        boolean isRemoved = removeSOFromGame(soID);
+        if (!isRemoved) {
+            return null;
         }
-        return null;
+        Player player = getPlayer(userID);
+        if (player == null) {
+            return null;
+        }
+        player.setSecret(soID);
+        return player.getSecrets();
     }
 
     public void drawSpecificActionCard(String acID, String userID) {
@@ -4220,5 +4219,13 @@ public class Game extends GameProperties {
             teamMateIDs.remove(player.getUserID());
         }
         return teamMateIDs;
+    }
+
+    public List<String> peekAtSecrets(int count) {
+        var peekedSecrets = new ArrayList<String>();
+        for (int i = 0; i < count && i < getSecretObjectives().size(); i++) {
+            peekedSecrets.add(getSecretObjectives().get(i));
+        }
+        return peekedSecrets;
     }
 }
