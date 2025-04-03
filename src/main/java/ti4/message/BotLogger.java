@@ -22,6 +22,8 @@ import ti4.listeners.ModalListener;
 import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
+import javax.annotation.Nonnull;
+
 public class BotLogger {
     /**
      * Sends a message to the Primary Async Server's #bot-log channel
@@ -31,6 +33,153 @@ public class BotLogger {
     public static void log(String msg) {
         log(null, msg, null);
     }
+
+
+    /**
+     * Stores the data necessary to send a log message. All elements may be null.
+     */
+    public static class LogData {
+        GenericInteractionCreateEvent event;
+        String msg;
+        Throwable err;
+        boolean includeTimestamp;
+    }
+
+
+    /**
+     * Sends a message to #bot-log-info in offending server, else resorting to #bot-log and finally webhook.
+     * <p>
+     * If err is not null, a full stack trace will be sent in a thread.
+     * <p>
+     * Assumes that the event specified in data has a guild if it exists.
+     *
+     * @param data - The log data to show in the log message. If null, the log message will indicate as such.
+     */
+    public static void info(@Nonnull LogData data) {
+        logToChannel(data, "bot-log-info");
+    }
+
+    /**
+     * Sends a message to #bot-log-warning in offending server, eelse resorting to #bot-log and finally webhook.
+     * <p>
+     * If err is not null, a full stack trace will be sent in a thread.
+     * <p>
+     * Assumes that the event specified in data has a guild if it exists.
+     *
+     * @param data - The log data to show in the log message. If null, the log message will indicate as such.
+     */
+    public static void warning(@Nonnull LogData data) {
+        logToChannel(data, "bot-log-warning");
+    }
+
+    /**
+     * Sends a message to #bot-log-error in offending server, else resorting to #bot-log and finally webhook.
+     * <p>
+     * If err is not null, a full stack trace will be sent in a thread.
+     * <p>
+     * Assumes that the event specified in data has a guild if it exists.
+     *
+     * @param data - The log data to show in the log message. If null, the log message will indicate as such.
+     */
+    public static void error(@Nonnull LogData data) {
+        logToChannel(data, "bot-log-error");
+    }
+
+
+    /**
+     * Sends a log message via the specified bot log channel. Should be used through info(), warning(), or error() methods.
+     * <p>
+     * Assumes that the event specified in data has a guild if it exists.
+     *
+     * @param data - The log data to show in the log message. If null, the log message will indicate as such.
+     * @param primaryChannelName - The channel to send the log message in. If null, it will default to the websocket.
+     */
+    private static void logToChannel(@Nonnull LogData data, @Nonnull String primaryChannelName) {
+        TextChannel channel = null;
+        StringBuilder msg = new StringBuilder();
+
+        // Get text channel and construct log message
+        if (data.event != null) {
+            channel = data.event.getGuild().getTextChannelsByName(primaryChannelName, false).getFirst();
+            if (channel == null) channel = data.event.getGuild().getTextChannelsByName("bot-log", false).getFirst();
+
+            if (channel == null) msg.append("Failed to find logging channel for \"")
+                    .append(data.event.getGuild().getName())
+                    .append("\". Log sent via webhook to main server.\n");
+
+            // Appending the channel must be done in the switch statement to ensure that it exists
+            switch (data.event) {
+                case SlashCommandInteractionEvent event -> msg.append("[")
+                        .append(data.event.getChannel().getName())
+                        .append("](")
+                        .append(event.getChannel().getAsMention())
+                        .append(") ")
+                        .append(event.getUser().getEffectiveName())
+                        .append(" used `")
+                        .append(event.getCommandString())
+                        .append("`\n");
+                case ButtonInteractionEvent event -> msg.append("[")
+                        .append(data.event.getChannel().getName())
+                        .append("](")
+                        .append(event.getMessage().getJumpUrl())
+                        .append(") ")
+                        .append(event.getUser().getEffectiveName())
+                        .append(" pressed button ")
+                        .append(ButtonHelper.getButtonRepresentation(event.getButton()))
+                        .append("\n");
+                case StringSelectInteractionEvent event -> msg.append("[")
+                        .append(data.event.getChannel().getName())
+                        .append("](")
+                        .append(event.getMessage().getJumpUrl())
+                        .append(") ")
+                        .append(event.getUser().getEffectiveName())
+                        .append(" selected ")
+                        .append(SelectionMenuProcessor.getSelectionMenuDebugText(event))
+                        .append("\n");
+                case ModalInteractionEvent event -> msg.append("[")
+                        .append(data.event.getChannel().getName())
+                        .append("](")
+                        .append(event.getChannel().getAsMention())
+                        .append(") ")
+                        .append(event.getUser().getEffectiveName())
+                        .append(" used modal ")
+                        .append(ModalListener.getModalDebugText(event))
+                        .append("\n");
+                default -> msg.append("[Unknown event]\n");
+            }
+        } else msg.append("Failed to find logging channel without event. Log sent via webhook to main server.\n");
+
+        if (data.includeTimestamp) msg.append(DateTimeHelper.getCurrentTimestamp());
+
+        msg.append("> Message: ").append(data.msg == null ? "" : data.msg);
+        String compiledMessage = msg.toString();
+        int msgLength = compiledMessage.length();
+
+        // Handle message length overflow. Overflow length is derived from previous implementation
+        for (int i = 0; i <= msgLength; i += 2000) {
+            String msgChunk = compiledMessage.substring(i, Math.min(i + 2000, msgLength));
+
+            if (data.err == null || i + 2000 >= msgLength) { // If length could overflow or there is no error to trace
+                if (channel == null) MessageHelper.sendMessageToBotLogWebhook(msgChunk); // Send message on websocket
+                else channel.sendMessage(msgChunk).queue(); // Send message on channel
+
+            } else { // Handle errored thread on last send
+                ThreadArchiveHelper.checkThreadLimitAndArchive(data.event.getGuild());
+
+                if (channel == null) MessageHelper.sendMessageToBotLogWebhook(compiledMessage.substring(i, msgLength));
+                else channel.sendMessage(compiledMessage.substring(i))
+                        .queue(m -> m.createThreadChannel("Stack Trace")
+                                .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                                .queue(t -> {
+                                    MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(data.err));
+                                    t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                                })
+                        );
+            }
+
+        }
+    }
+
 
     public static void logWithTimestamp(String msg) {
         String timeStampedMessage = DateTimeHelper.getCurrentTimestamp() + "  " + msg;
