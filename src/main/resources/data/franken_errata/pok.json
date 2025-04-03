@@ -118,6 +118,20 @@
         "source": "pok"
     },
     {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "ghost",
+        "AdditionalComponents": [
+            "ABILITY:creuss_gate"
+        ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "creuss_gate",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
         "ItemCategory": "ABILITY",
         "ItemId": "edict",
         "alternateText": "When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens; other players' tokens in your fleet pool increase your fleet limit but cannot be redistributed.",
