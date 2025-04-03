@@ -152,6 +152,8 @@ public class BotLogger {
         if (data.includeTimestamp) msg.append(DateTimeHelper.getCurrentTimestamp());
 
         msg.append("> Message: ").append(data.msg == null ? "" : data.msg);
+
+        // Send off message
         String compiledMessage = msg.toString();
         int msgLength = compiledMessage.length();
 
@@ -176,16 +178,11 @@ public class BotLogger {
                                 })
                         );
             }
-
         }
-
-
-
-
-
     }
 
 
+    @Deprecated
     public static void logWithTimestamp(String msg) {
         String timeStampedMessage = DateTimeHelper.getCurrentTimestamp() + "  " + msg;
         log(null, timeStampedMessage, null);
@@ -199,6 +196,7 @@ public class BotLogger {
      * @param msg - message to send to the #bot-log channel
      * @e - Exception
      */
+    @Deprecated
     public static void log(String msg, Throwable e) {
         log(null, msg, e);
     }
@@ -208,6 +206,7 @@ public class BotLogger {
      * 
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
      */
+    @Deprecated
     public static void log(GenericInteractionCreateEvent event, String msg) {
         log(event, msg, null);
     }
@@ -219,6 +218,7 @@ public class BotLogger {
      * 
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
      */
+    @Deprecated
     public static void log(GenericInteractionCreateEvent event, Exception e) {
         log(event, null, e);
     }
@@ -231,6 +231,7 @@ public class BotLogger {
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
      * @param e Exception
      */
+    @Deprecated
     public static void log(GenericInteractionCreateEvent event, String msg, Throwable e) {
         if (ignoredError(e)) return;
 
@@ -343,6 +344,9 @@ public class BotLogger {
         }
     }
 
+
+    // TODO: Replace existing usages of below methods
+    @Deprecated
     public static void logButton(ButtonInteractionEvent event) {
         TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
         if (primaryBotLogChannel == null) return;
@@ -358,6 +362,7 @@ public class BotLogger {
         }
     }
 
+    @Deprecated
     public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
         TextChannel primaryBotLogChannel = getPrimaryBotLogChannel();
         if (primaryBotLogChannel == null) return;
@@ -376,6 +381,7 @@ public class BotLogger {
     /**
      * Retreives either the event's guild's #bot-log channel, or, if that is null, the Primary server's #bot-log channel.
      */
+    @Deprecated
     public static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
         TextChannel botLogChannel = null;
         if (event != null) {
@@ -391,6 +397,7 @@ public class BotLogger {
         return botLogChannel;
     }
 
+    @Deprecated
     public static TextChannel getPrimaryBotLogChannel() {
         for (TextChannel textChannel : AsyncTI4DiscordBot.guildPrimary.getTextChannels()) {
             if ("bot-log".equals(textChannel.getName())) {
@@ -400,6 +407,7 @@ public class BotLogger {
         return null;
     }
 
+    @Deprecated
     public static void catchRestError(Throwable e) {
         // if it's ignored, it's not actionable. Simple
         // if (ignoredError(e)) return;
@@ -413,6 +421,7 @@ public class BotLogger {
         }
     }
 
+    @Deprecated
     private static boolean ignoredError(Throwable error) {
         if (error instanceof ErrorResponseException restError) {
             // This is an "unknown message" error. Typically caused by the bot trying to delete or edit
