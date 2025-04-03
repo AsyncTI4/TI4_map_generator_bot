@@ -123,7 +123,7 @@ public class ImageHelper {
         try {
             return ImageIO.read(new File(filePath));
         } catch (IOException e) {
-            BotLogger.log("Failed to read image '" + filePath + "': " + Arrays.toString(e.getStackTrace()));
+            BotLogger.error("Failed to read image '" + filePath + "': ", e, true);
         }
         return null;
     }
@@ -132,7 +132,7 @@ public class ImageHelper {
         try {
             return ImageIO.read(inputStream);
         } catch (IOException e) {
-            BotLogger.log("Failed to read image: " + Arrays.toString(e.getStackTrace()));
+            BotLogger.error("Failed to read image: ", e, true);
         }
         return null;
     }
@@ -145,7 +145,7 @@ public class ImageHelper {
         try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
             return readImage(inputStream);
         } catch (IOException e) {
-            BotLogger.log("Failed to read image URL'" + imageURL + "': " + Arrays.toString(e.getStackTrace()));
+            BotLogger.error("Failed to read image URL'" + imageURL + "': ", e, true);
         }
         return null;
     }

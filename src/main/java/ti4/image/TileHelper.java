@@ -33,9 +33,9 @@ public class TileHelper {
     private static final Map<String, List<PlanetModel>> tileIdsToPlanetModels = new HashMap<>();
 
     public static void init() {
-        BotLogger.logWithTimestamp("Initiating Planets");
+        BotLogger.info("Initiating Planets", true);
         initPlanetsFromJson();
-        BotLogger.logWithTimestamp("Initiating Tiles");
+        BotLogger.info("Initiating Tiles", true);
         initTilesFromJson();
     }
 
@@ -89,12 +89,12 @@ public class TileHelper {
                     badObjects.add(planet.getAlias());
                 }
             } catch (Exception e) {
-                BotLogger.log("Error reading planet from file:\n> " + file.getPath(), e);
+                BotLogger.error("Error reading planet from file:\n> " + file.getPath(), e, true);
             }
         });
         if (!badObjects.isEmpty())
-            BotLogger.log("The following **PlanetModel** are improperly formatted, but were imported anyway:\n> "
-                + String.join("\n> ", badObjects));
+            BotLogger.warning("The following **PlanetModel** are improperly formatted, but were imported anyway:\n> "
+                + String.join("\n> ", badObjects), false);
     }
 
     public static void initTilesFromJson() {
@@ -130,8 +130,8 @@ public class TileHelper {
             }
         });
         if (!badObjects.isEmpty())
-            BotLogger.log("The following **TileModel** are improperly formatted, but were imported anyway:\n> "
-                + String.join("\n> ", badObjects));
+            BotLogger.warning("The following **TileModel** are improperly formatted, but were imported anyway:\n> "
+                + String.join("\n> ", badObjects), false);
     }
 
     private static void duplicateDraftTiles(TileModel tile) {

@@ -48,10 +48,10 @@ class ButtonRuntimeWarningService {
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
                     DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (processingTime > eventDelay ? "😲" : "");
                 message += "\nContext time: " + contextRuntime + "ms\nResolve time: " + resolveRuntime + "ms\nSave time: " + saveRuntime + "ms";
-                BotLogger.log(message);
+                BotLogger.warning(event, message, true);
                 if (++runtimeWarningCount > 20) {
                     pauseWarningsUntil = now.plusMinutes(5);
-                    BotLogger.log("**Buttons are processing slowly. Pausing warnings for 5 minutes.**");
+                    BotLogger.error(event, "**Buttons are processing slowly. Pausing warnings for 5 minutes.**", true);
                     runtimeWarningCount = 0;
                 }
                 lastWarningTime = now;

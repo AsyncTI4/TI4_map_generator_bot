@@ -70,7 +70,7 @@ class GameSaveService {
                 saveTile(writer, tile);
             }
         } catch (Exception e) {
-            BotLogger.log("Could not save map: " + game.getName(), e);
+            BotLogger.error("Could not save map: " + game.getName(), e, true);
             return false;
         }
 
@@ -912,7 +912,7 @@ class GameSaveService {
 
             writer.write(System.lineSeparator());
         } catch (Exception e) {
-            BotLogger.log("Error trying to save peeked public objective(s): " + constant, e);
+            BotLogger.error("Error trying to save peeked public objective(s): " + constant, e, true);
         }
     }
 

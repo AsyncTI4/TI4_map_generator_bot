@@ -184,7 +184,7 @@ public class EndGameService {
                 // CREATE POST
                 if (publish) {
                     if (summaryChannel == null) {
-                        BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
+                        BotLogger.warning(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary", false);
                         return;
                     }
 
@@ -209,7 +209,7 @@ public class EndGameService {
             });
         } else if (publish) { //FOW SUMMARY
             if (summaryChannel == null) {
-                BotLogger.log(event, "`#fow-war-stories` channel not found - `/game end` cannot post summary");
+                BotLogger.warning(event, "`#fow-war-stories` channel not found - `/game end` cannot post summary", false);
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
@@ -374,9 +374,9 @@ public class EndGameService {
     public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
         Category inLimboCategory = guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();
         if (inLimboCategory == null) {
-            BotLogger.log(
+            BotLogger.warning(
                 "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
-                    + guild.getName());
+                    + guild.getName(), false);
             return;
         }
         inLimboCategory.getTextChannels().stream()

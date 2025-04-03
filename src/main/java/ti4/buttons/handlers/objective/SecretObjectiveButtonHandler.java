@@ -35,7 +35,7 @@ class SecretObjectiveButtonHandler {
                 DrawSecretService.drawSO(event, game, player);
             }
         } catch (Exception e) {
-            BotLogger.log(event, "Could not parse SO ID: " + soID, e);
+            BotLogger.error(event, "Could not parse SO ID: " + soID, e, true);
             event.getChannel().sendMessage("Could not parse secret objective ID: " + soID + ". Please discard manually.").queue();
             return;
         }

@@ -136,7 +136,7 @@ public class UnitRenderGenerator {
                 unitImage = scale == 1.0f ? ImageHelper.read(unitPath) : ImageHelper.readScaled(unitPath, scale);
 
             } catch (Exception e) {
-                BotLogger.log("Could not parse unit file for: " + unitKey + " in game " + game.getName(), e);
+                BotLogger.error("Could not parse unit file for: " + unitKey + " in game " + game.getName(), e, true);
                 continue;
             }
             if (unitImage == null) continue;

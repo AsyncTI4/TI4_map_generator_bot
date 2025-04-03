@@ -22,11 +22,11 @@ public class ThreadArchiveHelper {
                 int maxThreadCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.MAX_THREAD_COUNT.toString(), Integer.class, 975);
 
                 if (threadCount > maxThreadCount) {
-                    BotLogger.log("**" + guild.getName() + "** Max Threads Reached (" + threadCount + " out of  " + maxThreadCount + ") - Archiving " + closeCount + " threads");
+                    BotLogger.info("**" + guild.getName() + "** Max Threads Reached (" + threadCount + " out of  " + maxThreadCount + ") - Archiving " + closeCount + " threads", true);
                     archiveOldThreads(guild, closeCount);
                 }
             } catch (Exception e) {
-                BotLogger.log("Error in checkThreadLimitAndArchive", e);
+                BotLogger.error("Error in checkThreadLimitAndArchive", e, true);
             }
         });
     }

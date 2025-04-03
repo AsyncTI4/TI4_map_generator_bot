@@ -111,7 +111,7 @@ public class ObjectiveBox {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("Error drawing score control token markers", e);
+            BotLogger.error("Error drawing score control token markers", e, true);
         }
     }
 

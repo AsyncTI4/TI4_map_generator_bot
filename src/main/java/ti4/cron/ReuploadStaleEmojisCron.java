@@ -19,8 +19,8 @@ public class ReuploadStaleEmojisCron {
             ApplicationEmojiService.deleteHangingEmojis();
             ApplicationEmojiService.reportMissingEnums();
         } catch (Exception e) {
-            BotLogger.log("**ReuploadStaleEmojisCron failed.**", e);
+            BotLogger.error("**ReuploadStaleEmojisCron failed.**", e, true);
         }
-        BotLogger.log("Ran ReuploadStaleEmojisCron.");
+        BotLogger.info("Ran ReuploadStaleEmojisCron.", true);
     }
 }

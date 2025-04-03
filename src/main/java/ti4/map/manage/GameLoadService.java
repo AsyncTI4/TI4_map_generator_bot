@@ -88,19 +88,19 @@ class GameLoadService {
                     try {
                         Game game = readGame(file);
                         if (game == null || game.getName() == null) {
-                            BotLogger.log("Could not load game. Game or game name is null: " + file.getName());
+                            BotLogger.warning("Could not load game. Game or game name is null: " + file.getName(), false);
                             return null;
                         }
                         return new ManagedGame(game);
                     } catch (Exception e) {
-                        BotLogger.log("Could not load game: " + file.getName(), e);
+                        BotLogger.error("Could not load game: " + file.getName(), e, true);
                     }
                     return null;
                 })
                 .filter(Objects::nonNull)
                 .toList();
         } catch (IOException e) {
-            BotLogger.log("Exception occurred while getting all game names.", e);
+            BotLogger.error("Exception occurred while getting all game names.", e, true);
         }
         return Collections.emptyList();
     }
@@ -119,7 +119,7 @@ class GameLoadService {
     @Nullable
     private static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
-            BotLogger.log("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
+            BotLogger.error("Could not load map, map file does not exist: " + gameFile.getAbsolutePath(), false);
             return null;
         }
         try {
@@ -148,7 +148,7 @@ class GameLoadService {
                     try {
                         readGameInfo(game, data);
                     } catch (Exception e) {
-                        BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.", e);
+                        BotLogger.error("Encountered fatal error loading game " + game.getName() + ". Load aborted.", e, true);
                         return null;
                     }
                 }
@@ -178,14 +178,14 @@ class GameLoadService {
             }
             Map<String, Tile> tileMap = getTileMap(gameFileLines, game, gameFile);
             if (tileMap == null) {
-                BotLogger.log("Encountered fatal error loading game " + game.getName() + ". Load aborted.");
+                BotLogger.error("Encountered fatal error loading game " + game.getName() + ". Load aborted.", false);
                 return null;
             }
             game.setTileMap(tileMap);
             TransientGameInfoUpdater.update(game);
             return game;
         } catch (Exception e) {
-            BotLogger.log("Data read error: " + gameFile.getName(), e);
+            BotLogger.error("Data read error: " + gameFile.getName(), e, true);
             return null;
         }
     }
@@ -208,7 +208,7 @@ class GameLoadService {
                 if (tile != null) {
                     tileMap.put(tile.getPosition(), tile);
                 } else {
-                    BotLogger.log("Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData + "` - tile will be skipped - check save file");
+                    BotLogger.error("Error loading Map: `" + game.getName() + "` -> Tile is null: `" + tileData + "` - tile will be skipped - check save file", false);
                 }
 
                 while (gameFileLines.hasNext()) {
@@ -229,7 +229,7 @@ class GameLoadService {
                                 if (Constants.MIRAGE.equals(unitHolderName)) {
                                     Helper.addMirageToTile(tile);
                                 } else if (!tile.isSpaceHolderValid(unitHolderName)) {
-                                    BotLogger.log(game.getName() + ": Not valid unitholder detected: " + unitHolderName);
+                                    BotLogger.warning(game.getName() + ": Not valid unitholder detected: " + unitHolderName, false);
                                 }
                             }
                             continue;
@@ -274,7 +274,7 @@ class GameLoadService {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("Data read error: " + gameFile.getName(), e);
+            BotLogger.error("Data read error: " + gameFile.getName(), e, true);
             return null;
         }
         return tileMap;
@@ -340,14 +340,14 @@ class GameLoadService {
                         JavaType reference = mapper.getTypeFactory().constructParametricType(List.class, BorderAnomalyHolder.class);
                         game.setBorderAnomalies(mapper.readValue(info, reference));
                     } catch (Exception e) {
-                        BotLogger.log("Error reading border anomalies from save file!", e);
+                        BotLogger.error("Error reading border anomalies from save file!", e, true);
                     }
                 }
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
                         game.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
                     } catch (Exception e) {
-                        BotLogger.log("Failed to load adjacency overrides", e);
+                        BotLogger.error("Failed to load adjacency overrides", e, true);
                     }
                 }
                 case Constants.REVERSE_SPEAKER_ORDER -> game.setReverseSpeakerOrder("true".equals(info));
@@ -679,35 +679,35 @@ class GameLoadService {
                     try {
                         game.setRound(Integer.parseInt(info));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse round number", exception);
+                        BotLogger.error("Could not parse round number", exception, true);
                     }
                 }
                 case Constants.BUTTON_PRESS_COUNT -> {
                     try {
                         game.setButtonPressCount(Integer.parseInt(info));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse button press count", exception);
+                        BotLogger.error("Could not parse button press count", exception, true);
                     }
                 }
                 case Constants.STARTED_DATE -> {
                     try {
                         game.setStartedDate(Long.parseLong(info));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse started date", exception);
+                        BotLogger.error("Could not parse started date", exception, true);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {
                     try {
                         game.setLastModifiedDate(Long.parseLong(info));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse last modified date", exception);
+                        BotLogger.error("Could not parse last modified date", exception, true);
                     }
                 }
                 case Constants.ENDED_DATE -> {
                     try {
                         game.setEndedDate(Long.parseLong(info));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse ended date", exception);
+                        BotLogger.error("Could not parse ended date", exception, true);
                     }
                 }
                 case Constants.IMAGE_GEN_COUNT -> {
@@ -952,7 +952,7 @@ class GameLoadService {
                         }
                         player.setLeaders(leaderList);
                     } catch (Exception e) {
-                        BotLogger.log("Could not parse leaders loading map", e);
+                        BotLogger.error("Could not parse leaders loading map", e, true);
                     }
                 }
                 case Constants.FOW_SYSTEMS -> {
@@ -968,8 +968,8 @@ class GameLoadService {
                             player.addFogTile(tileID, position, label);
                         }
                     } catch (Exception e) {
-                        BotLogger.log("Could not parse fog of war systems for player when loading the map: "
-                            + player.getColor(), e);
+                        BotLogger.error("Could not parse fog of war systems for player when loading the map: "
+                            + player.getColor(), e, true);
                     }
                 }
                 case Constants.SO_SCORED -> {
@@ -1067,7 +1067,7 @@ class GameLoadService {
                 return null;
             return new Tile(tileID, position);
         } catch (Exception e) {
-            BotLogger.log("Error reading tileData: `" + tileData + "`", e);
+            BotLogger.error("Error reading tileData: `" + tileData + "`", e, true);
         }
         return null;
     }

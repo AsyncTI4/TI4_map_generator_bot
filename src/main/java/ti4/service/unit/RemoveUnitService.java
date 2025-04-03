@@ -101,7 +101,7 @@ public class RemoveUnitService {
 
     private static void handleEmptyUnitHolders(GenericInteractionCreateEvent event, Tile tile, ParsedUnit parsedUnit) {
         if (event != null && event instanceof ButtonInteractionEvent) {
-            BotLogger.log(event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation() + " " + parsedUnit.getLocation());
+            BotLogger.warning(event, event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation() + " " + parsedUnit.getLocation(), false);
         } else {
             MessageHelper.replyToMessage(event, "Unable to determine where the units are being removed from.");
         }

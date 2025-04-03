@@ -361,7 +361,7 @@ public class MiltyDraftManager {
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
         } catch (Exception e) {
-            BotLogger.log("err", e);
+            BotLogger.error("err", e, true);
         }
 
         setNextPlayerInDraft();

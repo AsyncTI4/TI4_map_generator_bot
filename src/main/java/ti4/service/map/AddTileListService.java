@@ -50,7 +50,7 @@ public class AddTileListService {
         try {
             badTiles = addTileMapToGame(game, mappedTilesToPosition);
         } catch (Exception e) {
-            BotLogger.log(e.getMessage(), e);
+            BotLogger.error(e.getMessage(), e, true);
             MessageHelper.replyToMessage(event, e.getMessage());
         }
 
@@ -103,7 +103,7 @@ public class AddTileListService {
                 game.setTile(tile);
             }
         } catch (Exception e) {
-            BotLogger.log("Could not add setup and Mallice tiles", e);
+            BotLogger.error("Could not add setup and Mallice tiles", e, true);
         }
 
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();

@@ -393,7 +393,7 @@ public class PlayerTechService {
         String techID = StringUtils.substringAfter(buttonID, "getTech_");
         techID = AliasHandler.resolveTech(techID);
         if (!Mapper.isValidTech(techID)) {
-            BotLogger.log(event, "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
+            BotLogger.warning(event, "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID, false);
             return;
         }
         TechnologyModel techM = Mapper.getTech(techID);

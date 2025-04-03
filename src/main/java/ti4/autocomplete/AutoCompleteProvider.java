@@ -71,7 +71,7 @@ public class AutoCompleteProvider {
         try {
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
-            BotLogger.log("Error in handleAutoCompleteEvent", e);
+            BotLogger.error("Error in handleAutoCompleteEvent", e, true);
         }
     }
 
@@ -727,7 +727,7 @@ public class AutoCompleteProvider {
                         abilities = Mapper.getAbilities();
                     }
                 } catch (Exception e) {
-                    BotLogger.log(event, "Ability Autocomplete Setup Error", e);
+                    BotLogger.error(event, "Ability Autocomplete Setup Error", e, true);
                     abilities = Mapper.getAbilities();
                 }
 
