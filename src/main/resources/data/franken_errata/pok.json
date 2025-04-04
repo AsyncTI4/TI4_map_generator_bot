@@ -372,6 +372,20 @@
         ],
         "source": "pok"
     },
+{
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "nomad_flagship",
+        "OptionalSwaps": [
+            "TECH:m2"
+        ],
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "m2",
+        "Undraftable": true,
+        "source": "pok"
+    },
     {
         "ItemCategory": "MECH",
         "ItemId": "yssaril_mech",
