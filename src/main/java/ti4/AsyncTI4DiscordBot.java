@@ -96,6 +96,10 @@ public class AsyncTI4DiscordBot {
     private static final List<Class<?>> classes = new ArrayList<>();
 
     public static void main(String[] args) {
+        // guildPrimaryID must be set before initializing listeners that use webhook logging
+        userID = args[1];
+        guildPrimaryID = args[2];
+
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         jda = JDABuilder.createDefault(args[0])
@@ -134,9 +138,6 @@ public class AsyncTI4DiscordBot {
         }
 
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
-
-        userID = args[1];
-        guildPrimaryID = args[2];
 
         MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
