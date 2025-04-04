@@ -29,7 +29,7 @@ public class EndOldGamesCron {
                 .map(ManagedGame::getGame)
                 .forEach(EndOldGamesCron::endIfOld);
         } catch (Exception e) {
-            BotLogger.error("**Error ending inactive games!**", e, true);
+            BotLogger.error("**Error ending inactive games!**", e);
         }
     }
 
@@ -42,7 +42,7 @@ public class EndOldGamesCron {
 
         if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.info("Game: " + game.getName() + " has not been modified since ~" + lastModifiedDate +
-                " - the game flag `hasEnded` has been set to true", true);
+                " - the game flag `hasEnded` has been set to true");
             game.setHasEnded(true);
             GameManager.save(game, "Game automatically ended");
         }

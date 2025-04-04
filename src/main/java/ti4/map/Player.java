@@ -383,7 +383,7 @@ public class Player extends PlayerProperties {
             actionsChannel = game.getMainGameChannel();
         }
         if (actionsChannel == null) {
-            BotLogger.warning("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: " + game.getName(), false);
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: " + game.getName());
             return null;
         }
 
@@ -424,7 +424,7 @@ public class Player extends PlayerProperties {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error("`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: " + getCardsInfoThreadID() + " for potential thread name: " + threadName, e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(this), "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: " + getCardsInfoThreadID() + " for potential thread name: " + threadName, e);
         }
 
         // ATTEMPT TO FIND BY NAME
@@ -448,7 +448,7 @@ public class Player extends PlayerProperties {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error("`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName, e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(this), "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName, e);
         }
 
         // CREATE NEW THREAD
@@ -649,7 +649,7 @@ public class Player extends PlayerProperties {
                     + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType()
                     + "`\n> Units Owned: `"
                     + getUnitsOwned() + "`";
-                BotLogger.warning(message, false);
+                BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
                 return message;
             }
         }
@@ -1253,7 +1253,7 @@ public class Player extends PlayerProperties {
             return null;
         FactionModel factionSetupInfo = Mapper.getFaction(getFaction());
         if (factionSetupInfo == null) {
-            BotLogger.warning("Could not get faction setup info for: " + getFaction(), false);
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "Could not get faction setup info for: " + getFaction());
             return null;
         }
         return factionSetupInfo;
@@ -1498,7 +1498,7 @@ public class Player extends PlayerProperties {
                     }
                 } catch (Exception e) {
                     BotLogger.error("`Player.getPublicVictoryPoints   map=" + game.getName() + "  player="
-                        + getUserName() + "` - error finding value of `PO_ID=" + poID, e, true);
+                        + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
                 }
             }
         }

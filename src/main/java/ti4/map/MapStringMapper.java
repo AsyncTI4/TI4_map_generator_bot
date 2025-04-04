@@ -30,7 +30,7 @@ public class MapStringMapper {
             }
 
             if (ringCount > 16) {
-                BotLogger.warning("Exceeding max ring (16) count for " + userActiveGame.getName(), false);
+                BotLogger.warning(new BotLogger.LogMessageOrigin(userActiveGame), "Exceeding max ring (16) count for " + userActiveGame.getName());
                 break;
             }
         }

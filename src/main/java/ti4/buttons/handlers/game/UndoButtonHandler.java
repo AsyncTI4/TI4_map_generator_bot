@@ -54,7 +54,7 @@ class UndoButtonHandler {
                 numbers.add(Integer.parseInt(fileName));
             }
         } catch (IOException e) {
-            BotLogger.error("Error while reading game undo directory: " + gameUndoDirectory, e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error while reading game undo directory: " + gameUndoDirectory, e);
         }
 
         int maxNumber = numbers.isEmpty() ? 0

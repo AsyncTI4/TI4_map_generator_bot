@@ -17,8 +17,8 @@ public class UploadStatsCron {
         try {
             WebHelper.putStats();
         } catch (Exception e) {
-            BotLogger.error("**UploadStatsCron failed.**", e, true);
+            BotLogger.error("**UploadStatsCron failed.**", e);
         }
-        BotLogger.info("Ran UploadStatsCron.", true);
+        BotLogger.info("Ran UploadStatsCron.");
     }
 }

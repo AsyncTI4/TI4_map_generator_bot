@@ -24,7 +24,7 @@ public class OldUndoFileCleanupCron {
         try {
             cleanupOldUndoFiles();
         } catch (Exception e) {
-            BotLogger.error("**OldUndoFileCleanupCron failed.**", e, true);
+            BotLogger.error("**OldUndoFileCleanupCron failed.**", e);
         }
     }
 
@@ -39,10 +39,10 @@ public class OldUndoFileCleanupCron {
                 count += deleteOldFilesInDirectory(subdirectory, cutoff);
             }
         } catch (IOException e) {
-            BotLogger.error("Error accessing directory: " + baseGameUndoDirectory, e, true);
+            BotLogger.error("Error accessing directory: " + baseGameUndoDirectory, e);
         }
 
-        BotLogger.info(String.format("OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff), true);
+        BotLogger.info(String.format("OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff));
     }
 
     private int deleteOldFilesInDirectory(Path directory, Instant cutoff) {
@@ -54,7 +54,7 @@ public class OldUndoFileCleanupCron {
                 }
             }
         } catch (IOException e) {
-            BotLogger.error("Error accessing directory: " + directory, e, true);
+            BotLogger.error("Error accessing directory: " + directory, e);
         }
 
         deleteEmptyDirectory(directory);
@@ -70,7 +70,7 @@ public class OldUndoFileCleanupCron {
                 return true;
             }
         } catch (Exception e) {
-            BotLogger.error("Failed to delete undo file: " + file, e, true);
+            BotLogger.error("Failed to delete undo file: " + file, e);
         }
         return false;
     }
@@ -81,7 +81,7 @@ public class OldUndoFileCleanupCron {
                 Files.delete(directory);
             }
         } catch (IOException e) {
-            BotLogger.error("Error deleting empty directory: " + directory, e, true);
+            BotLogger.error("Error deleting empty directory: " + directory, e);
         }
     }
 }

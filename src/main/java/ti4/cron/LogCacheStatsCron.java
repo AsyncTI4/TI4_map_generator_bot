@@ -17,9 +17,9 @@ public class LogCacheStatsCron {
     private static void logCacheStats() {
         try {
             String cacheStats = CacheStatsToStringConverter.convert(CacheManager.getNamesToCaches());
-            BotLogger.info("```\n" + cacheStats + "\n```", true);
+            BotLogger.info("```\n" + cacheStats + "\n```");
         } catch (Exception e) {
-            BotLogger.error("**LogCacheStatsCron failed.**", e, true);
+            BotLogger.error("**LogCacheStatsCron failed.**", e);
         }
     }
 }

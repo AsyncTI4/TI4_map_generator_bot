@@ -109,7 +109,7 @@ public class JimboButtons {
             MessageHelper.editMessageWithActionRowsAndFiles(event, msg, rowsToSend, listToSend);
             return true; // no further actions needed
         } catch (Exception e) {
-            BotLogger.error("Unexpected exception in JIMBO pagination:", e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Unexpected exception in JIMBO pagination:", e);
             return true; // we still want to abort any further actions
         }
     }

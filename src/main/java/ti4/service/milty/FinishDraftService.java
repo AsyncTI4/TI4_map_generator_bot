@@ -79,7 +79,7 @@ public class FinishDraftService {
                 error.append("\n").append(index).append(". ").append(d.getSlice().ttsString());
             }
             MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
-            BotLogger.error(e.getMessage(), e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), e.getMessage(), e);
         }
     }
 }
