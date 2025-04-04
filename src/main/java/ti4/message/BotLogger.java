@@ -130,7 +130,7 @@ public class BotLogger {
 
 			if (channel != null) return channel.getAsMention();
 
-			if (guild != null) return "Location source is a guild";
+			if (guild != null) return "<Location source is a guild>";
 
 			warning("A LocationSource was created with no location");
 			return "No mention available";
@@ -142,9 +142,9 @@ public class BotLogger {
 		 */
 		@Nonnull
 		public String getStrictestName() {
-			if (channel != null) return "channel " + channel.getName();
+			if (channel != null) return "| Channel \"" + channel.getName() + "\"";
 
-			if (guild != null) return "guild " + guild.getName();
+			if (guild != null) return "| Guild \"" + guild.getName() + "\"";
 
 			warning("A LocationSource was created with no location");
 			return "No name available";
@@ -158,12 +158,12 @@ public class BotLogger {
 		@Nonnull
 		public StringBuilder appendSourceString(@Nonnull StringBuilder builder) {
 			builder.append("Source: ");
-			if (player != null) builder.append("player \"")
+			if (player != null) builder.append("| Player \"")
 				.append(player.getDisplayName())
-				.append("\" in ");
-			if (game != null) builder.append("game \"")
+				.append("\" ");
+			if (game != null) builder.append("| Game \"")
 				.append(game.getName())
-				.append("\" in ");
+				.append("\" ");
 			builder.append(getStrictestName())
 				.append(" (")
 				.append(getStrictestMention())
