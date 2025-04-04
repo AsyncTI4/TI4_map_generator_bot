@@ -1557,10 +1557,10 @@ public class AgendaHelper {
             try {
                 nextInLine = getNextInLine(null, getVotingOrder(game), game);
             } catch (Exception e) {
-                BotLogger.error("Could not find next in line", e, true);
+                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not find next in line", e);
             }
             if (nextInLine == null) {
-                BotLogger.warning("`startTheVoting` is **null**", false);
+                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "`startTheVoting` is **null**");
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
@@ -1623,7 +1623,7 @@ public class AgendaHelper {
                 game.updateActivePlayer(nextInLine);
                 game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
             } catch (Exception e) {
-                BotLogger.error("Could not update active player", e, true);
+                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not update active player", e);
             }
 
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
@@ -2193,15 +2193,15 @@ public class AgendaHelper {
                 if (x < votingOrder.size()) {
                     Player player = votingOrder.get(x);
                     if (player == null) {
-                        BotLogger.warning("`getNextInLine` Hit a null player in game " + game.getName(), false);
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "`getNextInLine` Hit a null player in game " + game.getName());
                         return null;
                     }
 
                     if (player.isRealPlayer()) {
                         return player;
                     } else {
-                        BotLogger.warning("`getNextInLine` Hit a notRealPlayer player in game "
-                            + game.getName() + " on player " + player.getUserName(), false);
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "`getNextInLine` Hit a notRealPlayer player in game "
+                            + game.getName() + " on player " + player.getUserName());
                     }
                 }
             }
@@ -2391,8 +2391,8 @@ public class AgendaHelper {
             if (planetModel.getName() != null) {
                 planetNameProper = planetModel.getName();
             } else {
-                BotLogger.warning(event, "TEMP BOTLOG: A bad PlanetModel was found for planet: "
-                        + planet + " - using the planet id instead of the model name", false);
+                BotLogger.warning(new BotLogger.LogMessageOrigin(event), "TEMP BOTLOG: A bad PlanetModel was found for planet: "
+                        + planet + " - using the planet id instead of the model name");
             }
             if (voteAmount != 0) {
                 Button button = Buttons.gray("exhaustForVotes_planet_" + planet,
@@ -3746,7 +3746,7 @@ public class AgendaHelper {
         try {
             AgendaHelper.startTheVoting(game);
         } catch (Exception e) {
-            BotLogger.error(event, "Could not start the voting", e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Could not start the voting", e);
         }
     }
 

@@ -81,7 +81,7 @@ public class PersistenceManager {
         var file = getFile(PERSISTENCE_MANAGER_JSON_PATH, fileName);
         boolean deleted = file.delete();
         if (!deleted) {
-            BotLogger.error("Failed to delete file: " + file.getAbsolutePath(), true);
+            BotLogger.error("Failed to delete file: " + file.getAbsolutePath());
         }
     }
 

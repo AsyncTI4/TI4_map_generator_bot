@@ -195,7 +195,11 @@ public class DrawingUtil {
             if (player == null) gameName = "Null Player";
             if (player != null && player.getGame() == null) gameName = "Null Game";
             if (player != null && player.getGame() != null) gameName = player.getGame().getName();
-            BotLogger.error("Ignored error during map generation for `" + gameName + "`", e, true);
+            if (player != null) {
+                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored error during map generation for `" + gameName + "`", e);
+            } else {
+                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored error during map generation for `" + gameName + "`", e);
+            }
         }
     }
 
@@ -259,7 +263,7 @@ public class DrawingUtil {
             if (factionID.equalsIgnoreCase("fogalliance") || factionID.equalsIgnoreCase("generic")) {
                 return null;
             }
-            BotLogger.warning("Could not find image file for faction icon: " + factionID, false);
+            BotLogger.warning("Could not find image file for faction icon: " + factionID);
         }
         return factionFile;
     }
@@ -273,7 +277,7 @@ public class DrawingUtil {
             if (user == null) return null;
             return ImageHelper.readURLScaled(user.getEffectiveAvatar().getUrl(), 32, 32);
         } catch (Exception e) {
-            BotLogger.error("Could not get Avatar", e, true);
+            BotLogger.error("Could not get Avatar", e);
         }
         return null;
     }
@@ -445,7 +449,7 @@ public class DrawingUtil {
             if (setOpacity)
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         } catch (Exception e) {
-            BotLogger.error("Could not display player's faction icon image", e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not display player's faction icon image", e);
         }
     }
 
@@ -467,7 +471,7 @@ public class DrawingUtil {
             Graphics2D g2 = (Graphics2D) graphics;
             g2.drawImage(underlay, x, y, null);
         } catch (Exception e) {
-            BotLogger.error("Could not display player's faction icon image", e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not display player's faction icon image", e);
         }
     }
 

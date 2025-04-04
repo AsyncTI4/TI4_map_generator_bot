@@ -50,7 +50,7 @@ class JazzCommand extends Subcommand {
         try {
             return mapper.writeValueAsString(object);
         } catch (Exception e) {
-            BotLogger.error("Error mapping to json: ", e, true);
+            BotLogger.error("Error mapping to json: ", e);
         }
         return null;
     }

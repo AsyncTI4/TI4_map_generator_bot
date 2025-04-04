@@ -257,7 +257,7 @@ public class MapGenerator implements AutoCloseable {
                 try {
                     tileRingNumber = Integer.parseInt(tileRing);
                 } catch (Exception e) {
-                    BotLogger.error("Hitting an error", e, true);
+                    BotLogger.error("Hitting an error", e);
                 }
 
                 Tile setupTile = null;
@@ -504,7 +504,7 @@ public class MapGenerator implements AutoCloseable {
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
-            BotLogger.error("Could not display play area: " + resourceName, e, true);
+            BotLogger.error("Could not display play area: " + resourceName, e);
         }
     }
 
@@ -575,7 +575,7 @@ public class MapGenerator implements AutoCloseable {
                     DrawingUtil.drawControlToken(graphics, controlTokenImage, DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlID), tokenX, tokenY, convertToGeneric, scale);
                 } catch (Exception e) {
                     // nothing
-                    BotLogger.error("Could not display player: " + player.getUserName(), e, true);
+                    BotLogger.error("Could not display player: " + player.getUserName(), e);
                 }
                 row++;
             }
@@ -1772,7 +1772,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         } catch (Exception e) {
-            BotLogger.error("Ignored exception during map generation", e, true);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored exception during map generation", e);
         }
     }
 
@@ -1936,7 +1936,7 @@ public class MapGenerator implements AutoCloseable {
                 }
 
             } catch (Exception e) {
-                BotLogger.error("Could not paint agenda icon", e, true);
+                BotLogger.error("Could not paint agenda icon", e);
             }
 
             if (!secondColumn) {
@@ -1992,7 +1992,7 @@ public class MapGenerator implements AutoCloseable {
             try {
                 paintEventIcon(y, x);
             } catch (Exception e) {
-                BotLogger.error("Could not paint event icon", e, true);
+                BotLogger.error("Could not paint event icon", e);
             }
 
             if (!secondColumn) {
@@ -2059,7 +2059,7 @@ public class MapGenerator implements AutoCloseable {
         } catch (Exception exception) {
             BotLogger.error(
                 "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(),
-                exception, true);
+                exception);
         }
     }
 

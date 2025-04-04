@@ -70,7 +70,7 @@ public record Objective(
         }
         PublicObjectiveModel po = Mapper.getPublicObjective(key);
         if (po == null) {
-            BotLogger.warning(String.format("Objective not found: key = %s", key), false);
+            BotLogger.warning(String.format("Objective not found: key = %s", key));
             return "";
         }
         return po.getName();

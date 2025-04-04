@@ -64,7 +64,7 @@ public class MessageListener extends ListenerAdapter {
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
             BotLogger.error("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " +
-                event.getMessage().getJumpUrl(), e, true);
+                event.getMessage().getJumpUrl(), e);
         }
     }
 
@@ -238,7 +238,7 @@ public class MessageListener extends ListenerAdapter {
                     }
                 });
         } catch (Exception e) {
-            BotLogger.error("Reading previous message", e, true);
+            BotLogger.error("Reading previous message", e);
         }
         return true;
     }

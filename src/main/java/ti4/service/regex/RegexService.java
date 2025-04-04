@@ -25,7 +25,7 @@ public class RegexService {
     }
 
     private static void defaultHandleFailure(String buttonID, Exception e) {
-        BotLogger.error("Error matching regex: " + buttonID + "\n" + Constants.jazzPing(), e, true);
+        BotLogger.error("Error matching regex: " + buttonID + "\n" + Constants.jazzPing(), e);
     }
 
     public static void throwFailure() throws Exception {
@@ -59,7 +59,7 @@ public class RegexService {
                 function.accept(matcher);
                 return true;
             } catch (Throwable e) {
-                BotLogger.error("Exception in matcher for button press:\n> " + buttonID, e, true);
+                BotLogger.error("Exception in matcher for button press:\n> " + buttonID, e);
                 return false;
             }
         } else {

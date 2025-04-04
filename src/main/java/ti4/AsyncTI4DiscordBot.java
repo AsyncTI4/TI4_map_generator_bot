@@ -207,7 +207,7 @@ public class AsyncTI4DiscordBot {
         //}
 
         // LOAD DATA
-        BotLogger.info(null, "LOADING DATA", null, true);
+        BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
         TileHelper.init();
@@ -222,12 +222,12 @@ public class AsyncTI4DiscordBot {
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
 
         // LOAD GAMES NAMES
-        BotLogger.info(null, "LOADING GAMES", null, true);
+        BotLogger.info("LOADING GAMES");
         GameManager.initialize();
 
         // RUN DATA MIGRATIONS
         if (DataMigrationManager.runMigrations()) {
-            BotLogger.info(null, "RAN MIGRATIONS", null, true);
+            BotLogger.info("RAN MIGRATIONS");
         }
 
         // START ASYNC PIPELINES
@@ -252,33 +252,33 @@ public class AsyncTI4DiscordBot {
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
-        BotLogger.info("FINISHED LOADING GAMES", true);
+        BotLogger.info("FINISHED LOADING GAMES");
 
         // Register Shutdown Hook to run when SIGTERM is received from docker stop
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-                BotLogger.info("SHUTDOWN PROCESS STARTED", true);
+                BotLogger.info("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
-                BotLogger.info("NO LONGER ACCEPTING COMMANDS", true);
+                BotLogger.info("NO LONGER ACCEPTING COMMANDS");
                 if (ExecutorManager.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL", true);
+                    BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
                 } else {
-                    BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL", true);
+                    BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
                 }
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.info("FINISHED RENDERING MAPS", true);
+                    BotLogger.info("FINISHED RENDERING MAPS");
                 } else {
-                    BotLogger.info("DID NOT FINISH RENDERING MAPS", true);
+                    BotLogger.info("DID NOT FINISH RENDERING MAPS");
                 }
                 if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.info("FINISHED PROCESSING STATISTICS",  true);
+                    BotLogger.info("FINISHED PROCESSING STATISTICS");
                 } else {
-                    BotLogger.info("DID NOT FINISH PROCESSING STATISTICS", true);
+                    BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
-                BotLogger.info("SHUTDOWN PROCESS COMPLETE", true);
+                BotLogger.info("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();
                 jda.awaitShutdown(30, TimeUnit.SECONDS);
@@ -296,7 +296,7 @@ public class AsyncTI4DiscordBot {
         CommandListUpdateAction commands = guild.updateCommands();
         CommandManager.getCommands().forEach(command -> command.register(commands));
         commands.queue();
-        BotLogger.info("BOT STARTED UP: " + guild.getName(), true);
+        BotLogger.info(new BotLogger.LogMessageOrigin(guild), "BOT STARTED UP: " + guild.getName());
         guilds.add(guild);
     }
 

@@ -18,7 +18,7 @@ public class RemoveCommandCounterService {
 
     public static void fromTile(GenericInteractionCreateEvent event, Player player, Tile tile) {
         if (player == null) {
-            BotLogger.warning(event, "Player cannot be found for removing command counter", false);
+            BotLogger.warning(new BotLogger.LogMessageOrigin(event), "Player cannot be found for removing command counter");
             return;
         }
         fromTile(event, player.getColor(), tile, player.getGame());

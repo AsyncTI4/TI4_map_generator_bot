@@ -60,7 +60,7 @@ public class GlobalSettings {
         try {
             writer.writeValue(getFile(), settings);
         } catch (IOException e) {
-            BotLogger.error("Error saving Global Settings", e, true);
+            BotLogger.error("Error saving Global Settings", e);
         }
     }
 

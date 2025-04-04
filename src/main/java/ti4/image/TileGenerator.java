@@ -153,7 +153,7 @@ public class TileGenerator {
             String timeStamp = getTimeStamp();
             graphics.drawString(game.getName() + " " + timeStamp, 0, 34);
         } catch (Exception e) {
-            BotLogger.error(game.getName() + ": Could not save generated system info image", e, true);
+            BotLogger.error(game.getName() + ": Could not save generated system info image", e);
         }
 
         return mainImage;
@@ -204,7 +204,7 @@ public class TileGenerator {
             BufferedImage tileImage = draw(tile, step);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (Exception exception) {
-            BotLogger.error("Tile Error, when building map: " + tile.getTileID(), exception, true);
+            BotLogger.error("Tile Error, when building map: " + tile.getTileID(), exception);
         }
     }
 
@@ -1228,7 +1228,7 @@ public class TileGenerator {
             BufferedImage cached = ImageHelper.read(decorationType.getImageFilePath());
             borderDecorationImage = new BufferedImage(cached.getColorModel(), cached.copyData(null), cached.isAlphaPremultiplied(), null);
         } catch (Exception e) {
-            BotLogger.error("Could not find border decoration image! Decoration was " + decorationType, e, true);
+            BotLogger.error("Could not find border decoration image! Decoration was " + decorationType, e);
             return;
         }
 
@@ -1296,7 +1296,7 @@ public class TileGenerator {
                     DrawingUtil.drawCCOfPlayer(tileGraphics, ccID, imgX, imgY, 1, player, convertToGeneric);
                 }
             } catch (Exception ignored) {
-                BotLogger.error("Could not addCC", ignored, true);
+                BotLogger.error("Could not addCC", ignored);
             }
 
             if (image != null) {
@@ -1410,7 +1410,7 @@ public class TileGenerator {
             if (isValid.apply(tokenID)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.warning("Could not find token file for: " + tokenID, false);
+                    BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Could not find token file for: " + tokenID);
                     continue;
                 }
                 float scale = 0.85f;
@@ -1481,7 +1481,7 @@ public class TileGenerator {
                 }
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.warning("Could not parse token file for: " + tokenID + " on tile: " + tile.getAutoCompleteName(), false);
+                    BotLogger.warning("Could not parse token file for: " + tokenID + " on tile: " + tile.getAutoCompleteName());
                     continue;
                 }
                 BufferedImage tokenImage = ImageHelper.read(tokenPath);
@@ -1605,7 +1605,7 @@ public class TileGenerator {
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
             if (tokenPath == null) {
-                BotLogger.warning("Could not parse token file for: " + tokenID, false);
+                BotLogger.warning("Could not parse token file for: " + tokenID);
                 continue;
             }
             BufferedImage image = ImageHelper.readScaled(tokenPath, 0.85f);
@@ -1638,7 +1638,7 @@ public class TileGenerator {
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
             if (tokenPath == null) {
-                BotLogger.warning("Could not parse token file for: " + tokenID, false);
+                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Could not parse token file for: " + tokenID);
                 continue;
             }
             if (game.isCptiExploreMode() && tokenPath.toLowerCase().contains("token_frontier")) {
