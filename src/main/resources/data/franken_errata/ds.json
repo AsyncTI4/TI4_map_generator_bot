@@ -1,5 +1,23 @@
 [
     {
+        "ItemCategory": "ABILITY",
+        "ItemId": "military_industrial_complex",
+        "AdditionalComponents": [
+            "ABILITY:arms_dealers"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:axiscommander",
+            "HERO:axishero"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "arms_dealers",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
         "ItemCategory": "COMMANDER",
         "ItemId": "axiscommander",
         "Undraftable": true,
@@ -13,20 +31,8 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "arms_dealers",
+        "ItemId": "ancient_blueprints",
         "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "military_industrial_complex",
-        "AdditionalComponents": [
-            "ABILITY:arms_dealers"
-        ],
-        "OptionalSwaps": [
-            "HERO:axishero",
-            "COMMANDER:axiscommander"
-        ],
         "source": "ds"
     },
     {
@@ -64,12 +70,6 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "ancient_blueprints",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "byssus",
         "Undraftable": true,
         "source": "ds"
@@ -77,7 +77,7 @@
     {
         "ItemCategory": "AGENT",
         "ItemId": "cheiranagent",
-        "OptionalSwaps": [
+        "AdditionalComponents": [
             "ABILITY:byssus"
         ],
         "source": "ds"
@@ -118,8 +118,24 @@
         "ItemCategory": "MECH",
         "ItemId": "edyn_mech",
         "OptionalSwaps": [
-            "ABILITY:decree",
-            "ABILITY:radiance"
+            "ABILITY:radiance",
+            "ABILITY:decree"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "rally_to_the_cause",
+        "OptionalSwaps": [
+            "MECH:freesystems_mech"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "diplomats",
+        "AdditionalComponents": [
+            "ABILITY:free_people"
         ],
         "source": "ds"
     },
@@ -143,18 +159,21 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "rally_to_the_cause",
+        "ItemId": "the_lady_and_the_lord",
+        "AdditionalComponents": [
+            "FLAGSHIP:ghemina_flagship_lord"
+        ],
         "OptionalSwaps": [
-            "MECH:freesystems_mech"
+            "COMMANDER:gheminacommander",
+            "HERO:gheminaherolady",
+            "HERO:gheminaherolord"
         ],
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "diplomats",
-        "AdditionalComponents": [
-            "ABILITY:free_people"
-        ],
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "ghemina_flagship_lord",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -165,38 +184,13 @@
     },
     {
         "ItemCategory": "HERO",
-        "ItemId": "gheminaherolord",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "HERO",
         "ItemId": "gheminaherolady",
         "Undraftable": true,
         "source": "ds"
     },
     {
-        "ItemCategory": "FLAGSHIP",
-        "ItemId": "ghemina_flagship_lord",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "the_lady_and_the_lord",
-        "OptionalSwaps": [
-            "COMMANDER:gheminacommander",
-            "HERO:gheminaherolord",
-            "HERO:gheminaherolady"
-        ],
-        "AdditionalComponents": [
-            "FLAGSHIP:ghemina_flagship_lord"
-        ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "HOMESYSTEM",
-        "ItemId": "ghoti",
+        "ItemCategory": "HERO",
+        "ItemId": "gheminaherolord",
         "Undraftable": true,
         "source": "ds"
     },
@@ -215,17 +209,14 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "spawning_grounds",
-        "AdditionalComponents": [
-            "HOMESYSTEM:ghoti"
-        ],
         "OptionalSwaps": [
             "ABILITY:mobile_command"
         ],
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "celestial_reclamation",
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "ghoti",
         "Undraftable": true,
         "source": "ds"
     },
@@ -239,25 +230,7 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "probability_algorithms",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "limited_vision",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "PN",
-        "ItemId": "dspnauge",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "HERO",
-        "ItemId": "augershero",
+        "ItemId": "celestial_reclamation",
         "Undraftable": true,
         "source": "ds"
     },
@@ -275,9 +248,44 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "TECH",
-        "ItemId": "dskjalg",
+        "ItemCategory": "ABILITY",
+        "ItemId": "limited_vision",
         "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "probability_algorithms",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "dspnauge",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "augershero",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "glory",
+        "AdditionalComponents": [
+            "ABILITY:valor"
+        ],
+        "OptionalSwaps": [
+            "ABILITY:heroism",
+            "FLAGSHIP:kjalengard_flagship",
+            "TECH:dskjalg",
+            "AGENT:kjalengardagent",
+            "COMMANDER:kjalengardcommander",
+            "HERO:kjalengardhero",
+            "MECH:kjalengard_mech"
+        ],
         "source": "ds"
     },
     {
@@ -289,6 +297,18 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "valor",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "kjalengard_flagship",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dskjalg",
         "Undraftable": true,
         "source": "ds"
     },
@@ -317,39 +337,16 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "FLAGSHIP",
-        "ItemId": "kjalengard_flagship",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "glory",
-        "AdditionalComponents": [
-            "ABILITY:valor"
-        ],
-        "OptionalSwaps": [
-            "ABILITY:heroism",
-            "TECH:dskjalg",
-            "AGENT:kjalengardagent",
-            "COMMANDER:kjalengardcommander",
-            "HERO:kjalengardhero",
-            "FLAGSHIP:kjalengard_flagship",
-            "MECH:kjalengard_mech"
-        ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "FLAGSHIP",
-        "ItemId": "kollecc_flagship",
+        "ItemCategory": "MECH",
+        "ItemId": "kollecc_mech",
         "AdditionalComponents": [
             "ABILITY:shroud_of_lith"
         ],
         "source": "ds"
     },
     {
-        "ItemCategory": "MECH",
-        "ItemId": "kollecc_mech",
+        "ItemCategory": "ABILITY",
+        "ItemId": "cloaked_fleets",
         "AdditionalComponents": [
             "ABILITY:shroud_of_lith"
         ],
@@ -362,10 +359,19 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "cloaked_fleets",
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "kollecc_flagship",
         "AdditionalComponents": [
             "ABILITY:shroud_of_lith"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "contagion",
+        "AdditionalComponents": [
+            "ABILITY:plague_reservoir",
+            "ABILITY:subversive"
         ],
         "source": "ds"
     },
@@ -383,15 +389,6 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "contagion",
-        "AdditionalComponents": [
-            "ABILITY:plague_reservoir",
-            "ABILITY:subversive"
-        ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "a_new_edifice",
         "Undraftable": true,
         "source": "ds"
@@ -399,30 +396,6 @@
     {
         "ItemCategory": "COMMANDER",
         "ItemId": "lanefircommander",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "subterfuge",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "HERO",
-        "ItemId": "lizhohero",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "COMMANDER",
-        "ItemId": "lizhocommander",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "MECH",
-        "ItemId": "lizho_mech",
         "Undraftable": true,
         "source": "ds"
     },
@@ -437,6 +410,30 @@
             "HERO:lizhohero",
             "MECH:lizho_mech"
         ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "subterfuge",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "lizhocommander",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "lizhohero",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "lizho_mech",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -461,6 +458,17 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "prescient_memories",
+        "AdditionalComponents": [
+            "ABILITY:divination"
+        ],
+        "OptionalSwaps": [
+            "AGENT:mykomentoriagent"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "divination",
         "Undraftable": true,
         "source": "ds"
@@ -479,39 +487,16 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "prescient_memories",
-        "AdditionalComponents": [
-            "ABILITY:divination"
-        ],
-        "OptionalSwaps": [
-            "AGENT:mykomentoriagent"
-        ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "HOMESYSTEM",
-        "ItemId": "nivyn",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "singularity_point",
         "Undraftable": true,
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "celestial_guides",
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "nivyn",
         "OptionalSwaps": [
-            "HOMESYSTEM:nivyn"
+            "ABILITY:celestial_guides"
         ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "HERO",
-        "ItemId": "nivynhero",
-        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -527,21 +512,8 @@
             "ABILITY:singularity_point"
         ],
         "OptionalSwaps": [
-            "HERO:nivynhero",
             "TECH:dsnivymf"
         ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "COMMANDER",
-        "ItemId": "nokarcommander",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "desperados",
-        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -553,6 +525,12 @@
         "OptionalSwaps": [
             "COMMANDER:nokarcommander"
         ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "desperados",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -578,22 +556,16 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "orbital_foundries",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "MECH",
-        "ItemId": "rohdhna_mech",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "recycled_materials",
         "OptionalSwaps": [
             "MECH:rohdhna_mech"
         ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "orbital_foundries",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -605,14 +577,14 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "stealth_insertion",
+        "ItemCategory": "MECH",
+        "ItemId": "rohdhna_mech",
         "Undraftable": true,
         "source": "ds"
     },
     {
-        "ItemCategory": "TECH",
-        "ItemId": "dstnely",
+        "ItemCategory": "ABILITY",
+        "ItemId": "stealth_insertion",
         "Undraftable": true,
         "source": "ds"
     },
@@ -621,9 +593,6 @@
         "ItemId": "tnelis_mech",
         "AdditionalComponents": [
             "ABILITY:stealth_insertion"
-        ],
-        "OptionalSwaps": [
-            "TECH:dstnely"
         ],
         "source": "ds"
     },
@@ -635,14 +604,31 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "collateralized_loans",
+        "AdditionalComponents": [
+            "ABILITY:fine_print"
+        ],
+        "OptionalSwaps": [
+            "MECH:vaden_mech"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "binding_debts",
         "Undraftable": true,
         "source": "ds"
     },
     {
-        "ItemCategory": "COMMANDER",
-        "ItemId": "vadencommander",
-        "Undraftable": true,
+        "ItemCategory": "HERO",
+        "ItemId": "vadenhero",
+        "AdditionalComponents": [
+            "ABILITY:binding_debts",
+            "ABILITY:fine_print"
+        ],
+        "OptionalSwaps": [
+            "MECH:vaden_mech"
+        ],
         "source": "ds"
     },
     {
@@ -652,27 +638,38 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "collateralized_loans",
+        "ItemCategory": "COMMANDER",
+        "ItemId": "vadencommander",
         "AdditionalComponents": [
-            "ABILITY:fine_print",
-            "ABILITY:binding_debts"
-        ],
-        "OptionalSwaps": [
-            "MECH:vaden_mech"
+            "ABILITY:fine_print"
         ],
         "source": "ds"
     },
     {
-        "ItemCategory": "HERO",
-        "ItemId": "vadenhero",
+        "ItemCategory": "ABILITY",
+        "ItemId": "corporate_entity",
         "AdditionalComponents": [
-            "ABILITY:fine_print",
-            "ABILITY:binding_debts"
+            "PN:dspnveld1",
+            "PN:dspnveld2",
+            "PN:dspnveld3",
+            "PN:dspnveld4"
         ],
         "OptionalSwaps": [
-            "COMMANDER:vadencommander"
+            "HERO:veldyrhero",
+            "COMMANDER:veldyrcommander"
         ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "holding_company",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "targeted_acquisition",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -700,18 +697,6 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "targeted_acquisition",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "holding_company",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
         "ItemCategory": "COMMANDER",
         "ItemId": "veldyrcommander",
         "Undraftable": true,
@@ -721,22 +706,6 @@
         "ItemCategory": "HERO",
         "ItemId": "veldyrhero",
         "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "corporate_entity",
-        "AdditionalComponents": [
-            "ABILITY:holding_company"
-        ],
-        "OptionalSwaps": [
-            "HERO:veldyrhero",
-            "COMMANDER:veldyrcommander",
-            "PN:dspnveld1",
-            "PN:dspnveld2",
-            "PN:dspnveld3",
-            "PN:dspnveld4"
-        ],
         "source": "ds"
     },
     {
