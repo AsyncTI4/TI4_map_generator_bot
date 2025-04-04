@@ -1858,7 +1858,7 @@ public class ButtonHelperActionCards {
         int hits = 0;
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(UnitEmojis.fighter + " rolled ");
-            int threshold = "action_deck_2".equals(game.getAcDeckID()) ? 7 : 6;
+            int threshold = 6;
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(threshold);
                 msg.append(d1.getResult()).append(", ");
