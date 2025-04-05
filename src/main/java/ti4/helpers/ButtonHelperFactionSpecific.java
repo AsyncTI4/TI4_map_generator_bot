@@ -1669,8 +1669,7 @@ public class ButtonHelperFactionSpecific {
         if (cabal == player) {
             return false;
         }
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, cabal, UnitType.CabalSpacedock,
-            UnitType.Spacedock);
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, cabal, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             return false;
         }
@@ -1791,8 +1790,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> getUnitButtonsForVortex(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.CabalSpacedock,
-            UnitType.Spacedock);
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any Dimensional Tears.");
             return List.of();
