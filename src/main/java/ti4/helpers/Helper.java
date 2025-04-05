@@ -292,7 +292,7 @@ public class Helper {
     }
 
     public static String getNewStatusScoringRepresentation(Game game) {
-        if(game.getPhaseOfGame().equalsIgnoreCase("action")){
+        if (game.getPhaseOfGame().equalsIgnoreCase("action")) {
             return "";
         }
         StringBuilder rep = new StringBuilder("# __Scoring Summary__\n");
@@ -442,6 +442,7 @@ public class Helper {
         }
         return players;
     }
+
     public static int getPlayerSpeakerNumber(Player player, Game game) {
         Player speaker;
         if (game.getPlayer(game.getSpeakerUserID()) != null) {
@@ -472,10 +473,10 @@ public class Helper {
             }
         }
         int count = 1;
-        for(Player p2 : players){
-            if(player == p2){
+        for (Player p2 : players) {
+            if (player == p2) {
                 return count;
-            }else{
+            } else {
                 count++;
             }
         }
@@ -800,6 +801,7 @@ public class Helper {
         }
         return scButtons;
     }
+
     public static List<Integer> getRemainingSCs(Game game) {
         List<Integer> scButtons = new ArrayList<>();
 
@@ -885,7 +887,7 @@ public class Helper {
                 continue;
             }
             if (unit.equalsIgnoreCase("spacedock")) {
-                
+
                 if (uH == null || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
                     continue;
                 }
@@ -1630,7 +1632,6 @@ public class Helper {
                 boolean singleDock = "warfare".equalsIgnoreCase(warfareNOtherstuff) && !asn;
                 if (singleDock) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
-                        && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1
                         && !player.hasUnit("saar_spacedock") && !player.hasUnit("absol_saar_spacedock")
                         && !player.hasUnit("absol_saar_spacedock2") && !player.hasUnit("saar_spacedock2")
                         && !player.hasUnit("ghoti_flagship")) {
@@ -2212,14 +2213,14 @@ public class Helper {
         Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
         List<Player> sortedPlayers1 = game.getRealPlayers();
         List<Player> sortedPlayers = new ArrayList<>();
-        for(Player player : sortedPlayers1){
+        for (Player player : sortedPlayers1) {
             sortedPlayers.add(0, player);
         }
         Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
         try {
             for (Player player : sortedPlayers) {
                 SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
-                
+
             }
             if (!players.isEmpty()) {
                 newPlayerOrder.putAll(players);

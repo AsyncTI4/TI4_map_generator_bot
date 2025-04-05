@@ -1236,7 +1236,6 @@ public class ActionCardHelper {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 // player has a space dock in the system
                 int numSd = unitHolder.getUnitCount(Units.UnitType.Spacedock, colorID);
-                numSd += unitHolder.getUnitCount(Units.UnitType.CabalSpacedock, colorID);
                 numSd += unitHolder.getUnitCount(Units.UnitType.PlenaryOrbital, colorID);
                 if (numSd > 0) {
                     hasSD = true;
