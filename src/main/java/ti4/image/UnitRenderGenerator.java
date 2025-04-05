@@ -183,7 +183,10 @@ public class UnitRenderGenerator {
                         tileGraphics.drawImage(dimTear, dtX, dtY, null);
                     }
                 }
-                tileGraphics.drawImage(unitImage, imageX, imageY, null);
+
+                if (!"caballed".equals(player.getDecalSet()) || decal == null || posCtx.fighterOrInfantry) {
+                    tileGraphics.drawImage(unitImage, imageX, imageY, null);
+                }
 
                 if (!posCtx.fighterOrInfantry) {
                     tileGraphics.drawImage(decal, imageX, imageY, null);

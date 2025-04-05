@@ -8,6 +8,7 @@ public class UnitDecalService {
 
     public static boolean userMayUseDecal(String userID, String decalID) {
         return switch (decalID) {
+            case "caballed" -> userID.equals(Constants.eronousId); // caballed -> eronous
             case "cb_10" -> userID.equals(Constants.jazzId); // jazz -> jazz
             case "cb_11" -> Constants.tourneyWinners.contains(userID); // tournament winner decal
             case "cb_52" -> userID.equals(Constants.sigmaId); // sigma -> void
