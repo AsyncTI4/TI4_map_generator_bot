@@ -590,7 +590,7 @@
     {
         "id": "absol_cabal_spacedock2Alt",
         "baseType": "spacedock",
-        "asyncId": "csd",
+        "asyncId": "sd",
         "name": "Dimensional Tear II",
         "upgradesFromUnitId": "cabal_spacedock",
         "requiredTechId": "absol_dt2",
