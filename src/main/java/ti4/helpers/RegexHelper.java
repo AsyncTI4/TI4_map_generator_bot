@@ -87,6 +87,7 @@ public class RegexHelper {
     public static String unitTypeRegex(String group) {
         Set<String> types = new HashSet<>();
         Arrays.asList(UnitType.values()).forEach(x -> types.add(x.getValue()));
+        types.add("csd");
         return regexBuilder(group, types);
     }
 

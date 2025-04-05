@@ -895,7 +895,7 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, player.getRepresentation(false,true)
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, player.getRepresentation(false, true)
                         + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
                 }
                 if (automationID.equals("hack")) {
@@ -1236,7 +1236,6 @@ public class ActionCardHelper {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 // player has a space dock in the system
                 int numSd = unitHolder.getUnitCount(Units.UnitType.Spacedock, colorID);
-                numSd += unitHolder.getUnitCount(Units.UnitType.CabalSpacedock, colorID);
                 numSd += unitHolder.getUnitCount(Units.UnitType.PlenaryOrbital, colorID);
                 if (numSd > 0) {
                     hasSD = true;

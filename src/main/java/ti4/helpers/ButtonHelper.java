@@ -2041,8 +2041,8 @@ public class ButtonHelper {
             msg = player.getRepresentationUnfogged() + " this is a notice that " + msg;
             if (!game.isFowMode()) {
                 msg += " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                + " agent.";
+                    + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                    + " agent.";
             }
         }
 
@@ -2484,7 +2484,7 @@ public class ButtonHelper {
             if (button.getEmoji() != null && !"".equalsIgnoreCase(button.getEmoji().toString())) {
                 builder += ";" + button.getEmoji().toString();
             }
-            game.saveButton(builder.replace(",",""));
+            game.saveButton(builder.replace(",", ""));
         }
     }
 
@@ -2624,13 +2624,14 @@ public class ButtonHelper {
     public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
         return checkFleetAndCapacity(player, game, tile, event, false, true);
     }
+
     public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event, boolean ignoreFighters) {
         return checkFleetAndCapacity(player, game, tile, event, ignoreFighters, true);
     }
 
     public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event, boolean ignoreFighters, boolean issuePing) {
         String tileRepresentation = tile.getRepresentation();
-        int[] values = {0,0,0,0};
+        int[] values = { 0, 0, 0, 0 };
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
             return values;
         }
@@ -2671,18 +2672,6 @@ public class ButtonHelper {
             fleetCap += 1000;
         }
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
-            if (capChecker.getUnitCount(UnitType.CabalSpacedock, player.getColor()) > 0) {
-                String colorID = Mapper.getColorID(player.getColor());
-                UnitKey csdKey = Mapper.getUnitKey("csd", colorID);
-                UnitKey sdKey = Mapper.getUnitKey("sd", colorID);
-                capChecker.removeUnit(csdKey, 1);
-                capChecker.addUnit(sdKey, 1);
-                BotLogger.log("Removing csd in game " + game.getName());
-                // RemoveUnitService.removeUnits(event, player.getColor(), tile, "csd
-                // "+capChecker.getName(), game);
-                // AddUnitService.addUnits(event, tile, player.getColor(), "sd
-                // "+capChecker.getName(), game);
-            }
             Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
             for (UnitModel unit : unitsByQuantity.keySet()) {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
@@ -2811,12 +2800,12 @@ public class ButtonHelper {
             int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
             if (numInf > ((numOfCapitalShips
                 + tile.getUnitHolders().get("space").getUnitCount(UnitType.Destroyer, player.getColor())) / 2)) {
-                if(issuePing){
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation()
-                        + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
-                        + "You seem to be violating this in " + tile.getRepresentationForButtons(game, player)
-                        + ".");
+                if (issuePing) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        player.getRepresentation()
+                            + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
+                            + "You seem to be violating this in " + tile.getRepresentationForButtons(game, player)
+                            + ".");
                 }
             }
         }
@@ -2855,7 +2844,7 @@ public class ButtonHelper {
                 + (numInfNFightersNMechs - numFighter2s) + " thing"
                 + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + " ). ";
         }
-        if(issuePing){
+        if (issuePing) {
             if (capacityViolated || fleetSupplyViolated || structuresViolated) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
@@ -2870,15 +2859,15 @@ public class ButtonHelper {
 
             }
         }
-        if(numInfNFightersNMechs <= capacity){
+        if (numInfNFightersNMechs <= capacity) {
             numFighter2s = 0;
         }
         if (ignoreFighters) {
-            int[] capNCap = {((numOfCapitalShips + 1) / 2),numInfNFightersNMechs-numFighter2s+ignoredFs,capacity,fightersIgnored};
-            
+            int[] capNCap = { ((numOfCapitalShips + 1) / 2), numInfNFightersNMechs - numFighter2s + ignoredFs, capacity, fightersIgnored };
+
             return capNCap;
         }
-        int[] capNCap2 = {((numFighter2sFleet + numOfCapitalShips + 1) / 2),numInfNFightersNMechs-numFighter2s+ignoredFs,capacity,fightersIgnored};
+        int[] capNCap2 = { ((numFighter2sFleet + numOfCapitalShips + 1) / 2), numInfNFightersNMechs - numFighter2s + ignoredFs, capacity, fightersIgnored };
         return capNCap2;
     }
 
