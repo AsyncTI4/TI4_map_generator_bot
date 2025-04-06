@@ -1,4 +1,4 @@
-[ 
+[
     {
         "ItemCategory": "ABILITY",
         "ItemId": "mitosis",
@@ -88,7 +88,7 @@
         "ItemId": "orbital_drop",
         "OptionalSwaps": [
             "MECH:sol_mech"
-        ], 
+        ],
         "source": "pok"
     },
     {
@@ -153,7 +153,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "pillage",
         "OptionalSwaps": [
-            "COMMANDER:kelerescommander",
+            "AGENT:mentakagent",
             "PN:pop"
         ],
         "source": "pok"
@@ -372,7 +372,7 @@
         ],
         "source": "pok"
     },
-{
+    {
         "ItemCategory": "FLAGSHIP",
         "ItemId": "nomad_flagship",
         "OptionalSwaps": [
@@ -391,6 +391,5 @@
         "ItemId": "yssaril_mech",
         "Undraftable": true,
         "source": "pok"
-
     }
 ]

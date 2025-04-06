@@ -99,10 +99,11 @@ public class AddPlanetService {
                         alreadyOwned = true;
                     }
                     player_.removePlanet(planet);
+                    CommanderUnlockCheckService.checkPlayer(player_, "uydai");
                     List<String> relics = new ArrayList<>(player_.getRelics());
-                    if(planet.equalsIgnoreCase("mr")){
+                    if (planet.equalsIgnoreCase("mr")) {
                         String customPOName = "Ixthian Rex Point";
-                        if(game.getRevealedPublicObjectives().get(customPOName) != null){
+                        if (game.getRevealedPublicObjectives().get(customPOName) != null) {
                             int shardID = game.getRevealedPublicObjectives().get(customPOName);
                             game.unscorePublicObjective(player_.getUserID(), shardID);
                             game.scorePublicObjective(player.getUserID(), shardID);

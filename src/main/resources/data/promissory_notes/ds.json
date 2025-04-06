@@ -384,4 +384,14 @@
         "text": "When 1 or more of your units would make a BOMBARDMENT roll: If you produce 1 or more hits during this BOMBARDMENT roll, produce 1 additional hit for that roll.\nThen, return this card to the Zelian player.",
         "shortName": "Hyperkin. Ordinance"
     }
+    ,
+    {
+        "alias": "dspnuyda",
+        "name": "Eerie Predictions",
+        "faction": "uydai",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "At the start of the status phase:You may look at the top card of any 1 deck; place that card on the top or bottom of that deck. \nThen, return this card to the Uydai player."
+    }
 ]

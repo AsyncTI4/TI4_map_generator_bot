@@ -502,6 +502,15 @@ public class ButtonHelperAgents {
                 return;
             p2.addSpentThing("Exhausted " + ssruuClever + "Durran, the Gledge" + ssruuSlash + " agent, for +3 PRODUCTION value.");
         }
+        if ("uydaiagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Garstil, the Uydai" + ssruuSlash + " agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            String faction = rest.split("_")[1];
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
+            if (p2 == null)
+                return;
+            p2.addSpentThing("Exhausted " + ssruuClever + "Garstil, the Uydai" + ssruuSlash + " agent, for up to 3 infantry not to count towards production limit.");
+        }
         if ("khraskagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Udosh B'rtul, the Khrask" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
