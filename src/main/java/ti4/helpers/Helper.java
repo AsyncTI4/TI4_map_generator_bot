@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,6 +20,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -38,10 +43,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -974,10 +975,11 @@ public class Helper {
 
     public static String buildSpentThingsMessageForVoting(Player player, Game game, boolean justVoteTotal) {
         List<String> spentThings = player.getSpentThingsThisWindow();
+        Set<String> set = new HashSet<>(spentThings);
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " used the following: \n");
         int votes = 0;
         int tg = player.getSpentTgsThisWindow();
-        for (String thing : spentThings) {
+        for (String thing : set) {
             int count;
             if (!thing.contains("_")) {
                 BotLogger.log("Caught the following thing in the voting " + thing + " in game " + game.getName());

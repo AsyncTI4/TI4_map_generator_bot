@@ -638,7 +638,7 @@ public class AgendaHelper {
                 }
                 num++;
             }
-        }else{
+        } else {
             for (Player p2 : game.getRealPlayers()) {
                 if (game.getStoredValue("queuedAfters").contains(p2.getFaction())
                     || game.getStoredValue("declinedAfters").contains(p2.getFaction())) {
@@ -648,7 +648,7 @@ public class AgendaHelper {
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false)
-            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of "+num+" people). They have been pinged in their private thread. ");
+            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ");
 
     }
 
@@ -808,7 +808,7 @@ public class AgendaHelper {
         String watchPartyPing = watchPartyPing(game);
 
         Die d1 = new Die(6);
-        if(game.getAgendaDeckID().toLowerCase().contains("absol")){
+        if (game.getAgendaDeckID().toLowerCase().contains("absol")) {
             d1 = new Die(7);
         }
         String msg = "# Rolled a " + d1.getResult() + " for Ixthian Artifact!";
@@ -1036,7 +1036,7 @@ public class AgendaHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "Successfully stored a pre-vote. You can erase it with this button.", buttonsPV);
             return;
-        }else{
+        } else {
             game.setStoredValue("preVoting" + player.getFaction(), "");
         }
         if (!buttonID.contains("outcomeTie*")) {
@@ -1171,6 +1171,7 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(game), game);
                 realIdentity2 = nextInLine.getRepresentationUnfogged();
                 voteInfo = getVoteTotal(nextInLine, game);
+                willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
             }
 
             if (!nextInLine.getColor().equalsIgnoreCase(player.getColor())) {
@@ -1603,6 +1604,7 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(game), game);
                 realIdentity = nextInLine.getRepresentationUnfogged();
                 voteInfo = getVoteTotal(nextInLine, game);
+                willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
                 counter += 1;
             }
 
@@ -2047,7 +2049,7 @@ public class AgendaHelper {
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null) {
                         if (!losers.contains(loser) && !specificVote.contains("Rider")
-                            && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity")&& !specificVote.contains("Ability")) {
+                            && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity") && !specificVote.contains("Ability")) {
                             losers.add(loser);
                         }
 
@@ -3536,6 +3538,17 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom.");
         ButtonHelper.sendMessageToRightStratThread(game.getPlayer(game.getActivePlayerID()), game,
             "Agenda put on bottom.", "politics");
+    }
+
+    public static void putBottom(String agendaID, Game game) {
+        boolean success = game.putAgendaBottom(agendaID);
+        if (game.isFowMode()) {
+            return;
+        }
+        if (!success) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
+            return;
+        }
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {

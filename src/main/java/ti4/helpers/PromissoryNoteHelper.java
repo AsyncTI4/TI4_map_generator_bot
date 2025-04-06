@@ -209,6 +209,11 @@ public class PromissoryNoteHelper {
         if ("dspnbent".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerBentorPNButtons(player, game);
         }
+        if ("dspnuyda".equalsIgnoreCase(id)) {
+            List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, true, player);
+            String message = player.getRepresentationUnfogged() + " select which deck you wish to look at the top of.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        }
         if ("dspngled".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game);
         }

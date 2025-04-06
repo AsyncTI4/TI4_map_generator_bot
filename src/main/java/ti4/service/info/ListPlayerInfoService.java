@@ -572,7 +572,7 @@ public class ListPlayerInfoService {
             }
             case "otf" -> {
                 int count = 0;
-                for (String p : player.getPlanets()) {
+                for (String p : player.getPlanetsAllianceMode()) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet != null && planet.getUnitCount(Units.UnitType.Spacedock, player) < 1) {
                         count = Math.max(count, ButtonHelper.getNumberOfGroundForces(player, planet));
