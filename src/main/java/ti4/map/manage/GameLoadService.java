@@ -38,6 +38,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
+import ti4.helpers.omegaPhase.PriorityTrackHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;
@@ -1054,6 +1055,7 @@ class GameLoadService {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(rankID);
                     player.setPlayerTIGLRankAtGameStart(rank);
                 }
+                case Constants.PRIORITY_TRACK -> player.setPriorityPosition(Integer.parseInt(tokenizer.nextToken()));
             }
         }
     }

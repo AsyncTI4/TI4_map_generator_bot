@@ -710,6 +710,19 @@ public class Constants {
     public static final String PEEK_AT_STAGE1 = "peek_at_stage1";
     public static final String PEEK_AT_STAGE2 = "peek_at_stage2";
 
+    //Omega Phase bot commands and parameters
+    public static final String OMEGA_PHASE_COMMAND = "omegaphase";
+    public static final String SETUP_VOTC = "setup_voice_of_the_council";
+    public static final String ASSIGN_PLAYER_TO_VOTC = "assign_player_to_votc";
+    public static final String ASSIGN_PLAYER_PRIORITY = "assign_player_priority";
+    public static final String CLEAR_PRIORITY_TRACK = "clear_priority_track";
+    public static final String PRINT_PRIORITY_TRACK = "print_priority_track";
+    public static final String PEEK_AT_NEXT_OBJECTIVE = "peek_at_next_objective";
+    public static final String PRINT_OMEGA_PHASE_RULES = "print_omega_phase_rules";
+    public static final String PRIORITY_POSITION = "priority_position";
+    //Omega Phase state keys
+    public static final String PRIORITY_TRACK = "priority_track";
+
     public static final String ADD_CUSTOM = "po_add_custom";
     public static final String MAKE_SO_INTO_PO = "so_into_po";
     public static final String SO_TO_PO = "so_to_po";

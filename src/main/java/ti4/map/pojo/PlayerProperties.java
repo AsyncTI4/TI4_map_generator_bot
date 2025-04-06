@@ -81,6 +81,9 @@ public class PlayerProperties {
     private int sarweenCounter;
     private int pillageCounter;
 
+    //Omega Phase
+    private int priorityPosition;
+
     // OLRADIN POLICY ONCE PER ACTION EXHAUST PLANET ABILITIES
     private boolean hasUsedEconomyEmpowerAbility;
     private boolean hasUsedEconomyExploitAbility;
