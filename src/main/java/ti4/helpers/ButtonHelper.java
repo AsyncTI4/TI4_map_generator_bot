@@ -3060,8 +3060,8 @@ public class ButtonHelper {
             endButtons.add(
                 Buttons.green(finChecker + "exhaustAgent_lizhoagent", "Use Li-Zho Agent", FactionEmojis.lizho));
         }
-        if (player.getPathTokenCounter() > 7) {
-            endButtons.add(Buttons.green(finChecker + "cashInPathTokens", "Spend 8 Path Tokens For Secondary", FactionEmojis.uydai));
+        if (player.getPathTokenCounter() > 5) {
+            endButtons.add(Buttons.green(finChecker + "cashInPathTokens", "Spend 6 Path Tokens For Secondary", FactionEmojis.uydai));
         }
         if (player.hasAbility("the_starlit_path")) {
             endButtons.add(Buttons.green(finChecker + "startPath", "Choose A Path", FactionEmojis.uydai));
@@ -5917,7 +5917,7 @@ public class ButtonHelper {
     public static void acceptPath(ButtonInteractionEvent event, Game game, Player player) {
         deleteMessage(event);
 
-        player.setPathTokenCounter(Math.min(8, player.getPathTokenCounter() + 1));
+        player.setPathTokenCounter(Math.min(6, player.getPathTokenCounter() + 1));
         String msg1 = player.getRepresentation() + " chose to accept the path. Their current path token count is " + player.getPathTokenCounter();
         if (player.getPlanets().contains("uikos")) {
             player.setHarvestCounter(player.getHarvestCounter() + 1);
@@ -5976,7 +5976,7 @@ public class ButtonHelper {
     public static void cashInPathTokens(ButtonInteractionEvent event, Game game, Player player) {
         deleteTheOneButton(event);
         player.setPathTokenCounter(0);
-        String msg1 = player.getRepresentation() + " chose to turn in 8 path tokens in order to resolve the secondary of one readied or unchosen strategy card";
+        String msg1 = player.getRepresentation() + " chose to turn in 6 path tokens in order to resolve the secondary of one readied or unchosen strategy card";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to resolve a secondary", ButtonHelperHeroes.getNRAHeroButtons(game));
     }
