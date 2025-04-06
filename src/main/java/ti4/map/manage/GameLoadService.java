@@ -1034,6 +1034,8 @@ class GameLoadService {
                 case Constants.LANEFIR_ATS_COUNT -> player.setAtsCount(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.SARWEEN_COUNT -> player.setSarweenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.HARVEST_COUNT -> player.setHarvestCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());
                 case Constants.PLAYER_NEW_TEMP_MODS -> {

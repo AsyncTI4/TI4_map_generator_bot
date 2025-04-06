@@ -1171,6 +1171,7 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(game), game);
                 realIdentity2 = nextInLine.getRepresentationUnfogged();
                 voteInfo = getVoteTotal(nextInLine, game);
+                willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
             }
 
             if (!nextInLine.getColor().equalsIgnoreCase(player.getColor())) {
@@ -1603,6 +1604,7 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(game), game);
                 realIdentity = nextInLine.getRepresentationUnfogged();
                 voteInfo = getVoteTotal(nextInLine, game);
+                willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
                 counter += 1;
             }
 
@@ -3535,6 +3537,17 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Agenda put on bottom.");
         ButtonHelper.sendMessageToRightStratThread(game.getPlayer(game.getActivePlayerID()), game,
             "Agenda put on bottom.", "politics");
+    }
+
+    public static void putBottom(String agendaID, Game game) {
+        boolean success = game.putAgendaBottom(agendaID);
+        if (game.isFowMode()) {
+            return;
+        }
+        if (!success) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
+            return;
+        }
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {

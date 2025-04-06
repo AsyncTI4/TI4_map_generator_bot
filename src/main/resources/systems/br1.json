@@ -1,0 +1,35 @@
+{
+    "id": "br1",
+    "name": "Uikos - Uydai",
+    "aliases": [
+        "br1",
+        "uikos",
+        "uydai"
+    ],
+    "imagePath": "BR1_Uikos.png",
+    "shipPositionsType": "TYPE01",
+    "spaceTokenLocations": [
+        {
+            "x": 245.0,
+            "y": 100.0
+        },
+        {
+            "x": 200.0,
+            "y": 185.0
+        },
+        {
+            "x": 110.0,
+            "y": 215.0
+        },
+        {
+            "x": 120.0,
+            "y": 40.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "uikos"
+    ],
+    "source": "ds",
+    "tileBack": "green"
+}

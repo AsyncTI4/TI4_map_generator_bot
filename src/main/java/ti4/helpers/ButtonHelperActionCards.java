@@ -2097,7 +2097,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String acName = buttonID.split("_")[1];
+        String acName = buttonID.replace("resolveReverse_","");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);

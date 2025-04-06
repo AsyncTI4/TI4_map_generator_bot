@@ -82,7 +82,7 @@ public class EndGameService {
             }
         }
 
-        gameEndStuff(game, event, publish);
+        
         // MOVE CHANNELS TO IN-LIMBO
         List<Category> limbos = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true);
         Category inLimboCategory = limbos.isEmpty() ? null : limbos.getFirst();
@@ -124,13 +124,14 @@ public class EndGameService {
                 threadChannel.getManager().setArchived(true).queue();
             }
         }
-        // if (actionsChannel != null) {
-        //     for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-        //         if (!threadChannel.getName().contains("Cards Info")) {
-        //             threadChannel.getManager().setArchived(true).queue();
-        //         }
-        //     }
-        // }
+        if (actionsChannel != null) {
+            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+                if (!threadChannel.getName().contains("Cards Info")) {
+                    threadChannel.getManager().setArchived(true).queue();
+                }
+            }
+        }
+        gameEndStuff(game, event, publish);
 
         // GET BOTHELPER LOUNGE
         List<TextChannel> bothelperLoungeChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true);

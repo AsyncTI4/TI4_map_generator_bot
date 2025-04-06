@@ -40,9 +40,9 @@ public class CardsInfoService {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player,
             """
                 You may whisper to people from here by starting a message with `to[color]` or `to[faction]`.\
-                
+
                 You may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`.\
-                
+
                 You may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.""");
 
     }
@@ -55,6 +55,9 @@ public class CardsInfoService {
         buttons.add(modify);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             buttons.add(Buttons.gray("naaluCommander", "Do Naalu Commander", FactionEmojis.Naalu));
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "uydaicommander")) {
+            buttons.add(Buttons.gray("uydaiCommander", "Pay 1tg to Use Uydai Commander", FactionEmojis.uydai));
         }
         if (player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
             buttons.add(Buttons.gray("initialPeak", "Peek At Next Objective", FactionEmojis.augers));
@@ -115,6 +118,12 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("gledgeagent")) {
             buttons.add(Buttons.gray("getAgentSelection_gledgeagent", "Use Gledge Agent", FactionEmojis.gledge));
+        }
+        if (player.getPathTokenCounter() > 0) {
+            buttons.add(Buttons.gray("redistributePath", "Redistribute 1 CC With Path", FactionEmojis.uydai));
+        }
+        if (player.hasUnexhaustedLeader("uydaiagent")) {
+            buttons.add(Buttons.gray("getAgentSelection_uydaiagent", "Use Uydai Agent", FactionEmojis.uydai));
         }
         if (player.hasUnexhaustedLeader("khraskagent")) {
             buttons.add(Buttons.gray("getAgentSelection_khraskagent", "Use Khrask Agent", FactionEmojis.khrask));

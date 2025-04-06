@@ -876,6 +876,10 @@ public class StartCombatService {
             buttons.add(Buttons.gray("announceARetreat", "Announce A Retreat"));
             buttons.add(Buttons.red("retreat_" + pos, "Retreat"));
         }
+
+        if (!game.isFowMode()) {
+            buttons.add(Buttons.gray("announceReadyForDice_" + p1.getColor() + "_" + p2.getColor(), "Declare Ready To Throw Dice"));
+        }
         if (isSpaceCombat && p2.hasAbility("foresight") && p2.getStrategicCC() > 0 && !game.isFowMode()) {
             buttons.add(Buttons.red("retreat_" + pos + "_foresight", "Foresight", FactionEmojis.Naalu));
         }

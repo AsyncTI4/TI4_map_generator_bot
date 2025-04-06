@@ -813,6 +813,29 @@
         "source": "ds"
     },
     {
+        "id": "prescience",
+        "name": "Obsessive Designs",
+        "faction": "uydai",
+        "permanentEffect": "At the end of your turn,if you have not passed, place 1 of the plan cards on your faction sheet, face down. At the start of your turn, reveal and resolve the plan card on your faction sheet, if able",
+        "source": "ds"
+    },
+    {
+        "id": "the_starlit_path",
+        "name": "The Starlit Path",
+        "faction": "uydai",
+        "window": "At the end of your turn",
+        "windowEffect": "You may return 8 path tokens from your faction sheet to your reinforcements to resolve the secondary ability of 1 readied or unchosen strategy card without spending a command token",
+        "source": "ds"
+    },
+    {
+        "id": "narrow_way",
+        "name": "Narrow Way",
+        "faction": "uydai",
+        "window": "At any time",
+        "windowEffect": "You may return 1 path token to your reinforcements to redistribute 1 of your command tokens.",
+        "source": "ds"
+    },
+    {
         "id": "paranoia",
         "name": "Paranoia",
         "faction": "zelian",
