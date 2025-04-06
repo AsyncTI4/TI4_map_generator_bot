@@ -1366,6 +1366,15 @@ public class Helper {
                 }
             }
         }
+        if (player.hasTech("absol_ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
+            || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+            int structures = uH.getUnitCount(UnitType.Spacedock, player.getColor()) + uH.getUnitCount(UnitType.Pds, player.getColor());
+            productionValueTotal += structures;
+            planetUnitVal = structures;
+            if (player.hasRelic("boon_of_the_cerulean_god")) {
+                productionValueTotal++;
+            }
+        }
         if (player.hasTech("ah") && planetUnitVal < 1 && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
             || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
             productionValueTotal += 1;
