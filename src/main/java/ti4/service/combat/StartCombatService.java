@@ -703,12 +703,6 @@ public class StartCombatService {
             "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
             "Refresh Picture"));
 
-        Player titans = Helper.getPlayerFromUnlockedLeader(game, "titansagent");
-        if (!game.isFowMode() && titans != null && titans.hasUnexhaustedLeader("titansagent")) {
-            String finChecker = "FFCC_" + titans.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "exhaustAgent_titansagent", "Use Ul Agent", FactionEmojis.Titans));
-        }
-
         if (p1.hasTechReady("sc") || (!game.isFowMode() && p2.hasTechReady("sc"))) {
             if (p1.hasTechReady("sc")) {
                 buttons.add(Buttons.green(p1.getFinsFactionCheckerPrefix() + "applytempcombatmod__" + "tech" + "__" + "sc", "Use Supercharge", FactionEmojis.Naaz));

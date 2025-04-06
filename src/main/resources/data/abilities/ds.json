@@ -824,7 +824,7 @@
         "name": "The Starlit Path",
         "faction": "uydai",
         "window": "At the end of your turn",
-        "windowEffect": "You may return 8 path tokens from your faction sheet to your reinforcements to resolve the secondary ability of 1 readied or unchosen strategy card without spending a command token",
+        "windowEffect": "You may return 6 path tokens from your faction sheet to your reinforcements to resolve the secondary ability of 1 readied or unchosen strategy card without spending a command token",
         "source": "ds"
     },
     {
