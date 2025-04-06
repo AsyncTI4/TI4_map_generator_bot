@@ -121,7 +121,7 @@
         "name": "Chain Reaction",
         "phase": "Action",
         "window": "After you destroy 1 of your opponent's non-fighter ships",
-        "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your die rolls during this ability and repeat its effect.",
+        "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die. If the result is 8 or greater, produce 1 additional hit and roll again; this ability cannot produce more than 4 hits.",
         "flavorText": "As Jace tore through the enemy line, his ordnance erupted into a symphony of explosions.",
         "source": "action_deck_2"
     },
