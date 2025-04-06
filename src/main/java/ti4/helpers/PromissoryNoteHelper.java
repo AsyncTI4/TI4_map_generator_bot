@@ -61,6 +61,10 @@ public class PromissoryNoteHelper {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
                     sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
                     Player pnOwner = game.getPNOwner(pn.getKey());
+                    if (pnOwner == null) {
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " one of your PNs has no owner. PN id is " + pn.getKey() + " and number is " + pn.getValue());
+                        continue;
+                    }
                     if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
                     sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
                     sb.append(" `(").append(pn.getValue()).append(")`\n");
