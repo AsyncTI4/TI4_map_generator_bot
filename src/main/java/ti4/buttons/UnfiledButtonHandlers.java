@@ -429,43 +429,43 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 player.addSpentThing("sarween");
                 String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
                 ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
-                player.setSarweenCounter(player.getSarweenCounter()+1);
-                String msg = player.getFactionEmoji()+ " has used Sarween Tools to save "+player.getSarweenCounter() +" resource(s) in this game so far. ";
+                player.setSarweenCounter(player.getSarweenCounter() + 1);
+                String msg = player.getFactionEmoji() + " has used Sarween Tools to save " + player.getSarweenCounter() + " resource(s) in this game so far. ";
                 int result = ThreadLocalRandom.current().nextInt(0, 5);
-                if(player.getSarweenCounter() < 6){
-                    
+                if (player.getSarweenCounter() < 6) {
+
                     List<String> lameMessages = Arrays.asList(
-                    "Not too impressive.",
-                    "The technology has not yet proven its worth.",
-                    "There better be more savings to come.",
-                    "Your faction's stockholders are so far unimpressed.",
-                    "Perhaps AIDEV or Scanlink might have been more useful.");
+                        "Not too impressive.",
+                        "The technology has not yet proven its worth.",
+                        "There better be more savings to come.",
+                        "Your faction's stockholders are so far unimpressed.",
+                        "Perhaps AIDEV or Scanlink might have been more useful.");
                     msg += lameMessages.get(result);
-                }else{
-                    if(player.getSarweenCounter() < 11){
+                } else {
+                    if (player.getSarweenCounter() < 11) {
                         List<String> lameMessages = Arrays.asList(
-                        "Not too shabby.",
-                        "The tech is finally starting to justify its existence.",
-                        "Hopefully there are still even more savings to come.",
-                        "Your faction's stockholders are satisfied with the results of this technology.",
-                        "Some folks still think Scanlink might have been more useful.");
+                            "Not too shabby.",
+                            "The tech is finally starting to justify its existence.",
+                            "Hopefully there are still even more savings to come.",
+                            "Your faction's stockholders are satisfied with the results of this technology.",
+                            "Some folks still think Scanlink might have been more useful.");
                         msg += lameMessages.get(result);
-                    }else{
-                        if(player.getSarweenCounter() < 16){
+                    } else {
+                        if (player.getSarweenCounter() < 16) {
                             List<String> lameMessages = Arrays.asList(
-                            "Very impressive.",
-                            "If only all technology was this productive.",
-                            "Surely there can't be even more savings to come?",
-                            "Your faction's stockholders are ectatic.",
-                            "The Scanlink stans have been thoroughly shamed.");
+                                "Very impressive.",
+                                "If only all technology was this productive.",
+                                "Surely there can't be even more savings to come?",
+                                "Your faction's stockholders are ectatic.",
+                                "The Scanlink stans have been thoroughly shamed.");
                             msg += lameMessages.get(result);
-                        }else{
+                        } else {
                             List<String> lameMessages = Arrays.asList(
-                            "Words cannot adequately express how impressive this is.",
-                            "Is Sarween the best tech?!",
-                            "Is this much saving even legal? The international IRS will be doing an audit on your paperwork sometime soon.",
-                            "Your faction's stockholders have erected a statue of you in the city center.",
-                            "Keep this up and we'll have to make a new channel, called Sarween Streaks, just for your numbers.");
+                                "Words cannot adequately express how impressive this is.",
+                                "Is Sarween the best tech?!",
+                                "Is this much saving even legal? The international IRS will be doing an audit on your paperwork sometime soon.",
+                                "Your faction's stockholders have erected a statue of you in the city center.",
+                                "Keep this up and we'll have to make a new channel, called Sarween Streaks, just for your numbers.");
                             msg += lameMessages.get(result);
                         }
                     }
@@ -1610,6 +1610,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
                     buttons.add(Buttons.red("exhaustAgent_gledgeagent_" + player.getFaction(), "Use Gledge Agent", FactionEmojis.gledge));
                 }
+                if (player.hasUnexhaustedLeader("uydaiagent") && !"muaatagent".equalsIgnoreCase(buttonID)
+                    && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
+                    buttons.add(Buttons.red("exhaustAgent_uydaiagent_" + player.getFaction(), "Use Uydai Agent", FactionEmojis.gledge));
+                }
                 if (player.hasUnexhaustedLeader("ghotiagent")) {
                     buttons.add(Buttons.red("exhaustAgent_ghotiagent_" + player.getFaction(), "Use Ghoti Agent", FactionEmojis.ghoti));
                 }
@@ -1653,7 +1657,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
-            if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare") ||buttonID.contains("anarchy7Build"))) {
+            if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare") || buttonID.contains("anarchy7Build"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             player.resetSpentThings();
@@ -2012,6 +2016,23 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor()
             + " paid 1 trade good to announce a retreat " + player.gainTG(-1) + ".");
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("announceReadyForDice_")
+    public static void announceReadyForDice(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String p1Color = buttonID.split("_")[1];
+        Player p1 = game.getPlayerFromColorOrFaction(p1Color);
+        String p2Color = buttonID.split("_")[2];
+        Player p2 = game.getPlayerFromColorOrFaction(p2Color);
+        String msg = " your opponent has declared they are ready to roll combat dice if you are.";
+        if (player == p1 || player.getAllianceMembers().contains(p1.getFaction())) {
+            msg = p2.getRepresentation(false, true) + msg;
+        } else {
+            msg = p1.getRepresentation(false, true) + msg;
+        }
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+
     }
 
     @ButtonHandler("announceARetreat")

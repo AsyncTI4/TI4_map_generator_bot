@@ -51,6 +51,7 @@ public enum LeaderEmojis implements TI4Emoji {
     KolumeAgent, KolumeCommander, KolumeHero, //
     KortaliAgent, KortaliCommander, KortaliHero, //
     LanefirAgent, LanefirCommander, /* LanefirHero, */ //
+    UydaiAgent, UydaiCommander, UydaiHero,
 
     // Generic
     Agent, Commander, Hero, Envoy;
@@ -218,6 +219,9 @@ public enum LeaderEmojis implements TI4Emoji {
             case "kortalihero" -> KortaliHero;
             case "lanefiragent" -> LanefirAgent;
             case "lanefircommander" -> LanefirCommander;
+            case "uydaiagent" -> UydaiAgent;
+            case "uydaicommander" -> UydaiCommander;
+            case "uydaihero" -> UydaiHero;
             // case "lanefirhero" -> "";
             default -> TI4Emoji.getRandomGoodDog(leader.toLowerCase());
         };

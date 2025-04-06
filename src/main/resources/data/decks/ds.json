@@ -448,7 +448,9 @@
             "dsveldr",
             "dsvelddn",
             "dszelir",
-            "dszeliinf"
+            "dszeliinf",
+            "dsuydag",
+            "dsuydab"
         ],
         "source": "ds"
     }

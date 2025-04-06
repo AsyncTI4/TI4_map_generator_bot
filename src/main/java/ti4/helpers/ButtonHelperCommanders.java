@@ -27,8 +27,14 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.PlanetModel;
+import ti4.model.RelicModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.service.agenda.LookAgendaService;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
@@ -422,6 +428,121 @@ public class ButtonHelperCommanders {
             }
         }
         return buttons;
+    }
+
+    public static List<Button> getUydaiCommanderButtons(Game game, boolean ableToBottom, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        String abletobot = "_no";
+        if (ableToBottom) {
+            abletobot = "_yes";
+        }
+        buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_industrial" + abletobot, "Industrial", ExploreEmojis.Industrial));
+        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_hazardous" + abletobot, "Hazardous", ExploreEmojis.Hazardous));
+        buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_cultural" + abletobot, "Cultural", ExploreEmojis.Cultural));
+        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_frontier" + abletobot, "Frontier", ExploreEmojis.Frontier));
+        buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_relics" + abletobot, "Relic", ExploreEmojis.Relic));
+        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_secrets" + abletobot, "Secret", CardEmojis.SecretObjective));
+        buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_agenda" + abletobot, "Agenda", CardEmojis.Agenda));
+        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_acs" + abletobot, "Action Card", CardEmojis.ActionCard));
+        return buttons;
+    }
+
+    @ButtonHandler("uydaiCommander")
+    public static void uydaiCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        if (player.getTg() < 1) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " you need at least 1 tg to use this ability");
+            return;
+        }
+        if (game.getActivePlayer() != player) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " you need to be the active player to use this ability");
+            return;
+        }
+        player.setTg(player.getTg() - 1);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is paying 1tg to look at the top card of a deck");
+        List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, false, player);
+        String message = player.getRepresentationUnfogged() + " select which deck you wish to look at the top of.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    @ButtonHandler("uydaiCommanderLook_")
+    public static void uydaiCommanderLook(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String target = buttonID.split("_")[1];
+        String ableToBot = buttonID.split("_")[2];
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is choosing to look at the top of the " + event.getButton().getLabel() + " deck");
+        event.getMessage().delete().queue();
+        switch (target) {
+            case "industrial", "hazardous", "frontier", "cultural" -> {
+                ButtonHelperFactionSpecific.resolveExpLook(player, game, event, target);
+            }
+            case "agenda" -> {
+                LookAgendaService.lookAtAgendas(game, player, 1, false);
+            }
+            case "relics" -> {
+                List<String> relicDeck = game.getAllRelics();
+                if (relicDeck.isEmpty()) {
+                    MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty");
+                    return;
+                }
+                String relicID = relicDeck.getFirst();
+                RelicModel relicModel = Mapper.getRelic(relicID);
+                String sb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
+            }
+            case "secrets" -> {
+                List<String> secretDeck = game.getSecretObjectives();
+                String secretID = secretDeck.getFirst();
+                SecretObjectiveModel secretModel = Mapper.getSecretObjective(secretID);
+                String sb = "**Secret - Look at Top**\n" + player.getRepresentation() + "\n" + secretModel.getName() + "\n" + secretModel.getText();
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
+            }
+            case "acs" -> {
+                List<String> acDeck = game.getActionCards();
+                String acID = acDeck.getFirst();
+                ActionCardModel acModel = Mapper.getActionCard(acID);
+                String sb = "**Action Card - Look at Top**\n" + player.getRepresentation() + "\n" + acModel.getRepresentation();
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
+            }
+        }
+        if (ableToBot.equalsIgnoreCase("yes")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderBottom_" + target, "Bottom It"));
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Leave it on top"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " would you like to bottom the card or leave it on top?", buttons);
+        }
+    }
+
+    @ButtonHandler("uydaiCommanderBottom_")
+    public static void uydaiCommanderBottom(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String target = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is choosing to bottom the card they saw.");
+        event.getMessage().delete().queue();
+        switch (target) {
+            case "industrial", "hazardous", "frontier", "cultural" -> {
+                game.putExploreBottom(game.getExploreDeck(target).getFirst());
+            }
+            case "agenda" -> {
+                AgendaHelper.putBottom(game.getAgendas().getFirst(), game);
+            }
+            case "relics" -> {
+                List<String> relicDeck = game.getAllRelics();
+                if (relicDeck.isEmpty()) {
+                    MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty");
+                    return;
+                }
+                String relicID = relicDeck.getFirst();
+                game.putRelicBottom(relicID);
+            }
+            case "secrets" -> {
+                List<String> secretDeck = game.getSecretObjectives();
+                String secretID = secretDeck.getFirst();
+                game.putSOBottom(secretID);
+            }
+            case "acs" -> {
+                List<String> acDeck = game.getActionCards();
+                String acID = acDeck.getFirst();
+                game.putACBottom(acID);
+            }
+        }
     }
 
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event) {
