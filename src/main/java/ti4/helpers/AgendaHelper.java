@@ -1886,8 +1886,7 @@ public class AgendaHelper {
                             String message = identity
                                 + ", you have an _Armament Rider_ to resolve. Select the system in which you wish to produce 2 units each with cost 4 or less.";
 
-                            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR,
-                                UnitType.Spacedock, UnitType.CabalSpacedock);
+                            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR, UnitType.Spacedock);
                             List<Button> buttons = new ArrayList<>();
                             for (Tile tile : tiles) {
                                 Button starTile = Buttons.green("umbatTile_" + tile.getPosition(),
