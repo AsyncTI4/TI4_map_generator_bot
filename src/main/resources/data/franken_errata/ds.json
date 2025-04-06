@@ -36,12 +36,6 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "fervor",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
         "ItemCategory": "FLAGSHIP",
         "ItemId": "bentor_flagship",
         "AdditionalComponents": [
