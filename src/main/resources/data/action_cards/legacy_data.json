@@ -977,5 +977,14 @@
         "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your die rolls during this ability and repeat its effect.",
         "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—and Dart ran.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "public_outcry",
+        "name": "Public Outcry",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
+        "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
+        "source": "action_deck_2_old"
     }
 ]

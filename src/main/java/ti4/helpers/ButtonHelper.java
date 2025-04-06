@@ -2672,18 +2672,6 @@ public class ButtonHelper {
             fleetCap += 1000;
         }
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
-            if (capChecker.getUnitCount(UnitType.CabalSpacedock, player.getColor()) > 0) {
-                String colorID = Mapper.getColorID(player.getColor());
-                UnitKey csdKey = Mapper.getUnitKey("csd", colorID);
-                UnitKey sdKey = Mapper.getUnitKey("sd", colorID);
-                capChecker.removeUnit(csdKey, 1);
-                capChecker.addUnit(sdKey, 1);
-                BotLogger.log("Removing csd in game " + game.getName());
-                // RemoveUnitService.removeUnits(event, player.getColor(), tile, "csd
-                // "+capChecker.getName(), game);
-                // AddUnitService.addUnits(event, tile, player.getColor(), "sd
-                // "+capChecker.getName(), game);
-            }
             Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
             for (UnitModel unit : unitsByQuantity.keySet()) {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {

@@ -1006,7 +1006,6 @@ public class StartCombatService {
                 }
                 if (p1.hasAbility("assimilate") && isGroundCombat
                     && (unitH.getUnitCount(Units.UnitType.Spacedock, p2.getColor()) > 0
-                        || unitH.getUnitCount(Units.UnitType.CabalSpacedock, p2.getColor()) > 0
                         || unitH.getUnitCount(Units.UnitType.Pds, p2.getColor()) > 0)) {
                     String id = p1.finChecker() + "assimilate_" + unitH.getName();
                     String label = "Assimilate Structures on " + nameOfHolder;
