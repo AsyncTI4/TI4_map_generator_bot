@@ -736,7 +736,6 @@ public class BotLogger {
 						.append("\n");
 
 			message.append("\n");
-			BotLogger.info("In Abstract" + message.toString());
 			return message.toString();
 		}
 
