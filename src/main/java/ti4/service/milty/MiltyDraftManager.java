@@ -347,7 +347,7 @@ public class MiltyDraftManager {
         try {
             String drafted = player.getPing() + middle + switch (category) {
                 case "slice" -> "Slice " + item;
-                case "faction" -> Mapper.getFaction(item).getFactionTitle();
+                case "faction" -> Mapper.getFaction(item).getFactionTitle().replace("Keleres - Mentak", "Keleres");
                 case "order" -> StringHelper.ordinal(Integer.parseInt(item)) + " pick";
                 default -> "Error parsing milty button press: " + buttonID;
             } + "!";
@@ -356,6 +356,10 @@ public class MiltyDraftManager {
             // Shouldn't get errors here, but fallback to a boring message
             String drafted = player.getPing() + middle + item;
             MessageHelper.sendMessageToChannel(mainGameChannel, drafted);
+        }
+
+        if (category.equals("faction") && item.contains("keleres")) {
+            MiltyService.offerKeleresSetupButtons(this, player);
         }
 
         try {

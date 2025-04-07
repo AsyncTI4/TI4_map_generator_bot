@@ -494,13 +494,13 @@ public class DrawingUtil {
             while (width(g2, line) > maxWidth) {
                 int splitIndex = -1;
                 int nextSpace = line.indexOf(" ");
-    
+
                 // Prefer splitting at spaces
                 while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
                     splitIndex = nextSpace;
                     nextSpace = line.indexOf(" ", splitIndex + 1);
                 }
-    
+
                 // If no space is found or no valid split, break at max width
                 if (splitIndex == -1) {
                     for (int i = 1; i < line.length(); i++) {
@@ -510,11 +510,11 @@ public class DrawingUtil {
                         }
                     }
                 }
-    
+
                 finalSplit.add(line.substring(0, splitIndex).trim());
                 line = line.substring(splitIndex).trim();
             }
-    
+
             if (!line.isEmpty()) {
                 finalSplit.add(line);
             }

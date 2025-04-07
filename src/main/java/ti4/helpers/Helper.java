@@ -43,6 +43,10 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -619,25 +623,12 @@ public class Helper {
         };
     }
 
-    public static File getSCImageFile(Integer sc, Game game) {
-        String scSet = game.getScSetID();
-        if (Optional.ofNullable(game.getScSetID()).isEmpty()
-            || "null".equals(game.getScSetID())) { // I don't know *why* this is a thing that can happen, but it is
-            scSet = "pok";
-        }
-        boolean gameWithGroupedSCs = "pbd100".equals(game.getName()) || "pbd500".equals(game.getName()) && !"tribunal".equals(scSet);
-        if (gameWithGroupedSCs) {
-            //char scValue = String.valueOf(sc).charAt(0);
-            scSet = scSet.replace("pbd100", "pok");
-            scSet = scSet.replace("pbd1000", "pok");
-        }
-        StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
-        String scImagePath = scModel.getImageFilePath();
-        if (scImagePath == null) {
-            scImagePath = ResourceHelper.getResourceFromFolder("strat_cards/", "sadFace.png");
-        }
-
-        return new File(scImagePath);
+    public static String getScImageUrl(Integer sc, Game game) {
+        String scImagePath = game.getStrategyCardSet()
+            .getStrategyCardModelByInitiative(sc)
+            .map(StrategyCardModel::getImageFileName)
+            .orElse("sadFace.png");
+        return "https://raw.githubusercontent.com/AsyncTI4/TI4_map_generator_bot/refs/heads/master/src/main/resources/strat_cards/" + scImagePath + ".png";
     }
 
     public static Emoji getPlayerReactionEmoji(Game game, Player player, Message message) {

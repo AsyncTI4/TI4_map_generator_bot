@@ -128,7 +128,7 @@ public class PlayStrategyCardService {
         // SEND IMAGE OR SEND EMBED IF IMAGE DOES NOT EXIST
         if (!winnuHero) {
             if (scModel.hasImageFile()) {
-                MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToPlay, game));
+                MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getScImageUrl(scToPlay, game));
             } else {
                 baseMessageObject.addEmbeds(scModel.getRepresentationEmbed());
             }
@@ -362,7 +362,7 @@ public class PlayStrategyCardService {
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
-                    MessageHelper.sendFileToChannel(m5, Helper.getSCImageFile(scToPlay, game));
+                    MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
                 }
 
                 if (scModel.usesAutomationForSCID("pok5trade")) {
