@@ -198,7 +198,7 @@ public class DrawingUtil {
             if (player != null) {
                 BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored error during map generation for `" + gameName + "`", e);
             } else {
-                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored error during map generation for `" + gameName + "`", e);
+                BotLogger.error("Ignored error during map generation for `" + gameName + "`", e);
             }
         }
     }

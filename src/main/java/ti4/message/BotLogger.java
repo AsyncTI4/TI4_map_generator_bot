@@ -36,228 +36,6 @@ public class BotLogger {
 	public static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
 
 	/**
-	 * Describes the discord-based origin of a log message and handles fetching data for log messages from these sources.
-	 */
-	public static class LogMessageOrigin {
-		@Getter
-		@Nullable
-		private Guild guild;
-
-		@Getter
-		@Nullable
-		private GuildChannel channel;
-
-		@Getter
-		@Nullable
-		private GenericInteractionCreateEvent event;
-
-		@Getter
-		@Nullable
-		private Game game;
-
-		@Getter
-		@Nullable
-		private Player player;
-
-		@Getter
-		private String originTime;
-
-		public LogMessageOrigin(@Nonnull Guild guild) {
-			this.guild = guild;
-			this.originTime = DateTimeHelper.getCurrentTimestamp();
-		}
-
-		public LogMessageOrigin(@Nonnull GuildChannel channel) {
-			this.channel = channel;
-			this.guild = channel.getGuild();
-			this.originTime = DateTimeHelper.getCurrentTimestamp();
-		}
-
-		public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event) {
-			this.event = event;
-			if (event.isFromGuild()) {
-				this.channel = event.getGuildChannel();
-				this.guild = event.getGuild();
-			} else
-				BotLogger.warning("LocationSource created from non-guild event. This will not attribute messages.");
-			this.originTime = DateTimeHelper.getCurrentTimestamp();
-		}
-
-		public LogMessageOrigin(@Nonnull Game game) {
-			this.game = game;
-			this.guild = game.getGuild();
-			this.channel = game.getMainGameChannel();
-			this.originTime = DateTimeHelper.getCurrentTimestamp();
-		}
-
-		public LogMessageOrigin(@Nonnull Player player) {
-			this.player = player;
-			this.game = player.getGame();
-			if (game != null) {
-				this.guild = game.getGuild();
-				this.channel = game.getMainGameChannel();
-			} else
-				BotLogger.warning("LocationSource created from player with null game. This will not attribute messages.");
-			this.originTime = DateTimeHelper.getCurrentTimestamp();
-		}
-
-		public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
-			this.game = game;
-			this.guild = game.getGuild();
-			this.event = event;
-			if (event.isFromGuild())
-				this.channel = event.getGuildChannel();
-			else
-				this.channel = game.getMainGameChannel();
-			this.originTime = DateTimeHelper.getCurrentTimestamp();
-		}
-
-		public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Player player) {
-			this.player = player;
-			this.game = player.getGame();
-			if (game != null) this.guild = game.getGuild();
-			this.event = event;
-			if (event.isFromGuild()) {
-				this.channel = event.getGuildChannel();
-				this.guild = event.getGuild();
-			} else
-				this.channel = game.getMainGameChannel();
-			this.originTime = DateTimeHelper.getCurrentTimestamp();
-		}
-
-		/**
-		 * Get mention for the most granular source.
-		 * @return The most granular mention as a string
-		 */
-		@Nonnull
-		public String getStrictestMention() {
-			switch (event) {
-				case ButtonInteractionEvent bEvent -> {
-					return bEvent.getMessage().getJumpUrl();
-				}
-				case StringSelectInteractionEvent sEvent -> {
-					return sEvent.getMessage().getJumpUrl();
-				}
-				case ModalInteractionEvent mEvent -> {
-					if (mEvent.getMessage() != null) return mEvent.getMessage().getJumpUrl();
-				}
-				case null -> {}
-				default -> {} // This will default to the GuildChannel in which the event was sent.
-			}
-
-			if (channel != null) return channel.getAsMention();
-
-			if (guild != null) return "<Location source is a guild>";
-
-			warning("A LocationSource was created with no location");
-			return "No mention available";
-		}
-
-		/**
-		 * Get name of the most granular source.
-		 * @return The most granular name as a string
-		 */
-		@Nonnull
-		public String getStrictestName() {
-			if (channel != null) return "| Channel \"" + channel.getName() + "\"";
-
-			if (guild != null) return "| Guild \"" + guild.getName() + "\"";
-
-			warning("A LocationSource was created with no location");
-			return "No name available";
-		}
-
-		/**
-		 * Append the "Source:" portion of a log message to a StringBuilder.
-		 * @param builder - The StringBuilder to which the source string is appended
-		 * @return The StringBuilder passed into builder
-		 */
-		@Nonnull
-		public StringBuilder appendSourceString(@Nonnull StringBuilder builder) {
-			builder.append("Source: ");
-			if (player != null) builder.append("| Player \"")
-				.append(player.getDisplayName())
-				.append("\" ");
-			if (game != null) builder.append("| Game \"")
-				.append(game.getName())
-				.append("\" ");
-			builder.append(getStrictestName())
-				.append(" (")
-				.append(getStrictestMention())
-				.append(")\n");
-
-			return builder;
-		}
-
-		/**
-		 * Append the "Event:" portion of a log message to a StringBuilder.
-		 * @param builder - The StringBuilder to which the event string is appended
-		 * @return The StringBuilder passed into builder
-		 */
-		@Nonnull
-		public StringBuilder appendEventString(@Nonnull StringBuilder builder) {
-			if (event == null) return builder;
-
-			builder.append(event.getUser().getEffectiveName())
-				.append(" (")
-				.append(event.getUser().getAsMention())
-				.append(") ");
-
-			switch (event) {
-				case SlashCommandInteractionEvent sEvent -> builder.append("used command `")
-					.append(sEvent.getCommandString())
-					.append("`\n");
-				case ButtonInteractionEvent bEvent -> builder.append("pressed button ")
-					.append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
-					.append("\n");
-				case StringSelectInteractionEvent sEvent -> builder.append("selected ")
-					.append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
-					.append("\n");
-				case ModalInteractionEvent mEvent -> builder.append("used modal ")
-					.append(ModalListener.getModalDebugText(mEvent))
-					.append("\n");
-				default -> builder.append("initiated an unexpected event\n");
-			}
-
-			return builder;
-		}
-
-		/**
-		 * Get the most relevant log channel for this source. Priority is to severity.channelName, then "#bot-log", then returns null.
-		 *
-		 * @param severity - The severity of the log message, used to find the appropriate channel based on LogSeverity.channelName
-		 * @return The most relevant logging TextChannel
-		 */
-		@Nullable
-		public TextChannel getLogChannel(@Nonnull LogSeverity severity) {
-			if (guild == null) return null;
-
-			return guild.getTextChannelsByName(severity.channelName, false)
-				.stream()
-				.findAny()
-				.orElse(guild.getTextChannelsByName("bot-log", false)
-					.stream()
-					.findFirst()
-					.orElse(null));
-		}
-	}
-
-	/**
-	 * Enum for data associated with log severity
-	 */
-	public enum LogSeverity {
-		Info("bot-log-info", "### INFO\n"), Warning("bot-log-warning", "## WARNING\n"), Error("bot-log-error", "## ERROR\n");
-
-		public final String channelName;
-		public final String headerText;
-
-		LogSeverity(String channelName, String headerText) {
-			this.channelName = channelName;
-			this.headerText = headerText;
-		}
-	}
-
-	/**
 	 * Sends a message to #bot-log-info in the offending server, else resorting to #bot-log and finally webhook.
 	 * <p>
 	 * If err is not null, a full stack trace will be sent in a thread.
@@ -499,7 +277,7 @@ public class BotLogger {
 		if (timeToNextMessage <= 0) {
 			sendMessageToBotLogWebhook(message);
 		} else {
-			CronManager.scheduleOnce(MessageHelper.class, () -> sendMessageToBotLogWebhook(message), timeToNextMessage, TimeUnit.MILLISECONDS);
+            CronManager.scheduleOnce(BotLogger.class, () -> sendMessageToBotLogWebhook(message), timeToNextMessage, TimeUnit.MILLISECONDS);
 		}
 
 		lastScheduledWebhook = System.currentTimeMillis() + Math.max(timeToNextMessage, 0);
@@ -708,71 +486,6 @@ public class BotLogger {
 	 * This class represents an event to be logged via InteractionLogCron.
 	 * It contains all the necessary data to find the correct logging channel or thread in the primary server and write a log message.
 	 */
-	public sealed abstract static class AbstractEventLog { // Yes, this is basically trying to recreate a rust enum. No, I'm not sorry
-		protected LogMessageOrigin source;
-
-		// Implementor's note: These fields must have getters, as this is how the subclasses override the statics without changing them for all subclasses
-		@Getter
-		private static String channelName = "";
-
-		@Getter
-		private static String threadName = "";
-
-		@Getter
-		private static String messagePrefix = "";
-
-		protected String message = "";
-
-		public String getLogString() {
-			StringBuilder message = new StringBuilder();
-
-			source.appendEventString(
-				source.appendSourceString(
-					message.append(source.getOriginTime())
-						.append("\n")));
-
-			if (!this.message.isEmpty())
-				message.append(getMessagePrefix())
-					.append(this.message)
-					.append("\n");
-
-			message.append("\n");
-			return message.toString();
-		}
-
-		AbstractEventLog(LogMessageOrigin source) {
-			this.source = source;
-		}
-
-		public static final class ButtonInteraction extends AbstractEventLog {
-			@Getter
-			static String channelName = "bot-button-log";
-
-			@Getter
-			static String threadName = "button-log";
-
-			ButtonInteraction(LogMessageOrigin source) {
-				super(source);
-			}
-		}
-
-		public static final class SlashCommand extends AbstractEventLog {
-			@Getter
-			static String channelName = "bot-slash-command-log";
-
-			@Getter
-			static String threadName = "slash-command-log";
-
-			@Getter
-			static String messagePrefix = "Response: ";
-
-			SlashCommand(LogMessageOrigin source, Message commandResponse) {
-				super(source);
-				super.message = commandResponse.getContentDisplay();
-			}
-		}
-	}
-
 	public static void logButton(ButtonInteractionEvent event) {
 		InteractionLogCron.addLogMessage(new AbstractEventLog.ButtonInteraction(new LogMessageOrigin(event)));
 	}
@@ -830,5 +543,299 @@ public class BotLogger {
 			return restError.getErrorCode() == 10008;
 		}
 		return false;
+	}
+
+	/**
+	 * Enum for data associated with log severity
+	 */
+	private enum LogSeverity {
+		Info("bot-log-info", "### INFO\n"), Warning("bot-log-warning", "## WARNING\n"), Error("bot-log-error", "## ERROR\n");
+
+		public final String channelName;
+		public final String headerText;
+
+		LogSeverity(String channelName, String headerText) {
+			this.channelName = channelName;
+			this.headerText = headerText;
+		}
+	}
+
+	/**
+	 * Describes the discord-based origin of a log message and handles fetching data for log messages from these sources.
+	 */
+	public static class LogMessageOrigin {
+		@Getter
+		@Nullable
+		private Guild guild;
+
+		@Getter
+		@Nullable
+		private GuildChannel channel;
+
+		@Getter
+		@Nullable
+		private GenericInteractionCreateEvent event;
+
+		@Getter
+		@Nullable
+		private Game game;
+
+		@Getter
+		@Nullable
+		private Player player;
+
+		@Getter
+		private String originTime;
+
+		public LogMessageOrigin(@Nonnull Guild guild) {
+			this.guild = guild;
+			this.originTime = DateTimeHelper.getCurrentTimestamp();
+		}
+
+		public LogMessageOrigin(@Nonnull GuildChannel channel) {
+			this.channel = channel;
+			this.guild = channel.getGuild();
+			this.originTime = DateTimeHelper.getCurrentTimestamp();
+		}
+
+		public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event) {
+			this.event = event;
+			if (event.isFromGuild()) {
+				this.channel = event.getGuildChannel();
+				this.guild = event.getGuild();
+			} else {
+				BotLogger.warning("LocationSource created from non-guild event. This will not attribute messages.");
+			}
+			this.originTime = DateTimeHelper.getCurrentTimestamp();
+		}
+
+		public LogMessageOrigin(@Nonnull Game game) {
+			this.game = game;
+			this.guild = game.getGuild();
+			this.channel = game.getMainGameChannel();
+			this.originTime = DateTimeHelper.getCurrentTimestamp();
+		}
+
+		public LogMessageOrigin(@Nonnull Player player) {
+			this.player = player;
+			this.game = player.getGame();
+			if (game != null) {
+				this.guild = game.getGuild();
+				this.channel = game.getMainGameChannel();
+			} else {
+				BotLogger.warning("LocationSource created from player with null game. This will not attribute messages.");
+			}
+			this.originTime = DateTimeHelper.getCurrentTimestamp();
+		}
+
+		public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Game game) {
+			this.game = game;
+			this.guild = game.getGuild();
+			this.event = event;
+			if (event.isFromGuild())
+				this.channel = event.getGuildChannel();
+			else
+				this.channel = game.getMainGameChannel();
+			this.originTime = DateTimeHelper.getCurrentTimestamp();
+		}
+
+		public LogMessageOrigin(@Nonnull GenericInteractionCreateEvent event, @Nonnull Player player) {
+			this.player = player;
+			this.game = player.getGame();
+			if (game != null) this.guild = game.getGuild();
+			this.event = event;
+			if (event.isFromGuild()) {
+				this.channel = event.getGuildChannel();
+				this.guild = event.getGuild();
+			} else {
+				this.channel = game.getMainGameChannel();
+			}
+			this.originTime = DateTimeHelper.getCurrentTimestamp();
+		}
+
+		/**
+		 * Get mention for the most granular source.
+		 * @return The most granular mention as a string
+		 */
+		@Nonnull
+		public String getStrictestMention() {
+			switch (event) {
+				case ButtonInteractionEvent bEvent -> {
+					return bEvent.getMessage().getJumpUrl();
+				}
+				case StringSelectInteractionEvent sEvent -> {
+					return sEvent.getMessage().getJumpUrl();
+				}
+				case ModalInteractionEvent mEvent -> {
+					if (mEvent.getMessage() != null) return mEvent.getMessage().getJumpUrl();
+				}
+				case null -> {}
+				default -> {} // This will default to the GuildChannel in which the event was sent.
+			}
+
+			if (channel != null) return channel.getAsMention();
+
+			if (guild != null) return "<Location source is a guild>";
+
+			warning("A LocationSource was created with no location");
+			return "No mention available";
+		}
+
+		/**
+		 * Get name of the most granular source.
+		 * @return The most granular name as a string
+		 */
+		@Nonnull
+		public String getStrictestName() {
+			if (channel != null) return "| Channel \"" + channel.getName() + "\"";
+
+			if (guild != null) return "| Guild \"" + guild.getName() + "\"";
+
+			warning("A LocationSource was created with no location");
+			return "No name available";
+		}
+
+		/**
+		 * Append the "Source:" portion of a log message to a StringBuilder.
+		 * @param builder - The StringBuilder to which the source string is appended
+		 * @return The StringBuilder passed into builder
+		 */
+		@Nonnull
+		public StringBuilder appendSourceString(@Nonnull StringBuilder builder) {
+			builder.append("Source: ");
+			if (player != null) builder.append("| Player \"")
+					.append(player.getDisplayName())
+					.append("\" ");
+			if (game != null) builder.append("| Game \"")
+					.append(game.getName())
+					.append("\" ");
+			builder.append(getStrictestName())
+					.append(" (")
+					.append(getStrictestMention())
+					.append(")\n");
+
+			return builder;
+		}
+
+		/**
+		 * Append the "Event:" portion of a log message to a StringBuilder.
+		 * @param builder - The StringBuilder to which the event string is appended
+		 * @return The StringBuilder passed into builder
+		 */
+		@Nonnull
+		public StringBuilder appendEventString(@Nonnull StringBuilder builder) {
+			if (event == null) return builder;
+
+			builder.append(event.getUser().getEffectiveName())
+					.append(" (")
+					.append(event.getUser().getAsMention())
+					.append(") ");
+
+			switch (event) {
+				case SlashCommandInteractionEvent sEvent -> builder.append("used command `")
+						.append(sEvent.getCommandString())
+						.append("`\n");
+				case ButtonInteractionEvent bEvent -> builder.append("pressed button ")
+						.append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
+						.append("\n");
+				case StringSelectInteractionEvent sEvent -> builder.append("selected ")
+						.append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
+						.append("\n");
+				case ModalInteractionEvent mEvent -> builder.append("used modal ")
+						.append(ModalListener.getModalDebugText(mEvent))
+						.append("\n");
+				default -> builder.append("initiated an unexpected event\n");
+			}
+
+			return builder;
+		}
+
+		/**
+		 * Get the most relevant log channel for this source. Priority is to severity.channelName, then "#bot-log", then returns null.
+		 *
+		 * @param severity - The severity of the log message, used to find the appropriate channel based on LogSeverity.channelName
+		 * @return The most relevant logging TextChannel
+		 */
+		@Nullable
+		public TextChannel getLogChannel(@Nonnull LogSeverity severity) {
+			if (guild == null) return null;
+
+			return guild.getTextChannelsByName(severity.channelName, false)
+					.stream()
+					.findAny()
+					.orElse(guild.getTextChannelsByName("bot-log", false)
+							.stream()
+							.findFirst()
+							.orElse(null));
+		}
+	}
+
+	/**
+	 * Describes event logs to be sent to InteractionLogCron
+	 */
+	// Implementor's note: all subclasses of AbstractEventLog are automatically accounted for in InteractionLogCron as long as channelName and threadName are defined.
+	public sealed abstract static class AbstractEventLog { // Yes, this is basically trying to recreate a rust enum. No, I'm not sorry
+		protected LogMessageOrigin source;
+
+		// Implementor's note: These fields must have getters, as this is how the subclasses override the statics without changing them for all subclasses
+		@Getter
+		private static String channelName = "";
+
+		@Getter
+		private static String threadName = "";
+
+		@Getter
+		private static String messagePrefix = "";
+
+		protected String message = "";
+
+		public String getLogString() {
+			StringBuilder message = new StringBuilder();
+
+			source.appendEventString(
+					source.appendSourceString(
+							message.append(source.getOriginTime())
+									.append("\n")));
+
+			if (!this.message.isEmpty())
+				message.append(getMessagePrefix())
+						.append(this.message)
+						.append("\n");
+
+			message.append("\n");
+			return message.toString();
+		}
+
+		AbstractEventLog(LogMessageOrigin source) {
+			this.source = source;
+		}
+
+		public static final class ButtonInteraction extends AbstractEventLog {
+			@Getter
+			static String channelName = "bot-button-log";
+
+			@Getter
+			static String threadName = "button-log";
+
+			ButtonInteraction(LogMessageOrigin source) {
+				super(source);
+			}
+		}
+
+		public static final class SlashCommand extends AbstractEventLog {
+			@Getter
+			static String channelName = "bot-slash-command-log";
+
+			@Getter
+			static String threadName = "slash-command-log";
+
+			@Getter
+			static String messagePrefix = "Response: ";
+
+			SlashCommand(LogMessageOrigin source, Message commandResponse) {
+				super(source);
+				super.message = commandResponse.getContentDisplay();
+			}
+		}
 	}
 }
