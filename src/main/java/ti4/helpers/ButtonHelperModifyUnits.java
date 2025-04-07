@@ -790,8 +790,7 @@ public class ButtonHelperModifyUnits {
             if (p2 == player) {
                 continue;
             }
-            sdAmount = uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) + sdAmount
-                + uH.getUnitCount(UnitType.Spacedock, p2.getColor());
+            sdAmount += uH.getUnitCount(UnitType.Spacedock, p2.getColor());
             if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 RemoveUnitService.removeUnits(event, game.getTileFromPlanet(uH.getName()), game, p2.getColor(), sdAmount + " sd " + uH.getName());
                 RemoveUnitService.removeUnits(event, game.getTileFromPlanet(uH.getName()), game, p2.getColor(), sdAmount + " csd " + uH.getName());
@@ -2322,7 +2321,7 @@ public class ButtonHelperModifyUnits {
 
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(game, targetPlayer,
-            Units.UnitType.Spacedock, Units.UnitType.CabalSpacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
+            Units.UnitType.Spacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
         for (Tile tile : tiles) {
             Button tileButton = Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling",
                 tile.getRepresentationForButtons(game, targetPlayer));

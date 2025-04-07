@@ -67,7 +67,7 @@
         "name": "Betrayal",
         "phase": "Action",
         "window": "At the start of your turn",
-        "text": "Choose another player. During this turn, that player cannot choose to play action cards or promissory notes.",
+        "text": "Choose another player. That player cannot play action cards or promissory notes during this turn.",
         "flavorText": "Airo Shir Aur interrupted the diplomat with a wave of their hand, \"Our dominion knows no border.\"",
         "source": "action_deck_2"
     },
@@ -93,7 +93,7 @@
         "alias": "bounty",
         "name": "Bounty",
         "phase": "Action",
-        "window": "After 1 of your opponent's units with a cost of 3 or more is destroyed",
+        "window": "After you destroy another player's unit that has a cost of 3 or more",
         "text": "Gain 4 trade goods.",
         "flavorText": "\"Sorry, love, it's just business,\" Mot said with a hint of regret. S'ula screamed from behind her gag as she watched him reroute the ship toward Arcturus.",
         "source": "action_deck_2"
@@ -121,7 +121,7 @@
         "name": "Chain Reaction",
         "phase": "Action",
         "window": "After you destroy 1 of your opponent's non-fighter ships",
-        "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die; on a result of 7-10, apply -1 to the result of each of your die rolls during this ability and repeat its effect.",
+        "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die. If the result is 8 or greater, produce 1 additional hit and roll again; this ability cannot produce more than 4 hits.",
         "flavorText": "As Jace tore through the enemy line, his ordnance erupted into a symphony of explosions.",
         "source": "action_deck_2"
     },
@@ -150,15 +150,6 @@
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each player that voted for that outcome gains 2 trade goods.",
         "flavorText": "Mot sank into his chair after signing the last of the trade deals. He was gambling with the fate of the galaxy, yet his empire was secure. Many would suffer, but that was a sacrifice he was willing to make.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "corruption",
-        "name": "Corruption",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "Choose 1 player. That player may exhaust up to 4 planets they control to gain an equal number of trade goods.",
-        "flavorText": "Just as the charges went public, over half of the Council's Winnaran staff were arrested. The Winnu, meanwhile, secreted the true loyalist off of Mecatol and delivered their reward.",
         "source": "action_deck_2"
     },
     {
@@ -320,7 +311,7 @@
         "name": "Espionage",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose another player. That player shows you either 1 random secret objective from their hand or their hand of action cards.",
+        "text": "Choose another player. That player shows you their action cards or 1 random secret objective from their hand. [Note: Their choice. If they have no secrets, they must show you their action cards.]",
         "flavorText": "Z'eu closed her eyes and listened for a moment as her guests gasped for air, collapsing one by one as the poison took them. Such is the beauty of the Naalu, she thought.",
         "source": "action_deck_2"
     },
@@ -414,7 +405,7 @@
         "name": "Freedom Fighters",
         "phase": "Action",
         "window": "After you commit units to land on a planet you do not control in the active system",
-        "text": "Place up to 1 infantry from your reinforcements on each planet in that system.",
+        "text": "Place up to 1 infantry from your reinforcements on each planet in that system.[Note: These infantry cannot be targeted by PDS.]",
         "flavorText": "Harrugh had brought them supplies and hope. On the promised day, they would repay him with their determination for liberation.",
         "source": "action_deck_2"
     },
@@ -540,7 +531,7 @@
         "name": "Micrometeoroid Storm",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 7 or greater, destroy 1 of those units.",
+        "text": "Choose 1 system that contains another player's fighters. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
         "automationID": "micrometeoroid_storm",
         "flavorText": "The disaster investigation unit could not determine whether it was an act of providence or the beginning stages of an incursion.",
         "source": "action_deck_2"
@@ -559,7 +550,7 @@
         "name": "Mysterious Brokers",
         "phase": "Action",
         "window": "After you pass",
-        "text": "You may purge 1 of your relics to gain 1 relic; otherwise, gain trade goods equal to the number of players that have not passed.",
+        "text": "You may purge 1 of your relics to gain 1 relic. If you do not, gain trade goods equal to the number of players that have not passed.",
         "flavorText": "The broker sat unmoving. Its body, nearly stone, lent it to such an activity. However, this being was worth its weight in credits, for its memories stretched to the dawn of wonders, and its stories flowed to those who would fulfill its needs.",
         "source": "action_deck_2"
     },
@@ -699,8 +690,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "public_outcry",
-        "name": "Public Outcry",
+        "alias": "public_outrage",
+        "name": "Public Outrage",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
@@ -1055,6 +1046,15 @@
         "window": "After a player activates a system that contains your units",
         "text": "Choose 1 other system. That system is adjacent to the active system during this tactical action.",
         "flavorText": "The conduit was tearing itself apart as the space within it melted away to reveal the location of the beacon. Their panic quickly culled their jubilation.",
+        "source": "action_deck_2"
+    },
+    {
+        "alias": "virulent_payload",
+        "name": "Virulent Payload",
+        "phase": "Agenda",
+        "window": "After you produce a hit against units on a planet",
+        "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 6 or greater, resolve this ability again.",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2"
     },
     {

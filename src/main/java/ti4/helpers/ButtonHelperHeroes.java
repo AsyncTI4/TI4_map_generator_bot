@@ -39,6 +39,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
@@ -1112,16 +1113,21 @@ public class ButtonHelperHeroes {
             if (p.hasTech("dt2") || p.getUnitsOwned().contains("cabal_spacedock")
                 || p.getUnitsOwned().contains("cabal_spacedock2") || p.hasTech("absol_dt2") || p.getUnitsOwned().contains("absol_cabal_spacedock")
                 || p.getUnitsOwned().contains("absol_cabal_spacedock2")) {
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.CabalSpacedock,
-                    UnitType.Spacedock));
+                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Spacedock));
             }
         }
 
         List<Tile> adjTiles = new ArrayList<>();
+
+        if (RiftSetModeService.isActive(game)) {
+            tiles = RiftSetModeService.getAllTilesWithRift(game);
+            adjTiles.addAll(tiles);
+        }
+
         for (Tile tile : tiles) {
             for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
                 Tile tileToAdd = game.getTileByPosition(pos);
-                if (!adjTiles.contains(tileToAdd) && !tile.getPosition().equalsIgnoreCase(pos)) {
+                if (!tileToAdd.getTileModel().isHyperlane() && !adjTiles.contains(tileToAdd) && !tile.getPosition().equalsIgnoreCase(pos)) {
                     adjTiles.add(tileToAdd);
                 }
             }
@@ -1131,6 +1137,7 @@ public class ButtonHelperHeroes {
             empties.add(Buttons.blue(finChecker + "cabalHeroTile_" + tile.getPosition(),
                 "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
+        SortHelper.sortButtonsByTitle(empties); 
         return empties;
     }
 
@@ -1435,7 +1442,7 @@ public class ButtonHelperHeroes {
                 msg = msg
                     + "removed _Policy - The Environment: Preserve ➕_ and added _Policy - The Environment: Plunder ➖_.";
                 player.addAbility("policy_the_environment_plunder");
-            }else if (player.hasAbility("policy_the_environment_plunder")) {
+            } else if (player.hasAbility("policy_the_environment_plunder")) {
                 player.removeAbility("policy_the_environment_plunder");
                 msg = msg
                     + "removed _Policy - The Environment: Plunder ➖_ and added _Policy - The Environment: Preserve ➕_.";

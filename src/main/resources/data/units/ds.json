@@ -1974,5 +1974,38 @@
         "isGroundForce": true,
         "ability": "At the start of invasion, if this unit is in the space area of the active system, you may remove this unit from the game board to destroy 1 unit on a planet in that system.",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/mechs/collider.jpg?raw=true"
+    },
+    {
+        "id": "uydai_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Fulgurite",
+        "source": "ds",
+        "faction": "uydai",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "Apply +1 to this unit’s combat rolls for each round of combat that has been resolved this combat."
+    },
+    {
+        "id": "uydai_flagship",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "name": "Desert Sage",
+        "source": "ds",
+        "faction": "uydai",
+        "moveValue": 1,
+        "capacityValue": 3,
+        "capacityUsed": 1,
+        "cost": 8,
+        "combatHitsOn": 9,
+        "combatDieCount": 2,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true,
+        "ability": "During each round of combat in this system, you may reroll, or force your opponent to reroll, 1 combat die."
     }
 ]

@@ -149,6 +149,22 @@ public class OtherHeroButtonHandler {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("purgeUydaiHero")
+    public static void purgeUydaiHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
+        Leader playerLeader = player.unsafeGetLeader("uydaihero");
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                message + " - Uydai hero, has been purged.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Uydai hero, was not purged - something went wrong.");
+        }
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     @ButtonHandler("purgeKortaliHero_")
     public static void purgeKortaliHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
         Leader playerLeader = player.unsafeGetLeader("kortalihero");

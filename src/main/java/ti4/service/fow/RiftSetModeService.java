@@ -368,4 +368,13 @@ public class RiftSetModeService {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), MiscEmojis.GravityRift.emojiString());
         return false;
     }
+
+    //Cabal Hero works in every tile with a rift or adjacent to a rift
+    public static List<Tile> getAllTilesWithRift(Game game) {
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# All " + MiscEmojis.GravityRift + " tremble violently!\n"
+            + "## Ships nearby shake as a terrifying " + MiscEmojis.GravityRift + " force builds — danger is imminent.");
+        return game.getTileMap().values().stream()
+            .filter(tile -> tile.isGravityRift(game))
+            .collect(Collectors.toList());
+    }
 }
