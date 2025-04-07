@@ -21,10 +21,9 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.AsyncTI4DiscordBot;
+import ti4.cron.CronManager;
 import ti4.cron.InteractionLogCron;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.DateTimeHelper;
-import ti4.helpers.ThreadArchiveHelper;
+import ti4.helpers.*;
 import ti4.listeners.ModalListener;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -32,6 +31,10 @@ import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
 public class BotLogger {
+
+	private static long lastScheduledWebhook = 0;
+	public static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
+
 	/**
 	 * Describes the discord-based origin of a log message and handles fetching data for log messages from these sources.
 	 */
@@ -461,7 +464,7 @@ public class BotLogger {
 
 			if (err == null || i + 2000 < msgLength) { // If length could overflow or there is no error to trace
 				if (channel == null)
-					MessageHelper.sendMessageToBotLogWebhook(msgChunk); // Send message on websocket
+					scheduleWebhookMessage(msgChunk); // Send message on websocket
 				else
 					channel.sendMessage(msgChunk).queue(); // Send message on channel
 
@@ -472,7 +475,7 @@ public class BotLogger {
 					ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
 
 				if (channel == null)
-					MessageHelper.sendMessageToBotLogWebhook(msgChunk);
+					scheduleWebhookMessage(msgChunk);
 				else
 					channel.sendMessage(msgChunk)
 						.queue(m -> m.createThreadChannel("Stack Trace")
@@ -483,6 +486,44 @@ public class BotLogger {
 							}));
 			}
 		}
+	}
+
+	/**
+	 * Sends a message to the bot-log webhook.
+	 * <p>
+	 * Has a rudimentary fix for discord rate limiting on webhook messages.
+	 * @param message - The message to send to the webhook
+	 */
+	private static void scheduleWebhookMessage(@Nonnull String message) {
+		long timeToNextMessage = lastScheduledWebhook + DISCORD_RATE_LIMIT - System.currentTimeMillis();
+		if (timeToNextMessage <= 0) {
+			sendMessageToBotLogWebhook(message);
+		} else {
+			CronManager.scheduleOnce(MessageHelper.class, () -> sendMessageToBotLogWebhook(message), timeToNextMessage, TimeUnit.MILLISECONDS);
+		}
+
+		lastScheduledWebhook = System.currentTimeMillis() + Math.max(timeToNextMessage, 0);
+	}
+
+	private static void sendMessageToBotLogWebhook(String message) {
+		String botLogWebhookURL = switch (AsyncTI4DiscordBot.guildPrimaryID) {
+			case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
+					"https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
+			case "1059645656295292968" -> // PrisonerOne's Test Server
+					"https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
+			default ->
+				null;
+		};
+
+		if (botLogWebhookURL == null) {
+			System.out.println("\"ERROR: Unable to get url for bot-log webhook\n " + message);
+			return;
+		}
+		DiscordWebhook webhook = new DiscordWebhook(botLogWebhookURL);
+		webhook.setContent(message);
+		try {
+			webhook.execute();
+		} catch (Exception exception) { System.out.println("[BOT-LOG-WEBHOOK] " + message + "\n" + exception.getMessage()); }
 	}
 
 	/**

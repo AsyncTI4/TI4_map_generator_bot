@@ -135,12 +135,12 @@ public class AsyncTI4DiscordBot {
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
-            MessageHelper.sendMessageToBotLogWebhook("Error waiting for bot to get ready");
+            BotLogger.error("Error waiting for bot to get ready", e);
         }
 
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
-        MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
+        BotLogger.info("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
@@ -287,7 +287,7 @@ public class AsyncTI4DiscordBot {
                 jda.awaitShutdown(30, TimeUnit.SECONDS);
                 mainThread.join();
             } catch (Exception e) {
-                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());
+                BotLogger.error("Error encountered within shutdown hook:\n> ", e);
             }
         }));
     }
