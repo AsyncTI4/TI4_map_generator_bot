@@ -32,7 +32,8 @@ import ti4.settings.GlobalSettings;
 
 public class BotLogger {
 
-	private static long lastScheduledWebhook = 0;
+	private static volatile long lastScheduledWebhook = 0;
+	private static final Object lastScheduledWebhookLock = new Object();
 	public static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
 
 	/**
@@ -273,14 +274,17 @@ public class BotLogger {
 	 * @param message - The message to send to the webhook
 	 */
 	private static void scheduleWebhookMessage(@Nonnull String message) {
-		long timeToNextMessage = lastScheduledWebhook + DISCORD_RATE_LIMIT - System.currentTimeMillis();
+		long timeToNextMessage;
+		synchronized (lastScheduledWebhookLock) {
+			timeToNextMessage = lastScheduledWebhook + DISCORD_RATE_LIMIT - System.currentTimeMillis();
+			lastScheduledWebhook = System.currentTimeMillis() + Math.max(timeToNextMessage, 0);
+		}
+
 		if (timeToNextMessage <= 0) {
 			sendMessageToBotLogWebhook(message);
 		} else {
             CronManager.scheduleOnce(BotLogger.class, () -> sendMessageToBotLogWebhook(message), timeToNextMessage, TimeUnit.MILLISECONDS);
 		}
-
-		lastScheduledWebhook = System.currentTimeMillis() + Math.max(timeToNextMessage, 0);
 	}
 
 	private static void sendMessageToBotLogWebhook(String message) {
