@@ -18,10 +18,7 @@
         "vuilwrath",
         "54_1"
     ],
-    "positionInTile": {
-        "x": 170.0,
-        "y": 130.0
-    },
+    "positionInTile": { "x": 170.0, "y": 130.0 },
     "resources": 4,
     "influence": 0,
     "factionHomeworld": "cabal",
@@ -30,95 +27,10 @@
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
-    "unitPositions": {
+    "planetLayout": {
         "unitHolderName": "acheron",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 129.0,
-                    "y": 119.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 189.0,
-                    "y": 154.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 134.0,
-                    "y": 146.0
-                },
-                {
-                    "x": 151.0,
-                    "y": 146.0
-                },
-                {
-                    "x": 168.0,
-                    "y": 146.0
-                },
-                {
-                    "x": 143.0,
-                    "y": 157.0
-                },
-                {
-                    "x": 161.0,
-                    "y": 157.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 136.0,
-                    "y": 75.0
-                },
-                {
-                    "x": 154.0,
-                    "y": 75.0
-                },
-                {
-                    "x": 129.0,
-                    "y": 88.0
-                },
-                {
-                    "x": 147.0,
-                    "y": 88.0
-                },
-                {
-                    "x": 165.0,
-                    "y": 88.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 148.0,
-                    "y": 116.0
-                },
-                {
-                    "x": 115.0,
-                    "y": 116.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 72.0,
-                    "y": 108.0
-                },
-                {
-                    "x": 80.0,
-                    "y": 77.0
-                },
-                {
-                    "x": 199.0,
-                    "y": 108.0
-                },
-                {
-                    "x": 191.0,
-                    "y": 77.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": { "x": 170, "y": 130 }
     },
     "flavourText": "*Once a dusty, dead world concealing a portal to Ixth. Now, a gravity rift has shattered the world, creating a labyrinth of strange energies and tumbling shards of rock.*",
     "source": "pok"

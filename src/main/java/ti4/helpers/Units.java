@@ -101,7 +101,7 @@ public class Units {
      * UnitType - aka {@link UnitModel.getAsyncId()} - is a list of all the units in the game.
      */
     public enum UnitType {
-        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), Monument("monument"), // ground based
+        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), Monument("monument"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
         PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"), //relics
         StarfallPds("starfallpds");
@@ -118,7 +118,7 @@ public class Units {
                 case Infantry -> "Infantry";
                 case Mech -> "Mech";
                 case Pds, StarfallPds -> "PDS";
-                case Spacedock, CabalSpacedock -> "Space Dock";
+                case Spacedock -> "Space Dock";
                 case Fighter -> "Fighter";
                 case Destroyer -> "Destroyer";
                 case Cruiser -> "Cruiser";
@@ -139,7 +139,7 @@ public class Units {
                 case Infantry -> "infantry";
                 case Mech -> "mech";
                 case Pds, StarfallPds -> "pds";
-                case Spacedock, CabalSpacedock -> "spacedock";
+                case Spacedock -> "spacedock";
                 case Fighter -> "fighter";
                 case Destroyer -> "destroyer";
                 case Cruiser -> "cruiser";
@@ -160,7 +160,7 @@ public class Units {
                 case Infantry -> UnitEmojis.infantry;
                 case Mech -> UnitEmojis.mech;
                 case Pds, StarfallPds -> UnitEmojis.pds;
-                case Spacedock, CabalSpacedock -> UnitEmojis.spacedock;
+                case Spacedock -> UnitEmojis.spacedock;
                 case PlenaryOrbital -> UnitEmojis.PlenaryOrbital;
                 case Fighter -> UnitEmojis.fighter;
                 case Destroyer -> UnitEmojis.destroyer;
@@ -181,10 +181,26 @@ public class Units {
     }
 
     public static UnitType findUnitType(String unitType) {
-        for (UnitType t : UnitType.values()) {
-            if (t.value.equalsIgnoreCase(unitType)) return t;
-        }
-        return null;
+        return switch (unitType) {
+            case "gf" -> UnitType.Infantry;
+            case "mf" -> UnitType.Mech;
+            case "pd", "pds" -> UnitType.Pds;
+            case "sd", "csd" -> UnitType.Spacedock;
+            case "monument" -> UnitType.Monument;
+            case "ff" -> UnitType.Fighter;
+            case "dd" -> UnitType.Destroyer;
+            case "ca" -> UnitType.Cruiser;
+            case "cv" -> UnitType.Carrier;
+            case "dn" -> UnitType.Dreadnought;
+            case "fs" -> UnitType.Flagship;
+            case "ws" -> UnitType.Warsun;
+            case "plenaryorbital" -> UnitType.PlenaryOrbital;
+            case "tyrantslament" -> UnitType.TyrantsLament;
+            case "lady" -> UnitType.Lady;
+            case "cavalry" -> UnitType.Cavalry;
+            case "starfallpds" -> UnitType.StarfallPds;
+            default -> null;
+        };
     }
 
     public static UnitKey getUnitKey(String unitType, String colorID) {

@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -378,16 +377,9 @@ public class ButtonHelperSCs {
     }
     public static List<Button> getAnarchy7Buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        List<Tile> tiles = new ArrayList<>();
-        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Infantry));
-        tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech));
-        List<String> poses = new ArrayList<>();
-        for (Tile tile : tiles) {
-            if (!poses.contains(tile.getPosition())) {
+        for (Tile tile : ButtonHelper.getTilesOfUnitsWithProduction(player, game)) {
                 buttons.add(Buttons.green("anarchy7Build_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
-                poses.add(tile.getPosition());
-            }
         }
         return buttons;
     }

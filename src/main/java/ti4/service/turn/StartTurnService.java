@@ -174,6 +174,16 @@ public class StartTurnService {
                 player.setStasisInfantry(0);
             }
         }
+        if (!game.getStoredValue("pathOf" + player.getFaction()).isEmpty()) {
+            String msg1 = player.getRepresentation() + "The Starlit path points you towards a " + game.getStoredValue("pathOf" + player.getFaction()) + ".";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
+            String msg = player.getRepresentation() + " use buttons to either accept or refuse the path";
+            List<Button> buttons = new ArrayList<>();
+            game.removeStoredValue("pathOf" + player.getFaction());
+            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "acceptPath", "Accept Path"));
+            buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "declinePath", "Refuse Path"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+        }
     }
 
     public static String getMissedSCFollowsText(Game game, Player player) {
@@ -230,9 +240,9 @@ public class StartTurnService {
             Button tacticalAction = Buttons.green(finChecker + "tacticalAction",
                 "Tactical Action (" + player.getTacticalCC() + ")");
             List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(player);
-            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2-acButtons.size();
-            if(game.isFowMode()){
-                numOfComponentActions+=acButtons.size();
+            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2 - acButtons.size();
+            if (game.isFowMode()) {
+                numOfComponentActions += acButtons.size();
             }
             Button componentAction = Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
@@ -303,6 +313,12 @@ public class StartTurnService {
                     }
                 }
             }
+        }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "uydaicommander")) {
+            startButtons.add(Buttons.gray("uydaiCommander", "Pay 1tg For Uydai Commander", FactionEmojis.uydai));
+        }
+        if (player.getPathTokenCounter() > 0) {
+            startButtons.add(Buttons.gray("redistributePath", "Redistribute 1 CC With Path", FactionEmojis.uydai));
         }
         if (doneActionThisTurn) {
             ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);

@@ -43,6 +43,9 @@ class AddAllianceMember extends GameStateSubcommand {
             if (leaderID.contains("commander") && !player.hasLeader(leaderID)) {
                 if (!leaderID.contains("mahact") && !player.hasAbility("edict")) {
                     player.addLeader(leaderID);
+                    if(!leaderID.contains("celdauri")){
+                        game.addFakeCommander(leaderID);
+                    }
                     player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));
                 }
                 otherPlayer.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));

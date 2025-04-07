@@ -1083,5 +1083,32 @@
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheZelianPurifier_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions-discordant-stars?faction=TheZelianPurifier",
         "source": "ds"
+    },
+    {
+        "alias": "uydai",
+        "factionName": "Uydai Conclave",
+        "homeSystem": "br1",
+        "startingFleet": "3 cv,4 ff,5 inf u",
+        "commodities": 5,
+        "factionTech": ["dsuydag", "dsuydab"],
+        "startingTech": ["gd", "dxa"],
+        "homePlanets": ["uikos"],
+        "abilities": ["prescience", "the_starlit_path", "narrow_way"],
+        "leaders": ["uydaiagent", "uydaicommander", "uydaihero"],
+        "promissoryNotes": ["dspnuyda"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "uydai_flagship",
+            "infantry",
+            "uydai_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "source": "ds"
     }
 ]

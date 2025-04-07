@@ -472,7 +472,7 @@ public class ButtonHelperTacticalAction {
         CommanderUnlockCheckService.checkPlayer(player, "mortheus");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        if (needPDSCheck && !game.isL1Hero() && !playersWithPds2.isEmpty()) {
+        if ((needPDSCheck || game.isFowMode()) && !game.isL1Hero() && !playersWithPds2.isEmpty()) {
             tacticalActionSpaceCannonOffenceStep(game, player, playersWithPds2, tile);
         }
         StartCombatService.combatCheck(game, event, tile);

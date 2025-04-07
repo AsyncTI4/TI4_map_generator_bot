@@ -1295,6 +1295,21 @@
         "forCombatAbility": "combatround"
     },
     {
+        "alias": "plus_1_for_every_round_of_combat",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "combat_round",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "uydai_mech"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
         "alias": "roll_1_for_every_adjacent_mech_comb",
         "type": "extrarolls",
         "value": "+1",

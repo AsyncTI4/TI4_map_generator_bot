@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -1465,8 +1464,9 @@ public class ButtonHelper {
     public static int getNumberOfGroundForces(Player player, UnitHolder uH) {
         int count = 0;
         for (UnitKey uk : uH.getUnits().keySet()) {
+
             UnitModel model = player.getUnitFromUnitKey(uk);
-            if (model != null && model.getIsGroundForce()) {
+            if (model != null && model.getIsGroundForce() && uk.getColor().equalsIgnoreCase(player.getColor())) {
                 count += uH.getUnitCount(uk);
             }
         }
@@ -2041,8 +2041,8 @@ public class ButtonHelper {
             msg = player.getRepresentationUnfogged() + " this is a notice that " + msg;
             if (!game.isFowMode()) {
                 msg += " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                + " agent.";
+                    + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                    + " agent.";
             }
         }
 
@@ -2484,7 +2484,7 @@ public class ButtonHelper {
             if (button.getEmoji() != null && !"".equalsIgnoreCase(button.getEmoji().toString())) {
                 builder += ";" + button.getEmoji().toString();
             }
-            game.saveButton(builder.replace(",",""));
+            game.saveButton(builder.replace(",", ""));
         }
     }
 
@@ -2624,13 +2624,14 @@ public class ButtonHelper {
     public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event) {
         return checkFleetAndCapacity(player, game, tile, event, false, true);
     }
+
     public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event, boolean ignoreFighters) {
         return checkFleetAndCapacity(player, game, tile, event, ignoreFighters, true);
     }
 
     public static int[] checkFleetAndCapacity(Player player, Game game, Tile tile, GenericInteractionCreateEvent event, boolean ignoreFighters, boolean issuePing) {
         String tileRepresentation = tile.getRepresentation();
-        int[] values = {0,0,0,0};
+        int[] values = { 0, 0, 0, 0 };
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
             return values;
         }
@@ -2671,18 +2672,6 @@ public class ButtonHelper {
             fleetCap += 1000;
         }
         for (UnitHolder capChecker : tile.getUnitHolders().values()) {
-            if (capChecker.getUnitCount(UnitType.CabalSpacedock, player.getColor()) > 0) {
-                String colorID = Mapper.getColorID(player.getColor());
-                UnitKey csdKey = Mapper.getUnitKey("csd", colorID);
-                UnitKey sdKey = Mapper.getUnitKey("sd", colorID);
-                capChecker.removeUnit(csdKey, 1);
-                capChecker.addUnit(sdKey, 1);
-                BotLogger.info(new BotLogger.LogMessageOrigin(game), "Removing csd in game " + game.getName());
-                // RemoveUnitService.removeUnits(event, player.getColor(), tile, "csd
-                // "+capChecker.getName(), game);
-                // AddUnitService.addUnits(event, tile, player.getColor(), "sd
-                // "+capChecker.getName(), game);
-            }
             Map<UnitModel, Integer> unitsByQuantity = getAllUnits(capChecker, player);
             for (UnitModel unit : unitsByQuantity.keySet()) {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
@@ -2811,12 +2800,12 @@ public class ButtonHelper {
             int numInf = tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor());
             if (numInf > ((numOfCapitalShips
                 + tile.getUnitHolders().get("space").getUnitCount(UnitType.Destroyer, player.getColor())) / 2)) {
-                if(issuePing){
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentation()
-                        + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
-                        + "You seem to be violating this in " + tile.getRepresentationForButtons(game, player)
-                        + ".");
+                if (issuePing) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        player.getRepresentation()
+                            + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
+                            + "You seem to be violating this in " + tile.getRepresentationForButtons(game, player)
+                            + ".");
                 }
             }
         }
@@ -2855,7 +2844,7 @@ public class ButtonHelper {
                 + (numInfNFightersNMechs - numFighter2s) + " thing"
                 + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + " ). ";
         }
-        if(issuePing){
+        if (issuePing) {
             if (capacityViolated || fleetSupplyViolated || structuresViolated) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
@@ -2870,15 +2859,15 @@ public class ButtonHelper {
 
             }
         }
-        if(numInfNFightersNMechs <= capacity){
+        if (numInfNFightersNMechs <= capacity) {
             numFighter2s = 0;
         }
         if (ignoreFighters) {
-            int[] capNCap = {((numOfCapitalShips + 1) / 2),numInfNFightersNMechs-numFighter2s+ignoredFs,capacity,fightersIgnored};
-            
+            int[] capNCap = { ((numOfCapitalShips + 1) / 2), numInfNFightersNMechs - numFighter2s + ignoredFs, capacity, fightersIgnored };
+
             return capNCap;
         }
-        int[] capNCap2 = {((numFighter2sFleet + numOfCapitalShips + 1) / 2),numInfNFightersNMechs-numFighter2s+ignoredFs,capacity,fightersIgnored};
+        int[] capNCap2 = { ((numFighter2sFleet + numOfCapitalShips + 1) / 2), numInfNFightersNMechs - numFighter2s + ignoredFs, capacity, fightersIgnored };
         return capNCap2;
     }
 
@@ -2997,7 +2986,7 @@ public class ButtonHelper {
 
         List<String> implementedLegendaryPlanets = List.of(
             "mallice", "hexmallice", "mirage", "hopesend", "primor", // PoK
-            "silence", "prism", "echo", "domna"); // DS
+            "silence", "prism", "echo", "domna", "uikos"); // DS
 
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
@@ -3070,6 +3059,12 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("lizhoagent")) {
             endButtons.add(
                 Buttons.green(finChecker + "exhaustAgent_lizhoagent", "Use Li-Zho Agent", FactionEmojis.lizho));
+        }
+        if (player.getPathTokenCounter() > 5) {
+            endButtons.add(Buttons.green(finChecker + "cashInPathTokens", "Spend 6 Path Tokens For Secondary", FactionEmojis.uydai));
+        }
+        if (player.hasAbility("the_starlit_path")) {
+            endButtons.add(Buttons.green(finChecker + "startPath", "Choose A Path", FactionEmojis.uydai));
         }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "ravencommander")) {
@@ -4025,6 +4020,10 @@ public class ButtonHelper {
             buttons.add(Buttons.gray("exhaustTech_baldrick_gd", "Exhaust Gravity Drive", SourceEmojis.IgnisAurora));
         }
 
+        if (player.hasTechReady("dsuydab")) {
+            buttons.add(Buttons.gray("exhaustTech_dsuydab", "Exhaust Navigation Relays", FactionEmojis.uydai));
+        }
+
         if (player.hasTech("baldrick_lwd")) {
             buttons.add(
                 Buttons.gray("exhaustTech_baldrick_lwd", "Exhaust Light/Wave Deflector", SourceEmojis.IgnisAurora));
@@ -4046,6 +4045,10 @@ public class ButtonHelper {
 
         if (player.hasLeaderUnlocked("vaylerianhero")) {
             buttons.add(Buttons.blue(finChecker + "purgeVaylerianHero", "Use Vaylerian Hero", FactionEmojis.vaylerian));
+        }
+        Tile active = game.getTileByPosition(game.getActiveSystem());
+        if (!active.isHomeSystem() && player.hasLeaderUnlocked("uydaihero")) {
+            buttons.add(Buttons.blue(finChecker + "purgeUydaiHero", "Use Uydai Hero", FactionEmojis.vaylerian));
         }
 
         if (player.ownsUnit("ghost_mech") && getNumberOfUnitsOnTheBoard(game, player, "mech") > 0) {
@@ -5900,6 +5903,88 @@ public class ButtonHelper {
             player.getRepresentationUnfogged() + ", choose who you wish to swap a strategy card with.",
             buttons);
         deleteMessage(event);
+    }
+
+    @ButtonHandler("declinePath")
+    public static void declinePath(ButtonInteractionEvent event, Game game, Player player) {
+        deleteMessage(event);
+        player.setPathTokenCounter(Math.max(0, player.getPathTokenCounter() - 1));
+        String msg1 = player.getRepresentation() + " chose to decline the path. Their current path token count is " + player.getPathTokenCounter();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
+    }
+
+    @ButtonHandler("acceptPath")
+    public static void acceptPath(ButtonInteractionEvent event, Game game, Player player) {
+        deleteMessage(event);
+
+        player.setPathTokenCounter(Math.min(6, player.getPathTokenCounter() + 1));
+        String msg1 = player.getRepresentation() + " chose to accept the path. Their current path token count is " + player.getPathTokenCounter();
+        if (player.getPlanets().contains("uikos")) {
+            player.setHarvestCounter(player.getHarvestCounter() + 1);
+            msg1 += "\nThe number of commodities on the legendary planet Uikos card is currently " + player.getHarvestCounter();
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
+    }
+
+    public static List<Button> getPathButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.blue("setPath_Tactical Action", "Tactical Action"));
+        buttons.add(Buttons.green("setPath_Component Action", "Component Action"));
+        boolean hadAnyUnplayedSCs = false;
+        for (Integer SC : player.getSCs()) {
+            if (!game.getPlayedSCs().contains(SC)) {
+                hadAnyUnplayedSCs = true;
+            }
+        }
+        if (hadAnyUnplayedSCs) {
+            buttons.add(Buttons.gray("setPath_Strategic Action", "Strategic Action"));
+        } else {
+            buttons.add(Buttons.red("setPath_Pass Action", "Pass"));
+        }
+
+        return buttons;
+    }
+
+    @ButtonHandler("setPath_")
+    public static void setPath(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        deleteMessage(event);
+        String path = buttonID.split("_")[1];
+        game.setStoredValue("pathOf" + player.getFaction(), path);
+        String msg1 = player.getRepresentationNoPing() + " successfully set their path.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
+        MessageHelper.sendEphemeralMessageToEventChannel(event, "Set path to " + path);
+    }
+
+    @ButtonHandler("redistributePath")
+    public static void redistributePath(ButtonInteractionEvent event, Game game, Player player) {
+        if (player.getPathTokenCounter() < 1) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not have the path tokens to do this");
+            return;
+        }
+        player.setPathTokenCounter(player.getPathTokenCounter() - 1);
+        String msg1 = player.getRepresentation() + " chose to remove a path token in order to redistribute one command token. Their current path token count is " + player.getPathTokenCounter();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
+        Button deleteButton = Buttons.red("FFCC_" + player.getFaction() + "_deleteButtons",
+            "Delete These Buttons");
+        String message = player.getRepresentation(false, true) + " use buttons to redistribute";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
+            List.of(Buttons.REDISTRIBUTE_CCs, deleteButton));
+
+    }
+
+    @ButtonHandler("cashInPathTokens")
+    public static void cashInPathTokens(ButtonInteractionEvent event, Game game, Player player) {
+        deleteTheOneButton(event);
+        player.setPathTokenCounter(0);
+        String msg1 = player.getRepresentation() + " chose to turn in 6 path tokens in order to resolve the secondary of one readied or unchosen strategy card";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to resolve a secondary", ButtonHelperHeroes.getNRAHeroButtons(game));
+    }
+
+    @ButtonHandler("startPath")
+    public static void startPath(ButtonInteractionEvent event, Game game, Player player) {
+        deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to choose your next turn's path", getPathButtons(game, player));
     }
 
     public static List<Button> getMawButtons() {
