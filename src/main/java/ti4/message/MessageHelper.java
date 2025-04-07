@@ -749,6 +749,7 @@ public class MessageHelper {
         sendMessageToChannelWithEmbeds(channel, message, embeds);
     }
 
+    @Deprecated
     public static void sendMessageToBotLogWebhook(String message) {
         if (getBotLogWebhookURL() == null) {
             System.out.println("[BOT-LOG-WEBHOOK] " + message);
@@ -758,13 +759,14 @@ public class MessageHelper {
         webhook.setContent(message);
         try {
             webhook.execute();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { System.out.println("[BOT-LOG-WEBHOOK] " + message + ignored.getMessage()); }
     }
 
     /**
      * @return a webhook URL for the bot-log channel of the Primary guild. Add
      *         your test server's ID and #bot-log channel webhook url here
      */
+    @Deprecated
     public static String getBotLogWebhookURL() {
         return switch (AsyncTI4DiscordBot.guildPrimaryID) {
             case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
