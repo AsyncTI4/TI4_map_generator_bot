@@ -97,7 +97,7 @@ public class BotLogger {
 				this.guild = game.getGuild();
 				this.channel = game.getMainGameChannel();
 			} else
-                BotLogger.warning("LocationSource created from player with null game. This will not attribute messages.");
+				BotLogger.warning("LocationSource created from player with null game. This will not attribute messages.");
 			this.originTime = DateTimeHelper.getCurrentTimestamp();
 		}
 
@@ -441,14 +441,14 @@ public class BotLogger {
 
 		if (origin != null) {
 			msg.append(origin.getOriginTime())
-					.append("\n");
+				.append("\n");
 			origin.appendSourceString(msg);
 			origin.appendEventString(msg);
 			channel = origin.getLogChannel(severity);
 		} else {
 			msg.append(DateTimeHelper.getCurrentTimestamp())
-					.append("\n")
-					.append("Source: Not provided\n");
+				.append("\n")
+				.append("Source: Not provided\n");
 		}
 
 		msg.append("Message: ")
@@ -508,11 +508,11 @@ public class BotLogger {
 	private static void sendMessageToBotLogWebhook(String message) {
 		String botLogWebhookURL = switch (AsyncTI4DiscordBot.guildPrimaryID) {
 			case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
-					"https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
+				"https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
 			case "1059645656295292968" -> // PrisonerOne's Test Server
-					"https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
+				"https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
 			case null, default ->
-					null;
+				null;
 		};
 
 		if (botLogWebhookURL == null) {
@@ -523,7 +523,9 @@ public class BotLogger {
 		webhook.setContent(message);
 		try {
 			webhook.execute();
-		} catch (Exception exception) { System.out.println("[BOT-LOG-WEBHOOK] " + message + "\n" + exception.getMessage()); }
+		} catch (Exception exception) {
+			System.out.println("[BOT-LOG-WEBHOOK] " + message + "\n" + exception.getMessage());
+		}
 	}
 
 	/**
@@ -591,12 +593,12 @@ public class BotLogger {
 		TextChannel botLogChannel = getBotLogChannel(event);
 		if (msg == null) msg = "";
 
-        String sysOut = "[BOT-LOG] " + msg;
-        if (e != null) {
-            sysOut += "\n> - " + e.getMessage();
-        }
-        System.out.println(sysOut);
-        if (e != null) e.printStackTrace();
+		String sysOut = "[BOT-LOG] " + msg;
+		if (e != null) {
+			sysOut += "\n> - " + e.getMessage();
+		}
+		System.out.println(sysOut);
+		if (e != null) e.printStackTrace();
 
 		//Adding so we don't cause an exception by attempting to log
 		if (msg.length() > 2000) {
@@ -725,15 +727,14 @@ public class BotLogger {
 			StringBuilder message = new StringBuilder();
 
 			source.appendEventString(
-					source.appendSourceString(
-							message.append(source.getOriginTime())
-									.append("\n")
-					));
+				source.appendSourceString(
+					message.append(source.getOriginTime())
+						.append("\n")));
 
 			if (!this.message.isEmpty())
 				message.append(getMessagePrefix())
-						.append(this.message)
-						.append("\n");
+					.append(this.message)
+					.append("\n");
 
 			message.append("\n");
 			return message.toString();
