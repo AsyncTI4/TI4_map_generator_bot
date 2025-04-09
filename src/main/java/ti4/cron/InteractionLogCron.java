@@ -17,9 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class InteractionLogCron {
 	@Nonnull
 	private static final ArrayDeque<BotLogger.AbstractEventLog> messageBuffer = new ArrayDeque<>(500);
-	@Nonnull
-	private static final Map<Class<?>, TextChannel> logChannels = new HashMap<>();
-	private static TextChannel primaryBotLogChannel;
+	private static TextChannel primaryBotLogChannel; // It is safe to store this channel as it should always exist
 	private static boolean isRegistered;
 
 	/**
@@ -33,7 +31,6 @@ public class InteractionLogCron {
 	}
 
 	// This is rather ugly, but it keeps the implementation of BotLogger.AbstractEventLog extenders simple
-	@SneakyThrows // The exceptions in this method are a result of getting abstract class methods, which are required to be defined by the nature of an abstract class
 	public static void register() {
 		if (isRegistered) {
 			BotLogger.info("INTERACTION LOG CRON ALREADY REGISTERED");
@@ -49,23 +46,18 @@ public class InteractionLogCron {
 		}
 		primaryBotLogChannel = logCandidates.getFirst();
 
-		for (Class<?> eventLog : BotLogger.AbstractEventLog.class.getDeclaredClasses()) {
-			logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName((String) eventLog.getMethod("getChannelName").invoke(null), false);
-			if (logCandidates.isEmpty())
-				BotLogger.info("No log channel found for event log " + eventLog.getName());
-			else
-				logChannels.put(eventLog, logCandidates.getFirst());
-		}
-
 		CronManager.schedulePeriodically(InteractionLogCron.class, InteractionLogCron::logInteractions, 2, 2, TimeUnit.MINUTES);
 	}
 
+	@SneakyThrows // The exceptions in this method are a result of getting abstract class methods, which are required to be defined by the nature of an abstract class
 	public static void logInteractions() {
+		// Build event -> combined message map
 		HashMap<Class<?>, StringBuilder> messageBuilders = new HashMap<>();
 		for (Class<?> logType : BotLogger.AbstractEventLog.class.getDeclaredClasses()) {
 			messageBuilders.put(logType, new StringBuilder());
 		}
 
+		// Get messages from buffer
 		synchronized (messageBuffer) {
 			for (BotLogger.AbstractEventLog eventLog : messageBuffer) {
 				messageBuilders.get(eventLog.getClass()).append(eventLog.getLogString());
@@ -73,20 +65,23 @@ public class InteractionLogCron {
 			messageBuffer.clear();
 		}
 
-		messageBuilders.forEach((variant, message) -> {
-			if (message.isEmpty()) return;
+		// For each class of message either send by channel (if exists) or thread
+		for (Map.Entry<Class<?>, StringBuilder> entry : messageBuilders.entrySet()) {
+			if (entry.getValue().isEmpty()) return;
 
-			if (logChannels.containsKey(variant))
-				logChannels.get(variant).sendMessage(message.toString()).queue();
-			else {
+			List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName((String) entry.getKey().getMethod("getChannelName").invoke(null), false);
+
+			if (!logCandidates.isEmpty()) {
+				logCandidates.getFirst().sendMessage(entry.getValue().toString()).queue();
+			} else {
 				try {
-					ThreadGetter.getThreadInChannel(primaryBotLogChannel, (String) variant.getMethod("getThreadName").invoke(null), (threadChannel) -> {
-						MessageHelper.sendMessageToChannel(threadChannel, message.toString());
+					ThreadGetter.getThreadInChannel(primaryBotLogChannel, (String) entry.getKey().getMethod("getThreadName").invoke(null), (threadChannel) -> {
+						MessageHelper.sendMessageToChannel(threadChannel, entry.getValue().toString());
 					});
 				} catch (Exception e) {
 					BotLogger.error("Failed to send a message via ThreadGetter in InteractionLogCron (this should not happen)", e);
 				}
 			}
-		});
+		}
 	}
 }
