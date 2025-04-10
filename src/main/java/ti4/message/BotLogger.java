@@ -238,7 +238,7 @@ public class BotLogger {
 		String compiledMessage = msg.toString();
 		int msgLength = compiledMessage.length();
 
-		if (channel == null) {
+		if (channel == null && AsyncTI4DiscordBot.guildPrimary != null) {
 			List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bot-log", false);
 			if (logCandidates.isEmpty()) {
 				BotLogger.error("Primary log channel could not be found in main server, defaulting to webhook");
