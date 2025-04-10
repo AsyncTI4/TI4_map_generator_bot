@@ -51,7 +51,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
                 checkIfUserLeftActiveGames(event.getGuild(), event.getUser(), voluntary);
             }, BotLogger::catchRestError);
         } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
+            BotLogger.error("Error in `UserJoinServerListener.onGuildMemberRemove`", e);
         }
     }
 

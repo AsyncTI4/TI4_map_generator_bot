@@ -40,7 +40,7 @@ public class GameUndoNameService {
                     File::getName,
                     GameUndoNameService::getLastModifiedDateAndLastCommandTextFromFile));
         } catch (IOException e) {
-            BotLogger.log("Error listing files in directory: " + undoPath, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Error listing files in directory: " + undoPath, e);
             return Collections.emptyMap();
         }
     }
@@ -67,7 +67,7 @@ public class GameUndoNameService {
                 .map(lastModifiedDate -> DateTimeHelper.getTimeRepresentationToSeconds(dateTime - lastModifiedDate))
                 .orElse(DateTimeHelper.getTimestampFromMillisecondsEpoch(fileLastModifiedDate));
         } catch (Exception e) {
-            BotLogger.log("Could not get AutoComplete data from undo file: " + file.getName());
+            BotLogger.error("Could not get AutoComplete data from undo file: " + file.getName(), e);
         }
 
         return file.getName() + " (" + lastModifiedDateString + " ago):  " + latestCommand;
@@ -91,14 +91,14 @@ public class GameUndoNameService {
                     try {
                         undoNumbers.add(Integer.parseInt(undoNumberStr));
                     } catch (NumberFormatException e) {
-                        BotLogger.log("Could not parse undo number '" + undoNumberStr + "' for game " + gameName, e);
+                        BotLogger.error("Could not parse undo number '" + undoNumberStr + "' for game " + gameName, e);
                     }
                 }
             }
             undoNumbers.sort(Integer::compareTo);
             return undoNumbers;
         } catch (Exception e) {
-            BotLogger.log("Failed to get undo numbers for game " + gameName, e);
+            BotLogger.error("Failed to get undo numbers for game " + gameName, e);
             return Collections.emptyList();
         }
     }

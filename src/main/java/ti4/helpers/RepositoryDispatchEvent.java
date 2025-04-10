@@ -46,11 +46,11 @@ public class RepositoryDispatchEvent {
                 .build();
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
-                    BotLogger.log("RespositoryDisptachEvent error: " + response.body().string());
+                    BotLogger.error("RespositoryDisptachEvent error: " + response.body().string());
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("RespositoryDisptachEvent error", e);
+            BotLogger.error("RespositoryDisptachEvent error", e);
         }
     }
 }

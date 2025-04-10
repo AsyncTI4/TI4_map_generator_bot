@@ -141,7 +141,7 @@ public class Buttons {
     private static Button makeButton(ButtonStyle style, String id, String label, String emoji) {
         Emoji e = getEmoji(emoji);
         if (id == null || id.isBlank()) {
-            BotLogger.log("Illegal button attempt", new Throwable("Illegal button attempt"));
+            BotLogger.error("Illegal button attempt", new Throwable("Illegal button attempt"));
             return null;
         }
         if (e == null && (label == null || label.isBlank())) {
@@ -156,7 +156,7 @@ public class Buttons {
         try {
             return Emoji.fromFormatted(emoji);
         } catch (Exception e) {
-            BotLogger.log("Failed to load emoji [" + emoji + "]", e);
+            BotLogger.error("Failed to load emoji [" + emoji + "]", e);
         }
         return null;
     }

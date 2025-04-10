@@ -239,7 +239,7 @@ public class Storage {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             tiFont = tiFont.deriveFont(size);
         } catch (Exception e) {
-            BotLogger.log("Could not load font", e);
+            BotLogger.error("Could not load font", e);
         }
         return tiFont;
     }
@@ -253,7 +253,7 @@ public class Storage {
             font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             font = font.deriveFont(size);
         } catch (Exception e) {
-            BotLogger.log("Could not load font", e);
+            BotLogger.error("Could not load font", e);
         }
         return font;
     }

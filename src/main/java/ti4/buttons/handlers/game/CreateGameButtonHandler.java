@@ -46,7 +46,7 @@ class CreateGameButtonHandler {
         Game game;
         if(!lastGame.equalsIgnoreCase("pbd1")) {
             if (!GameManager.isValid(lastGame)) {
-                BotLogger.log("**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
+                BotLogger.warning(new BotLogger.LogMessageOrigin(event), "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
                 return;
             }
             game = GameManager.getManagedGame(lastGame).getGame();

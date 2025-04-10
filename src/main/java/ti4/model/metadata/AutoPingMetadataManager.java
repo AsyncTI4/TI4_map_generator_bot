@@ -100,7 +100,7 @@ public class AutoPingMetadataManager {
             AutoPings autoPings = PersistenceManager.readObjectFromJsonFile(AUTO_PING_FILE, AutoPings.class);
             return autoPings != null ? autoPings : new AutoPings(new HashMap<>());
         } catch (IOException e) {
-            BotLogger.log("Failed to read json data for AutoPings.", e);
+            BotLogger.error("Failed to read json data for AutoPings.", e);
             return null;
         }
     }
@@ -109,7 +109,7 @@ public class AutoPingMetadataManager {
         try {
             PersistenceManager.writeObjectToJsonFile(AUTO_PING_FILE, toPersist);
         } catch (Exception e) {
-            BotLogger.log("Failed to write json data for AutoPings.", e);
+            BotLogger.error("Failed to write json data for AutoPings.", e);
         }
     }
 

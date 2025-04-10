@@ -122,7 +122,7 @@ public abstract class BagDraft {
     public ThreadChannel regenerateBagChannel(Player player) {
         TextChannel actionsChannel = owner.getMainGameChannel();
         if (actionsChannel == null) {
-            BotLogger.log("`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: " + owner.getName());
+            BotLogger.warning(new BotLogger.LogMessageOrigin(player), "`Helper.getBagChannel`: actionsChannel is null for game, or community game private channel not set: " + owner.getName());
             return null;
         }
 
@@ -202,7 +202,7 @@ public abstract class BagDraft {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: " + bagInfoThread + " for potential thread name: " + threadName, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "`Player.getBagInfoThread`: Could not find existing Bag Info thead using ID: " + bagInfoThread + " for potential thread name: " + threadName, e);
         }
 
         //ATTEMPT TO FIND BY NAME
@@ -232,7 +232,7 @@ public abstract class BagDraft {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "`Player.getBagInfoThread`: Could not find existing Bag Info thead using name: " + threadName, e);
         }
         return null;
     }

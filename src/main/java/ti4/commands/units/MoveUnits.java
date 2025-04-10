@@ -66,7 +66,7 @@ public class MoveUnits extends GameStateCommand {
 
         Tile tileFrom = CommandHelper.getTile(event, game);
         if (tileFrom == null) {
-            BotLogger.log("Could not find the tile you're moving from.");
+            BotLogger.warning(new BotLogger.LogMessageOrigin(event), "Could not find the tile you're moving from.");
             return;
         }
 

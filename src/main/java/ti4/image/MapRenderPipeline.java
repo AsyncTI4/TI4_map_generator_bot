@@ -37,7 +37,7 @@ public class MapRenderPipeline {
                     Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e) {
-                    BotLogger.log("MapRenderPipeline worker threw an exception.", e);
+                    BotLogger.error("MapRenderPipeline worker threw an exception.", e);
                 }
             }
         });
@@ -53,7 +53,7 @@ public class MapRenderPipeline {
             instance.worker.join(20000);
             return !instance.worker.isAlive();
         } catch (InterruptedException e) {
-            BotLogger.log("MapRenderPipeline shutdown interrupted.");
+            BotLogger.error("MapRenderPipeline shutdown interrupted.", e);
             Thread.currentThread().interrupt();
             return false;
         }
@@ -72,7 +72,7 @@ public class MapRenderPipeline {
                             mapGenerator.uploadToWebsite();
                         }
                     } catch (Exception e) {
-                        BotLogger.log("Render event threw an exception. Game '" + renderEvent.game.getName() + "'", e);
+                        BotLogger.error("Render event threw an exception. Game '" + renderEvent.game.getName() + "'", e);
                     }
                 });
         timedRunnable.run();
@@ -84,7 +84,7 @@ public class MapRenderPipeline {
                 callback.accept(fileUpload);
             }
         } catch (IOException e) {
-            BotLogger.log("Could not render images for " + mapGenerator.getGameName(), e);
+            BotLogger.error("Could not render images for " + mapGenerator.getGameName(), e);
         }
     }
 

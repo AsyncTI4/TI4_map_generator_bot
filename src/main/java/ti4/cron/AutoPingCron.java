@@ -108,7 +108,7 @@ public class AutoPingCron {
         try {
             handleAutoPing(game);
         } catch (Exception e) {
-            BotLogger.log("AutoPing failed for game: " + game.getName(), e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "AutoPing failed for game: " + game.getName(), e);
         }
     }
 

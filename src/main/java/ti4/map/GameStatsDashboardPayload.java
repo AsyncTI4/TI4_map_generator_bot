@@ -38,7 +38,7 @@ public class GameStatsDashboardPayload {
         try {
             return mapper.writeValueAsString(this);
         } catch (Exception e) {
-            BotLogger.log("Could not get GameStatsDashboardPayload JSON for Game ", e);
+            BotLogger.error("Could not get GameStatsDashboardPayload JSON for Game ", e);
             return null;
         }
     }

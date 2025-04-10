@@ -52,7 +52,7 @@ public class ImageCache {
         try {
             return fileImageCache.get(key, loader);
         } catch (Exception e) {
-            BotLogger.log("Unable to load from image cache.", e);
+            BotLogger.error("Unable to load from image cache.", e);
         }
         return null;
     }
@@ -61,7 +61,7 @@ public class ImageCache {
         try {
             return urlImageCache.get(key, loader);
         } catch (Exception e) {
-            BotLogger.log("Unable to load from image cache.", e);
+            BotLogger.error("Unable to load from image cache.", e);
         }
         return null;
     }

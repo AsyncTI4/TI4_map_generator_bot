@@ -533,7 +533,7 @@ public class Helper {
     public static String getDamagePath() {
         String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_damage.png");
         if (tokenPath == null) {
-            BotLogger.log("Could not find token: marker_damage");
+            BotLogger.warning("Could not find token: marker_damage");
             return null;
         }
         return tokenPath;
@@ -984,7 +984,7 @@ public class Helper {
         for (String thing : set) {
             int count;
             if (!thing.contains("_")) {
-                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + game.getName());
+                BotLogger.info(new BotLogger.LogMessageOrigin(game), "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -1042,7 +1042,7 @@ public class Helper {
         player.setTg(player.getTg() + tg);
         for (String thing : spentThings) {
             if (!thing.contains("_")) {
-                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + game.getName());
+                BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -1799,7 +1799,7 @@ public class Helper {
 
         LeaderModel leaderModel = Mapper.getLeader(leaderID);
         if (leaderModel == null) {
-            BotLogger.log("Invalid `leaderID=" + leaderID + "` caught within `Helper.getLeaderRepresentation`");
+            BotLogger.warning("Invalid `leaderID=" + leaderID + "` caught within `Helper.getLeaderRepresentation`");
             return leader.getId();
         }
 
@@ -2052,7 +2052,7 @@ public class Helper {
         Role role = null;
         if (!roles.isEmpty()) {
             if (roles.size() > 1) {
-                BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName
+                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "There are " + roles.size() + " roles that match the game name: `" + gameName
                     + "` - please investigate, as this may cause issues.");
                 return;
             }
@@ -2100,7 +2100,7 @@ public class Helper {
     public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
         var guild = event.getGuild();
         if (guild == null) {
-            BotLogger.log("Guild was null in addBotHelperPermissionsToGameChannels.");
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Guild was null in addBotHelperPermissionsToGameChannels.");
             return;
         }
         // long role = 1093925613288562768L;
@@ -2174,7 +2174,7 @@ public class Helper {
             }
             return (GuildMessageChannel) messageChannel;
         } catch (Exception e) {
-            BotLogger.log(event, ExceptionUtils.getStackTrace(e));
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Something went wrong getting thread channels.", e);
             return null;
         }
     }
@@ -2458,7 +2458,7 @@ public class Helper {
     public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
         if (!(defaultChannel instanceof TextChannel tc)) {
-            BotLogger.log("Default channel is not available or is not a text channel on " + guild.getName());
+            BotLogger.error(new BotLogger.LogMessageOrigin(guild), "Default channel is not available or is not a text channel on " + guild.getName());
         } else {
             return tc.createInvite()
                 .setMaxUses(uses)
