@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitKey;
@@ -50,8 +52,6 @@ import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperHeroes {
 
@@ -1137,7 +1137,7 @@ public class ButtonHelperHeroes {
             empties.add(Buttons.blue(finChecker + "cabalHeroTile_" + tile.getPosition(),
                 "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
-        SortHelper.sortButtonsByTitle(empties); 
+        SortHelper.sortButtonsByTitle(empties);
         return empties;
     }
 
@@ -2004,6 +2004,31 @@ public class ButtonHelperHeroes {
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
+        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+
+        return scButtons;
+    }
+
+    public static List<Button> getSecondaryButtons(Game game) {
+        List<Button> scButtons = new ArrayList<>();
+        scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+        //scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
+
+        scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
+
+        scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
+
+        scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
+        scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+
+        scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+
+        scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+
+        scButtons.add(Buttons.GET_A_TECH);
+
+        scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
 
         return scButtons;
