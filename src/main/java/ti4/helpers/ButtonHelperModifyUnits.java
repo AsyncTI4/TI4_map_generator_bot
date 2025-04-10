@@ -1464,7 +1464,7 @@ public class ButtonHelperModifyUnits {
                 event.getMessage().delete().queue();
             } else {
                 event.getMessage().editMessage(Helper.buildProducedUnitsMessage(player, game)).queue(
-                    null, (error) -> BotLogger.log(MessageHelper.getRestActionFailureMessage(event.getMessageChannel(), "Failed to edit message", null, error)));
+                    null, (error) -> BotLogger.error(new BotLogger.LogMessageOrigin(event, player), MessageHelper.getRestActionFailureMessage(event.getMessageChannel(), "Failed to edit message", null, error), error));
             }
         }
         if ("sd".equalsIgnoreCase(unitID)) {

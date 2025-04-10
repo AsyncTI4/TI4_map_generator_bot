@@ -37,7 +37,7 @@ public class AgendaPhaseAutoReactCron {
         try {
             automaticallyReactToWhensAndAfters(game);
         } catch (Exception e) {
-            BotLogger.log("AgendaPhaseAutoReactCron failed for game: " + game.getName(), e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "AgendaPhaseAutoReactCron failed for game: " + game.getName(), e);
         }
     }
 

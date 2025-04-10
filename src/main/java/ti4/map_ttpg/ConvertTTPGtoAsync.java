@@ -142,13 +142,13 @@ public class ConvertTTPGtoAsync {
             File file = Storage.getTTPGExportStorage(filename);
             TTPGMap ttpgMap = getTTPGMapFromJsonFile(file);
             if (ttpgMap == null) {
-                BotLogger.log("TTPG Import Failed:\n> filename: " + filename + " is not valid TTPG export JSON format");
+                BotLogger.warning("TTPG Import Failed:\n> filename: " + filename + " is not valid TTPG export JSON format");
                 return false;
             }
             Game game = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
             GameManager.save(game, "Imported from TTPG");
         } catch (Exception e) {
-            BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename, e);
+            BotLogger.error("TTPG Import Failed: " + gamename + "    filename: " + filename, e);
             return false;
         }
         return true;

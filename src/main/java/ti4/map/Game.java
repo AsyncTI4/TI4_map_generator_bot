@@ -302,7 +302,7 @@ public class Game extends GameProperties {
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we can even see private fields.
-                    BotLogger.log("Unknown error exporting fields from Game.", e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(this), "Unknown error exporting fields from Game.", e);
                 }
             }
         }
@@ -347,7 +347,7 @@ public class Game extends GameProperties {
                     JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
                     miltySettings = new MiltySettings(this, json);
                 } catch (Exception e) {
-                    BotLogger.log("Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(), e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(this), "Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(), e);
                     MessageHelper.sendMessageToChannel(getActionsChannel(), "Milty draft settings failed to load. Resetting to default.");
                     miltySettings = new MiltySettings(this, null);
                 }
@@ -633,7 +633,7 @@ public class Game extends GameProperties {
         if (botChannels.size() == 1) {
             return botChannels.getFirst();
         } else if (botChannels.size() > 1) {
-            BotLogger.log(getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
             return botChannels.getFirst();
         }
 
@@ -2408,7 +2408,7 @@ public class Game extends GameProperties {
         if (deck.isEmpty()) {
             shuffleDiscardsIntoExploreDeck(reqType);
             deck = getExplores(reqType, explore);
-            BotLogger.log("Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
                 + " deck was empty, shuffling discards into deck.");
         } // end of migration code
 
@@ -3453,7 +3453,7 @@ public class Game extends GameProperties {
 
         // Find duplicate PNs - PNs that are in multiple players' hands or play areas
         if (!Helper.findDuplicateInList(allPlayerHandPromissoryNotes).isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
                 + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
 
@@ -3463,7 +3463,7 @@ public class Game extends GameProperties {
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (!unOwnedPromissoryNotes.isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
                 + unOwnedPromissoryNotes + "`");
             getPurgedPN().removeAll(unOwnedPromissoryNotes);
         }
@@ -3474,7 +3474,7 @@ public class Game extends GameProperties {
             for (String pnID : pns) {
                 if (unOwnedPromissoryNotes.contains(pnID)) {
                     player.removePromissoryNote(pnID);
-                    BotLogger.log("`" + getName() + "`: removed promissory note `" + pnID + "` from player `"
+                    BotLogger.info("`" + getName() + "`: removed promissory note `" + pnID + "` from player `"
                         + player.getUserName() + "` because nobody 'owned' it");
                 }
             }
@@ -3484,7 +3484,7 @@ public class Game extends GameProperties {
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (!missingPromissoryNotes.isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
             for (Player player : getPlayers().values()) {
                 PromissoryNoteHelper.checkAndAddPNs(this, player);
             }

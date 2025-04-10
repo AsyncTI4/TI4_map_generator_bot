@@ -366,7 +366,7 @@ public class MiltyDraftHelper {
             manager.loadSlicesFromString(sliceString);
             return manager.getSlices();
         } catch (Exception e) {
-            BotLogger.log("invalid slice string", e);
+            BotLogger.error("invalid slice string", e);
             return null;
         }
     }

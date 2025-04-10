@@ -127,11 +127,11 @@ public class TIGLHelper {
 
         boolean tiglProblem = false;
         if (getTIGLChannel() == null) {
-            BotLogger.log("TIGLHelper.validateTIGLness: missing channel: `" + TIGL_CHANNEL_NAME + "`");
+            BotLogger.warning("TIGLHelper.validateTIGLness: missing channel: `" + TIGL_CHANNEL_NAME + "`");
             tiglProblem = true;
         }
         if (getTIGLAdminThread() == null) {
-            BotLogger.log("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
+            BotLogger.warning("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
             tiglProblem = true;
         }
         if (!AsyncTI4DiscordBot.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
@@ -139,7 +139,7 @@ public class TIGLHelper {
         }
         for (TIGLRank rank : TIGLRank.values()) {
             if (rank.getRole() == null) {
-                BotLogger.log("TIGLHelper.validateTIGLness: missing Role: `" + rank.name + "`");
+                BotLogger.warning("TIGLHelper.validateTIGLness: missing Role: `" + rank.name + "`");
                 tiglProblem = true;
             }
         }
@@ -258,7 +258,7 @@ public class TIGLHelper {
     private static void crownNewHero(User user, String faction) {
         TIGLRank heroRank = TIGLRank.fromString("hero_" + faction);
         if (heroRank == null || heroRank.getRole() == null) {
-            BotLogger.log("TIGLHelper.dethroneHero - faction role not found: " + faction);
+            BotLogger.warning("TIGLHelper.dethroneHero - faction role not found: " + faction);
             return;
         }
         Role heroRole = heroRank.getRole();
@@ -302,7 +302,7 @@ public class TIGLHelper {
         if (channels.isEmpty()) {
             return null;
         } else if (channels.size() > 1) {
-            BotLogger.log("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `" + TIGL_CHANNEL_NAME + "`");
+            BotLogger.warning("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `" + TIGL_CHANNEL_NAME + "`");
         }
         return channels.getFirst();
     }

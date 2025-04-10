@@ -128,7 +128,7 @@ class SampleColors extends Subcommand {
             fileUpload.setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
             MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
         } catch (IOException e) {
-            BotLogger.log("Exception when closing FileUpload.", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Exception when closing FileUpload.", e);
         }
     }
 }

@@ -31,7 +31,7 @@ public class SelectionMenuProcessor {
             }
         } catch (Exception e) {
             String message = "Selection Menu issue in event: " + event.getComponentId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
-            BotLogger.log(message, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), message, e);
         }
     }
 
@@ -74,7 +74,7 @@ public class SelectionMenuProcessor {
                     selection.postExecute(event);
                 } catch (Exception e) {
                     String messageText = "Error trying to execute selection: " + event.getComponentId();
-                    BotLogger.log(event, messageText, e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(event), messageText, e);
                 }
                 return;
             }
