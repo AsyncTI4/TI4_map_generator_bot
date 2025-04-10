@@ -935,6 +935,7 @@ public class Constants {
 
     public static final String ABILITY = "ability";
     public static final String BAN_ABILITY = "ban_ability";
+    public static final String BAN_FACTION = "ban_faction";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";
     public static final String ABILITY_3 = "ability_3";

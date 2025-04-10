@@ -170,9 +170,9 @@ public class CreateGameService {
         introductionForNewPlayers(newGame);
 
         // Create Cards Info Threads
-        for (Player player : newGame.getPlayers().values()) {
-            player.createCardsInfoThreadChannelsIfRequired();
-        }
+        // for (Player player : newGame.getPlayers().values()) {
+        //     player.createCardsInfoThreadChannelsIfRequired();
+        // }
 
         // Report Channel Creation back to Launch channel
         String message = "Role and Channels have been set up:\n> " +
