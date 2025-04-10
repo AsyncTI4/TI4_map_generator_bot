@@ -41,7 +41,6 @@ import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
-import ti4.cron.InteractionLogCron;
 import ti4.executors.ExecutorManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
@@ -97,10 +96,6 @@ public class AsyncTI4DiscordBot {
     private static final List<Class<?>> classes = new ArrayList<>();
 
     public static void main(String[] args) {
-        // guildPrimaryID must be set before initializing listeners that use webhook logging
-        userID = args[1];
-        guildPrimaryID = args[2];
-
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
         jda = JDABuilder.createDefault(args[0])
@@ -135,12 +130,15 @@ public class AsyncTI4DiscordBot {
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
-            BotLogger.error("Error waiting for bot to get ready", e);
+            MessageHelper.sendMessageToBotLogWebhook("Error waiting for bot to get ready");
         }
 
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("STARTING UP: Connecting to Servers"));
 
-        BotLogger.info("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
+        userID = args[1];
+        guildPrimaryID = args[2];
+
+        MessageHelper.sendMessageToBotLogWebhook("# `" + new Timestamp(System.currentTimeMillis()) + "`  BOT IS STARTING UP");
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
@@ -209,7 +207,7 @@ public class AsyncTI4DiscordBot {
         //}
 
         // LOAD DATA
-        BotLogger.info("LOADING DATA");
+        BotLogger.logWithTimestamp(" LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
         TileHelper.init();
@@ -224,12 +222,12 @@ public class AsyncTI4DiscordBot {
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
 
         // LOAD GAMES NAMES
-        BotLogger.info("LOADING GAMES");
+        BotLogger.logWithTimestamp(" LOADING GAMES");
         GameManager.initialize();
 
         // RUN DATA MIGRATIONS
         if (DataMigrationManager.runMigrations()) {
-            BotLogger.info("RAN MIGRATIONS");
+            BotLogger.logWithTimestamp(" RAN MIGRATIONS");
         }
 
         // START ASYNC PIPELINES
@@ -250,44 +248,43 @@ public class AsyncTI4DiscordBot {
         //AgendaPhaseAutoReactCron.register();  Disabled due to new afters/whens handling
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
-        InteractionLogCron.register();
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
         jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
-        BotLogger.info("FINISHED LOADING GAMES");
+        BotLogger.log("# `" + new Timestamp(System.currentTimeMillis()) + "`  FINISHED LOADING GAMES");
 
         // Register Shutdown Hook to run when SIGTERM is received from docker stop
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("BOT IS SHUTTING DOWN"));
-                BotLogger.info("SHUTDOWN PROCESS STARTED");
+                BotLogger.logWithTimestamp("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
-                BotLogger.info("NO LONGER ACCEPTING COMMANDS");
+                BotLogger.logWithTimestamp("NO LONGER ACCEPTING COMMANDS");
                 if (ExecutorManager.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING ASYNC THREADPOOL");
                 } else {
-                    BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING ASYNC THREADPOOL");
                 }
                 if (MapRenderPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.info("FINISHED RENDERING MAPS");
+                    BotLogger.logWithTimestamp("FINISHED RENDERING MAPS");
                 } else {
-                    BotLogger.info("DID NOT FINISH RENDERING MAPS");
+                    BotLogger.logWithTimestamp("DID NOT FINISH RENDERING MAPS");
                 }
                 if (StatisticsPipeline.shutdown()) { // will wait for up to an additional 20 seconds
-                    BotLogger.info("FINISHED PROCESSING STATISTICS");
+                    BotLogger.logWithTimestamp("FINISHED PROCESSING STATISTICS");
                 } else {
-                    BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
+                    BotLogger.logWithTimestamp("DID NOT FINISH PROCESSING STATISTICS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
-                BotLogger.info("SHUTDOWN PROCESS COMPLETE");
+                BotLogger.logWithTimestamp("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();
                 jda.awaitShutdown(30, TimeUnit.SECONDS);
                 mainThread.join();
             } catch (Exception e) {
-                BotLogger.error("Error encountered within shutdown hook:\n> ", e);
+                MessageHelper.sendMessageToBotLogWebhook("Error encountered within shutdown hook:\n> " + e.getMessage());
             }
         }));
     }
@@ -299,7 +296,7 @@ public class AsyncTI4DiscordBot {
         CommandListUpdateAction commands = guild.updateCommands();
         CommandManager.getCommands().forEach(command -> command.register(commands));
         commands.queue();
-        BotLogger.info(new BotLogger.LogMessageOrigin(guild), "BOT STARTED UP: " + guild.getName());
+        BotLogger.logWithTimestamp(" BOT STARTED UP: " + guild.getName());
         guilds.add(guild);
     }
 
@@ -315,7 +312,6 @@ public class AsyncTI4DiscordBot {
      */
     private static void initializeWhitelistedRoles() {
         //ADMIN ROLES
-
         adminRoles.add(jda.getRoleById("943596173896323072")); // Async Primary (Hub)
         adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary (Stroter's Paradise)
         adminRoles.add(jda.getRoleById("1146511484264906814")); // Async Tertiary (Dreadn't)
@@ -342,7 +338,6 @@ public class AsyncTI4DiscordBot {
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
-
         developerRoles.addAll(adminRoles); //admins may also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async Primary (Hub)
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary (Stroter's Paradise)
@@ -360,7 +355,6 @@ public class AsyncTI4DiscordBot {
         developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
-
         bothelperRoles.addAll(adminRoles); //admins can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("1166011604488425482")); // Async Primary (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary (Stroter's Paradise)

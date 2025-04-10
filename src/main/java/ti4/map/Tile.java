@@ -223,7 +223,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnit(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            BotLogger.error("Could not parse unit count", e);
+            BotLogger.log("Could not parse unit count", e);
         }
     }
 
@@ -232,7 +232,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnitDamage(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            BotLogger.error("Could not parse unit count", e);
+            BotLogger.log("Could not parse unit count", e);
         }
     }
 
@@ -274,7 +274,7 @@ public class Tile {
         }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            BotLogger.warning("Could not find tile: " + tileID);
+            BotLogger.log("Could not find tile: " + tileID);
         }
         return tilePath;
     }
@@ -333,7 +333,7 @@ public class Tile {
         String tileName = Mapper.getTileID(fowTileID);
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Could not find tile: " + fowTileID);
+            BotLogger.log("Could not find tile: " + fowTileID);
         }
         return tilePath;
     }

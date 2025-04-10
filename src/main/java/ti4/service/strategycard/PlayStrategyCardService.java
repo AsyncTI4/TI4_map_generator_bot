@@ -50,7 +50,7 @@ public class PlayStrategyCardService {
     public static void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Game game, MessageChannel mainGameChannel, Player player, boolean winnuHero) {
         StrategyCardModel scModel = game.getStrategyCardModelByInitiative(scToPlay).orElse(null);
         if (scModel == null) { // Temporary Error Reporting
-            BotLogger.warning(new BotLogger.LogMessageOrigin(player), "`PlayStrategyCardService.playSC` - Game: `" + game.getName() + "` - SC Model not found for SC `" + scToPlay + "` from set `" + game.getScSetID() + "`");
+            BotLogger.log("`PlayStrategyCardService.playSC` - Game: `" + game.getName() + "` - SC Model not found for SC `" + scToPlay + "` from set `" + game.getScSetID() + "`");
         }
 
         String stratCardName = Helper.getSCName(scToPlay, game);

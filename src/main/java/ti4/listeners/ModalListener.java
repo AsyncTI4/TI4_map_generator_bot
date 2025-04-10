@@ -55,7 +55,7 @@ public class ModalListener extends ListenerAdapter {
             }
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), message, e);
+            BotLogger.log(message, e);
         }
     }
 

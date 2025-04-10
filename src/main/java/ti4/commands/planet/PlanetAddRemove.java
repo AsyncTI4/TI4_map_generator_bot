@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -79,12 +80,13 @@ abstract class PlanetAddRemove extends GameStateSubcommand {
                     return;
                 }
                 String planet = possiblePlanets.getFirst();
-                BotLogger.warning(new BotLogger.LogMessageOrigin(event), "`PlanetAddRemove.parseParameter - " + getName() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
+                BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getName() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
                 doAction(event, player, planet, game);
                 MessageHelper.sendMessageToEventChannel(event, "> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Error parsing planet: " + planetID, e);
+            BotLogger.log(event, "Error parsing planet: " + planetID);
+            BotLogger.log(ExceptionUtils.getStackTrace(e));
         }
     }
 

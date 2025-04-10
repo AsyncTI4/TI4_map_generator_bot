@@ -46,7 +46,7 @@ public class ApplicationEmojiService {
         List<EmojiFileData> newEmojis = emojiFiles.values().stream()
             .filter(data -> !emojis.containsKey(data.getName()))
             .toList();
-        BotLogger.info("Uploading " + newEmojis.size() + " new emojis...");
+        BotLogger.logWithTimestamp("Uploading " + newEmojis.size() + " new emojis...");
         boolean success = createAppEmojis(newEmojis);
         pushEmojiListToCache(success);
     }
@@ -57,7 +57,7 @@ public class ApplicationEmojiService {
             .filter(data -> emojis.containsKey(data.getName()))
             .filter(data -> emojis.get(data.getName()).getTimeCreated() < data.getFile().lastModified())
             .toList();
-        BotLogger.info("Re-uploading " + staleEmojis.size() + " stale emojis...");
+        BotLogger.logWithTimestamp("Re-uploading " + staleEmojis.size() + " stale emojis...");
         boolean success = reuploadAppEmojis(staleEmojis);
         pushEmojiListToCache(success);
     }
@@ -67,7 +67,7 @@ public class ApplicationEmojiService {
         List<CachedEmoji> hangingEmojis = emojis.values().stream()
             .filter(emoji -> !emojiFiles.containsKey(emoji.getName()))
             .toList();
-        BotLogger.info("Deleting " + hangingEmojis.size() + " hanging emojis...");
+        BotLogger.logWithTimestamp("Deleting " + hangingEmojis.size() + " hanging emojis...");
         boolean success = deleteAppEmojis(hangingEmojis);
         pushEmojiListToCache(success);
     }
@@ -78,11 +78,11 @@ public class ApplicationEmojiService {
         Set<String> emojiFileNames = new HashSet<>(enumerateEmojiFilesRecursive().map(EmojiFileData::new).map(EmojiFileData::getName).toList());
         Set<String> missingEnums = SetUtils.difference(emojiFileNames, emojiEnumNames);
         if (!missingEnums.isEmpty()) {
-            BotLogger.error("Missing " + missingEnums.size() + " Emoji enums: " + missingEnums);
+            BotLogger.log("Missing " + missingEnums.size() + " Emoji enums: " + missingEnums);
         }
         Set<String> missingFiles = SetUtils.difference(emojiEnumNames, emojiFileNames);
         if (!missingFiles.isEmpty()) {
-            BotLogger.error("Missing " + missingFiles.size() + " Emoji files: " + missingFiles);
+            BotLogger.log("Missing " + missingFiles.size() + " Emoji files: " + missingFiles);
         }
     }
 
@@ -113,7 +113,7 @@ public class ApplicationEmojiService {
                 .forEach(data -> emojiFiles.put(data.getName(), data));
             filesInitialized = true;
         } catch (Exception e) {
-            BotLogger.error("Unknown exception initializing emojis:", e);
+            BotLogger.log("Unknown exception initializing emojis:", e);
         }
     }
 
@@ -123,7 +123,7 @@ public class ApplicationEmojiService {
             return AsyncTI4DiscordBot.jda.createApplicationEmoji(emoji.getName(), emoji.getIcon()).complete();
         } catch (Exception e) {
             // Check if we failed because it already exists...
-            BotLogger.error("Failed to upload emoji file: " + emoji.getName(), e);
+            BotLogger.log("Failed to upload emoji file: " + emoji.getName(), e);
             return null;
         }
     }
@@ -145,7 +145,7 @@ public class ApplicationEmojiService {
             AsyncTI4DiscordBot.jda.retrieveApplicationEmojiById(emoji.getId()).complete().delete().complete();
             return true;
         } catch (Exception e) {
-            BotLogger.error("Failed to delete emoji file: " + emoji.getName(), e);
+            BotLogger.log("Failed to delete emoji file: " + emoji.getName(), e);
             return false;
         }
     }
@@ -179,7 +179,7 @@ public class ApplicationEmojiService {
                 .flatMap(v -> AsyncTI4DiscordBot.jda.createApplicationEmoji(name, emojiIcon))
                 .complete();
         } catch (Exception e) {
-            BotLogger.error(Constants.jazzPing() + " Failed to upload emoji file: " + name, e);
+            BotLogger.log(Constants.jazzPing() + " Failed to upload emoji file: " + name, e);
             return null;
         }
     }
@@ -200,7 +200,7 @@ public class ApplicationEmojiService {
             }
             return success;
         } catch (Exception e) {
-            BotLogger.error(Constants.jazzPing() + " Failed to upload emoji files: ", e);
+            BotLogger.log(Constants.jazzPing() + " Failed to upload emoji files: ", e);
             return false;
         }
     }
@@ -208,7 +208,7 @@ public class ApplicationEmojiService {
     // Footgun
     private static void resetCacheFromDiscord() {
         List<ApplicationEmoji> appEmojis = AsyncTI4DiscordBot.jda.retrieveApplicationEmojis().complete();
-        BotLogger.info("> - Discord has " + appEmojis.size() + " emojis.");
+        BotLogger.log("> - Discord has " + appEmojis.size() + " emojis.");
         emojis.clear();
         appEmojis.stream().map(CachedEmoji::new).forEach(e -> emojis.put(e.getName(), e));
         pushEmojiListToCache();
@@ -280,7 +280,7 @@ public class ApplicationEmojiService {
     private static void pushEmojiListToCache(boolean isHealthy) {
         if (spoofing) return;
         if (!isHealthy) {
-            BotLogger.warning(Constants.jazzPing() + " - Uploading failed, reinitializing cache from Discord.");
+            BotLogger.log(Constants.jazzPing() + " - Uploading failed, reinitializing cache from Discord.");
             resetCacheFromDiscord();
         } else {
             pushEmojiListToCache();

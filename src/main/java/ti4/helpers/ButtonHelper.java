@@ -444,7 +444,7 @@ public class ButtonHelper {
             }
             Planet p = game.getPlanetsInfo().get(planet);
             if (p == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Null unitholder for planet " + planet);
+                BotLogger.log("Null unitholder for planet " + planet);
                 continue;
             }
             Set<String> tokenList = p.getTokenList();
@@ -1213,12 +1213,12 @@ public class ButtonHelper {
         if (tile == null) {
             List<String> fakePlanets = new ArrayList<>(List.of("custodiavigilia", "ghoti"));
             if (!fakePlanets.contains(planetName))
-                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Couldn't find tile for " + planetName + " in game " + game.getName());
+                BotLogger.log("Couldn't find tile for " + planetName + " in game " + game.getName());
             return "none";
         }
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         if (unitHolder == null) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Couldn't find unitholder for " + planetName + " in game " + game.getName());
+            BotLogger.log("Couldn't find unitholder for " + planetName + " in game " + game.getName());
             return "none";
         }
         Set<String> tokenList = unitHolder.getTokenList();
@@ -1855,7 +1855,7 @@ public class ButtonHelper {
         int count = 0;
         Tile hs = player.getHomeSystemTile();
         if (hs == null) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(player), "not finding a HS for " + player.getFaction() + " in " + game.getName());
+            BotLogger.log("not finding a HS for " + player.getFaction() + " in " + game.getName());
             return 0;
         }
         String hsPos = hs.getPosition();
@@ -3628,7 +3628,7 @@ public class ButtonHelper {
             tradeHolder = game.getPlayerFromColorOrFaction(buttonID.split("_")[2]);
         }
         if (tradeHolder == null) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event, player), "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
+            BotLogger.log(event, "`ButtonHelper.sendTradeHolderSomething` tradeHolder was **null**");
             return;
         }
         if ("tg".equalsIgnoreCase(tgOrDebt)) {
@@ -5246,7 +5246,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentation() + message, buttons);
             } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Failing to set up player #cards-info thread in " + game.getName(), e);
+                BotLogger.log("Failing to set up player #cards-info thread in " + game.getName(), e);
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
@@ -5726,7 +5726,7 @@ public class ButtonHelper {
         for (String adjTilePos : adjTiles) {
             Tile adjTile = game.getTileByPosition(adjTilePos);
             if (adjTile == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(player), "`ButtonHelper.tileHasPDS2Cover` Game: " + game.getName() + " Tile: " + tilePos
+                BotLogger.log("`ButtonHelper.tileHasPDS2Cover` Game: " + game.getName() + " Tile: " + tilePos
                     + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
                 continue;
             }
@@ -5786,7 +5786,7 @@ public class ButtonHelper {
         for (String adjTilePos : adjTiles) {
             Tile adjTile = game.getTileByPosition(adjTilePos);
             if (adjTile == null) {
-                BotLogger.warning(new BotLogger.LogMessageOrigin(player), "`ButtonHelper.tileHasPDS2Cover` Game: " + game.getName() + " Tile: " + tilePos
+                BotLogger.log("`ButtonHelper.tileHasPDS2Cover` Game: " + game.getName() + " Tile: " + tilePos
                     + " has a null adjacent tile: `" + adjTilePos + "` within: `" + adjTiles + "`");
                 continue;
             }
@@ -5852,7 +5852,7 @@ public class ButtonHelper {
 
             game.setPhaseOfGame("action");
         } else {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event, player), "`ButtonHelper.startMyTurn` player is null");
+            BotLogger.log(event, "`ButtonHelper.startMyTurn` player is null");
             return;
         }
 

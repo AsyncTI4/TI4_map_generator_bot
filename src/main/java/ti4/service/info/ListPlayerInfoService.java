@@ -544,7 +544,7 @@ public class ListPlayerInfoService {
                 for (String p : player.getPlanets()) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet == null) {
-                        BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Planet \"" + p + "\" not found for game " + game.getName());
+                        BotLogger.log("Planet \"" + p + "\" not found for game " + game.getName());
                     } else if (planet.isLegendary()) {
                         count++;
                     }

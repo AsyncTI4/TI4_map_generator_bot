@@ -28,7 +28,7 @@ public class StatisticsPipeline {
                     Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e) {
-                    BotLogger.error("StatsComputationPipeline worker threw an exception.", e);
+                    BotLogger.log("StatsComputationPipeline worker threw an exception.", e);
                 }
             }
         });
@@ -44,7 +44,7 @@ public class StatisticsPipeline {
             instance.worker.join(20000);
             return !instance.worker.isAlive();
         } catch (InterruptedException e) {
-            BotLogger.error("StatisticsPipeline shutdown interrupted.", e);
+            BotLogger.log("StatisticsPipeline shutdown interrupted.");
             Thread.currentThread().interrupt();
             return false;
         }

@@ -60,7 +60,7 @@ public class ButtonProcessor {
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Something went wrong with button interaction", e);
+            BotLogger.log(event, "Something went wrong with button interaction", e);
         }
 
         runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextRuntime, resolveRuntime, saveRuntime);

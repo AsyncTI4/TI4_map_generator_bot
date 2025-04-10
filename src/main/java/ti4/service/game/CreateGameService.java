@@ -314,7 +314,7 @@ public class CreateGameService {
                     FileUpload fileUpload = FileUploadService.createFileUpload(colorsImage, "colors");
                     MessageHelper.sendFileUploadToChannel(introThread, fileUpload);
                 } catch (Exception e) {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(game), "newPlayerIntro", e);
+                    BotLogger.log("newPlayerIntro", e);
                 }
             }, null);
     }
@@ -431,7 +431,7 @@ public class CreateGameService {
 
         int index = guilds.indexOf(guild);
         if (index == -1) { // NOT FOUND
-            BotLogger.warning("`CreateGameService.getNextAvailableServer` WARNING: Current guild is not in the list of available overflow servers: ***" + guild.getName() + "***");
+            BotLogger.log("`CreateGameService.getNextAvailableServer` WARNING: Current guild is not in the list of available overflow servers: ***" + guild.getName() + "***");
         }
 
         // CHECK IF CURRENT GUILD HAS ROOM (INDEX = X)
@@ -463,7 +463,7 @@ public class CreateGameService {
             return AsyncTI4DiscordBot.guildPrimary;
         }
 
-        BotLogger.warning("`CreateGameService.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
+        BotLogger.log("`CreateGameService.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
         return null;
     }
 
@@ -479,14 +479,14 @@ public class CreateGameService {
         }
 
         if (guilds.isEmpty()) {
-            BotLogger.warning("`CreateGameService.getServerWithMostCapacity` No available servers to create a new game category");
+            BotLogger.log("`CreateGameService.getServerWithMostCapacity` No available servers to create a new game category");
             return null;
         }
 
         String debugText = guilds.stream()
             .map(g -> g.getName() + ": " + getServerCapacityForNewGames(g))
             .collect(Collectors.joining("\n"));
-        BotLogger.info("Server Game Capacity Check:\n" + debugText);
+        BotLogger.log("Server Game Capacity Check:\n" + debugText);
         return guilds.getLast();
     }
 
@@ -498,7 +498,7 @@ public class CreateGameService {
     private static boolean serverHasRoomForNewRole(Guild guild) {
         int roleCount = guild.getRoles().size();
         if (roleCount >= 250) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(guild), "`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
+            BotLogger.log("`CreateGameService.serverHasRoomForNewRole` Cannot create a new role. Server **"
                 + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return false;
         }
@@ -526,7 +526,7 @@ public class CreateGameService {
         // SPACE FOR 25 ROLES
         int roleCount = guild.getRoles().size();
         if (roleCount > (250 - maxGamesPerCategory)) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(guild), "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
+            BotLogger.log("`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                 + guild.getName() + "** currently has **" + roleCount + "** roles and a new category requires space for " + maxGamesPerCategory + " roles.");
             return false;
         }
@@ -536,7 +536,7 @@ public class CreateGameService {
         int channelMax = 500;
         int channelsCountRequiredForNewCategory = 1 + 2 * maxGamesPerCategory;
         if (channelCount > (channelMax - channelsCountRequiredForNewCategory)) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(guild), "`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
+            BotLogger.log("`CreateGameService.serverHasRoomForNewFullCategory` Cannot create a new category. Server **"
                 + guild.getName() + "** currently has " + channelCount + " channels and a new category requires space for "
                 + channelsCountRequiredForNewCategory + " new channels (including 1 for the category itself)");
             return false;
@@ -550,7 +550,7 @@ public class CreateGameService {
         int channelMax = 500;
         int channelsCountRequiredForNewGame = 2;
         if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(guild), "`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
+            BotLogger.log("`CreateGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **"
                 + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
         }
@@ -577,7 +577,7 @@ public class CreateGameService {
                     return category.getName();
                 }
             } catch (Exception e) {
-                BotLogger.error("Could not parse integers within category name: " + category.getName(), e);
+                BotLogger.log("Could not parse integers within category name: " + category.getName());
             }
         }
 
@@ -596,14 +596,14 @@ public class CreateGameService {
     public static Category createNewCategory(String categoryName) {
         Guild guild = getServerWithMostCapacity();
         if (guild == null) {
-            BotLogger.warning("`CreateGameService.createNewCategory` No available servers to create a new game category");
+            BotLogger.log("`CreateGameService.createNewCategory` No available servers to create a new game category");
             return null;
         }
 
         List<Category> categories = AsyncTI4DiscordBot.jda.getCategoriesByName(categoryName, false);
         if (!categories.isEmpty()) {
             String message = categories.stream().map(Channel::getAsMention).collect(Collectors.joining("\n"));
-            BotLogger.info("Game Channel Creation - Category Already Exists:\n" + message);
+            BotLogger.log("Game Channel Creation - Category Already Exists:\n" + message);
             return categories.getFirst();
         }
 
