@@ -731,9 +731,7 @@ public class BotLogger {
 			if (event == null) return builder;
 
 			builder.append(event.getUser().getEffectiveName())
-					.append(" (")
-					.append(event.getUser().getAsMention())
-					.append(") ");
+					.append(" ");
 
 			switch (event) {
 				case SlashCommandInteractionEvent sEvent -> builder.append("used command `")
