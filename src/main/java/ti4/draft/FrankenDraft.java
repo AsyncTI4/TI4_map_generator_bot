@@ -52,10 +52,21 @@ public class FrankenDraft extends BagDraft {
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
+        String[] results = game.getStoredValue("bannedFactions").split("finSep");
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
+        factionSet.removeIf(factionModel -> contains(results, factionModel.getAlias()));
         return factionSet;
+    }
+
+    public static boolean contains(String[] array, String target) {
+        for (String str : array) {
+            if (str.equalsIgnoreCase(target)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static List<FactionModel> getAllFrankenLegalFactions() {

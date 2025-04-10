@@ -5976,9 +5976,9 @@ public class ButtonHelper {
     public static void cashInPathTokens(ButtonInteractionEvent event, Game game, Player player) {
         deleteTheOneButton(event);
         player.setPathTokenCounter(0);
-        String msg1 = player.getRepresentation() + " chose to turn in 6 path tokens in order to resolve the secondary of one readied or unchosen strategy card";
+        String msg1 = player.getRepresentation() + " chose to turn in 6 path tokens in order to resolve any 1 secondary";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to resolve a secondary", ButtonHelperHeroes.getNRAHeroButtons(game));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to resolve a secondary", ButtonHelperHeroes.getSecondaryButtons(game));
     }
 
     @ButtonHandler("startPath")
