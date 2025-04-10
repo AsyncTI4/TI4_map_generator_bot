@@ -1,5 +1,6 @@
 package ti4.message;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -237,24 +238,33 @@ public class BotLogger {
 		String compiledMessage = msg.toString();
 		int msgLength = compiledMessage.length();
 
+		if (channel == null && AsyncTI4DiscordBot.guildPrimary != null) {
+			List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bot-log", false);
+			if (logCandidates.isEmpty()) {
+				BotLogger.error("Primary log channel could not be found in main server, defaulting to webhook");
+			} else {
+				channel = logCandidates.getFirst();
+			}
+		}
+
 		// Handle message length overflow. Overflow length is derived from previous implementation
 		for (int i = 0; i <= msgLength; i += 2000) {
 			String msgChunk = compiledMessage.substring(i, Math.min(i + 2000, msgLength));
 
 			if (err == null || i + 2000 < msgLength) { // If length could overflow or there is no error to trace
 				if (channel == null)
-					scheduleWebhookMessage(msgChunk); // Send message on websocket
+					scheduleWebhookMessage(msgChunk); // Send message on webhook
 				else
 					channel.sendMessage(msgChunk).queue(); // Send message on channel
 
 			} else { // Handle error on last send
-				if (channel != null)
+				if (origin != null && origin.getGuild() != null) // Second check may not be necessary but this is a hotfix.
 					ThreadArchiveHelper.checkThreadLimitAndArchive(origin.getGuild());
 				else
 					ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
 
 				if (channel == null)
-					scheduleWebhookMessage(msgChunk);
+					scheduleWebhookMessage(msgChunk); // Send message on webhook
 				else
 					channel.sendMessage(msgChunk)
 						.queue(m -> m.createThreadChannel("Stack Trace")
