@@ -58,6 +58,10 @@ public class GMService {
         return channels.isEmpty() ? null : channels.getFirst();
     }
 
+    public static void sendMessageToGMChannel(Game game, String msg) {
+        MessageHelper.sendMessageToChannel(getGMChannel(game), msg);
+    }
+
     @ButtonHandler("gmShowGameAs_")
     public static void showGameAs(ButtonInteractionEvent event, String buttonID, Game game) {
         String faction = buttonID.replace("gmShowGameAs_", "");

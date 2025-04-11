@@ -90,6 +90,7 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
@@ -3297,7 +3298,7 @@ public class ButtonHelper {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> ringButtons = new ArrayList<>();
         Tile centerTile = game.getTileByPosition("000");
-        if (centerTile != null) {
+        if (centerTile != null && FOWPlusService.canActivatePosition("000", player, game)) {
             Button rex = Buttons.green(finChecker + "ringTile_000",
                 centerTile.getRepresentationForButtons(game, player));
             if (!CommandCounterHelper.hasCC(player, centerTile)) {
@@ -3326,6 +3327,9 @@ public class ButtonHelper {
             return false;
         if (game.isNaaluAgent() && tile.isHomeSystem(game))
             return false;
+        if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game))
+            return false;
+
         return !CommandCounterHelper.hasCC(null, player.getColor(), tile);
     }
 
