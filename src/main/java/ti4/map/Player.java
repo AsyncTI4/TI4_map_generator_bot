@@ -73,6 +73,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -2035,6 +2036,10 @@ public class Player extends PlayerProperties {
         String label = fow_customLabels.get(position);
         if (label == null)
             label = "";
+
+        if (FOWPlusService.hideFogTile(tileID, label, game)) {
+            return null;
+        }
 
         return new Tile(tileID, position, player, true, label);
     }
