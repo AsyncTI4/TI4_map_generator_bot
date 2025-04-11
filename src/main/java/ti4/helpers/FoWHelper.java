@@ -30,6 +30,7 @@ import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.game.GameNameService;
 
@@ -107,7 +108,7 @@ public class FoWHelper {
 
             Set<String> systems = new HashSet<>();
             for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-                if (!tileEntry.getValue().hasFog(player)) {
+                if (!tileEntry.getValue().hasFog(player) || FOWPlusService.tileAlwaysVisible(tileEntry.getValue(), player, game)) {
                     systems.add(tileEntry.getKey());
                 }
             }
