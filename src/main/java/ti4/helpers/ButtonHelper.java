@@ -3319,6 +3319,9 @@ public class ButtonHelper {
         }
         Button corners = Buttons.green(finChecker + "ring_corners", "Corners");
         ringButtons.add(corners);
+        if (FOWPlusService.isActive(game)) {
+            ringButtons.add(Buttons.red(finChecker + "blindTileSelection~MDL", "Blind Tile"));
+        }
         return ringButtons;
     }
 
