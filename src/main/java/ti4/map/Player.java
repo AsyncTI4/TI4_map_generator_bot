@@ -232,6 +232,7 @@ public class Player extends PlayerProperties {
         }
         addSpentThing("tg_" + newTgSpent);
     }
+
     public void increaseSarweenCount(int amount) {
         int oldTgSpent = getSpentTgsThisWindow();
         int newTgSpent = oldTgSpent + amount;
@@ -320,7 +321,7 @@ public class Player extends PlayerProperties {
     public boolean hasInf2Tech() {// "dszeliinf"
         return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2")
             || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2")
-            || getTechs().contains("dszeliinf");
+            || getTechs().contains("dszeliinf") || getUnitsOwned().contains("pharadn_infantry") || getUnitsOwned().contains("pharadn_infantry2");
     }
 
     @JsonIgnore

@@ -259,6 +259,41 @@ public class ButtonHelperAgents {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("pharadnAgentSelect_")
+    public static void pharadnAgentSelect(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String faction = buttonID.replace("pharadnAgentSelect_", "");
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Could not find player, please resolve manually.");
+            return;
+        }
+        String message = p2.getRepresentation() + " use buttons to select the planet that you wish to kill all the infantry on. ";
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : p2.getPlanetsAllianceMode()) {
+            buttons.add(Buttons.gray("pharadnAgentKill_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("pharadnAgentKill_")
+    public static void pharadnAgentKill(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String planet = buttonID.replace("pharadnAgentKill_", "");
+
+        String message = player.getRepresentation() + " chose to destroy all infantry on " + Helper.getPlanetRepresentation(planet, game);
+        UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        int amountToKill = uH.getUnitCount(UnitType.Infantry, player.getColor());
+        if (player.hasInf2Tech()) {
+            ButtonHelper.resolveInfantryDeath(player, amountToKill);
+        }
+        message += ". " + amountToKill + " infantry were destroyed. " + Math.min(player.getCommoditiesTotal(), amountToKill) + " comms were gained and then converted to tgs";
+        player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), amountToKill));
+        player.setCommodities(Math.max(0, player.getCommodities() - Math.min(player.getCommoditiesTotal(), amountToKill)));
+        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("hacanAgentRefresh_")
     public static void hacanAgentRefresh(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String faction = buttonID.replace("hacanAgentRefresh_", "");
@@ -587,6 +622,13 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             message = trueIdentity + " select the faction on which you wish to use " + ssruuClever + "Carth of Golden Sands, the Hacan" + ssruuSlash + " agent.";
             List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "hacanAgentRefresh", null);
+            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+        }
+        if ("pharadnagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Avhkan, The Crow, the Pharadn" + ssruuSlash + " agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            message = trueIdentity + " select the faction on which you wish to use " + ssruuClever + "Avhkan, The Crow, the Pharadn" + ssruuSlash + " agent.";
+            List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "pharadnAgentSelect", null);
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
         if ("fogallianceagent".equalsIgnoreCase(agent)) {
@@ -1464,9 +1506,9 @@ public class ButtonHelperAgents {
         player.setTg(fTG);
         ButtonHelperAbilities.pillageCheck(player, game);
         resolveArtunoCheck(player, 1);
-        String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece, the Ghoti"
+        String msg = player.getRepresentation() + " Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece, the Ghoti"
             + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to gain 1 trade good (" + cTG + "->" + fTG + "). ";
-        player.addSpentThing(msg);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
 

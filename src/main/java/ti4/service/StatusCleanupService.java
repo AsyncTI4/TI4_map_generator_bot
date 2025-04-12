@@ -24,6 +24,7 @@ public class StatusCleanupService {
 
     public void runStatusCleanup(Game game) {
         game.removeStoredValue("deflectedSC");
+        game.removeStoredValue("pharadnPNUsed");
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();
@@ -58,7 +59,7 @@ public class StatusCleanupService {
             player.clearExhaustedRelics();
             player.clearExhaustedAbilities();
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
-            game.removeStoredValue(player.getFaction()+"scpickqueue");
+            game.removeStoredValue(player.getFaction() + "scpickqueue");
 
             if (player.isRealPlayer() && game.getStoredValue("Pre Pass " + player.getFaction()) != null
                 && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {

@@ -1,0 +1,113 @@
+{
+    "id": "phar",
+    "tileId": "br2",
+    "name": "Phar",
+    "aliases": [
+        "phar",
+        "pharadn"
+    ],
+    "positionInTile": {
+        "x": 170.0,
+        "y": 128.0
+    },
+    "resources": 1,
+    "influence": 0,
+    "factionHomeworld": "pharadn",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "jord",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 132.0,
+                    "y": 118.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 192.0,
+                    "y": 153.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 137.0,
+                    "y": 145.0
+                },
+                {
+                    "x": 154.0,
+                    "y": 145.0
+                },
+                {
+                    "x": 171.0,
+                    "y": 145.0
+                },
+                {
+                    "x": 146.0,
+                    "y": 156.0
+                },
+                {
+                    "x": 164.0,
+                    "y": 156.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 139.0,
+                    "y": 74.0
+                },
+                {
+                    "x": 157.0,
+                    "y": 74.0
+                },
+                {
+                    "x": 132.0,
+                    "y": 87.0
+                },
+                {
+                    "x": 150.0,
+                    "y": 87.0
+                },
+                {
+                    "x": 168.0,
+                    "y": 87.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 151.0,
+                    "y": 115.0
+                },
+                {
+                    "x": 118.0,
+                    "y": 115.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 75.0,
+                    "y": 107.0
+                },
+                {
+                    "x": 83.0,
+                    "y": 76.0
+                },
+                {
+                    "x": 202.0,
+                    "y": 107.0
+                },
+                {
+                    "x": 194.0,
+                    "y": 76.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "contrastColor": "orange",
+    "source": "ds"
+}

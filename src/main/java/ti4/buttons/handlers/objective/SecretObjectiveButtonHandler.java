@@ -9,7 +9,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.FactionModel;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.objectives.DiscardSecretService;
@@ -59,7 +58,7 @@ class SecretObjectiveButtonHandler {
     }
 
     @ButtonHandler("deal2SOToAll")
-    public static void deal2SOToAll(ButtonInteractionEvent event, Game game) {
+    public static void deal2SOToAll(ButtonInteractionEvent event, Game game, Player player) {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         if (manager.isFinished() && manager.isFactionTaken("keleresm") && game.getPlayerFromColorOrFaction("keleres") == null) {
             Player keleres = null;
@@ -72,14 +71,15 @@ class SecretObjectiveButtonHandler {
             }
         }
         boolean allPlayersSetup = true;
-        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting tech. If this is an error, use `/so deal_to_all`:";
+        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting tech. If you wish to proceed anyways, just press the button again";
         for (Player p : game.getRealPlayers()) {
             if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
                 message += "\n> " + p.getRepresentation();
                 allPlayersSetup = false;
             }
         }
-        if (!allPlayersSetup) {
+        if (!allPlayersSetup && !game.getStoredValue("overrideSORes").contains(player.getFaction())) {
+            game.setStoredValue("overrideSORes", game.getStoredValue("overrideSORes") + player.getFaction());
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             return;
         }

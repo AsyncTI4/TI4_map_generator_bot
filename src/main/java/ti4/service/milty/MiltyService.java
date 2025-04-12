@@ -483,6 +483,12 @@ public class MiltyService {
                 "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
                     + " any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
         }
+        if (player.hasAbility("ancient_empire")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("startAncientEmpire", "Place a tomb token"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentation() + " You can use this button to place 14 tomb tokens.", buttons);
+        }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");

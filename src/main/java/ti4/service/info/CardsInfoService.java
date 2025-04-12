@@ -68,6 +68,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasUnexhaustedLeader("pharadnagent")) {
+            buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
+        }
         if (ButtonHelper.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
         }
@@ -135,7 +138,14 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_ghotiagent", "Use Ghoti Agent", FactionEmojis.ghoti));
         }
         if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().isEmpty()) {
-            buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", FactionEmojis.Cabal));
+            FactionEmojis f = FactionEmojis.Cabal;
+            if (player.hasAbility("mark_of_pharadn")) {
+                f = FactionEmojis.pharadn;
+            }
+            if (player.hasAbility("shroud_of_lith")) {
+                f = FactionEmojis.kollecc;
+            }
+            buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", f));
         }
         if (player.hasRelicReady("e6-g0_network")) {
             buttons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw Action Card"));

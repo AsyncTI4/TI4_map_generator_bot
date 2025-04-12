@@ -21,7 +21,6 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -893,7 +892,7 @@ public class Helper {
                     continue;
                 }
             }
-            Button button = Buttons.red("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, game));
+            Button button = Buttons.green("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, game));
             if (unit.equalsIgnoreCase("2gf") || unit.equalsIgnoreCase("3gf")) {
                 button = button.withEmoji(UnitEmojis.infantry.asEmoji());
             }

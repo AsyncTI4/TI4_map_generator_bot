@@ -117,7 +117,9 @@ class ExploreButtonHandler {
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-
+        if (player.getUnitsOwned().contains("pharadn_infantry") || player.getUnitsOwned().contains("pharadn_infantry2")) {
+            ButtonHelper.resolveInfantryDeath(player, 1);
+        }
         String message = player.getRepresentation() + " is removing an infantry to resolve _Volatile Fuel Source_."
             + " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation();
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -177,7 +179,9 @@ class ExploreButtonHandler {
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-
+        if (player.getUnitsOwned().contains("pharadn_infantry") || player.getUnitsOwned().contains("pharadn_infantry2")) {
+            ButtonHelper.resolveInfantryDeath(player, 1);
+        }
         PlanetService.refreshPlanet(player, planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _Expedition_. "
             + Helper.getPlanetRepresentation(planetID, game) + " has been readied.";
@@ -236,7 +240,9 @@ class ExploreButtonHandler {
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-
+        if (player.getUnitsOwned().contains("pharadn_infantry") || player.getUnitsOwned().contains("pharadn_infantry2")) {
+            ButtonHelper.resolveInfantryDeath(player, 1);
+        }
         String message = player.getRepresentation() + " is removing an infantry to resolve _Core Mine_. "
             + " Gained 1 trade good " + player.gainTG(1, true) + ".";
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -299,7 +305,9 @@ class ExploreButtonHandler {
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-
+        if (player.getUnitsOwned().contains("pharadn_infantry") || player.getUnitsOwned().contains("pharadn_infantry2")) {
+            ButtonHelper.resolveInfantryDeath(player, 1);
+        }
         AddUnitService.addUnits(event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _War Forge Ruins_."
             + " Placing " + placedUnit + " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
@@ -393,7 +401,9 @@ class ExploreButtonHandler {
         UnitKey infKey = Mapper.getUnitKey("gf", colorID);
         Tile tile = game.getTile(AliasHandler.resolveTile(planetID));
         tile.removeUnit(planetID, infKey, 1);
-
+        if (player.getUnitsOwned().contains("pharadn_infantry") || player.getUnitsOwned().contains("pharadn_infantry2")) {
+            ButtonHelper.resolveInfantryDeath(player, 1);
+        }
         String message = player.getRepresentation() + " is removing an infantry to resolve _Seedy Space Port_.";
         if ("ac".equalsIgnoreCase(agent)) {
             if (player.hasAbility("scheming")) {

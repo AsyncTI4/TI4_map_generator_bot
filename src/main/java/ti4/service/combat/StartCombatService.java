@@ -26,6 +26,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.image.TileGenerator;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -311,6 +312,12 @@ public class StartCombatService {
                     if (player.hasRelic("thalnos")) {
                         thalnos = true;
                     }
+                    if (player.getPromissoryNotesInPlayArea().contains("dspnphar")) {
+                        Player pharadn = game.getPNOwner("dspnphar");
+                        List<Button> buttons = new ArrayList<>();
+                        buttons.add(Buttons.green(pharadn.getFinsFactionCheckerPrefix() + "capture1Pharad", "Capture 1 Infantry", FactionEmojis.pharadn));
+                        MessageHelper.sendMessageToChannelWithButtons(threadChannel, pharadn.getRepresentation() + " you can use this button when/if a " + player.getFactionEmoji() + " infantry dies to capture one infantry, per the power of your PN.", buttons);
+                    }
                 }
             }
             if (!autoButtons.isEmpty()) {
@@ -578,7 +585,7 @@ public class StartCombatService {
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to roll ANTI-FIGHTER BARRAGE (if applicable).", afbButtons);
         if (!game.isFowMode()) {
             for (Player player : combatPlayers) {
-                if (ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war")
+                if ((ButtonHelper.doesPlayerHaveMechHere("naalu_mech", player, tile) && !ButtonHelper.isLawInPlay(game, "articles_war"))
                     || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_1", player, tile)
                     || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_2", player, tile)) {
                     MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use ANTI-FIGHTER BARRAGE against " + player.getFactionEmojiOrColor() + " due to their mech power.");
@@ -880,6 +887,12 @@ public class StartCombatService {
         if (isSpaceCombat && p1.hasAbility("foresight") && p1.getStrategicCC() > 0) {
             buttons.add(Buttons.red("retreat_" + pos + "_foresight", "Foresight", FactionEmojis.Naalu));
         }
+        if (p2.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty() && !game.isFowMode()) {
+            buttons.add(Buttons.gray(p2.getFinsFactionCheckerPrefix() + "pharadnPNUse", "Get 2 Inf On A Planet You Control", FactionEmojis.pharadn));
+        }
+        if (p1.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty()) {
+            buttons.add(Buttons.gray(p1.getFinsFactionCheckerPrefix() + "pharadnPNUse", "Get 2 Inf On A Planet You Control", FactionEmojis.pharadn));
+        }
         boolean gheminaCommanderApplicable = false;
         if (tile.getPlanetUnitHolders().isEmpty()) {
             gheminaCommanderApplicable = true;
@@ -977,19 +990,33 @@ public class StartCombatService {
                 nameOfHolder = Helper.getPlanetRepresentation(unitH.getName(), game);
                 for (Player p : List.of(p1, p2)) {
                     // Sol Commander
+                    Player otherP = p1;
+                    if (p == p1) {
+                        otherP = p2;
+                    }
                     if (p != game.getActivePlayer() && game.playerHasLeaderUnlockedOrAlliance(p, "solcommander") && isGroundCombat) {
                         String id = p.finChecker() + "utilizeSolCommander_" + unitH.getName();
                         String label = "Use Sol Commander on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Sol));
                     }
+                    if (p != game.getActivePlayer() && p.hasLeaderUnlocked("pharadnhero") && isGroundCombat && (unitH.getUnitCount(UnitType.Pds, p) > 0 || unitH.getUnitCount(UnitType.Spacedock, p) > 0)) {
+                        String id = p.finChecker() + "utilizePharadnHero_" + unitH.getName();
+                        String label = "Use Pharadn Hero on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, FactionEmojis.pharadn));
+                    }
+                    if (p != game.getActivePlayer() && game.playerHasLeaderUnlockedOrAlliance(p, "pharadncommander") && isGroundCombat && unitH.getUnitCount(Units.UnitType.Infantry, otherP.getColor()) > 0) {
+                        String id = p.finChecker() + "utilizePharadnCommander_" + unitH.getName();
+                        String label = "Use Pharadn Commander on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, FactionEmojis.pharadn));
+                    }
                     // Yin Indoctrinate
-                    if (p.hasAbility("indoctrination") && isGroundCombat) {
+                    if (p.hasAbility("indoctrination") && isGroundCombat && unitH.getUnitCount(Units.UnitType.Infantry, otherP.getColor()) > 0) {
                         String id = p.finChecker() + "initialIndoctrination_" + unitH.getName();
                         String label = "Indoctrinate on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Yin));
                     }
                     // Letnev Mech
-                    if (p.hasUnit("letnev_mech") && isGroundCombat && unitH.getUnitCount(Units.UnitType.Infantry, p.getColor()) > 0
+                    if (p.hasUnit("letnev_mech") && !ButtonHelper.isLawInPlay(game, "regulations") && isGroundCombat && unitH.getUnitCount(Units.UnitType.Infantry, p.getColor()) > 0
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p, "mech") < 4) {
                         String id = p.finChecker() + "letnevMechRes_" + unitH.getName() + "_mech";
                         String label = "Deploy Dunlain Reaper on " + nameOfHolder;

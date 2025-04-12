@@ -40,6 +40,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -549,6 +550,21 @@ public class ButtonHelperCommanders {
         resolveMuaatCommanderCheck(player, game, event, "unknown trigger");
     }
 
+    public static List<Button> getPharadnCommanderUnlockButtons(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            if (uH != null) {
+                int amountToKill = uH.getUnitCount(UnitType.Infantry, player.getColor());
+                if (amountToKill > 1) {
+                    buttons.add(Buttons.gray("pharadnCommanderUnlockKill_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                }
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done"));
+        return buttons;
+    }
+
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event, String reason) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
@@ -633,6 +649,28 @@ public class ButtonHelperCommanders {
         }
     }
 
+    @ButtonHandler("unlockPharadnCommander")
+    public static void unlockPharadnCommander(Player player, Game game, ButtonInteractionEvent event) {
+        CommanderUnlockCheckService.checkPlayer(player, "pharadn");
+        String message = "Use buttons to end turn or do another action.";
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " use buttons to destroy infantry on 5 planets in order to unlock the commander", getPharadnCommanderUnlockButtons(player, game));
+    }
+
+    @ButtonHandler("pharadnCommanderUnlockKill_")
+    public static void pharadnAgentKill(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String planet = buttonID.split("_")[1];
+        String message = player.getRepresentation() + " chose to destroy 2 infantry on " + Helper.getPlanetRepresentation(planet, game) + " as part of the Pharadn Commander unlock";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        int amountToKill = 2;
+        if (player.hasInf2Tech()) {
+            ButtonHelper.resolveInfantryDeath(player, amountToKill);
+        }
+        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     @ButtonHandler("utilizeSolCommander_")
     public static void resolveSolCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
@@ -642,6 +680,27 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 infantry on "
                 + Helper.getPlanetRepresentation(planet, game) + " using Claire Gibson, the Sol Commander.");
+    }
+
+    @ButtonHandler("utilizePharadnCommander_")
+    public static void utilizePharadnCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        Tile tile = game.getTileFromPlanet(planet);
+        for (Player p2 : game.getPlayers().values()) {
+            if (p2.getColor() == null || p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+                continue; // fix indoctrinate vs neutral
+            }
+            if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet) && !player.getAllianceMembers().contains(p2.getFaction())) {
+                RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
+                if (player.hasInf2Tech()) {
+                    ButtonHelper.resolveInfantryDeath(p2, 1);
+                }
+                break;
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmoji() + " destroyed 1 opposing infantry on "
+                + Helper.getPlanetRepresentation(planet, game) + " using the Pharadn Commander.");
     }
 
     @ButtonHandler("yssarilcommander_")
