@@ -115,6 +115,12 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "HERO",
+        "ItemId": "edynhero",
+        "alternateText": "Midir - Living Will (The Edyn Mandate) | Golden Order - Peace Eternal\nACTION: For each system with your mechs on the game board, draw 1 agenda. Reveal and resolve each agenda in any order as if you had cast 1 vote for an outcome of your choice. Other players cannot resolve abilities during this action.\n\nThen, purge this card.",
+        "source": "ds"
+    },
+    {
         "ItemCategory": "MECH",
         "ItemId": "edyn_mech",
         "OptionalSwaps": [
@@ -390,6 +396,18 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "a_new_edifice",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dslaner",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "iconoclasm",
         "Undraftable": true,
         "source": "ds"
     },
