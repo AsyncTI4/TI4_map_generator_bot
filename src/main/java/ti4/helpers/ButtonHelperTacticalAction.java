@@ -25,6 +25,7 @@ import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
@@ -361,11 +362,11 @@ public class ButtonHelperTacticalAction {
     public static void finishMovingForTacticalAction(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String message = "Moved all units to the space area.";
 
-        Tile tile;
-        if (buttonID.contains("_")) {
-            tile = game.getTileByPosition(buttonID.split("_")[1]);
-        } else {
-            tile = game.getTileByPosition(game.getActiveSystem());
+        String position = buttonID.contains("_") ? buttonID.split("_")[1] : game.getActiveSystem();
+        Tile tile = game.getTileByPosition(position);
+        if (FOWPlusService.isVoid(game, position)) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## Your ships continued their journey into The Void " + MiscEmojis.GravityRift + " never to be seen again...");
+            message = "All units were lost.";
         }
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
 

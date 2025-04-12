@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -394,7 +395,7 @@ public class Tile {
                     return getPosition();
 
                 Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(game, player);
-                if (tilesToShow.contains(getPosition())) {
+                if (tilesToShow.contains(getPosition()) && !StringUtils.isEmpty(getRepresentation())) {
                     return getPosition() + " (" + getRepresentation() + ")";
                 } else {
                     return getPosition();

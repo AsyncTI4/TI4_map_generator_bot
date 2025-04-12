@@ -219,6 +219,9 @@ public class FoWHelper {
     }
 
     public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow, boolean includeTile) {
+        if (FOWPlusService.isVoid(game, position)) 
+            return new HashSet<>();
+
         Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
 
         List<String> adjacentCustomTiles = game.getCustomAdjacentTiles().get(position);
