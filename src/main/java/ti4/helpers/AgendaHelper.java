@@ -1366,6 +1366,9 @@ public class AgendaHelper {
     @ButtonHandler("eraseMyRiders")
     public static void reverseAllRiders(Game game, Player player) {
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
+        if (player.hasAbility("galactic_threat")) {
+            game.removeStoredValue("galacticThreatUsed");
+        }
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
             if (existingData != null && !"empty".equalsIgnoreCase(existingData) && !"".equalsIgnoreCase(existingData)) {
@@ -2393,7 +2396,7 @@ public class AgendaHelper {
                 planetNameProper = planetModel.getName();
             } else {
                 BotLogger.warning(new BotLogger.LogMessageOrigin(event), "TEMP BOTLOG: A bad PlanetModel was found for planet: "
-                        + planet + " - using the planet id instead of the model name");
+                    + planet + " - using the planet id instead of the model name");
             }
             if (voteAmount != 0) {
                 Button button = Buttons.gray("exhaustForVotes_planet_" + planet,

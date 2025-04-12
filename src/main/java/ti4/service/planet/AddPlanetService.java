@@ -56,6 +56,11 @@ public class AddPlanetService {
         if (unitHolder.getTokenList().contains("token_freepeople.png")) {
             unitHolder.removeToken("token_freepeople.png");
         }
+        if (unitHolder.getTokenList().contains("token_tomb.png") && player.hasAbility("ancient_empire")) {
+            unitHolder.removeToken("token_tomb.png");
+            AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "2 inf");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you captured 2 infantry from a tomb token.");
+        }
 
         List<String> mecatols = Constants.MECATOLS;
         if (mecatols.contains(planet) && player.hasIIHQ()) {

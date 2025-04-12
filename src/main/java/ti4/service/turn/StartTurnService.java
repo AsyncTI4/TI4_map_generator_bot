@@ -338,6 +338,9 @@ public class StartTurnService {
             if (player.getTechs().contains("cm")) {
                 startButtons.add(Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
+            if (player.getTechs().contains("dspharinf") && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game).isEmpty()) {
+                startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Inf", FactionEmojis.pharadn));
+            }
             if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
             }
@@ -368,6 +371,9 @@ public class StartTurnService {
         startButtons.add(modify);
         if (player.hasUnexhaustedLeader("hacanagent")) {
             startButtons.add(Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+        }
+        if (player.hasUnexhaustedLeader("pharadnagent")) {
+            startButtons.add(Buttons.gray(finChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
         }
         if (player.hasRelicReady("e6-g0_network")) {
             startButtons.add(Buttons.green(finChecker + "exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
