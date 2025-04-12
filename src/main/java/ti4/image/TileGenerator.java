@@ -382,24 +382,24 @@ public class TileGenerator {
                     unitHolders.remove(spaceUnitHolder);
                     unitHolders.add(spaceUnitHolder);
                 }
-                
+
                 int prodInSystem = 0;
                 int capacity = 0;
                 int capacityUsed = 0;
                 int ignoredFs = 0;
                 for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
-                    if(capacity == 0 && capacityUsed == 0){
+                    if (capacity == 0 && capacityUsed == 0) {
                         ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[3];
                         capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[2];
-                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, event,false, false)[1];
+                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[1];
                     }
                 }
                 for (UnitHolder unitHolder : unitHolders) {
                     addSleeperToken(tile, tileGraphics, unitHolder, TileGenerator::isValidToken, game);
                     addControl(tile, tileGraphics, unitHolder, rectangles);
                 }
-                if(game.isShowGears() && !game.isFowMode()){
+                if (game.isShowGears() && !game.isFowMode()) {
                     if (prodInSystem > 0) {
                         int textModifer = 0;
                         if (prodInSystem == 1) {
@@ -424,8 +424,8 @@ public class TileGenerator {
                         tileGraphics.setFont(Storage.getFont35());
                         tileGraphics.drawString(prodInSystem + "", TILE_PADDING + TILE_POSITION_POINT.x + xMod + 15 + textModifer - 25, TILE_PADDING + TILE_POSITION_POINT.y + yMod + 40);
                     }
-                    
-                    if( capacityUsed > 0 || capacity > 0 || ignoredFs > 0){
+
+                    if (capacityUsed > 0 || capacity > 0 || ignoredFs > 0) {
                         int textModifer = 0;
                         if (capacity == 1) {
                             textModifer = 7;
@@ -447,53 +447,51 @@ public class TileGenerator {
                             xMod = -155;
                         }
                         Graphics2D g2d = (Graphics2D) tileGraphics;
-                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  
+                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                         // Calculate water height  
                         double waterHeight;
-                        if(capacity + ignoredFs > 0){
-                            waterHeight = 20.0 * capacityUsed /  (capacity+ignoredFs); 
-                        }else{
+                        if (capacity + ignoredFs > 0) {
+                            waterHeight = 20.0 * capacityUsed / (capacity + ignoredFs);
+                        } else {
                             waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
-                        } 
+                        }
 
                         // Draw brown box (3 sides)  
-                         
-                        g2d.setStroke(new BasicStroke(6));  
-                        
-                        int gearX = TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29;
-                        int gearY = TILE_PADDING + TILE_POSITION_POINT.y + yMod +5;
 
-                        if(prodInSystem == 0){
-                            gearX = gearX -27;
-                            gearY = gearY-55;
+                        g2d.setStroke(new BasicStroke(6));
+
+                        int gearX = TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29;
+                        int gearY = TILE_PADDING + TILE_POSITION_POINT.y + yMod + 5;
+
+                        if (prodInSystem == 0) {
+                            gearX = gearX - 27;
+                            gearY = gearY - 55;
                         }
-                       
+
                         //g2d.setColor(new Color(128, 197, 222));  
                         //g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);   
                         //g2d.setColor(new Color(122, 127, 128)); 
 
-                
                         //g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);  
-                        
+
                         // Right side  
                         //g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);  
-                        
+
                         // Bottom side  
                         //g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);  
-                        tileGraphics.drawImage(carrierImage, gearX+24, gearY+60, null);
-                        g2d.setColor(Color.WHITE);  
+                        tileGraphics.drawImage(carrierImage, gearX + 24, gearY + 60, null);
+                        g2d.setColor(Color.WHITE);
                         tileGraphics.setFont(Storage.getFont12());
-                        String msg = capacityUsed + " / "+capacity;
-                        if(ignoredFs > 0){
-                            msg = capacityUsed + " / "+(capacity+ignoredFs)+"*";
+                        String msg = capacityUsed + " / " + capacity;
+                        if (ignoredFs > 0) {
+                            msg = capacityUsed + " / " + (capacity + ignoredFs) + "*";
                         }
-                        DrawingUtil.superDrawString(tileGraphics, msg, gearX + 39 +17, gearY+95, Color.WHITE, HorizontalAlign.Center, null, stroke4, Color.BLACK);
-                        
+                        DrawingUtil.superDrawString(tileGraphics, msg, gearX + 39 + 17, gearY + 95, Color.WHITE, HorizontalAlign.Center, null, stroke4, Color.BLACK);
+
                     }
                 }
 
-                
                 if (spaceUnitHolder != null) {
                     addCC(tile, tileGraphics, spaceUnitHolder);
                 }

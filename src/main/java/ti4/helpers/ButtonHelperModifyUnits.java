@@ -1665,10 +1665,12 @@ public class ButtonHelperModifyUnits {
         } else {
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();
-                orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
-                orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Decline"));
+                if (player.hasUnit("sol_mech") && !ButtonHelper.isLawInPlay(game, "regulations") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                    orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
+                }
+                orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Finish Orbital Drop"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-                    ", you may pay 3 resources to drop a mech on the planet too", orbFollowUp);
+                    ", you may pay 3 resources to drop a mech on the planet too (if applicable)", orbFollowUp);
             }
         }
 

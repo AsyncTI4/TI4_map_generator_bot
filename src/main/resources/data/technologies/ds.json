@@ -885,5 +885,28 @@
         "faction": "uydai",
         "source": "ds",
         "text": "After you activate a system, you may exhaust this card to allow your ships and units they transport to move out of systems that contain your command tokens during this tactical action."
+    },
+    {
+        "alias": "dspharinf",
+        "name": "Immortal II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "pharadn",
+        "baseUpgrade": "inf2",
+        "source": "ds",
+        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. At the start of your turn, place up to 1 of your captured infantry on a planet in a system that contains your structures, as if they were your own."
+    },
+    {
+        "alias": "dspharb",
+        "name": "Reality-Field Impactor",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "pharadn",
+        "source": "ds",
+        "text": "After you activate a system, you may choose 1 anomaly on the game board; that anomaly has no effect until the end of this tactical action."
     }
 ]
