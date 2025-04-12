@@ -167,7 +167,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "the_lady_and_the_lord",
         "AdditionalComponents": [
-            "FLAGSHIP:ghemina_flagship_lord"
+            "FLAGSHIP:ghemina_flagship_lady"
         ],
         "OptionalSwaps": [
             "COMMANDER:gheminacommander",
@@ -178,7 +178,7 @@
     },
     {
         "ItemCategory": "FLAGSHIP",
-        "ItemId": "ghemina_flagship_lord",
+        "ItemId": "ghemina_flagship_lady",
         "Undraftable": true,
         "source": "ds"
     },
