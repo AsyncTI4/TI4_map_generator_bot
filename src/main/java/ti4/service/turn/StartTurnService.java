@@ -382,6 +382,7 @@ public class StartTurnService {
         if (game.isFowMode()) {
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
             FowCommunicationThreadService.checkAllCommThreads(game);
+            FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
         }
 
         startButtons.add(Buttons.gray("showMap", "Show Map"));
