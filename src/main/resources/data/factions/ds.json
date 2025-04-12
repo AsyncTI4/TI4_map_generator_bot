@@ -1110,5 +1110,32 @@
         ],
         "complexity": "Moderate",
         "source": "ds"
+    },
+    {
+        "alias": "pharadn",
+        "factionName": "Pharadn Order",
+        "homeSystem": "br2",
+        "startingFleet": "1 cv,2 ff,8 inf p, 1 sd p, 2 cr",
+        "commodities": 2,
+        "factionTech": ["dspharinf", "dspharb"],
+        "startingTech": ["ie"],
+        "homePlanets": ["phar"],
+        "abilities": ["ancient_empire", "dark_purpose", "mark_of_pharadn"],
+        "leaders": ["pharadnagent", "pharadncommander", "pharadnhero"],
+        "promissoryNotes": ["dspnphar"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "pharadn_flagship",
+            "pharadn_infantry",
+            "pharadn_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
     }
 ]

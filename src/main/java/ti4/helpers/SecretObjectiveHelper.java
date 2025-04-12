@@ -22,6 +22,7 @@ import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
+import ti4.service.unit.AddUnitService;
 
 public class SecretObjectiveHelper {
 
@@ -58,8 +59,8 @@ public class SecretObjectiveHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
-            if(!game.getPhaseOfGame().equalsIgnoreCase("action") && Mapper.getSecretObjective(entry.getKey()) != null){
-                game.setStoredValue(player.getFaction() + "round"+game.getRound()+"SO", Mapper.getSecretObjective(entry.getKey()).getName());
+            if (!game.getPhaseOfGame().equalsIgnoreCase("action") && Mapper.getSecretObjective(entry.getKey()) != null) {
+                game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", Mapper.getSecretObjective(entry.getKey()).getName());
             }
             if (entry.getKey().equalsIgnoreCase("dhw")) { // destroy heretical works
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
@@ -69,13 +70,12 @@ public class SecretObjectiveHelper {
                     for (String fragid : fragmentsToPurge) {
                         player.removeFragment(fragid);
                         game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                        switch (fragid)
-                        {
+                        switch (fragid) {
                             case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message2.append(" " + ExploreEmojis.CFrag);
-                            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message2.append(" " + ExploreEmojis.HFrag);
-                            case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message2.append(" " + ExploreEmojis.IFrag);
-                            case "urf1", "urf2", "urf3" ->  message2.append(" " + ExploreEmojis.UFrag);
-                            default ->  message2.append(" ").append(fragid);
+                            case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message2.append(" " + ExploreEmojis.HFrag);
+                            case "irf1", "irf2", "irf3", "irf4", "irf5" -> message2.append(" " + ExploreEmojis.IFrag);
+                            case "urf1", "urf2", "urf3" -> message2.append(" " + ExploreEmojis.UFrag);
+                            default -> message2.append(" ").append(fragid);
                         }
                     }
                     CommanderUnlockCheckService.checkAllPlayersInGame(game, "lanefir");
@@ -128,6 +128,10 @@ public class SecretObjectiveHelper {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
+        if (player.hasAbility("dark_purpose")) {
+            AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "2 infantry");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " captured 2 infantry due to scoring an objective while having the Dark Purpose ability");
+        }
         CommanderUnlockCheckService.checkPlayer(player, "nomad");
         Helper.checkEndGame(game, player);
     }

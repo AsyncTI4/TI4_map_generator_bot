@@ -38,5 +38,12 @@
         "spaceOrPlanet": "planet",
         "aliasList": ["freesystems_raccoon", "raccoon", "coon"],
         "source": "ds"
+    },
+    {
+        "id": "pharadn_tomb",
+        "imagePath": "token_tomb.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": ["pharadn_tomb", "tomb"],
+        "source": "ds"
     }
 ]

@@ -125,6 +125,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 + " is using _Lightning Drives_ to give each ship not transporting fighters or infantry a +1 move boost."
                 + "\n-# A ship transporting just mechs gets this boost.";
         }
+        if (msg.contains("Impactor")) {
+            msg = player.getFactionEmojiOrColor()
+                + " is using _Reality Field Impactor_ to nullify the effects of one anomaly for this tactical action.";
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -357,7 +361,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 && !player.hasTechReady("gr")) {
                 List<Button> buttons = new ArrayList<>();
                 String msg = player.getRepresentation()
-                    + " The bot may also auto react for you when you have no whens/afters, using the same interval. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
+                    + " The bot may also auto react for you when you have no whens/afters. Default for this is off. This will only apply to this game. If you have any whens or afters or related when/after abilities, it will not do anything. ";
                 buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
                 buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -1260,7 +1264,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, soButtons);
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "You have no secret objectives you can score");
         }
     }
 
@@ -1393,11 +1397,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 ActionCardHelper.sendActionCardInfo(game, player);
                 String message = "Use buttons to end turn or do another action.";
                 if (stalling) {
-                    String message3 = "Use buttons to drop 1 mech on a planet or decline";
-                    List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game,
-                        "mech", "placeOneNDone_skipbuild"));
-                    buttons.add(Buttons.red("deleteButtons", "Decline to drop Mech"));
-                    MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
+                    if (player.hasUnit("yssaril_mech") && !ButtonHelper.isLawInPlay(game, "regulations") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                        String message3 = "Use buttons to drop 1 mech on a planet or decline";
+                        List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game,
+                            "mech", "placeOneNDone_skipbuild"));
+                        buttons.add(Buttons.red("deleteButtons", "Decline to drop Mech"));
+                        MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
+                    }
                     List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
                     MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                 }
