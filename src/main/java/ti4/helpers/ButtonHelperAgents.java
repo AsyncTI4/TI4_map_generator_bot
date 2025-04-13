@@ -677,8 +677,10 @@ public class ButtonHelperAgents {
                 channel = p2.getPrivateChannel();
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
             }
-            message = "Doing a tactical action. Please select the ring of the map that the system you wish to activate is located in."
-                + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+            message = "Doing a tactical action. Please select the ring of the map that the system you wish to activate is located in.";
+            if (!game.isFowMode()) {
+                message += " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+            }
             List<Button> ringButtons = ButtonHelper.getPossibleRings(p2, game);
             game.resetCurrentMovedUnitsFrom1TacticalAction();
             MessageHelper.sendMessageToChannelWithButtons(channel, p2.getRepresentationUnfogged()

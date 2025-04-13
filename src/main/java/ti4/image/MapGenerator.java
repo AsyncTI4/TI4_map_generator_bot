@@ -321,14 +321,20 @@ public class MapGenerator implements AutoCloseable {
         Set<String> tilesToShow = FoWHelper.fowFilter(game, fowPlayer);
         Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
         keys.removeAll(tilesToShow);
-        if (fowPlayer != null) {
-            for (String key : keys) {
-                tilesToDisplay.remove(key);
+        for (String key : keys) {
+            tilesToDisplay.remove(key);
+            if (fowPlayer != null) {
                 Tile fogTile = fowPlayer.buildFogTile(key, fowPlayer);
                 if (fogTile != null) {
                     tilesToDisplay.put(key, fogTile);
                 }
             }
+        }
+        //Check custom fog labeled tiles without actual tile
+        Set<String> labelWithoutTile = new HashSet<>(fowPlayer.getFogLabels().keySet());
+        labelWithoutTile.removeAll(tilesToDisplay.keySet());
+        for (String position : labelWithoutTile) {
+            tilesToDisplay.put(position, fowPlayer.buildFogTile(position, fowPlayer));
         }
     }
 
