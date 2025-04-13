@@ -92,7 +92,7 @@ public class SlashCommandListener extends ListenerAdapter {
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
             event.getChannel().sendMessage(commandText).queue(m -> {
-                BotLogger.logSlashCommand(event, m);
+                BotLogger.logSlashCommand(event);
                 SusSlashCommandService.checkIfShouldReportSusSlashCommand(event, m.getJumpUrl());
             }, BotLogger::catchRestError);
         }
