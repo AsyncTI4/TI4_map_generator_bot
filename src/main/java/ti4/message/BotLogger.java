@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -501,11 +500,11 @@ public class BotLogger {
 	 * It contains all the necessary data to find the correct logging channel or thread in the primary server and write a log message.
 	 */
 	public static void logButton(ButtonInteractionEvent event) {
-		InteractionLogCron.addLogMessage(new AbstractEventLog.ButtonInteraction(new LogMessageOrigin(event)));
+		InteractionLogCron.addLogMessage(new AbstractEventLog.ButtonInteraction(event));
 	}
 
-	public static void logSlashCommand(SlashCommandInteractionEvent event, Message commandResponseMessage) {
-		InteractionLogCron.addLogMessage(new AbstractEventLog.SlashCommand(new LogMessageOrigin(event), commandResponseMessage));
+	public static void logSlashCommand(SlashCommandInteractionEvent event) {
+		InteractionLogCron.addLogMessage(new AbstractEventLog.SlashCommand(event));
 	}
 
 	/**
@@ -796,31 +795,26 @@ public class BotLogger {
 		@Getter
 		private static String threadName = "";
 
-		@Getter
-		private static String messagePrefix = "";
-
-		protected String message = "";
-
 		public String getLogString() {
 			StringBuilder message = new StringBuilder();
+			message.append(source.getOriginTime())
+					.append(" | ");
 
-			source.appendEventString(
-					source.appendSourceString(
-							message.append(source.getOriginTime())
-									.append("\n")));
+			if (source.getChannel() != null)
+				message.append("Channel: ")
+						.append(source.getChannel().getAsMention())
+						.append(" | ");
 
-			if (!this.message.isEmpty())
-				message.append(getMessagePrefix())
-						.append(this.message)
-						.append("\n");
+			message = appendEventString(message.append(source.getEvent().getUser().getEffectiveName())); // Event cannot be null
 
-			message.append("\n");
-			return message.toString();
+			return message.append("\n").toString();
 		}
 
-		AbstractEventLog(LogMessageOrigin source) {
+		private AbstractEventLog(LogMessageOrigin source) {
 			this.source = source;
 		}
+
+		abstract StringBuilder appendEventString(@Nonnull StringBuilder builder);
 
 		public static final class ButtonInteraction extends AbstractEventLog {
 			@Getter
@@ -829,8 +823,11 @@ public class BotLogger {
 			@Getter
 			static String threadName = "button-log";
 
-			ButtonInteraction(LogMessageOrigin source) {
-				super(source);
+			ButtonInteraction(ButtonInteractionEvent source) { super(new LogMessageOrigin(source)); }
+
+			StringBuilder appendEventString(@Nonnull StringBuilder builder) {
+				return builder.append(" pressed button ")
+						.append(ButtonHelper.getButtonRepresentation(((ButtonInteractionEvent) source.getEvent()).getButton()));
 			}
 		}
 
@@ -841,12 +838,14 @@ public class BotLogger {
 			@Getter
 			static String threadName = "slash-command-log";
 
-			@Getter
-			static String messagePrefix = "Response: ";
+			SlashCommand(SlashCommandInteractionEvent source) {
+				super(new LogMessageOrigin(source));
+			}
 
-			SlashCommand(LogMessageOrigin source, Message commandResponse) {
-				super(source);
-				super.message = commandResponse.getContentDisplay();
+			StringBuilder appendEventString(@Nonnull StringBuilder builder) {
+				return builder.append(" used command `")
+						.append(((SlashCommandInteractionEvent) source.getEvent()).getCommandString())
+						.append("`");
 			}
 		}
 	}
