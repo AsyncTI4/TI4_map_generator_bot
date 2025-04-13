@@ -214,7 +214,7 @@
         "source": "pok"
     },
     {
-        "ItemCategory": "PN"    
+        "ItemCategory": "PN",    
         "ItemId": "antivirus",
         "Undraftable": true,
         "source": "pok"
