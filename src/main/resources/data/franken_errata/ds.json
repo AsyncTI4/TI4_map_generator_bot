@@ -166,20 +166,11 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "the_lady_and_the_lord",
-        "AdditionalComponents": [
-            "FLAGSHIP:ghemina_flagship_lady"
-        ],
         "OptionalSwaps": [
             "COMMANDER:gheminacommander",
             "HERO:gheminaherolady",
             "HERO:gheminaherolord"
         ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "FLAGSHIP",
-        "ItemId": "ghemina_flagship_lady",
-        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -670,7 +661,8 @@
             "PN:dspnveld1",
             "PN:dspnveld2",
             "PN:dspnveld3",
-            "PN:dspnveld4"
+            "PN:dspnveld4",
+            "ABILITY:holding_company"
         ],
         "OptionalSwaps": [
             "HERO:veldyrhero",
@@ -745,5 +737,85 @@
             "ABILITY:paranoia"
         ],
         "source": "ds"
-    }
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"the_starlit_path",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"narrow_way",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"prescience",
+        "AdditionalComponents": [
+            "ABILITY:the_starlit_path",
+            "ABILITY:narrow_way"
+        ],
+        "OptionalSwaps": [
+            "HOMESYSTEM:uydai"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "uydai",
+        "Undraftable": true,
+        "source": "ds"
+    },       
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "pharadn",
+        "Undraftable": true,
+        "source": "ds"
+    },  
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"ancient_empire",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"dark_purpose",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"mark_of_pharadn",
+        "Undraftable": true,
+        "source": "ds"
+    }, 
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "pharadncommander",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "pharadnhero",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dspharinf",
+        "AdditionalComponents": [
+            "ABILITY:ancient_empire",
+            "ABILITY:dark_purpose",
+            "ABILITY:mark_of_pharadn"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:pharadncommander",
+            "HERO:pharadnhero"
+        ],
+        "source": "ds"
+    },
 ]
