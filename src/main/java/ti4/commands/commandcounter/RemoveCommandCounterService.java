@@ -32,7 +32,7 @@ public class RemoveCommandCounterService {
         }
         if (game.isFowMode()) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a command token in the system.");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " command token has been removed from the system.");
         }
         tile.removeCC(ccID);
     }

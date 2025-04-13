@@ -2114,15 +2114,17 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
-        String ident = game.isFowMode() ? "someone" : player.getRepresentationNoPing();
-        String msg = ident + " removed your command token from " + tileRep + ".";
+        String ident = game.isFowMode() ? player.getFactionEmojiOrColor() : player.getRepresentationNoPing();
+        String msg = ident + " removed command token from " + tileRep + ".";
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             player = game.getPlayerFromColorOrFaction(faction);
-            msg = player.getRepresentationUnfogged() + " this is a notice that " + msg;
-            if (!game.isFowMode()) {
-                msg += " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            if (game.isFowMode()) {
+                msg = player.getRepresentationUnfogged() + " this is a notice that someone removed your command token from " + tileRep;
+            } else {
+                msg = player.getRepresentationUnfogged() + " this is a notice that " + msg + " using "
+                    + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                     + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent.";
             }
