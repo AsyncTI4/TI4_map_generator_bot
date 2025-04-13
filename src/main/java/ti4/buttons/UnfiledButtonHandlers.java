@@ -195,7 +195,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("ring_")
     public static void ring(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        List<Button> ringButtons = ButtonHelper.getTileInARing(player, game, buttonID, event);
+        List<Button> ringButtons = ButtonHelper.getTileInARing(player, game, buttonID);
         String num = buttonID.replace("ring_", "");
         String message;
         if (!"corners".equalsIgnoreCase(num)) {

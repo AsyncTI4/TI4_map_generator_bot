@@ -3435,6 +3435,7 @@ public class ButtonHelper {
         Button corners = Buttons.green(finChecker + "ring_corners", "Corners");
         ringButtons.add(corners);
         if (FOWPlusService.isActive(game)) {
+            FOWPlusService.filterRingButtons(ringButtons, player, game);
             ringButtons.add(Buttons.red(finChecker + "blindTileSelection~MDL", "Blind Tile"));
         }
         return ringButtons;
@@ -3452,8 +3453,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getTileInARing(
-        Player player, Game game, String buttonID,
-        GenericInteractionCreateEvent event
+        Player player, Game game, String buttonID
     ) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> ringButtons = new ArrayList<>();
