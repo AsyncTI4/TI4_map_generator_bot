@@ -2220,8 +2220,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("ChooseDifferentDestination")
     public static void chooseDifferentDestination(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "Choosing a different system to activate. Please select the ring of the map that the system you wish to activate is located in."
-            + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+        String message = "Choosing a different system to activate. Please select the ring of the map that the system you wish to activate is located in.";
+        if (!game.isFowMode()) {
+            message += " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+        }
         List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
         ButtonHelper.deleteMessage(event);

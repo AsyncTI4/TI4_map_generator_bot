@@ -549,8 +549,10 @@ public class ButtonHelperTacticalAction {
         if (!game.isFowMode() && game.getRingCount() < 5 && prefersDistanceBasedTacticalActions) {
             alternateWayOfOfferingTiles(player, game);
         } else {
-            String message = "Doing a tactical action. Please select the ring of the map that the system you wish to activate is located in."
-                + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+            String message = "Doing a tactical action. Please select the ring of the map that the system you wish to activate is located in.";
+            if (!game.isFowMode()) {
+                message += " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+            }
             List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, ringButtons);
         }
