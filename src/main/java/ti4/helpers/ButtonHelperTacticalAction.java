@@ -365,7 +365,7 @@ public class ButtonHelperTacticalAction {
         String position = buttonID.contains("_") ? buttonID.split("_")[1] : game.getActiveSystem();
         Tile tile = game.getTileByPosition(position);
         if (FOWPlusService.isVoid(game, position)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## Your ships continued their journey into The Void " + MiscEmojis.GravityRift + " never to be seen again...");
+            FOWPlusService.resolveVoidActivation(player, game);
             message = "All units were lost.";
         }
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
@@ -375,7 +375,8 @@ public class ButtonHelperTacticalAction {
         if (game.getMovedUnitsFromCurrentActivation().isEmpty()
             && !game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
             && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) < 1
-            && tile.getUnitHolders().get("space").getUnitCount(UnitType.Mech, player) < 1) {
+            && tile.getUnitHolders().get("space").getUnitCount(UnitType.Mech, player) < 1
+            && !FOWPlusService.isVoid(game, position)) {
             message = "Nothing moved. Use buttons to decide if you wish to build (if you can), or finish the activation.";
             systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
             needPDSCheck = true;

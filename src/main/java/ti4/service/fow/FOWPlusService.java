@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +20,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -25,6 +28,8 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 /*
@@ -130,6 +135,25 @@ public class FOWPlusService {
                 }
             }
         }
+    }
+
+    public static void resolveVoidActivation(Player player, Game game) {
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## Your ships continued their journey into The Void " 
+            + MiscEmojis.GravityRift + " never to be seen again...");
+        
+        Map<String, Integer> unitsGoingToVoid = game.getMovedUnitsFromCurrentActivation();
+        float valueOfUnitsLost = 0f;
+        String unitEmojis = "";
+        for (Entry<String, Integer> unit : unitsGoingToVoid.entrySet()) {
+            UnitModel model = Mapper.getUnit(unit.getKey());
+            if (model != null) {
+                valueOfUnitsLost += model.getCost() * unit.getValue();
+                unitEmojis += StringUtils.repeat("" + model.getUnitEmoji(), unit.getValue());
+            }
+        }
+        GMService.sendMessageToGMChannel(game, player.getRepresentation(true, false) 
+            + " lost " + unitEmojis + " (" + valueOfUnitsLost + " res) to The Void round " + game.getRound() + " turn " + player.getNumberOfTurns());
+        game.resetCurrentMovedUnitsFrom1TacticalAction();
     }
 
 }
