@@ -1,6 +1,11 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -131,7 +136,7 @@ public class UnitRenderGenerator {
                 unitImage = scale == 1.0f ? ImageHelper.read(unitPath) : ImageHelper.readScaled(unitPath, scale);
 
             } catch (Exception e) {
-                BotLogger.log("Could not parse unit file for: " + unitKey + " in game " + game.getName(), e);
+                BotLogger.error("Could not parse unit file for: " + unitKey + " in game " + game.getName(), e);
                 continue;
             }
             if (unitImage == null) continue;
@@ -141,6 +146,10 @@ public class UnitRenderGenerator {
             BufferedImage decal = getUnitDecal(player, unitKey);
             BufferedImage spoopy = getSpoopyImage(unitKey, player);
             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
+            if (unitModel == null) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " a unit model could not be found for the unit with an async ID of " + unitKey.asyncID());
+                continue;
+            }
 
             // Contains pre-computed values common to this 'unit class'
             // (e.g. all fighters, all infantry, all mechs, etc.)
@@ -166,7 +175,18 @@ public class UnitRenderGenerator {
                     tileGraphics.drawImage(badPositionImage, imageX - 5, imageY - 5, null);
                 }
 
-                tileGraphics.drawImage(unitImage, imageX, imageY, null);
+                if (unitKey.getUnitType() == UnitType.Spacedock && player.ownsUnitSubstring("cabal_spacedock")) {
+                    BufferedImage dimTear = ImageHelper.read(resourceHelper.getDecalFile("DimensionalTear.png"));
+                    if (dimTear != null) {
+                        int dtX = imageX + (unitImage.getWidth() - dimTear.getWidth()) / 2;
+                        int dtY = imageY + (unitImage.getHeight() - dimTear.getHeight()) / 2;
+                        tileGraphics.drawImage(dimTear, dtX, dtY, null);
+                    }
+                }
+
+                if (!"caballed".equals(player.getDecalSet()) || decal == null || posCtx.fighterOrInfantry) {
+                    tileGraphics.drawImage(unitImage, imageX, imageY, null);
+                }
 
                 if (!posCtx.fighterOrInfantry) {
                     tileGraphics.drawImage(decal, imageX, imageY, null);
@@ -390,11 +410,6 @@ public class UnitRenderGenerator {
         Player player = game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
         if (player == null) return unitPath;
 
-        // Handle special unit cases
-        if (unitKey.getUnitType() == UnitType.Spacedock && player.ownsUnitSubstring("cabal_spacedock")) {
-            return unitPath.replace("sd", "csd");
-        }
-
         // Handle special unit replacements
         return switch (unitKey.getUnitType()) {
             case Lady -> unitPath.replace("lady", "fs");
@@ -450,7 +465,7 @@ public class UnitRenderGenerator {
         typeOrder.addAll(List.of(UnitType.Infantry, UnitType.Fighter));
         // Ground unit ordering
         typeOrder.addAll(List.of(UnitType.Spacedock, UnitType.Pds, UnitType.Mech));
-        typeOrder.addAll(List.of(UnitType.CabalSpacedock, UnitType.Monument, UnitType.PlenaryOrbital)); // other misc
+        typeOrder.addAll(List.of(UnitType.Monument, UnitType.PlenaryOrbital)); // other misc
         // Space unit ordering
         typeOrder.addAll(List.of(UnitType.Flagship, UnitType.Dreadnought, UnitType.Carrier, UnitType.Cruiser, UnitType.Destroyer));
         typeOrder.addAll(List.of(UnitType.Warsun, UnitType.TyrantsLament, UnitType.Cavalry, UnitType.Lady));

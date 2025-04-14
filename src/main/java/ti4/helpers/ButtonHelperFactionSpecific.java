@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -15,8 +20,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
@@ -55,8 +58,6 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperFactionSpecific {
 
@@ -1252,6 +1253,57 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    public static List<Button> getPharadnInf2ReleaseButtons(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        boolean hasInf = false;
+        for (UnitHolder unitHolder : player.getNomboxTile().getUnitHolders().values()) {
+            for (UnitKey unitKey : unitHolder.getUnits().keySet()) {
+                if (unitKey.getUnitType() == UnitType.Infantry && unitHolder.getUnits().get(unitKey) > 0) {
+                    hasInf = true;
+                }
+            }
+        }
+        if (!hasInf) {
+            return buttons;
+        }
+        for (Tile tile : game.getTileMap().values()) {
+            if (ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile)) {
+                for (Planet planet : tile.getPlanetUnitHolders()) {
+                    buttons.add(Buttons.green(player.finChecker() + "pharadnInf2Revive_" + planet.getName(), planet.getPlanetModel().getAutoCompleteName()));
+                }
+            }
+        }
+        return buttons;
+    }
+
+    @ButtonHandler("pharadnInf2Revive_")
+    public static void pharadnInf2Revive(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        Tile tile = game.getTileFromPlanet(planet);
+        RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), "infantry");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getRepresentationUnfogged() + " put 1 captured infantry on the planet of "
+                + Mapper.getPlanet(planet).getAutoCompleteName() + " using the Pharadn Infantry 2 ability.");
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("capture1Pharad")
+    public static void capture1Pharad(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getRepresentationUnfogged() + " captured 1 destroyed infantry via their PN");
+        AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "1 inf");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("startPharadnInfRevive")
+    public static void startPharadnInfRevive(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        List<Button> buttons = getPharadnInf2ReleaseButtons(player, game);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            player.getRepresentationUnfogged() + " use buttons to release an infantry onto a planet", buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     public static void checkForGeneticRecombination(Player voter, Game game) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == voter) {
@@ -1440,6 +1492,16 @@ public class ButtonHelperFactionSpecific {
     public static void offerNekrophageButtons(Player player, ButtonInteractionEvent event) {
         String message = player.getRepresentationUnfogged() + " Resolve **Necrophage** ability using buttons. ";
         List<Button> buttons = gainOrConvertCommButtons(player, true);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("pharadnPNUse")
+    public static void pharadnPNUse(Player player, Game game, ButtonInteractionEvent event) {
+        String message = player.getRepresentationUnfogged() + " Drop 2 infantry on a planet you control with buttons. ";
+        game.setStoredValue("pharadnPNUsed", "true");
+        List<Button> buttons = new ArrayList<>(
+            Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -1669,8 +1731,7 @@ public class ButtonHelperFactionSpecific {
         if (cabal == player) {
             return false;
         }
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, cabal, UnitType.CabalSpacedock,
-            UnitType.Spacedock);
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, cabal, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             return false;
         }
@@ -1791,8 +1852,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static List<Button> getUnitButtonsForVortex(Player player, Game game, GenericInteractionCreateEvent event) {
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.CabalSpacedock,
-            UnitType.Spacedock);
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock);
         if (tiles.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Couldn't find any Dimensional Tears.");
             return List.of();
@@ -2493,8 +2553,8 @@ public class ButtonHelperFactionSpecific {
                 + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
-        String msg = player.getRepresentation() + " used _Salvage Operations_ to gain 1 trade good (you currently have " + player.getTg()
-            + "trade good" + (player.getTg() == 1 ? "" : "s") + ").";
+        String msg = player.getRepresentation() + " used _Salvage Operations_ to gain 1 trade good (you now have " + player.getTg()
+            + " trade good" + (player.getTg() == 1 ? "" : "s") + ").";
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

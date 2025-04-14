@@ -615,24 +615,42 @@ public class ButtonHelperAbilities {
             buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         } else {
-            
+
             player.setPillageCounter(player.getPillageCounter() + 1);
             pillaged.setPillageCounter(pillaged.getPillageCounter() + 1);
-            String pillagerMessage = player.getRepresentationUnfogged() + " you **Pillage**'d, so your trade goods have gone from "
+            String pillagerMessage = player.getRepresentationUnfogged() + " you succesfully **Pillage**'d, so your ~~doubloons~~ trade goods have gone from "
                 + player.getTg() + " to "
-                + (player.getTg() + 1) + ". The number of times you have pillaged this game is "+player.getPillageCounter();
-            String pillagedMessage = pillaged.getRepresentationUnfogged() + " you have been **Pillage**'d";
+                + (player.getTg() + 1) + ". The number of innocent merchant ships you have looted this game is " + player.getPillageCounter();
+            if (player.getPillageCounter() < 5) {
+                pillagerMessage += ", which is not enough to be well-known yet, keep trying young matey.";
+            } else {
+                if (player.getPillageCounter() < 10) {
+                    pillagerMessage += ", which is a small but significant amount, you'll be an infamous pirate yet, just keep at it for 10, maybe 20, more rounds.";
+                } else {
+                    if (player.getPillageCounter() < 15) {
+                        pillagerMessage += ", which is quite the treasure hoard of ill-gotten goods. Hope you didn't spend it all in one place.";
+                    } else {
+                        if (player.getPillageCounter() < 20) {
+                            pillagerMessage += ", which is starting to be a bit legendary. Sort of surprised the table hasn't united against you yet";
+                        } else {
+                            pillagerMessage += ", which is enough to ensure your name goes down in async history as one of the most successfull pirates ever to sail the intergalactic seas.";
+                        }
+
+                    }
+                }
+            }
+            String pillagedMessage = "Arrr " + pillaged.getRepresentationUnfogged() + " it do seem ye have been **Pillage**'d 🏴‍☠️🏴‍☠️🏴‍☠️";
 
             if (pillaged.getCommodities() > 0 && checkedStatus.contains("checkedcomm")) {
-                pillagedMessage += ", so your commodities have gone from " + pillaged.getCommodities() + " to "
+                pillagedMessage += ", so your worthless commodities went from " + pillaged.getCommodities() + " to "
                     + (pillaged.getCommodities() - 1) + ".";
                 pillaged.setCommodities(pillaged.getCommodities() - 1);
             } else {
-                pillagedMessage += ", so your trade goods have gone from " + pillaged.getTg() + " to "
+                pillagedMessage += ", so your trade goods went from " + pillaged.getTg() + " to "
                     + (pillaged.getTg() - 1) + ".";
                 pillaged.setTg(pillaged.getTg() - 1);
             }
-            pillagedMessage += " This number of times you have been pillaged this game is "+pillaged.getPillageCounter();
+            pillagedMessage += " This number of times your gold has been forcefully liberated from your grasping hands for the benefit of the needy this game is " + pillaged.getPillageCounter();
             player.setTg(player.getTg() + 1);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pillagerMessage);
@@ -722,7 +740,35 @@ public class ButtonHelperAbilities {
         unitHolder.removeToken("token_freepeople.png");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         event.getMessage().delete().queue();
+    }
 
+    @ButtonHandler("addTombToken_")
+    public static void addTombToken(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String planet = buttonID.split("_")[1];
+        String message = player.getFactionEmoji() + " added a tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".";
+        UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        unitHolder.addToken("token_tomb.png");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("startAncientEmpire")
+    public static void startAncientEmpire(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String message = player.getRepresentation() + " chose a planet to add a tomb token to.";
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : game.getPlanets()) {
+            if (player.getPlanets().contains(planet)) {
+                continue;
+            }
+            UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            if (unitHolder != null) {
+                if (unitHolder.getTokenList().contains("token_tomb.png")) {
+                    continue;
+                }
+                buttons.add(Buttons.green("addTombToken_" + planet, Helper.getPlanetRepresentation(planet, game)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
     @ButtonHandler("mitosisInf")
@@ -1394,11 +1440,14 @@ public class ButtonHelperAbilities {
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + planet);
         String opponent = "their opponent's";
         for (Player p2 : game.getPlayers().values()) {
-            if (p2.getColor() == null || p2 == player) {
+            if (p2.getColor() == null || p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
                 continue; // fix indoctrinate vs neutral
             }
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet) && !player.getAllianceMembers().contains(p2.getFaction())) {
                 RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
+                if (p2.getUnitsOwned().contains("pharadn_infantry") || p2.getUnitsOwned().contains("pharadn_infantry2")) {
+                    ButtonHelper.resolveInfantryDeath(p2, 1);
+                }
                 opponent = p2.getRepresentationNoPing();
                 break;
             }

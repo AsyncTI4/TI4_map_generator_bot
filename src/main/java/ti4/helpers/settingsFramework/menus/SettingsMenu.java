@@ -200,7 +200,7 @@ public abstract class SettingsMenu {
 
     protected void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
         if (pingJazz) {
-            BotLogger.log(event, userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
             userMsg += "\n> *Jazz has been pinged to take a look.*";
         }
         if (event instanceof ButtonInteractionEvent buttonEvent)
@@ -382,7 +382,7 @@ public abstract class SettingsMenu {
             if (allottedSpace < 3) {
                 // This shouldn't ever happen as I don't really expect to ever see more than 7 other buttons,
                 // which means allotted space should always be >= 18
-                BotLogger.log("NOT ENOUGH SPACE FOR BUTTONS IN MENU: " + navId());
+                BotLogger.error("NOT ENOUGH SPACE FOR BUTTONS IN MENU: " + navId());
                 return Collections.emptyList();
             }
             List<List<Button>> paginated = ListUtils.partition(allButtons, allottedSpace - 2);
@@ -424,7 +424,7 @@ public abstract class SettingsMenu {
         try {
             return mapper.writeValueAsString(this);
         } catch (Exception e) {
-            BotLogger.log("Error mapping to json:", e);
+            BotLogger.error("Error mapping to json:", e);
         }
         return null;
     }

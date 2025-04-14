@@ -30,7 +30,7 @@ class ShowAgendasButtonHandler {
         switch (deck) {
             case "ac" -> ShowActionCardsService.showDiscard(game, event, false);
             case "agenda" -> AgendaHelper.showDiscards(game, event);
-            case "relic" -> RelicHelper.showRemaining(event, false, game, player);
+            case "relic" -> RelicHelper.showRemaining(event.getMessageChannel(), false, game, player);
             case "unscoredSO" -> SecretObjectiveHelper.showUnscored(game, event);
             case Constants.PROPULSION, Constants.WARFARE, Constants.CYBERNETIC, Constants.BIOTIC, Constants.UNIT_UPGRADE -> ShowTechDeckService.displayTechDeck(game, event, deck);
             case Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER, "all" -> {

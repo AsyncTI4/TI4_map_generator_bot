@@ -28,6 +28,7 @@ import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.AddFrontierTokensService;
 
@@ -35,6 +36,7 @@ import ti4.service.explore.AddFrontierTokensService;
 public class AddTileListService {
 
     public static void addTileListToMap(Game game, String tileList, GenericInteractionCreateEvent event) {
+        tileList = tileList.replace("\n", " ");
         tileList = tileList.replace(",", " ");
         tileList = tileList.replace("  ", " ");
 
@@ -49,7 +51,7 @@ public class AddTileListService {
         try {
             badTiles = addTileMapToGame(game, mappedTilesToPosition);
         } catch (Exception e) {
-            BotLogger.log(e.getMessage(), e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), e.getMessage(), e);
             MessageHelper.replyToMessage(event, e.getMessage());
         }
 
@@ -102,7 +104,7 @@ public class AddTileListService {
                 game.setTile(tile);
             }
         } catch (Exception e) {
-            BotLogger.log("Could not add setup and Mallice tiles", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Could not add setup and Mallice tiles", e);
         }
 
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
@@ -113,7 +115,7 @@ public class AddTileListService {
 
         MessageHelper.sendMessageToChannelWithButtons(
             game.getMainGameChannel(), "Press this button after every player is setup.",
-            List.of(Buttons.green("deal2SOToAll", "Deal 2 Secret Objectives To All")));
+            List.of(Buttons.green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
 
         if (!game.isFowMode() && game.getRealPlayers().size() < game.getPlayers().size()) {
             ButtonHelper.offerPlayerSetupButtons(channel, game);

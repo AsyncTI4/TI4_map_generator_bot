@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -223,7 +224,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnit(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            BotLogger.log("Could not parse unit count", e);
+            BotLogger.error("Could not parse unit count", e);
         }
     }
 
@@ -232,7 +233,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnitDamage(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            BotLogger.log("Could not parse unit count", e);
+            BotLogger.error("Could not parse unit count", e);
         }
     }
 
@@ -274,7 +275,7 @@ public class Tile {
         }
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            BotLogger.log("Could not find tile: " + tileID);
+            BotLogger.warning("Could not find tile: " + tileID);
         }
         return tilePath;
     }
@@ -333,7 +334,7 @@ public class Tile {
         String tileName = Mapper.getTileID(fowTileID);
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            BotLogger.log("Could not find tile: " + fowTileID);
+            BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Could not find tile: " + fowTileID);
         }
         return tilePath;
     }
@@ -394,7 +395,7 @@ public class Tile {
                     return getPosition();
 
                 Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(game, player);
-                if (tilesToShow.contains(getPosition())) {
+                if (tilesToShow.contains(getPosition()) && !StringUtils.isEmpty(getRepresentation())) {
                     return getPosition() + " (" + getRepresentation() + ")";
                 } else {
                     return getPosition();
@@ -501,9 +502,6 @@ public class Tile {
                 return true;
             }
             for (UnitKey unit : unitHolder.getUnits().keySet()) {
-                if (unit.getUnitType() == UnitType.CabalSpacedock) {
-                    return true;
-                }
                 if (unit.getUnitType() == UnitType.Spacedock && game != null) {
                     Player player = game.getPlayerFromColorOrFaction(unit.getColor());
                     if (player != null && player.getUnitFromUnitKey(unit).getId().contains("cabal_spacedock")) {

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -55,7 +56,7 @@ public class VoteButtonHandler {
             pfaction2 = player.getFaction();
         }
         if (pfaction2 != null) {
-            String voteMessage = player.getRepresentation()+ " Chose to Vote. Click buttons for which outcome to vote for.";
+            String voteMessage = player.getRepresentation() + " Chose to Vote. Click buttons for which outcome to vote for.";
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
             List<Button> outcomeActionRow;
             if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
@@ -78,7 +79,7 @@ public class VoteButtonHandler {
                 outcomeActionRow = getLawOutcomeButtons(game, null, "outcome");
             }
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
                 outcomeActionRow);
         }
     }
@@ -130,7 +131,7 @@ public class VoteButtonHandler {
         Button buttonFor;
         Button buttonAgainst;
         String finChecker = "";
-        if(player != null){
+        if (player != null) {
             finChecker = player.getFinsFactionCheckerPrefix();
         }
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
@@ -167,11 +168,11 @@ public class VoteButtonHandler {
             }
         }
         if (rider == null) {
-            buttonFor = Buttons.green(finChecker+prefix + "_for", "For");
-            buttonAgainst = Buttons.red(finChecker+prefix + "_against", "Against");
+            buttonFor = Buttons.green(finChecker + prefix + "_for", "For");
+            buttonAgainst = Buttons.red(finChecker + prefix + "_against", "Against");
         } else {
-            buttonFor = Buttons.green(finChecker+prefix + "rider_fa;for_" + rider, "For");
-            buttonAgainst = Buttons.red(finChecker+prefix + "rider_fa;against_" + rider, "Against");
+            buttonFor = Buttons.green(finChecker + prefix + "rider_fa;for_" + rider, "For");
+            buttonAgainst = Buttons.red(finChecker + prefix + "rider_fa;against_" + rider, "Against");
         }
 
         buttonFor = buttonFor.withEmoji(Emoji.fromFormatted(forEmojiString));

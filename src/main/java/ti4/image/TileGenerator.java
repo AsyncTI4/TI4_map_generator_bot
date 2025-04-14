@@ -153,7 +153,7 @@ public class TileGenerator {
             String timeStamp = getTimeStamp();
             graphics.drawString(game.getName() + " " + timeStamp, 0, 34);
         } catch (Exception e) {
-            BotLogger.log(game.getName() + ": Could not save generated system info image");
+            BotLogger.error(game.getName() + ": Could not save generated system info image", e);
         }
 
         return mainImage;
@@ -204,7 +204,7 @@ public class TileGenerator {
             BufferedImage tileImage = draw(tile, step);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (Exception exception) {
-            BotLogger.log("Tile Error, when building map: " + tile.getTileID(), exception);
+            BotLogger.error("Tile Error, when building map: " + tile.getTileID(), exception);
         }
     }
 
@@ -376,30 +376,30 @@ public class TileGenerator {
                 List<Rectangle> rectangles = new ArrayList<>();
                 Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
                 UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
-
                 if (spaceUnitHolder != null) {
                     addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileGenerator::isValidCustodianToken, game);
                     addToken(tile, tileGraphics, spaceUnitHolder, game);
                     unitHolders.remove(spaceUnitHolder);
                     unitHolders.add(spaceUnitHolder);
                 }
+
                 int prodInSystem = 0;
                 int capacity = 0;
                 int capacityUsed = 0;
                 int ignoredFs = 0;
                 for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
-                    if(capacity == 0 && capacityUsed == 0){
+                    if (capacity == 0 && capacityUsed == 0) {
                         ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[3];
                         capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[2];
-                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, event,false, false)[1];
+                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[1];
                     }
                 }
                 for (UnitHolder unitHolder : unitHolders) {
                     addSleeperToken(tile, tileGraphics, unitHolder, TileGenerator::isValidToken, game);
                     addControl(tile, tileGraphics, unitHolder, rectangles);
                 }
-                if(game.isShowGears() && !game.isFowMode()){
+                if (game.isShowGears() && !game.isFowMode()) {
                     if (prodInSystem > 0) {
                         int textModifer = 0;
                         if (prodInSystem == 1) {
@@ -424,8 +424,8 @@ public class TileGenerator {
                         tileGraphics.setFont(Storage.getFont35());
                         tileGraphics.drawString(prodInSystem + "", TILE_PADDING + TILE_POSITION_POINT.x + xMod + 15 + textModifer - 25, TILE_PADDING + TILE_POSITION_POINT.y + yMod + 40);
                     }
-                    
-                    if( capacityUsed > 0 || capacity > 0 || ignoredFs > 0){
+
+                    if (capacityUsed > 0 || capacity > 0 || ignoredFs > 0) {
                         int textModifer = 0;
                         if (capacity == 1) {
                             textModifer = 7;
@@ -447,49 +447,48 @@ public class TileGenerator {
                             xMod = -155;
                         }
                         Graphics2D g2d = (Graphics2D) tileGraphics;
-                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);  
+                        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                         // Calculate water height  
                         double waterHeight;
-                        if(capacity + ignoredFs > 0){
-                            waterHeight = 20.0 * capacityUsed /  (capacity+ignoredFs); 
-                        }else{
+                        if (capacity + ignoredFs > 0) {
+                            waterHeight = 20.0 * capacityUsed / (capacity + ignoredFs);
+                        } else {
                             waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
-                        } 
+                        }
 
                         // Draw brown box (3 sides)  
-                         
-                        g2d.setStroke(new BasicStroke(6));  
-                        
-                        int gearX = TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29;
-                        int gearY = TILE_PADDING + TILE_POSITION_POINT.y + yMod +5;
 
-                        if(prodInSystem == 0){
-                            gearX = gearX -27;
-                            gearY = gearY-55;
+                        g2d.setStroke(new BasicStroke(6));
+
+                        int gearX = TILE_PADDING + TILE_POSITION_POINT.x + xMod - 29;
+                        int gearY = TILE_PADDING + TILE_POSITION_POINT.y + yMod + 5;
+
+                        if (prodInSystem == 0) {
+                            gearX = gearX - 27;
+                            gearY = gearY - 55;
                         }
-                       
+
                         //g2d.setColor(new Color(128, 197, 222));  
                         //g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);   
                         //g2d.setColor(new Color(122, 127, 128)); 
 
-                
                         //g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);  
-                        
+
                         // Right side  
                         //g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);  
-                        
+
                         // Bottom side  
                         //g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);  
-                        tileGraphics.drawImage(carrierImage, gearX+24, gearY+60, null);
-                        g2d.setColor(Color.WHITE);  
+                        tileGraphics.drawImage(carrierImage, gearX + 24, gearY + 60, null);
+                        g2d.setColor(Color.WHITE);
                         tileGraphics.setFont(Storage.getFont12());
-                        String msg = capacityUsed + " / "+capacity;
-                        if(ignoredFs > 0){
-                            msg = capacityUsed + " / "+(capacity+ignoredFs)+"*";
+                        String msg = capacityUsed + " / " + capacity;
+                        if (ignoredFs > 0) {
+                            msg = capacityUsed + " / " + (capacity + ignoredFs) + "*";
                         }
-                        DrawingUtil.superDrawString(tileGraphics, msg, gearX + 39 +17, gearY+95, Color.WHITE, HorizontalAlign.Center, null, stroke4, Color.BLACK);
-                        
+                        DrawingUtil.superDrawString(tileGraphics, msg, gearX + 39 + 17, gearY + 95, Color.WHITE, HorizontalAlign.Center, null, stroke4, Color.BLACK);
+
                     }
                 }
 
@@ -498,6 +497,7 @@ public class TileGenerator {
                 }
                 int degree = 180;
                 int degreeChange = 5;
+
                 for (UnitHolder unitHolder : unitHolders) {
                     int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS
                         : Constants.RADIUS;
@@ -1226,7 +1226,7 @@ public class TileGenerator {
             BufferedImage cached = ImageHelper.read(decorationType.getImageFilePath());
             borderDecorationImage = new BufferedImage(cached.getColorModel(), cached.copyData(null), cached.isAlphaPremultiplied(), null);
         } catch (Exception e) {
-            BotLogger.log("Could not find border decoration image! Decoration was " + decorationType);
+            BotLogger.error("Could not find border decoration image! Decoration was " + decorationType, e);
             return;
         }
 
@@ -1294,7 +1294,7 @@ public class TileGenerator {
                     DrawingUtil.drawCCOfPlayer(tileGraphics, ccID, imgX, imgY, 1, player, convertToGeneric);
                 }
             } catch (Exception ignored) {
-                BotLogger.log("Could not addCC", ignored);
+                BotLogger.error("Could not addCC", ignored);
             }
 
             if (image != null) {
@@ -1408,7 +1408,7 @@ public class TileGenerator {
             if (isValid.apply(tokenID)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.log("Could not find token file for: " + tokenID);
+                    BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Could not find token file for: " + tokenID);
                     continue;
                 }
                 float scale = 0.85f;
@@ -1479,7 +1479,7 @@ public class TileGenerator {
                 }
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.log("Could not parse token file for: " + tokenID + " on tile: " + tile.getAutoCompleteName());
+                    BotLogger.warning("Could not parse token file for: " + tokenID + " on tile: " + tile.getAutoCompleteName());
                     continue;
                 }
                 BufferedImage tokenImage = ImageHelper.read(tokenPath);
@@ -1603,7 +1603,7 @@ public class TileGenerator {
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
             if (tokenPath == null) {
-                BotLogger.log("Could not parse token file for: " + tokenID);
+                BotLogger.warning("Could not parse token file for: " + tokenID);
                 continue;
             }
             BufferedImage image = ImageHelper.readScaled(tokenPath, 0.85f);
@@ -1636,7 +1636,7 @@ public class TileGenerator {
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
             if (tokenPath == null) {
-                BotLogger.log("Could not parse token file for: " + tokenID);
+                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Could not parse token file for: " + tokenID);
                 continue;
             }
             if (game.isCptiExploreMode() && tokenPath.toLowerCase().contains("token_frontier")) {

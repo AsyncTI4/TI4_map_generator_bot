@@ -24,7 +24,7 @@ public class OldUndoFileCleanupCron {
         try {
             cleanupOldUndoFiles();
         } catch (Exception e) {
-            BotLogger.log("**OldUndoFileCleanupCron failed.**", e);
+            BotLogger.error("**OldUndoFileCleanupCron failed.**", e);
         }
     }
 
@@ -39,10 +39,10 @@ public class OldUndoFileCleanupCron {
                 count += deleteOldFilesInDirectory(subdirectory, cutoff);
             }
         } catch (IOException e) {
-            BotLogger.log("Error accessing directory: " + baseGameUndoDirectory, e);
+            BotLogger.error("Error accessing directory: " + baseGameUndoDirectory, e);
         }
 
-        BotLogger.log(String.format("OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff));
+        BotLogger.info(String.format("OldUndoFileCleanupCron: Cleaned up `%d` undo files that were over `%d` days old (%s)", count, daysOld, cutoff));
     }
 
     private int deleteOldFilesInDirectory(Path directory, Instant cutoff) {
@@ -54,7 +54,7 @@ public class OldUndoFileCleanupCron {
                 }
             }
         } catch (IOException e) {
-            BotLogger.log("Error accessing directory: " + directory, e);
+            BotLogger.error("Error accessing directory: " + directory, e);
         }
 
         deleteEmptyDirectory(directory);
@@ -70,7 +70,7 @@ public class OldUndoFileCleanupCron {
                 return true;
             }
         } catch (Exception e) {
-            BotLogger.log("Failed to delete undo file: " + file, e);
+            BotLogger.error("Failed to delete undo file: " + file, e);
         }
         return false;
     }
@@ -81,7 +81,7 @@ public class OldUndoFileCleanupCron {
                 Files.delete(directory);
             }
         } catch (IOException e) {
-            BotLogger.log("Error deleting empty directory: " + directory, e);
+            BotLogger.error("Error deleting empty directory: " + directory, e);
         }
     }
 }

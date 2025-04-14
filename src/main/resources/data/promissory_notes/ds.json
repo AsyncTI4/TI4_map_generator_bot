@@ -383,5 +383,23 @@
         "source": "ds",
         "text": "When 1 or more of your units would make a BOMBARDMENT roll: If you produce 1 or more hits during this BOMBARDMENT roll, produce 1 additional hit for that roll.\nThen, return this card to the Zelian player.",
         "shortName": "Hyperkin. Ordinance"
+    },
+    {
+        "alias": "dspnuyda",
+        "name": "Eerie Predictions",
+        "faction": "uydai",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "At the start of the status phase: You may look at the top card of any 1 deck; place that card on the top or bottom of that deck. \nThen, return this card to the Uydai player."
+    },
+    {
+        "alias": "dspnphar",
+        "name": " Death Binding",
+        "faction": "pharadn",
+        "color": "",
+        "playArea": true,
+        "source": "ds",
+        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nAt the start of a round of combat, you may exhaust this card to place 2 infantry from your reinforcements on a planet you control. \nOnce per combat, after 1 of your infantry is destroyed, the Pharad'n player may capture that unit."
     }
 ]

@@ -49,6 +49,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
 import ti4.service.turn.EndTurnService;
@@ -117,43 +118,45 @@ public class StartPhaseService {
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
         }
     }
+
     public static List<Button> getQueueSCPickButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        String alreadyQueued = game.getStoredValue(player.getFaction()+"scpickqueue");
-        for(int x = 1; x < 9; x++){
-            String num = x+"";
-            if(alreadyQueued.contains(num)){
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
+        for (int x = 1; x < 9; x++) {
+            String num = x + "";
+            if (alreadyQueued.contains(num)) {
                 continue;
             }
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
-            buttons.add(Buttons.green("queueScPick_"+num, Helper.getSCName(x, game), scEmoji));
+            buttons.add(Buttons.green("queueScPick_" + num, Helper.getSCName(x, game), scEmoji));
         }
         buttons.add(Buttons.red("deleteButtons", "Decline to Queue"));
         buttons.add(Buttons.gray("restartSCQueue", "Restart Queue"));
         return buttons;
     }
+
     public static String getQueueSCMessage(Game game, Player player) {
         int number = Helper.getPlayerSpeakerNumber(player, game);
-        String alreadyQueued = game.getStoredValue(player.getFaction()+"scpickqueue");
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
         int numQueued = alreadyQueued.split("_").length;
-        if(alreadyQueued.isEmpty()){
+        if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        String msg = player.getRepresentation() +" you are #"+number+" pick in this strategy phase and so can queue "+number+" strategy cards (SCs). So "+
-        "far you have queued "+numQueued+" cards. ";
-        if(game.isFowMode()){
-            msg = player.getRepresentation() +" you can queue up to 8 cards. So "+
-            "far you have queued "+numQueued+" cards. ";
+        String msg = player.getRepresentation() + " you are #" + number + " pick in this strategy phase and so can queue " + number + " strategy cards (SCs). So " +
+            "far you have queued " + numQueued + " cards. ";
+        if (game.isFowMode()) {
+            msg = player.getRepresentation() + " you can queue up to 8 cards. So " +
+                "far you have queued " + numQueued + " cards. ";
         }
-        if(numQueued > 0){
+        if (numQueued > 0) {
             msg += "The queued SCs are as follows (in the order the bot will attempt to select them for you):\n";
             int count = 1;
-            for(String num : alreadyQueued.split("_")){
-                if(num.isEmpty()){
+            for (String num : alreadyQueued.split("_")) {
+                if (num.isEmpty()) {
                     continue;
                 }
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(Integer.parseInt(num));
-                msg += count+". "+Helper.getSCName(Integer.parseInt(num), game) + " "+scEmoji+"\n";
+                msg += count + ". " + Helper.getSCName(Integer.parseInt(num), game) + " " + scEmoji + "\n";
             }
         }
         return msg;
@@ -361,6 +364,9 @@ public class StartPhaseService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed.");
             return;
         }
+        if (!speaker.getSCs().isEmpty() && game.getRealPlayers().size() > 1) {
+            speaker = Helper.getSpeakerOrderFromThisPlayer(speaker, game).get(1);
+        }
         String message = speaker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(speaker);
         game.setPhaseOfGame("strategy");
@@ -368,14 +374,14 @@ public class StartPhaseService {
         String pickSCMsg = " Please use the buttons to pick a strategy card.";
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
             pickSCMsg = " Please use the buttons to pick the strategy card you wish to give to someone else.";
-        }else{
-            if(game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()){
+        } else {
+            if (game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()) {
                 for (Player player2 : game.getRealPlayers()) {
                     int number = Helper.getPlayerSpeakerNumber(player2, game);
-                    if(number == 1 || (number == 8 && !game.isFowMode())){
+                    if (number == 1 || (number == 8 && !game.isFowMode()) || !player2.getSCs().isEmpty()) {
                         continue;
                     }
-                    String msg = player2.getRepresentation()+" in order to speed up the strategy phase, you can now offer the bot a ranked list of your desired"+
+                    String msg = player2.getRepresentation() + " in order to speed up the strategy phase, you can now offer the bot a ranked list of your desired" +
                         " strategy cards, which it will pick for you when it's your turn to pick. If you do not want to, that is fine, just decline.";
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), msg);
                     MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), getQueueSCMessage(game, player2), getQueueSCPickButtons(game, player2));
@@ -594,6 +600,7 @@ public class StartPhaseService {
 
         game.getMainGameChannel().sendMessage(messageObject).queue(message -> GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
 
+        GMService.createFOWStatusSummary(game);
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }
 

@@ -1,7 +1,6 @@
 package ti4.helpers;
 
 import java.awt.Point;
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,7 +21,6 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,6 +79,7 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
@@ -294,7 +293,7 @@ public class Helper {
     }
 
     public static String getNewStatusScoringRepresentation(Game game) {
-        if(game.getPhaseOfGame().equalsIgnoreCase("action")){
+        if (game.getPhaseOfGame().equalsIgnoreCase("action")) {
             return "";
         }
         StringBuilder rep = new StringBuilder("# __Scoring Summary__\n");
@@ -444,6 +443,7 @@ public class Helper {
         }
         return players;
     }
+
     public static int getPlayerSpeakerNumber(Player player, Game game) {
         Player speaker;
         if (game.getPlayer(game.getSpeakerUserID()) != null) {
@@ -474,10 +474,10 @@ public class Helper {
             }
         }
         int count = 1;
-        for(Player p2 : players){
-            if(player == p2){
+        for (Player p2 : players) {
+            if (player == p2) {
                 return count;
-            }else{
+            } else {
                 count++;
             }
         }
@@ -533,7 +533,7 @@ public class Helper {
     public static String getDamagePath() {
         String tokenPath = ResourceHelper.getResourceFromFolder("extra/", "marker_damage.png");
         if (tokenPath == null) {
-            BotLogger.log("Could not find token: marker_damage");
+            BotLogger.warning("Could not find token: marker_damage");
             return null;
         }
         return tokenPath;
@@ -620,25 +620,12 @@ public class Helper {
         };
     }
 
-    public static File getSCImageFile(Integer sc, Game game) {
-        String scSet = game.getScSetID();
-        if (Optional.ofNullable(game.getScSetID()).isEmpty()
-            || "null".equals(game.getScSetID())) { // I don't know *why* this is a thing that can happen, but it is
-            scSet = "pok";
-        }
-        boolean gameWithGroupedSCs = "pbd100".equals(game.getName()) || "pbd500".equals(game.getName()) && !"tribunal".equals(scSet);
-        if (gameWithGroupedSCs) {
-            //char scValue = String.valueOf(sc).charAt(0);
-            scSet = scSet.replace("pbd100", "pok");
-            scSet = scSet.replace("pbd1000", "pok");
-        }
-        StrategyCardModel scModel = game.getStrategyCardSet().getStrategyCardModelByInitiative(sc).orElse(null);
-        String scImagePath = scModel.getImageFilePath();
-        if (scImagePath == null) {
-            scImagePath = ResourceHelper.getResourceFromFolder("strat_cards/", "sadFace.png");
-        }
-
-        return new File(scImagePath);
+    public static String getScImageUrl(Integer sc, Game game) {
+        String scImagePath = game.getStrategyCardSet()
+            .getStrategyCardModelByInitiative(sc)
+            .map(StrategyCardModel::getImageFileName)
+            .orElse("sadFace.png");
+        return "https://raw.githubusercontent.com/AsyncTI4/TI4_map_generator_bot/refs/heads/master/src/main/resources/strat_cards/" + scImagePath + ".png";
     }
 
     public static Emoji getPlayerReactionEmoji(Game game, Player player, Message message) {
@@ -816,6 +803,29 @@ public class Helper {
         return scButtons;
     }
 
+    public static List<Integer> getRemainingSCs(Game game) {
+        List<Integer> scButtons = new ArrayList<>();
+
+        for (Integer sc : game.getSCList()) {
+            if (sc <= 0)
+                continue; // some older games have a 0 in the list of SCs
+            boolean held = false;
+            for (Player player : game.getPlayers().values()) {
+                if (player == null || player.getFaction() == null) {
+                    continue;
+                }
+                if (player.getSCs() != null && player.getSCs().contains(sc) && !game.isFowMode()) {
+                    held = true;
+                    break;
+                }
+            }
+            if (held)
+                continue;
+            scButtons.add(sc);
+        }
+        return scButtons;
+    }
+
     public static List<Button> getPlanetExhaustButtons(Player player, Game game) {
         return getPlanetExhaustButtons(player, game, "both");
     }
@@ -878,12 +888,12 @@ public class Helper {
                 continue;
             }
             if (unit.equalsIgnoreCase("spacedock")) {
-                
+
                 if (uH == null || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
                     continue;
                 }
             }
-            Button button = Buttons.red("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, game));
+            Button button = Buttons.green("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet, getPlanetRepresentation(planet, game));
             if (unit.equalsIgnoreCase("2gf") || unit.equalsIgnoreCase("3gf")) {
                 button = button.withEmoji(UnitEmojis.infantry.asEmoji());
             }
@@ -967,13 +977,14 @@ public class Helper {
 
     public static String buildSpentThingsMessageForVoting(Player player, Game game, boolean justVoteTotal) {
         List<String> spentThings = player.getSpentThingsThisWindow();
+        Set<String> set = new HashSet<>(spentThings);
         StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " used the following: \n");
         int votes = 0;
         int tg = player.getSpentTgsThisWindow();
-        for (String thing : spentThings) {
+        for (String thing : set) {
             int count;
             if (!thing.contains("_")) {
-                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + game.getName());
+                BotLogger.info(new BotLogger.LogMessageOrigin(game), "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -1031,7 +1042,7 @@ public class Helper {
         player.setTg(player.getTg() + tg);
         for (String thing : spentThings) {
             if (!thing.contains("_")) {
-                BotLogger.log("Caught the following thing in the voting " + thing + " in game " + game.getName());
+                BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Caught the following thing in the voting " + thing + " in game " + game.getName());
                 continue;
             }
             String secondHalf = thing.split("_")[1];
@@ -1111,8 +1122,10 @@ public class Helper {
                         String comms = StringUtils.substringAfter(thing, "by ");
                         comms = StringUtils.substringBefore(comms, " (");
                         keleresAgent = Integer.parseInt(comms);
+                        msg.append("Keleres Agent for ").append(comms).append(" comms\n");
+                    } else {
+                        msg.append(thing).append("\n");
                     }
-                    msg.append(thing).append("\n");
                 } else {
                     Tile t = game.getTileFromPlanet(planet.getName());
                     if (t != null && !t.isHomeSystem()) {
@@ -1353,6 +1366,15 @@ public class Helper {
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+            }
+        }
+        if (player.hasTech("absol_ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
+            || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {
+            int structures = uH.getUnitCount(UnitType.Spacedock, player.getColor()) + uH.getUnitCount(UnitType.Pds, player.getColor());
+            productionValueTotal += structures;
+            planetUnitVal = structures;
+            if (player.hasRelic("boon_of_the_cerulean_god")) {
+                productionValueTotal++;
             }
         }
         if (player.hasTech("ah") && planetUnitVal < 1 && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
@@ -1623,7 +1645,6 @@ public class Helper {
                 boolean singleDock = "warfare".equalsIgnoreCase(warfareNOtherstuff) && !asn;
                 if (singleDock) {
                     if (unitHolder.getUnitCount(UnitType.Spacedock, player.getColor()) < 1
-                        && unitHolder.getUnitCount(UnitType.CabalSpacedock, player.getColor()) < 1
                         && !player.hasUnit("saar_spacedock") && !player.hasUnit("absol_saar_spacedock")
                         && !player.hasUnit("absol_saar_spacedock2") && !player.hasUnit("saar_spacedock2")
                         && !player.hasUnit("ghoti_flagship")) {
@@ -1780,7 +1801,7 @@ public class Helper {
 
         LeaderModel leaderModel = Mapper.getLeader(leaderID);
         if (leaderModel == null) {
-            BotLogger.log("Invalid `leaderID=" + leaderID + "` caught within `Helper.getLeaderRepresentation`");
+            BotLogger.warning("Invalid `leaderID=" + leaderID + "` caught within `Helper.getLeaderRepresentation`");
             return leader.getId();
         }
 
@@ -2033,7 +2054,7 @@ public class Helper {
         Role role = null;
         if (!roles.isEmpty()) {
             if (roles.size() > 1) {
-                BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName
+                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "There are " + roles.size() + " roles that match the game name: `" + gameName
                     + "` - please investigate, as this may cause issues.");
                 return;
             }
@@ -2081,7 +2102,7 @@ public class Helper {
     public static void addBotHelperPermissionsToGameChannels(GenericInteractionCreateEvent event) {
         var guild = event.getGuild();
         if (guild == null) {
-            BotLogger.log("Guild was null in addBotHelperPermissionsToGameChannels.");
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Guild was null in addBotHelperPermissionsToGameChannels.");
             return;
         }
         // long role = 1093925613288562768L;
@@ -2155,7 +2176,7 @@ public class Helper {
             }
             return (GuildMessageChannel) messageChannel;
         } catch (Exception e) {
-            BotLogger.log(event, ExceptionUtils.getStackTrace(e));
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Something went wrong getting thread channels.", e);
             return null;
         }
     }
@@ -2198,6 +2219,30 @@ public class Helper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static void reverseSpeakerOrder(Game game) {
+        Map<String, Player> newPlayerOrder = new LinkedHashMap<>();
+        Map<String, Player> players = new LinkedHashMap<>(game.getPlayers());
+        List<Player> sortedPlayers1 = game.getRealPlayers();
+        List<Player> sortedPlayers = new ArrayList<>();
+        for (Player player : sortedPlayers1) {
+            sortedPlayers.add(0, player);
+        }
+        Map<String, Player> playersBackup = new LinkedHashMap<>(game.getPlayers());
+        try {
+            for (Player player : sortedPlayers) {
+                SetOrderService.setPlayerOrder(newPlayerOrder, players, player);
+
+            }
+            if (!players.isEmpty()) {
+                newPlayerOrder.putAll(players);
+            }
+            game.setPlayers(newPlayerOrder);
+        } catch (Exception e) {
+            game.setPlayers(playersBackup);
+        }
+
     }
 
     public static void setOrder(Game game) {
@@ -2296,10 +2341,11 @@ public class Helper {
             }
             buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                "# " + game.getPing() + fowGmPing(game) + " it appears as though " + player.getRepresentationNoPing()
+                "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
                     + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
             if (game.isFowMode()) {
+                GMService.sendMessageToGMChannel(game, "# GAME HAS ENDED", true);
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), """
                     ## Note about FoW
                     When you press **End Game** all the game channels will be deleted immediately!
@@ -2314,16 +2360,6 @@ public class Helper {
                     titleButton);
             }
         }
-    }
-
-    private static String fowGmPing(Game game) {
-        if (game.isFowMode()) {
-            List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
-            if (!gmRoles.isEmpty()) {
-                return ", " + gmRoles.getFirst().getAsMention();
-            }
-        }
-        return "";
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {
@@ -2415,7 +2451,7 @@ public class Helper {
     public static String getGuildInviteURL(Guild guild, int uses, boolean forever) {
         DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
         if (!(defaultChannel instanceof TextChannel tc)) {
-            BotLogger.log("Default channel is not available or is not a text channel on " + guild.getName());
+            BotLogger.error(new BotLogger.LogMessageOrigin(guild), "Default channel is not available or is not a text channel on " + guild.getName());
         } else {
             return tc.createInvite()
                 .setMaxUses(uses)

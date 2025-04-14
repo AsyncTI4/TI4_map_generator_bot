@@ -206,6 +206,10 @@ public class ComponentActionHelper {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
             compButtons.add(abilityButton);
         }
+        if (p1.hasLeader("pharadncommander") && !p1.hasLeaderUnlocked("pharadncommander") && ButtonHelperCommanders.getPharadnCommanderUnlockButtons(p1, game).size() > 5) {
+            Button abilityButton = Buttons.green("unlockPharadnCommander", "Unlock Commander", FactionEmojis.pharadn);
+            compButtons.add(abilityButton);
+        }
         if (p1.hasUnit("lanefir_mech") && !p1.getFragments().isEmpty()
             && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p1, "mech", true) < 4) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_lanefirMech", "Purge 1 Fragment For Mech", FactionEmojis.lanefir);
@@ -248,7 +252,7 @@ public class ComponentActionHelper {
 
         // ACs
         List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play AC with Component Action ("+acButtons.size()+")");
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play AC with Component Action (" + acButtons.size() + ")");
         compButtons.add(acButton);
         compButtons.addAll(acButtons);
 

@@ -935,6 +935,7 @@ public class Constants {
 
     public static final String ABILITY = "ability";
     public static final String BAN_ABILITY = "ban_ability";
+    public static final String BAN_FACTION = "ban_faction";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";
     public static final String ABILITY_3 = "ability_3";
@@ -1016,6 +1017,8 @@ public class Constants {
     public static final String LANEFIR_ATS_COUNT = "ats_count";
     public static final String PILLAGE_COUNT = "pillage_count";
     public static final String SARWEEN_COUNT = "sarween_count";
+    public static final String PATH_TOKEN_COUNT = "path_token_count";
+    public static final String HARVEST_COUNT = "harvest_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
     public static final String ZELIAN_HERO = "zelian_hero";

@@ -24,7 +24,7 @@ public class DisasterWatchHelper {
         try (FileUpload systemWithContext = new TileGenerator(game, event, null, rings, tile.getPosition()).createFileUpload()) {
             MessageHelper.sendMessageWithFile(watchParty, systemWithContext, message, false);
         } catch (IOException e) {
-            BotLogger.log("Exception while closing FileUpload", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Exception while closing FileUpload", e);
         }
     }
 }

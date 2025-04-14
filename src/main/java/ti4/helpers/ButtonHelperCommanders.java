@@ -27,13 +27,20 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 import ti4.model.PlanetModel;
+import ti4.model.RelicModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.service.agenda.LookAgendaService;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 
@@ -424,8 +431,138 @@ public class ButtonHelperCommanders {
         return buttons;
     }
 
+    public static List<Button> getUydaiCommanderButtons(Game game, boolean ableToBottom, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        String abletobot = "_no";
+        if (ableToBottom) {
+            abletobot = "_yes";
+        }
+        buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_industrial" + abletobot, "Industrial", ExploreEmojis.Industrial));
+        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_hazardous" + abletobot, "Hazardous", ExploreEmojis.Hazardous));
+        buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_cultural" + abletobot, "Cultural", ExploreEmojis.Cultural));
+        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_frontier" + abletobot, "Frontier", ExploreEmojis.Frontier));
+        buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_relics" + abletobot, "Relic", ExploreEmojis.Relic));
+        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_secrets" + abletobot, "Secret", CardEmojis.SecretObjective));
+        buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_agenda" + abletobot, "Agenda", CardEmojis.Agenda));
+        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "uydaiCommanderLook_acs" + abletobot, "Action Card", CardEmojis.ActionCard));
+        return buttons;
+    }
+
+    @ButtonHandler("uydaiCommander")
+    public static void uydaiCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        if (player.getTg() < 1) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " you need at least 1 tg to use this ability");
+            return;
+        }
+        if (game.getActivePlayer() != player) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " you need to be the active player to use this ability");
+            return;
+        }
+        player.setTg(player.getTg() - 1);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is paying 1tg to look at the top card of a deck");
+        List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, false, player);
+        String message = player.getRepresentationUnfogged() + " select which deck you wish to look at the top of.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+    }
+
+    @ButtonHandler("uydaiCommanderLook_")
+    public static void uydaiCommanderLook(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String target = buttonID.split("_")[1];
+        String ableToBot = buttonID.split("_")[2];
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is choosing to look at the top of the " + event.getButton().getLabel() + " deck");
+        event.getMessage().delete().queue();
+        switch (target) {
+            case "industrial", "hazardous", "frontier", "cultural" -> {
+                ButtonHelperFactionSpecific.resolveExpLook(player, game, event, target);
+            }
+            case "agenda" -> {
+                LookAgendaService.lookAtAgendas(game, player, 1, false);
+            }
+            case "relics" -> {
+                List<String> relicDeck = game.getAllRelics();
+                if (relicDeck.isEmpty()) {
+                    MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty");
+                    return;
+                }
+                String relicID = relicDeck.getFirst();
+                RelicModel relicModel = Mapper.getRelic(relicID);
+                String sb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
+            }
+            case "secrets" -> {
+                List<String> secretDeck = game.getSecretObjectives();
+                String secretID = secretDeck.getFirst();
+                SecretObjectiveModel secretModel = Mapper.getSecretObjective(secretID);
+                String sb = "**Secret - Look at Top**\n" + player.getRepresentation() + "\n" + secretModel.getName() + "\n" + secretModel.getText();
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
+            }
+            case "acs" -> {
+                List<String> acDeck = game.getActionCards();
+                String acID = acDeck.getFirst();
+                ActionCardModel acModel = Mapper.getActionCard(acID);
+                String sb = "**Action Card - Look at Top**\n" + player.getRepresentation() + "\n" + acModel.getRepresentation();
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
+            }
+        }
+        if (ableToBot.equalsIgnoreCase("yes")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderBottom_" + target, "Bottom It"));
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Leave it on top"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " would you like to bottom the card or leave it on top?", buttons);
+        }
+    }
+
+    @ButtonHandler("uydaiCommanderBottom_")
+    public static void uydaiCommanderBottom(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String target = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is choosing to bottom the card they saw.");
+        event.getMessage().delete().queue();
+        switch (target) {
+            case "industrial", "hazardous", "frontier", "cultural" -> {
+                game.putExploreBottom(game.getExploreDeck(target).getFirst());
+            }
+            case "agenda" -> {
+                AgendaHelper.putBottom(game.getAgendas().getFirst(), game);
+            }
+            case "relics" -> {
+                List<String> relicDeck = game.getAllRelics();
+                if (relicDeck.isEmpty()) {
+                    MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty");
+                    return;
+                }
+                String relicID = relicDeck.getFirst();
+                game.putRelicBottom(relicID);
+            }
+            case "secrets" -> {
+                List<String> secretDeck = game.getSecretObjectives();
+                String secretID = secretDeck.getFirst();
+                game.putSOBottom(secretID);
+            }
+            case "acs" -> {
+                List<String> acDeck = game.getActionCards();
+                String acID = acDeck.getFirst();
+                game.putACBottom(acID);
+            }
+        }
+    }
+
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event) {
         resolveMuaatCommanderCheck(player, game, event, "unknown trigger");
+    }
+
+    public static List<Button> getPharadnCommanderUnlockButtons(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            if (uH != null) {
+                int amountToKill = uH.getUnitCount(UnitType.Infantry, player.getColor());
+                if (amountToKill > 1) {
+                    buttons.add(Buttons.gray("pharadnCommanderUnlockKill_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                }
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done"));
+        return buttons;
     }
 
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event, String reason) {
@@ -512,6 +649,28 @@ public class ButtonHelperCommanders {
         }
     }
 
+    @ButtonHandler("unlockPharadnCommander")
+    public static void unlockPharadnCommander(Player player, Game game, ButtonInteractionEvent event) {
+        CommanderUnlockCheckService.checkPlayer(player, "pharadn");
+        String message = "Use buttons to end turn or do another action.";
+        List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " use buttons to destroy infantry on 5 planets in order to unlock the commander", getPharadnCommanderUnlockButtons(player, game));
+    }
+
+    @ButtonHandler("pharadnCommanderUnlockKill_")
+    public static void pharadnAgentKill(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String planet = buttonID.split("_")[1];
+        String message = player.getRepresentation() + " chose to destroy 2 infantry on " + Helper.getPlanetRepresentation(planet, game) + " as part of the Pharadn Commander unlock";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        int amountToKill = 2;
+        if (player.hasInf2Tech()) {
+            ButtonHelper.resolveInfantryDeath(player, amountToKill);
+        }
+        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     @ButtonHandler("utilizeSolCommander_")
     public static void resolveSolCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
@@ -521,6 +680,27 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " placed 1 infantry on "
                 + Helper.getPlanetRepresentation(planet, game) + " using Claire Gibson, the Sol Commander.");
+    }
+
+    @ButtonHandler("utilizePharadnCommander_")
+    public static void utilizePharadnCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        Tile tile = game.getTileFromPlanet(planet);
+        for (Player p2 : game.getPlayers().values()) {
+            if (p2.getColor() == null || p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+                continue; // fix indoctrinate vs neutral
+            }
+            if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet) && !player.getAllianceMembers().contains(p2.getFaction())) {
+                RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
+                if (player.hasInf2Tech()) {
+                    ButtonHelper.resolveInfantryDeath(p2, 1);
+                }
+                break;
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmoji() + " destroyed 1 opposing infantry on "
+                + Helper.getPlanetRepresentation(planet, game) + " using the Pharadn Commander.");
     }
 
     @ButtonHandler("yssarilcommander_")

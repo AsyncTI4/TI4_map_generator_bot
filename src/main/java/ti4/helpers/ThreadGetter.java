@@ -26,7 +26,7 @@ public class ThreadGetter {
                 .findFirst()
                 .ifPresentOrElse(consumer, () -> searchForArchivedThreadOrCreateNew(channel, threadName, createIfDoesntExist, createAsPrivate, consumer));
         } catch (Exception e) {
-            BotLogger.log("Could not find existing #cards-info thread using name: " + threadName, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(channel), "Could not find existing #cards-info thread using name: " + threadName, e);
         }
 
     }

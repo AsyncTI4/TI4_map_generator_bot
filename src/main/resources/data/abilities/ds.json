@@ -813,6 +813,51 @@
         "source": "ds"
     },
     {
+        "id": "prescience",
+        "name": "Obsessive Designs",
+        "faction": "uydai",
+        "permanentEffect": "At the end of your turn,if you have not passed, place 1 of the plan cards on your faction sheet, face down. At the start of your turn, reveal and resolve the plan card on your faction sheet, if able",
+        "source": "ds"
+    },
+    {
+        "id": "the_starlit_path",
+        "name": "The Starlit Path",
+        "faction": "uydai",
+        "window": "At the end of your turn",
+        "windowEffect": "You may return 6 path tokens from your faction sheet to your reinforcements to resolve the secondary ability of any strategy card without spending a command token.",
+        "source": "ds"
+    },
+    {
+        "id": "narrow_way",
+        "name": "Narrow Way",
+        "faction": "uydai",
+        "window": "At any time",
+        "windowEffect": "You may return 1 path token to your reinforcements to redistribute 1 of your command tokens.",
+        "source": "ds"
+    },
+    {
+        "id": "ancient_empire",
+        "name": "Ancient Empire",
+        "faction": "pharadn",
+        "permanentEffect": "During setup, place 1 tomb token on each of up to 14 planets. When you gain control of a planet that contains a tomb token, purge that token to capture 2 infantry from the supply. ",
+        "source": "ds"
+    },
+    {
+        "id": "dark_purpose",
+        "name": "Dark Purpose",
+        "faction": "pharadn",
+        "window": "When you score an objective",
+        "windowEffect": "Capture 2 infantry from the supply",
+        "source": "ds"
+    },
+    {
+        "id": "mark_of_pharadn",
+        "name": "Mark Of Pharadn",
+        "faction": "pharadn",
+        "permanentEffect": "Abilities that would place infantry from your reinforcements on planets instead allow you to produce those units. When you produce infantry, you must return 1 of your captured infantry to produce each of those units, instead of spending resources.",
+        "source": "ds"
+    },
+    {
         "id": "paranoia",
         "name": "Paranoia",
         "faction": "zelian",

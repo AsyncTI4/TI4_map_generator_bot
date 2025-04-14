@@ -638,7 +638,7 @@ public class AgendaHelper {
                 }
                 num++;
             }
-        }else{
+        } else {
             for (Player p2 : game.getRealPlayers()) {
                 if (game.getStoredValue("queuedAfters").contains(p2.getFaction())
                     || game.getStoredValue("declinedAfters").contains(p2.getFaction())) {
@@ -648,7 +648,7 @@ public class AgendaHelper {
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false)
-            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of "+num+" people). They have been pinged in their private thread. ");
+            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ");
 
     }
 
@@ -808,7 +808,7 @@ public class AgendaHelper {
         String watchPartyPing = watchPartyPing(game);
 
         Die d1 = new Die(6);
-        if(game.getAgendaDeckID().toLowerCase().contains("absol")){
+        if (game.getAgendaDeckID().toLowerCase().contains("absol")) {
             d1 = new Die(7);
         }
         String msg = "# Rolled a " + d1.getResult() + " for Ixthian Artifact!";
@@ -917,7 +917,7 @@ public class AgendaHelper {
         }
         game.setLatestOutcomeVotedFor(outcome);
         game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), outcome);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
             getPlanetButtonsVersion2(event, player, game));
         ButtonHelper.deleteMessage(event);
     }
@@ -1036,7 +1036,7 @@ public class AgendaHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "Successfully stored a pre-vote. You can erase it with this button.", buttonsPV);
             return;
-        }else{
+        } else {
             game.setStoredValue("preVoting" + player.getFaction(), "");
         }
         if (!buttonID.contains("outcomeTie*")) {
@@ -1171,6 +1171,7 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(game), game);
                 realIdentity2 = nextInLine.getRepresentationUnfogged();
                 voteInfo = getVoteTotal(nextInLine, game);
+                willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
             }
 
             if (!nextInLine.getColor().equalsIgnoreCase(player.getColor())) {
@@ -1365,6 +1366,9 @@ public class AgendaHelper {
     @ButtonHandler("eraseMyRiders")
     public static void reverseAllRiders(Game game, Player player) {
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
+        if (player.hasAbility("galactic_threat")) {
+            game.removeStoredValue("galacticThreatUsed");
+        }
         for (String outcome : outcomes.keySet()) {
             String existingData = outcomes.getOrDefault(outcome, "empty");
             if (existingData != null && !"empty".equalsIgnoreCase(existingData) && !"".equalsIgnoreCase(existingData)) {
@@ -1557,10 +1561,10 @@ public class AgendaHelper {
             try {
                 nextInLine = getNextInLine(null, getVotingOrder(game), game);
             } catch (Exception e) {
-                BotLogger.log("Could not find next in line", e);
+                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not find next in line", e);
             }
             if (nextInLine == null) {
-                BotLogger.log("`startTheVoting` is **null**");
+                BotLogger.warning(new BotLogger.LogMessageOrigin(game), "`startTheVoting` is **null**");
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
@@ -1603,6 +1607,7 @@ public class AgendaHelper {
                 nextInLine = getNextInLine(nextInLine, getVotingOrder(game), game);
                 realIdentity = nextInLine.getRepresentationUnfogged();
                 voteInfo = getVoteTotal(nextInLine, game);
+                willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
                 counter += 1;
             }
 
@@ -1623,7 +1628,7 @@ public class AgendaHelper {
                 game.updateActivePlayer(nextInLine);
                 game.setStoredValue("preVoting" + nextInLine.getFaction(), "");
             } catch (Exception e) {
-                BotLogger.log("Could not update active player", e);
+                BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not update active player", e);
             }
 
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
@@ -1884,8 +1889,7 @@ public class AgendaHelper {
                             String message = identity
                                 + ", you have an _Armament Rider_ to resolve. Select the system in which you wish to produce 2 units each with cost 4 or less.";
 
-                            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR,
-                                UnitType.Spacedock, UnitType.CabalSpacedock);
+                            List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR, UnitType.Spacedock);
                             List<Button> buttons = new ArrayList<>();
                             for (Tile tile : tiles) {
                                 Button starTile = Buttons.green("umbatTile_" + tile.getPosition(),
@@ -2047,7 +2051,7 @@ public class AgendaHelper {
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null) {
                         if (!losers.contains(loser) && !specificVote.contains("Rider")
-                            && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity")&& !specificVote.contains("Ability")) {
+                            && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity") && !specificVote.contains("Ability")) {
                             losers.add(loser);
                         }
 
@@ -2193,14 +2197,14 @@ public class AgendaHelper {
                 if (x < votingOrder.size()) {
                     Player player = votingOrder.get(x);
                     if (player == null) {
-                        BotLogger.log("`getNextInLine` Hit a null player in game " + game.getName());
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "`getNextInLine` Hit a null player in game " + game.getName());
                         return null;
                     }
 
                     if (player.isRealPlayer()) {
                         return player;
                     } else {
-                        BotLogger.log("`getNextInLine` Hit a notRealPlayer player in game "
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "`getNextInLine` Hit a notRealPlayer player in game "
                             + game.getName() + " on player " + player.getUserName());
                     }
                 }
@@ -2391,9 +2395,8 @@ public class AgendaHelper {
             if (planetModel.getName() != null) {
                 planetNameProper = planetModel.getName();
             } else {
-                BotLogger.log(
-                    event.getChannel().getAsMention() + " TEMP BOTLOG: A bad PlanetModel was found for planet: "
-                        + planet + " - using the planet id instead of the model name");
+                BotLogger.warning(new BotLogger.LogMessageOrigin(event), "TEMP BOTLOG: A bad PlanetModel was found for planet: "
+                    + planet + " - using the planet id instead of the model name");
             }
             if (voteAmount != 0) {
                 Button button = Buttons.gray("exhaustForVotes_planet_" + planet,
@@ -2682,13 +2685,22 @@ public class AgendaHelper {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                         if (NumberUtils.isDigits(vote)) {
                             totalVotes += Integer.parseInt(vote);
+
                         }
-                        outcomeSummaryBuilder.append(faction).append("-").append(vote).append(", ");
+                        outcomeSummaryBuilder.append(faction).append("-").append(vote);
+                        if (NumberUtils.isDigits(vote) && !game.isFowMode() && p2.hasTech("dskyrog")) {
+                            outcomeSummaryBuilder.append(" (Impressment Teams)");
+                        }
+                        if (!game.isFowMode() && p2.hasAbility("future_sight")) {
+                            outcomeSummaryBuilder.append(" (Future Sight)");
+                        }
+                        outcomeSummaryBuilder.append(", ");
                     } else {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                         if (NumberUtils.isDigits(vote)) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummaryBuilder.append(faction).append(" voted ").append(vote).append(" votes. ");
+
                         } else {
                             outcomeSummaryBuilder.append(faction).append(" cast a ").append(vote).append(". ");
                         }
@@ -3538,6 +3550,17 @@ public class AgendaHelper {
             "Agenda put on bottom.", "politics");
     }
 
+    public static void putBottom(String agendaID, Game game) {
+        boolean success = game.putAgendaBottom(agendaID);
+        if (game.isFowMode()) {
+            return;
+        }
+        if (!success) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
+            return;
+        }
+    }
+
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
         if (!RiftSetModeService.deckInfoAvailable(game.getPlayer(event.getUser().getId()), game)) {
             return;
@@ -3747,7 +3770,7 @@ public class AgendaHelper {
         try {
             AgendaHelper.startTheVoting(game);
         } catch (Exception e) {
-            BotLogger.log(event, "Could not start the voting", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Could not start the voting", e);
         }
     }
 
