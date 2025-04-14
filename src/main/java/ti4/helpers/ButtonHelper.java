@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -1497,7 +1496,9 @@ public class ButtonHelper {
                     }
                 }
             } else {
-                MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
+                if (!event.getMessageChannel().getName().contains("announcements")) {
+                    MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
+                }
                 foundSomething = true;
             }
             if (!foundSomething) {
