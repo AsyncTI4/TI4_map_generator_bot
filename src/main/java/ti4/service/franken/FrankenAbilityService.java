@@ -81,6 +81,9 @@ public class FrankenAbilityService {
                     "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
                         + ", any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
             }
+            if (abilityID.equalsIgnoreCase("the_lady_and_the_lord")) {
+                player.addOwnedUnitByID("ghemina_flagship_lady");
+            }
             if (abilityID.equalsIgnoreCase("ancient_empire")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("startAncientEmpire", "Place a tomb token"));

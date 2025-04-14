@@ -1121,8 +1121,10 @@ public class Helper {
                         String comms = StringUtils.substringAfter(thing, "by ");
                         comms = StringUtils.substringBefore(comms, " (");
                         keleresAgent = Integer.parseInt(comms);
+                        msg.append("Keleres Agent for ").append(comms).append(" comms\n");
+                    } else {
+                        msg.append(thing).append("\n");
                     }
-                    msg.append(thing).append("\n");
                 } else {
                     Tile t = game.getTileFromPlanet(planet.getName());
                     if (t != null && !t.isHomeSystem()) {
