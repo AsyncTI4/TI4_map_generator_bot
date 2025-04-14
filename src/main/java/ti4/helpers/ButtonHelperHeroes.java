@@ -962,7 +962,7 @@ public class ButtonHelperHeroes {
         buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos),
             "arboHeroBuild", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 

@@ -1973,7 +1973,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent on **Construction**.";
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
-        ButtonHelper.updateMap(game, event);
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event);
+        }
         ButtonHelper.deleteMessage(event);
     }
 

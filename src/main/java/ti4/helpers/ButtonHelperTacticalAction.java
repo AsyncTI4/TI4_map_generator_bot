@@ -481,7 +481,6 @@ public class ButtonHelperTacticalAction {
         ButtonHelper.deleteMessage(event);
     }
 
-    
     private static void tacticalActionSpaceCannonOffenceStep(Game game, Player player, List<Player> playersWithPds2, Tile tile) {
         if (game.isFowMode()) {
             String title = "### Space Cannon Offence " + UnitEmojis.pds + "\n";
@@ -491,8 +490,8 @@ public class ButtonHelperTacticalAction {
             List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
             spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
             for (Player playerWithPds : playersWithPds2) {
-                MessageHelper.sendMessageToChannelWithButtons(playerWithPds.getCorrectChannel(), title + playerWithPds.getRepresentationUnfogged() 
-                  + " you have PDS coverage in " + tile.getRepresentation() + ", use buttons to resolve:", spaceCannonButtons);
+                MessageHelper.sendMessageToChannelWithButtons(playerWithPds.getCorrectChannel(), title + playerWithPds.getRepresentationUnfogged()
+                    + " you have PDS coverage in " + tile.getRepresentation() + ", use buttons to resolve:", spaceCannonButtons);
             }
         } else {
             StartCombatService.sendSpaceCannonButtonsToThread(player.getCorrectChannel(), game, player, tile);
@@ -702,6 +701,19 @@ public class ButtonHelperTacticalAction {
         } else {
             if (player.hasAbility("awaken")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, game, game.getTileByPosition(pos), event);
+            }
+        }
+        if (player.hasAbility("plague_reservoir") && player.hasTech("dxa")) {
+            for (Planet planetUH : tile.getPlanetUnitHolders()) {
+                String planet = planetUH.getName();
+                if (player.getPlanetsAllianceMode().contains(planetUH.getName())) {
+                    String msg10 = player.getRepresentationUnfogged()
+                        + " when you get to the invasion step of the tactical action, you may have an opportunity to use Dacxive Animators on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". Only use this on one planet, per the plague reservoir ability.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
+                        ButtonHelper.getDacxiveButtons(planet, player));
+                }
             }
         }
 
