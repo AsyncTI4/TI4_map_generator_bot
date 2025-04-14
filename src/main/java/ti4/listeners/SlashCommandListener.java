@@ -1,9 +1,8 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -41,7 +40,8 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
-        ExecutorManager.runAsync("SlashCommandListener task: " + event.getFullCommandName(), gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorManager.runAsync("SlashCommandListener task " + event.getFullCommandName() + " for " + gameName,
+            gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static void process(SlashCommandInteractionEvent event) {
