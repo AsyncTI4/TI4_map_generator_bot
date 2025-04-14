@@ -1533,6 +1533,10 @@ public class Game extends GameProperties {
                 break;
             }
         }
+        return removeCustomPO(id);
+    }
+
+    public boolean removeCustomPO(String id) {
         if (!id.isEmpty()) {
             revealedPublicObjectives.remove(id);
             soToPoList.remove(id);
@@ -1816,6 +1820,10 @@ public class Game extends GameProperties {
                 break;
             }
         }
+        return addLaw(id, optionalText);
+    }
+
+    public boolean addLaw(String id, String optionalText) {
         if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);

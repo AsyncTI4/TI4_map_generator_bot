@@ -21,7 +21,7 @@ public class Source {
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, riftset,
+        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, riftset, omega_phase,
 
         // catchall
         other;

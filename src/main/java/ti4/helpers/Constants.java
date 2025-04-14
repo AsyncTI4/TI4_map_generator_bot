@@ -720,6 +720,10 @@ public class Constants {
     public static final String PEEK_AT_NEXT_OBJECTIVE = "peek_at_next_objective";
     public static final String PRINT_OMEGA_PHASE_RULES = "print_omega_phase_rules";
     public static final String PRIORITY_POSITION = "priority_position";
+    public static final String VOICE_OF_THE_COUNCIL_ID = "voice_of_the_council_omegaphase";
+    public static final String VOICE_OF_THE_COUNCIL_PO = "Voice of the Council";
+    public static final String RESET_VOICE_OF_THE_COUNCIL = "reset_voice_of_the_council";
+    public static final String ELECT_VOICE_OF_THE_COUNCIL = "elect_voice_of_the_council";
     //Omega Phase state keys
     public static final String PRIORITY_TRACK = "priority_track";
 
