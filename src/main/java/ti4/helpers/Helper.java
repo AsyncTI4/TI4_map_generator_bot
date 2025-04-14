@@ -79,6 +79,7 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
@@ -2340,10 +2341,11 @@ public class Helper {
             }
             buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
-                "# " + game.getPing() + fowGmPing(game) + " it appears as though " + player.getRepresentationNoPing()
+                "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
                     + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
                 buttons);
             if (game.isFowMode()) {
+                GMService.sendMessageToGMChannel(game, "# GAME HAS ENDED", true);
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), """
                     ## Note about FoW
                     When you press **End Game** all the game channels will be deleted immediately!
@@ -2358,16 +2360,6 @@ public class Helper {
                     titleButton);
             }
         }
-    }
-
-    private static String fowGmPing(Game game) {
-        if (game.isFowMode()) {
-            List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
-            if (!gmRoles.isEmpty()) {
-                return ", " + gmRoles.getFirst().getAsMention();
-            }
-        }
-        return "";
     }
 
     public static boolean mechCheck(String planetName, Game game, Player player) {
