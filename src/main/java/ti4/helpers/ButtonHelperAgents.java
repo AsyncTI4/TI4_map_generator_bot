@@ -985,8 +985,8 @@ public class ButtonHelperAgents {
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("ghotiATG", "Use Agent for 1 Trade Good"));
-            buttons.add(Buttons.gray("ghotiAProd", "Use Agent to Produce 2 Additional Units"));
+            buttons.add(Buttons.green("ghotiATG", "Get 1 Trade Good"));
+            buttons.add(Buttons.gray("ghotiAProd", "Produce 2 Additional Units"));
             buttons.add(Buttons.red("deleteButtons", "Delete This"));
             channel = p2.getCorrectChannel();
             message = p2.getRepresentationUnfogged()
@@ -1515,10 +1515,25 @@ public class ButtonHelperAgents {
     }
 
     @ButtonHandler("ghotiAProd")
-    public static void ghotiAgentForProduction(ButtonInteractionEvent event, Player player) {
+    public static void ghotiAgentForProduction(Game game, ButtonInteractionEvent event, Player player) {
         String msg = "Used " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Becece, the Ghoti"
             + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to gain the ability to produce 2 more units. ";
-        player.addSpentThing(msg);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
+        List<String> uniquePlaces = new ArrayList<>();
+        int count = 0;
+        String tilePos = "";
+        for (String unit : producedUnits.keySet()) {
+            tilePos = unit.split("_")[1];
+            String planetOrSpace = unit.split("_")[2];
+            if (!uniquePlaces.contains(tilePos + "_" + planetOrSpace)) {
+                uniquePlaces.add(tilePos + "_" + planetOrSpace);
+            }
+            count++;
+        }
+        if (count == 1) {
+            ButtonHelperHeroes.resolveArboHeroBuild(game, player, event, "arboHeroBuild_" + tilePos);
+        }
         ButtonHelper.deleteMessage(event);
     }
 

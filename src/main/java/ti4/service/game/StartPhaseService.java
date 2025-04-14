@@ -364,6 +364,9 @@ public class StartPhaseService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed.");
             return;
         }
+        if (!speaker.getSCs().isEmpty() && game.getRealPlayers().size() > 1) {
+            speaker = Helper.getSpeakerOrderFromThisPlayer(speaker, game).get(1);
+        }
         String message = speaker.getRepresentationUnfogged() + " is up to pick a strategy card.";
         game.updateActivePlayer(speaker);
         game.setPhaseOfGame("strategy");

@@ -917,7 +917,7 @@ public class AgendaHelper {
         }
         game.setLatestOutcomeVotedFor(outcome);
         game.setStoredValue("latestOutcomeVotedFor" + player.getFaction(), outcome);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
             getPlanetButtonsVersion2(event, player, game));
         ButtonHelper.deleteMessage(event);
     }
@@ -2685,13 +2685,22 @@ public class AgendaHelper {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                         if (NumberUtils.isDigits(vote)) {
                             totalVotes += Integer.parseInt(vote);
+
                         }
-                        outcomeSummaryBuilder.append(faction).append("-").append(vote).append(", ");
+                        outcomeSummaryBuilder.append(faction).append("-").append(vote);
+                        if (NumberUtils.isDigits(vote) && !game.isFowMode() && p2.hasTech("dskyrog")) {
+                            outcomeSummaryBuilder.append(" (Impressment Teams)");
+                        }
+                        if (!game.isFowMode() && p2.hasAbility("future_sight")) {
+                            outcomeSummaryBuilder.append(" (Future Sight)");
+                        }
+                        outcomeSummaryBuilder.append(", ");
                     } else {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
                         if (NumberUtils.isDigits(vote)) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummaryBuilder.append(faction).append(" voted ").append(vote).append(" votes. ");
+
                         } else {
                             outcomeSummaryBuilder.append(faction).append(" cast a ").append(vote).append(". ");
                         }
