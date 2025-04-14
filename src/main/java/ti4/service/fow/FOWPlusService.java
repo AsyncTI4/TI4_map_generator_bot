@@ -134,7 +134,7 @@ public class FOWPlusService {
             }
         }
         GMService.sendMessageToGMChannel(game, player.getRepresentation(true, false) 
-            + " lost " + unitEmojis + " (" + valueOfUnitsLost + " res) to The Void round " + game.getRound() + " turn " + player.getNumberOfTurns());
+            + " lost " + unitEmojis + " (" + valueOfUnitsLost + " res) to The Void round " + game.getRound() + " turn " + player.getNumberOfTurns(), true);
         game.resetCurrentMovedUnitsFrom1TacticalAction();
     }
 
