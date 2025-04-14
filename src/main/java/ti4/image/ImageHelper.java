@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
 
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
@@ -123,7 +122,7 @@ public class ImageHelper {
         try {
             return ImageIO.read(new File(filePath));
         } catch (IOException e) {
-            BotLogger.log("Failed to read image '" + filePath + "': " + Arrays.toString(e.getStackTrace()));
+            BotLogger.error("Failed to read image '" + filePath + "': ", e);
         }
         return null;
     }
@@ -132,7 +131,7 @@ public class ImageHelper {
         try {
             return ImageIO.read(inputStream);
         } catch (IOException e) {
-            BotLogger.log("Failed to read image: " + Arrays.toString(e.getStackTrace()));
+            BotLogger.error("Failed to read image: ", e);
         }
         return null;
     }
@@ -145,7 +144,7 @@ public class ImageHelper {
         try (InputStream inputStream = URI.create(imageURL).toURL().openStream()) {
             return readImage(inputStream);
         } catch (IOException e) {
-            BotLogger.log("Failed to read image URL'" + imageURL + "': " + Arrays.toString(e.getStackTrace()));
+            BotLogger.error("Failed to read image URL'" + imageURL + "': ", e);
         }
         return null;
     }

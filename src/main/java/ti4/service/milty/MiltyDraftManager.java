@@ -347,7 +347,7 @@ public class MiltyDraftManager {
         try {
             String drafted = player.getPing() + middle + switch (category) {
                 case "slice" -> "Slice " + item;
-                case "faction" -> Mapper.getFaction(item).getFactionTitle();
+                case "faction" -> Mapper.getFaction(item).getFactionTitle().replace("Keleres - Mentak", "Keleres");
                 case "order" -> StringHelper.ordinal(Integer.parseInt(item)) + " pick";
                 default -> "Error parsing milty button press: " + buttonID;
             } + "!";
@@ -358,10 +358,14 @@ public class MiltyDraftManager {
             MessageHelper.sendMessageToChannel(mainGameChannel, drafted);
         }
 
+        if (category.equals("faction") && item.contains("keleres")) {
+            MiltyService.offerKeleresSetupButtons(this, player);
+        }
+
         try {
             MiltyDraftHelper.buildPartialMap(game, event);
         } catch (Exception e) {
-            BotLogger.log("err", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "err", e);
         }
 
         setNextPlayerInDraft();

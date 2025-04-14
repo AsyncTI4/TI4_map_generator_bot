@@ -1,0 +1,17 @@
+{
+    "id": "br2",
+    "name": "Phar - Pharadn",
+    "aliases": [
+        "br2",
+        "phar",
+        "pharadn"
+    ],
+    "imagePath": "BR2_Phar.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": [
+        "phar"
+    ],
+    "source": "ds",
+    "tileBack": "green"
+}

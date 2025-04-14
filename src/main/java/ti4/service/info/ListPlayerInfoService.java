@@ -259,7 +259,7 @@ public class ListPlayerInfoService {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
                 if (secret) {
-                    if (game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
+                    if (game.didPlayerScoreThisAlready(player.getUserID(), objID) || game.didPlayerScoreThisAlready(player.getUserID(),Mapper.getSecretObjectivesJustNames().get(objID))) {
                         representation.append("✅  ");
                     } else {
                         if (getObjectiveThreshold(objID, game) > 0) {
@@ -544,7 +544,7 @@ public class ListPlayerInfoService {
                 for (String p : player.getPlanets()) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet == null) {
-                        BotLogger.log("Planet \"" + p + "\" not found for game " + game.getName());
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Planet \"" + p + "\" not found for game " + game.getName());
                     } else if (planet.isLegendary()) {
                         count++;
                     }
@@ -572,7 +572,7 @@ public class ListPlayerInfoService {
             }
             case "otf" -> {
                 int count = 0;
-                for (String p : player.getPlanets()) {
+                for (String p : player.getPlanetsAllianceMode()) {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet != null && planet.getUnitCount(Units.UnitType.Spacedock, player) < 1) {
                         count = Math.max(count, ButtonHelper.getNumberOfGroundForces(player, planet));

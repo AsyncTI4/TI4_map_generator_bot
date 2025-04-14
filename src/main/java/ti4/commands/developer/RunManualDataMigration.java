@@ -45,7 +45,7 @@ class RunManualDataMigration extends Subcommand {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName() + " but no changes were required.");
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            BotLogger.log("failed to run data migration", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "failed to run data migration", e);
         }
     }
 }

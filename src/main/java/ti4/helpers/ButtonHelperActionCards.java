@@ -541,31 +541,33 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who took the planet from you.", buttons);
     }
+
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
         String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to resolve parley on. If it's not present (because the opponent took it already), try pressing UNDO, then /planet add it back to yourself, then try again";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix()+"resolveParleyStep2_" + planet,
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "resolveParleyStep2_" + planet,
                 Helper.getPlanetRepresentation(planet, game)));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
+
     @ButtonHandler("resolveParleyStep2")
     public static void resolveParleyStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String message = player.getRepresentationUnfogged() + " parleyed the planet of "+Helper.getPlanetRepresentationNoResInf(planet, game);
+        String message = player.getRepresentationUnfogged() + " parleyed the planet of " + Helper.getPlanetRepresentationNoResInf(planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         Tile tile = game.getTileFromPlanet(planet);
-        if(tile != null){
+        if (tile != null) {
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             UnitHolder planetUnitHolder = unitHolders.get(planet);
             UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
             if (planetUnitHolder != null && spaceUnitHolder != null) {
                 Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
                 for (Player player_ : game.getPlayers().values()) {
-                    if(player_== player || player.getAllianceMembers().contains(player_.getFaction())){
+                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
                         continue;
                     }
                     String color = player_.getColor();
@@ -575,7 +577,7 @@ public class ButtonHelperActionCards {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey key = unitEntry.getKey();
                     Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
-                    if(player_== player || player.getAllianceMembers().contains(player_.getFaction())){
+                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
                         continue;
                     }
                     if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
@@ -1335,8 +1337,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0
-                || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+            if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 if (!game.getTileFromPlanet(planet).isHomeSystem()) {
                     Tile tile = game.getTileFromPlanet(planet);
                     buttons.add(Buttons.gray(
@@ -1858,7 +1859,7 @@ public class ButtonHelperActionCards {
         int hits = 0;
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(UnitEmojis.fighter + " rolled ");
-            int threshold = "action_deck_2".equals(game.getAcDeckID()) ? 7 : 6;
+            int threshold = 6;
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(threshold);
                 msg.append(d1.getResult()).append(", ");
@@ -2096,7 +2097,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String acName = buttonID.split("_")[1];
+        String acName = buttonID.replace("resolveReverse_","");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);

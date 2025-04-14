@@ -9,6 +9,7 @@ import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -41,4 +42,19 @@ class CombatButtonHandler {
             MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), opponent.getRepresentation() + " Your opponent has voted to automate the entire combat. Press to confirm:", automate);
         }
     }
+
+    @ButtonHandler("declinePDS_")
+    public static void declinePDS(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Tile tile = game.getTile(buttonID.split("_")[1]);
+        String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON" + (tile != null ? " at " + tile.getRepresentation() : "");
+        if (game.isFowMode()) {
+            String targetFaction = buttonID.split("_")[2];
+            Player target = game.getPlayerFromColorOrFaction(targetFaction);
+            if (target != null) {
+                MessageHelper.sendMessageToChannel(target.getCorrectChannel(), target.getRepresentationUnfogged() + " " + msg);
+            }
+        }
+        MessageHelper.sendMessageToChannel(game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg); 
+    }
+
 }

@@ -17,7 +17,7 @@ public enum FactionEmojis implements TI4Emoji {
     // Discordant Stars
     augers, axis, bentor, celdauri, cheiran, cymiae, dihmohn, edyn, florzen, freesystems, ghemina, //
     ghoti, gledge, khrask, kjalengard, kollecc, kolume, kortali, kyro, lanefir, lizho, mirveda, mortheus, //
-    mykomentori, nivyn, nokar, olradin, rohdhna, tnelis, vaden, vaylerian, veldyr, zealots, zelian, //
+    mykomentori, nivyn, nokar, olradin, rohdhna, tnelis, vaden, vaylerian, veldyr, zealots, zelian, uydai, pharadn, //
 
     // Franken
     Franken1, Franken2, Franken3, Franken4, Franken5, Franken6, Franken7, Franken8, //
@@ -114,7 +114,8 @@ public enum FactionEmojis implements TI4Emoji {
             case "veldyr" -> veldyr;
             case "zealots" -> zealots;
             case "zelian" -> zelian;
-
+            case "uydai" -> uydai;
+            case "pharadn" -> pharadn;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
 

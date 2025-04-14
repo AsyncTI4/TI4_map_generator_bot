@@ -73,6 +73,7 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -232,6 +233,7 @@ public class Player extends PlayerProperties {
         }
         addSpentThing("tg_" + newTgSpent);
     }
+
     public void increaseSarweenCount(int amount) {
         int oldTgSpent = getSpentTgsThisWindow();
         int newTgSpent = oldTgSpent + amount;
@@ -320,7 +322,7 @@ public class Player extends PlayerProperties {
     public boolean hasInf2Tech() {// "dszeliinf"
         return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2")
             || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2")
-            || getTechs().contains("dszeliinf");
+            || getTechs().contains("dszeliinf") || getUnitsOwned().contains("pharadn_infantry") || getUnitsOwned().contains("pharadn_infantry2");
     }
 
     @JsonIgnore
@@ -383,7 +385,7 @@ public class Player extends PlayerProperties {
             actionsChannel = game.getMainGameChannel();
         }
         if (actionsChannel == null) {
-            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: " + game.getName());
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game, or community game private channel not set: " + game.getName());
             return null;
         }
 
@@ -424,7 +426,7 @@ public class Player extends PlayerProperties {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: " + getCardsInfoThreadID() + " for potential thread name: " + threadName, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(this), "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using ID: " + getCardsInfoThreadID() + " for potential thread name: " + threadName, e);
         }
 
         // ATTEMPT TO FIND BY NAME
@@ -448,7 +450,7 @@ public class Player extends PlayerProperties {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(this), "`Player.getCardsInfoThread`: Could not find existing #cards-info thread using name: " + threadName, e);
         }
 
         // CREATE NEW THREAD
@@ -649,7 +651,7 @@ public class Player extends PlayerProperties {
                     + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType()
                     + "`\n> Units Owned: `"
                     + getUnitsOwned() + "`";
-                BotLogger.log(message);
+                BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
                 return message;
             }
         }
@@ -1253,7 +1255,7 @@ public class Player extends PlayerProperties {
             return null;
         FactionModel factionSetupInfo = Mapper.getFaction(getFaction());
         if (factionSetupInfo == null) {
-            BotLogger.log("Could not get faction setup info for: " + getFaction());
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "Could not get faction setup info for: " + getFaction());
             return null;
         }
         return factionSetupInfo;
@@ -1497,7 +1499,7 @@ public class Player extends PlayerProperties {
                         }
                     }
                 } catch (Exception e) {
-                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + game.getName() + "  player="
+                    BotLogger.error("`Player.getPublicVictoryPoints   map=" + game.getName() + "  player="
                         + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
                 }
             }
@@ -2035,6 +2037,10 @@ public class Player extends PlayerProperties {
         String label = fow_customLabels.get(position);
         if (label == null)
             label = "";
+
+        if (FOWPlusService.hideFogTile(tileID, label, game)) {
+            return null;
+        }
 
         return new Tile(tileID, position, player, true, label);
     }

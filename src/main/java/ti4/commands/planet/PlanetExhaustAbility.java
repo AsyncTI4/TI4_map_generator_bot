@@ -80,6 +80,12 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Use buttons to drop 2 infantry on a planet.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
             }
+            case "uikos" -> {
+                int comms = player.getHarvestCounter();
+                player.setHarvestCounter(0);
+                player.setCommodities(Math.min(player.getCommoditiesTotal(), player.getCommodities() + comms));
+                MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " + player.getCommodities() + " commodities (from the " + comms + " that were on the card)");
+            }
             case "mirage" -> {
                 output = "Use buttons to put 2 fighters with your ships.";
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));

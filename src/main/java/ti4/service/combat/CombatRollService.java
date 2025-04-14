@@ -1,5 +1,7 @@
 package ti4.service.combat;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,12 +12,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -44,9 +48,8 @@ import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @UtilityClass
 public class CombatRollService {
@@ -175,6 +178,11 @@ public class CombatRollService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        if (game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence && isFoWPrivateChannelRoll(player, event)) {
+            //If roll was from pds button in private channel, send the result to the target
+            MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " " + FOWCombatThreadMirroring.parseCombatRollMessage(message).replace("Someone", player.getRepresentationNoPing()));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Roll result was sent to " + opponent.getRepresentationNoPing());
+        }
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName, "Roll Thalnos", ExploreEmojis.Relic);
             Button decline = Buttons.gray("editMessage_" + player.getFactionEmoji() + " declined Thalnos", "Decline");
@@ -296,9 +304,10 @@ public class CombatRollService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
         }
-        if (!game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != player) {
+        if ((!game.isFowMode() || isFoWPrivateChannelRoll(player, event)) && rollType == CombatRollType.SpaceCannonOffence && h > 0 && opponent != player) {
+            MessageChannel channel = isFoWPrivateChannelRoll(player, event) ? opponent.getCorrectChannel() : event.getMessageChannel();
             String msg = "\n" + opponent.getRepresentation(true, true, true, true) + " suffered " + h + " hit" + (h == 1 ? "" : "s") + " from SPACE CANNON against your ships.";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            MessageHelper.sendMessageToChannel(channel, msg);
             List<Button> buttons = new ArrayList<>();
             String finChecker = "FFCC_" + opponent.getFaction() + "_";
             buttons.add(Buttons.green(finChecker + "autoAssignSpaceCannonOffenceHits_" + tile.getPosition() + "_" + h, "Auto-assign Hit" + (h == 1 ? "" : "s")));
@@ -306,7 +315,7 @@ public class CombatRollService {
             buttons.add(Buttons.gray(finChecker + "cancelPdsOffenseHits_" + tile.getPosition() + "_" + h, "Cancel a Hit"));
             String msg2 = opponent.getRepresentationNoPing() + ", you may automatically assign " + (h == 1 ? "the hit" : "hits") + "."
                 + ButtonHelperModifyUnits.autoAssignSpaceCombatHits(opponent, game, tile, h, event, true, true);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(channel, msg2, buttons);
         }
         if (!game.isFowMode() && rollType == CombatRollType.bombardment && h > 0) {
             List<Button> buttons = new ArrayList<>();
@@ -344,6 +353,11 @@ public class CombatRollService {
 
         }
         return h;
+    }
+
+    //This roll was made from fow private channel and not from a combat thread
+    private static boolean isFoWPrivateChannelRoll(Player player, GenericInteractionCreateEvent event) {
+        return event.getMessageChannel().equals(player.getPrivateChannel());
     }
 
     public static String rollForUnits(

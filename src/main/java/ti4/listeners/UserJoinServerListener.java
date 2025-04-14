@@ -42,7 +42,7 @@ public class UserJoinServerListener extends ListenerAdapter {
         try {
             checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
         } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
+            BotLogger.error("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
         }
     }
 

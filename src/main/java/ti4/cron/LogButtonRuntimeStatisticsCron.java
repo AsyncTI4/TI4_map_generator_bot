@@ -16,9 +16,9 @@ public class LogButtonRuntimeStatisticsCron {
     private static void logButtonRuntimeStatistics() {
         try {
             String buttonProcessingStatistics = ButtonProcessor.getButtonProcessingStatistics();
-            BotLogger.log(buttonProcessingStatistics);
+            BotLogger.info(buttonProcessingStatistics);
         } catch (Exception e) {
-            BotLogger.log("**LogButtonRuntimeStatisticsCron failed.**", e);
+            BotLogger.error("**LogButtonRuntimeStatisticsCron failed.**", e);
         }
     }
 }

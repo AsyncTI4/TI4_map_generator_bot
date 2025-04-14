@@ -92,7 +92,7 @@
         "name": "Lucky Shot",
         "phase": "Action",
         "window": "Action",
-        "text": "Destroy another player's dreadnought, cruiser, or destroyer in a system that contains a planet you control.",
+        "text": "Destroy another player's dreadnought, cruiser, or destroyer in a system that contains a planet you control. [Note: This card cannot be played to no effect]",
         "automationID": "lucky",
         "source": "project_pi"
     },

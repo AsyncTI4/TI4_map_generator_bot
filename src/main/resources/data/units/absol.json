@@ -183,7 +183,7 @@
         "capacityValue": 5,
         "fleetSupplyBonus": 1,
         "isStructure": true,
-        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 5 fighters in this system do not count against your ships' capacity.",
+        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 5 fighters in this system do not count against your ships' capacity.1 non-fighter ship in this system does not count against your fleet pool",
         "homebrewReplacesID": "spacedock2",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/absol/SpaceDockII.png?raw=true"
     },
@@ -590,7 +590,7 @@
     {
         "id": "absol_cabal_spacedock2Alt",
         "baseType": "spacedock",
-        "asyncId": "csd",
+        "asyncId": "sd",
         "name": "Dimensional Tear II",
         "upgradesFromUnitId": "cabal_spacedock",
         "requiredTechId": "absol_dt2",

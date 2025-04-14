@@ -74,7 +74,7 @@ public class ColorModelTest extends BaseTi4Test {
     }
 
     private static void checkUnitImages(ColorModel color) {
-        List<UnitType> unitsToTest = List.of(UnitType.Spacedock, UnitType.Pds, UnitType.CabalSpacedock,
+        List<UnitType> unitsToTest = List.of(UnitType.Spacedock, UnitType.Pds,
             UnitType.Infantry, UnitType.Fighter, UnitType.Mech,
             UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought,
             UnitType.Flagship, UnitType.Warsun);

@@ -911,8 +911,7 @@
         "faction": "argent",
         "source": "absol",
         "text": "Other players cannot move ships through systems that contain your structures.\nEach planet that contains 1 or more of your structures gains the PRODUCTION X ability as if it were a unit, where X is the number of structures on that planet.",
-        "homebrewReplacesID": "ah",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/AerieHololattice.png?raw=true"
+        "homebrewReplacesID": "ah"
     },
     {
         "alias": "absol_swa2",

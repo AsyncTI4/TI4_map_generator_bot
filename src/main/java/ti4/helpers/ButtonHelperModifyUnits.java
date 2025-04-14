@@ -48,7 +48,7 @@ public class ButtonHelperModifyUnits {
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
         int sustains = 0;
         Player mentak = Helper.getPlayerFromUnit(game, "mentak_mech");
-        if (mentak != null && mentak != player && !space && unitHolder.getUnitCount(UnitType.Mech, mentak.getColor()) > 0) {
+        if (mentak != null && mentak != player && !space && unitHolder.getUnitCount(UnitType.Mech, mentak.getColor()) > 0 && !game.getLaws().containsKey("articles_war")) {
             return 0;
         }
         Player mentakFS = Helper.getPlayerFromUnit(game, "mentak_flagship");
@@ -790,8 +790,7 @@ public class ButtonHelperModifyUnits {
             if (p2 == player) {
                 continue;
             }
-            sdAmount = uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) + sdAmount
-                + uH.getUnitCount(UnitType.Spacedock, p2.getColor());
+            sdAmount += uH.getUnitCount(UnitType.Spacedock, p2.getColor());
             if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 RemoveUnitService.removeUnits(event, game.getTileFromPlanet(uH.getName()), game, p2.getColor(), sdAmount + " sd " + uH.getName());
                 RemoveUnitService.removeUnits(event, game.getTileFromPlanet(uH.getName()), game, p2.getColor(), sdAmount + " csd " + uH.getName());
@@ -1422,7 +1421,7 @@ public class ButtonHelperModifyUnits {
                     }
                 }
                 if (!hasConstruction && ("action".equalsIgnoreCase(game.getPhaseOfGame())
-                    || game.getCurrentAgendaInfo().contains("Strategy"))
+                    || game.getCurrentAgendaInfo().contains("Strategy")) && !game.getStrategyCardSet().getAlias().toLowerCase().contains("anarchy")
                     && !ButtonHelper.isPlayerElected(game, player, "absol_minsindus")) {
                     tile = TileHelper.getTile(event, planetName, game);
                     String msg = playerRep + " placed 1 command token from reinforcements in the "
@@ -1465,7 +1464,7 @@ public class ButtonHelperModifyUnits {
                 event.getMessage().delete().queue();
             } else {
                 event.getMessage().editMessage(Helper.buildProducedUnitsMessage(player, game)).queue(
-                    null, (error) -> BotLogger.log(MessageHelper.getRestActionFailureMessage(event.getMessageChannel(), "Failed to edit message", null, error)));
+                    null, (error) -> BotLogger.error(new BotLogger.LogMessageOrigin(event, player), MessageHelper.getRestActionFailureMessage(event.getMessageChannel(), "Failed to edit message", null, error), error));
             }
         }
         if ("sd".equalsIgnoreCase(unitID)) {
@@ -1666,10 +1665,12 @@ public class ButtonHelperModifyUnits {
         } else {
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();
-                orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
-                orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Decline"));
+                if (player.hasUnit("sol_mech") && !ButtonHelper.isLawInPlay(game, "regulations") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                    orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
+                }
+                orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Finish Orbital Drop"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-                    ", you may pay 3 resources to drop a mech on the planet too", orbFollowUp);
+                    ", you may pay 3 resources to drop a mech on the planet too (if applicable)", orbFollowUp);
             }
         }
 
@@ -2322,7 +2323,7 @@ public class ButtonHelperModifyUnits {
 
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(game, targetPlayer,
-            Units.UnitType.Spacedock, Units.UnitType.CabalSpacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
+            Units.UnitType.Spacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
         for (Tile tile : tiles) {
             Button tileButton = Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling",
                 tile.getRepresentationForButtons(game, targetPlayer));

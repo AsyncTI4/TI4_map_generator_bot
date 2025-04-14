@@ -22,7 +22,9 @@ public class FOWOptionService {
         HIDE_TOTAL_VOTES("Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER("Hide voting order", "Hide player colors from vote order"),
         HIDE_PLAYER_NAMES("Hide real names", "Completely hide player Discord names on the map"),
-        
+        STATUS_SUMMARY("Status summary", "Prints explores info as summary thread in status homework"),
+        FOW_PLUS("Extra Dark Mode", "Hello darkness my old friend... WIP"),
+
         //Hidden from normal options
         RIFTSET_MODE("RiftSet Mode", "For Eronous to run fow300", false);
 

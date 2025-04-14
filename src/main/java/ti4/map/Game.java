@@ -1,6 +1,9 @@
 package ti4.map;
 
-import java.awt.*;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
+
+import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -21,6 +24,10 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,6 +35,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -40,9 +48,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -85,12 +90,10 @@ import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
-
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
 
@@ -300,7 +303,7 @@ public class Game extends GameProperties {
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we can even see private fields.
-                    BotLogger.log("Unknown error exporting fields from Game.", e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(this), "Unknown error exporting fields from Game.", e);
                 }
             }
         }
@@ -345,7 +348,7 @@ public class Game extends GameProperties {
                     JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
                     miltySettings = new MiltySettings(this, json);
                 } catch (Exception e) {
-                    BotLogger.log("Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(), e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(this), "Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(), e);
                     MessageHelper.sendMessageToChannel(getActionsChannel(), "Milty draft settings failed to load. Resetting to default.");
                     miltySettings = new MiltySettings(this, null);
                 }
@@ -631,7 +634,7 @@ public class Game extends GameProperties {
         if (botChannels.size() == 1) {
             return botChannels.getFirst();
         } else if (botChannels.size() > 1) {
-            BotLogger.log(getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
             return botChannels.getFirst();
         }
 
@@ -2124,6 +2127,52 @@ public class Game extends GameProperties {
         return false;
     }
 
+    public boolean putAgendaBottom(String id) {
+        if (!id.isEmpty()) {
+            getAgendas().remove(id);
+            getAgendas().add(id);
+            sentAgendas.remove(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putExploreBottom(String id) {
+        if (!id.isEmpty()) {
+            explore.remove(id);
+            explore.add(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putRelicBottom(String id) {
+        if (!id.isEmpty()) {
+            relics.remove(id);
+            relics.add(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putACBottom(String id) {
+        if (!id.isEmpty()) {
+            getActionCards().remove(id);
+            getActionCards().add(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putSOBottom(String id) {
+        if (!id.isEmpty()) {
+            getSecretObjectives().remove(id);
+            getSecretObjectives().add(id);
+            return true;
+        }
+        return false;
+    }
+
     @Nullable
     public Entry<String, Integer> drawAgenda() {
         if (!getAgendas().isEmpty()) {
@@ -2368,7 +2417,7 @@ public class Game extends GameProperties {
         if (deck.isEmpty()) {
             shuffleDiscardsIntoExploreDeck(reqType);
             deck = getExplores(reqType, explore);
-            BotLogger.log("Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
                 + " deck was empty, shuffling discards into deck.");
         } // end of migration code
 
@@ -2569,17 +2618,16 @@ public class Game extends GameProperties {
 
     @Nullable
     public Map<String, Integer> drawSpecificSecretObjective(String soID, String userID) {
-        if (!getSecretObjectives().isEmpty()) {
-            boolean remove = removeSOFromGame(soID);
-            if (remove) {
-                Player player = getPlayer(userID);
-                if (player != null) {
-                    player.setSecret(soID);
-                    return player.getSecrets();
-                }
-            }
+        boolean isRemoved = removeSOFromGame(soID);
+        if (!isRemoved) {
+            return null;
         }
-        return null;
+        Player player = getPlayer(userID);
+        if (player == null) {
+            return null;
+        }
+        player.setSecret(soID);
+        return player.getSecrets();
     }
 
     public void drawSpecificActionCard(String acID, String userID) {
@@ -3154,7 +3202,8 @@ public class Game extends GameProperties {
 
     public Tile getTileByPosition(String position) {
         if (position == null) return null;
-        return tileMap.get(position);
+        Tile tile = tileMap.get(position);
+        return tile == null && FOWPlusService.isActive(this) ? FOWPlusService.voidTile(position) : tile;
     }
 
     public boolean isTileDuplicated(String tileID) {
@@ -3414,7 +3463,7 @@ public class Game extends GameProperties {
 
         // Find duplicate PNs - PNs that are in multiple players' hands or play areas
         if (!Helper.findDuplicateInList(allPlayerHandPromissoryNotes).isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
                 + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
 
@@ -3424,7 +3473,7 @@ public class Game extends GameProperties {
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (!unOwnedPromissoryNotes.isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
                 + unOwnedPromissoryNotes + "`");
             getPurgedPN().removeAll(unOwnedPromissoryNotes);
         }
@@ -3435,7 +3484,7 @@ public class Game extends GameProperties {
             for (String pnID : pns) {
                 if (unOwnedPromissoryNotes.contains(pnID)) {
                     player.removePromissoryNote(pnID);
-                    BotLogger.log("`" + getName() + "`: removed promissory note `" + pnID + "` from player `"
+                    BotLogger.info("`" + getName() + "`: removed promissory note `" + pnID + "` from player `"
                         + player.getUserName() + "` because nobody 'owned' it");
                 }
             }
@@ -3445,7 +3494,7 @@ public class Game extends GameProperties {
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (!missingPromissoryNotes.isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
             for (Player player : getPlayers().values()) {
                 PromissoryNoteHelper.checkAndAddPNs(this, player);
             }
@@ -4228,5 +4277,13 @@ public class Game extends GameProperties {
             teamMateIDs.remove(player.getUserID());
         }
         return teamMateIDs;
+    }
+
+    public List<String> peekAtSecrets(int count) {
+        var peekedSecrets = new ArrayList<String>();
+        for (int i = 0; i < count && i < getSecretObjectives().size(); i++) {
+            peekedSecrets.add(getSecretObjectives().get(i));
+        }
+        return peekedSecrets;
     }
 }

@@ -43,7 +43,7 @@ public class WebHelper {
         try (InputStream input = new FileInputStream(Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
             webProperties.load(input);
         } catch (IOException e) {
-            BotLogger.log("Could not load web properties.", e);
+            BotLogger.error("Could not load web properties.", e);
         }
     }
 
@@ -65,11 +65,11 @@ public class WebHelper {
 
             httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .exceptionally(e -> {
-                    BotLogger.log("An exception occurred while performing an async send of game data to the website.", e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(game), "An exception occurred while performing an async send of game data to the website.", e);
                     return null;
                 });
         } catch (IOException e) {
-            BotLogger.log("Could not put data to web server", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
     }
 
@@ -88,11 +88,11 @@ public class WebHelper {
 
             s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
                 .exceptionally(e -> {
-                    BotLogger.log("An exception occurred while performing an async send of overlay data to the website.", e);
+                    BotLogger.error("An exception occurred while performing an async send of overlay data to the website.", e);
                     return null;
                 });
         } catch (Exception e) {
-            BotLogger.log("Could not put overlay to web server", e);
+            BotLogger.error("Could not put overlay to web server", e);
         }
     }
 
@@ -113,14 +113,14 @@ public class WebHelper {
                     payloads.add(new GameStatsDashboardPayload(game));
                 } catch (Exception e) {
                     badGames.add(managedGame.getName());
-                    BotLogger.log("Failed to create GameStatsDashboardPayload for game: `" + managedGame.getName() + "`", e);
+                    BotLogger.error("Failed to create GameStatsDashboardPayload for game: `" + managedGame.getName() + "`", e);
                 }
             }
         }
 
         String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of " + payloads.size() + " games are being uploaded to the web server.";
         if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
-        BotLogger.log(message);
+        BotLogger.info(message);
 
         try {
             String json = objectMapper.writeValueAsString(payloads);
@@ -133,11 +133,11 @@ public class WebHelper {
 
             s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
                 .exceptionally(e -> {
-                    BotLogger.log("An exception occurred while performing an async send of game stats to the website.", e);
+                    BotLogger.error("An exception occurred while performing an async send of game stats to the website.", e);
                     return null;
                 });
         } catch (Exception e) {
-            BotLogger.log("Could not put statistics to web server", e);
+            BotLogger.error("Could not put statistics to web server", e);
         }
     }
 
@@ -166,13 +166,13 @@ public class WebHelper {
                 .build();
             s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(imageBytes))
                 .exceptionally(e -> {
-                    BotLogger.log("An exception occurred while performing an async send of the game image to the website.", e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(player), "An exception occurred while performing an async send of the game image to the website.", e);
                     return null;
                 });
         } catch (SdkClientException e) {
-            BotLogger.log("Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
-            BotLogger.log("Could not add image for game `" + gameName + "` to web server", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not add image for game `" + gameName + "` to web server", e);
         }
     }
 }

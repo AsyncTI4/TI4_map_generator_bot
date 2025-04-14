@@ -18,7 +18,7 @@ public class RemoveCommandCounterService {
 
     public static void fromTile(GenericInteractionCreateEvent event, Player player, Tile tile) {
         if (player == null) {
-            BotLogger.log("Player cannot be found for removing command counter");
+            BotLogger.warning(new BotLogger.LogMessageOrigin(event), "Player cannot be found for removing command counter");
             return;
         }
         fromTile(event, player.getColor(), tile, player.getGame());
@@ -32,7 +32,7 @@ public class RemoveCommandCounterService {
         }
         if (game.isFowMode()) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a command token in the system.");
+            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " command token has been removed from the system.");
         }
         tile.removeCC(ccID);
     }

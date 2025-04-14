@@ -893,7 +893,7 @@
         "name": "Unstable Planet",
         "phase": "Action",
         "window": "Action",
-        "text": "Choose 1 hazardous planet. Exhaust that planet and destroy up to 3 infantry on it. [Note: You can use this on an exhausted planet and still kill the infantry]",
+        "text": "Choose 1 hazardous planet. Exhaust that planet and destroy up to 3 infantry on it. [Note: You can use this on an exhausted planet and still kill the infantry. Also note you dont have to kill any infantry. No targetting your own planet though]",
         "automationID": "unstable",
         "flavorText": "Another quake shook the planet, and a wave of dirt and rock rose up to swallow the Tekklar legion.",
         "source": "base"
