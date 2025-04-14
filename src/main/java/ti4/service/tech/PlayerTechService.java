@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperActionCards;
@@ -82,6 +84,11 @@ public class PlayerTechService {
         if (tech.contains("dskortg")) {
             pos = tech.split("_")[1];
             tech = "dskortg";
+        }
+        String inf = "";
+        if (tech.contains("_inf") && tech.contains("absol_aida")) {
+            tech = tech.replace("_inf", "");
+            inf = "inf";
         }
         TechnologyModel techModel = Mapper.getTech(tech);
         if (!player.getTechs().contains(tech)) {
@@ -201,7 +208,10 @@ public class PlayerTechService {
                     } else {
                         player.addSpentThing(tech);
                     }
-                    String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
+                    if (inf.isEmpty()) {
+                        inf = "res";
+                    }
+                    String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, inf);
                     buttonEvent.getMessage().editMessage(exhaustedMessage).queue();
                 }
             }
@@ -233,6 +243,22 @@ public class PlayerTechService {
                 String message = player.getRepresentationUnfogged() + ", please choose who you wish to target with _Mageon Implants_.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
+            }
+            case "dsuydag" -> {
+                deleteIfButtonEvent(event);
+                ActionCardHelper.doRise(player, event, game);
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+                Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+                buttons.add(doneExhausting);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Click the names of the planets you wish to exhaust to pay the required " + player.getPlanetsAllianceMode().size() + " influence.", buttons);
+                sendNextActionButtonsIfButtonEvent(event, game, player);
+            }
+            case "dsuydab" -> {
+                game.setDominusOrb(true);
+                ButtonHelper.deleteMessage(event);
+                String message = "Choose a system to move from.";
+                List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
             }
             case "dsaxisy" -> {
                 deleteIfButtonEvent(event);
@@ -317,8 +343,7 @@ public class PlayerTechService {
             case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>();
-                List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player,
-                    Units.UnitType.Spacedock, Units.UnitType.CabalSpacedock, Units.UnitType.PlenaryOrbital));
+                List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Spacedock, Units.UnitType.PlenaryOrbital));
                 if (player.hasUnit("ghoti_flagship")) {
                     tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship));
                 }
@@ -393,7 +418,7 @@ public class PlayerTechService {
         String techID = StringUtils.substringAfter(buttonID, "getTech_");
         techID = AliasHandler.resolveTech(techID);
         if (!Mapper.isValidTech(techID)) {
-            BotLogger.log(event, "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
+            BotLogger.warning(new BotLogger.LogMessageOrigin(event), "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
             return;
         }
         TechnologyModel techM = Mapper.getTech(techID);
@@ -540,7 +565,11 @@ public class PlayerTechService {
             buttons.add(aiDEVButton);
         }
         if (techM.isUnitUpgrade() && player.hasTechReady("absol_aida")) {
-            Button aiDEVButton = Buttons.red("exhaustTech_absol_aida", "Exhaust AI Development Algorithm");
+            String inf = "";
+            if (payType.equalsIgnoreCase("inf")) {
+                inf = "_inf";
+            }
+            Button aiDEVButton = Buttons.red("exhaustTech_absol_aida" + inf, "Exhaust AI Development Algorithm");
             buttons.add(aiDEVButton);
         }
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {

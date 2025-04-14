@@ -48,14 +48,26 @@ public class FrankenDraft extends BagDraft {
         return "franken";
     }
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral" };
+    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "pharadn" };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
+        String[] results = game.getStoredValue("bannedFactions").split("finSep");
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
+        factionSet.removeIf(factionModel -> contains(results, factionModel.getAlias()));
+
         return factionSet;
+    }
+
+    public static boolean contains(String[] array, String target) {
+        for (String str : array) {
+            if (str.equalsIgnoreCase(target)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static List<FactionModel> getAllFrankenLegalFactions() {
@@ -115,7 +127,7 @@ public class FrankenDraft extends BagDraft {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
                     }
                 }
             }

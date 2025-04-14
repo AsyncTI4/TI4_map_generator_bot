@@ -25,7 +25,7 @@ public class TechSummaryCron {
 
     private static void postTechSummaries(TechSummariesMetadataManager.TechSummaries techSummaries) {
         if (techSummaries == null) {
-            BotLogger.log("Unable to run TechSummaryCron: TechSummary was unavailable.");
+            BotLogger.warning("Unable to run TechSummaryCron: TechSummary was unavailable.");
             return;
         }
         techSummaries.gameNameToTechSummary().entrySet()
@@ -46,7 +46,7 @@ public class TechSummaryCron {
             postTechSummary(managedGame.getGame(), techSummaries);
             return true;
         } catch (Exception e) {
-            BotLogger.log("TechSummaryCron failed for game: " + gameName, e);
+            BotLogger.error("TechSummaryCron failed for game: " + gameName, e);
             return false;
         }
     }

@@ -30,6 +30,8 @@ import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
+import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.game.GameNameService;
 
 public class FoWHelper {
@@ -217,6 +219,9 @@ public class FoWHelper {
     }
 
     public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow, boolean includeTile) {
+        if (FOWPlusService.isVoid(game, position)) 
+            return new HashSet<>();
+
         Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
 
         List<String> adjacentCustomTiles = game.getCustomAdjacentTiles().get(position);
@@ -848,23 +853,23 @@ public class FoWHelper {
             }
             successfulCount += success ? 1 : 0;
         }
-        feedbackMessage(event, successfulCount, players.size());
+        feedbackMessage(game, successfulCount, players.size());
     }
 
     /** This will ping all players */
     public static void pingAllPlayers(Game game, GenericInteractionCreateEvent event, String message) {
         int succesfulCount = 0;
 
-        for (Player player_ : game.getPlayers().values()) {
+        for (Player player_ : game.getRealPlayers()) {
             String playerMessage = player_.getRepresentation() + " all player ping\n>>> " + message;
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
             succesfulCount += success ? 1 : 0;
         }
-        feedbackMessage(event, succesfulCount, game.getPlayers().size());
+        feedbackMessage(game, succesfulCount, game.getRealPlayers().size());
     }
 
     public static void pingAllPlayersWithFullStats(Game game, GenericInteractionCreateEvent event, Player playerWithChange, String message) {
-        var playersToPing = game.getPlayers().values().stream()
+        var playersToPing = game.getRealPlayers().stream()
             .filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
             .collect(Collectors.toSet());
         int succesfulCount = 0;
@@ -874,14 +879,14 @@ public class FoWHelper {
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, playerMessage);
             succesfulCount += success ? 1 : 0;
         }
-        feedbackMessage(event, succesfulCount, playersToPing.size());
+        feedbackMessage(game, succesfulCount, playersToPing.size());
     }
 
     public static void pingPlayersDifferentMessages(Game game, GenericInteractionCreateEvent event, Player playerWithChange, String messageForFullInfo, String messageForAll) {
-        Set<Player> playersWithVisiblity = game.getPlayers().values().stream()
+        Set<Player> playersWithVisiblity = game.getRealPlayers().stream()
             .filter(viewer -> initializeAndCheckStatVisibility(game, playerWithChange, viewer))
             .collect(Collectors.toSet());
-        Set<Player> playersWithoutVisiblity = game.getPlayers().values().stream()
+        Set<Player> playersWithoutVisiblity = game.getRealPlayers().stream()
             .filter(player -> !playersWithVisiblity.contains(player) && player != playerWithChange)
             .collect(Collectors.toSet());
         int succesfulCount = 0;
@@ -892,12 +897,10 @@ public class FoWHelper {
             succesfulCount += success ? 1 : 0;
         }
         for (Player player_ : playersWithoutVisiblity) {
-            if (!player_.isRealPlayer())
-                continue;
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, messageForAll);
             succesfulCount += success ? 1 : 0;
         }
-        feedbackMessage(event, succesfulCount, totalPings);
+        feedbackMessage(game, succesfulCount, totalPings);
     }
 
     public static void pingPlayersTransaction(
@@ -912,7 +915,7 @@ public class FoWHelper {
         int attemptCount = 0;
         // iterate through the player list. this may result in some extra pings, we'll
         // sort that out later
-        for (Player player_ : game.getPlayers().values()) {
+        for (Player player_ : game.getRealPlayers()) {
             if ("null".equals(player_.getColor()))
                 continue;
             if (player_ == sendingPlayer || player_ == receivingPlayer)
@@ -945,13 +948,12 @@ public class FoWHelper {
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, game, message);
             successCount += success ? 1 : 0;
         }
-        feedbackMessage(event, successCount, attemptCount);
+        feedbackMessage(game, successCount, attemptCount);
     }
 
-    private static void feedbackMessage(GenericInteractionCreateEvent event, int success, int total) {
+    private static void feedbackMessage(Game game, int success, int total) {
         if (success < total) {
-            MessageHelper.replyToMessage(event,
-                "One more more pings failed to send.  Please follow up with game's GM.");
+            GMService.sendMessageToGMChannel(game, "One more more pings failed to send. Please check private channels are set up correctly.");
         }
     }
 

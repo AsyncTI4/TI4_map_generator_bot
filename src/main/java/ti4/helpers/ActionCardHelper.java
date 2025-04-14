@@ -63,8 +63,8 @@ public class ActionCardHelper {
 
     private static String getTrapCardInfo(Player player) {
         StringBuilder sb = new StringBuilder();
-        sb.append("_ _\n");
-        sb.append("**Trap Cards:**").append("\n");
+        sb.append("\n");
+        sb.append("Trap Cards:").append("\n");
         int index = 1;
         Map<String, Integer> trapCards = player.getTrapCards();
         Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
@@ -74,7 +74,7 @@ public class ActionCardHelper {
             } else {
                 for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
                     Integer value = trapCard.getValue();
-                    sb.append(index++).append("\\. ").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    sb.append(index++).append(". ").append(Helper.leftpad("(" + value, 4)).append(")`");
                     sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
                 }
             }
@@ -94,7 +94,7 @@ public class ActionCardHelper {
             if (representation == null) {
                 representation = planet;
             }
-            sb.append(" **__Planet: ").append(representation).append("**__");
+            sb.append("\n> Planet: ").append(representation).append("");
         }
         sb.append("\n");
         return sb.toString();
@@ -895,7 +895,7 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, player.getRepresentation(false,true)
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, (game.isFowMode() ? "" : player.getRepresentation(false, true))
                         + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
                 }
                 if (automationID.equals("hack")) {
@@ -1236,7 +1236,6 @@ public class ActionCardHelper {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 // player has a space dock in the system
                 int numSd = unitHolder.getUnitCount(Units.UnitType.Spacedock, colorID);
-                numSd += unitHolder.getUnitCount(Units.UnitType.CabalSpacedock, colorID);
                 numSd += unitHolder.getUnitCount(Units.UnitType.PlenaryOrbital, colorID);
                 if (numSd > 0) {
                     hasSD = true;

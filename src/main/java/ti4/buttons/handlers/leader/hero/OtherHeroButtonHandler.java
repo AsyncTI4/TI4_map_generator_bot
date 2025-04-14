@@ -1,22 +1,28 @@
 package ti4.buttons.handlers.leader.hero;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class OtherHeroButtonHandler {
@@ -54,6 +60,65 @@ public class OtherHeroButtonHandler {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " All ships have been removed, continue to land troops.");
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("utilizePharadnHero_")
+    public static void utilizePharadnHero(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "pharadnHeroDestroy_" + planet, "Destroy All Infantry"));
+        for (int x = 1; x < player.getNomboxTile().getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) + 1; x++) {
+            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "pharadnHeroCommit_" + planet + "_" + x, "Commit " + x + " Infantry"));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            player.getFactionEmoji() + " you chose to use the Pharadn Hero on " + Mapper.getPlanet(planet).getAutoCompleteName() + ". Decide whether to destroy all infantry or commit infantry.", buttons);
+
+        Leader playerLeader = player.unsafeGetLeader("pharadnhero");
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                message + " - the Pharadn hero has been purged.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "the Pharadn hero was not purged - something went wrong.");
+        }
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("pharadnHeroDestroy_")
+    public static void pharadnHeroDestroy(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmoji() + " you chose to use the Pharadn Hero on " + Mapper.getPlanet(planet).getAutoCompleteName() + " to destroy all infantry. ");
+        ButtonHelper.deleteMessage(event);
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        Tile tile = game.getTileFromPlanet(planet);
+        for (Player p2 : game.getRealPlayers()) {
+            String name = unitHolder.getName().replace("space", "");
+            if (tile.containsPlayersUnits(p2)) {
+                int amountInf = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
+                if (p2.hasInf2Tech()) {
+                    ButtonHelper.resolveInfantryDeath(p2, amountInf);
+                }
+                if (amountInf > 0) {
+                    RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
+                }
+            }
+        }
+    }
+
+    @ButtonHandler("pharadnHeroCommit_")
+    public static void pharadnHeroCommit(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        String amount = buttonID.split("_")[2];
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmoji() + " you chose to use the Pharadn Hero on " + Mapper.getPlanet(planet).getAutoCompleteName() + " to commit " + amount + " infantry.");
+        ButtonHelper.deleteMessage(event);
+        Tile tile = game.getTileFromPlanet(planet);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " inf " + planet);
+        RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), amount + " inf");
     }
 
     @ButtonHandler("purgeRohdhnaHero")
@@ -146,6 +211,22 @@ public class OtherHeroButtonHandler {
         ButtonHelperHeroes.resolvDihmohnHero(game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged()
             + " sustained everything. Reminder you do not take hits this round.");
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("purgeUydaiHero")
+    public static void purgeUydaiHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
+        Leader playerLeader = player.unsafeGetLeader("uydaihero");
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                message + " - Uydai hero, has been purged.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Uydai hero, was not purged - something went wrong.");
+        }
         ButtonHelper.deleteTheOneButton(event);
     }
 

@@ -61,7 +61,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 String messageText = "Error trying to execute command: " + command.getName();
                 String errorMessage = ExceptionUtils.getMessage(e);
                 event.getHook().editOriginal(errorMessage).queue();
-                BotLogger.log(event, messageText, e);
+                BotLogger.error(new BotLogger.LogMessageOrigin(event), messageText, e);
             }
         }
 
@@ -79,7 +79,7 @@ public class SlashCommandListener extends ListenerAdapter {
                 DateTimeHelper.getTimestampFromMillisecondsEpoch(eventTime) + " command was issued by user\n> " +
                 DateTimeHelper.getTimestampFromMillisecondsEpoch(startTime) + " `" + responseTime + "` to respond\n> " +
                 DateTimeHelper.getTimestampFromMillisecondsEpoch(endTime) + " `" + executionTime + "` to execute" + (processingRuntime > eventDelay ? "😲" : "");
-            BotLogger.log(message);
+            BotLogger.warning(new BotLogger.LogMessageOrigin(event), message);
         }
     }
 

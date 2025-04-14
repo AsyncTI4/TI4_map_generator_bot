@@ -40,9 +40,9 @@ public class CardsInfoService {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player,
             """
                 You may whisper to people from here by starting a message with `to[color]` or `to[faction]`.\
-                
+
                 You may schedule a message to yourself (delivered at start of your next turn) by starting a message with `tofutureme`.\
-                
+
                 You may schedule a message to others (delivered at start of their next turn) by starting a message with `tofuture[color]` or `tofuture[faction]`.""");
 
     }
@@ -56,6 +56,9 @@ public class CardsInfoService {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) {
             buttons.add(Buttons.gray("naaluCommander", "Do Naalu Commander", FactionEmojis.Naalu));
         }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "uydaicommander")) {
+            buttons.add(Buttons.gray("uydaiCommander", "Pay 1tg to Use Uydai Commander", FactionEmojis.uydai));
+        }
         if (player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
             buttons.add(Buttons.gray("initialPeak", "Peek At Next Objective", FactionEmojis.augers));
         }
@@ -64,6 +67,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("hacanagent")) {
             buttons.add(Buttons.gray("exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
+        }
+        if (player.hasUnexhaustedLeader("pharadnagent")) {
+            buttons.add(Buttons.gray("exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
         }
         if (ButtonHelper.isPlayerElected(game, player, "minister_peace")) {
             buttons.add(Buttons.gray("ministerOfPeace", "Use Minister of Peace", CardEmojis.Agenda));
@@ -116,6 +122,12 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("gledgeagent")) {
             buttons.add(Buttons.gray("getAgentSelection_gledgeagent", "Use Gledge Agent", FactionEmojis.gledge));
         }
+        if (player.getPathTokenCounter() > 0) {
+            buttons.add(Buttons.gray("redistributePath", "Redistribute 1 CC With Path", FactionEmojis.uydai));
+        }
+        if (player.hasUnexhaustedLeader("uydaiagent")) {
+            buttons.add(Buttons.gray("getAgentSelection_uydaiagent", "Use Uydai Agent", FactionEmojis.uydai));
+        }
         if (player.hasUnexhaustedLeader("khraskagent")) {
             buttons.add(Buttons.gray("getAgentSelection_khraskagent", "Use Khrask Agent", FactionEmojis.khrask));
         }
@@ -126,7 +138,14 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_ghotiagent", "Use Ghoti Agent", FactionEmojis.ghoti));
         }
         if (!player.getNomboxTile().getUnitHolders().get("space").getUnits().isEmpty()) {
-            buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", FactionEmojis.Cabal));
+            FactionEmojis f = FactionEmojis.Cabal;
+            if (player.hasAbility("mark_of_pharadn")) {
+                f = FactionEmojis.pharadn;
+            }
+            if (player.hasAbility("shroud_of_lith")) {
+                f = FactionEmojis.kollecc;
+            }
+            buttons.add(Buttons.gray("getReleaseButtons", "Release Captured Units", f));
         }
         if (player.hasRelicReady("e6-g0_network")) {
             buttons.add(Buttons.green("exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw Action Card"));

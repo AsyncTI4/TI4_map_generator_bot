@@ -27,7 +27,7 @@ public interface TI4Emoji {
     default String emojiString() {
         CachedEmoji emoji = ApplicationEmojiService.getApplicationEmoji(name());
         if (emoji == null) {
-            BotLogger.log(Constants.jazzPing() + " could not find requested emoji: " + name());
+            BotLogger.warning(Constants.jazzPing() + " could not find requested emoji: " + name());
             return ApplicationEmojiService.fallbackEmoji;
         }
         return emoji.getFormatted();

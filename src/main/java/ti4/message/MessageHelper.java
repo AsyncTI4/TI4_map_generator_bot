@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import net.dv8tion.jda.api.entities.Guild;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -130,7 +131,7 @@ public class MessageHelper {
             newButtons.add(Buttons.gray("ultimateUndo_" + maxNumber, "UNDO"));
             return newButtons;
         } catch (Exception e) {
-            BotLogger.log("Error trying to make undo copy for map: " + gameName, e);
+            BotLogger.error("Error trying to make undo copy for map: " + gameName, e);
             return buttons;
         }
     }
@@ -139,7 +140,7 @@ public class MessageHelper {
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
         if (reactionEmoji != null) {
             message.addReaction(reactionEmoji).queue(null,
-                error -> BotLogger.log(getRestActionFailureMessage(message.getChannel(), "Failed to add reaction to message", null, error)));
+                error -> BotLogger.error(getRestActionFailureMessage(message.getChannel(), "Failed to add reaction to message", null, error), error));
         }
         String messageId = message.getId();
         GameMessageManager.addReaction(game.getName(), player.getFaction(), messageId);
@@ -208,7 +209,7 @@ public class MessageHelper {
                     yield new StringTokenizer(game.getStoredValue("Pass On Shenanigans"), "_");
                 }
                 default -> {
-                    BotLogger.log("Unable to handle message type: " + messageType);
+                    BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Unable to handle message type: " + messageType);
                     yield null;
                 }
             };
@@ -224,7 +225,7 @@ public class MessageHelper {
 
     public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
         MessageFunction pin = (msg) -> msg.pin().queue(null,
-            error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to pin message", null, error)));
+            error -> BotLogger.error(getRestActionFailureMessage(channel, "Failed to pin message", null, error), error));
         splitAndSentWithAction(messageText, channel, pin);
     }
 
@@ -235,16 +236,16 @@ public class MessageHelper {
 
     public static void sendFileUploadToChannel(MessageChannel channel, FileUpload fileUpload) {
         if (fileUpload == null) {
-            BotLogger.log("FileUpload null");
+            BotLogger.error("FileUpload null");
             return;
         }
         channel.sendFiles(fileUpload).queue(null,
-            error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error)));
+            error -> BotLogger.error(getRestActionFailureMessage(channel, "Failed to send File to Channel", null, error), error));
     }
 
     public static void sendEphemeralFileInResponseToButtonPress(FileUpload fileUpload, GenericInteractionCreateEvent event) {
         if (fileUpload == null) {
-            BotLogger.log("FileUpload null");
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "FileUpload null");
             return;
         }
         if (event instanceof ButtonInteractionEvent button)
@@ -255,7 +256,7 @@ public class MessageHelper {
 
     public static void sendFileToChannelAndAddLinkToButtons(MessageChannel channel, FileUpload fileUpload, String message, List<Button> buttons) {
         if (fileUpload == null) {
-            BotLogger.log("FileUpload null");
+            BotLogger.error("FileUpload null");
             return;
         }
         final List<Button> realButtons = new ArrayList<>();
@@ -371,7 +372,7 @@ public class MessageHelper {
                 thread.getManager().setArchived(false).queue((v) -> splitAndSentWithAction(txt, channel, restAction, sanitizedEmbeds, butts), BotLogger::catchRestError);
                 return;
             } else if (thread.isLocked()) {
-                BotLogger.log("WARNING: Attempting to send a message to locked thread: " + thread.getJumpUrl());
+                BotLogger.warning("WARNING: Attempting to send a message to locked thread: " + thread.getJumpUrl());
             }
         }
 
@@ -395,7 +396,7 @@ public class MessageHelper {
             MessageCreateData messageCreateData = iterator.next();
             if (iterator.hasNext()) { // not last message
                 channel.sendMessage(messageCreateData).queue(null,
-                    error -> BotLogger.log(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error)));
+                    error -> BotLogger.error(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error), error));
             } else { // last message, do action
                 channel.sendMessage(messageCreateData).queue(message -> {
                     ManagedGame managedGame = GameManager.getManagedGame(gameName);
@@ -408,7 +409,7 @@ public class MessageHelper {
                     if (restAction != null) {
                         restAction.run(message);
                     }
-                }, error -> BotLogger.log(getRestActionFailureMessage(channel, finalMessageText, messageCreateData, error)));
+                }, error -> BotLogger.error(getRestActionFailureMessage(channel, finalMessageText, messageCreateData, error), error));
             }
         }
     }
@@ -661,7 +662,7 @@ public class MessageHelper {
             for (Button b : buttons) {
                 error.append("> - id:`").append(b.getId()).append("`");
             }
-            BotLogger.log(error.toString(), null);
+            BotLogger.error(error.toString(), null);
             break;
         }
         return messageCreateDataList;
@@ -733,7 +734,7 @@ public class MessageHelper {
                 .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
                 .queueAfter(500, TimeUnit.MILLISECONDS,
                     t -> sendMessageToChannelWithEmbeds(t, null, embeds),
-                    error -> BotLogger.log("Error creating thread channel: " + threadName + " in channel: " +
+                    error -> BotLogger.error("Error creating thread channel: " + threadName + " in channel: " +
                         channel.getAsMention(), error));
         } else if (channel instanceof ThreadChannel) {
             sendMessageToChannelWithEmbeds(channel, null, embeds);
@@ -748,6 +749,7 @@ public class MessageHelper {
         sendMessageToChannelWithEmbeds(channel, message, embeds);
     }
 
+    @Deprecated
     public static void sendMessageToBotLogWebhook(String message) {
         if (getBotLogWebhookURL() == null) {
             System.out.println("[BOT-LOG-WEBHOOK] " + message);
@@ -757,13 +759,14 @@ public class MessageHelper {
         webhook.setContent(message);
         try {
             webhook.execute();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) { System.out.println("[BOT-LOG-WEBHOOK] " + message + ignored.getMessage()); }
     }
 
     /**
      * @return a webhook URL for the bot-log channel of the Primary guild. Add
      *         your test server's ID and #bot-log channel webhook url here
      */
+    @Deprecated
     public static String getBotLogWebhookURL() {
         return switch (AsyncTI4DiscordBot.guildPrimaryID) {
             case Constants.ASYNCTI4_HUB_SERVER_ID -> // AsyncTI4 Primary HUB Production Server
@@ -822,7 +825,7 @@ public class MessageHelper {
                 sb.append(error);
                 sb.append("\n```");
             }
-            BotLogger.log(sb.toString());
+            BotLogger.warning(sb.toString());
         }
         return newButtons;
     }
@@ -849,7 +852,7 @@ public class MessageHelper {
             }
             return edited.toString();
         } catch (Exception e) {
-            BotLogger.log("Issue injecting Rules into message: " + message, e);
+            BotLogger.error("Issue injecting Rules into message: " + message, e);
             return message;
         }
     }

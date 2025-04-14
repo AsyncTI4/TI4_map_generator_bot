@@ -193,7 +193,7 @@ public class GameMessageManager {
             GameMessages gameMessages = PersistenceManager.readObjectFromJsonFile(GAME_MESSAGES_FILE, GameMessages.class);
             return gameMessages != null ? gameMessages : new GameMessages(new HashMap<>());
         } catch (IOException e) {
-            BotLogger.log("Failed to read json data for GameMessages.", e);
+            BotLogger.error("Failed to read json data for GameMessages.", e);
             return null;
         }
     }
@@ -202,7 +202,7 @@ public class GameMessageManager {
         try {
             PersistenceManager.writeObjectToJsonFile(GAME_MESSAGES_FILE, toPersist);
         } catch (Exception e) {
-            BotLogger.log("Failed to write json data for GameMessages.", e);
+            BotLogger.error("Failed to write json data for GameMessages.", e);
         }
     }
 

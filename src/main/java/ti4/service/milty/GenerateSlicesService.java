@@ -130,7 +130,7 @@ public class GenerateSlicesService {
             for (Map.Entry<String, Integer> reason : reasons.entrySet()) {
                 sb.append("`").append(Helper.leftpad(reason.getKey(), 15)).append(" fail:` ").append(reason.getValue()).append("\n");
             }
-            BotLogger.log(event, sb.toString());
+            BotLogger.warning(new BotLogger.LogMessageOrigin(event), sb.toString());
         }
         return slicesCreated;
     }

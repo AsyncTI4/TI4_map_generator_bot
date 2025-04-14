@@ -56,6 +56,30 @@ import ti4.service.tech.ListTechService;
 @UtilityClass
 public class MiltyService {
 
+    public static void offerKeleresSetupButtons(MiltyDraftManager manager, Player player) {
+        List<String> flavors = List.of("mentak", "xxcha", "argent");
+        List<Button> keleresPresets = new ArrayList<>();
+        boolean warn = false;
+        for (String f : flavors) {
+            if (manager.isFactionTaken(f)) continue;
+
+            FactionModel model = Mapper.getFaction(f);
+            String id = "draftPresetKeleres_" + f;
+            String label = StringUtils.capitalize(f);
+            if (manager.getFactionDraft().contains(f)) {
+                keleresPresets.add(Buttons.gray(id, label + " 🛑", model.getFactionEmoji()));
+                warn = true;
+            } else {
+                keleresPresets.add(Buttons.green(id, label, model.getFactionEmoji()));
+            }
+        }
+
+        String message = player.getPing() + " Pre-select which flavor of Keleres to play in this game by clicking one of these buttons!";
+        message += " You can change your decision later by clicking a different button.";
+        if (warn) message += "\n- 🛑 Some of these factions are in the draft! 🛑 If you preset them and they get chosen, then the preset will be cancelled.";
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, keleresPresets);
+    }
+
     public static String startFromSettings(GenericInteractionCreateEvent event, MiltySettings settings) {
         Game game = settings.getGame();
         DraftSpec specs = new DraftSpec(game);
@@ -459,6 +483,12 @@ public class MiltyService {
                 "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
                     + " any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
         }
+        if (player.hasAbility("ancient_empire")) {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("startAncientEmpire", "Place a tomb token"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentation() + " You can use this button to place 14 tomb tokens.", buttons);
+        }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
@@ -488,7 +518,7 @@ public class MiltyService {
             player.addAbility("policy_the_economy_empower");
             player.removeOwnedUnitByID("olradin_mech");
             player.addOwnedUnitByID("olradin_mech_positive");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),player.getRepresentationUnfogged()+ " automatically set all of your policies to the positive side, but you can flip any of them now with these buttons");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " automatically set all of your policies to the positive side, but you can flip any of them now with these buttons");
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);

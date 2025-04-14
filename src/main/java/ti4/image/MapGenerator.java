@@ -257,7 +257,7 @@ public class MapGenerator implements AutoCloseable {
                 try {
                     tileRingNumber = Integer.parseInt(tileRing);
                 } catch (Exception e) {
-                    BotLogger.log("Hitting an error");
+                    BotLogger.error("Hitting an error", e);
                 }
 
                 Tile setupTile = null;
@@ -324,8 +324,17 @@ public class MapGenerator implements AutoCloseable {
         for (String key : keys) {
             tilesToDisplay.remove(key);
             if (fowPlayer != null) {
-                tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
+                Tile fogTile = fowPlayer.buildFogTile(key, fowPlayer);
+                if (fogTile != null) {
+                    tilesToDisplay.put(key, fogTile);
+                }
             }
+        }
+        //Check custom fog labeled tiles without actual tile
+        Set<String> labelWithoutTile = new HashSet<>(fowPlayer.getFogLabels().keySet());
+        labelWithoutTile.removeAll(tilesToDisplay.keySet());
+        for (String position : labelWithoutTile) {
+            tilesToDisplay.put(position, fowPlayer.buildFogTile(position, fowPlayer));
         }
     }
 
@@ -504,7 +513,7 @@ public class MapGenerator implements AutoCloseable {
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
-            BotLogger.log("Could not display play area: " + resourceName, e);
+            BotLogger.error("Could not display play area: " + resourceName, e);
         }
     }
 
@@ -575,7 +584,7 @@ public class MapGenerator implements AutoCloseable {
                     DrawingUtil.drawControlToken(graphics, controlTokenImage, DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlID), tokenX, tokenY, convertToGeneric, scale);
                 } catch (Exception e) {
                     // nothing
-                    BotLogger.log("Could not display player: " + player.getUserName(), e);
+                    BotLogger.error("Could not display player: " + player.getUserName(), e);
                 }
                 row++;
             }
@@ -1772,7 +1781,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("Ignored exception during map generation", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored exception during map generation", e);
         }
     }
 
@@ -1936,7 +1945,7 @@ public class MapGenerator implements AutoCloseable {
                 }
 
             } catch (Exception e) {
-                BotLogger.log("Could not paint agenda icon", e);
+                BotLogger.error("Could not paint agenda icon", e);
             }
 
             if (!secondColumn) {
@@ -1992,7 +2001,7 @@ public class MapGenerator implements AutoCloseable {
             try {
                 paintEventIcon(y, x);
             } catch (Exception e) {
-                BotLogger.log("Could not paint event icon", e);
+                BotLogger.error("Could not paint event icon", e);
             }
 
             if (!secondColumn) {
@@ -2057,7 +2066,7 @@ public class MapGenerator implements AutoCloseable {
             BufferedImage tileImage = new TileGenerator(game, event, displayType).draw(tile, step);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (Exception exception) {
-            BotLogger.log(
+            BotLogger.error(
                 "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(),
                 exception);
         }

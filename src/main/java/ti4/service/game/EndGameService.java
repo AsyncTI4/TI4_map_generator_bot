@@ -82,7 +82,7 @@ public class EndGameService {
             }
         }
 
-        gameEndStuff(game, event, publish);
+        
         // MOVE CHANNELS TO IN-LIMBO
         List<Category> limbos = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true);
         Category inLimboCategory = limbos.isEmpty() ? null : limbos.getFirst();
@@ -124,13 +124,14 @@ public class EndGameService {
                 threadChannel.getManager().setArchived(true).queue();
             }
         }
-        // if (actionsChannel != null) {
-        //     for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-        //         if (!threadChannel.getName().contains("Cards Info")) {
-        //             threadChannel.getManager().setArchived(true).queue();
-        //         }
-        //     }
-        // }
+        if (actionsChannel != null) {
+            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+                if (!threadChannel.getName().contains("Cards Info")) {
+                    threadChannel.getManager().setArchived(true).queue();
+                }
+            }
+        }
+        gameEndStuff(game, event, publish);
 
         // GET BOTHELPER LOUNGE
         List<TextChannel> bothelperLoungeChannels = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true);
@@ -184,7 +185,7 @@ public class EndGameService {
                 // CREATE POST
                 if (publish) {
                     if (summaryChannel == null) {
-                        BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(event), "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
                         return;
                     }
 
@@ -209,7 +210,7 @@ public class EndGameService {
             });
         } else if (publish) { //FOW SUMMARY
             if (summaryChannel == null) {
-                BotLogger.log(event, "`#fow-war-stories` channel not found - `/game end` cannot post summary");
+                BotLogger.warning(new BotLogger.LogMessageOrigin(event), "`#fow-war-stories` channel not found - `/game end` cannot post summary");
                 return;
             }
             MessageHelper.sendMessageToChannel(summaryChannel, gameEndText);
@@ -374,8 +375,8 @@ public class EndGameService {
     public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
         Category inLimboCategory = guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();
         if (inLimboCategory == null) {
-            BotLogger.log(
-                "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
+            BotLogger.warning(new BotLogger.LogMessageOrigin(guild),
+                    "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
                     + guild.getName());
             return;
         }

@@ -29,7 +29,7 @@ public class UserSettingsManager {
         try {
             return PersistenceManager.readObjectFromJsonFile(USER_SETTINGS_PATH, userId + ".json", UserSettings.class);
         } catch (IOException e) {
-            BotLogger.log("Failed to read json data for UserSettingsManager.", e);
+            BotLogger.error("Failed to read json data for UserSettingsManager.", e);
             return null;
         }
     }
@@ -38,7 +38,7 @@ public class UserSettingsManager {
         try {
             PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
         } catch (Exception e) {
-            BotLogger.log("Failed to write json data for UserSettingsManager.", e);
+            BotLogger.error("Failed to write json data for UserSettingsManager.", e);
         }
     }
 }

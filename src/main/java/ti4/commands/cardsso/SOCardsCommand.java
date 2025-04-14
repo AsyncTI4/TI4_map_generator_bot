@@ -12,6 +12,7 @@ public class SOCardsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
                     new DrawSO(),
+                    new ShuffleSecretDeck(),
                     new DiscardSO(),
                     new SOInfo(),
                     new ShowSO(),

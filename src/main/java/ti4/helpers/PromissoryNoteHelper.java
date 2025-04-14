@@ -61,6 +61,10 @@ public class PromissoryNoteHelper {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
                     sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
                     Player pnOwner = game.getPNOwner(pn.getKey());
+                    if (pnOwner == null) {
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " one of your PNs has no owner. PN id is " + pn.getKey() + " and number is " + pn.getValue());
+                        continue;
+                    }
                     if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
                     sb.append(ColorEmojis.getColorEmojiWithName(pnOwner.getColor()));
                     sb.append(" `(").append(pn.getValue()).append(")`\n");
@@ -209,6 +213,11 @@ public class PromissoryNoteHelper {
         if ("dspnbent".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerBentorPNButtons(player, game);
         }
+        if ("dspnuyda".equalsIgnoreCase(id)) {
+            List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, true, player);
+            String message = player.getRepresentationUnfogged() + " select which deck you wish to look at the top of.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        }
         if ("dspngled".equalsIgnoreCase(id)) {
             ButtonHelperFactionSpecific.offerGledgeBaseButtons(player, game);
         }
@@ -304,6 +313,7 @@ public class PromissoryNoteHelper {
             owner.setFleetCC(owner.getFleetCC() - 1);
             String reducedMsg = owner.getRepresentationUnfogged()
                 + ", 1 command token has been removed from your fleet pool because _Fires of the Gashlai_ was played.";
+            ButtonHelper.checkFleetInEveryTile(owner, game, event);
             MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {

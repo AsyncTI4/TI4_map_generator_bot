@@ -1,7 +1,5 @@
 package ti4.map.manage;
 
-import static ti4.map.manage.GamePersistenceKeys.*;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,6 +27,26 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
+import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
+import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.manage.GamePersistenceKeys.PLAYER;
+import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.manage.GamePersistenceKeys.TILE;
+import static ti4.map.manage.GamePersistenceKeys.TOKENS;
+import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
+import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.manage.GamePersistenceKeys.UNITS;
 import ti4.message.BotLogger;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.milty.MiltyDraftManager;
@@ -70,7 +88,7 @@ class GameSaveService {
                 saveTile(writer, tile);
             }
         } catch (Exception e) {
-            BotLogger.log("Could not save map: " + game.getName(), e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not save map: " + game.getName(), e);
             return false;
         }
 
@@ -597,6 +615,12 @@ class GameSaveService {
             writer.write(Constants.SARWEEN_COUNT + " " + player.getSarweenCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.PATH_TOKEN_COUNT + " " + player.getPathTokenCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
+            writer.write(System.lineSeparator());
+
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getEvents(), writer, Constants.EVENTS);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
@@ -912,7 +936,7 @@ class GameSaveService {
 
             writer.write(System.lineSeparator());
         } catch (Exception e) {
-            BotLogger.log("Error trying to save peeked public objective(s): " + constant, e);
+            BotLogger.error("Error trying to save peeked public objective(s): " + constant, e);
         }
     }
 

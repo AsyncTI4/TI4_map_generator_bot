@@ -377,6 +377,28 @@
         "source": "ds"
     },
     {
+        "id": "uydaiagent",
+        "faction": "uydai",
+        "type": "agent",
+        "name": "Garstil",
+        "title": "Recruitment Officer",
+        "abilityWindow": "When a player produces 1 or more infantry",
+        "abilityText": "You may exhaust this card. If you do, up to 3 of those units do not count against their PRODUCTION limit.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
+    {
+        "id": "pharadnagent",
+        "faction": "pharadn",
+        "type": "agent",
+        "name": "Nokash",
+        "title": "Architect",
+        "abilityWindow": "At any time:",
+        "abilityText": "Exhaust this card to allow a player to destroy all their infantry on 1 planet they control. For each infantry destroyed, that player gains 1 commodity. Then, that player converts all of their commodities to trade goods.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
+    {
         "id": "axiscommander",
         "faction": "axis",
         "type": "commander",
@@ -749,6 +771,28 @@
         "abilityWindow": "Ongoing",
         "abilityText": "Each of your Dreadnoughts and War Suns without ANTI-FIGHTER BARRAGE gains ANTI-FIGHTER BARRAGE 5.",
         "unlockCondition": "Have 1 or more ships in 2 systems that contain an asteroid field.",
+        "source": "ds"
+    },
+    {
+        "id": "uydaicommander",
+        "faction": "uydai",
+        "type": "commander",
+        "name": "Reides Lupaat",
+        "title": "Gifted Telepath",
+        "abilityWindow": "During your turn",
+        "abilityText": "For each common deck, you may spend 1 trade good to look at the top card of that deck",
+        "unlockCondition": "Lose control of a planet.",
+        "source": "ds"
+    },
+    {
+        "id": "pharadncommander",
+        "faction": "pharadn",
+        "type": "commander",
+        "name": "Avhkan",
+        "title": "The Crow",
+        "abilityWindow": "At the start of ground combat on a planet you control",
+        "abilityText": "You may destroy 1 infantry on that planet",
+        "unlockCondition": "ACTION: Destroy 2 of your infantry on each of 5 planets.",
         "source": "ds"
     },
     {
@@ -1169,6 +1213,30 @@
         "abilityName": "Cataclysm - Celestial Impact",
         "abilityWindow": "After you move a unit with BOMBARDMENT into a non-home system other than Mecatol Rex:",
         "abilityText": "You may gain trade goods equal to the total combined resource values of planets in that system. If you do, destroy all units on planets in that system and replace that system tile with the Zelian asteroid tile. Then, purge this card and each planet card that corresponds to the replaced system tile.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
+        "id": "uydaihero",
+        "faction": "uydai",
+        "type": "hero",
+        "name": "Londor II",
+        "title": "God Emperor",
+        "abilityName": "Obsidian Gate, Pathfinder",
+        "abilityWindow": "After you activate a non-home system:",
+        "abilityText": "You may purge this card to treat each of your units as adjacent to the active system until the end of this tactical action.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
+        "id": "pharadnhero",
+        "faction": "pharadn",
+        "type": "hero",
+        "name": "Pharad'n the Immortal",
+        "title": " Imperishable Unifier",
+        "abilityName": "Black Star - Apocalypse",
+        "abilityWindow": "After a player commits ground forces to a planet that contains 1 of your structures",
+        "abilityText": "You may purge this card to destroy all infantry on that planet, or commit any number of your captured infantry to that planet as if they were your own.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     }

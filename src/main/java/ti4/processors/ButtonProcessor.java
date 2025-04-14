@@ -60,7 +60,7 @@ public class ButtonProcessor {
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
-            BotLogger.log(event, "Something went wrong with button interaction", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Something went wrong with button interaction", e);
         }
 
         runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextRuntime, resolveRuntime, saveRuntime);
@@ -152,7 +152,6 @@ public class ButtonProcessor {
                 case "resolveHarness" -> ButtonHelperStats.replenishComms(event, game, player, false);
                 case "pass_on_abilities" -> ReactionService.addReaction(event, game, player, " is " + event.getButton().getLabel().toLowerCase() + ".");
                 case "lastMinuteDeliberation" -> UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);
-                case "declinePDS" -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON.");
                 case "searchMyGames" -> SearchGameHelper.searchGames(event.getUser(), event, false, false, false, true, false, true, false, false);
                 case "checkWHView" -> ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
                 case "checkAnomView" -> ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);

@@ -54,7 +54,7 @@ public class PositionMapper {
             try (InputStream input = new FileInputStream(positionFile)) {
                 positionMap.load(input);
             } catch (IOException e) {
-                BotLogger.log(errorMessage);
+                BotLogger.error(errorMessage, e);
             }
         }
     }
@@ -107,7 +107,7 @@ public class PositionMapper {
                 int y = Integer.parseInt(tokenizer.nextToken());
                 return new Point(x, y);
             } catch (Exception e) {
-                BotLogger.log("Could not parse position coordinates", e);
+                BotLogger.error("Could not parse position coordinates", e);
             }
         }
         return null;
@@ -126,7 +126,7 @@ public class PositionMapper {
             String y = individualPoints.nextToken();
             point = new Point(Integer.parseInt(x), Integer.parseInt(y));
         } catch (Exception e) {
-            BotLogger.log("Could not parse player positions", e);
+            BotLogger.error("Could not parse player positions", e);
         }
         return point;
     }
@@ -147,7 +147,7 @@ public class PositionMapper {
                 positions.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
             }
         } catch (Exception e) {
-            BotLogger.log("Could not parse player positions", e);
+            BotLogger.error("Could not parse player positions", e);
         }
 
         return positions;

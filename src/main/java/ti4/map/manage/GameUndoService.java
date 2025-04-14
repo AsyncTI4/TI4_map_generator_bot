@@ -35,7 +35,7 @@ class GameUndoService {
                 Path mapUndoStorage = Storage.getGameUndo(gameName, getUndoFileName(gameName, latestIndex + 1));
                 Files.copy(gameFile.toPath(), mapUndoStorage, StandardCopyOption.REPLACE_EXISTING);
             } catch (Exception e) {
-                BotLogger.log("Error copying undo file for " + gameName, e);
+                BotLogger.error("Error copying undo file for " + gameName, e);
             }
         });
     }
@@ -56,7 +56,7 @@ class GameUndoService {
 
             return maxUndoNumber;
         } catch (Exception e) {
-            BotLogger.log("Error trying clean up excess undo files for: " + gameName, e);
+            BotLogger.error("Error trying clean up excess undo files for: " + gameName, e);
         }
         return -1;
     }
@@ -84,7 +84,7 @@ class GameUndoService {
         try {
             File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
             if (!currentGameFile.exists()) {
-                BotLogger.log("Game file for " + gameName + " doesn't exist!");
+                BotLogger.error(new BotLogger.LogMessageOrigin(gameToUndo), "Game file for " + gameName + " doesn't exist!");
                 return null;
             }
 
@@ -102,7 +102,7 @@ class GameUndoService {
             sendUndoConfirmationMessage(gameToUndo, undoIndex, latestUndoIndex);
             return loadedGame;
         } catch (Exception e) {
-            BotLogger.log("Error trying to undo: " + gameName, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(gameToUndo), "Error trying to undo: " + gameName, e);
             return null;
         }
     }
@@ -136,7 +136,7 @@ class GameUndoService {
             undoCommands.add(undoNamesToCommandText.get(fileName));
             Path currentUndo = Storage.getGameUndo(gameToUndo.getName(), fileName);
             if (!currentUndo.toFile().delete()) {
-                BotLogger.log("Failed to delete undo file: " + currentUndo);
+                BotLogger.error(new BotLogger.LogMessageOrigin(gameToUndo), "Failed to delete undo file: " + currentUndo);
             }
         }
 
@@ -159,7 +159,7 @@ class GameUndoService {
                 MessageHelper.sendMessageToChannelWithButtons(game.getSavedChannel(), game.getSavedMessage(), ButtonHelper.getSavedButtons(game));
             }
         } catch (Exception e) {
-            BotLogger.log("Error trying to generated saved buttons for " + game.getName(), e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Error trying to generated saved buttons for " + game.getName(), e);
         }
     }
 
@@ -167,7 +167,7 @@ class GameUndoService {
         try {
             Files.deleteIfExists(path);
         } catch (Exception e) {
-            BotLogger.log("Error trying to delete file: " + path, e);
+            BotLogger.error("Error trying to delete file: " + path, e);
         }
     }
 
@@ -178,7 +178,7 @@ class GameUndoService {
             replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
             return GameLoadService.load(gameName);
         } catch (IOException e) {
-            BotLogger.log("Error trying to undo for missing game: " + gameName, e);
+            BotLogger.error("Error trying to undo for missing game: " + gameName, e);
         }
         return null;
     }

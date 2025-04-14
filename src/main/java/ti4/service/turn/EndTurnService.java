@@ -50,7 +50,7 @@ public class EndTurnService {
 
     public static Player findNextUnpassedPlayer(Game game, Player currentPlayer) {
         List<Player> turnOrder = game.getActionPhaseTurnOrder();
-        if(turnOrder.isEmpty()){
+        if (turnOrder.isEmpty()) {
             return null;
         }
         while (!turnOrder.getLast().equals(currentPlayer))
@@ -247,7 +247,9 @@ public class EndTurnService {
         List<Button> poButtons = getScoreObjectiveButtons(game);
         Button noPOScoring = Buttons.red(Constants.PO_NO_SCORING, "No Public Objective Scored");
         Button noSOScoring = Buttons.red(Constants.SO_NO_SCORING, "No Secret Objective Scored");
+        Button scoreAnObjective = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
         poButtons.add(noPOScoring);
+        poButtons.add(scoreAnObjective);
         poButtons.add(noSOScoring);
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
             poButtons.add(Buttons.gray("refreshStatusSummary", "Refresh Summary"));
@@ -288,6 +290,10 @@ public class EndTurnService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " trade good" + (numScoredSOs == 1 ? "" : "s")
                         + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
+            }
+            if (player.getPromissoryNotes().keySet().contains("dspnuyda") && !player.getPromissoryNotesOwned().contains("dspnuyda")) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " reminder this is the window to use the Uydai promissory note");
             }
         }
 

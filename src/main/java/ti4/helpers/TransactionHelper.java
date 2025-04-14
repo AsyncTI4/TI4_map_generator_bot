@@ -218,8 +218,12 @@ public class TransactionHelper {
                                 }
                                 trans.append(CardEmojis.PN);
                                 if (!hidePrivateCardText) {
-                                    trans.append(" ").append(StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")))
-                                        .append(" _").append(Mapper.getPromissoryNote(id).getName()).append("_");
+                                    if (Mapper.getPromissoryNote(id) != null) {
+                                        trans.append(" ").append(StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")))
+                                            .append(" _").append(Mapper.getPromissoryNote(id).getName()).append("_");
+                                    } else {
+                                        trans.append(" ").append("null pn info for " + id);
+                                    }
                                 }
                             }
                         }
@@ -672,7 +676,10 @@ public class TransactionHelper {
 
         if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("binding_debts")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
-            player.addTransactionItem("sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount);
+            String clear = "sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount;
+            if (!player.getTransactionItems().contains(clear)) {
+                player.addTransactionItem(clear);
+            }
         }
         Player opposing = p2;
         if (player == p2) {

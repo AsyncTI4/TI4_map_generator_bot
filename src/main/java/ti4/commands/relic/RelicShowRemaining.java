@@ -22,6 +22,6 @@ class RelicShowRemaining extends GameStateSubcommand {
         if (override != null) {
             over = "TRUE".equalsIgnoreCase(override.getAsString());
         }
-        RelicHelper.showRemaining(event, over, getGame(), getPlayer());
+        RelicHelper.showRemaining(event.getMessageChannel(), over, getGame(), getPlayer());
     }
 }

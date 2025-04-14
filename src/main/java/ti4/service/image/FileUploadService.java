@@ -48,7 +48,7 @@ public class FileUploadService {
         try (FileOutputStream fileOutputStream = new FileOutputStream(mapImageStoragePath)) {
             fileOutputStream.write(bytes);
         } catch (IOException e) {
-            BotLogger.log("Could not create File for " + filenamePrefix + "." + filenameSuffix, e);
+            BotLogger.error("Could not create File for " + filenamePrefix + "." + filenameSuffix, e);
         }
     }
 }

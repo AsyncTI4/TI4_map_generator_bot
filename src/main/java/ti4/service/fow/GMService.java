@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -13,7 +15,9 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RelicHelper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -22,6 +26,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.explore.ExploreService;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 public class GMService {
 
@@ -42,6 +48,8 @@ public class GMService {
         Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
         Buttons.DONE_DELETE_BUTTONS);
 
+    private static final String STATUS_SUMMARY_THREAD = "Status Summaries";
+
     public static void showGMButtons(Game game) {
         MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), "GM Buttons", GMBUTTONS);
     }
@@ -49,6 +57,27 @@ public class GMService {
     public static TextChannel getGMChannel(Game game) {
         List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
         return channels.isEmpty() ? null : channels.getFirst();
+    }
+
+    public static void sendMessageToGMChannel(Game game, String msg) {
+        sendMessageToGMChannel(game, msg, false);
+    }
+
+    public static void sendMessageToGMChannel(Game game, String msg, boolean ping) {
+        if (ping) {
+            msg += " - " + gmPing(game);
+        }
+        MessageHelper.sendMessageToChannel(getGMChannel(game), msg);
+    }
+    
+    private static String gmPing(Game game) {
+        if (game.isFowMode()) {
+            List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
+            if (!gmRoles.isEmpty()) {
+                return gmRoles.getFirst().getAsMention();
+            }
+        }
+        return "";
     }
 
     @ButtonHandler("gmShowGameAs_")
@@ -144,4 +173,46 @@ public class GMService {
         MessageHelper.sendMessageToChannel(getGMChannel(game), sb.toString());
     }
 
+    public static void createFOWStatusSummary(Game game) {
+        if (!game.isFowMode() || !game.getFowOption(FOWOption.STATUS_SUMMARY)) return;
+
+        TextChannel mainChannel = game.getMainGameChannel();
+        //Expecting it to be archived
+        mainChannel.retrieveArchivedPublicThreadChannels().queue(archivedThreads -> {
+            for (ThreadChannel thread : archivedThreads) {
+                if (thread.getName().equals(STATUS_SUMMARY_THREAD)) {
+                    thread.getManager().setArchived(false).queue(success -> {
+                        sendSummary(game, thread);
+                        return;
+                    });
+                }
+            }
+        });
+
+        ThreadChannel summaryThread = null;
+        // Check active threads
+        for (ThreadChannel thread : mainChannel.getThreadChannels()) {
+            if (thread.getName().equals(STATUS_SUMMARY_THREAD)) {
+                summaryThread = thread;
+                break;
+            }
+        }
+        // If still null, create a new thread
+        if (summaryThread == null) {
+            summaryThread = mainChannel.createThreadChannel(STATUS_SUMMARY_THREAD).complete();
+        }
+        sendSummary(game, summaryThread);
+    }
+
+    private static void sendSummary(Game game, ThreadChannel summaryThread) {
+        MessageHelper.sendMessageToChannel(summaryThread, "# Round " + game.getRound() + " Status Summary " + game.getPing());
+        List<String> types = new ArrayList<>();
+        types.add(Constants.CULTURAL);
+        types.add(Constants.INDUSTRIAL);
+        types.add(Constants.HAZARDOUS);
+        types.add(Constants.FRONTIER);
+        ExploreService.secondHalfOfExpInfo(types, summaryThread, null, game, true, false);
+       
+        RelicHelper.showRemaining(summaryThread, true, game, null);
+    }
 }

@@ -863,5 +863,50 @@
         "source": "ds",
         "text": "Cost 1(x2), Combat 7\nBOMBARDMENT 8\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/impactor_2.jpg?raw=true"
+    },
+    {
+        "alias": "dsuydag",
+        "name": "Messiah Protocols",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "uydai",
+        "source": "ds",
+        "text": "ACTION: Exhaust this card and spend an amount of influence equal to the number of planets you control. Then, place 1 infantry from your reinforcements on each planet you control."
+    },
+    {
+        "alias": "dsuydab",
+        "name": "Navigation Relays",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "uydai",
+        "source": "ds",
+        "text": "After you activate a system, you may exhaust this card to allow your ships and units they transport to move out of systems that contain your command tokens during this tactical action."
+    },
+    {
+        "alias": "dspharinf",
+        "name": "Immortal II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "pharadn",
+        "baseUpgrade": "inf2",
+        "source": "ds",
+        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. At the start of your turn, place up to 1 of your captured infantry on a planet in a system that contains your structures, as if they were your own."
+    },
+    {
+        "alias": "dspharb",
+        "name": "Reality-Field Impactor",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "pharadn",
+        "source": "ds",
+        "text": "After you activate a system, you may choose 1 anomaly on the game board; that anomaly has no effect until the end of this tactical action."
     }
 ]
