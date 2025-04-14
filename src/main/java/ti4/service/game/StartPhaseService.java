@@ -378,7 +378,7 @@ public class StartPhaseService {
             if (game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()) {
                 for (Player player2 : game.getRealPlayers()) {
                     int number = Helper.getPlayerSpeakerNumber(player2, game);
-                    if (number == 1 || (number == 8 && !game.isFowMode())) {
+                    if (number == 1 || (number == 8 && !game.isFowMode()) || !player2.getSCs().isEmpty()) {
                         continue;
                     }
                     String msg = player2.getRepresentation() + " in order to speed up the strategy phase, you can now offer the bot a ranked list of your desired" +
