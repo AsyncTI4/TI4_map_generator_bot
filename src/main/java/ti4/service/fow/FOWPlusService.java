@@ -55,11 +55,6 @@ public class FOWPlusService {
         return isActive(game) && tileID.equals("0b") && StringUtils.isEmpty(label);
     }
 
-    //Always show supernovas player has not seen
-    public static boolean tileAlwaysVisible(Tile tile, Player player, Game game) {
-        return isActive(game) && !player.getFogLabels().keySet().contains(tile.getPosition()) && tile.isSupernova();
-    }
-
     public static boolean isVoid(Game game, String position) {
         return game.getTileByPosition(position).getTileID().equals(VOID_TILEID);
     }
@@ -73,14 +68,9 @@ public class FOWPlusService {
         TextInput position = TextInput.create(Constants.POSITION, "Position to activate", TextInputStyle.SHORT)
             .setRequired(true)
             .build();
-        /*TextInput direction = TextInput.create(Constants.PRIMARY_TILE_DIRECTION, "Direction to activate", TextInputStyle.SHORT)
-            .setRequired(true)
-            .setPlaceholder("N / NE / SE / S / SW / NW")
-            .build();*/
 
         Modal blindActivationModal = Modal.create("blindActivation_" + event.getMessageId(), "Activate a blind tile")
             .addActionRow(position)
-            //.addActionRow(direction)
             .build();
 
         event.replyModal(blindActivationModal).queue();
@@ -91,21 +81,13 @@ public class FOWPlusService {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         String origMessageId = event.getModalId().replace("blindActivation_", "");
         String position = event.getValue(Constants.POSITION).getAsString().trim();
-        //String direction = event.getValue(Constants.PRIMARY_TILE_DIRECTION).getAsString().trim().toUpperCase();
 
         if (!PositionMapper.isTilePositionValid(position)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Position " + position + " is invalid.");
             return;
         }
 
-        /*int index = List.of("N", "NE", "SE", "S", "SW", "NW").indexOf(direction);
-        if (index == -1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Direction " + direction + " is invalid.");
-            return;
-        }
-
-        List<String> adjacentPositions = PositionMapper.getAdjacentTilePositions(position);*/
-        String targetPosition = position; //adjacentPositions.get(index);
+        String targetPosition = position;
         Tile tile = game.getTileByPosition(targetPosition);
 
         List<Button> chooseTileButtons = new ArrayList<>();
