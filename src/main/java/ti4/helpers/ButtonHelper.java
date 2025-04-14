@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -1497,7 +1496,9 @@ public class ButtonHelper {
                     }
                 }
             } else {
-                MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
+                if (!event.getMessageChannel().getName().contains("announcements")) {
+                    MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), fileUpload);
+                }
                 foundSomething = true;
             }
             if (!foundSomething) {
@@ -2114,15 +2115,17 @@ public class ButtonHelper {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         String tileRep = tile.getRepresentationForButtons(game, player);
-        String ident = game.isFowMode() ? "someone" : player.getRepresentationNoPing();
-        String msg = ident + " removed your command token from " + tileRep + ".";
+        String ident = game.isFowMode() ? player.getFactionEmojiOrColor() : player.getRepresentationNoPing();
+        String msg = ident + " removed command token from " + tileRep + ".";
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             player = game.getPlayerFromColorOrFaction(faction);
-            msg = player.getRepresentationUnfogged() + " this is a notice that " + msg;
-            if (!game.isFowMode()) {
-                msg += " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+            if (game.isFowMode()) {
+                msg = player.getRepresentationUnfogged() + " this is a notice that someone removed your command token from " + tileRep;
+            } else {
+                msg = player.getRepresentationUnfogged() + " this is a notice that " + msg + " using "
+                    + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                     + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent.";
             }
@@ -3433,6 +3436,7 @@ public class ButtonHelper {
         Button corners = Buttons.green(finChecker + "ring_corners", "Corners");
         ringButtons.add(corners);
         if (FOWPlusService.isActive(game)) {
+            FOWPlusService.filterRingButtons(ringButtons, player, game);
             ringButtons.add(Buttons.red(finChecker + "blindTileSelection~MDL", "Blind Tile"));
         }
         return ringButtons;
@@ -3450,8 +3454,7 @@ public class ButtonHelper {
     }
 
     public static List<Button> getTileInARing(
-        Player player, Game game, String buttonID,
-        GenericInteractionCreateEvent event
+        Player player, Game game, String buttonID
     ) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> ringButtons = new ArrayList<>();

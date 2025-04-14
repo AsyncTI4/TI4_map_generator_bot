@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -59,7 +60,24 @@ public class GMService {
     }
 
     public static void sendMessageToGMChannel(Game game, String msg) {
+        sendMessageToGMChannel(game, msg, false);
+    }
+
+    public static void sendMessageToGMChannel(Game game, String msg, boolean ping) {
+        if (ping) {
+            msg += " - " + gmPing(game);
+        }
         MessageHelper.sendMessageToChannel(getGMChannel(game), msg);
+    }
+    
+    private static String gmPing(Game game) {
+        if (game.isFowMode()) {
+            List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
+            if (!gmRoles.isEmpty()) {
+                return gmRoles.getFirst().getAsMention();
+            }
+        }
+        return "";
     }
 
     @ButtonHandler("gmShowGameAs_")

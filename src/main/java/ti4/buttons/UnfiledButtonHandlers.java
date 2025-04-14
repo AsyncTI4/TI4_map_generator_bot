@@ -195,7 +195,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("ring_")
     public static void ring(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        List<Button> ringButtons = ButtonHelper.getTileInARing(player, game, buttonID, event);
+        List<Button> ringButtons = ButtonHelper.getTileInARing(player, game, buttonID);
         String num = buttonID.replace("ring_", "");
         String message;
         if (!"corners".equalsIgnoreCase(num)) {
@@ -1973,7 +1973,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent on **Construction**.";
         ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
-        ButtonHelper.updateMap(game, event);
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event);
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -2220,8 +2222,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("ChooseDifferentDestination")
     public static void chooseDifferentDestination(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "Choosing a different system to activate. Please select the ring of the map that the system you wish to activate is located in."
-            + " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+        String message = "Choosing a different system to activate. Please select the ring of the map that the system you wish to activate is located in.";
+        if (!game.isFowMode()) {
+            message += " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
+        }
         List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
         ButtonHelper.deleteMessage(event);

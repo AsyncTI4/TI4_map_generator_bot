@@ -108,7 +108,7 @@ public class FoWHelper {
 
             Set<String> systems = new HashSet<>();
             for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
-                if (!tileEntry.getValue().hasFog(player) || FOWPlusService.tileAlwaysVisible(tileEntry.getValue(), player, game)) {
+                if (!tileEntry.getValue().hasFog(player)) {
                     systems.add(tileEntry.getKey());
                 }
             }
