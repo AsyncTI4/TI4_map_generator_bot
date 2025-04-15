@@ -9,9 +9,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.ThreadGetter;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.fow.GMService;
 import ti4.service.game.GameNameService;
 
 @UtilityClass
@@ -34,7 +37,7 @@ public class SusSlashCommandService {
     public static void checkIfShouldReportSusSlashCommand(SlashCommandInteractionEvent event, String jumpUrl) {
         String gameName = GameNameService.getGameName(event);
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (managedGame == null || managedGame.isFowMode()) return;
+        if (managedGame == null) return;
 
         if (HARMLESS_COMMANDS.contains(event.getInteraction().getName())) return;
 
@@ -48,8 +51,16 @@ public class SusSlashCommandService {
             && event.getMessageChannel() != managedGame.getTableTalkChannel()
             && !event.getMessageChannel().getName().contains("bot-map-updates");
 
-        if ((isPrivateThread || isNotGameChannel) && !isPublicThread) {
+        if (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread) {
             reportSusSlashCommand(event, jumpUrl);
+        }
+
+        if (managedGame.isFowMode()){
+            Game game = managedGame.getGame();
+            Player player = game.getPlayer(event.getUser().getId());
+            if (player != null && !game.getPlayersWithGMRole().contains(player)) {
+                GMService.logPlayerActivity(game, player, event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "`", jumpUrl);
+            }
         }
     }
 

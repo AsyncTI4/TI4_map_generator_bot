@@ -330,12 +330,6 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         }
-        //Check custom fog labeled tiles without actual tile
-        Set<String> labelWithoutTile = new HashSet<>(fowPlayer.getFogLabels().keySet());
-        labelWithoutTile.removeAll(tilesToDisplay.keySet());
-        for (String position : labelWithoutTile) {
-            tilesToDisplay.put(position, fowPlayer.buildFogTile(position, fowPlayer));
-        }
     }
 
     private boolean isFowModeActive() {
