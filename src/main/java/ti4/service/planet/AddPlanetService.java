@@ -317,7 +317,7 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                         + " if you have the correct amount of infantry (3 or 4), you may remove them and DEPLOY 1 space dock on "
-                        + planet + " using the buttons.",
+                        + planet + " using the buttons. Note that you will be able to build out of this space dock this action",
                     buttons);
 
             }

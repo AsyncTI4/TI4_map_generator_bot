@@ -782,7 +782,7 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(finChecker + "gloryTech", "Research Unit Upgrade (Upon Win)", FactionEmojis.kjalengard));
             }
         }
-        if (p1.hasAbility("glory") && ButtonHelperAgents.getGloryTokenTiles(game).size() < 3) {
+        if (p1.hasAbility("glory")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             if (!ButtonHelperAgents.getGloryTokensLeft(game).isEmpty()) {
                 buttons.add(Buttons.gray(finChecker + "placeGlory_" + pos, "Place Glory Token (Upon Win)", FactionEmojis.kjalengard));
