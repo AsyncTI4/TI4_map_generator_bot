@@ -444,7 +444,7 @@
         "name": "Contagion",
         "faction": "kyro",
         "window": "After you resolve the primary or secondary ability of the \"Politics\" strategy card",
-        "windowEffect": "Before 3/31/24: Commit 1 infantry from your reinforcements to each of 2 planets that are in or adjacent to a system that contains a planet you control; resolve invasion on those planets. After 3/31/24: commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
+        "windowEffect": "Commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
         "source": "ds"
     },
     {

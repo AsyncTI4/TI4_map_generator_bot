@@ -1366,6 +1366,20 @@ public class Helper {
                     productionValueTotal++;
                 }
             }
+            if (token.contains("facilitycorefactory")) {
+                planetUnitVal += 1;
+                productionValueTotal += 1;
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+            }
+            if (token.contains("facilitynavalbase")) {
+                planetUnitVal += 3;
+                productionValueTotal += 3;
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+            }
         }
         if (player.hasTech("absol_ah") && (uH.getUnitCount(UnitType.Pds, player.getColor()) > 0
             || uH.getUnitCount(UnitType.Spacedock, player.getColor()) > 0)) {

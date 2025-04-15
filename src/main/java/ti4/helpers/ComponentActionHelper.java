@@ -177,7 +177,7 @@ public class ComponentActionHelper {
                 && !prom.getOwner().equalsIgnoreCase(p1.getColor())
                 && !p1.getPromissoryNotesInPlayArea().contains(pn) && prom.getText() != null) {
                 String pnText = prom.getText();
-                if (pnText.toLowerCase().contains("action:") && !"bmf".equalsIgnoreCase(pn)) {
+                if (pnText.toLowerCase().contains("action:") && !"bmf".equalsIgnoreCase(pn) && !"acq".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
                     Button pnButton = Buttons.red(finChecker + prefix + "pn_" + pn, "Use " + pnName);
