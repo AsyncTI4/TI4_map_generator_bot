@@ -23,6 +23,7 @@ import ti4.helpers.CryypterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -337,6 +338,16 @@ public class PlayStrategyCardService {
                         }
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
                             + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
+                    }
+                } else {
+                    if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
+                        Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                        if (reactionEmoji2 != null) {
+                            message.addReaction(reactionEmoji2).queue();
+                            p2.addFollowedSC(scToPlay, event);
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                                + stratCardName + "** because the bot does not believe you have a space dock in your home system");
+                        }
                     }
                 }
             }
