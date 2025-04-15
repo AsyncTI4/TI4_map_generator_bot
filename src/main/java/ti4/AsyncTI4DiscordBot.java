@@ -61,7 +61,6 @@ import ti4.listeners.UserJoinServerListener;
 import ti4.listeners.UserLeaveServerListener;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
 import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
