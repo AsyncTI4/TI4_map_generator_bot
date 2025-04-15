@@ -190,7 +190,7 @@ public class EndGameService {
                     }
 
                     // INFORM PLAYERS
-                    summaryChannel.sendMessage(gameEndText).queue(m -> { // POST INITIAL MESSAGE
+                    MessageHelper.splitAndSentWithAction(gameEndText, summary channel, m -> { // POST INITIAL MESSAGE
                         m.editMessageAttachments(fileUpload).queue(); // ADD MAP FILE TO MESSAGE
                         m.createThreadChannel(game.getName()).queueAfter(2, TimeUnit.SECONDS, t -> {
                             sendFeedbackMessage(t, game);
