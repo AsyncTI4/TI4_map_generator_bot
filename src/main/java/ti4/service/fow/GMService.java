@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -86,7 +84,7 @@ public class GMService {
     }
 
     public static void logPlayerActivity(Game game, Player player, String eventLog, String jumpUrl) {
-        ThreadGetter.getThreadInChannel(getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, true,
+        ThreadGetter.getThreadInChannel(getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false,
             threadChannel -> {
                 if (jumpUrl != null) {
                     MessageHelper.sendMessageToChannel(threadChannel, eventLog + " - " + jumpUrl);
