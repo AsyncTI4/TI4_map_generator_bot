@@ -1,0 +1,110 @@
+[
+    {
+        "id": "facilityrefinery",
+        "name": "Refinery (Facility)",
+        "imagePath": "attachment_facilityrefinery.png",
+        "resourcesModifier": 1,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilitycolony",
+        "name": "Colony (Facility)",
+        "imagePath": "attachment_facilitycolony.png",
+        "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilitycorefactory",
+        "name": "Core Factory (Facility)",
+        "imagePath": "attachment_facilitycorefactory.png",
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilitytransitnode",
+        "name": "Transit Node (Facility)",
+        "imagePath": "attachment_facilitytransitnode.png",
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilityresearchlab",
+        "name": "Research Lab (Facility)",
+        "imagePath": "attachment_facilityresearchlab.png",
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilitynavalbase",
+        "name": "Naval Base (Facility)",
+        "imagePath": "attachment_facilitynavalbase.png",
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilitylogisticshub",
+        "name": "Logistics Hub (Facility)",
+        "imagePath": "attachment_facilitylogisticshub.png",
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilityembassy1",
+        "name": "Embassy (Facility)",
+        "imagePath": "attachment_facilityembassy1.png",
+        "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilityembassy2",
+        "name": "Embassy (Facility)",
+        "imagePath": "attachment_facilityembassy2.png",
+        "influenceModifier": 2,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilityembassy3",
+        "name": "Embassy (Facility)",
+        "imagePath": "attachment_facilityembassy3.png",
+        "influenceModifier": 3,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilityembassy4",
+        "name": "Embassy (Facility)",
+        "imagePath": "attachment_facilityembassy4.png",
+        "influenceModifier": 4,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilityembassy5",
+        "name": "Embassy (Facility)",
+        "imagePath": "attachment_facilityembassy5.png",
+        "influenceModifier": 5,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilityembassy6",
+        "name": "Embassy (Facility)",
+        "imagePath": "attachment_facilityembassy6.png",
+        "influenceModifier": 6,
+        "isFakeAttachment": true,
+        "source": "other"
+    },
+    {
+        "id": "facilityembassy7",
+        "name": "Embassy (Facility)",
+        "imagePath": "attachment_facilityembassy7.png",
+        "influenceModifier": 7,
+        "isFakeAttachment": true,
+        "source": "other"
+    }
+
+]
