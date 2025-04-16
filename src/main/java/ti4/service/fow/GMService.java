@@ -73,7 +73,7 @@ public class GMService {
         MessageHelper.sendMessageToChannel(getGMChannel(game), msg);
     }
     
-    private static String gmPing(Game game) {
+    public static String gmPing(Game game) {
         if (game.isFowMode()) {
             List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
             if (!gmRoles.isEmpty()) {

@@ -154,6 +154,8 @@ public class CreateFoWGameService {
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
         HomebrewService.offerGameHomebrewButtons(gmChannel);
+        GMService.logPlayerActivity(newGame, null, 
+            "This thread will log player slash commands and other possible suspicious activities.", GMService.gmPing(newGame));
 
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
