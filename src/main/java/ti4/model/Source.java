@@ -101,6 +101,7 @@ public class Source {
                 case promises_promises -> "Promises Promises";
                 case franken -> "Franken Draft [Homebrew Game Mode]";
                 case monuments -> "Monuments+";
+                case omega_phase -> "Omega Phase [Homebrew]";
                 default -> toString();
             };
         }

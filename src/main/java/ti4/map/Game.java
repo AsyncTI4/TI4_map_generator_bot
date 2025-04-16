@@ -1165,6 +1165,19 @@ public class Game extends GameProperties {
         }
     }
 
+    public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
+        List<String> objectiveList = type == 1 ? publicObjectives1Peakable : publicObjectives2Peakable;
+        if (objectiveList.size() + 1 < sizeOfBottom) {
+            throw new IllegalArgumentException("Cannot shuffle in bottom objective, size of bottom exceeds new size of deck.");
+        }
+        if (sizeOfBottom < 1) {
+            throw new IllegalArgumentException("Size of bottom must be greater than 0.");
+        }
+        var insertPositionFromEnd = ThreadLocalRandom.current().nextInt(sizeOfBottom);
+        var insertPosition = objectiveList.size() - insertPositionFromEnd;
+        objectiveList.add(insertPosition, cardIdToShuffle);
+    }
+
     public void setUpPeakableObjectives(int num, int type) {
         if (type == 1) {
             while (publicObjectives1Peakable.size() != num) {

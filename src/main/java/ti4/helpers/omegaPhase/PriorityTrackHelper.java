@@ -2,7 +2,6 @@ package ti4.helpers.omegaPhase;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import ti4.map.Game;
 import ti4.map.Player;
@@ -118,12 +117,12 @@ public class PriorityTrackHelper {
 
     public static List<Player> GetPriorityTrack(Game game) {
         List<Player> priorityTrack = new ArrayList<>();
-        int numPlayers = game.getPlayers().size();
+        int numPlayers = game.getRealPlayers().size();
         for (int i = 0; i < numPlayers; i++) {
             priorityTrack.add(null);
         }
 
-        for (Player player : game.getPlayers().values()) {
+        for (Player player : game.getRealPlayers()) {
             int position = player.getPriorityPosition();
             if (position > 0 && position <= numPlayers) {
                 priorityTrack.set(position - 1, player);

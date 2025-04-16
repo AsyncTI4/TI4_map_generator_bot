@@ -18,6 +18,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.player.RefreshCardsService;
 
 @UtilityClass
 public class StatusCleanupService {
@@ -54,10 +55,7 @@ public class StatusCleanupService {
             player.setInRoundTurnCount(0);
             player.clearSCs();
             player.clearFollowedSCs();
-            player.clearExhaustedTechs();
-            player.clearExhaustedPlanets(true);
-            player.clearExhaustedRelics();
-            player.clearExhaustedAbilities();
+            RefreshCardsService.refreshPlayerCards(game, player, true);
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
             game.removeStoredValue(player.getFaction() + "scpickqueue");
 

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +53,7 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.omegaPhase.PriorityTrackHelper;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.listeners.annotations.ButtonHandler;
@@ -86,6 +88,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
+import ti4.service.player.RefreshCardsService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.PassService;
@@ -1847,14 +1850,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
                     buttons.add(drawStage1);
                 }
-                if (game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) {
+                if ((game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) && !game.isOmegaPhaseMode()) {
                     if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                         buttons.add(draw2Stage2);
                     } else {
                         buttons.add(drawStage2);
                     }
                 }
-                if (game.getRound() > 7 || game.getPublicObjectives2Peakable().isEmpty()) {
+                if (game.getRound() > (game.isOmegaPhaseMode() ? 9 : 7) || game.getPublicObjectives2Peakable().isEmpty()) {
                     if (game.isFowMode()) {
                         message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
                         message2 += " Or end the game manually.";
@@ -2551,10 +2554,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("proceed_to_strategy")
     public static void proceedToStrategy(ButtonInteractionEvent event, Game game) {
+        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
+            PriorityTrackHelper.PrintPriorityTrack(game);
+            return;
+        }
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             for (Player player_ : players.values()) {
-                player_.clearExhaustedPlanets(false);
+                RefreshCardsService.refreshPlayerCards(game, player_, false);
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), "All planets have been readied at the end of the agenda phase.");
         } else {
@@ -2688,6 +2696,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("startStrategyPhase")
     public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
+        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
+            PriorityTrackHelper.PrintPriorityTrack(game);
+            return;
+        }
         StartPhaseService.startPhase(event, game, "strategy");
         ButtonHelper.deleteMessage(event);
     }
@@ -2993,6 +3006,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (speaker == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please assign speaker before hitting this button.");
             ButtonHelper.offerSpeakerButtons(game, player);
+            return;
+        }
+        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before revealing public objectives.");
+            PriorityTrackHelper.PrintPriorityTrack(game);
             return;
         }
         RevealPublicObjectiveService.revealTwoStage1(game);

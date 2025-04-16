@@ -400,6 +400,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.RED_TAPE_MODE + " " + game.isRedTapeMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.OMEGA_PHASE_MODE + " " + game.isOmegaPhaseMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.STRAT_PINGS + " " + game.isStratPings());
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + game.isAbsolMode());
