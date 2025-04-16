@@ -19,7 +19,7 @@ public class OmegaPhaseModStatusHelper {
             "- When everyone has passed, skip the start of the Status Phase scoring by using `/game start_phase statusHomework`\n" +
             "- At the end of the Status Phase and any Agenda Phase, use `game start_phase statusScoring` to do scoring and reveal the next Agenda\n" +
             "- After scoring, the Speaker should use `/custom peek_at_stage1 location1: 1` to peek at the next Objective\n" +
-            "- After scoring, use `/game start_phase strategy` to star the Strategy Phase\n" +
+            "- After scoring, use `/game start_phase strategy` to start the Strategy Phase\n" +
             "- Voting is currently skipped, skipping straight to buttons to resolve the Agenda. Players should privately message the Speaker which planets they will exhaust, and the Speaker will reveal all player's exhausted planets together when all voting players have done so. At this time, players may use relevant abilities that apply when voting. Players should sum their planets' votes and then note their actual final vote tally after all effects are accounted for. Then the Speaker votes, and uses the appropriate button to resolve the correct outcome.\n";
         MessageHelper.sendMessageToChannelAndPin(game.getActionsChannel(), greeting);
     }
