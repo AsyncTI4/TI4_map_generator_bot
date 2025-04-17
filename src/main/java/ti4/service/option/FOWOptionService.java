@@ -91,12 +91,8 @@ public class FOWOptionService {
         if (event == null) {
             MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, sb.toString(), optionButtons);
         } else {
-            List<ActionRow> rows = new ArrayList<>();
-            for (int i = 0; i < optionButtons.size(); i += 5) {
-                int end = Math.min(i + 5, optionButtons.size());
-                rows.add(ActionRow.of(optionButtons.subList(i, end)));
-            }
-            event.getHook().editOriginal(sb.toString()).setComponents(rows).queue();
+            List<List<ActionRow>> buttonRows = MessageHelper.getPartitionedButtonLists(optionButtons);
+            event.getHook().editOriginal(sb.toString()).setComponents(buttonRows.getFirst()).queue();
         }
     }
 
