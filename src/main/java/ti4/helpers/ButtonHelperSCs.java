@@ -3,7 +3,9 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -11,16 +13,20 @@ import org.jetbrains.annotations.NotNull;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
@@ -662,7 +668,12 @@ public class ButtonHelperSCs {
         ReactionService.addReaction(event, game, player);
         String unit = buttonID.replace("construction_", "");
         if (unit.equalsIgnoreCase("facility")) {
-
+            String message = player.getRepresentationUnfogged() + ", please choose the facility you wish to place.";
+            if (!player.getSCs().contains(4)) {
+                message += "\n## __It will place a command token in the system as well.__ ";
+            }
+            List<Button> buttons = getPossibleFacilities(game, player);
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         } else {
             UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
             String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
@@ -677,7 +688,180 @@ public class ButtonHelperSCs {
         // for (MessageCreateData messageD : messageList) {
         //     event.getHook().setEphemeral(true).sendMessage(messageD).queue();
         // }
+    }
 
+    public static List<String> findUsedFacilities(Game game, Player player) {
+        List<String> facilities = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            Planet uH = game.getUnitHolderFromPlanet(planet);
+            if (uH != null) {
+                for (String token : uH.getTokenList()) {
+                    if (token.contains("facility")) {
+                        facilities.add(token.replace(".png", "").replace("attachment_", ""));
+                    }
+                }
+            }
+        }
+        return facilities;
+    }
+
+    @ButtonHandler("startFacilityPlacement_")
+    public static void startFacilityPlacement(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        String facility = buttonID.split("_")[1];
+        List<String> planets = findUsablePlanetsForFacility(game, player, facility);
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : planets) {
+            buttons.add(Buttons.green("addFacility_" + planet + "_" + facility, Helper.getPlanetRepresentation(planet, game)));
+        }
+        String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your facility on";
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+    }
+
+    public static List<Button> getPossibleFacilities(Game game, Player player) {
+        List<Button> facilities = new ArrayList<>();
+        List<String> usedFacilities = findUsedFacilities(game, player);
+        String facilityID = "facilitycorefactory";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Core Factory"));
+        }
+        facilityID = "facilitytransitnode";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Transit Node"));
+        }
+        facilityID = "facilityresearchlab";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Research Lab"));
+        }
+        facilityID = "facilitynavalbase";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Naval Base"));
+        }
+        facilityID = "facilitylogisticshub";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Logistics Hub"));
+        }
+        facilityID = "facilityembassy";
+        boolean hasEmbassy = false;
+        for (String fac : usedFacilities) {
+            if (fac.contains("facilityembassy")) {
+                hasEmbassy = true;
+            }
+        }
+        if (!hasEmbassy) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Embassy"));
+        }
+        int colonies = 0;
+        facilityID = "facilitycolony";
+        for (String fac : usedFacilities) {
+            if (fac.contains(facilityID)) {
+                colonies++;
+            }
+        }
+        if (colonies < 2) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Colony"));
+        }
+        colonies = 0;
+        facilityID = "facilityrefinery";
+        for (String fac : usedFacilities) {
+            if (fac.contains(facilityID)) {
+                colonies++;
+            }
+        }
+        if (colonies < 2) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Refinery"));
+        }
+        return facilities;
+    }
+
+    public static List<String> findUsablePlanetsForFacility(Game game, Player player, String facility) {
+        List<String> planets = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            Planet uH = game.getUnitHolderFromPlanet(planet);
+            if (uH != null) {
+                if (uH.getPlanetTypes().contains("industrial") && !facility.contains("research")) {
+                    planets.add(planet);
+                } else if (uH.getPlanetTypes().contains("cultural") && !facility.contains("research") && !facility.contains("corefactory")) {
+                    planets.add(planet);
+                } else if (uH.getPlanetTypes().contains("hazardous") && !facility.contains("research") && !facility.contains("embassy") && !facility.contains("naval")) {
+                    planets.add(planet);
+                } else if (planet.equalsIgnoreCase("mr") && !facility.contains("research") && !facility.contains("logistics")) {
+                    planets.add(planet);
+                } else if (!uH.getTechSpecialities().isEmpty() && facility.contains("research")) {
+                    planets.add(planet);
+                } else if (uH.isLegendary() && !facility.contains("research") && !facility.contains("embassy") && !facility.contains("core") && !facility.contains("logistics")) {
+                    planets.add(planet);
+                }
+            }
+        }
+        return planets;
+    }
+
+    public static int getNearbyEmbassyCount(Game game, Tile tile, Player player) {
+        int embassy = 0;
+        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
+            Tile tile2 = game.getTileByPosition(pos);
+            for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
+                for (String token : uH.getTokenList()) {
+                    if (token.contains("facilityembassy")) {
+                        embassy++;
+                    }
+                }
+            }
+        }
+        return embassy;
+    }
+
+    public static void updateEmbassies(Game game, Player player, Tile tile) {
+        int count = getNearbyEmbassyCount(game, tile, player);
+        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
+            Tile tile2 = game.getTileByPosition(pos);
+            for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
+                Set<String> tokens = new HashSet<>();
+                tokens.addAll(uH.getTokenList());
+                for (String token : tokens) {
+                    if (token.contains("facilityembassy")) {
+                        uH.removeToken(token);
+                        uH.addToken("attachment_facilityembassy" + count + ".png");
+                    }
+                }
+            }
+        }
+    }
+
+    @ButtonHandler("addFacility_")
+    public static void addFacility(Game game, Player player, String buttonID, GenericInteractionCreateEvent event) {
+        String planet = buttonID.split("_")[1];
+        String facility = buttonID.split("_")[2];
+        Planet plan = game.getUnitHolderFromPlanet(planet);
+        String message = player.getRepresentation() + " added a facility of type " + facility + " to " + Helper.getPlanetRepresentation(planet, game);
+        if (plan != null) {
+            if (!facility.contains("embassy")) {
+                plan.addToken("attachment_" + facility + ".png");
+            } else {
+                int embassy = getNearbyEmbassyCount(game, game.getTileFromPlanet(planet), player);
+                plan.addToken("attachment_" + facility + (embassy + 1) + ".png");
+                updateEmbassies(game, player, game.getTileFromPlanet(planet));
+            }
+            if (facility.contains("logistics")) {
+                player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
+                message += " Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect. Players will have to monitor this)";
+            }
+        }
+
+        if (event instanceof ButtonInteractionEvent bEvent) {
+            bEvent.getMessage().delete().queue();
+            if (!buttonID.contains("_dont")) {
+                ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
+            } else {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            }
+            if (!player.getSCs().contains(4) && !buttonID.contains("_dont")) {
+                UnfiledButtonHandlers.reinforcementsCCPlacement(event, game, player, "reinforcements_cc_placement_" + planet);
+            }
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        }
     }
 
     @ButtonHandler("anarchy10PeekStart")

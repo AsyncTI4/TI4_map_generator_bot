@@ -46,6 +46,7 @@
         "spaceCannonHitsOn": 8,
         "spaceCannonDieCount": 1,
         "sustainDamage": true,
+        "isGroundForce": true,
         "ability": "When this unit uses SUSTAIN DAMAGE, cancel 2 hits instead of 1.",
         "homebrewReplacesID": "xxcha_mech",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/absol/Indomitus.png?raw=true"
