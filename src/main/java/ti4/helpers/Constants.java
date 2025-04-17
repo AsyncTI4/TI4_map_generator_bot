@@ -1016,6 +1016,7 @@ public class Constants {
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
     public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
     public static final String LANEFIR_ATS_COUNT = "ats_count";
+    public static final String SET_PLANET_TRADEGOODS = "set_planet_tradegoods";
     public static final String PILLAGE_COUNT = "pillage_count";
     public static final String SARWEEN_COUNT = "sarween_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";

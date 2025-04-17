@@ -1,5 +1,7 @@
 package ti4.buttons;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 
@@ -713,13 +714,13 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (uH != null) {
             if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
                 Tile tile = game.getTileFromPlanet(planetName);
-                String msg = player.getRepresentation() + " added 1 infantry to " + planetName
+                String msg = player.getRepresentation() + " added 1 infantry to " + Helper.getPlanetRepresentation(planetName, game)
                     + " due to the _Arcane Citadel_.";
                 AddUnitService.addUnits(event, tile, game, player.getColor(), "1 infantry " + planetName);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             if (uH.getTokenList().contains("attachment_facilitylogisticshub.png")) {
-                String msg = player.getRepresentation() + " gained 1 commodity due to exhausting " + planetName
+                String msg = player.getRepresentation() + " gained 1 commodity due to exhausting " + Helper.getPlanetRepresentation(planetName, game)
                     + " while it had a Logistics Hub Facility.";
                 player.setCommodities(Math.min(player.getCommodities() + 1, player.getCommoditiesTotal()));
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -727,9 +728,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             if (uH.getTokenList().contains("attachment_facilityresearchlab.png")) {
                 player.setHarvestCounter(player.getHarvestCounter() + 1);
                 String msg = player.getRepresentation() + " gained 1 trade good on the research lab due to exhausting "
-                    + planetName
+                    + Helper.getPlanetRepresentation(planetName, game)
                     + " while it had a Research Lab on it. It now has " + player.getHarvestCounter()
-                    + " tradegoods on it, which can be adjusted with /ds set_planet_tradegoods";
+                    + " trade goods on it, which can be adjusted with /ds set_planet_tradegoods";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }

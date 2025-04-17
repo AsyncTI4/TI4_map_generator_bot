@@ -577,7 +577,10 @@ public class PlayStrategyCardService {
         Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
-
+        if (game.isFacilitiesMode()) {
+            Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
+            return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
 
@@ -671,6 +674,10 @@ public class PlayStrategyCardService {
         Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button monumentButton = Buttons.red("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        if (game.isFacilitiesMode()) {
+            Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
+            return List.of(followButton, sdButton, pdsButton, monumentButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, sdButton, pdsButton, monumentButton, noFollowButton);
     }
 }

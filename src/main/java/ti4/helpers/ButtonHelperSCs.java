@@ -834,7 +834,7 @@ public class ButtonHelperSCs {
         String planet = buttonID.split("_")[1];
         String facility = buttonID.split("_")[2];
         Planet plan = game.getUnitHolderFromPlanet(planet);
-        String message = player.getRepresentation() + " added a facility of type " + facility + " to " + Helper.getPlanetRepresentation(planet, game);
+        String message = player.getRepresentation() + " added a facility of type " + facility.replace("facility", "");
         if (plan != null) {
             if (!facility.contains("embassy")) {
                 plan.addToken("attachment_" + facility + ".png");
@@ -843,6 +843,7 @@ public class ButtonHelperSCs {
                 plan.addToken("attachment_" + facility + (embassy + 1) + ".png");
                 updateEmbassies(game, player, game.getTileFromPlanet(planet));
             }
+            message += " to " + Helper.getPlanetRepresentation(planet, game);
             if (facility.contains("logistics")) {
                 player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
                 message += " Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect. Players will have to monitor this)";
