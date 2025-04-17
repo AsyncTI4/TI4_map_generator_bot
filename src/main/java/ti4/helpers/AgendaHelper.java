@@ -1429,6 +1429,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
 
         ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " don't forget you now have to decide on whether you will play any more afters.");
     }
 
     public static List<Button> getWhenButtons(Game game) {
