@@ -1429,6 +1429,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
 
         ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " don't forget you now have to decide on whether you will play any more afters.");
     }
 
     public static List<Button> getWhenButtons(Game game) {
@@ -3444,7 +3445,7 @@ public class AgendaHelper {
             pingAboutDebt(game);
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
-                String message = "During the action phase, the **Politics** player did the following with the agendas that they looked at: "
+                String message = "## The Politics player did the following with the agendas that they looked at: "
                     + game.getStoredValue(key).replace("_", ", ") + ".";
                 MessageHelper.sendMessageToChannel(channel, message);
 

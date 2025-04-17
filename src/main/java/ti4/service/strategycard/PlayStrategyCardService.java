@@ -439,7 +439,7 @@ public class PlayStrategyCardService {
             case "pok1leadership" -> getLeadershipButtons(sc);
             case "pok2diplomacy" -> getDiplomacyButtons(sc, player);
             case "pok3politics" -> getPoliticsButtons(sc);
-            case "pok4construction" -> getConstructionButtons(sc);
+            case "pok4construction" -> getConstructionButtons(sc, game);
             case "pok5trade" -> getTradeButtons(sc);
             case "pok6warfare" -> getWarfareButtons(sc);
             case "anarchy1" -> getAnarchy1Buttons(sc);
@@ -461,7 +461,7 @@ public class PlayStrategyCardService {
             case "cryypter_3" -> CryypterHelper.getCryypterSC3Buttons(sc);
 
             // monuments
-            case "monuments4construction" -> getMonumentsConstructionButtons(sc);
+            case "monuments4construction" -> getMonumentsConstructionButtons(sc, game);
 
             //riftset
             case "riftset_9" -> RiftSetModeService.getSacrificeButtons();
@@ -572,11 +572,15 @@ public class PlayStrategyCardService {
     /**
      * @return buttons which hit {@link ButtonHelperSCs#construction}
      */
-    private static List<Button> getConstructionButtons(int sc) {
+    private static List<Button> getConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        if (game.isFacilitiesMode()) {
+            Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
+            return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
 
@@ -664,12 +668,16 @@ public class PlayStrategyCardService {
     /**
      * @return buttons which hit {@link ButtonHelperSCs#construction}
      */
-    private static List<Button> getMonumentsConstructionButtons(int sc) {
+    private static List<Button> getMonumentsConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button monumentButton = Buttons.red("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        if (game.isFacilitiesMode()) {
+            Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
+            return List.of(followButton, sdButton, pdsButton, monumentButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, sdButton, pdsButton, monumentButton, noFollowButton);
     }
 }

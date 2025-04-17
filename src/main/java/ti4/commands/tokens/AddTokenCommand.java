@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,8 +16,8 @@ import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -129,7 +131,27 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
 
                 }
             }
-            tile.addToken(tokenID, planet);
+            if (tokenID.contains("facility")) {
+                String facility = tokenID;
+                Player player = game.getActivePlayer();
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2.getPlanets().contains(planet)) {
+                        player = p2;
+                    }
+                }
+                if (!facility.contains("embassy")) {
+                    tile.addToken(tokenID, planet);
+                } else {
+                    int embassy = ButtonHelperSCs.getNearbyEmbassyCount(game, tile, player);
+                    tile.addToken("attachment_facilityembassy" + +(embassy + 1) + ".png", planet);
+                    ButtonHelperSCs.updateEmbassies(game, player, tile);
+                }
+                if (facility.contains("logistics")) {
+                    player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
+                }
+            } else {
+                tile.addToken(tokenID, planet);
+            }
             if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)) {
                 Helper.addMirageToTile(tile);
             }
@@ -156,8 +178,7 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 .setRequired(true)
                 .setAutoComplete(true),
             new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
-                .setAutoComplete(true)
-        );
+                .setAutoComplete(true));
     }
 
 }

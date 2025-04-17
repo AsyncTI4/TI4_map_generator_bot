@@ -206,6 +206,10 @@ public class ComponentActionHelper {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
             compButtons.add(abilityButton);
         }
+        if (ButtonHelperSCs.findUsedFacilities(game, p1).contains("facilitycorefactory")) {
+            Button abilityButton = Buttons.green(finChecker + "corefacilityAction", "Use Core Facility Action");
+            compButtons.add(abilityButton);
+        }
         if (p1.hasLeader("pharadncommander") && !p1.hasLeaderUnlocked("pharadncommander") && ButtonHelperCommanders.getPharadnCommanderUnlockButtons(p1, game).size() > 5) {
             Button abilityButton = Buttons.green("unlockPharadnCommander", "Unlock Commander", FactionEmojis.pharadn);
             compButtons.add(abilityButton);

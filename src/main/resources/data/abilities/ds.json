@@ -760,7 +760,7 @@
         "id": "corporate_entity",
         "name": "Corporate Entity",
         "faction": "veldyr",
-        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives.",
+        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives. [Note: they still count towards strengthen bonds and betray a friend, as they are promissory notes]",
         "source": "ds"
     },
     {

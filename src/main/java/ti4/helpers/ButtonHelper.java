@@ -2814,6 +2814,7 @@ public class ButtonHelper {
                 for (String token : capChecker.getTokenList()) {
                     if (token.contains("facilitynavalbase")) {
                         fightersIgnored += 4;
+                        fleetCap += 2;
                     }
                 }
             }
