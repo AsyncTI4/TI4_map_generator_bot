@@ -92,6 +92,7 @@ public class GameProperties {
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
+    private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
     private @ExportableField boolean allianceMode;
     private @ExportableField boolean communityMode;

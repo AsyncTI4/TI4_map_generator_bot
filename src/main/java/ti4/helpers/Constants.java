@@ -996,6 +996,7 @@ public class Constants {
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String CC_LIMIT = "cc_limit";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";
+    public static final String FACILITIES_MODE = "facilities_mode";
     public static final String MINOR_FACTIONS_MODE = "minor_factions_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
@@ -1015,6 +1016,7 @@ public class Constants {
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
     public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
     public static final String LANEFIR_ATS_COUNT = "ats_count";
+    public static final String SET_PLANET_TRADEGOODS = "set_planet_tradegoods";
     public static final String PILLAGE_COUNT = "pillage_count";
     public static final String SARWEEN_COUNT = "sarween_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";

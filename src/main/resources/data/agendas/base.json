@@ -95,7 +95,7 @@
         "name": "Enforced Travel Ban",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Alpha and beta wormholes have no effect during movement.",
+        "text1": "For: Alpha and beta wormholes have no effect during movement. [Note: this only affects normal wormhole adjacency. Ghost agent, other agenda laws, and the AC lost star chart will overrule this.]",
         "text2": "Against: Destroy each PDS in or adjacent to a system that contains a wormhole.",
         "forEmoji": "⛔",
         "againstEmoji": "💥",
