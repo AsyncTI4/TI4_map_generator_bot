@@ -1,5 +1,9 @@
 package ti4.helpers.omegaPhase;
 
+import java.util.Map;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -43,5 +47,17 @@ public class VoiceOfTheCouncilHelper {
         }
         sb.append(player.getRepresentation()).append(" has been elected as Voice of the Council.");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
+    }
+
+    public static void RevealVoiceOfTheCouncil(Game game, GenericInteractionCreateEvent event) {
+        if (!game.removeLaw(Constants.VOICE_OF_THE_COUNCIL_ID)) {
+            game.revealAgenda(Constants.VOICE_OF_THE_COUNCIL_ID, true);
+        }
+        game.getScoredPublicObjectives().remove(Constants.VOICE_OF_THE_COUNCIL_PO);
+
+        Map<String, Integer> discardAgendas = game.getDiscardAgendas();
+        Integer uniqueID = discardAgendas.get(Constants.VOICE_OF_THE_COUNCIL_ID);
+        game.putAgendaBackIntoDeckOnTop(uniqueID);
+        AgendaHelper.revealAgenda(event, false, game, event.getMessageChannel());
     }
 }

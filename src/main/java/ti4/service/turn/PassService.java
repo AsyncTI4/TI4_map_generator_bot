@@ -10,6 +10,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.DiscordantStarsHelper;
+import ti4.helpers.omegaPhase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -65,6 +66,10 @@ public class PassService {
                     + " (commodities went from " + oldComm + " -> " + player.getCommodities() + ").";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
+        }
+
+        if (game.isOmegaPhaseMode()) {
+            PriorityTrackHelper.AssignPlayerToPriority(game, player, null);
         }
 
         DiscordantStarsHelper.checkKjalengardMechs(event, player, game);

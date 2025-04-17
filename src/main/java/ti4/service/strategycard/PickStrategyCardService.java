@@ -196,6 +196,9 @@ public class PickStrategyCardService {
             }
         }
         if (allPicked) {
+            if (game.isOmegaPhaseMode()) {
+                PriorityTrackHelper.ClearPriorityTrack(game);
+            }
             for (Player p2 : game.getRealPlayers()) {
                 List<Button> buttons = new ArrayList<>();
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {

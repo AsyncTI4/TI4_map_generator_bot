@@ -47,10 +47,12 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.ObjectiveHelper;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.omegaPhase.PriorityTrackHelper;
@@ -1074,7 +1076,17 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
 
-        StartPhaseService.startStatusHomework(event, game);
+        if (!game.isOmegaPhaseMode()) {
+            StartPhaseService.startStatusHomework(event, game);
+        } else {
+            var speakerPlayer = game.getSpeaker();
+            ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
+            String message = "The next Objective has been revealed to " + speakerPlayer.getRepresentation() + ". When ready, proceed to the Strategy Phase.";
+            Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
+                "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
+            MessageHelper.sendMessageToChannelWithButton(event.getChannel(), message, proceedToStrategyPhase);
+        }
+
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1857,7 +1869,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         buttons.add(drawStage2);
                     }
                 }
-                if (game.getRound() > (game.isOmegaPhaseMode() ? 9 : 7) || game.getPublicObjectives2Peakable().isEmpty()) {
+                var endGameDeck = game.isOmegaPhaseMode() ? game.getPublicObjectives1Peakable() : game.getPublicObjectives2Peakable();
+                var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
+                if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
                     if (game.isFowMode()) {
                         message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
                         message2 += " Or end the game manually.";
@@ -1873,7 +1887,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }
             case "pass_on_abilities" -> {
-                if (game.isCustodiansScored()) {
+                if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now,",
@@ -1885,7 +1899,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
             }
             case "redistributeCCButtons" -> {
-                if (game.isCustodiansScored()) {
+                if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                     List<Button> buttons = List.of(flipAgenda);
@@ -2093,7 +2107,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("scoreAnObjective")
     public static void scoreAnObjective(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> poButtons = EndTurnService.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
+        List<Button> poButtons = StatusHelper.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
         poButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {

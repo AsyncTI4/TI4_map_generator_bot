@@ -11,6 +11,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.omegaPhase.OmegaPhaseModStatusHelper;
+import ti4.helpers.omegaPhase.PriorityTrackHelper;
 import ti4.helpers.omegaPhase.VoiceOfTheCouncilHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -199,6 +200,7 @@ public class HomebrewService {
                 //end
 
                 VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(game);
+                PriorityTrackHelper.CreateDefaultPriorityTrack(game);
                 OmegaPhaseModStatusHelper.PrintGreeting(game);
             }
         }

@@ -3027,9 +3027,15 @@ public class AgendaHelper {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         Button flipNextAgenda = Buttons.blue("flip_agenda", "Flip Agenda #" + aCount);
-        Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
-            "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
-        List<Button> resActionRow = Arrays.asList(flipNextAgenda, proceedToStrategyPhase);
+        List<Button> resActionRow = Arrays.asList(flipNextAgenda);
+        if (!game.isOmegaPhaseMode()) {
+            Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
+                "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
+            resActionRow.add(proceedToStrategyPhase);
+        } else {
+            Button proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to scoring objectives");
+            resActionRow.add(proceedToScoring);
+        }
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
         ButtonHelper.deleteMessage(event);
     }

@@ -27,6 +27,7 @@ import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.omegaPhase.PriorityTrackHelper;
 import ti4.image.BannerGenerator;
@@ -90,7 +91,9 @@ public class StartPhaseService {
                 game.setExplorationDeckID(deckModel.getAlias());
             }
             case "statusScoring" -> {
-                EndTurnService.showPublicObjectivesWhenAllPassed(event, game, game.getMainGameChannel());
+                StatusHelper.AnnounceStatusPhase(game);
+                StatusHelper.BeginScoring(event, game, event.getMessageChannel());
+                StatusHelper.HandleStatusPhaseMiddle(event, game, event.getMessageChannel());
                 game.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {
@@ -371,6 +374,7 @@ public class StartPhaseService {
                 firstSCPicker = Helper.getSpeakerOrderFromThisPlayer(firstSCPicker, game).get(1);
             }
         } else {
+            PriorityTrackHelper.PrintPriorityTrack(game);
             var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
             var firstInPriorityOrder = priorityTrack.stream()
                 .filter(Objects::nonNull)
@@ -582,7 +586,7 @@ public class StartPhaseService {
         }
         boolean custodiansTaken = game.isCustodiansScored();
         Button passOnAbilities;
-        if (custodiansTaken) {
+        if (custodiansTaken || game.isOmegaPhaseMode()) {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
             message2 += """
                 This is the moment when you should resolve:\s

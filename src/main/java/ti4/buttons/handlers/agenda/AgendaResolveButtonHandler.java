@@ -751,7 +751,7 @@ class AgendaResolveButtonHandler {
 
                 }
             }
-            if ("absol_artifact".equalsIgnoreCase(agID) ||"artifact".equalsIgnoreCase(agID) || "little_omega_artifact".equalsIgnoreCase(agID)) {
+            if ("absol_artifact".equalsIgnoreCase(agID) || "artifact".equalsIgnoreCase(agID) || "little_omega_artifact".equalsIgnoreCase(agID)) {
                 TextChannel watchParty = AgendaHelper.watchPartyChannel(game);
                 String watchPartyPing = AgendaHelper.watchPartyPing(game);
                 if (watchParty != null && !game.isFowMode()) {
@@ -772,12 +772,12 @@ class AgendaResolveButtonHandler {
                 } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "Against on _Ixthian Artifact_‽ Disgraceful.");
-                    if("absol_artifact".equalsIgnoreCase(agID)){
+                    if ("absol_artifact".equalsIgnoreCase(agID)) {
                         Integer poIndex = game.addCustomPO("Ixthian Rex Point", 1);
                         StringBuilder message = new StringBuilder();
                         message.append("Custom objective _Ixthian Rex Point_ has been added.\n");
                         for (Player playerWL : game.getRealPlayers()) {
-                            if(playerWL.getPlanets().contains("mr")){
+                            if (playerWL.getPlanets().contains("mr")) {
                                 game.scorePublicObjective(playerWL.getUserID(), poIndex);
                                 message.append(playerWL.getRepresentation()).append(" scored _Ixthian Rex Point_.\n");
                                 Helper.checkEndGame(game, playerWL);
@@ -1052,7 +1052,14 @@ class AgendaResolveButtonHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
         RiftSetModeService.includeCrucibleAgendaButton(buttons, game);
-        buttons.add(Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)"));
+        if (!game.isOmegaPhaseMode()) {
+            buttons.add(Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)"));
+        } else {
+            Button electVoiceOfTheCouncil = Buttons.green("elect_voice_of_the_council", "Elect Voice of the Council");
+            buttons.add(electVoiceOfTheCouncil);
+            Button proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to scoring objectives");
+            buttons.add(proceedToScoring);
+        }
 
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
