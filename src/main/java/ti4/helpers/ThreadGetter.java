@@ -1,6 +1,8 @@
 package ti4.helpers;
 
 import javax.annotation.Nonnull;
+
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import lombok.experimental.UtilityClass;
@@ -26,22 +28,54 @@ public class ThreadGetter {
                 .findFirst()
                 .ifPresentOrElse(consumer, () -> searchForArchivedThreadOrCreateNew(channel, threadName, createIfDoesntExist, createAsPrivate, consumer));
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(channel), "Could not find existing #cards-info thread using name: " + threadName, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(channel), "Could not find existing thread using name: " + threadName, e);
         }
 
     }
 
     private static void searchForArchivedThreadOrCreateNew(@Nonnull TextChannel channel, @Nonnull String threadName, boolean createIfDoesntExist, boolean createAsPrivate,
                                                             @Nonnull Consumer<ThreadChannel> consumer) {
-        channel.retrieveArchivedPrivateThreadChannels().queue(threadChannels ->
-            threadChannels.stream()
-                .filter(threadChannel -> threadChannel.getName().equals(threadName))
-                .findFirst()
-                .ifPresentOrElse(consumer, () -> {
+        // First: Check private archived threads
+        channel.retrieveArchivedPrivateThreadChannels().queue(privateThreads -> {
+            Optional<ThreadChannel> privateMatch = privateThreads.stream()
+                .filter(thread -> thread.getName().equals(threadName))
+                .findFirst();
+
+            if (privateMatch.isPresent()) {
+                reopenIfNeededOrPass(privateMatch.get(), channel, threadName, createIfDoesntExist, createAsPrivate, consumer);
+            } else {
+                // Then: Check public archived threads
+                channel.retrieveArchivedPublicThreadChannels().queue(publicThreads -> {
+                    Optional<ThreadChannel> publicMatch = publicThreads.stream()
+                        .filter(thread -> thread.getName().equals(threadName))
+                        .findFirst();
+
+                    if (publicMatch.isPresent()) {
+                        reopenIfNeededOrPass(publicMatch.get(), channel, threadName, createIfDoesntExist, createAsPrivate, consumer);
+                    } else if (createIfDoesntExist) {
+                        createNewThreadChannel(channel, threadName, createAsPrivate, consumer);
+                    }
+                });
+            }
+        });
+    }
+
+    private static void reopenIfNeededOrPass(@Nonnull ThreadChannel thread, @Nonnull TextChannel channel, String threadName,
+                                         boolean createIfDoesntExist, boolean createAsPrivate,
+                                         @Nonnull Consumer<ThreadChannel> consumer) {
+        if (thread.isArchived()) {
+            thread.getManager().setArchived(false).queue(
+                success -> consumer.accept(thread),
+                error -> {
+                    BotLogger.error(new BotLogger.LogMessageOrigin(channel), "Failed to unarchive thread: " + threadName, error);
                     if (createIfDoesntExist) {
                         createNewThreadChannel(channel, threadName, createAsPrivate, consumer);
                     }
-                }));
+                }
+            );
+        } else {
+            consumer.accept(thread);
+        }
     }
 
     private static void createNewThreadChannel(@Nonnull TextChannel channel, @Nonnull String threadName, boolean createAsPrivate,

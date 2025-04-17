@@ -3,9 +3,11 @@ package ti4.service.fow;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -17,6 +19,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.ThreadGetter;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -47,6 +50,7 @@ public class GMService {
         Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
         Buttons.DONE_DELETE_BUTTONS);
 
+    private static final String ACTIVITY_LOG_THREAD= "-activity-log";
     private static final String STATUS_SUMMARY_THREAD = "Status Summaries";
 
     public static void showGMButtons(Game game) {
@@ -59,7 +63,50 @@ public class GMService {
     }
 
     public static void sendMessageToGMChannel(Game game, String msg) {
+        sendMessageToGMChannel(game, msg, false);
+    }
+
+    public static void sendMessageToGMChannel(Game game, String msg, boolean ping) {
+        if (ping) {
+            msg += " - " + gmPing(game);
+        }
         MessageHelper.sendMessageToChannel(getGMChannel(game), msg);
+    }
+    
+    private static String gmPing(Game game) {
+        if (game.isFowMode()) {
+            List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
+            if (!gmRoles.isEmpty()) {
+                return gmRoles.getFirst().getAsMention();
+            }
+        }
+        return "";
+    }
+
+    public static void logPlayerActivity(Game game, Player player, String eventLog, String jumpUrl) {
+        ThreadGetter.getThreadInChannel(getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false,
+            threadChannel -> {
+                if (jumpUrl != null) {
+                    MessageHelper.sendMessageToChannel(threadChannel, eventLog + " - " + jumpUrl);
+                } else {
+                    jumpToLatestMessage(player, latestJumpUrl -> {
+                        MessageHelper.sendMessageToChannel(threadChannel, eventLog + " - " + latestJumpUrl);
+                    });
+                }
+            });
+    }
+
+    private static void jumpToLatestMessage(Player player, Consumer<String> callback) {
+        MessageChannel privateChannel = player.getPrivateChannel();
+        if (privateChannel != null) {
+            privateChannel.getHistory().retrievePast(1).queue(messages -> {
+                callback.accept( messages.get(0).getJumpUrl());
+            }, throwable -> {
+                callback.accept("No latest message.");
+            });
+        } else {
+            callback.accept("No private channel.");
+        }
     }
 
     @ButtonHandler("gmShowGameAs_")
@@ -158,43 +205,17 @@ public class GMService {
     public static void createFOWStatusSummary(Game game) {
         if (!game.isFowMode() || !game.getFowOption(FOWOption.STATUS_SUMMARY)) return;
 
-        TextChannel mainChannel = game.getMainGameChannel();
-        //Expecting it to be archived
-        mainChannel.retrieveArchivedPublicThreadChannels().queue(archivedThreads -> {
-            for (ThreadChannel thread : archivedThreads) {
-                if (thread.getName().equals(STATUS_SUMMARY_THREAD)) {
-                    thread.getManager().setArchived(false).queue(success -> {
-                        sendSummary(game, thread);
-                        return;
-                    });
-                }
-            }
-        });
-
-        ThreadChannel summaryThread = null;
-        // Check active threads
-        for (ThreadChannel thread : mainChannel.getThreadChannels()) {
-            if (thread.getName().equals(STATUS_SUMMARY_THREAD)) {
-                summaryThread = thread;
-                break;
-            }
-        }
-        // If still null, create a new thread
-        if (summaryThread == null) {
-            summaryThread = mainChannel.createThreadChannel(STATUS_SUMMARY_THREAD).complete();
-        }
-        sendSummary(game, summaryThread);
-    }
-
-    private static void sendSummary(Game game, ThreadChannel summaryThread) {
-        MessageHelper.sendMessageToChannel(summaryThread, "# Round " + game.getRound() + " Status Summary " + game.getPing());
-        List<String> types = new ArrayList<>();
-        types.add(Constants.CULTURAL);
-        types.add(Constants.INDUSTRIAL);
-        types.add(Constants.HAZARDOUS);
-        types.add(Constants.FRONTIER);
-        ExploreService.secondHalfOfExpInfo(types, summaryThread, null, game, true, false);
-       
-        RelicHelper.showRemaining(summaryThread, true, game, null);
+        ThreadGetter.getThreadInChannel(game.getMainGameChannel(), STATUS_SUMMARY_THREAD, true, false,
+            threadChannel -> {
+                MessageHelper.sendMessageToChannel(threadChannel, "# Round " + game.getRound() + " Status Summary " + game.getPing());
+                List<String> types = new ArrayList<>();
+                types.add(Constants.CULTURAL);
+                types.add(Constants.INDUSTRIAL);
+                types.add(Constants.HAZARDOUS);
+                types.add(Constants.FRONTIER);
+                ExploreService.secondHalfOfExpInfo(types, threadChannel, null, game, true, false);
+              
+                RelicHelper.showRemaining(threadChannel, true, game, null);
+            });
     }
 }

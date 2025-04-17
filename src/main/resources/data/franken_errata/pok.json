@@ -21,6 +21,13 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "the_tribuni",
+        "Undraftable": true,
+        "source": "pok"
+    },
+
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "star_forge",
         "OptionalSwaps": [
             "MECH:muaat_mech"
@@ -203,6 +210,12 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "propagation",
+        "Undraftable": true,
+        "source": "pok"
+    },
+    {
+        "ItemCategory": "PN",    
+        "ItemId": "antivirus",
         "Undraftable": true,
         "source": "pok"
     },
