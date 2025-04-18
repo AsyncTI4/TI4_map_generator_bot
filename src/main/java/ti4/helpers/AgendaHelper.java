@@ -3288,7 +3288,7 @@ public class AgendaHelper {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         game.setStoredValue("agendaCount", aCount + "");
-        if (aCount == 1 && game.isShowBanners()) {
+        if (aCount == 1 && game.isShowBanners() && !game.isOmegaPhaseMode()) {
             BannerGenerator.drawPhaseBanner("agenda", game.getRound(), game.getActionsChannel());
         }
 

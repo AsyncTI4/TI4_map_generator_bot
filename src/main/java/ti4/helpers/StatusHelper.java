@@ -39,7 +39,7 @@ public class StatusHelper {
     public static void AnnounceStatusPhase(Game game) {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have passed.");
         if (game.isShowBanners()) {
-            BannerGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel());
+            BannerGenerator.drawPhaseBanner("status", game.getRound(), game.getActionsChannel(), game.isOmegaPhaseMode() ? "omega" : null);
         }
     }
 
@@ -328,7 +328,7 @@ public class StatusHelper {
             if (po_name == null) {
                 Integer integer = customPublicVP.get(key);
                 if (integer != null && !key.toLowerCase().contains("custodian") && !key.toLowerCase().contains("imperial")
-                    && !key.contains("Shard of the Throne")) {
+                    && !key.contains("Shard of the Throne") && !key.contains(Constants.VOICE_OF_THE_COUNCIL_PO)) {
                     po_name = key;
                     poStatus = 2;
                 }
