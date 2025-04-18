@@ -1,6 +1,5 @@
-package ti4.commands2.search;
+package ti4.commands.search;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,7 +15,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands2.Subcommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
