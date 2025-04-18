@@ -219,6 +219,7 @@ public class Constants {
     public static final String SEARCH_MY_GAMES = "my_games";
     public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
+    public static final String SEARCH_SOURCES = "sources";
 
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
     public static final String RELOAD_GAME = "reload_game";

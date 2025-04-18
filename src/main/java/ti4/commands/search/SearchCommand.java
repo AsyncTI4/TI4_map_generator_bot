@@ -33,7 +33,8 @@ public class SearchCommand implements ParentCommand {
         new SearchDecksSubcommand(),
         new SearchFactionsSubcommand(),
         new SearchEmojisSubcommand(),
-        new SearchStrategyCardsSubcommand()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new SearchStrategyCardsSubcommand(),
+        new SearchSources()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

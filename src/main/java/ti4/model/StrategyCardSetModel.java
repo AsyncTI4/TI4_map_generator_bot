@@ -70,4 +70,8 @@ public class StrategyCardSetModel implements ModelInterface {
     public boolean isGroupedSet() {
         return getStrategyCardModels().stream().anyMatch(sc -> sc.getGroup().isPresent());
     }
+    
+    public boolean searchSource(ComponentSource searchSource) {
+        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
+    }
 }
