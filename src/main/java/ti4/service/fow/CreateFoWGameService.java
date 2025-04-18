@@ -144,28 +144,29 @@ public class CreateFoWGameService {
         long gameRoleGMID = roleGM.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
+        // CREATE Anon Announcements CHANNEL
+        TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
+            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
+        StringBuilder sb = new StringBuilder(role.getAsMention() + " - announcements channel\n");
+        sb.append(getInfoTextFromFile("FoWMainChannelIntro.txt"));
+        MessageHelper.sendMessageToChannel(actionsChannel, sb.toString());
+        newGame.setMainChannelID(actionsChannel.getId());
+
         // CREATE GM CHANNEL
         TextChannel gmChannel = guild.createTextChannel(newGMChannelName, category)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleGMID, permission, 0)
             .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
         
-        StringBuilder sb = new StringBuilder(roleGM.getAsMention() + " - gm room\n");
+        sb = new StringBuilder(roleGM.getAsMention() + " - gm room\n");
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
         HomebrewService.offerGameHomebrewButtons(gmChannel);
         GMService.logPlayerActivity(newGame, null, 
-            "This thread will log player slash commands and other possible suspicious activities.", GMService.gmPing(newGame));
-
-        // CREATE Anon Announcements CHANNEL
-        TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
-            .syncPermissionOverrides()
-            .addRolePermissionOverride(gameRoleID, permission, 0)
-            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
-        sb = new StringBuilder(role.getAsMention() + " - announcements channel\n");
-        sb.append(getInfoTextFromFile("FoWMainChannelIntro.txt"));
-        MessageHelper.sendMessageToChannel(actionsChannel, sb.toString());
-        newGame.setMainChannelID(actionsChannel.getId());
+            "This thread will log player slash commands and other activities.",
+            "If you don't care to follow this, just remove yourself from the thread.", true);
 
         // Individual player channels
         String privateChannelIntro = getInfoTextFromFile("FoWPrivateChannelIntro.txt");

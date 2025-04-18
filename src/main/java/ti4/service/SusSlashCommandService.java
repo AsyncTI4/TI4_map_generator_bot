@@ -60,7 +60,7 @@ public class SusSlashCommandService {
             Game game = managedGame.getGame();
             Player player = game.getPlayer(event.getUser().getId());
             if (player != null && !game.getPlayersWithGMRole().contains(player)) {
-                GMService.logPlayerActivity(game, player, event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "`", jumpUrl);
+                GMService.logPlayerActivity(game, player, event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "`", jumpUrl, false);
             }
         }
     }

@@ -98,14 +98,19 @@ public class GMService {
         return "";
     }
 
-    public static void logPlayerActivity(Game game, Player player, String eventLog, String jumpUrl) {
+    public static void logPlayerActivity(Game game, Player player, String eventLog) {
+        logPlayerActivity(game, player, eventLog, null, false);
+    }
+
+    public static void logPlayerActivity(Game game, Player player, String eventLog, String jumpUrl, boolean ping) {
+        final String log = eventLog + (ping ? " - " + gmPing(game): "");
         ThreadGetter.getThreadInChannel(getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false,
             threadChannel -> {
                 if (jumpUrl != null) {
-                    MessageHelper.sendMessageToChannel(threadChannel, eventLog + " - " + jumpUrl);
+                    MessageHelper.sendMessageToChannel(threadChannel, log + " - " + jumpUrl);
                 } else {
                     jumpToLatestMessage(player, latestJumpUrl -> {
-                        MessageHelper.sendMessageToChannel(threadChannel, eventLog + " - " + latestJumpUrl);
+                        MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl);
                     });
                 }
             });
@@ -380,7 +385,7 @@ public class GMService {
         MessageEmbed embed = buildLoreEmbed(game, pos, systemLore.get(pos));
         MessageHelper.sendMessageToChannelWithEmbed(player.getPrivateChannel(), "You found a Lore Fragment", embed);
         
-        logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + pos, null);
+        logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + pos);
 
         systemLore.remove(pos);
         setSystemLore(game, systemLore);
