@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
+import ti4.helpers.omegaPhase.PriorityTrackHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
@@ -479,10 +480,13 @@ public class MapGenerator implements AutoCloseable {
         y = coord.y + 30;
         x = 10 + landscapeShift;
         int tempY = y;
-        y = drawObjectives(y + 180);
+        tempY = drawScoreTrack(tempY + 20);
+        if (game.isOmegaPhaseMode()) {
+            tempY = drawPriorityTrack(tempY);
+        }
+        y = drawObjectives(tempY);
         y = laws(y);
         y = events(y);
-        tempY = drawScoreTrack(tempY + 20);
         if (displayTypeBasic != DisplayType.stats) {
             playerInfo(game);
         }
@@ -591,7 +595,58 @@ public class MapGenerator implements AutoCloseable {
             row = 0;
             col++;
         }
-        y += 180;
+        y += 160;
+        return y;
+    }
+
+    private int drawPriorityTrack(int y) {
+        int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(stroke5);
+        graphics.setFont(Storage.getFont50());
+        int boxHeight = 95;
+        int boxWidth = 100;
+        int boxBuffer = -1;
+        int labelWidth = 360;
+        var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+        DrawingUtil.drawCenteredString(g2, "PRIORITY:", new Rectangle(landscapeShift, y, labelWidth, boxHeight), Storage.getFont64());
+        int trackXShift = landscapeShift + labelWidth;
+        for (int i = 0; i < priorityTrack.size(); i++) {
+            graphics.setColor(Color.WHITE);
+            Rectangle rect = new Rectangle(i * boxWidth + trackXShift, y, boxWidth, boxHeight / 2);
+            DrawingUtil.drawCenteredString(g2, Integer.toString(i + 1), rect, Storage.getFont50());
+            g2.setColor(ColorUtil.getSCColor(6, game, true));
+            g2.drawRect(i * boxWidth + trackXShift, y, boxWidth, boxHeight);
+        }
+
+        int colCount = priorityTrack.size() - 1;
+        int availableSpacePerColumn = (boxWidth - boxBuffer * 2) / colCount;
+        int availableSpacePerRow = boxHeight - boxBuffer * 2;
+        float scale = 0.7f;
+        for (Player player : priorityTrack) {
+            if (player == null) {
+                continue;
+            }
+            try {
+                String controlID = Mapper.getControlID(player.getColor());
+
+                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                int tokenWidth = controlTokenImage == null ? 51 : controlTokenImage.getWidth(); // 51
+                int tokenHeight = controlTokenImage == null ? 33 : controlTokenImage.getHeight(); // 33
+                int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);
+                int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) * 3 / 4);
+
+                int spaceOnTrack = player.getPriorityPosition() - 1;
+                int firstX = Math.min(boxBuffer + /*(availableSpacePerColumn * col) +*/ centreHorizontally, boxWidth - tokenWidth - boxBuffer) + trackXShift;
+                int tokenX = spaceOnTrack * boxWidth + firstX;
+                int tokenY = y + boxBuffer + centreVertically;
+                DrawingUtil.drawControlToken(graphics, controlTokenImage, player, tokenX, tokenY, false, scale);
+            } catch (Exception e) {
+                // nothing
+                BotLogger.error("Could not display player: " + player.getUserName(), e);
+            }
+        }
+        y += boxHeight + 20;
         return y;
     }
 
@@ -1796,6 +1851,12 @@ public class MapGenerator implements AutoCloseable {
 
         // Objective 1
         List<Objective> objectives = Objective.retrievePublic1(game);
+        List<Objective> secondHalfObjectives = null;
+        if (game.isOmegaPhaseMode()) {
+            int splitSize = objectives.size() / 2;
+            secondHalfObjectives = objectives.stream().skip(splitSize).toList();
+            objectives = objectives.stream().limit(splitSize).toList();
+        }
         int maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
         int boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
 
@@ -1811,6 +1872,9 @@ public class MapGenerator implements AutoCloseable {
         y = top;
 
         objectives = Objective.retrievePublic2(game);
+        if (game.isOmegaPhaseMode()) {
+            objectives.addAll(secondHalfObjectives);
+        }
         maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
         boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
         for (Objective objective : objectives) {
