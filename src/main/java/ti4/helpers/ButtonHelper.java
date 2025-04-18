@@ -4783,7 +4783,7 @@ public class ButtonHelper {
                                 messageBuilder.append(" (distance exceeds move value (").append(distance).append(" > ")
                                     .append(moveValue).append("), __does not have _Gravity Drive___)");
                                 if (game.isFowMode()) {
-                                    GMService.logPlayerActivity(game, player, messageBuilder.toString(), null);
+                                    GMService.logPlayerActivity(game, player, messageBuilder.toString());
                                 }
                             }
                             if (player.getTechs().contains("dsgledb")) {
