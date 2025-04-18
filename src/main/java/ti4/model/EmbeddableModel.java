@@ -16,5 +16,9 @@ public interface EmbeddableModel {
 
     }
 
+    default boolean searchSource(ComponentSource searchSource) {
+        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
+    }
+
     String getAutoCompleteName();
 }
