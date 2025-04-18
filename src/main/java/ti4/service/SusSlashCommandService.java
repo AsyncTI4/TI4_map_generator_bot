@@ -29,7 +29,8 @@ public class SusSlashCommandService {
         Constants.INFO, Constants.CREATE_GAME_BUTTON, "po_info", Constants.DICE_LUCK, Constants.SHOW_AC_DISCARD_LIST, "show_deck",
         Constants.TURN_STATS, Constants.SHOW_AC_REMAINING_CARD_COUNT, Constants.SHOW_HAND, Constants.SHOW_BAG, Constants.UNIT_INFO,
         Constants.TURN_END, Constants.PING_ACTIVE_PLAYER, Constants.CHANGE_COLOR, Constants.END, Constants.REMATCH, Constants.ABILITY_INFO,
-        Constants.SPENDS, Constants.SHOW_TO_ALL, Constants.SHOW_ALL, Constants.SHOW_ALL_TO_ALL, Constants.SHOW_REMAINING
+        Constants.SPENDS, Constants.SHOW_TO_ALL, Constants.SHOW_ALL, Constants.SHOW_ALL_TO_ALL, Constants.SHOW_REMAINING,
+        Constants.CHECK_PRIVATE_COMMUNICATIONS
     );
 
     private static final List<String> EXCLUDED_GAMES = List.of("pbd1000", "pbd100two");
@@ -59,7 +60,7 @@ public class SusSlashCommandService {
             Game game = managedGame.getGame();
             Player player = game.getPlayer(event.getUser().getId());
             if (player != null && !game.getPlayersWithGMRole().contains(player)) {
-                GMService.logPlayerActivity(game, player, event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "`", jumpUrl);
+                GMService.logPlayerActivity(game, player, event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "`", jumpUrl, false);
             }
         }
     }
