@@ -17,6 +17,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.async.RoundSummaryHelper;
+import ti4.helpers.omegaPhase.PriorityTrackHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -170,10 +171,19 @@ public class StatusHelper {
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
-            for (Player player : game.getActionPhaseTurnOrder()) {
+            for (Player player : getPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }
+        }
+    }
+
+    private static List<Player> getPlayersInScoringOrder(Game game) {
+        if (game.isOmegaPhaseMode()) {
+            return PriorityTrackHelper.GetPriorityTrack(game)
+                .stream().filter(Objects::nonNull).toList();
+        } else {
+            return game.getActionPhaseTurnOrder();
         }
     }
 

@@ -65,16 +65,6 @@ public class StatusCleanupService {
                     game.setStoredValue("Pre Pass " + player.getFaction(), "");
                 }
             }
-            List<Leader> leads = new ArrayList<>(player.getLeaders());
-            for (Leader leader : leads) {
-                if (!leader.isLocked()) {
-                    if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")) {
-                        player.removeLeader(leader.getId());
-                    } else {
-                        RefreshLeaderService.refreshLeader(player, leader, game);
-                    }
-                }
-            }
             if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber")) {
                 for (String planet : game.getPlanets()) {
                     game.getPlanetsInfo().get(planet).removeToken("attachment_sigma_cyber.png");

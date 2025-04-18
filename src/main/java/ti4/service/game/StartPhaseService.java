@@ -642,6 +642,10 @@ public class StartPhaseService {
             }
         }
 
+        if (game.isOmegaPhaseMode()) {
+            PriorityTrackHelper.ClearPriorityTrack(game);
+        }
+
         Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
         game.setPhaseOfGame("action");
         if (nextPlayer == null) {

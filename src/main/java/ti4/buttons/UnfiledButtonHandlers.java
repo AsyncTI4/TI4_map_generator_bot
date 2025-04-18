@@ -1081,7 +1081,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         } else {
             var speakerPlayer = game.getSpeaker();
             ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
-            String message = "The next Objective has been revealed to " + speakerPlayer.getRepresentation() + ". When ready, proceed to the Strategy Phase.";
+            String message = "The next Objective has been revealed to " + MiscEmojis.SpeakerToken + speakerPlayer.getRepresentationNoPing() + ". When ready, proceed to the Strategy Phase.";
             Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
                 "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
             MessageHelper.sendMessageToChannelWithButton(event.getChannel(), message, proceedToStrategyPhase);
@@ -3023,9 +3023,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             return;
         }
         if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before revealing public objectives.");
+            PriorityTrackHelper.CreateDefaultPriorityTrack(game);
+            if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to fill the Priority Track with the default seating order. Use `/omegaphase assign_player_priority` to fill the track before proceeding.");
+                PriorityTrackHelper.PrintPriorityTrack(game);
+                return;
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up the Priority Track in the default seating order.");
             PriorityTrackHelper.PrintPriorityTrack(game);
-            return;
         }
         RevealPublicObjectiveService.revealTwoStage1(game);
         StartPhaseService.startStrategyPhase(event, game);
