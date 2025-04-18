@@ -380,10 +380,7 @@ public class GMService {
         MessageEmbed embed = buildLoreEmbed(game, pos, systemLore.get(pos));
         MessageHelper.sendMessageToChannelWithEmbed(player.getPrivateChannel(), "You found a Lore Fragment", embed);
         
-        jumpToLatestMessage(player, latestJumpUrl -> {
-            MessageHelper.sendMessageToChannel(getGMChannel(game), 
-                player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + pos + " - " + latestJumpUrl);
-        });
+        logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + pos, null);
 
         systemLore.remove(pos);
         setSystemLore(game, systemLore);
