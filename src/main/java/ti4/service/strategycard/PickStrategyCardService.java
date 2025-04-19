@@ -77,6 +77,10 @@ public class PickStrategyCardService {
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
 
+            if (game.isOmegaPhaseMode()) {
+                PriorityTrackHelper.ClearPriorityTrack(game);
+            }
+
             for (Player p2 : game.getRealPlayers()) {
                 ButtonHelperActionCards.checkForAssigningCoup(game, p2);
                 if (game.getStoredValue("Play Naalu PN") != null && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
@@ -196,9 +200,6 @@ public class PickStrategyCardService {
             }
         }
         if (allPicked) {
-            if (game.isOmegaPhaseMode()) {
-                PriorityTrackHelper.ClearPriorityTrack(game);
-            }
             for (Player p2 : game.getRealPlayers()) {
                 List<Button> buttons = new ArrayList<>();
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
