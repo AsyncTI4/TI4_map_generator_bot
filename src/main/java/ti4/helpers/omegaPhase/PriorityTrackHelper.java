@@ -3,6 +3,7 @@ package ti4.helpers.omegaPhase;
 import java.util.ArrayList;
 import java.util.List;
 
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -134,9 +135,13 @@ public class PriorityTrackHelper {
 
     public static void CreateDefaultPriorityTrack(Game game) {
         var currentPriorityTrack = GetPriorityTrack(game);
+        var players = game.getRealPlayers();
+        if (game.getSpeaker() != null) {
+            players = Helper.getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
+        }
         for (var i = 0; i < currentPriorityTrack.size(); i++) {
             if (currentPriorityTrack.get(i) == null) {
-                var player = game.getRealPlayers().stream()
+                var player = players.stream()
                     .filter(p -> !p.hasPriorityPosition())
                     .findFirst();
                 if (player.isPresent()) {
