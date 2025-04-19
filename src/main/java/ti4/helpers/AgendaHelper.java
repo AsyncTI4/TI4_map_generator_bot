@@ -618,10 +618,29 @@ public class AgendaHelper {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "# All players have passed on \"afters\". Voting will now begin.");
+            String msg = "# All players have passed on \"afters\".";
+            if (!game.isOmegaPhaseMode()) {
+                msg += " Voting will now begin.";
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                    msg);
+                startTheVoting(game);
+            } else {
+                if (getPlayersWhoNeedToPreVoted(game).isEmpty()) {
+                    msg += " Voting will now begin.";
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                        msg);
+                    startTheVoting(game);
+                } else {
+                    msg += " Still need " + getPlayersWhoNeedToPreVoted(game).size() + " players to prevote.";
+                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                        msg);
+                    for (Player p2 : getPlayersWhoNeedToPreVoted(game)) {
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the game is waiting upon you to prevote before it moves onto voting.");
+                    }
+                }
+            }
             game.setStoredValue("aftersResolved", "Yes");
-            startTheVoting(game);
+
         }
     }
 
@@ -774,15 +793,38 @@ public class AgendaHelper {
     }
 
     private static void offerPreVote(Player player) {
+        Game game = player.getGame();
         String msg = player.getRepresentation()
             + " if you intend to preset an abstention or vote on this agenda, you have the option to preset it here. Feel free not to, this is simply an optional way to resolve agendas faster.";
         List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("preVote", "Pre-Vote"));
         if (player.hasAbility("future_sight")) {
             msg += " Reminder that you have **Future Sight** and may not wish to abstain.";
         }
-        buttons.add(Buttons.green("preVote", "Pre-Vote"));
-        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
-        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        if (game.isOmegaPhaseMode()) {
+            Player argent = Helper.getPlayerFromAbility(game, "zeal");
+            if (argent != null) {
+                if (argent == player) {
+                    msg = player.getRepresentation()
+                        + " since this is game is in omega phase mode, all non-speaker players who can vote will need to pre-vote using this button before voting can begin. " +
+                        "If you cant vote due to playing a rider or having no votes just ignore this button. " +
+                        "Otherwise, since you have the zeal ability, you need to vote first and do so now, even if you are speaker. Other players are free to wait to vote until they see your vote.";
+                } else {
+                    msg = player.getRepresentation()
+                        + " since this is game is in omega phase mode, all non-speaker players who can vote will need to pre-vote using this button before voting can begin. " +
+                        "If you cant vote due to playing a rider or having no votes, or if you are speaker, just ignore this button. " +
+                        "Since Argent is in this game, you can wait to pre-vote until you see what they vote (assuming argent can vote).";
+                }
+            } else {
+                msg = player.getRepresentation()
+                    + " since this is game is in omega phase mode, all non-speaker players who can vote will need to pre-vote using this button before voting can begin. If you cant vote due to playing a rider or having no votes, or if you are speaker, just ignore this button";
+
+            }
+        } else {
+            buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+        }
+
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -1020,6 +1062,23 @@ public class AgendaHelper {
         }
     }
 
+    public static List<Player> getPlayersWhoNeedToPreVoted(Game game) {
+        List<Player> players = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            int[] voteInfo = getVoteTotal(player, game);
+            if (voteInfo[0] < 1) {
+                continue;
+            }
+            if (!player.hasAbility("zeal") && player.isSpeaker()) {
+                continue;
+            }
+            if (game.getStoredValue("preVoting" + player.getFaction()).isEmpty()) {
+                players.add(player);
+            }
+        }
+        return players;
+    }
+
     @ButtonHandler("resolveAgendaVote_")
     public static void resolvingAnAgendaVote(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         boolean resolveTime = false;
@@ -1029,14 +1088,31 @@ public class AgendaHelper {
 
         boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty() && player != game.getActivePlayer();
         if (prevoting) {
+
             ButtonHelper.deleteMessage(event);
             game.setStoredValue("preVoting" + player.getFaction(), votes);
             List<Button> buttonsPV = new ArrayList<>();
             buttonsPV.add(Buttons.red("erasePreVote", "Erase Pre-Vote"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "Successfully stored a pre-vote. You can erase it with this button.", buttonsPV);
+            if (game.isOmegaPhaseMode()) {
+                if (player.hasAbility("zeal")) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## The player with the zeal ability votes the following:\n" +
+                        Helper.buildSpentThingsMessageForVoting(player, game, false));
+                }
+                if (game.getStoredValue("aftersResolved").equalsIgnoreCase("Yes")) {
+                    if (getPlayersWhoNeedToPreVoted(game).isEmpty()) {
+                        startTheVoting(game);
+                    } else {
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Game needs " + getPlayersWhoNeedToPreVoted(game).size() + " more people to pre-vote before voting will start");
+                    }
+                }
+
+            }
             return;
-        } else {
+        } else
+
+        {
             game.setStoredValue("preVoting" + player.getFaction(), "");
         }
         if (!buttonID.contains("outcomeTie*")) {
@@ -2129,14 +2205,6 @@ public class AgendaHelper {
             voteCount = 0;
         }
 
-        //HACK: While the Omega Phase agenda automation isn't in the game,
-        // make players resolve voting manually.
-        //This is accomplished by effectively abstaining everyone, so the Speaker
-        // can directly resolve the agenda after all manual tallying/effects.
-        if (game.isOmegaPhaseMode()) {
-            voteCount = 0;
-        }
-
         return new int[] { voteCount, hasXxchaHero, hasXxchaAlliance };
     }
 
@@ -2820,11 +2888,6 @@ public class AgendaHelper {
         int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
             .mapToInt(Planet::getInfluence).sum();
         int voteCount = baseInfluenceCount; // default
-
-        //HACK: Skip voting in Omega Phase until automation is implemented
-        if (game.isOmegaPhaseMode()) {
-            return 0;
-        }
 
         // NEKRO unless XXCHA ALLIANCE
         if (player.hasAbility("galactic_threat")
