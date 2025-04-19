@@ -501,6 +501,12 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "ABILITY",
+        "ItemId": "celestial_guides",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
         "ItemCategory": "HOMESYSTEM",
         "ItemId": "nivyn",
         "OptionalSwaps": [
