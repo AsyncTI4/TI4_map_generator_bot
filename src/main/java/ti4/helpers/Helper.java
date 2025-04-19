@@ -445,6 +445,11 @@ public class Helper {
     }
 
     public static int getPlayerSpeakerNumber(Player player, Game game) {
+        if (game.isOmegaPhaseMode()) {
+            if (player.getPriorityPosition() < 1) return 1;
+            return player.getPriorityPosition();
+        }
+
         Player speaker;
         if (game.getPlayer(game.getSpeakerUserID()) != null) {
             speaker = game.getPlayers().get(game.getSpeakerUserID());
