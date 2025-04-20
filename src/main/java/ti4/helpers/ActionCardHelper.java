@@ -940,9 +940,9 @@ public class ActionCardHelper {
 
         // Fog of war ping
         if (game.isFowMode()) {
-            String fowMessage = player.getRepresentation() + " played an action card: _" + actionCardTitle + "_.";
+            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.ActionCard + ": _" + actionCardTitle + "_.";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
-            MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card: _" + actionCardTitle + "_.");
+            MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card " + CardEmojis.ActionCard + ": _" + actionCardTitle + "_.");
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
