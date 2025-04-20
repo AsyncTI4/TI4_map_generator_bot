@@ -11,8 +11,8 @@ import ti4.service.leader.RefreshLeaderService;
 
 @UtilityClass
 public class RefreshCardsService {
-    public static void refreshPlayerCards(Game game, Player player, boolean endOfStatusPhase) {
-        boolean planetsOnly = endOfStatusPhase;
+    public static void refreshPlayerCards(Game game, Player player, boolean isStatusPhaseCleanup) {
+        boolean planetsOnly = !isStatusPhaseCleanup;
         if (game.isOmegaPhaseMode()) {
             planetsOnly = !planetsOnly;
         }
