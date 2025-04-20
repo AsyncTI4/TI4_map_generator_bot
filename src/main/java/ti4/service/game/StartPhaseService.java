@@ -1,7 +1,6 @@
 package ti4.service.game;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -608,9 +607,6 @@ public class StartPhaseService {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
-        Collection<Player> activePlayers = game.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .toList();
 
         for (Player p2 : game.getRealPlayers()) {
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
@@ -639,6 +635,9 @@ public class StartPhaseService {
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(nextPlayer, game, event, msgExtra, fail, success);
+            if (game.isShowBanners()) {
+                BannerGenerator.drawFactionBanner(nextPlayer);
+            }
             msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             game.updateActivePlayer(nextPlayer);
