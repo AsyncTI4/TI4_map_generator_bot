@@ -124,7 +124,7 @@ public class StatusHelper {
                 if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(obbie, game);
                     int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(obbie, game, player);
-                    if (playerProgress >= threshold) {
+                    if (playerProgress >= threshold && threshold > 0) {
                         scorables.add(Mapper.getPublicObjective(obbie).getRepresentation(false));
                     }
                 }
