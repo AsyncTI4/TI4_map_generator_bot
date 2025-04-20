@@ -72,17 +72,36 @@ public class CreateFoWGameService {
             }
         }
 
-        Member gm = event.getGuild().getMemberById(StringUtils.substringBefore(StringUtils.substringBetween(buttonMsg, "GM: ", "\n"), "."));
+        //Get GM
+        String gmLine = StringUtils.substringBetween(buttonMsg, "GM: ", "\n");
+        String gmId = StringUtils.substringBefore(gmLine, ".");
+        Member gm = event.getGuild().getMemberById(gmId);
+        
+        //Get Members
         List<Member> members = new ArrayList<>();
-        for (int i = 4; i <= 10; i++) {
-            if (StringUtils.countMatches(buttonMsg, ":") < (i)) {
-                break;
+        String[] lines = buttonMsg.split("\n");
+        boolean inPlayerSection = false;
+        for (String line : lines) {
+            line = line.trim();
+
+            if (line.startsWith("Players:")) {
+                inPlayerSection = true;
+                continue;
             }
-            String user = buttonMsg.split(":")[i];
-            user = StringUtils.substringBefore(user, ".");
-            Member member = event.getGuild().getMemberById(user);
-            if (member != null) {
-                members.add(member);
+
+            if (inPlayerSection) {
+                if (line.isEmpty()) { // Reached the end of the player list
+                    break;
+                }
+
+                // Example line: 1:[userid].([username]])
+                String userId = StringUtils.substringBetween(line, ":", ".");
+                if (userId != null) {
+                    Member member = event.getGuild().getMemberById(userId);
+                    if (member != null) {
+                        members.add(member);
+                    }
+                }
             }
         }
 
