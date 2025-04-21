@@ -97,7 +97,10 @@ public class StartTurnService {
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         Helper.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
-        game.removeStoredValue("violatedSystems");
+
+        if (game.isShowBanners()) {
+            BannerGenerator.drawFactionBanner(player);
+        }
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
 
@@ -119,10 +122,6 @@ public class StartTurnService {
             game.resetListOfTilesPinged();
 
         } else {
-            //checkhere
-            if (game.isShowBanners()) {
-                BannerGenerator.drawFactionBanner(player);
-            }
             MessageHelper.sendMessageToChannel(gameChannel, text);
             if (getMissedSCFollowsText(game, player) != null
                 && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
