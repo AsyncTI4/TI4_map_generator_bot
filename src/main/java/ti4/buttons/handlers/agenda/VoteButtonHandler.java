@@ -237,13 +237,13 @@ public class VoteButtonHandler {
     public static List<Button> getStrategyOutcomeButtons(Game game, String rider, String prefix) {
         List<Button> strategyButtons = new ArrayList<>();
         StrategyCardSetModel stratCards = game.getStrategyCardSet();
-        for (int x = 1; x < 9; x++) {
+        for (ti4.model.StrategyCardModel sc : stratCards.getStrategyCardModels()) {
             Button button;
-            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
+            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc.getInitiative());
             if (rider == null) {
-                button = Buttons.blue(prefix + "_" + x, stratCards.getSCName(x), scEmoji);
+                button = Buttons.blue(prefix + "_" + sc.getInitiative(), stratCards.getSCName(sc.getInitiative()), scEmoji);
             } else {
-                button = Buttons.blue(prefix + "rider_sc;" + x + "_" + rider, stratCards.getSCName(x), scEmoji);
+                button = Buttons.blue(prefix + "rider_sc;" + sc.getInitiative() + "_" + rider, stratCards.getSCName(sc.getInitiative()), scEmoji);
             }
             strategyButtons.add(button);
         }

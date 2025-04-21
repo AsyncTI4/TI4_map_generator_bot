@@ -1862,7 +1862,7 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "After a player activates this system, you may remove this unit from the game board to place 1 PDS from your reinforcements on this planet.",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/mechs/aurora_stormcaller.jpg?raw=true"
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/units/ds/mechs/aurora_stormcaller.png?raw=true"
     },
     {
         "id": "zealots_flagship",

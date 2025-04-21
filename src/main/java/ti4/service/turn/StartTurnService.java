@@ -101,6 +101,7 @@ public class StartTurnService {
         if (game.isShowBanners()) {
             BannerGenerator.drawFactionBanner(player);
         }
+        game.removeStoredValue("violatedSystems");
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
 
@@ -120,6 +121,7 @@ public class StartTurnService {
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
 
             game.resetListOfTilesPinged();
+
         } else {
             MessageHelper.sendMessageToChannel(gameChannel, text);
             if (getMissedSCFollowsText(game, player) != null

@@ -292,7 +292,7 @@ public class ButtonHelperSCs {
 
         if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-                + " since you do not currently hold your _Trade Agreemnt_, washing here seems likely an error and will mess with the _Trade Agreement_ resolution."
+                + " since you do not currently hold your _Trade Agreement_, washing here seems likely an error and will mess with the _Trade Agreement_ resolution."
                 + " Nothing has been processed as a result. Try a different route of washing your commodities if this correction is wrong.");
             return;
         }
