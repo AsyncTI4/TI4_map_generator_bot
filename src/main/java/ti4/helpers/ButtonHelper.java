@@ -2966,18 +2966,20 @@ public class ButtonHelper {
                 + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + " ). ";
         }
         if (issuePing) {
-            if (capacityViolated || fleetSupplyViolated || structuresViolated) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
-                    "Remove Units in " + tile.getRepresentationForButtons(game, player)));
-                buttons.add(Buttons.red("deleteButtons",
-                    "Dismiss These Buttons"));
+            if (!game.getStoredValue("violatedSystems").contains(tile.getPosition())) {
+                if (capacityViolated || fleetSupplyViolated || structuresViolated) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
+                        "Remove Units in " + tile.getRepresentationForButtons(game, player)));
+                    buttons.add(Buttons.red("deleteButtons",
+                        "Dismiss These Buttons"));
 
-                FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player)
-                    .createFileUpload();
-                MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message,
-                    buttons);
-
+                    FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player)
+                        .createFileUpload();
+                    MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message,
+                        buttons);
+                    game.setStoredValue("violatedSystems", game.getStoredValue("violatedSystems") + tile.getPosition() + "_");
+                }
             }
         }
         if (numInfNFightersNMechs <= capacity) {

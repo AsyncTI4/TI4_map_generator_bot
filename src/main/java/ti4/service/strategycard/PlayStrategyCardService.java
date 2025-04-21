@@ -220,10 +220,10 @@ public class PlayStrategyCardService {
                                 + ", **Trade** has just been played and this is a reminder that you hold the _Trade Agreement_ of "
                                 + p2.getColor() + ". ";
                             if (p3 == player) {
-                                message3 += "If you force that player to replenish commodities, then you will be prompted to play the _Trade Agreemnt_.";
+                                message3 += "If you force that player to replenish commodities, then you will be prompted to play the _Trade Agreement_.";
                             } else {
                                 message3 += "If you work out a deal with the **Trade** holder,"
-                                    + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreemnt_.";
+                                    + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreement_.";
                             }
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }

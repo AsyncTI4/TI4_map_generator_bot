@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -460,6 +461,8 @@ public class ButtonHelperHeroes {
             + p2.getFactionEmojiOrColor()
             + ", who now owes a promissory note in return. Buttons have been sent to the players `#cards-info` thread to resolve.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        player.removeRelic(shipOrder);
+        p2.addRelic(shipOrder);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message2 = p2.getRepresentationUnfogged()
             + " You have been given an Axis Order by Demi-Queen Mdcksssk, the Axis hero, and now must send a promissory note in return."
