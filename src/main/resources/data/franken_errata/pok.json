@@ -73,8 +73,10 @@
         "ItemCategory": "ABILITY",
         "ItemId": "dark_whispers",
         "OptionalSwaps": [
-            "PN:dark_pact",
             "PN:blood_pact"
+        ],
+        "AdditionalComponents": [
+            "PN:dark_pact"
         ],
         "source": "pok"
     },
