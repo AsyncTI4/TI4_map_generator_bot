@@ -264,7 +264,11 @@
             "dsveldr",
             "dsvelddn",
             "dszelir",
-            "dszeliinf"
+            "dszeliinf",
+            "dsuydag",
+            "dsuydab",
+            "dspharinf",
+            "dspharb"
         ],
         "source": "other"
     }
