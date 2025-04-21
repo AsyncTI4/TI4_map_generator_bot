@@ -97,7 +97,7 @@ public class StartTurnService {
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(player, game);
         Helper.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
-
+        game.removeStoredValue("violatedSystems");
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
 
@@ -117,6 +117,7 @@ public class StartTurnService {
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
 
             game.resetListOfTilesPinged();
+
         } else {
             //checkhere
             if (game.isShowBanners()) {

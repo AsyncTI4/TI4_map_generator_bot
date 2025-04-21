@@ -1254,7 +1254,7 @@ public class ButtonHelperActionCards {
         String message = switch (ThreadLocalRandom.current().nextInt(7)) {
             case 1 -> ", your representatives (all of them) fell out of some windows.";
             case 2 -> ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.";
-            case 3 -> ", your representatives were \"invited\" to \"experienced\" the \"sight-seeing\" Sea of Desolation \"tour\".";
+            case 3 -> ", your representatives were \"invited\" to \"experience\" the \"sight-seeing\" Sea of Desolation \"tour\".";
             case 4 -> ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).";
             case 5 -> ", your representatives have followed in a great tradition, and so have been stabbed 23 times.";
             case 6 -> ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.";
@@ -2097,7 +2097,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String acName = buttonID.replace("resolveReverse_","");
+        String acName = buttonID.replace("resolveReverse_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);

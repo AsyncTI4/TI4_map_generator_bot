@@ -321,6 +321,7 @@ public class ButtonHelperTacticalAction {
             player = game.getPlayer(game.getActivePlayerID());
             game.setNaaluAgent(false);
         }
+        game.removeStoredValue("violatedSystems");
         game.setStoredValue("tnelisCommanderTracker", "");
         game.setL1Hero(false);
         game.setStoredValue("vaylerianHeroActive", "");
