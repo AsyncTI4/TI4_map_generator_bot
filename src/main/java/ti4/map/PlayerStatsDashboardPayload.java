@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.AgendaModel;
@@ -142,6 +143,9 @@ public class PlayerStatsDashboardPayload {
                 }
                 if (objId.toLowerCase().contains("censure")) {
                     return "Political Censure";
+                }
+                if (objId.equalsIgnoreCase(Constants.VOICE_OF_THE_COUNCIL_PO)) {
+                    return "Voice of the Council";
                 }
                 if (objId.toLowerCase().contains("mutiny")) {
                     return "Mutiny";

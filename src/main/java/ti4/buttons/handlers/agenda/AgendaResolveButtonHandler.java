@@ -29,6 +29,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
+import ti4.helpers.omegaPhase.VoiceOfTheCouncilHelper;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.listeners.annotations.ButtonHandler;
@@ -107,6 +108,9 @@ class AgendaResolveButtonHandler {
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
                     Helper.checkEndGame(game, player2);
+                }
+                if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(agID)) {
+                    VoiceOfTheCouncilHelper.ElectVoiceOfTheCouncil(game, player2);
                 }
                 if ("warrant".equalsIgnoreCase(agID)) {
                     player2.flipSearchWarrant();

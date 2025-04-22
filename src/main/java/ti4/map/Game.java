@@ -66,6 +66,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.omegaPhase.VoiceOfTheCouncilHelper;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -2017,6 +2018,10 @@ public class Game extends GameProperties {
         if (id.isEmpty()) {
             return false;
         }
+        if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
+            VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
+            return true;
+        }
         if ("warrant".equalsIgnoreCase(id)) {
             for (Player p2 : getRealPlayers()) {
                 if (ButtonHelper.isPlayerElected(this, p2, id)) {
@@ -2032,6 +2037,7 @@ public class Game extends GameProperties {
                 }
             }
         }
+
         laws.remove(id);
         lawsInfo.remove(id);
         addDiscardAgenda(id);
@@ -2040,6 +2046,10 @@ public class Game extends GameProperties {
 
     public boolean removeLaw(String id) {
         if (!id.isEmpty()) {
+            if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
+                VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
+                return true;
+            }
             if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
