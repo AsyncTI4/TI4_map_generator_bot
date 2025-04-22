@@ -46,6 +46,7 @@ import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.omegaPhase.PriorityTrackHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -300,15 +301,24 @@ public class Helper {
         if (game.getRealPlayers().size() > 10) {
             return "This game is too large to display a scoring summary";
         }
-        for (Player player : game.getActionPhaseTurnOrder()) {
-            int sc = player.getLowestSC();
-            rep.append(CardEmojis.getSCBackFromInteger(sc)).append(player.getRepresentation(false, false)).append("\n");
+        var playersInScoringOrder = game.isOmegaPhaseMode() ? PriorityTrackHelper.GetPriorityTrack(game) : game.getActionPhaseTurnOrder();
+        for (Player player : playersInScoringOrder) {
+            if (!game.isOmegaPhaseMode()) {
+                int sc = player.getLowestSC();
+                rep.append(CardEmojis.getSCBackFromInteger(sc)).append(player.getRepresentation(false, false)).append("\n");
+            } else {
+                rep.append(player.getPriorityPosition() + ". ").append(player.getRepresentation(false, false)).append("\n");
+            }
+
             String poMessage = "";
             String soMessage = CardEmojis.SecretObjective + " ";
             String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
             String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
             if (po.isEmpty() || po.equalsIgnoreCase("Queued") || po.equalsIgnoreCase("None")) {
-                poMessage += CardEmojis.Public1 + " " + CardEmojis.Public2 + " ";
+                poMessage += CardEmojis.Public1 + " ";
+                if (!game.isOmegaPhaseMode()) {
+                    poMessage += CardEmojis.Public2 + " ";
+                }
                 if (po.isEmpty()) {
                     poMessage += "❓";
                 }
