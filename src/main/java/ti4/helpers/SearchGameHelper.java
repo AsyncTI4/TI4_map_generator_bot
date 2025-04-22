@@ -127,16 +127,15 @@ public class SearchGameHelper {
         int index = 0;
 
         double wins = 0;
-
-        StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
         for (var managedGame : filteredManagedGames) {
             var game = managedGame.getGame();
             if (game.isHasEnded() && game.hasWinner()) {
                 if (game.getWinners().contains(game.getPlayer(userID))) {
                     wins++;
                 }
+                index++;
             }
-            index++;
+
         }
 
         return wins / index;
@@ -164,7 +163,7 @@ public class SearchGameHelper {
                 }
                 sb.append("\n");
                 double getWinPercentage = SearchGameHelper.getWinPercentage(user, event, false, true, false, true, false, true, true, true);
-                sb.append("> Player win percentage accross all games was: " + String.format("%.2f", getWinPercentage) + "\n");
+                sb.append("> Player win percentage across all games was: " + String.format("%.2f", getWinPercentage) + "\n");
             }
             index.getAndIncrement();
         }
