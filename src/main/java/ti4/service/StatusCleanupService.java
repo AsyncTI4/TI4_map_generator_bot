@@ -10,14 +10,12 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.info.ListPlayerInfoService;
-import ti4.service.leader.RefreshLeaderService;
 import ti4.service.player.RefreshCardsService;
 
 @UtilityClass
@@ -102,7 +100,7 @@ public class StatusCleanupService {
                 SpinRingsHelper.spinRingsCustom(game, game.getSpinMode(), null);
             }
         }
-        if (!game.isFowMode() && game.getTableTalkChannel() != null) {
+        if (!game.isFowMode() && game.getTableTalkChannel() != null && !game.isOmegaPhaseMode()) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
             ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
         }

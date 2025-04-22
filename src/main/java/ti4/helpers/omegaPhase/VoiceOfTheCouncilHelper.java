@@ -40,7 +40,7 @@ public class VoiceOfTheCouncilHelper {
 
         StringBuilder sb = new StringBuilder();
         sb.append("**Voice of the Council**\n");
-        if (previousElectee != null && previousElectee != player.getFaction()) {
+        if (previousElectee != null && !previousElectee.equalsIgnoreCase(player.getFaction())) {
             var previousPlayer = game.getPlayerFromColorOrFaction(previousElectee);
             sb.append(previousPlayer.getRepresentation()).append(" is no longer Voice of the Council.\n");
         }

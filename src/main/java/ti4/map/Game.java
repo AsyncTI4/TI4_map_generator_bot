@@ -406,10 +406,31 @@ public class Game extends GameProperties {
             if (player.getTotalVictoryPoints() >= getVp()) {
                 if (winner == null) {
                     winner = player;
+                } else if (isOmegaPhaseMode()) {
+                    if (player.hasPriorityPosition() && !winner.hasPriorityPosition()) {
+                        winner = player;
+                    } else if (player.hasPriorityPosition() && winner.hasPriorityPosition()) {
+                        winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
+                    }
                 } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
                     winner = getLowestInitiativePlayer(player, winner);
                 } else {
                     return Optional.empty();
+                }
+            }
+        }
+        if (winner == null && isOmegaPhaseMode() && revealedPublicObjectives.containsKey(Constants.IMPERIUM_REX_ID)) {
+            // If no winner was found, but Imperium Rex is revealed, the player with the most VP wins (Priority Track is tie-breaker)
+            for (Player player : getRealPlayersNDummies()) {
+                if (player == null || !player.hasPriorityPosition())
+                    continue;
+
+                if (winner == null) {
+                    winner = player;
+                } else if (player.getTotalVictoryPoints() > winner.getTotalVictoryPoints()) {
+                    winner = player;
+                } else if (player.getTotalVictoryPoints() == winner.getTotalVictoryPoints()) {
+                    winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
                 }
             }
         }

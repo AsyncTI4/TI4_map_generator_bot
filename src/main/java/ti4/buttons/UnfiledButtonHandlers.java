@@ -83,8 +83,10 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.game.SwapFactionService;
+import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -92,7 +94,6 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.player.RefreshCardsService;
 import ti4.service.strategycard.PlayStrategyCardService;
-import ti4.service.turn.EndTurnService;
 import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -1051,6 +1052,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
             }
         }
+        String revealedObjective = null;
         if (!game.isRedTapeMode()) {
             if ("2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealS2(game, event, event.getChannel());
@@ -1059,7 +1061,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             } else if ("none".equalsIgnoreCase(stage)) {
                 //continue without revealing anything
             } else {
-                RevealPublicObjectiveService.revealS1(game, event, event.getChannel());
+                revealedObjective = RevealPublicObjectiveService.revealS1(game, event, event.getChannel());
             }
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "In Red Tape, no objective is revealed at this stage.");
@@ -1079,12 +1081,20 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (!game.isOmegaPhaseMode()) {
             StartPhaseService.startStatusHomework(event, game);
         } else {
-            var speakerPlayer = game.getSpeaker();
-            ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
-            String message = "The next Objective has been revealed to " + MiscEmojis.SpeakerToken + speakerPlayer.getRepresentationNoPing() + ". When ready, proceed to the Strategy Phase.";
-            Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
-                "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
-            MessageHelper.sendMessageToChannelWithButton(event.getChannel(), message, proceedToStrategyPhase);
+            if (revealedObjective != null && revealedObjective.equalsIgnoreCase(Constants.IMPERIUM_REX_ID)) {
+                EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
+            } else {
+                var speakerPlayer = game.getSpeaker();
+                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
+                if (!game.isFowMode() && game.getTableTalkChannel() != null) {
+                    MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
+                    ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
+                }
+                String message = "The next Objective has been revealed to " + MiscEmojis.SpeakerToken + speakerPlayer.getRepresentationNoPing() + ". When ready, proceed to the Strategy Phase.";
+                Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
+                    "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
+                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), message, proceedToStrategyPhase);
+            }
         }
 
         ButtonHelper.deleteMessage(event);
