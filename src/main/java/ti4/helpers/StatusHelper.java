@@ -171,14 +171,14 @@ public class StatusHelper {
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
-            for (Player player : getPlayersInScoringOrder(game)) {
+            for (Player player : GetPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
             }
         }
     }
 
-    private static List<Player> getPlayersInScoringOrder(Game game) {
+    public static List<Player> GetPlayersInScoringOrder(Game game) {
         if (game.isOmegaPhaseMode()) {
             return PriorityTrackHelper.GetPriorityTrack(game)
                 .stream().filter(Objects::nonNull).toList();

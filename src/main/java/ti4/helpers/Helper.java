@@ -370,7 +370,7 @@ public class Helper {
             || game.getHighestScore() + 1 > game.getVp()) {
             return;
         }
-        for (Player player : game.getActionPhaseTurnOrder()) {
+        for (Player player : StatusHelper.GetPlayersInScoringOrder(game)) {
             if (game.getHighestScore() + 1 > game.getVp()) {
                 return;
             }
