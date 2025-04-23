@@ -36,6 +36,7 @@ public class StatusCleanupService {
         }
         game.removeStoredValue("galacticThreatUsed");
         game.removeStoredValue("conspiratorsUsed");
+        game.removeStoredValue("violatedSystems");
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
         for (Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);

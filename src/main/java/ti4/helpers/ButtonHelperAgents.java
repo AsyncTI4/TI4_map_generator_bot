@@ -955,6 +955,13 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             resolveZelianAgentStep2(player, game, event, rest);
         }
+        if ("kyroagent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + " the Kyro" + ssruuSlash + " agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
+            if (event instanceof ButtonInteractionEvent bEvent) {
+                resolveKyroAgentStep2(player, game, bEvent, rest);
+            }
+        }
         if ("mirvedaagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Logic Machina, the Mirveda" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);

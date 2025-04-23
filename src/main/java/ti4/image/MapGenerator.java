@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -19,14 +26,15 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
@@ -329,12 +337,6 @@ public class MapGenerator implements AutoCloseable {
                     tilesToDisplay.put(key, fogTile);
                 }
             }
-        }
-        //Check custom fog labeled tiles without actual tile
-        Set<String> labelWithoutTile = new HashSet<>(fowPlayer.getFogLabels().keySet());
-        labelWithoutTile.removeAll(tilesToDisplay.keySet());
-        for (String position : labelWithoutTile) {
-            tilesToDisplay.put(position, fowPlayer.buildFogTile(position, fowPlayer));
         }
     }
 
@@ -1339,15 +1341,17 @@ public class MapGenerator implements AutoCloseable {
                     }
                 } else if (offBoardHighlighting == 1) {
                     BufferedImage bufferedImage = ImageHelper.read(traitFiles.getFirst());
-                    bufferedImage = ImageHelper.scale(
-                        bufferedImage,
-                        (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                        bufferedImage,
-                        miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                            + (player.isSpeaker() ? 30 : 0),
-                        null);
+                    if (bufferedImage != null) {
+                        bufferedImage = ImageHelper.scale(
+                            bufferedImage,
+                            (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                        graphics.drawImage(
+                            bufferedImage,
+                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                            miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                + (player.isSpeaker() ? 30 : 0),
+                            null);
+                    }
                 }
             } else if (displayType == DisplayType.techskips) {
                 List<String> techFiles = new ArrayList<>();

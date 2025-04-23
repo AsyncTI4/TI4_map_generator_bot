@@ -1,6 +1,7 @@
 package ti4.service.planet;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -150,6 +152,19 @@ public class AddPlanetService {
                             player_.removePromissoryNote(pn);
                             player.setPromissoryNote(pn);
                             player.addPromissoryNoteToPlayArea(pn);
+                        }
+                    }
+                    Set<String> tokens = new HashSet<>();
+                    tokens.addAll(unitHolder.getTokenList());
+                    for (String token : tokens) {
+                        if (token.contains("facility")) {
+                            unitHolder.removeToken(token);
+                            if (token.contains("embassy")) {
+                                ButtonHelperSCs.updateEmbassies(game, player_, tile);
+                            }
+                            if (token.contains("logistics")) {
+                                player_.setCommoditiesTotal(player_.getCommoditiesTotal() - 1);
+                            }
                         }
                     }
                     if (Mapper.getPlanet(planet) != null &&
@@ -317,7 +332,7 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                         + " if you have the correct amount of infantry (3 or 4), you may remove them and DEPLOY 1 space dock on "
-                        + planet + " using the buttons.",
+                        + planet + " using the buttons. Note that you will be able to build out of this space dock this action",
                     buttons);
 
             }

@@ -672,7 +672,7 @@ public class ButtonHelperModifyUnits {
                         var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
                         RemoveUnitService.removeUnit(event, tile, game, unit);
                         handleCabalEatsUnit(cabal, player, unitName, min, event, tile, game);
-                        if (player.hasAbility("heroism") && unitModel.getBaseType().equalsIgnoreCase("fighter")) {
+                        if (!spaceCannonOffence && player.hasAbility("heroism") && unitModel.getBaseType().equalsIgnoreCase("fighter")) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, min, unitName, event);
                         }
                         msg.append("> Destroyed ").append(min).append(" ").append(unitModel.getUnitEmoji()).append("\n");

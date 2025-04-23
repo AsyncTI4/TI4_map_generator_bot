@@ -133,8 +133,8 @@ public class FOWPlusService {
                 unitEmojis += StringUtils.repeat("" + model.getUnitEmoji(), unit.getValue());
             }
         }
-        GMService.sendMessageToGMChannel(game, player.getRepresentation(true, false) 
-            + " lost " + unitEmojis + " (" + valueOfUnitsLost + " res) to The Void round " + game.getRound() + " turn " + player.getNumberOfTurns(), true);
+        GMService.logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() 
+            + " lost " + unitEmojis + " (" + valueOfUnitsLost + " res) to The Void round " + game.getRound() + " turn " + player.getInRoundTurnCount(), null, true);
         game.resetCurrentMovedUnitsFrom1TacticalAction();
     }
 
