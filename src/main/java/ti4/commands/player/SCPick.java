@@ -119,6 +119,9 @@ class SCPick extends GameStateSubcommand {
         }
         if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
             game.setSCPlayed(scPicked, true);
+            for (Player p2 : game.getRealPlayers()) {
+                p2.addFollowedSC(scPicked);
+            }
         }
 
         boolean nextCorrectPing = false;

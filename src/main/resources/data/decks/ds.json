@@ -450,7 +450,9 @@
             "dszelir",
             "dszeliinf",
             "dsuydag",
-            "dsuydab"
+            "dsuydab",
+            "dspharinf",
+            "dspharb"
         ],
         "source": "ds"
     }

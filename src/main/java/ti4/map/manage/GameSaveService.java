@@ -1,5 +1,7 @@
 package ti4.map.manage;
 
+import static ti4.map.manage.GamePersistenceKeys.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,26 +30,6 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
-import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLAYER;
-import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.TILE;
-import static ti4.map.manage.GamePersistenceKeys.TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.UNITS;
 import ti4.message.BotLogger;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.milty.MiltyDraftManager;
@@ -425,6 +407,8 @@ class GameSaveService {
         writer.write(Constants.BETA_TEST_MODE + " " + game.isTestBetaFeaturesMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_EXPLORATION_MODE + " " + game.isAgeOfExplorationMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.FACILITIES_MODE + " " + game.isFacilitiesMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.MINOR_FACTIONS_MODE + " " + game.isMinorFactionsMode());
         writer.write(System.lineSeparator());

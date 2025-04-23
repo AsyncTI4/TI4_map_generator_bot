@@ -34,6 +34,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXTRA_SECRET_MODE, "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(new OptionData(OptionType.BOOLEAN, FOWOption.RIFTSET_MODE.toString(), "True to enable Eronous RiftSet mode"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Catc Facilities"));
     }
 
     @Override
@@ -61,6 +62,9 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
+
+        Boolean facilitiesMode = event.getOption(Constants.FACILITIES_MODE, null, OptionMapping::getAsBoolean);
+        if (facilitiesMode != null) game.setFacilitiesMode(facilitiesMode);
 
         Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
         if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");

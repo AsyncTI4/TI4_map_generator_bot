@@ -673,6 +673,7 @@ class GameLoadService {
                 }
                 case Constants.BETA_TEST_MODE -> game.setTestBetaFeaturesMode(loadBooleanOrDefault(info, false));
                 case Constants.AGE_OF_EXPLORATION_MODE -> game.setAgeOfExplorationMode(loadBooleanOrDefault(info, false));
+                case Constants.FACILITIES_MODE -> game.setFacilitiesMode(loadBooleanOrDefault(info, false));
                 case Constants.MINOR_FACTIONS_MODE -> game.setMinorFactionsMode(loadBooleanOrDefault(info, false));
                 case Constants.SHOW_FULL_COMPONENT_TEXT -> game.setShowFullComponentTextEmbeds(loadBooleanOrDefault(info, false));
                 case Constants.GAME_HAS_ENDED -> game.setHasEnded(loadBooleanOrDefault(info, false));

@@ -34,10 +34,8 @@ public class AddUnitService {
 
         if (isTileAlreadyPinged(game, tile)) return;
 
-        String message = ColorEmojis.getColorEmojiWithName(color) + " has modified units in the system.";
-        message += " Specific units modified: " + unitList;
-        message += " Refresh map to see changes.";
-        FoWHelper.pingSystem(game, event, tile.getPosition(), message);
+        FoWHelper.pingSystem(game, event, tile.getPosition(), 
+            ColorEmojis.getColorEmojiWithName(color) + " has modified units in the system: " + unitList);
 
         markTileAsPinged(game, tile);
     }

@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +19,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.apache.commons.lang3.function.Consumers;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -91,6 +92,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
@@ -2808,6 +2810,14 @@ public class ButtonHelper {
                     }
                 }
             }
+            if (player.getPlanets().contains(capChecker.getName())) {
+                for (String token : capChecker.getTokenList()) {
+                    if (token.contains("facilitynavalbase")) {
+                        fightersIgnored += 4;
+                        fleetCap += 2;
+                    }
+                }
+            }
 
             for (Player p2 : game.getRealPlayers()) {
                 if (player.getAllianceMembers().contains(p2.getFaction())) {
@@ -2956,18 +2966,20 @@ public class ButtonHelper {
                 + (numInfNFightersNMechs - numFighter2s == 1 ? "" : "s") + " ). ";
         }
         if (issuePing) {
-            if (capacityViolated || fleetSupplyViolated || structuresViolated) {
-                List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
-                    "Remove Units in " + tile.getRepresentationForButtons(game, player)));
-                buttons.add(Buttons.red("deleteButtons",
-                    "Dismiss These Buttons"));
+            if (!game.getStoredValue("violatedSystems").contains(tile.getPosition())) {
+                if (capacityViolated || fleetSupplyViolated || structuresViolated) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.blue("getDamageButtons_" + tile.getPosition() + "_remove",
+                        "Remove Units in " + tile.getRepresentationForButtons(game, player)));
+                    buttons.add(Buttons.red("deleteButtons",
+                        "Dismiss These Buttons"));
 
-                FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player)
-                    .createFileUpload();
-                MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message,
-                    buttons);
-
+                    FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player)
+                        .createFileUpload();
+                    MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message,
+                        buttons);
+                    game.setStoredValue("violatedSystems", game.getStoredValue("violatedSystems") + tile.getPosition() + "_");
+                }
             }
         }
         if (numInfNFightersNMechs <= capacity) {
@@ -4783,6 +4795,9 @@ public class ButtonHelper {
                             } else {
                                 messageBuilder.append(" (distance exceeds move value (").append(distance).append(" > ")
                                     .append(moveValue).append("), __does not have _Gravity Drive___)");
+                                if (game.isFowMode()) {
+                                    GMService.logPlayerActivity(game, player, messageBuilder.toString());
+                                }
                             }
                             if (player.getTechs().contains("dsgledb")) {
                                 messageBuilder.append(" (has _Lightning Drives_ for +1 movement if not transporting)");
