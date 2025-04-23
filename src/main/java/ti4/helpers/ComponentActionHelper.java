@@ -177,7 +177,7 @@ public class ComponentActionHelper {
                 && !prom.getOwner().equalsIgnoreCase(p1.getColor())
                 && !p1.getPromissoryNotesInPlayArea().contains(pn) && prom.getText() != null) {
                 String pnText = prom.getText();
-                if (pnText.toLowerCase().contains("action:") && !"bmf".equalsIgnoreCase(pn)) {
+                if (pnText.toLowerCase().contains("action:") && !"bmf".equalsIgnoreCase(pn) && !"acq".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
                     Button pnButton = Buttons.red(finChecker + prefix + "pn_" + pn, "Use " + pnName);
@@ -204,6 +204,10 @@ public class ComponentActionHelper {
         }
         if (p1.hasAbility("orbital_drop") && p1.getStrategicCC() > 0) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
+            compButtons.add(abilityButton);
+        }
+        if (ButtonHelperSCs.findUsedFacilities(game, p1).contains("facilitycorefactory")) {
+            Button abilityButton = Buttons.green(finChecker + "corefacilityAction", "Use Core Facility Action");
             compButtons.add(abilityButton);
         }
         if (p1.hasLeader("pharadncommander") && !p1.hasLeaderUnlocked("pharadncommander") && ButtonHelperCommanders.getPharadnCommanderUnlockButtons(p1, game).size() > 5) {

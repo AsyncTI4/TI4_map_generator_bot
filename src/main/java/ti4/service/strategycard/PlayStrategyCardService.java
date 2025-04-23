@@ -23,6 +23,7 @@ import ti4.helpers.CryypterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -219,10 +220,10 @@ public class PlayStrategyCardService {
                                 + ", **Trade** has just been played and this is a reminder that you hold the _Trade Agreement_ of "
                                 + p2.getColor() + ". ";
                             if (p3 == player) {
-                                message3 += "If you force that player to replenish commodities, then you will be prompted to play the _Trade Agreemnt_.";
+                                message3 += "If you force that player to replenish commodities, then you will be prompted to play the _Trade Agreement_.";
                             } else {
                                 message3 += "If you work out a deal with the **Trade** holder,"
-                                    + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreemnt_.";
+                                    + " they may force the player to replenish commodities, and then you will be prompted to play the _Trade Agreement_.";
                             }
                             MessageHelper.sendMessageToChannel(p3.getCardsInfoThread(), message3);
                         }
@@ -338,6 +339,16 @@ public class PlayStrategyCardService {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
                             + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
                     }
+                } else {
+                    if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
+                        Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                        if (reactionEmoji2 != null) {
+                            message.addReaction(reactionEmoji2).queue();
+                            p2.addFollowedSC(scToPlay, event);
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                                + stratCardName + "** because the bot does not believe you have a space dock in your home system");
+                        }
+                    }
                 }
             }
         }
@@ -428,7 +439,7 @@ public class PlayStrategyCardService {
             case "pok1leadership" -> getLeadershipButtons(sc);
             case "pok2diplomacy" -> getDiplomacyButtons(sc, player);
             case "pok3politics" -> getPoliticsButtons(sc);
-            case "pok4construction" -> getConstructionButtons(sc);
+            case "pok4construction" -> getConstructionButtons(sc, game);
             case "pok5trade" -> getTradeButtons(sc);
             case "pok6warfare" -> getWarfareButtons(sc);
             case "anarchy1" -> getAnarchy1Buttons(sc);
@@ -450,7 +461,7 @@ public class PlayStrategyCardService {
             case "cryypter_3" -> CryypterHelper.getCryypterSC3Buttons(sc);
 
             // monuments
-            case "monuments4construction" -> getMonumentsConstructionButtons(sc);
+            case "monuments4construction" -> getMonumentsConstructionButtons(sc, game);
 
             //riftset
             case "riftset_9" -> RiftSetModeService.getSacrificeButtons();
@@ -561,11 +572,15 @@ public class PlayStrategyCardService {
     /**
      * @return buttons which hit {@link ButtonHelperSCs#construction}
      */
-    private static List<Button> getConstructionButtons(int sc) {
+    private static List<Button> getConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        if (game.isFacilitiesMode()) {
+            Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
+            return List.of(followButton, sdButton, pdsButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
 
@@ -653,12 +668,16 @@ public class PlayStrategyCardService {
     /**
      * @return buttons which hit {@link ButtonHelperSCs#construction}
      */
-    private static List<Button> getMonumentsConstructionButtons(int sc) {
+    private static List<Button> getMonumentsConstructionButtons(int sc, Game game) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button sdButton = Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock);
         Button pdsButton = Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds);
         Button monumentButton = Buttons.red("construction_monument", "Place 1 Monument", UnitEmojis.Monument);
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
+        if (game.isFacilitiesMode()) {
+            Button facilityButton = Buttons.green("construction_facility", "Place A Facility");
+            return List.of(followButton, sdButton, pdsButton, monumentButton, facilityButton, noFollowButton);
+        }
         return List.of(followButton, sdButton, pdsButton, monumentButton, noFollowButton);
     }
 }

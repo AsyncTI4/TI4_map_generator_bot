@@ -56,7 +56,7 @@ public class StatisticsPipeline {
 
     public static void run(StatisticsEvent event) {
         event.event.getHook().sendMessage("Your statistics are being processed, please hold...").setEphemeral(true).queue();
-        new TimedRunnable(event.name, event.runnable).run();
+        new TimedRunnable(event.name, event.runnable).run(); // would probably be better to rewrite this with a timeout mechanism
     }
 
     public record StatisticsEvent(String name, IReplyCallback event, Runnable runnable) {}

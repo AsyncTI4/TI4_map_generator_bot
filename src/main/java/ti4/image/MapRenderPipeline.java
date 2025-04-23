@@ -75,7 +75,7 @@ public class MapRenderPipeline {
                         BotLogger.error("Render event threw an exception. Game '" + renderEvent.game.getName() + "'", e);
                     }
                 });
-        timedRunnable.run();
+        timedRunnable.run(); // would probably be better to rewrite this with a timeout mechanism
     }
 
     private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {

@@ -38,4 +38,8 @@ public class TokenModel implements ModelInterface {
     public boolean allowedOnPlanet() {
         return spaceOrPlanet == null || "planet".equals(spaceOrPlanet) || "both".equals(spaceOrPlanet);
     }
+    
+    public boolean searchSource(ComponentSource searchSource) {
+        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
+    }
 }

@@ -1,8 +1,5 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
-
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
@@ -22,8 +19,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import static java.util.function.Predicate.not;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -4066,6 +4065,7 @@ public class Game extends GameProperties {
             || isExtraSecretMode()
             || isFowMode()
             || isAgeOfExplorationMode()
+            || isFacilitiesMode()
             || isMinorFactionsMode()
             || isLightFogMode()
             || isRedTapeMode()

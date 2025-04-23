@@ -3,7 +3,9 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -11,16 +13,20 @@ import org.jetbrains.annotations.NotNull;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
 import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.PublicObjectiveModel;
@@ -286,7 +292,7 @@ public class ButtonHelperSCs {
 
         if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-                + " since you do not currently hold your _Trade Agreemnt_, washing here seems likely an error and will mess with the _Trade Agreement_ resolution."
+                + " since you do not currently hold your _Trade Agreement_, washing here seems likely an error and will mess with the _Trade Agreement_ resolution."
                 + " Nothing has been processed as a result. Try a different route of washing your commodities if this correction is wrong.");
             return;
         }
@@ -375,43 +381,45 @@ public class ButtonHelperSCs {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         event.getMessage().delete().queue();
     }
+
     public static List<Button> getAnarchy7Buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfUnitsWithProduction(player, game)) {
-                buttons.add(Buttons.green("anarchy7Build_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player)));
+            buttons.add(Buttons.green("anarchy7Build_" + tile.getPosition(),
+                tile.getRepresentationForButtons(game, player)));
         }
         return buttons;
     }
+
     public static List<Button> getAnarchy3SecondaryButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
-        if (!Helper.getRemainingSCs(game).contains(1) || (game.getScPlayed().get(1)!= null && game.getScPlayed().get(1))) {
+        if (!Helper.getRemainingSCs(game).contains(1) || (game.getScPlayed().get(1) != null && game.getScPlayed().get(1))) {
             scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
         }
-        if (!Helper.getRemainingSCs(game).contains(2) || (game.getScPlayed().get(2)!= null && game.getScPlayed().get(2))) {
-            scButtons.add( Buttons.gray("anarchy2secondary", "Ready a non-SC Card"));
+        if (!Helper.getRemainingSCs(game).contains(2) || (game.getScPlayed().get(2) != null && game.getScPlayed().get(2))) {
+            scButtons.add(Buttons.gray("anarchy2secondary", "Ready a non-SC Card"));
             scButtons.add(Buttons.green("diploRefresh2", "Ready Planets"));
         }
-        if (!Helper.getRemainingSCs(game).contains(4) || (game.getScPlayed().get(4)!= null && game.getScPlayed().get(4))) {
+        if (!Helper.getRemainingSCs(game).contains(4) || (game.getScPlayed().get(4) != null && game.getScPlayed().get(4))) {
             scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
-        if (!Helper.getRemainingSCs(game).contains(5) || (game.getScPlayed().get(5)!= null && game.getScPlayed().get(5))) {
+        if (!Helper.getRemainingSCs(game).contains(5) || (game.getScPlayed().get(5) != null && game.getScPlayed().get(5))) {
             scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
             scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
         }
-        if (!Helper.getRemainingSCs(game).contains(6) ||(game.getScPlayed().get(6)!= null && game.getScPlayed().get(6))) {
+        if (!Helper.getRemainingSCs(game).contains(6) || (game.getScPlayed().get(6) != null && game.getScPlayed().get(6))) {
             scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
-        if (!Helper.getRemainingSCs(game).contains(7) || (game.getScPlayed().get(7)!= null && game.getScPlayed().get(7))) {
+        if (!Helper.getRemainingSCs(game).contains(7) || (game.getScPlayed().get(7) != null && game.getScPlayed().get(7))) {
             scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
         }
-        if (!Helper.getRemainingSCs(game).contains(8) || (game.getScPlayed().get(8)!= null && game.getScPlayed().get(8))) {
+        if (!Helper.getRemainingSCs(game).contains(8) || (game.getScPlayed().get(8) != null && game.getScPlayed().get(8))) {
             scButtons.add(Buttons.green("resolveAnarchy8Secondary", "Lift Command Token"));
         }
-        if (!Helper.getRemainingSCs(game).contains(9) || (game.getScPlayed().get(9)!= null && game.getScPlayed().get(9))) {
+        if (!Helper.getRemainingSCs(game).contains(9) || (game.getScPlayed().get(9) != null && game.getScPlayed().get(9))) {
             scButtons.add(Buttons.GET_A_TECH);
         }
-        if (!Helper.getRemainingSCs(game).contains(11) || (game.getScPlayed().get(11)!= null && game.getScPlayed().get(11))) {
+        if (!Helper.getRemainingSCs(game).contains(11) || (game.getScPlayed().get(11) != null && game.getScPlayed().get(11))) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
@@ -468,32 +476,34 @@ public class ButtonHelperSCs {
         }
         event.getMessage().delete().queue();
     }
-    public static List<Button> getAnarchy2ReadyComponentButtons(Game game, Player player){
+
+    public static List<Button> getAnarchy2ReadyComponentButtons(Game game, Player player) {
 
         List<Button> buttons = new ArrayList<>();
         buttons.addAll(ButtonHelper.getAllTechsToReady(player));
-        for(Player p2 : game.getRealPlayers()){
-            for(String leader : p2.getLeaderIDs()){
-                if(!p2.hasUnexhaustedLeader(leader)){
+        for (Player p2 : game.getRealPlayers()) {
+            for (String leader : p2.getLeaderIDs()) {
+                if (!p2.hasUnexhaustedLeader(leader)) {
                     LeaderModel leaderM = Mapper.getLeader(leader);
-                    buttons.add(Buttons.green("anarchy2ReadyAgent_"+leader+"_"+p2.getFaction(), "Ready "+leaderM.getName()));
+                    buttons.add(Buttons.green("anarchy2ReadyAgent_" + leader + "_" + p2.getFaction(), "Ready " + leaderM.getName()));
                 }
             }
         }
-        for(String relic : player.getExhaustedRelics()){
+        for (String relic : player.getExhaustedRelics()) {
             String relicName = relic;
-            if(Mapper.getRelic(relic) != null){
+            if (Mapper.getRelic(relic) != null) {
                 relicName = Mapper.getRelic(relic).getName();
             }
-            buttons.add(Buttons.green("anarchy2ReadyRelic_"+relic, "Ready "+relicName));
+            buttons.add(Buttons.green("anarchy2ReadyRelic_" + relic, "Ready " + relicName));
         }
 
         return buttons;
 
     }
+
     @ButtonHandler("anarchy2secondary")
     public static void secondaryOfAnarchy2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = ButtonHelperSCs.getAnarchy2ReadyComponentButtons(game,player);
+        List<Button> buttons = ButtonHelperSCs.getAnarchy2ReadyComponentButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
                 + " use the buttons to ready something",
@@ -504,44 +514,46 @@ public class ButtonHelperSCs {
         List<Button> scButtons = new ArrayList<>();
         Button followButton = Buttons.green("sc_follow_12", "Spend A Strategy Token");
         scButtons.add(followButton);
-        if (Helper.getRemainingSCs(game).contains(2) && (game.getScPlayed().get(2)== null || !game.getScPlayed().get(2))) {
-            scButtons.add( Buttons.gray("anarchy2secondary", "Ready a non-SC Card"));
+        if (Helper.getRemainingSCs(game).contains(2) && (game.getScPlayed().get(2) == null || !game.getScPlayed().get(2))) {
+            scButtons.add(Buttons.gray("anarchy2secondary", "Ready a non-SC Card"));
             scButtons.add(Buttons.green("diploRefresh2", "Ready Planets"));
         }
-        if (Helper.getRemainingSCs(game).contains(3) && (game.getScPlayed().get(3)== null || !game.getScPlayed().get(3))) {
+        if (Helper.getRemainingSCs(game).contains(3) && (game.getScPlayed().get(3) == null || !game.getScPlayed().get(3))) {
             scButtons.add(Buttons.gray("anarchy3secondary", "Perform Unchosen Or Exhausted Secondary"));
         }
-        if (Helper.getRemainingSCs(game).contains(4) && (game.getScPlayed().get(4)== null || !game.getScPlayed().get(4))) {
+        if (Helper.getRemainingSCs(game).contains(4) && (game.getScPlayed().get(4) == null || !game.getScPlayed().get(4))) {
             scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
         }
-        if (Helper.getRemainingSCs(game).contains(5) && (game.getScPlayed().get(5)== null || !game.getScPlayed().get(5))) {
+        if (Helper.getRemainingSCs(game).contains(5) && (game.getScPlayed().get(5) == null || !game.getScPlayed().get(5))) {
             scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
             scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
         }
-        if (Helper.getRemainingSCs(game).contains(6) && (game.getScPlayed().get(6)== null || !game.getScPlayed().get(6))) {
+        if (Helper.getRemainingSCs(game).contains(6) && (game.getScPlayed().get(6) == null || !game.getScPlayed().get(6))) {
             scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
         }
-        if (Helper.getRemainingSCs(game).contains(7) && (game.getScPlayed().get(7)== null || !game.getScPlayed().get(7))) {
+        if (Helper.getRemainingSCs(game).contains(7) && (game.getScPlayed().get(7) == null || !game.getScPlayed().get(7))) {
             scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
         }
-        if (Helper.getRemainingSCs(game).contains(8) && (game.getScPlayed().get(8)== null || !game.getScPlayed().get(8))) {
+        if (Helper.getRemainingSCs(game).contains(8) && (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8))) {
             scButtons.add(Buttons.green("resolveAnarchy8Secondary", "Lift Command Token"));
         }
-        if (Helper.getRemainingSCs(game).contains(9) && (game.getScPlayed().get(9)== null || !game.getScPlayed().get(9))) {
+        if (Helper.getRemainingSCs(game).contains(9) && (game.getScPlayed().get(9) == null || !game.getScPlayed().get(9))) {
             scButtons.add(Buttons.GET_A_TECH);
         }
-        if (Helper.getRemainingSCs(game).contains(11) && (game.getScPlayed().get(11)== null || !game.getScPlayed().get(11))) {
+        if (Helper.getRemainingSCs(game).contains(11) && (game.getScPlayed().get(11) == null || !game.getScPlayed().get(11))) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
 
         return scButtons;
     }
+
     @ButtonHandler("reverseSpeakerOrder")
     public static void reverseSpeakerOrder(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Helper.reverseSpeakerOrder(game);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji()+" has reversed speaker order"); 
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " has reversed speaker order");
     }
+
     @ButtonHandler("primaryOfAnarchy1")
     public static void primaryOfAnarchy1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = ButtonHelperSCs.getAnarchy1PrimaryButtons(game);
@@ -550,6 +562,7 @@ public class ButtonHelperSCs {
                 + " use the buttons to resolve the secondary (remember to spend a strat CC)",
             buttons);
     }
+
     @ButtonHandler("anarchy3secondary")
     public static void anarchy3secondary(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = ButtonHelperSCs.getAnarchy3SecondaryButtons(game);
@@ -558,6 +571,7 @@ public class ButtonHelperSCs {
                 + " use the buttons to resolve the secondary",
             buttons);
     }
+
     @ButtonHandler("primaryOfAnarchy7")
     public static void primaryOfAnarchy7(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = ButtonHelperSCs.getAnarchy7Buttons(game, player);
@@ -570,7 +584,7 @@ public class ButtonHelperSCs {
     @ButtonHandler("resolveAnarchy8Secondary")
     public static void resolveUnexpectedAction(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpected");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation()+" Use buttons to remove token.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Use buttons to remove token.", buttons);
     }
 
     @ButtonHandler("warfareBuild")
@@ -653,44 +667,228 @@ public class ButtonHelperSCs {
         }
         ReactionService.addReaction(event, game, player);
         String unit = buttonID.replace("construction_", "");
-        UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
-        String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
-            + unitKey.unitName() + " on for **Construction**.";
-        if (!player.getSCs().contains(4)) {
-            message += "\n## __It will place a command token in the system as well.__ ";
+        if (unit.equalsIgnoreCase("facility")) {
+            String message = player.getRepresentationUnfogged() + ", please choose the facility you wish to place.";
+            if (!player.getSCs().contains(4)) {
+                message += "\n## __It will place a command token in the system as well.__ ";
+            }
+            List<Button> buttons = getPossibleFacilities(game, player);
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+        } else {
+            UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
+            String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
+                + unitKey.unitName() + " on for **Construction**.";
+            if (!player.getSCs().contains(4)) {
+                message += "\n## __It will place a command token in the system as well.__ ";
+            }
+            List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         }
-        List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
-        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
         // List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(message, buttons);
         // for (MessageCreateData messageD : messageList) {
         //     event.getHook().setEphemeral(true).sendMessage(messageD).queue();
         // }
+    }
 
+    public static List<String> findUsedFacilities(Game game, Player player) {
+        List<String> facilities = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            Planet uH = game.getUnitHolderFromPlanet(planet);
+            if (uH != null) {
+                for (String token : uH.getTokenList()) {
+                    if (token.contains("facility")) {
+                        facilities.add(token.replace(".png", "").replace("attachment_", ""));
+                    }
+                }
+            }
+        }
+        return facilities;
+    }
+
+    @ButtonHandler("startFacilityPlacement_")
+    public static void startFacilityPlacement(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteMessage(event);
+        String facility = buttonID.split("_")[1];
+        List<String> planets = findUsablePlanetsForFacility(game, player, facility);
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : planets) {
+            buttons.add(Buttons.green("addFacility_" + planet + "_" + facility, Helper.getPlanetRepresentation(planet, game)));
+        }
+        String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your facility on";
+        MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
+    }
+
+    public static List<Button> getPossibleFacilities(Game game, Player player) {
+        List<Button> facilities = new ArrayList<>();
+        List<String> usedFacilities = findUsedFacilities(game, player);
+        String facilityID = "facilitycorefactory";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Core Factory"));
+        }
+        facilityID = "facilitytransitnode";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Transit Node"));
+        }
+        facilityID = "facilityresearchlab";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Research Lab"));
+        }
+        facilityID = "facilitynavalbase";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Naval Base"));
+        }
+        facilityID = "facilitylogisticshub";
+        if (!usedFacilities.contains(facilityID)) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Logistics Hub"));
+        }
+        facilityID = "facilityembassy";
+        boolean hasEmbassy = false;
+        for (String fac : usedFacilities) {
+            if (fac.contains("facilityembassy")) {
+                hasEmbassy = true;
+            }
+        }
+        if (!hasEmbassy) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Embassy"));
+        }
+        int colonies = 0;
+        facilityID = "facilitycolony";
+        for (String fac : usedFacilities) {
+            if (fac.contains(facilityID)) {
+                colonies++;
+            }
+        }
+        if (colonies < 2) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Colony"));
+        }
+        colonies = 0;
+        facilityID = "facilityrefinery";
+        for (String fac : usedFacilities) {
+            if (fac.contains(facilityID)) {
+                colonies++;
+            }
+        }
+        if (colonies < 2) {
+            facilities.add(Buttons.green("startFacilityPlacement_" + facilityID, "Refinery"));
+        }
+        return facilities;
+    }
+
+    public static List<String> findUsablePlanetsForFacility(Game game, Player player, String facility) {
+        List<String> planets = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            Planet uH = game.getUnitHolderFromPlanet(planet);
+            if (uH != null) {
+                if (uH.getPlanetTypes().contains("industrial") && !facility.contains("research")) {
+                    planets.add(planet);
+                } else if (uH.getPlanetTypes().contains("cultural") && !facility.contains("research") && !facility.contains("corefactory")) {
+                    planets.add(planet);
+                } else if (uH.getPlanetTypes().contains("hazardous") && !facility.contains("research") && !facility.contains("embassy") && !facility.contains("naval")) {
+                    planets.add(planet);
+                } else if (planet.equalsIgnoreCase("mr") && !facility.contains("research") && !facility.contains("logistics")) {
+                    planets.add(planet);
+                } else if (!uH.getTechSpecialities().isEmpty() && facility.contains("research")) {
+                    planets.add(planet);
+                } else if (uH.isLegendary() && !facility.contains("research") && !facility.contains("embassy") && !facility.contains("core") && !facility.contains("logistics")) {
+                    planets.add(planet);
+                }
+            }
+        }
+        return planets;
+    }
+
+    public static int getNearbyEmbassyCount(Game game, Tile tile, Player player) {
+        int embassy = 0;
+        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
+            Tile tile2 = game.getTileByPosition(pos);
+            for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
+                for (String token : uH.getTokenList()) {
+                    if (token.contains("facilityembassy")) {
+                        embassy++;
+                    }
+                }
+            }
+        }
+        return embassy;
+    }
+
+    public static void updateEmbassies(Game game, Player player, Tile tile) {
+        int count = getNearbyEmbassyCount(game, tile, player);
+        for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true, true)) {
+            Tile tile2 = game.getTileByPosition(pos);
+            for (UnitHolder uH : tile2.getPlanetUnitHolders()) {
+                Set<String> tokens = new HashSet<>();
+                tokens.addAll(uH.getTokenList());
+                for (String token : tokens) {
+                    if (token.contains("facilityembassy")) {
+                        uH.removeToken(token);
+                        uH.addToken("attachment_facilityembassy" + count + ".png");
+                    }
+                }
+            }
+        }
+    }
+
+    @ButtonHandler("addFacility_")
+    public static void addFacility(Game game, Player player, String buttonID, GenericInteractionCreateEvent event) {
+        String planet = buttonID.split("_")[1];
+        String facility = buttonID.split("_")[2];
+        Planet plan = game.getUnitHolderFromPlanet(planet);
+        String message = player.getRepresentation() + " added a facility of type " + facility.replace("facility", "");
+        if (plan != null) {
+            if (!facility.contains("embassy")) {
+                plan.addToken("attachment_" + facility + ".png");
+            } else {
+                int embassy = getNearbyEmbassyCount(game, game.getTileFromPlanet(planet), player);
+                plan.addToken("attachment_" + facility + (embassy + 1) + ".png");
+                updateEmbassies(game, player, game.getTileFromPlanet(planet));
+            }
+            message += " to " + Helper.getPlanetRepresentation(planet, game);
+            if (facility.contains("logistics")) {
+                player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
+                message += " Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect. Players will have to monitor this)";
+            }
+        }
+
+        if (event instanceof ButtonInteractionEvent bEvent) {
+            bEvent.getMessage().delete().queue();
+            if (!buttonID.contains("_dont")) {
+                ButtonHelper.sendMessageToRightStratThread(player, game, message, "construction");
+            } else {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+            }
+            if (!player.getSCs().contains(4) && !buttonID.contains("_dont")) {
+                UnfiledButtonHandlers.reinforcementsCCPlacement(event, game, player, "reinforcements_cc_placement_" + planet);
+            }
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        }
     }
 
     @ButtonHandler("anarchy10PeekStart")
     public static void anarchy10PeekStart(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
-        for(int x = 0; x < game.getPublicObjectives1Peakable().size();x++){
-            buttons.add(Buttons.green("anarchy10PeekAt_"+game.getPublicObjectives1Peakable().get(x), "Stage 1 Position "+(x+1)));
+        for (int x = 0; x < game.getPublicObjectives1Peakable().size(); x++) {
+            buttons.add(Buttons.green("anarchy10PeekAt_" + game.getPublicObjectives1Peakable().get(x), "Stage 1 Position " + (x + 1)));
         }
-        for(int x = 0; x < game.getPublicObjectives2Peakable().size();x++){
-            buttons.add(Buttons.blue("anarchy10PeekAt_"+game.getPublicObjectives2Peakable().get(x), "Stage 2 Position "+(x+1)));
+        for (int x = 0; x < game.getPublicObjectives2Peakable().size(); x++) {
+            buttons.add(Buttons.blue("anarchy10PeekAt_" + game.getPublicObjectives2Peakable().get(x), "Stage 2 Position " + (x + 1)));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() +" choose which objective you wish to peek at. "
-        +"They are listed in the order that they would normally be revealed", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " choose which objective you wish to peek at. "
+            + "They are listed in the order that they would normally be revealed", buttons);
     }
+
     @ButtonHandler("anarchy10PeekAt")
     public static void anarchy10PeekAt(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
-        String objID = buttonID.replace("anarchy10PeekAt_","");
+        String objID = buttonID.replace("anarchy10PeekAt_", "");
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),player.getFactionEmoji() +" peeked at a public objective");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " peeked at a public objective");
         PublicObjectiveModel po = Mapper.getPublicObjective(objID);
         player.getCardsInfoThread().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
-        buttons.add(Buttons.green("cutTape_"+objID, "Reveal Objective"));
+        buttons.add(Buttons.green("cutTape_" + objID, "Reveal Objective"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() +" choose whether to reveal the objective or not", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " choose whether to reveal the objective or not", buttons);
     }
 
     @ButtonHandler("leadershipGenerateCCButtons")
@@ -746,7 +944,7 @@ public class ButtonHelperSCs {
         Button doneGainingCC = Buttons.red(player.getFinsFactionCheckerPrefix() + "deleteButtons_leadership", "Done Gaining Command Tokens");
         Button resetCC = Buttons.gray(player.getFinsFactionCheckerPrefix() + "resetCCs", "Reset Command Tokens");
         List<Button> buttons2 = Arrays.asList(getTactic, getFleet, getStrat, doneGainingCC, resetCC);
-       // MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons2);
+        // MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons2);
         if (!game.isFowMode()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons2);
         } else {

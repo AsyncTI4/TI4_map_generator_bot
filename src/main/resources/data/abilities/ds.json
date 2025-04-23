@@ -444,7 +444,7 @@
         "name": "Contagion",
         "faction": "kyro",
         "window": "After you resolve the primary or secondary ability of the \"Politics\" strategy card",
-        "windowEffect": "Before 3/31/24: Commit 1 infantry from your reinforcements to each of 2 planets that are in or adjacent to a system that contains a planet you control; resolve invasion on those planets. After 3/31/24: commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
+        "windowEffect": "Commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
         "source": "ds"
     },
     {
@@ -760,7 +760,7 @@
         "id": "corporate_entity",
         "name": "Corporate Entity",
         "faction": "veldyr",
-        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives.",
+        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives. [Note: they still count towards strengthen bonds and betray a friend, as they are promissory notes]",
         "source": "ds"
     },
     {
@@ -814,7 +814,7 @@
     },
     {
         "id": "prescience",
-        "name": "Obsessive Designs",
+        "name": "Prescience",
         "faction": "uydai",
         "permanentEffect": "At the end of your turn,if you have not passed, place 1 of the plan cards on your faction sheet, face down. At the start of your turn, reveal and resolve the plan card on your faction sheet, if able",
         "source": "ds"
