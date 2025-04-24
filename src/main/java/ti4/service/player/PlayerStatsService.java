@@ -13,6 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -137,7 +138,7 @@ public class PlayerStatsService {
             tg += tgCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                + " from picking " + Helper.getSCName(scNumber, game) + ".");
+                    + " from picking " + Helper.getSCName(scNumber, game) + ".");
             if (game.isFowMode()) {
                 String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
                     + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game) + ".";
@@ -155,19 +156,25 @@ public class PlayerStatsService {
         return true;
     }
 
-    public void setValue(SlashCommandInteractionEvent event, Game game, Player player, OptionMapping option,
-        Consumer<Integer> consumer, Supplier<Integer> supplier) {
+    public void setValue(
+        SlashCommandInteractionEvent event, Game game, Player player, OptionMapping option,
+        Consumer<Integer> consumer, Supplier<Integer> supplier
+    ) {
         setValue(event, game, player, option.getName(), consumer, supplier, option.getAsString(), false);
     }
 
-    public void setValue(SlashCommandInteractionEvent event, Game game, Player player, OptionMapping option,
-        Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
+    public void setValue(
+        SlashCommandInteractionEvent event, Game game, Player player, OptionMapping option,
+        Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage
+    ) {
         setValue(event, game, player, option.getName(), consumer, supplier, option.getAsString(),
             suppressMessage);
     }
 
-    public void setValue(SlashCommandInteractionEvent event, Game game, Player player, String optionName,
-        Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
+    public void setValue(
+        SlashCommandInteractionEvent event, Game game, Player player, String optionName,
+        Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage
+    ) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             String explanation = "";
@@ -204,8 +211,10 @@ public class PlayerStatsService {
         }
     }
 
-    public static String getSetValueMessage(String optionName,
-        Integer setToNumber, Integer existingNumber, String explanation) {
+    public static String getSetValueMessage(
+        String optionName,
+        Integer setToNumber, Integer existingNumber, String explanation
+    ) {
         if (explanation == null || "".equalsIgnoreCase(explanation)) {
             return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
                 + existingNumber + ", a change of " + (setToNumber - existingNumber)
@@ -218,8 +227,10 @@ public class PlayerStatsService {
 
     }
 
-    public static String getChangeValueMessage(String optionName,
-        Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation) {
+    public static String getChangeValueMessage(
+        String optionName,
+        Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation
+    ) {
         String changeDescription = "changed";
         if (changeNumber > 0) {
             changeDescription = "increased";

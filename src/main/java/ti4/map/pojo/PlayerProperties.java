@@ -81,6 +81,9 @@ public class PlayerProperties {
     private int sarweenCounter;
     private int pillageCounter;
 
+    //Omega Phase
+    private int priorityPosition;
+
     //uydai tracking
     private int pathTokenCounter;
     private int harvestCounter;

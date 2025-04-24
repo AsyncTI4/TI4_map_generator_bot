@@ -10,14 +10,13 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.info.ListPlayerInfoService;
-import ti4.service.leader.RefreshLeaderService;
+import ti4.service.player.RefreshCardsService;
 
 @UtilityClass
 public class StatusCleanupService {
@@ -55,10 +54,7 @@ public class StatusCleanupService {
             player.setInRoundTurnCount(0);
             player.clearSCs();
             player.clearFollowedSCs();
-            player.clearExhaustedTechs();
-            player.clearExhaustedPlanets(true);
-            player.clearExhaustedRelics();
-            player.clearExhaustedAbilities();
+            RefreshCardsService.refreshPlayerCards(game, player, true);
             game.removeStoredValue("passOnAllWhensNAfters" + player.getFaction());
             game.removeStoredValue(player.getFaction() + "scpickqueue");
 
@@ -66,16 +62,6 @@ public class StatusCleanupService {
                 && game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction())) {
                 if (game.getStoredValue("Pre Pass " + player.getFaction()).contains(player.getFaction()) && !player.isPassed()) {
                     game.setStoredValue("Pre Pass " + player.getFaction(), "");
-                }
-            }
-            List<Leader> leads = new ArrayList<>(player.getLeaders());
-            for (Leader leader : leads) {
-                if (!leader.isLocked()) {
-                    if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")) {
-                        player.removeLeader(leader.getId());
-                    } else {
-                        RefreshLeaderService.refreshLeader(player, leader, game);
-                    }
                 }
             }
             if (player.getPromissoryNotesInPlayArea().contains("sigma_cyber")) {
@@ -115,7 +101,7 @@ public class StatusCleanupService {
                 SpinRingsHelper.spinRingsCustom(game, game.getSpinMode(), null);
             }
         }
-        if (!game.isFowMode() && game.getTableTalkChannel() != null) {
+        if (!game.isFowMode() && game.getTableTalkChannel() != null && !game.isOmegaPhaseMode()) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
             ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
         }

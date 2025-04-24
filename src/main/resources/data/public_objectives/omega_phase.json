@@ -1,0 +1,162 @@
+[
+  {
+    "alias": "corner_omegaphase",
+    "name": "Corner the Market",
+    "phase": "Omega",
+    "text": "Control 4 planets that each have the same trait",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "galvanize_omegaphase",
+    "name": "Galvanize the People",
+    "phase": "Omega",
+    "text": "Have a total of 6 tokens in your tactic and/or strategy pools.",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "manipulate_law_omegaphase",
+    "name": "Manipulate Galactic Law",
+    "phase": "Omega",
+    "text": "Have 16 influence via trade goods and/or planets, exhausted or readied.",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "golden_age_omegaphase",
+    "name": "Found a Golden Age",
+    "phase": "Omega",
+    "text": "Have 16 resources via trade goods and/or planets, exhausted or readied.",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "centralize_trade_omegaphase",
+    "name": "Centralize Galactic Trade",
+    "phase": "Omega",
+    "text": "Have 10 trade goods",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "revolutionize_omegaphase",
+    "name": "Revolutionize Warfare",
+    "phase": "Omega",
+    "text": "Own 3 unit upgrade technologies",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "master_science_omegaphase",
+    "name": "Master the Sciences",
+    "phase": "Omega",
+    "text": "Own 6 non-unit upgrade technologies",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "subdue_omegaphase",
+    "name": "Subdue the Galaxy",
+    "phase": "Omega",
+    "text": "Control 8 planets in non-home systems",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "brain_trust_omegaphase",
+    "name": "Form Galactic Brain Trust",
+    "phase": "Omega",
+    "text": "Control 4 planets that have technology specialties",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "distant_lands_omegaphase",
+    "name": "Rule Distant Lands",
+    "phase": "Omega",
+    "text": "Control 2 planets that are each in or adjacent to a different, other player's home system",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "push_boundaries_omegaphase",
+    "name": "Push Boundaries",
+    "phase": "Omega",
+    "text": "Control more planets than each of 2 of your neighbors",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "ancient_monuments_omegaphase",
+    "name": "Reclaim Ancient Monuments",
+    "phase": "Omega",
+    "text": "Control 3 planets that have attachments",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "vast_territories_omegaphase",
+    "name": "Patrol Vast Territories",
+    "phase": "Omega",
+    "text": "Have units in 4 systems that do not contain planets",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "intimidate_omegaphase",
+    "name": "Intimidate Council",
+    "phase": "Omega",
+    "text": "Have units in 3 systems adjacent to Mecatol Rex",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "massive_cities_omegaphase",
+    "name": "Construct Massive Cities",
+    "phase": "Omega",
+    "text": "Have 5 or more structures",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "become_legend_omegaphase",
+    "name": "Become a Legend",
+    "phase": "Omega",
+    "text": "Have units in 3 systems that contain legendary planets, Mecatol Rex, or anomalies",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "command_armada_omegaphase",
+    "name": "Command and Armada",
+    "phase": "Omega",
+    "text": "Have 6 or more non-fighter ships in one system",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "supremacy_omegaphase",
+    "name": "Achieve Supremacy",
+    "phase": "Omega",
+    "text": "Have your flagship or a war sun in another player's home system or Mecatol Rex",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "control_borderlands_omegaphase",
+    "name": "Control the Borderlands",
+    "phase": "Omega",
+    "text": "Have units in 4 systems on the edge of the game board other than your home system",
+    "points": 1,
+    "source": "omega_phase"
+  },
+  {
+    "alias": "imperium_rex_omegaphase",
+    "name": "Imperium Rex",
+    "phase": "Omega",
+    "text": "Immediately end the game",
+    "points": 1,
+    "source": "omega_phase"
+  }
+]
