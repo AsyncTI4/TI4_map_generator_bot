@@ -2,6 +2,7 @@ package ti4.service.game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import lombok.experimental.UtilityClass;
@@ -25,7 +26,9 @@ import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -87,7 +90,9 @@ public class StartPhaseService {
                 game.setExplorationDeckID(deckModel.getAlias());
             }
             case "statusScoring" -> {
-                EndTurnService.showPublicObjectivesWhenAllPassed(event, game, game.getMainGameChannel());
+                StatusHelper.AnnounceStatusPhase(game);
+                StatusHelper.BeginScoring(event, game, event.getMessageChannel());
+                StatusHelper.HandleStatusPhaseMiddle(event, game, event.getMessageChannel());
                 game.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {
@@ -356,18 +361,32 @@ public class StartPhaseService {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
         }
-        Player speaker;
-        if (game.getPlayer(game.getSpeakerUserID()) != null) {
-            speaker = game.getPlayers().get(game.getSpeakerUserID());
+        Player firstSCPicker;
+        if (!game.isOmegaPhaseMode()) {
+            if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                firstSCPicker = game.getPlayers().get(game.getSpeakerUserID());
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed.");
+                return;
+            }
+            if (!firstSCPicker.getSCs().isEmpty() && game.getRealPlayers().size() > 1) {
+                firstSCPicker = Helper.getSpeakerOrderFromThisPlayer(firstSCPicker, game).get(1);
+            }
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed.");
-            return;
+            PriorityTrackHelper.PrintPriorityTrack(game);
+            var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+            var firstInPriorityOrder = priorityTrack.stream()
+                .filter(Objects::nonNull)
+                .filter(p -> p.getSCs().size() < game.getStrategyCardsPerPlayer())
+                .findFirst();
+            if (!firstInPriorityOrder.isPresent()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No player found on the Priority Track with fewer than the max SC cards. Can't offer anyone Strategy Cards.");
+                return;
+            }
+            firstSCPicker = firstInPriorityOrder.get();
         }
-        if (!speaker.getSCs().isEmpty() && game.getRealPlayers().size() > 1) {
-            speaker = Helper.getSpeakerOrderFromThisPlayer(speaker, game).get(1);
-        }
-        String message = speaker.getRepresentationUnfogged() + " is up to pick a strategy card.";
-        game.updateActivePlayer(speaker);
+        String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
+        game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
         FowCommunicationThreadService.checkAllCommThreads(game);
         String pickSCMsg = " Please use the buttons to pick a strategy card.";
@@ -389,7 +408,7 @@ public class StartPhaseService {
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
-        MessageHelper.sendMessageToChannelWithButtons(speaker.getCorrectChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, speaker));
+        MessageHelper.sendMessageToChannelWithButtons(firstSCPicker.getCorrectChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, firstSCPicker));
 
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Start of the strategy phase for round #" + game.getRound() + ".");
@@ -566,7 +585,7 @@ public class StartPhaseService {
         }
         boolean custodiansTaken = game.isCustodiansScored();
         Button passOnAbilities;
-        if (custodiansTaken) {
+        if (custodiansTaken || game.isOmegaPhaseMode()) {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
             message2 += """
                 This is the moment when you should resolve:\s
@@ -617,6 +636,10 @@ public class StartPhaseService {
                     PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
                 }
             }
+        }
+
+        if (game.isOmegaPhaseMode()) {
+            PriorityTrackHelper.ClearPriorityTrack(game);
         }
 
         Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();

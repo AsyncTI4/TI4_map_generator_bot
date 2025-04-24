@@ -21,6 +21,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
@@ -380,6 +381,8 @@ class GameSaveService {
         writer.write(Constants.CPTI_EXPLORE_MODE + " " + game.isCptiExploreMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.RED_TAPE_MODE + " " + game.isRedTapeMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.OMEGA_PHASE_MODE + " " + game.isOmegaPhaseMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.STRAT_PINGS + " " + game.isStratPings());
         writer.write(System.lineSeparator());
@@ -800,6 +803,11 @@ class GameSaveService {
 
             if (player.getPlayerTIGLRankAtGameStart() != null) {
                 writer.write(Constants.TIGL_RANK + " " + player.getPlayerTIGLRankAtGameStart());
+                writer.write(System.lineSeparator());
+            }
+
+            if (player.hasPriorityPosition()) {
+                writer.write(Constants.PRIORITY_TRACK + " " + player.getPriorityPosition());
                 writer.write(System.lineSeparator());
             }
 
