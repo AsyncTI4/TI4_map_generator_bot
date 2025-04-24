@@ -3785,7 +3785,9 @@ public class AgendaHelper {
 
     public static List<Player> getAgendaAbilityResolutionOrder(Game game) {
         if (game.isOmegaPhaseMode()) {
-            return PriorityTrackHelper.GetPriorityTrack(game).stream().filter(Objects::nonNull).toList();
+            List<Player> arrayPlayers = new ArrayList<Player>();
+            arrayPlayers.addAll(PriorityTrackHelper.GetPriorityTrack(game).stream().filter(Objects::nonNull).toList());
+            return arrayPlayers;
         }
         return Helper.getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
 
@@ -3793,6 +3795,7 @@ public class AgendaHelper {
 
     public static List<Player> getAgendaAbilityResolutionOrderFromPlayer(Player player, Game game) {
         var votingOrder = getAgendaAbilityResolutionOrder(game);
+
         if (player != null) {
             Player initialFirstPlayer = votingOrder.get(0);
             while (!votingOrder.get(0).getFaction().equalsIgnoreCase(player.getFaction())) {
