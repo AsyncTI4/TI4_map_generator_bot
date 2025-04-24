@@ -3438,6 +3438,9 @@ public class ButtonHelper {
             if (CommandCounterHelper.hasCC(player, tile)) {
                 continue;
             }
+            if (game.isNaaluAgent() && tile.isHomeSystem(game)) {
+                continue;
+            }
             ringButtons.add(Buttons.green(finChecker + "ringTile_" + tile.getPosition(),
                 tile.getRepresentationForButtons(game, player), UnitEmojis.spacedock));
         }
@@ -3462,7 +3465,7 @@ public class ButtonHelper {
         if (!FOWPlusService.canActivatePosition(tile.getPosition(), player, game))
             return false;
 
-        return !CommandCounterHelper.hasCC(null, player.getColor(), tile);
+        return !CommandCounterHelper.hasCC(null, player.getColor(), tile) || game.isL1Hero();
     }
 
     public static List<Button> getTileInARing(
