@@ -38,7 +38,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
-import ti4.helpers.omegaPhase.PriorityTrackHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;

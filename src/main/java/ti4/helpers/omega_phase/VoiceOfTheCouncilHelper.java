@@ -1,4 +1,4 @@
-package ti4.helpers.omegaPhase;
+package ti4.helpers.omega_phase;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.AgendaHelper;

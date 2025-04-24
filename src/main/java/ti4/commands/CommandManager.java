@@ -26,7 +26,7 @@ import ti4.commands.installation.InstallationCommand;
 import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.MapCommand;
 import ti4.commands.milty.MiltyCommand;
-import ti4.commands.omegaphase.OmegaPhaseCommand;
+import ti4.commands.omega_phase.OmegaPhaseCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.relic.RelicCommand;

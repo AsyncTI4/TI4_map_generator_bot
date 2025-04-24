@@ -13,7 +13,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.omegaPhase.PriorityTrackHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;

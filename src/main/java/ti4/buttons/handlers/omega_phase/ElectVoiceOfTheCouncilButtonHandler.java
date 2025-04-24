@@ -2,7 +2,7 @@ package ti4.buttons.handlers.omega_phase;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.omegaPhase.VoiceOfTheCouncilHelper;
+import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;

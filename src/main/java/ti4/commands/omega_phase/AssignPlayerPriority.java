@@ -1,13 +1,12 @@
-package ti4.commands.omegaphase;
+package ti4.commands.omega_phase;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
-import ti4.helpers.omegaPhase.PriorityTrackHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 
 class AssignPlayerPriority extends GameStateSubcommand {
     public AssignPlayerPriority() {

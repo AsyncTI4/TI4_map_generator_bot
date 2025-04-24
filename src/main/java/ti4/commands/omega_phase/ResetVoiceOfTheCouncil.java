@@ -1,9 +1,9 @@
-package ti4.commands.omegaphase;
+package ti4.commands.omega_phase;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.omegaPhase.VoiceOfTheCouncilHelper;
+import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 
 class ResetVoiceOfTheCouncil extends GameStateSubcommand {
     public ResetVoiceOfTheCouncil() {

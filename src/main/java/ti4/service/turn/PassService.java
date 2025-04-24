@@ -10,7 +10,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.DiscordantStarsHelper;
-import ti4.helpers.omegaPhase.PriorityTrackHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;

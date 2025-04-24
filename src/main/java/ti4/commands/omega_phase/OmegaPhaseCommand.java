@@ -1,4 +1,4 @@
-package ti4.commands.omegaphase;
+package ti4.commands.omega_phase;
 
 import java.util.Map;
 import java.util.stream.Collectors;

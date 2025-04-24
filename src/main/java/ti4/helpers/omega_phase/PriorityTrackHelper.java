@@ -1,4 +1,4 @@
-package ti4.helpers.omegaPhase;
+package ti4.helpers.omega_phase;
 
 import java.util.ArrayList;
 import java.util.List;
