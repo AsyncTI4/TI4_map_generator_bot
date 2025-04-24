@@ -15,7 +15,7 @@ public class ObjectiveHelper {
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
         String sb = player.getRepresentationUnfogged() +
             " **Stage 1 Public Objective at location " + loc1 + "**" + "\n" +
-            po.getRepresentation() + "\n";
+            po.getRepresentation(!po.getAlias().equalsIgnoreCase(Constants.IMPERIUM_REX_ID)) + "\n";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
     }
 

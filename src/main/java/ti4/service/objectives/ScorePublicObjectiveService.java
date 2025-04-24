@@ -117,6 +117,10 @@ public class ScorePublicObjectiveService {
             AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "2 infantry");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " captured 2 infantry due to scoring an objective while having the Dark Purpose ability");
         }
+        if (game.isOmegaPhaseMode()) {
+            //Omega Phase objectives require you to have, not spend. Skip all the spending checks.
+            return;
+        }
         if (poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument")
             || poName.toLowerCase().contains("found a golden age")
             || poName.toLowerCase().contains("amass wealth")
