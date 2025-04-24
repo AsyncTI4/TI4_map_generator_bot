@@ -65,6 +65,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -404,10 +405,31 @@ public class Game extends GameProperties {
             if (player.getTotalVictoryPoints() >= getVp()) {
                 if (winner == null) {
                     winner = player;
+                } else if (isOmegaPhaseMode()) {
+                    if (player.hasPriorityPosition() && !winner.hasPriorityPosition()) {
+                        winner = player;
+                    } else if (player.hasPriorityPosition() && winner.hasPriorityPosition()) {
+                        winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
+                    }
                 } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
                     winner = getLowestInitiativePlayer(player, winner);
                 } else {
                     return Optional.empty();
+                }
+            }
+        }
+        if (winner == null && isOmegaPhaseMode() && revealedPublicObjectives.containsKey(Constants.IMPERIUM_REX_ID)) {
+            // If no winner was found, but Imperium Rex is revealed, the player with the most VP wins (Priority Track is tie-breaker)
+            for (Player player : getRealPlayersNDummies()) {
+                if (player == null || !player.hasPriorityPosition())
+                    continue;
+
+                if (winner == null) {
+                    winner = player;
+                } else if (player.getTotalVictoryPoints() > winner.getTotalVictoryPoints()) {
+                    winner = player;
+                } else if (player.getTotalVictoryPoints() == winner.getTotalVictoryPoints()) {
+                    winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
                 }
             }
         }
@@ -1164,6 +1186,19 @@ public class Game extends GameProperties {
         }
     }
 
+    public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
+        List<String> objectiveList = type == 1 ? publicObjectives1Peakable : publicObjectives2Peakable;
+        if (objectiveList.size() + 1 < sizeOfBottom) {
+            throw new IllegalArgumentException("Cannot shuffle in bottom objective, size of bottom exceeds new size of deck.");
+        }
+        if (sizeOfBottom < 1) {
+            throw new IllegalArgumentException("Size of bottom must be greater than 0.");
+        }
+        var insertPositionFromEnd = ThreadLocalRandom.current().nextInt(sizeOfBottom);
+        var insertPosition = objectiveList.size() - insertPositionFromEnd;
+        objectiveList.add(insertPosition, cardIdToShuffle);
+    }
+
     public void setUpPeakableObjectives(int num, int type) {
         if (type == 1) {
             while (publicObjectives1Peakable.size() != num) {
@@ -1535,6 +1570,10 @@ public class Game extends GameProperties {
                 break;
             }
         }
+        return removeCustomPO(id);
+    }
+
+    public boolean removeCustomPO(String id) {
         if (!id.isEmpty()) {
             revealedPublicObjectives.remove(id);
             soToPoList.remove(id);
@@ -1818,6 +1857,10 @@ public class Game extends GameProperties {
                 break;
             }
         }
+        return addLaw(id, optionalText);
+    }
+
+    public boolean addLaw(String id, String optionalText) {
         if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -1995,6 +2038,10 @@ public class Game extends GameProperties {
         if (id.isEmpty()) {
             return false;
         }
+        if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
+            VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
+            return true;
+        }
         if ("warrant".equalsIgnoreCase(id)) {
             for (Player p2 : getRealPlayers()) {
                 if (ButtonHelper.isPlayerElected(this, p2, id)) {
@@ -2010,6 +2057,7 @@ public class Game extends GameProperties {
                 }
             }
         }
+
         laws.remove(id);
         lawsInfo.remove(id);
         addDiscardAgenda(id);
@@ -2018,6 +2066,10 @@ public class Game extends GameProperties {
 
     public boolean removeLaw(String id) {
         if (!id.isEmpty()) {
+            if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
+                VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
+                return true;
+            }
             if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {

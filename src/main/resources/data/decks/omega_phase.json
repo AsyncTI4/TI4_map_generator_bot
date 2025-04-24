@@ -1,0 +1,38 @@
+[
+  {
+    "alias": "public_stage_1_objectives_omegaphase",
+    "name": "Omega Phase Public Stage I Objectives",
+    "type": "public_stage_1_objective",
+    "description": "Omega Phase public objectives",
+    "cardIDs": [
+      "corner_omegaphase",
+      "galvanize_omegaphase",
+      "manipulate_law_omegaphase",
+      "golden_age_omegaphase",
+      "centralize_trade_omegaphase",
+      "revolutionize_omegaphase",
+      "master_science_omegaphase",
+      "subdue_omegaphase",
+      "brain_trust_omegaphase",
+      "distant_lands_omegaphase",
+      "push_boundaries_omegaphase",
+      "ancient_monuments_omegaphase",
+      "vast_territories_omegaphase",
+      "intimidate_omegaphase",
+      "massive_cities_omegaphase",
+      "become_legend_omegaphase",
+      "command_armada_omegaphase",
+      "supremacy_omegaphase",
+      "control_borderlands_omegaphase"
+    ],
+    "source": "omega_phase"
+  },
+  {
+    "alias": "public_stage_2_objectives_omegaphase",
+    "name": "Omega Phase Public Stage II Objectives",
+    "type": "public_stage_2_objective",
+    "description": "An empty deck, as Omega Phase has no Stage II public objectives",
+    "cardIDs": [],
+    "source": "omega_phase"
+  }
+]

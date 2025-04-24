@@ -38,6 +38,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;
@@ -641,6 +642,7 @@ class GameLoadService {
                 case Constants.LIGHT_FOG_MODE -> game.setLightFogMode(loadBooleanOrDefault(info, false));
                 case Constants.CPTI_EXPLORE_MODE -> game.setCptiExploreMode(loadBooleanOrDefault(info, false));
                 case Constants.RED_TAPE_MODE -> game.setRedTapeMode(loadBooleanOrDefault(info, false));
+                case Constants.OMEGA_PHASE_MODE -> game.setOmegaPhaseMode(loadBooleanOrDefault(info, false));
                 case Constants.HOMEBREW_SC_MODE -> game.setHomebrewSCMode(loadBooleanOrDefault(info, false));
                 case Constants.INJECT_RULES_LINKS -> game.setInjectRulesLinks(loadBooleanOrDefault(info, false));
                 case Constants.SPIN_MODE -> {
@@ -1057,6 +1059,7 @@ class GameLoadService {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(rankID);
                     player.setPlayerTIGLRankAtGameStart(rank);
                 }
+                case Constants.PRIORITY_TRACK -> player.setPriorityPosition(Integer.parseInt(tokenizer.nextToken()));
             }
         }
     }

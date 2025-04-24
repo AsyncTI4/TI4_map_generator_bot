@@ -3567,6 +3567,17 @@ public class ButtonHelper {
         return count;
     }
 
+    public static int getNumberOfNonUnitUpgrades(Player player) {
+        int count = 0;
+        for (String tech : player.getTechs()) {
+            TechnologyModel techM = Mapper.getTech(tech);
+            if (!techM.isUnitUpgrade()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public static int getNumberOfCertainTypeOfTech(Player player, TechnologyType type) {
         int count = 0;
         for (String tech : player.getTechs()) {
