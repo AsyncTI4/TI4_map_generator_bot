@@ -90,121 +90,140 @@ public class ListPlayerInfoService {
             case "faa" -> 4; // 4 cultural
             case "fc" -> (game.getRealPlayers().size() - 1); // neighbors
 
+            // Omega phase objectives
+            case "corner_omegaphase" -> 4;
+            case "galvanize_omegaphase" -> 6;
+            case "manipulate_law_omegaphase", "golden_age_omegaphase" -> 16;
+            case "centralize_trade_omegaphase" -> 10;
+            case "revolutionize_omegaphase" -> 3;
+            case "master_science_omegaphase" -> 6;
+            case "subdue_omegaphase" -> 8;
+            case "brain_trust_omegaphase" -> 4;
+            case "distant_lands_omegaphase" -> 2;
+            case "push_boundaries_omegaphase" -> 2;
+            case "ancient_monuments_omegaphase" -> 3;
+            case "vast_territories_omegaphase" -> 4;
+            case "intimidate_omegaphase" -> 3;
+            case "massive_cities_omegaphase" -> 5;
+            case "become_legend_omegaphase" -> 3;
+            case "command_armada_omegaphase" -> 6;
+            case "supremacy_omegaphase" -> 1;
+            case "control_borderlands_omegaphase" -> 4;
+            case "imperium_rex_omegaphase" -> 0;
+
             default -> 0;
         };
     }
 
+    record ObjectiveResult(boolean canFullyMeet, int closenessScore) {}
 
-    record ObjectiveResult(boolean canFullyMeet, int closenessScore) {}  
-    public ObjectiveResult checkObjective(List<String> planets, int tradeGoods, int goal, Player player, Game game, int closestScore) {  
-        return backtrack(planets, 0, 0, 0, new HashSet<>(), tradeGoods, goal, player, game, closestScore);  
-    }  
+    public ObjectiveResult checkObjective(List<String> planets, int tradeGoods, int goal, Player player, Game game, int closestScore) {
+        return backtrack(planets, 0, 0, 0, new HashSet<>(), tradeGoods, goal, player, game, closestScore);
+    }
 
-    private ObjectiveResult backtrack(  
-        List<String> planets,   
-        int currentResources,   
-        int currentInfluence,   
-        int index,   
-        Set<String> usedPlanets,  
+    private ObjectiveResult backtrack(
+        List<String> planets,
+        int currentResources,
+        int currentInfluence,
+        int index,
+        Set<String> usedPlanets,
         int remainingTradeGoods,
         int goal,
         Player player,
         Game game,
         int closestScore
-    ) {  
+    ) {
         // Success condition  
-        if (currentResources >= goal && currentInfluence >= goal) {  
-            return new ObjectiveResult(true, goal*2);  
-        }  
-        int additionalResources2 = Math.min(remainingTradeGoods,   
-                                               Math.max(0, goal - currentResources));  
-        int additionalInfluence2 = Math.min(remainingTradeGoods - additionalResources2,   
-                                            Math.max(0, goal - currentInfluence));  
-        
-        int newResources2 = currentResources + additionalResources2;  
-        int newInfluence2 = currentInfluence + additionalInfluence2;  
-        
+        if (currentResources >= goal && currentInfluence >= goal) {
+            return new ObjectiveResult(true, goal * 2);
+        }
+        int additionalResources2 = Math.min(remainingTradeGoods,
+            Math.max(0, goal - currentResources));
+        int additionalInfluence2 = Math.min(remainingTradeGoods - additionalResources2,
+            Math.max(0, goal - currentInfluence));
+
+        int newResources2 = currentResources + additionalResources2;
+        int newInfluence2 = currentInfluence + additionalInfluence2;
+
         // Calculate closeness score  
-        int resourceShortfall2 = Math.max(0, goal - newResources2);  
-        int influenceShortfall2 = Math.max(0, goal - newInfluence2);  
-        int closenessScore2 = goal*2 - (resourceShortfall2 + influenceShortfall2);  
+        int resourceShortfall2 = Math.max(0, goal - newResources2);
+        int influenceShortfall2 = Math.max(0, goal - newInfluence2);
+        int closenessScore2 = goal * 2 - (resourceShortfall2 + influenceShortfall2);
         closestScore = Math.max(closenessScore2, closestScore);
-        
+
         // Failure condition - run out of options  
-        if (index >= planets.size() && remainingTradeGoods == 0) {  
+        if (index >= planets.size() && remainingTradeGoods == 0) {
             // Calculate closeness score  
-            int resourceShortfall = Math.max(0, goal - currentResources);  
-            int influenceShortfall = Math.max(0, goal - currentInfluence);  
-            int closenessScore = goal*2 - (resourceShortfall + influenceShortfall);  
+            int resourceShortfall = Math.max(0, goal - currentResources);
+            int influenceShortfall = Math.max(0, goal - currentInfluence);
+            int closenessScore = goal * 2 - (resourceShortfall + influenceShortfall);
             closenessScore = Math.max(closenessScore, closestScore);
-            return new ObjectiveResult(false, Math.max(0, closenessScore));  
-        }  
-        
+            return new ObjectiveResult(false, Math.max(0, closenessScore));
+        }
+
         // If we've run out of planets, try using trade goods  
-        if (index >= planets.size()) {  
+        if (index >= planets.size()) {
             // Try using remaining trade goods for resources  
-            int additionalResources = Math.min(remainingTradeGoods,   
-                                               Math.max(0, goal - currentResources));  
-            int additionalInfluence = Math.min(remainingTradeGoods - additionalResources,   
-                                               Math.max(0, goal - currentInfluence));  
-            
-            int newResources = currentResources + additionalResources;  
-            int newInfluence = currentInfluence + additionalInfluence;  
-            
+            int additionalResources = Math.min(remainingTradeGoods,
+                Math.max(0, goal - currentResources));
+            int additionalInfluence = Math.min(remainingTradeGoods - additionalResources,
+                Math.max(0, goal - currentInfluence));
+
+            int newResources = currentResources + additionalResources;
+            int newInfluence = currentInfluence + additionalInfluence;
+
             // Calculate closeness score  
-            int resourceShortfall = Math.max(0, goal - newResources);  
-            int influenceShortfall = Math.max(0, goal - newInfluence);  
-            int closenessScore = goal*2 - (resourceShortfall + influenceShortfall);  
+            int resourceShortfall = Math.max(0, goal - newResources);
+            int influenceShortfall = Math.max(0, goal - newInfluence);
+            int closenessScore = goal * 2 - (resourceShortfall + influenceShortfall);
             closenessScore = Math.max(closenessScore, closestScore);
-            boolean canMeet = newResources >= goal && newInfluence >= goal;  
-            return new ObjectiveResult(canMeet, canMeet ? goal*2 : Math.max(0, closenessScore));  
-        }  
-        
-        String current = planets.get(index);  
-        
-         
+            boolean canMeet = newResources >= goal && newInfluence >= goal;
+            return new ObjectiveResult(canMeet, canMeet ? goal * 2 : Math.max(0, closenessScore));
+        }
+
+        String current = planets.get(index);
+
         Planet planet = game.getPlanetsInfo().get(current);
         int resources = planet.getResources();
         int influence = planet.getInfluence();
-        if(player.hasLeaderUnlocked("xxchahero")){
+        if (player.hasLeaderUnlocked("xxchahero")) {
             resources += influence;
             influence += planet.getResources();
         }
-        if(resources > 0){
-            ObjectiveResult resourceResult = backtrack(planets,   
-                    currentResources + resources,   
-                    currentInfluence,   
-                    index + 1,   
-                    usedPlanets,  
-                    remainingTradeGoods, goal, player, game, closestScore);  
-                    closestScore = Math.max(resourceResult.closenessScore, closestScore);
-                    if (resourceResult.canFullyMeet()) {  
-                        return resourceResult;  
-                    }  
-        }  
-        // Try using planet for influence  
-        if(influence > 0){
-            ObjectiveResult influenceResult = backtrack(planets,   
-                    currentResources,   
-                    currentInfluence + influence,   
-                    index + 1,   
-                    usedPlanets,  
-                    remainingTradeGoods,goal, player, game, closestScore);  
-            closestScore = Math.max(influenceResult.closenessScore, closestScore);
-            if (influenceResult.canFullyMeet()) {  
-                return influenceResult;  
-            }  
+        if (resources > 0) {
+            ObjectiveResult resourceResult = backtrack(planets,
+                currentResources + resources,
+                currentInfluence,
+                index + 1,
+                usedPlanets,
+                remainingTradeGoods, goal, player, game, closestScore);
+            closestScore = Math.max(resourceResult.closenessScore, closestScore);
+            if (resourceResult.canFullyMeet()) {
+                return resourceResult;
+            }
         }
-        
-        
+        // Try using planet for influence  
+        if (influence > 0) {
+            ObjectiveResult influenceResult = backtrack(planets,
+                currentResources,
+                currentInfluence + influence,
+                index + 1,
+                usedPlanets,
+                remainingTradeGoods, goal, player, game, closestScore);
+            closestScore = Math.max(influenceResult.closenessScore, closestScore);
+            if (influenceResult.canFullyMeet()) {
+                return influenceResult;
+            }
+        }
+
         // Skip this planet  
-        return backtrack(planets,   
-                         currentResources,   
-                         currentInfluence,   
-                         index + 1,   
-                         usedPlanets,  
-                         remainingTradeGoods,goal, player, game, closestScore);  
-    } 
+        return backtrack(planets,
+            currentResources,
+            currentInfluence,
+            index + 1,
+            usedPlanets,
+            remainingTradeGoods, goal, player, game, closestScore);
+    }
 
     public static void displayerScoringProgression(Game game, boolean onlyThisGameObj, MessageChannel channel, String stage1sOrTwos) {
         StringBuilder msg = new StringBuilder();
@@ -259,7 +278,7 @@ public class ListPlayerInfoService {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ");
                 if (secret) {
-                    if (game.didPlayerScoreThisAlready(player.getUserID(), objID) || game.didPlayerScoreThisAlready(player.getUserID(),Mapper.getSecretObjectivesJustNames().get(objID))) {
+                    if (game.didPlayerScoreThisAlready(player.getUserID(), objID) || game.didPlayerScoreThisAlready(player.getUserID(), Mapper.getSecretObjectivesJustNames().get(objID))) {
                         representation.append("✅  ");
                     } else {
                         if (getObjectiveThreshold(objID, game) > 0) {
@@ -317,7 +336,7 @@ public class ListPlayerInfoService {
             comms = player.getCommodities();
         }
         switch (objID) {
-            case "push_boundaries" -> {
+            case "push_boundaries", "push_boundaries_omegaphase" -> {
                 int aboveN = 0;
                 for (Player p2 : player.getNeighbouringPlayers(true)) {
                     int p1count = player.getPlanets().size();
@@ -328,7 +347,7 @@ public class ListPlayerInfoService {
                 }
                 return aboveN;
             }
-            case "outer_rim", "control_borderlands" -> {
+            case "outer_rim", "control_borderlands", "control_borderlands_omegaphase" -> {
                 int edge = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isEdgeOfBoard(game)
@@ -338,7 +357,7 @@ public class ListPlayerInfoService {
                 }
                 return edge;
             }
-            case "make_history", "become_legend" -> {
+            case "make_history", "become_legend", "become_legend_omegaphase" -> {
                 int counter = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     boolean tileCounts = tile.isMecatol() || tile.isAnomaly(game) || ButtonHelper.isTileLegendary(tile);
@@ -363,7 +382,7 @@ public class ListPlayerInfoService {
                 }
                 return counter;
             }
-            case "corner", "unify_colonies" -> {
+            case "corner", "unify_colonies", "corner_omegaphase" -> {
                 int max = 0;
                 for (String type : List.of("cultural", "hazardous", "industrial")) {
                     int number = ButtonHelper.getNumberOfXTypePlanets(player, game, type, false);
@@ -371,7 +390,7 @@ public class ListPlayerInfoService {
                 }
                 return max;
             }
-            case "develop", "revolutionize" -> {
+            case "develop", "revolutionize", "revolutionize_omegaphase" -> {
                 return ButtonHelper.getNumberOfUnitUpgrades(player);
             }
             case "diversify", "master_science" -> {
@@ -383,6 +402,10 @@ public class ListPlayerInfoService {
                 }
                 return numAbove1;
             }
+            case "master_science_omegaphase" -> {
+                return ButtonHelper.getNumberOfNonUnitUpgrades(player);
+
+            }
             case "monument", "golden_age" -> {
                 int x = Helper.getPlayerResourcesAvailable(player, game) + player.getTg() + comms;
                 if (player.hasTech("mc")) {
@@ -390,7 +413,14 @@ public class ListPlayerInfoService {
                 }
                 return x;
             }
-            case "expand_borders", "subdue" -> {
+            case "golden_age_omegaphase" -> {
+                int x = Helper.getPlayerResourcesTotal(player, game) + player.getTg() + comms;
+                if (player.hasTech("mc")) {
+                    x += player.getTg() + comms;
+                }
+                return x;
+            }
+            case "expand_borders", "subdue", "subdue_omegaphase" -> {
                 int count = 0;
                 for (String p : player.getPlanets()) {
                     Tile tile = game.getTileFromPlanet(p);
@@ -400,7 +430,7 @@ public class ListPlayerInfoService {
                 }
                 return count;
             }
-            case "research_outposts", "brain_trust" -> {
+            case "research_outposts", "brain_trust", "brain_trust_omegaphase" -> {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
                     if (ButtonHelper.checkForTechSkips(game, planet)) {
@@ -421,10 +451,22 @@ public class ListPlayerInfoService {
                 }
                 return count;
             }
-            case "lead", "galvanize" -> {
+            case "intimidate_omegaphase" -> {
+                int count = 0;
+                Tile mecatol = game.getMecatolTile();
+                if (mecatol == null) return 3;
+                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
+                    Tile tile2 = game.getTileByPosition(pos);
+                    if (tile2.containsPlayersUnits(player)) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+            case "lead", "galvanize", "galvanize_omegaphase" -> {
                 return player.getTacticalCC() + player.getStrategicCC();
             }
-            case "trade_routes", "centralize_trade" -> {
+            case "trade_routes", "centralize_trade", "centralize_trade_omegaphase" -> {
                 return player.getTg() + comms;
             }
             case "amass_wealth" -> {
@@ -433,19 +475,19 @@ public class ListPlayerInfoService {
                 if (player.hasTech("mc")) {
                     leftOverTg *= 2;
                 }
-                if(player.getReadiedPlanets().size() > 15){
+                if (player.getReadiedPlanets().size() > 15) {
                     int forResources = Math.min(3, Helper.getPlayerResourcesAvailable(player, game));
                     int forInfluence = Math.min(3, Helper.getPlayerInfluenceAvailable(player, game));
                     return forTG + leftOverTg + forInfluence + forResources;
-                }else{
-                    return forTG + checkObjective(player.getReadiedPlanets(), leftOverTg, 3, player, game,0).closenessScore;
+                } else {
+                    return forTG + checkObjective(player.getReadiedPlanets(), leftOverTg, 3, player, game, 0).closenessScore;
                 }
             }
-            case "build_defenses", "massive_cities" -> {
+            case "build_defenses", "massive_cities", "massive_cities_omegaphase" -> {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
                     + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
             }
-            case "lost_outposts", "ancient_monuments" -> {
+            case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
                 int count = 0;
                 for (String p : player.getPlanets()) {
                     Planet planet = game.getPlanetsInfo().get(p);
@@ -464,10 +506,10 @@ public class ListPlayerInfoService {
                     + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
                     + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
             }
-            case "deep_space", "vast_territories" -> {
+            case "deep_space", "vast_territories", "vast_territories_omegaphase" -> {
                 return ButtonHelper.getNumberOfTilesPlayerIsInWithNoPlanets(game, player);
             }
-            case "raise_fleet", "command_armada" -> {
+            case "raise_fleet", "command_armada", "command_armada_omegaphase" -> {
                 int x = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasShipsInSystem(player, tile)) {
@@ -483,6 +525,13 @@ public class ListPlayerInfoService {
                 }
                 return x;
             }
+            case "manipulate_law_omegaphase" -> {
+                int x = Helper.getPlayerInfluenceTotal(player, game) + player.getTg() + comms;
+                if (player.hasTech("mc")) {
+                    x += player.getTg() + comms;
+                }
+                return x;
+            }
             case "conquer" -> {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
@@ -493,7 +542,7 @@ public class ListPlayerInfoService {
                 }
                 return count;
             }
-            case "supremacy" -> {
+            case "supremacy", "supremacy_omegaphase" -> {
                 int count = 0;
                 for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
                     if ((tile.isHomeSystem() && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
@@ -508,15 +557,15 @@ public class ListPlayerInfoService {
                 if (player.hasTech("mc")) {
                     leftOverTg *= 2;
                 }
-                if(player.getReadiedPlanets().size() > 15){
+                if (player.getReadiedPlanets().size() > 15) {
                     int forResources = Math.min(6, Helper.getPlayerResourcesAvailable(player, game));
                     int forInfluence = Math.min(6, Helper.getPlayerInfluenceAvailable(player, game));
                     return forTG + leftOverTg + forInfluence + forResources;
-                }else{
-                    return forTG + checkObjective(player.getReadiedPlanets(), leftOverTg, 6, player, game,0).closenessScore;
+                } else {
+                    return forTG + checkObjective(player.getReadiedPlanets(), leftOverTg, 6, player, game, 0).closenessScore;
                 }
             }
-            case "distant_lands" -> {
+            case "distant_lands", "distant_lands_omegaphase" -> {
                 Set<String> planetsAdjToHomes = new HashSet<>();
                 Set<Tile> homesAdjTo = new HashSet<>();
                 for (Player p2 : game.getRealAndEliminatedPlayers()) {

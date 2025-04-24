@@ -26,6 +26,7 @@ import ti4.commands.installation.InstallationCommand;
 import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.MapCommand;
 import ti4.commands.milty.MiltyCommand;
+import ti4.commands.omega_phase.OmegaPhaseCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.relic.RelicCommand;
@@ -118,8 +119,8 @@ public class CommandManager {
         new PlanetCommand(),
         new SelectionBoxDemoCommand(),
         new UserCommand(),
-        new TIGLCommand()
-    ).collect(Collectors.toMap(ParentCommand::getName, command -> command));
+        new TIGLCommand(),
+        new OmegaPhaseCommand()).collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
     public static ParentCommand getCommand(String name) {
         return commands.get(name);

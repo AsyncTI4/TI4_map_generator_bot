@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -82,16 +83,16 @@ public class RevealPublicObjectiveService {
         game.setStrategyCardsPerPlayer(maxSCsPerPlayer);
     }
 
-    public void revealS1(Game game, GenericInteractionCreateEvent event, MessageChannel channel) {
+    public String revealS1(Game game, GenericInteractionCreateEvent event, MessageChannel channel) {
         Map.Entry<String, Integer> objective = game.revealStage1();
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
-            if (!game.isFowMode()) {
+            if (!game.isFowMode() && objective.getKey() != Constants.IMPERIUM_REX_ID) {
                 MessageHelper.sendMessageToChannel(channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
-            return;
+            return objective.getKey();
         }
         // first do cleanup if necessary
         int playersWithSCs = 0;
@@ -103,7 +104,7 @@ public class RevealPublicObjectiveService {
 
         if (playersWithSCs > 0) {
             StatusCleanupService.runStatusCleanup(game);
-            if (!game.isFowMode()) {
+            if (!game.isFowMode() && objective.getKey() != Constants.IMPERIUM_REX_ID) {
                 MessageHelper.sendMessageToChannel(channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -113,6 +114,8 @@ public class RevealPublicObjectiveService {
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }
+
+        return objective.getKey();
     }
 
     public static void revealTwoStage1(Game game) {

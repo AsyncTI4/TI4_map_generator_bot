@@ -128,7 +128,9 @@ public class ApplicationEmojiService {
             return AsyncTI4DiscordBot.jda.createApplicationEmoji(emoji.getName(), emoji.getIcon()).complete();
         } catch (Exception e) {
             // Check if we failed because it already exists...
+
             BotLogger.error("Failed to upload emoji file: " + emoji.getName(), e);
+
             return null;
         }
     }
@@ -185,6 +187,7 @@ public class ApplicationEmojiService {
                 .complete();
         } catch (Exception e) {
             BotLogger.error(Constants.jazzPing() + " Failed to upload emoji file: " + name, e);
+
             return null;
         }
     }
@@ -205,7 +208,9 @@ public class ApplicationEmojiService {
             }
             return success;
         } catch (Exception e) {
+
             BotLogger.error(Constants.jazzPing() + " Failed to upload emoji files: ", e);
+
             return false;
         }
     }

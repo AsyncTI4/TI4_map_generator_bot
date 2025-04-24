@@ -1,0 +1,12 @@
+[
+  {
+    "alias": "voice_of_the_council_omegaphase",
+    "name": "Voice of the Council",
+    "type": "Law",
+    "target": "Elect Player",
+    "text1": "The elected player gains this card and 1 victory point. When this law is removed or discarded, this player loses 1 victory point and this card is placed in the common play area.",
+    "text2": "",
+    "mapText": "Gain this card and 1 victory point. If you lose this card, you lose 1 victory point and this card is placed in the common play area.",
+    "source": "omega_phase"
+  }
+]
