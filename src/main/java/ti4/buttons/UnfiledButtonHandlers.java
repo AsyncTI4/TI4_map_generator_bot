@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -48,12 +49,15 @@ import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.ObjectiveHelper;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.listeners.annotations.ButtonHandler;
@@ -81,15 +85,17 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.game.SwapFactionService;
+import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
+import ti4.service.player.RefreshCardsService;
 import ti4.service.strategycard.PlayStrategyCardService;
-import ti4.service.turn.EndTurnService;
 import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -1112,6 +1118,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
             }
         }
+        String revealedObjective = null;
         if (!game.isRedTapeMode()) {
             if ("2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealS2(game, event, event.getChannel());
@@ -1120,7 +1127,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             } else if ("none".equalsIgnoreCase(stage)) {
                 // continue without revealing anything
             } else {
-                RevealPublicObjectiveService.revealS1(game, event, event.getChannel());
+                revealedObjective = RevealPublicObjectiveService.revealS1(game, event, event.getChannel());
             }
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
@@ -1138,7 +1145,25 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
         }
 
-        StartPhaseService.startStatusHomework(event, game);
+        if (!game.isOmegaPhaseMode()) {
+            StartPhaseService.startStatusHomework(event, game);
+        } else {
+            if (revealedObjective != null && revealedObjective.equalsIgnoreCase(Constants.IMPERIUM_REX_ID)) {
+                EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
+            } else {
+                var speakerPlayer = game.getSpeaker();
+                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
+                if (!game.isFowMode() && game.getTableTalkChannel() != null) {
+                    MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
+                    ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
+                }
+                String message = "The next Objective has been revealed to " + MiscEmojis.SpeakerToken + speakerPlayer.getRepresentationNoPing() + ". When ready, proceed to the Strategy Phase.";
+                Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
+                    "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
+                MessageHelper.sendMessageToChannelWithButton(event.getChannel(), message, proceedToStrategyPhase);
+            }
+        }
+
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1212,7 +1237,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String key3 = "potentialScorePOBlockers";
         String key3b = "potentialScoreSOBlockers";
         String message;
-        for (Player player2 : game.getActionPhaseTurnOrder()) {
+        for (Player player2 : StatusHelper.GetPlayersInScoringOrder(game)) {
             if (player2 == player) {
                 if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                     game.setStoredValue(key2, game.getStoredValue(key2)
@@ -1376,7 +1401,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 String key3 = "potentialScoreSOBlockers";
                 String key3b = "potentialScorePOBlockers";
                 String message;
-                for (Player player2 : game.getActionPhaseTurnOrder()) {
+                for (Player player2 : StatusHelper.GetPlayersInScoringOrder(game)) {
                     if (player2 == player) {
                         int soIndex = Integer.parseInt(soID);
                         SecretObjectiveHelper.scoreSO(event, game, player, soIndex, channel);
@@ -1966,14 +1991,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
                     buttons.add(drawStage1);
                 }
-                if (game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) {
+                if ((game.getRound() > 3 || game.getPublicObjectives1Peakable().isEmpty()) && !game.isOmegaPhaseMode()) {
                     if ("456".equalsIgnoreCase(game.getStoredValue("homebrewMode"))) {
                         buttons.add(draw2Stage2);
                     } else {
                         buttons.add(drawStage2);
                     }
                 }
-                if (game.getRound() > 7 || game.getPublicObjectives2Peakable().isEmpty()) {
+                var endGameDeck = game.isOmegaPhaseMode() ? game.getPublicObjectives1Peakable() : game.getPublicObjectives2Peakable();
+                var endGameRound = game.isOmegaPhaseMode() ? 9 : 7;
+                if (game.getRound() > endGameRound || endGameDeck.isEmpty()) {
                     if (game.isFowMode()) {
                         message2 += "\n> - If there are no more objectives to reveal, use the button to continue as is.";
                         message2 += " Or end the game manually.";
@@ -1989,7 +2016,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }
             case "pass_on_abilities" -> {
-                if (game.isCustodiansScored()) {
+                if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now,",
@@ -2001,7 +2028,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
             }
             case "redistributeCCButtons" -> {
-                if (game.isCustodiansScored()) {
+                if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
                     // new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                     List<Button> buttons = List.of(flipAgenda);
@@ -2312,7 +2339,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("scoreAnObjective")
     public static void scoreAnObjective(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> poButtons = EndTurnService.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
+        List<Button> poButtons = StatusHelper.getScoreObjectiveButtons(game, player.getFinsFactionCheckerPrefix());
         poButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
@@ -2803,10 +2830,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("proceed_to_strategy")
     public static void proceedToStrategy(ButtonInteractionEvent event, Game game) {
+        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
+            PriorityTrackHelper.PrintPriorityTrack(game);
+            return;
+        }
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             for (Player player_ : players.values()) {
-                player_.clearExhaustedPlanets(false);
+                RefreshCardsService.refreshPlayerCards(game, player_, false);
             }
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "All planets have been readied at the end of the agenda phase.");
@@ -2945,6 +2977,11 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("startStrategyPhase")
     public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
+        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
+            PriorityTrackHelper.PrintPriorityTrack(game);
+            return;
+        }
         StartPhaseService.startPhase(event, game, "strategy");
         ButtonHelper.deleteMessage(event);
     }
@@ -3268,6 +3305,16 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 "Please assign speaker before hitting this button.");
             ButtonHelper.offerSpeakerButtons(game, player);
             return;
+        }
+        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+            PriorityTrackHelper.CreateDefaultPriorityTrack(game);
+            if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to fill the Priority Track with the default seating order. Use `/omegaphase assign_player_priority` to fill the track before proceeding.");
+                PriorityTrackHelper.PrintPriorityTrack(game);
+                return;
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up the Priority Track in the default seating order.");
+            PriorityTrackHelper.PrintPriorityTrack(game);
         }
         RevealPublicObjectiveService.revealTwoStage1(game);
         StartPhaseService.startStrategyPhase(event, game);

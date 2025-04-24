@@ -2508,4 +2508,9 @@ public class Player extends PlayerProperties {
     public boolean isGM() {
         return getGame().getPlayersWithGMRole().contains(this);
     }
+
+    @JsonIgnore
+    public boolean hasPriorityPosition() {
+        return this.getPriorityPosition() != -1 && this.getPriorityPosition() != 0;
+    }
 }
