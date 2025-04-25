@@ -1,6 +1,8 @@
 package ti4.service.fow;
 
 import java.awt.Color;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -67,6 +69,8 @@ public class GMService {
     private static final String STATUS_SUMMARY_THREAD = "Status Summaries";
     private static final String SYSTEM_LORE_KEY = "fowSystemLore";
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM HH:mm:ss");
+
     public static void showGMButtons(Game game) {
         if (!game.isFowMode()) return;
         MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), "GM Buttons", GMBUTTONS);
@@ -103,7 +107,8 @@ public class GMService {
     }
 
     public static void logPlayerActivity(Game game, Player player, String eventLog, String jumpUrl, boolean ping) {
-        final String log = eventLog + (ping ? " - " + gmPing(game): "");
+        String timestamp = "`[" + LocalDateTime.now().format(formatter) + "]` ";
+        final String log = timestamp + eventLog + (ping ? " - " + gmPing(game): "");
         ThreadGetter.getThreadInChannel(getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false,
             threadChannel -> {
                 if (jumpUrl != null) {

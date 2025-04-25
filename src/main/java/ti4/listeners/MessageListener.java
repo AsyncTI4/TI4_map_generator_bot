@@ -1,8 +1,11 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -11,7 +14,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.executors.ExecutorManager;
 import ti4.helpers.AliasHandler;
@@ -136,7 +138,7 @@ public class MessageListener extends ListenerAdapter {
         if (game == null) {
             return true;
         }
-        
+
         //Prevent whispers from fow combat threads
         if (game.isFowMode() && event.getChannel() instanceof ThreadChannel
             && event.getChannel().getName().contains("vs")
@@ -221,6 +223,20 @@ public class MessageListener extends ListenerAdapter {
 
     private static boolean addFactionEmojiReactionsToMessages(MessageReceivedEvent event, String gameName) {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
+        if (managedGame.getGame().isHiddenAgendaMode() && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
+            Player player = getPlayer(event, managedGame.getGame());
+            if (player == null || !player.isRealPlayer()) {
+                return false;
+            }
+            if (!player.isSpeaker()) {
+                event.getChannel().getHistory()
+                    .retrievePast(1)
+                    .queue(messages -> {
+                        var emoji = Emoji.fromFormatted("🤫");
+                        messages.getFirst().addReaction(emoji).queue();
+                    });
+            }
+        }
         if (managedGame == null || !managedGame.isFactionReactMode() || managedGame.isFowMode()) {
             return false;
         }

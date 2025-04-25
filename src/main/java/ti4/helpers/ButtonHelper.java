@@ -6341,6 +6341,9 @@ public class ButtonHelper {
             msg += " on " + buttonID.split("_")[2];
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + ".");
+        if (game.isHiddenAgendaMode() && msg.toLowerCase().contains("abstain on") && player.hasAbility("zeal")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## The player with the zeal ability has decided to abstain.");
+        }
         game.setStoredValue(messageID, part2);
         deleteMessage(event);
         List<Button> buttons = new ArrayList<>();
@@ -6673,7 +6676,7 @@ public class ButtonHelper {
             if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeakerUserID())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
-                    Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmoji());
+                    Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmojiOrColor());
                     assignSpeakerButtons.add(button);
                 }
             }

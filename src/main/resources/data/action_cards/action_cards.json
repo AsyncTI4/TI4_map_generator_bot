@@ -515,7 +515,7 @@
         "name": "Lucky Shot",
         "phase": "Action",
         "window": "Action",
-        "text": "Destroy 1 dreadnought, cruiser, or destroyer in a system that contains a planet you control. [Note: You cannot destroy your own units.]",
+        "text": "Destroy 1 dreadnought, cruiser, or destroyer in a system that contains a planet you control. [Note: You cannot destroy your own units. You cannot play this card to no effect.]",
         "flavorText": "The missile - an insignificant spark against the darkness - struck the hull of the dreadnought. Moments later, the starboard flank erupted in flames.",
         "source": "base"
     },

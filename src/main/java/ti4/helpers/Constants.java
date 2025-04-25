@@ -1018,6 +1018,7 @@ public class Constants {
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";
     public static final String FACILITIES_MODE = "facilities_mode";
     public static final String MINOR_FACTIONS_MODE = "minor_factions_mode";
+    public static final String HIDDEN_AGENDA_MODE = "hidden_agenda_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
