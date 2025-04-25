@@ -501,7 +501,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech") && type.equalsIgnoreCase("ground") && ButtonHelper.getUnitHolderFromPlanetName(unitHolderName, game).getUnitCount(Units.UnitType.Mech, player) == 2) {
-                Button explore = Buttons.gray(player.finChecker() + "gheminaMechStart_" + otherPlayer.getFaction(), "Mech Explores", FactionEmojis.ghemina);
+                Button explore = Buttons.gray(player.finChecker() + "gheminaMechStart_" + unitHolderName, "Mech Explores", FactionEmojis.ghemina);
                 String message = msg + " this is a reminder that if you win the combat, you may use the button to resolve your mech ability.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, explore);
             }

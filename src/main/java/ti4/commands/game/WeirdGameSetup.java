@@ -29,7 +29,8 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Dane Tweet."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.HIDDEN_AGENDA_MODE, "True to enable Hidden Agenda, per Dane Leek."));
+        //addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXTRA_SECRET_MODE, "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
@@ -51,14 +52,17 @@ class WeirdGameSetup extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong and the game modes could not be set, please see error above.");
         }
 
-        Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
-        if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
+        // Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
+        // if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
 
         Boolean explorationMode = event.getOption(Constants.AGE_OF_EXPLORATION_MODE, null, OptionMapping::getAsBoolean);
         if (explorationMode != null) game.setAgeOfExplorationMode(explorationMode);
 
         Boolean minorMode = event.getOption(Constants.MINOR_FACTIONS_MODE, null, OptionMapping::getAsBoolean);
         if (minorMode != null) game.setMinorFactionsMode(minorMode);
+
+        Boolean agendaMode = event.getOption(Constants.HIDDEN_AGENDA_MODE, null, OptionMapping::getAsBoolean);
+        if (agendaMode != null) game.setHiddenAgendaMode(agendaMode);
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
