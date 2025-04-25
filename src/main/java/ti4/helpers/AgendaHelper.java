@@ -487,17 +487,17 @@ public class AgendaHelper {
         String alreadyResolved = game.getStoredValue("aftersResolved");
         String whensResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty() && !whensResolved.isEmpty()) {
-            String lastPlayerToPlayAWhen = game.getStoredValue("lastPlayerToPlayAnAfter");
+            String lastPlayerToPlayAnAfter = game.getStoredValue("lastPlayerToPlayAnAfter");
             List<Player> agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrder(game);
-            if (!lastPlayerToPlayAWhen.isEmpty()) {
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAWhen), game);
+            if (!lastPlayerToPlayAnAfter.isEmpty()) {
+                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAnAfter), game);
                 agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
             }
             for (Player player : agendaAbilityResolutionOrder) {
-                String factionsThatHavePassedOnWhens = game.getStoredValue("declinedAfters");
-                if (!factionsThatHavePassedOnWhens.contains(player.getFaction())) {
-                    String factionsThatHaveQueuedAWhen = game.getStoredValue("queuedAfters");
-                    if (!factionsThatHaveQueuedAWhen.contains(player.getFaction())) {
+                String factionsThatHavePassedOnAfters = game.getStoredValue("declinedAfters");
+                if (!factionsThatHavePassedOnAfters.contains(player.getFaction())) {
+                    String factionsThatHaveQueuedAnAfter = game.getStoredValue("queuedAfters");
+                    if (!factionsThatHaveQueuedAnAfter.contains(player.getFaction())) {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                             "This is a nudge that the \"after\" queue is currently waiting on you.");
                         int num = 0;
@@ -580,6 +580,9 @@ public class AgendaHelper {
                             }
                         }
                         for (Player p2 : game.getRealPlayers()) {
+                            if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
+                                VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                            }
                             if (!game.getStoredValue("queuedAftersLockedFor" + p2.getFaction()).isEmpty()) {
                                 continue;
                             }
@@ -618,7 +621,7 @@ public class AgendaHelper {
                 }
             }
             String msg = "# All players have passed on \"afters\".";
-            if (!game.isOmegaPhaseMode()) {
+            if (!game.isOmegaPhaseMode() && !game.isHiddenAgendaMode()) {
                 msg += " Voting will now begin.";
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                     msg);
@@ -630,11 +633,14 @@ public class AgendaHelper {
                         msg);
                     startTheVoting(game);
                 } else {
-                    msg += " Still need " + getPlayersWhoNeedToPreVoted(game).size() + " players to prevote.";
+                    msg += " Still need " + getPlayersWhoNeedToPreVoted(game).size() + " players to prevote";
+                    if (game.isHiddenAgendaMode()) {
+                        msg += " or pre-abstain";
+                    }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         msg);
                     for (Player p2 : getPlayersWhoNeedToPreVoted(game)) {
-                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the game is waiting upon you to prevote before it moves onto voting.");
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation() + " the game is waiting upon you to decide voting before it moves onto voting.");
                     }
                 }
             }
@@ -792,16 +798,21 @@ public class AgendaHelper {
     }
 
     private static void offerPreVote(Player player) {
+
         Game game = player.getGame();
+        int[] voteInfo = getVoteTotal(player, game);
+        if (voteInfo[0] < 1) {
+            return;
+        }
         String msg = player.getRepresentation()
-            + " if you intend to preset an abstention or vote on this agenda, you have the option to preset it here. Feel free not to, this is simply an optional way to resolve agendas faster.";
+            + " if you intend to preset an abstention or vote on this agenda, you have the option to preset it here. Feel free not to, this is simply an optional way to resolve agendas faster. Any pre-votes will be automatically erased if someone plays an after.";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
         if (player.hasAbility("future_sight")) {
             msg += " Reminder that you have **Future Sight** and may not wish to abstain.";
         }
+        Player argent = Helper.getPlayerFromAbility(game, "zeal");
         if (game.isOmegaPhaseMode()) {
-            Player argent = Helper.getPlayerFromAbility(game, "zeal");
             if (argent != null) {
                 if (argent == player) {
                     msg = player.getRepresentation()
@@ -817,9 +828,24 @@ public class AgendaHelper {
             } else {
                 msg = player.getRepresentation()
                     + " since this is game is in omega phase mode, all non-speaker players who can vote will need to pre-vote using this button before voting can begin. If you cant vote due to playing a rider or having no votes, or if you are speaker, just ignore this button";
-
             }
         } else {
+            if (game.isHiddenAgendaMode()) {
+                if (argent != null) {
+                    if (argent == player) {
+                        msg = player.getRepresentation()
+                            + " since this is game is in hidden agenda mode, all players will need to pre-vote or pre-abstain using these button before voting can begin. If you cant vote due to playing a rider or having no votes just ignore this button. " +
+                            "Otherwise, since you have the zeal ability, you need to vote or abstain first and do so now. Other players are free to wait to vote until they see your vote.";
+                    } else {
+                        msg = player.getRepresentation()
+                            + " since this is game is in hidden agenda mode, all players will need to pre-vote or pre-abstain using these button before voting can begin. If you cant vote due to playing a rider or having no votes just ignore this button. " +
+                            "Since Argent is in this game, you can wait to pre-vote until you see what they vote (assuming argent can vote).";
+                    }
+                } else {
+                    msg = player.getRepresentation()
+                        + " since this is game is in hidden agenda mode, all players will need to pre-vote or pre-abstain using these button before voting can begin. If you cant vote due to playing a rider or having no votes just ignore this button";
+                }
+            }
             buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
         }
@@ -886,6 +912,9 @@ public class AgendaHelper {
     }
 
     public static void pingAboutDebt(Game game) {
+        if (game.isHiddenAgendaMode()) {
+            return;
+        }
         for (Player player : game.getRealPlayers()) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts")
@@ -1068,7 +1097,10 @@ public class AgendaHelper {
             if (voteInfo[0] < 1) {
                 continue;
             }
-            if (!player.hasAbility("zeal") && player.isSpeaker()) {
+            if (!player.hasAbility("zeal") && player.isSpeaker() && game.isOmegaPhaseMode()) {
+                continue;
+            }
+            if (game.isHiddenAgendaMode() && game.getStoredValue("Abstain On Agenda").contains(player.getFaction())) {
                 continue;
             }
             if (game.getStoredValue("preVoting" + player.getFaction()).isEmpty()) {
@@ -1093,8 +1125,8 @@ public class AgendaHelper {
             List<Button> buttonsPV = new ArrayList<>();
             buttonsPV.add(Buttons.red("erasePreVote", "Erase Pre-Vote"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                "Successfully stored a pre-vote. You can erase it with this button.", buttonsPV);
-            if (game.isOmegaPhaseMode()) {
+                "Successfully stored a pre-vote. You can erase it with this button. It will be automatically erased if someone plays an after", buttonsPV);
+            if (game.isOmegaPhaseMode() || game.isHiddenAgendaMode()) {
                 if (player.hasAbility("zeal")) {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## The player with the zeal ability votes the following:\n" +
                         Helper.buildSpentThingsMessageForVoting(player, game, false));
@@ -2181,12 +2213,8 @@ public class AgendaHelper {
             voteCount = 0;
         }
 
-        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt")
-            || game.getLaws().containsKey("absol_government"))) {
+        if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt"))) {
             voteCount = 1;
-            if (game.getLaws().containsKey("absol_government") && player.controlsMecatol(false)) {
-                voteCount = 2;
-            }
         }
 
         if ("nekro".equals(player.getFaction()) && hasXxchaAlliance == 0) {
@@ -2456,6 +2484,12 @@ public class AgendaHelper {
                 voteAmount += 5;
             }
         }
+        if (game.getLaws().containsKey("absol_government")) {
+            voteAmount = 1;
+            if (planet.equalsIgnoreCase("mr")) {
+                voteAmount++;
+            }
+        }
         return voteAmount;
     }
 
@@ -2481,57 +2515,59 @@ public class AgendaHelper {
             }
             totalPlanetVotes += voteAmount;
         }
-        if (player.hasAbility("zeal")) {
-            int numPlayers = 0;
-            for (Player player_ : game.getPlayers().values()) {
-                if (player_.isRealPlayer())
-                    numPlayers++;
+        if (!game.getLaws().containsKey("absol_government")) {
+            if (player.hasAbility("zeal")) {
+                int numPlayers = 0;
+                for (Player player_ : game.getPlayers().values()) {
+                    if (player_.isRealPlayer())
+                        numPlayers++;
+                }
+                planetButtons.add(Buttons.blue("exhaustForVotes_zeal_" + numPlayers,
+                    "Special Argent Votes (" + numPlayers + ")", FactionEmojis.Argent));
             }
-            planetButtons.add(Buttons.blue("exhaustForVotes_zeal_" + numPlayers,
-                "Special Argent Votes (" + numPlayers + ")", FactionEmojis.Argent));
-        }
 
-        if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
-            planetButtons.add(Buttons.blue("exhaustForVotes_predictive_3", "Use Predictive Intelligence Votes (3)",
-                TechEmojis.CyberneticTech));
-        }
+            if (player.hasTechReady("pi") || player.hasTechReady("absol_pi")) {
+                planetButtons.add(Buttons.blue("exhaustForVotes_predictive_3", "Use Predictive Intelligence Votes (3)",
+                    TechEmojis.CyberneticTech));
+            }
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
-            planetButtons.add(Buttons.gray("exhaustForVotes_hacanCommanderTg", "Spend Trade Goods for 2 Votes Each", FactionEmojis.Hacan));
-        }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "hacancommander")) {
+                planetButtons.add(Buttons.gray("exhaustForVotes_hacanCommanderTg", "Spend Trade Goods for 2 Votes Each", FactionEmojis.Hacan));
+            }
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "kyrocommander")) {
-            planetButtons.add(Buttons.gray("exhaustForVotes_kyrocommanderInf", "Kill Infantry for 1 Vote per Kill",
-                FactionEmojis.kyro));
-        }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "kyrocommander")) {
+                planetButtons.add(Buttons.gray("exhaustForVotes_kyrocommanderInf", "Kill Infantry for 1 Vote per Kill",
+                    FactionEmojis.kyro));
+            }
 
-        if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
-            int count = player.getTechs().size() / 2;
-            planetButtons.add(Buttons.gray("exhaustForVotes_augerscommander_" + count,
-                "Use Ilyxum Commander Votes (" + count + ")", FactionEmojis.augers));
-        }
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "augerscommander")) {
+                int count = player.getTechs().size() / 2;
+                planetButtons.add(Buttons.gray("exhaustForVotes_augerscommander_" + count,
+                    "Use Ilyxum Commander Votes (" + count + ")", FactionEmojis.augers));
+            }
 
-        if (CollectionUtils.containsAny(player.getRelics(),
-            List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
-            int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size();
-            int shardVotes = 2 * count; // +2 votes per Absol shard
-            Button button = Buttons.gray("exhaustForVotes_absolShard_" + shardVotes,
-                "Use Shard of the Throne Votes (" + shardVotes + ")", SourceEmojis.Absol);
-            planetButtons.add(button);
-        }
-        // Absol's Syncretone - +1 vote for each neighbour
-        if (player.hasRelicReady("absol_syncretone")) {
-            int count = game.getRealPlayers().size();
-            Button button = Buttons.gray("exhaustForVotes_absolsyncretone_" + count,
-                "Use Syncretone Votes (" + count + ")", SourceEmojis.Absol);
-            planetButtons.add(button);
-        }
+            if (CollectionUtils.containsAny(player.getRelics(),
+                List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
+                int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size();
+                int shardVotes = 2 * count; // +2 votes per Absol shard
+                Button button = Buttons.gray("exhaustForVotes_absolShard_" + shardVotes,
+                    "Use Shard of the Throne Votes (" + shardVotes + ")", SourceEmojis.Absol);
+                planetButtons.add(button);
+            }
+            // Absol's Syncretone - +1 vote for each neighbour
+            if (player.hasRelicReady("absol_syncretone")) {
+                int count = game.getRealPlayers().size();
+                Button button = Buttons.gray("exhaustForVotes_absolsyncretone_" + count,
+                    "Use Syncretone Votes (" + count + ")", SourceEmojis.Absol);
+                planetButtons.add(button);
+            }
 
-        // Ghoti Wayfarer Tech
-        if (player.hasTechReady("dsghotg")) {
-            int fleetCC = player.getFleetCC();
-            planetButtons.add(Buttons.gray("exhaustForVotes_dsghotg_" + fleetCC,
-                "Use Some Silly Ghoti Technology Votes (" + fleetCC + ")", FactionEmojis.ghoti));
+            // Ghoti Wayfarer Tech
+            if (player.hasTechReady("dsghotg")) {
+                int fleetCC = player.getFleetCC();
+                planetButtons.add(Buttons.gray("exhaustForVotes_dsghotg_" + fleetCC,
+                    "Silly Ghoti Tech Votes (" + fleetCC + ")", FactionEmojis.ghoti));
+            }
         }
         planetButtons.add(Buttons.gray("exhaustForVotes_allPlanets_" + totalPlanetVotes,
             "Exhaust All Voting Planets (" + totalPlanetVotes + ")"));
@@ -2863,14 +2899,13 @@ public class AgendaHelper {
             sb.append("  ").append(additionalVotesText);
         } else
             sb.append("**");
-        if (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government")) {
+        if (game.getLaws().containsKey("rep_govt")) {
             sb = new StringBuilder();
-            if (game.getLaws().containsKey("absol_government") && player.controlsMecatol(false)) {
-                sb.append(" vote count (_Representative Government_ while controlling Mecatol Rex): **2**");
-            } else {
-                sb.append(" vote count (_Representative Government_): **1**");
-            }
-
+            sb.append(" vote count (_Representative Government_): **1**");
+        }
+        if (game.getLaws().containsKey("absol_government")) {
+            sb = new StringBuilder();
+            sb.append(" vote count (_Representative Government_): **").append(voteCount).append("**");
         }
         return sb.toString();
     }
@@ -2941,6 +2976,12 @@ public class AgendaHelper {
             }
         }
 
+        if (game.getLaws().containsKey("absol_government")) {
+            voteCount = planets.size();
+            if (planets.contains("mr")) {
+                voteCount++;
+            }
+        }
         return voteCount;
     }
 
@@ -3022,7 +3063,7 @@ public class AgendaHelper {
         // Ghoti Wayfarer Tech
         if (player.hasTechReady("dsghotg")) {
             int fleetCC = player.getFleetCC();
-            additionalVotesAndSources.put(TechEmojis.BioticTech + "Exhaust Some Silly Ghoti Technology", fleetCC);
+            additionalVotesAndSources.put(TechEmojis.BioticTech + " Some Silly Ghoti Tech", fleetCC);
         }
 
         return additionalVotesAndSources;
@@ -3106,13 +3147,9 @@ public class AgendaHelper {
     @ButtonHandler("outcome_")
     public static void outcome(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         if (game.getLaws() != null
-            && (game.getLaws().containsKey("rep_govt") || game.getLaws().containsKey("absol_government"))) {
+            && (game.getLaws().containsKey("rep_govt"))) {
             player.resetSpentThings();
             player.addSpentThing("representative_1");
-            boolean playerHasMr = CollectionUtils.containsAny(player.getPlanets(), Constants.MECATOLS);
-            if (game.getLaws().containsKey("absol_government") && playerHasMr) {
-                player.addSpentThing("absolRexControlRepresentative_1");
-            }
             String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
             String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome);
             if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {

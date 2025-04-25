@@ -1,9 +1,10 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -16,7 +17,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
 import ti4.executors.ExecutorManager;
 import ti4.helpers.Helper;
-import ti4.helpers.ThreadGetter;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
@@ -146,9 +146,9 @@ public class UserLeaveServerListener extends ListenerAdapter {
         boolean foundOne = false;
         for (Game g : games) {
             Player p = g.getPlayer(player.getId());
-            if(p != null && g.getLastActivePlayerChange().toString() != null){
+            if (p != null && g.getLastActivePlayerChange().toString() != null) {
                 float value = p.getTotalResourceValueOfUnits("space") + p.getTotalResourceValueOfUnits("ground");
-                if(!foundOne && value > 0 && Helper.getDateDifference(Helper.getDateRepresentation(g.getLastActivePlayerChange().getTime()), Helper.getDateRepresentation(System.currentTimeMillis())) < 15 ){
+                if (!foundOne && value > 0 && Helper.getDateDifference(Helper.getDateRepresentation(g.getLastActivePlayerChange().getTime()), Helper.getDateRepresentation(System.currentTimeMillis())) < 15) {
                     foundOne = true;
                 }
             }
@@ -156,31 +156,31 @@ public class UserLeaveServerListener extends ListenerAdapter {
             msg.append(separator);
         }
         msg.append("\nUser has **__").append(userTotalGames(player)).append("__** in-progress games and **__").append(player.getGames().size()).append("__** lifetime games across all servers.");
-        if(!foundOne){
+        if (!foundOne) {
             return "dud";
         }
         return msg.toString();
     }
 
     private static void reportUserLeftServer(Guild guild, ManagedPlayer player, List<Game> games) {
-        TextChannel staffLounge = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("staff-lounge", true).stream().findFirst().orElse(null);
-        if (staffLounge == null) return;
+        TextChannel moderationLogChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("moderation-log", true).stream()
+            .findFirst().orElse(null);
+        if (moderationLogChannel == null) return;
 
-        String threadName = "in-progress-games-left";
         try {
             String msg = generateBothelperReport(guild, player, games);
             StringBuilder gs = new StringBuilder();
-            if(!msg.equalsIgnoreCase("dud")){
-                ThreadGetter.getThreadInChannel(staffLounge, threadName, tc -> MessageHelper.sendMessageToChannel(tc, msg));
-            }else{
-                for(Game game : games){
+            if (!msg.equalsIgnoreCase("dud")) {
+                MessageHelper.sendMessageToChannel(moderationLogChannel, msg);
+            } else {
+                for (Game game : games) {
                     gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
                 }
                 final String gss = gs.toString();
-                ThreadGetter.getThreadInChannel(staffLounge, threadName, tc -> MessageHelper.sendMessageToChannel(tc, player.getName()+" left some games, but the games were ruled to be duds. Games were as follows: "+gss));
+                MessageHelper.sendMessageToChannel(moderationLogChannel, player.getName() + " left some games, but the games were ruled to be duds. Games were as follows: " + gss);
             }
-        } catch (Exception e){
-            ThreadGetter.getThreadInChannel(staffLounge, threadName, tc -> MessageHelper.sendMessageToChannel(tc, "reportUserLeftServer method hit the following error: "+e.getMessage()));
+        } catch (Exception e) {
+            MessageHelper.sendMessageToChannel(moderationLogChannel, "reportUserLeftServer method hit the following error: " + e.getMessage());
         }
     }
 }
