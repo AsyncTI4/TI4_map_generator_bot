@@ -387,13 +387,14 @@ public class StartTurnService {
             .remove(game.getName(), GameMessageType.TURN)
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
-            startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
             FowCommunicationThreadService.checkAllCommThreads(game);
             FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
+            startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
+        } else {
+            startButtons.add(Buttons.gray("showMap", "Show Map"));
+            startButtons.add(Buttons.gray("showPlayerAreas", "Show Player Areas"));
         }
 
-        startButtons.add(Buttons.gray("showMap", "Show Map"));
-        startButtons.add(Buttons.gray("showPlayerAreas", "Show Player Areas"));
         if (!confirmed2ndAction && doneActionThisTurn) {
             startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
         }
