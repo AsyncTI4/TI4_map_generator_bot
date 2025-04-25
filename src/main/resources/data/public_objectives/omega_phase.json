@@ -51,7 +51,7 @@
     "alias": "master_science_omegaphase",
     "name": "Master the Sciences",
     "phase": "Omega",
-    "text": "Own 6 non-unit upgrade technologies",
+    "text": "Own 4 non-unit upgrade technologies",
     "points": 1,
     "source": "omega_phase"
   },
@@ -59,7 +59,7 @@
     "alias": "subdue_omegaphase",
     "name": "Subdue the Galaxy",
     "phase": "Omega",
-    "text": "Control 8 planets in non-home systems",
+    "text": "Control 6 planets in non-home systems",
     "points": 1,
     "source": "omega_phase"
   },
@@ -67,7 +67,7 @@
     "alias": "brain_trust_omegaphase",
     "name": "Form Galactic Brain Trust",
     "phase": "Omega",
-    "text": "Control 4 planets that have technology specialties",
+    "text": "Control 3 planets that have technology specialties",
     "points": 1,
     "source": "omega_phase"
   },
@@ -115,7 +115,7 @@
     "alias": "massive_cities_omegaphase",
     "name": "Construct Massive Cities",
     "phase": "Omega",
-    "text": "Have 5 or more structures",
+    "text": "Have 4 or more structures",
     "points": 1,
     "source": "omega_phase"
   },
