@@ -6673,7 +6673,7 @@ public class ButtonHelper {
             if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeakerUserID())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
-                    Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmoji());
+                    Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmojiOrColor());
                     assignSpeakerButtons.add(button);
                 }
             }
