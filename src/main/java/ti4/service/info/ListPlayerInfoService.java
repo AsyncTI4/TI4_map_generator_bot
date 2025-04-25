@@ -95,7 +95,7 @@ public class ListPlayerInfoService {
             case "galvanize_omegaphase" -> 6;
             case "manipulate_law_omegaphase", "golden_age_omegaphase" -> 16;
             case "centralize_trade_omegaphase" -> 10;
-            case "revolutionize_omegaphase" -> 3;
+            case "revolutionize_omegaphase" -> 2;
             case "master_science_omegaphase" -> 4;
             case "subdue_omegaphase" -> 6;
             case "brain_trust_omegaphase" -> 3;

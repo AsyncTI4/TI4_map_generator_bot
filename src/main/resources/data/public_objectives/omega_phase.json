@@ -43,7 +43,7 @@
     "alias": "revolutionize_omegaphase",
     "name": "Revolutionize Warfare",
     "phase": "Omega",
-    "text": "Own 3 unit upgrade technologies",
+    "text": "Own 2 unit upgrade technologies",
     "points": 1,
     "source": "omega_phase"
   },
