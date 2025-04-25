@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
@@ -32,15 +33,27 @@ import ti4.service.tech.ListTechService;
 public class VoteButtonHandler {
 
     @ButtonHandler("erasePreVote")
-    public static void erasePreVote(ButtonInteractionEvent event, Player player, Game game) {
+    public static void erasePreVote(GenericInteractionCreateEvent event, Player player, Game game) {
         game.setStoredValue("preVoting" + player.getFaction(), "");
         player.resetSpentThings();
-        event.getMessage().delete().queue();
+        if (event instanceof ButtonInteractionEvent bEvent) {
+            bEvent.getMessage().delete().queue();
+        }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
         buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
         buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Erased the pre-vote", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Erased the pre-vote", buttons);
+    }
+
+    public static void erasePreVoteDueToAfterPlay(Player player, Game game) {
+        game.setStoredValue("preVoting" + player.getFaction(), "");
+        player.resetSpentThings();
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("preVote", "Pre-Vote"));
+        buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
+        buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " due to the playing of an after, your pre-vote was erased. You can use these buttons to pre-vote again.", buttons);
     }
 
     @ButtonHandler("preVote")

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.CommandHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -897,6 +898,11 @@ public class ActionCardHelper {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, (game.isFowMode() ? "" : player.getRepresentation(false, true))
                         + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
+                            VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                        }
+                    }
                 }
                 if (automationID.equals("hack")) {
                     game.setHasHackElectionBeenPlayed(true);
@@ -912,6 +918,11 @@ public class ActionCardHelper {
                 if (automationID.equals("assassin")) {
                     codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAssRepsStep1", buttonLabel));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
+                            VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                        }
+                    }
                 }
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
