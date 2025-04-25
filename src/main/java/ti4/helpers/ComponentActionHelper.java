@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitType;
@@ -123,7 +124,7 @@ public class ComponentActionHelper {
                         }
 
                     } else {
-                        Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, factionEmoji);
+                        Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName + " (" + StringUtils.capitalize(leaderModel.getType()) + ")", factionEmoji);
                         compButtons.add(lButton);
                     }
 

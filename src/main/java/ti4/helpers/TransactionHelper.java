@@ -409,6 +409,11 @@ public class TransactionHelper {
     public static void transaction(Player player, Game game) {
         List<Button> buttons = TransactionHelper.getPlayersToTransact(game, player);
         String message = player.getRepresentation() + " Use the buttons to select which player you wish to transact with";
+        if (game.isHiddenAgendaMode() && !game.getPhaseOfGame().toLowerCase().contains("action")) {
+            message = player.getRepresentation() + " this game is in hidden agenda mode, which does not allow transactions outside of the action phase. ";
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+            return;
+        }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
