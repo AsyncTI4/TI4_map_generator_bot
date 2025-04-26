@@ -23,9 +23,7 @@ public class GameLaunchThreadHelper {
         if (!ButtonHelper.isNumeric(threadID)) {
             return;
         }
-        ThreadChannel threadChannel = game.isFowMode() 
-            ? AsyncTI4DiscordBot.guildFogOfWar.getThreadChannelById(threadID) 
-            : AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID);
+        ThreadChannel threadChannel = AsyncTI4DiscordBot.guildPrimary.getThreadChannelById(threadID);
         if (threadChannel == null) {
             return;
         }
