@@ -16,9 +16,11 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.Constants;
@@ -212,6 +214,14 @@ public class CreateFoWGameService {
         MessageHelper.sendMessageToChannel(eventChannel, message);
 
         GameManager.save(newGame, "Create FOW Game Channels");
+
+        if (eventChannel instanceof ThreadChannel thread && thread.getParentChannel().getName().equals("making-fow-games")) {
+            newGame.setLaunchPostThreadID(thread.getId());
+            ThreadChannelManager manager = thread.getManager()
+                .setName(StringUtils.left(newGame.getName().toUpperCase() + "-LAUNCHED - " + thread.getName(), 100))
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+            manager.queue();
+        }
     }
 
     private static String getInfoTextFromFile(String file) {

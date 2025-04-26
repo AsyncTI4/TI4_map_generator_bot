@@ -96,8 +96,8 @@ public class FoWHelper {
         }
 
         return game != null && (hasHomeSystemInView(player, viewingPlayer) 
-            || hasPlayersPromInPlayArea(player, viewingPlayer) 
-            || hasMahactCCInFleet(player, viewingPlayer) 
+            || (hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer)) 
+            && !FOWPlusService.isActive(game)
             || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
     }
 
