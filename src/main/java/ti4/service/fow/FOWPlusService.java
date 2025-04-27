@@ -171,4 +171,8 @@ public class FOWPlusService {
         return true;
     }
 
+    //Can only remove CCs from tiles that can be seen
+    public static boolean preventRemovingCCFromTile(Game game, Player player, Tile tile) {
+        return isActive(game) && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition());
+    }
 }
