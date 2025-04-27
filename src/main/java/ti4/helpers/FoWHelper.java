@@ -378,7 +378,7 @@ public class FoWHelper {
                 continue;
             }
             
-            if (!FOWPlusService.shouldTravelAdjacency(game, position, dirFrom)) {
+            if (!FOWPlusService.shouldTraverseAdjacency(game, position_, dirFrom)) {
                 continue;
             }
 
