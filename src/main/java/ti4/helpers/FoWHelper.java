@@ -377,6 +377,10 @@ public class FoWHelper {
                 // the hyperlane doesn't exist & doesn't go that direction, skip.
                 continue;
             }
+            
+            if (!FOWPlusService.shouldTravelAdjacency(game, position, dirFrom)) {
+                continue;
+            }
 
             // explore that tile now!
             int direcetionFrom = naturalMapOnly ? -2 : dirFrom;
