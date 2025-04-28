@@ -1,0 +1,71 @@
+[
+ {
+    "alias": "7pAnaphase",
+	"author": "Aliquis",
+    "playerCount": 7,
+    "templateTiles": [
+      { "pos": "000", "staticTileId": "83b5" },
+
+      { "pos": "101", "staticTileId": "87b5" },
+      { "pos": "102", "playerNumber": 1, "miltyTileIndex": 4 },
+      { "pos": "103", "staticTileId": "18", "custodians": true },
+      { "pos": "104", "staticTileId": "89b4" },
+      { "pos": "105", "staticTileId": "85a0" },
+      { "pos": "106", "staticTileId": "83a1" },
+
+      { "pos": "201", "playerNumber": 1, "miltyTileIndex": 2 },
+      { "pos": "202", "playerNumber": 1, "miltyTileIndex": 1 },
+      { "pos": "203", "playerNumber": 1, "miltyTileIndex": 3 },
+      { "pos": "204", "playerNumber": 2, "miltyTileIndex": 4 },
+      { "pos": "205", "playerNumber": 3, "miltyTileIndex": 4 },
+      { "pos": "206", "playerNumber": 4, "miltyTileIndex": 4 },
+      { "pos": "207", "playerNumber": 4, "miltyTileIndex": 3 },
+      { "pos": "208", "staticTileId": "87b5" },
+      { "pos": "209", "staticTileId": "83a1" },
+      { "pos": "210", "staticTileId": "83a1" },
+      { "pos": "211", "playerNumber": 7, "miltyTileIndex": 4 },
+      { "pos": "212", "playerNumber": 7, "miltyTileIndex": 3 },
+
+      { "pos": "302", "playerNumber": 1, "home": true },
+      { "pos": "303", "playerNumber": 1, "miltyTileIndex": 0 },
+      { "pos": "304", "playerNumber": 2, "miltyTileIndex": 2 },
+      { "pos": "305", "playerNumber": 2, "miltyTileIndex": 1 },
+      { "pos": "306", "playerNumber": 2, "miltyTileIndex": 3 },
+      { "pos": "307", "playerNumber": 3, "miltyTileIndex": 1 },
+      { "pos": "308", "playerNumber": 3, "miltyTileIndex": 3 },
+      { "pos": "309", "playerNumber": 4, "miltyTileIndex": 1 },
+      { "pos": "310", "playerNumber": 4, "miltyTileIndex": 0 },
+      { "pos": "311", "staticTileId": "84b4" },
+      { "pos": "312", "staticTileId": "83a1" },
+      { "pos": "313", "staticTileId": "83a1" },
+      { "pos": "314", "playerNumber": 5, "miltyTileIndex": 4 },
+      { "pos": "315", "playerNumber": 6, "miltyTileIndex": 4 },
+      { "pos": "316", "playerNumber": 6, "miltyTileIndex": 3 },
+      { "pos": "317", "playerNumber": 7, "miltyTileIndex": 1 },
+      { "pos": "318", "playerNumber": 7, "miltyTileIndex": 0 },
+
+      { "pos": "406", "playerNumber": 2, "home": true },
+      { "pos": "407", "playerNumber": 2, "miltyTileIndex": 0 },
+      { "pos": "408", "playerNumber": 3, "miltyTileIndex": 2 },
+      { "pos": "409", "playerNumber": 3, "home": true },
+      { "pos": "410", "playerNumber": 3, "miltyTileIndex": 0 },
+      { "pos": "411", "playerNumber": 4, "miltyTileIndex": 2 },
+      { "pos": "412", "playerNumber": 4, "home": true },
+      { "pos": "415", "staticTileId": "85a0" },
+      { "pos": "416", "staticTileId": "83a1" },
+      { "pos": "417", "playerNumber": 5, "miltyTileIndex": 2 },
+      { "pos": "418", "playerNumber": 5, "miltyTileIndex": 1 },
+      { "pos": "419", "playerNumber": 5, "miltyTileIndex": 3 },
+	  { "pos": "420", "playerNumber": 6, "miltyTileIndex": 1 },
+	  { "pos": "421", "playerNumber": 6, "miltyTileIndex": 0 },
+	  { "pos": "422", "playerNumber": 7, "miltyTileIndex": 2 },
+	  { "pos": "423", "playerNumber": 7, "home": true },
+	  
+	  { "pos": "522", "playerNumber": 5, "home": true },
+	  { "pos": "523", "playerNumber": 5, "miltyTileIndex": 0 },
+	  { "pos": "524", "playerNumber": 6, "miltyTileIndex": 2 },
+	  { "pos": "525", "playerNumber": 6, "home": true }
+	  
+    ]
+  }
+ ]
