@@ -200,7 +200,6 @@ public class HomebrewService {
                 //end
 
                 VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(game);
-                PriorityTrackHelper.CreateDefaultPriorityTrack(game);
                 OmegaPhaseModStatusHelper.PrintGreeting(game);
             }
         }
