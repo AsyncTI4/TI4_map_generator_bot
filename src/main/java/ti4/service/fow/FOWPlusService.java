@@ -33,10 +33,15 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 /*
-  * All 0b tiles hidden from the map.
-  * Can only activate tiles you can see.  
-  * Can activate any other tile with Blind Tile button which allows activating tiles without a tile
-    -> Will send ships into the void
+  To activate Extra Dark mode use /fow fow_options
+
+  * 0b tiles are hidden
+  * Adjacent hyperlanes that don't connect to the viewing tile are hidden
+  * Can only activate tiles you can see
+    * Can activate any other tile with Blind Tile button including tiles without a tile
+      -> Will send ships into the Void
+  * Other players stats areas are visible only by seeing their HS - PNs don't count
+  * To remove a token from the board, you need to see it
  */
 public class FOWPlusService {
     public static final String VOID_TILEID = "-1";
@@ -138,4 +143,36 @@ public class FOWPlusService {
         game.resetCurrentMovedUnitsFrom1TacticalAction();
     }
 
+    //If the target position is void or hyperlane that does not connect to tile we are checking from
+    public static boolean shouldTraverseAdjacency(Game game, String position, int dirFrom) {
+        if (!isActive(game)) return true;
+
+        if (isVoid(game, position)) {
+            return false;
+        }
+
+        Tile targetTile = game.getTileByPosition(position);
+        if (targetTile.getTileModel() != null && targetTile.getTileModel().isHyperlane()) {
+            boolean hasHyperlaneConnection = false;
+            for (int i = 0; i < 6; i++) {
+                if (i == dirFrom) continue; //check all other sources except the one we came from
+
+                List<Boolean> targetHyperlaneData = targetTile.getHyperlaneData(i);
+                if (targetHyperlaneData != null && !targetHyperlaneData.isEmpty() && targetHyperlaneData.get(dirFrom)) {
+                    hasHyperlaneConnection = true;
+                    break;
+                }
+            }
+            if (!hasHyperlaneConnection) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    //Can only remove CCs from tiles that can be seen
+    public static boolean preventRemovingCCFromTile(Game game, Player player, Tile tile) {
+        return isActive(game) && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition());
+    }
 }

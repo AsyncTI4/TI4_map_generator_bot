@@ -96,8 +96,8 @@ public class FoWHelper {
         }
 
         return game != null && (hasHomeSystemInView(player, viewingPlayer) 
-            || hasPlayersPromInPlayArea(player, viewingPlayer) 
-            || hasMahactCCInFleet(player, viewingPlayer) 
+            || (hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer)) 
+            && !FOWPlusService.isActive(game)
             || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
     }
 
@@ -375,6 +375,10 @@ public class FoWHelper {
 
             if ("x".equals(position_) || (hyperlaneData != null && !hyperlaneData.isEmpty() && !hyperlaneData.get(i))) {
                 // the hyperlane doesn't exist & doesn't go that direction, skip.
+                continue;
+            }
+            
+            if (!FOWPlusService.shouldTraverseAdjacency(game, position_, dirFrom)) {
                 continue;
             }
 

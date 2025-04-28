@@ -2333,6 +2333,9 @@ public class ButtonHelper {
                     continue;
                 }
             }
+            if (FOWPlusService.preventRemovingCCFromTile(game, player, tile)) {
+                continue;
+            }
             String id = finChecker + "removeCCFromBoard_" + whatIsItFor.replace("_", "") + "_" + tile.getPosition();
             String label = "Remove CC From " + tile.getRepresentationForButtons(game, player);
             buttonsToRemoveCC.add(Buttons.green(id, label));
@@ -6341,8 +6344,17 @@ public class ButtonHelper {
             msg += " on " + buttonID.split("_")[2];
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + ".");
-        if (game.isHiddenAgendaMode() && msg.toLowerCase().contains("abstain on") && player.hasAbility("zeal")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## The player with the zeal ability has decided to abstain.");
+        if (game.isHiddenAgendaMode() && msg.toLowerCase().contains("abstain on")) {
+            if (player.hasAbility("zeal")) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## The player with the zeal ability has decided to abstain.");
+            }
+            if (game.getStoredValue("aftersResolved").equalsIgnoreCase("Yes")) {
+                if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).isEmpty()) {
+                    AgendaHelper.startTheVoting(game);
+                } else {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Game needs " + AgendaHelper.getPlayersWhoNeedToPreVoted(game).size() + " more people to pre-vote before voting will start");
+                }
+            }
         }
         game.setStoredValue(messageID, part2);
         deleteMessage(event);
