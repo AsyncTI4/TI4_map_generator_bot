@@ -671,8 +671,12 @@ public class AgendaHelper {
                 num++;
             }
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false)
-            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ");
+        String msg = player.getRepresentation(true, false)
+            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ";
+        if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
+            msg += "The " + AgendaHelper.getPlayersWhoNeedToPreVoted(game).size() + " who still need to decide on voting were also reminded";
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
     }
 
