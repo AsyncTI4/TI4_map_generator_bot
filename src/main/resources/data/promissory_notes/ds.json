@@ -401,5 +401,14 @@
         "playArea": true,
         "source": "ds",
         "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nAt the start of a round of combat, you may exhaust this card to place 2 infantry from your reinforcements on a planet you control. \nOnce per combat, after 1 of your infantry is destroyed, the Pharad'n player may capture that unit."
+    },
+    {
+        "alias": "dspnqhet",
+        "name": " Death Binding",
+        "faction": "qhet",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "At the start of a round of combat: During this round of combat, hits you produce cannot be canceled. [Note: this means that sustain damage cannot be used against these hits.] After that round of combat, return this card to the Qhet player."
     }
 ]
