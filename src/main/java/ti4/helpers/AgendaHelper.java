@@ -3135,7 +3135,8 @@ public class AgendaHelper {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         Button flipNextAgenda = Buttons.blue("flip_agenda", "Flip Agenda #" + aCount);
-        List<Button> resActionRow = Arrays.asList(flipNextAgenda);
+        List<Button> resActionRow = new ArrayList<>();
+        resActionRow.add(flipNextAgenda);
         if (!game.isOmegaPhaseMode()) {
             Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
                 "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");

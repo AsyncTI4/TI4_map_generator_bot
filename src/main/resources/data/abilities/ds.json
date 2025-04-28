@@ -863,5 +863,20 @@
         "faction": "zelian",
         "permanentEffect": "Game effects other than your command tokens cannot prevent you from activating, or moving ships into, your home system.",
         "source": "ds"
+    },
+    {
+        "id": "data_recovery",
+        "name": "Data Recovery",
+        "faction": "qhet",
+        "permanentEffect": "Game effects other than your command tokens cannot prevent you from activating, or moving ships into, your home system.",
+        "source": "ds"
+    },
+    {
+        "id": "black_ops",
+        "name": "Black Ops",
+        "faction": "qhet",
+        "window": "After you win a combat as the attacker",
+        "windowEffect": "You may remove 2 of your opponent’s control tokens from your faction sheet to draw 1 secret objective, or 5 of those tokens to gain 1 command token and take 1 of their unscored secret objectives. ",
+        "source": "ds"
     }
 ]
