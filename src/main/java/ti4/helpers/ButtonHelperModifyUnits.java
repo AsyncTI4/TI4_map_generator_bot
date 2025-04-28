@@ -1665,7 +1665,7 @@ public class ButtonHelperModifyUnits {
         } else {
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();
-                if (player.hasUnit("sol_mech") && !ButtonHelper.isLawInPlay(game, "regulations") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                if (player.hasUnit("sol_mech") && !ButtonHelper.isLawInPlay(game, "articles_war") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                     orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
                 }
                 orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Finish Orbital Drop"));
@@ -1741,6 +1741,18 @@ public class ButtonHelperModifyUnits {
             player.getFactionEmojiOrColor() + " undid landing of " + amount + " " + unitName + " on " + planetName + ".");
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
+
+    @ButtonHandler("vadenYellowTechUse")
+    public static void munitionsReserves(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (player.getTg() < 1) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + ", you only have "
+                + player.getTg() + " trade goods and thus can't use this tech.");
+            return;
+        }
+        String msg = player.getFactionEmoji() + " spent 1 trade good " + player.gainTG(-1) + " to generate 1 additional hit using Krovoz Strike Teams. " + p2.getRepresentation() + " Please assign it with the assign hits button.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @ButtonHandler("assCannonNDihmohn_")
