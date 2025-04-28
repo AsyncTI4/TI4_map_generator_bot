@@ -921,7 +921,7 @@ public class AgendaHelper {
         }
         for (Player player : game.getRealPlayers()) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts")
+                if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts") || p2.hasAbility("data_recovery")
                     || p2.hasAbility("fine_print") || p2.getDebtTokenCount(player.getColor()) < 1) {
                     continue;
                 }
