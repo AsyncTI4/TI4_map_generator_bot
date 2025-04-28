@@ -769,21 +769,6 @@
         "forCombatAbility": "combatround"
     },
     {
-        "alias": "plus_x_po_others_scored_always_mech",
-        "type": "mods",
-        "value": "+1",
-        "valueScalingType": "po_opponent_exclusively_scored",
-        "persistenceType": "ALWAYS",
-        "scope": "mf",
-        "related": [
-            {
-                "type": "unit",
-                "alias": "kyro_mech"
-            }
-        ],
-        "forCombatAbility": "combatround"
-    },
-    {
         "alias": "plus_half_unit_tech_always_mech",
         "type": "mods",
         "value": "+1",

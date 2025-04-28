@@ -530,13 +530,17 @@ public class ButtonHelperAgents {
         }
         if ("gledgeagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Durran, the Gledge" + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
+
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            if (p2 == null)
+            if (p2 == null) {
+                MessageHelper.sendMessageToChannel(channel, exhaustText);
                 return;
+            }
+            MessageHelper.sendMessageToChannel(channel, exhaustText + " for use on " + p2.getRepresentationNoPing());
             p2.addSpentThing("Exhausted " + ssruuClever + "Durran, the Gledge" + ssruuSlash + " agent, for +3 PRODUCTION value.");
         }
+
         if ("uydaiagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Garstil, the Uydai" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
