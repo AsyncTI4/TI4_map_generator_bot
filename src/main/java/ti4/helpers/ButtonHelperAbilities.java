@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,15 +35,64 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperAbilities {
+
+    @ButtonHandler("dataRecovery_")
+    public static void dataRecovery(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        SendDebtService.sendDebt(p2, player, 1);
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), player.getRepresentation() + " placed 1 of " + p2.getRepresentation() + " control tokens on their sheet via their data recovery ability");
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("blackOps_")
+    public static void blackOps(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        int amount = Integer.parseInt(buttonID.split("_")[2]);
+        player.clearDebt(p2, amount);
+        String msg = player.getRepresentation() + " spent " + amount + " of " + p2.getRepresentation() + " control tokens on their sheet via their black ops ability to ";
+        if (amount == 2) {
+            msg += "draw 1 SO";
+            game.drawSecretObjective(player.getUserID());
+            if (player.hasAbility("plausible_deniability")) {
+                game.drawSecretObjective(player.getUserID());
+                msg += ". Drew a second secret objective due to **Plausible Deniability**.";
+            }
+            SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+        } else {
+            msg += "gain 1 command token and steal 1 of their opponents unscored SOs";
+            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
+                + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+            if (p2.getSecretsUnscored().size() > 0) {
+                int randInt = ThreadLocalRandom.current().nextInt(0, p2.getSecretsUnscored().size());
+                List<Map.Entry<String, Integer>> entries = new ArrayList<>(p2.getSecretsUnscored().entrySet());
+                Map.Entry<String, Integer> randomEntry = entries.get(randInt);
+                p2.removeSecret(randomEntry.getValue());
+                player.setSecret(randomEntry.getKey());
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+                SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
+                game.checkSOLimit(player);
+            } else {
+                msg += ". Their opponent did not have an unscored SO";
+            }
+        }
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
+
+        ButtonHelper.deleteMessage(event);
+    }
 
     public static void autoneticMemoryStep1(Game game, Player player, int count) {
         List<Button> buttons = new ArrayList<>();

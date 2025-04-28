@@ -380,7 +380,11 @@ public class PlayStrategyCardService {
                     Button transaction = Buttons.blue("transaction", "Transaction");
                     scButtons.add(transaction);
                     scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1 Trade Good"));
-                    scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), "Send 1 Debt"));
+                    String label = "Send 1 Debt";
+                    if (player.hasAbility("binding_debts")) {
+                        label += " (Binding Debts)";
+                    }
+                    scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), label));
                 }
                 MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread.", scButtons);
 

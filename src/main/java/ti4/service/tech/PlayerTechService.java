@@ -165,6 +165,11 @@ public class PlayerTechService {
                     Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "dsvadey" -> {
+                deleteTheOneButtonIfButtonEvent(event);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    player.getFactionEmoji() + " is destroying a unit that sustained damage by using Krovoz Strike Teams. The owner should destroy the unit with the assign hits button.");
+            }
             case "absol_nm" -> { // Absol's Neural Motivator
                 deleteIfButtonEvent(event);
                 Button draw2ACButton = Buttons.gray(player.getFinsFactionCheckerPrefix() + "draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard);

@@ -50,6 +50,7 @@ import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
+import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
@@ -985,6 +986,26 @@ public class ButtonHelperHeroes {
             }
         }
         return techPlanets;
+    }
+
+    @ButtonHandler("qhetHeroAbility_")
+    public static void qhetHeroAbility(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String thing = buttonID.split("_")[1];
+        ButtonHelper.deleteMessage(event);
+        if (thing.contains("command")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +
+                " is using their hero ability to gain a command token.");
+            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
+                + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +
+                " is using their hero ability to take another action.");
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Aciton buttons",
+                StartTurnService.getStartOfTurnButtons(player, game, true, event, true));
+        }
     }
 
     @ButtonHandler("purgeCeldauriHero_")

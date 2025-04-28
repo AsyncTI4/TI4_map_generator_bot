@@ -95,6 +95,15 @@ public class StatusHelper {
             if (player.getTotalVictoryPoints() > maxVP) {
                 maxVP = player.getTotalVictoryPoints();
             }
+            if (player.getStasisInfantry() > 0 && player.hasTech("dsqhetinf")) {
+                List<Button> infButtons = new ArrayList<>();
+                for (String planet : ButtonHelper.getPlanetsWithStructures(player, game)) {
+                    infButtons.add(Buttons.green("qhetInfRevival_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                }
+                infButtons.add(Buttons.red("deleteButtons", "Done"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use these buttons to put up to 2 infantry on each planet with a structure." +
+                    " Your current number of infantry you can revive is " + player.getStasisInfantry() + ". Each press will place 1 infantry.", infButtons);
+            }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
                 int numScoredPos = player.getPublicVictoryPoints(false);
