@@ -2333,6 +2333,9 @@ public class ButtonHelper {
                     continue;
                 }
             }
+            if (FOWPlusService.preventRemovingCCFromTile(game, player, tile)) {
+                continue;
+            }
             String id = finChecker + "removeCCFromBoard_" + whatIsItFor.replace("_", "") + "_" + tile.getPosition();
             String label = "Remove CC From " + tile.getRepresentationForButtons(game, player);
             buttonsToRemoveCC.add(Buttons.green(id, label));
@@ -6676,7 +6679,7 @@ public class ButtonHelper {
             if (player.isRealPlayer() && !player.getUserID().equals(game.getSpeakerUserID())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isValidFaction(faction)) {
-                    Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmoji());
+                    Button button = Buttons.gray("assignSpeaker_" + faction, null, player.getFactionEmojiOrColor());
                     assignSpeakerButtons.add(button);
                 }
             }
