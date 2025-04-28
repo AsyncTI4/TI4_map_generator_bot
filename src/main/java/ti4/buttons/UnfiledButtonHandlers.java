@@ -2277,6 +2277,10 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Player p1 = game.getPlayerFromColorOrFaction(p1Color);
         String p2Color = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(p2Color);
+        if (player != p1 && player != p2) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " don't press buttons that arent meant for you.");
+            return;
+        }
         String msg = " your opponent has declared they are ready to roll combat dice if you are.";
         if (player == p1 || player.getAllianceMembers().contains(p1.getFaction())) {
             msg = p2.getRepresentation(false, true) + msg;

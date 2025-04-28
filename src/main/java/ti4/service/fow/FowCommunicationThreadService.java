@@ -62,7 +62,9 @@ public class FowCommunicationThreadService {
     }
 
     private static boolean areAllowedToTalkInAgenda(Game game) {
-        return game.getPhaseOfGame().startsWith("agenda") && game.getFowOption(FOWOption.ALLOW_AGENDA_COMMS);
+        return game.getPhaseOfGame().startsWith("agenda") 
+            && game.getFowOption(FOWOption.ALLOW_AGENDA_COMMS)
+            && !game.isHiddenAgendaMode();
     }
 
     private static Set<Player> getNeighbors(Game game, Player player) {
