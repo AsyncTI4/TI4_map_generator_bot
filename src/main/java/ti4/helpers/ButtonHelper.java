@@ -4350,44 +4350,43 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice.");
             return new ArrayList<>();
         }
-        if (game.isNaaluAgent()) {
-            if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                && game.getStoredValue("vaylerianHeroActive").isEmpty() && player == game.getActivePlayer()) {
-                if (!game.getStoredValue("absolLux").isEmpty()) {
-                    player.setTacticalCC(player.getTacticalCC() + 1);
-                }
-                int cc = player.getTacticalCC();
-                cc -= 1;
-                player.setTacticalCC(cc);
-                CommandCounterHelper.addCC(event, player, tile);
+        if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
+            && game.getStoredValue("vaylerianHeroActive").isEmpty() && player == game.getActivePlayer()) {
+            if (!game.getStoredValue("absolLux").isEmpty()) {
+                player.setTacticalCC(player.getTacticalCC() + 1);
             }
-            String thingToAdd = "box";
-            for (String unit : displacedUnits.keySet()) {
-                int amount = displacedUnits.get(unit);
-                if (unit.contains("damaged")) {
-                    unit = unit.replace("damaged", "");
-                }
-                if ("box".equalsIgnoreCase(thingToAdd)) {
-                    thingToAdd = amount + " " + unit;
-                } else {
-                    thingToAdd += ", " + amount + " " + unit;
-                }
-            }
-            if (!"box".equalsIgnoreCase(thingToAdd)) {
-                AddUnitService.addUnits(event, tile, game, player.getColor(), thingToAdd);
-            }
-            for (String unit : displacedUnits.keySet()) {
-                int amount = displacedUnits.get(unit);
-                if (unit.contains("damaged")) {
-                    unit = unit.replace("damaged", "");
-                    String colorID = Mapper.getColorID(player.getColor());
-                    UnitKey unitID = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), colorID);
-                    tile.addUnitDamage("space", unitID, amount);
-                }
-            }
-
-            game.resetCurrentMovedUnitsFrom1TacticalAction();
+            int cc = player.getTacticalCC();
+            cc -= 1;
+            player.setTacticalCC(cc);
+            CommandCounterHelper.addCC(event, player, tile);
         }
+        String thingToAdd = "box";
+        for (String unit : displacedUnits.keySet()) {
+            int amount = displacedUnits.get(unit);
+            if (unit.contains("damaged")) {
+                unit = unit.replace("damaged", "");
+            }
+            if ("box".equalsIgnoreCase(thingToAdd)) {
+                thingToAdd = amount + " " + unit;
+            } else {
+                thingToAdd += ", " + amount + " " + unit;
+            }
+        }
+        if (!"box".equalsIgnoreCase(thingToAdd)) {
+            AddUnitService.addUnits(event, tile, game, player.getColor(), thingToAdd);
+        }
+        for (String unit : displacedUnits.keySet()) {
+            int amount = displacedUnits.get(unit);
+            if (unit.contains("damaged")) {
+                unit = unit.replace("damaged", "");
+                String colorID = Mapper.getColorID(player.getColor());
+                UnitKey unitID = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), colorID);
+                tile.addUnitDamage("space", unitID, amount);
+            }
+        }
+
+        game.resetCurrentMovedUnitsFrom1TacticalAction();
+
         List<Button> buttons = ButtonHelper.getLandingTroopsButtons(player, game, event, tile);
         Button concludeMove;
         if (game.isNaaluAgent() || player == game.getActivePlayer()) {
