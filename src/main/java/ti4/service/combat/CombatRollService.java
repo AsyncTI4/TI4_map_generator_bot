@@ -637,6 +637,17 @@ public class CombatRollService {
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();
             }
+            if (!game.getStoredValue("hiredGunsInPlay").isEmpty()) {
+                Player nokar = game.getPlayerFromColorOrFaction(game.getStoredValue("hiredGunsInPlay").split("_")[0]);
+                Player activePlay = game.getPlayerFromColorOrFaction(game.getStoredValue("hiredGunsInPlay").split("_")[1]);
+                if (player == nokar || player == activePlay) {
+                    for (Player p2 : opponents) {
+                        if (p2 != nokar && p2 != activePlay) {
+                            opponent = p2;
+                        }
+                    }
+                }
+            }
         }
         return opponent;
     }
