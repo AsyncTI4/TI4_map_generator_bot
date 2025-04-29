@@ -182,6 +182,26 @@ public class TurnOrderHelperTest extends BaseTi4Test {
     }
 
     @Test
+    void ImperialAgenda_SODraw_Queue() {
+        var game = createTestGame(false);
+        game.setPhaseOfGame("agenda");
+        PlayStrategyCardService.handleSOQueueing(game, false);
+        assertEquals("nomad*letnev*sol*nekro*argent*", game.getStoredValue("potentialBlockers"));
+        assertEquals("xxcha*", game.getStoredValue("factionsThatAreNotDiscardingSOs"));
+        assertEquals("", game.getStoredValue("queueToDrawSOs"));
+    }
+
+    @Test
+    void ImperialAgenda_SODraw_Queue_OmegaPhase() {
+        var game = createTestGame(true);
+        game.setPhaseOfGame("agenda");
+        PlayStrategyCardService.handleSOQueueing(game, false);
+        assertEquals("nomad*sol*nekro*letnev*argent*", game.getStoredValue("potentialBlockers"));
+        assertEquals("xxcha*", game.getStoredValue("factionsThatAreNotDiscardingSOs"));
+        assertEquals("", game.getStoredValue("queueToDrawSOs"));
+    }
+
+    @Test
     void Imperial_SODraw_Queue() {
         var game = createTestGame(false);
         PlayStrategyCardService.handleSOQueueing(game, false);
@@ -194,9 +214,9 @@ public class TurnOrderHelperTest extends BaseTi4Test {
     void Imperial_SODraw_Queue_OmegaPhase() {
         var game = createTestGame(true);
         PlayStrategyCardService.handleSOQueueing(game, false);
-        assertEquals(game.getStoredValue("potentialBlockers"), "sol*nekro*letnev*argent*nomad*");
-        assertEquals(game.getStoredValue("factionsThatAreNotDiscardingSOs"), "xxcha*");
-        assertEquals(game.getStoredValue("queueToDrawSOs"), "");
+        assertEquals("sol*nekro*nomad*argent*letnev*", game.getStoredValue("potentialBlockers"));
+        assertEquals("xxcha*", game.getStoredValue("factionsThatAreNotDiscardingSOs"));
+        assertEquals("", game.getStoredValue("queueToDrawSOs"));
     }
 
     private Game createTestGame(boolean withOmegaPhase) {
@@ -204,9 +224,9 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         game.setName("testGame");
         game.setOmegaPhaseMode(withOmegaPhase);
         createPlayer("p1", "nekro", "blue", Set.of(1), 4, game, false);
-        createPlayer("p2", "argent", "blue", Set.of(2), 1, game, false);
-        var playerScoringSecrets = createPlayer("p3", "xxcha", "blue", Set.of(3), 5, game, false);
-        createPlayer("p4", "nomad", "blue", Set.of(4), 2, game, true);
+        createPlayer("p2", "argent", "blue", Set.of(4), 1, game, false);
+        var playerScoringSecrets = createPlayer("p3", "xxcha", "blue", Set.of(7), 5, game, false);
+        createPlayer("p4", "nomad", "blue", Set.of(2), 2, game, true);
         createPlayer("p5", "letnev", "blue", Set.of(5), 6, game, false);
         createPlayer("p6", "sol", "blue", Set.of(8), 3, game, false);
         for (var player : game.getPlayers().values()) {

@@ -224,7 +224,11 @@ public class ButtonHelperSCs {
         if (!game.isOmegaPhaseMode()) {
             players = Helper.getNonInitiativeOrderFromPlayer(imperialHolder, game);
         } else {
-            players = game.getActionPhaseTurnOrder();
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getNonInitiativeOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
             Collections.rotate(players, -players.indexOf(imperialHolder));
         }
         String key2 = "queueToDrawSOs";
