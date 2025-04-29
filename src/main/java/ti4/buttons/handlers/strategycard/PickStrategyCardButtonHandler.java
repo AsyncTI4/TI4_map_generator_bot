@@ -31,53 +31,44 @@ import ti4.service.strategycard.PickStrategyCardService;
 @UtilityClass
 public class PickStrategyCardButtonHandler {
 
-
-
-    
-
     @ButtonHandler("queueScPick_")
     public static void queueScPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         event.getMessage().delete().queue();
-        if(game.getActivePlayer() == player){
+        if (game.getActivePlayer() == player) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are currently up to pick SC and should just do that instead of queueing.");
         }
         String num = buttonID.split("_")[1];
-        game.setStoredValue(player.getFaction()+"scpickqueue",game.getStoredValue(player.getFaction()+"scpickqueue")+num+"_");
-        String alreadyQueued = game.getStoredValue(player.getFaction()+"scpickqueue");
-        int number = Helper.getPlayerSpeakerNumber(player, game);
-        if(game.isFowMode()){
+        game.setStoredValue(player.getFaction() + "scpickqueue", game.getStoredValue(player.getFaction() + "scpickqueue") + num + "_");
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
+        int number = Helper.getPlayerNonInitiativeNumber(player, game);
+        if (game.isFowMode()) {
             number = 8;
         }
         int numQueued = alreadyQueued.split("_").length;
-        if(alreadyQueued.isEmpty()){
+        if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
         List<Button> buttons = StartPhaseService.getQueueSCPickButtons(game, player);
         String msg = StartPhaseService.getQueueSCMessage(game, player);
-        if(number <= numQueued){
-            msg +="You can use this button to restart if some mistake was made. Otherwise one of these cards should be selected for you when it is your turn to pick SC.";
+        if (number <= numQueued) {
+            msg += "You can use this button to restart if some mistake was made. Otherwise one of these cards should be selected for you when it is your turn to pick SC.";
             buttons = new ArrayList<>();
             buttons.add(Buttons.gray("restartSCQueue", "Restart Queue"));
-        }else{
-            msg +="You can use these buttons to queue another card in case all the ones you currently have queued are taken.";
+        } else {
+            msg += "You can use these buttons to queue another card in case all the ones you currently have queued are taken.";
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
+
     @ButtonHandler("restartSCQueue")
     public static void restartSCQueue(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         event.getMessage().delete().queue();
-        game.setStoredValue(player.getFaction()+"scpickqueue","");
+        game.setStoredValue(player.getFaction() + "scpickqueue", "");
         List<Button> buttons = StartPhaseService.getQueueSCPickButtons(game, player);
         String msg = StartPhaseService.getQueueSCMessage(game, player);
-        msg +="You can use these buttons to queue your SC picks.";
+        msg += "You can use these buttons to queue your SC picks.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
-
-
-
-
-
-
 
     @ButtonHandler("scPick_")
     public static boolean scPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {

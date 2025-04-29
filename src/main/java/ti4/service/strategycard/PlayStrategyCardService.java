@@ -1,6 +1,7 @@
 package ti4.service.strategycard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
@@ -24,6 +25,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -487,8 +489,15 @@ public class PlayStrategyCardService {
         game.setStoredValue(key, "");
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
+        List<Player> players;
+        if (!game.isOmegaPhaseMode()) {
+            players = Helper.getNonInitiativeOrderFromPlayer(imperialHolder, game);
+        } else {
+            players = PriorityTrackHelper.GetPriorityTrack(game);
+            Collections.rotate(players, -players.indexOf(imperialHolder));
+        }
         if (game.isQueueSO()) {
-            for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
+            for (Player player : players) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
                     || player.getSoScored() == player.getMaxSOCount()
                     || (player == imperialHolder && player.controlsMecatol(true) && !game.getPhaseOfGame().contains("agenda"))) {

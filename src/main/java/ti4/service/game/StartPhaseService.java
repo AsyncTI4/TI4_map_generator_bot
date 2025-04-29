@@ -140,7 +140,7 @@ public class StartPhaseService {
     }
 
     public static String getQueueSCMessage(Game game, Player player) {
-        int number = Helper.getPlayerSpeakerNumber(player, game);
+        int number = Helper.getPlayerNonInitiativeNumber(player, game);
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
         int numQueued = alreadyQueued.split("_").length;
         if (alreadyQueued.isEmpty()) {
@@ -395,7 +395,7 @@ public class StartPhaseService {
         } else {
             if (game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()) {
                 for (Player player2 : game.getRealPlayers()) {
-                    int number = Helper.getPlayerSpeakerNumber(player2, game);
+                    int number = Helper.getPlayerNonInitiativeNumber(player2, game);
                     if (number == 1 || (number == 8 && !game.isFowMode()) || !player2.getSCs().isEmpty()) {
                         continue;
                     }
