@@ -1165,6 +1165,34 @@ public class ButtonHelperAbilities {
         if (player != null) pillageCheck(player, player.getGame());
     }
 
+    @ButtonHandler("fakeHiredGuns")
+    public static void fakeHiredGuns(Player player, Game game, ButtonInteractionEvent event) {
+        if (game.getActivePlayer() == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "The bot does not know who the active player is.");
+            return;
+        }
+        if (game.getActivePlayer() == player) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "The bot thinks you are the active player. You cannot sell ships to yourself.");
+            return;
+        }
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray("startHiredGuns", "Sell Ships", FactionEmojis.nokar));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " you are about to sell ships to  " +
+            game.getActivePlayer().getRepresentationNoPing() + ". Please do not do this until they finish moving, or else the buttons will get messy. " +
+            "Press the button to confirm that you wish to sell to this player and that they have finished moving. ", buttons);
+
+    }
+
+    @ButtonHandler("startHiredGuns")
+    public static void startHiredGuns(Player player, Game game, ButtonInteractionEvent event) {
+        CommanderUnlockCheckService.checkPlayer(player, "nokar");
+        ButtonHelper.deleteTheOneButton(event);
+        game.setStoredValue("hiredGunsInPlay", player.getFaction() + "_" + game.getActivePlayer().getFaction());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is using their hired guns ability to send up to three ships to the active system to fight under the command of " + game.getActivePlayer().getRepresentation() +
+            ".\nWhen the tactical action concludes, any of the sold ships in the active system will be converted into the active players ships.");
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to select up to three ships", ButtonHelper.getTilesToMoveFrom(player, game, event));
+    }
+
     public static void pillageCheck(Player player, Game game) {
         if (canBePillaged(player, game, player.getTg())) {
             Player pillager = Helper.getPlayerFromAbility(game, "pillage");

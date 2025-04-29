@@ -128,6 +128,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("qhetagent")) {
             buttons.add(Buttons.gray("getAgentSelection_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
         }
+        if (player.hasAbility("hired_guns")) {
+            buttons.add(Buttons.gray("fakeHiredGuns", "Sell Ships Via Hired Guns", FactionEmojis.nokar));
+        }
         if (player.hasUnexhaustedLeader("ghostagent")) {
             buttons.add(Buttons.gray("getAgentSelection_ghostagent", "Use Ghost Agent", FactionEmojis.Ghost));
         }
