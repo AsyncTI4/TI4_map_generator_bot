@@ -1201,6 +1201,10 @@ public class Game extends GameProperties {
 
     public void setUpPeakableObjectives(int num, int type) {
         if (type == 1) {
+            var maxSize = publicObjectives1.size() + publicObjectives1Peakable.size();
+            if (num > maxSize) {
+                num = maxSize;
+            }
             while (publicObjectives1Peakable.size() != num) {
                 if (publicObjectives1Peakable.size() > num) {
                     String id = publicObjectives1Peakable.removeLast();
@@ -1214,6 +1218,10 @@ public class Game extends GameProperties {
                 }
             }
         } else {
+            var maxSize = publicObjectives2.size() + publicObjectives2Peakable.size();
+            if (num > maxSize) {
+                num = maxSize;
+            }
             while (publicObjectives2Peakable.size() != num) {
                 if (publicObjectives2Peakable.size() > num) {
                     String id = publicObjectives2Peakable.removeLast();
