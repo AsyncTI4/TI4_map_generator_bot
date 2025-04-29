@@ -422,10 +422,10 @@ public class AgendaHelper {
         String alreadyResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty()) {
             String lastPlayerToPlayAWhen = game.getStoredValue("lastPlayerToPlayAWhen");
-            List<Player> agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrder(game);
+            List<Player> agendaAbilityResolutionOrder = Helper.getNonInitiativeOrder(game);
             if (!lastPlayerToPlayAWhen.isEmpty()) {
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAWhen), game);
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
+                agendaAbilityResolutionOrder = Helper.getNonInitiativeOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAWhen), game);
+                agendaAbilityResolutionOrder = Helper.getNonInitiativeOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
             }
             for (Player player : agendaAbilityResolutionOrder) {
                 String factionsThatHavePassedOnWhens = game.getStoredValue("declinedWhens");
@@ -488,10 +488,10 @@ public class AgendaHelper {
         String whensResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty() && !whensResolved.isEmpty()) {
             String lastPlayerToPlayAnAfter = game.getStoredValue("lastPlayerToPlayAnAfter");
-            List<Player> agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrder(game);
+            List<Player> agendaAbilityResolutionOrder = Helper.getNonInitiativeOrder(game);
             if (!lastPlayerToPlayAnAfter.isEmpty()) {
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAnAfter), game);
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
+                agendaAbilityResolutionOrder = Helper.getNonInitiativeOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAnAfter), game);
+                agendaAbilityResolutionOrder = Helper.getNonInitiativeOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
             }
             for (Player player : agendaAbilityResolutionOrder) {
                 String factionsThatHavePassedOnAfters = game.getStoredValue("declinedAfters");
@@ -3822,32 +3822,6 @@ public class AgendaHelper {
         } else {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
-    }
-
-    public static List<Player> getAgendaAbilityResolutionOrder(Game game) {
-        if (game.isOmegaPhaseMode()) {
-            List<Player> arrayPlayers = new ArrayList<Player>();
-            arrayPlayers.addAll(PriorityTrackHelper.GetPriorityTrack(game).stream().filter(Objects::nonNull).toList());
-            return arrayPlayers;
-        }
-        return Helper.getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
-
-    }
-
-    public static List<Player> getAgendaAbilityResolutionOrderFromPlayer(Player player, Game game) {
-        var votingOrder = getAgendaAbilityResolutionOrder(game);
-
-        if (player != null) {
-            Player initialFirstPlayer = votingOrder.get(0);
-            while (!votingOrder.get(0).getFaction().equalsIgnoreCase(player.getFaction())) {
-                votingOrder.add(votingOrder.remove(0));
-                if (votingOrder.get(0).getFaction().equalsIgnoreCase(initialFirstPlayer.getFaction())) {
-                    //If we loop back around, time to stop
-                    break;
-                }
-            }
-        }
-        return votingOrder;
     }
 
     @ButtonHandler("topAgenda_")

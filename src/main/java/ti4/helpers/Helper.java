@@ -243,7 +243,15 @@ public class Helper {
             return;
         }
 
-        for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
+        List<Player> players;
+        if (!game.isOmegaPhaseMode()) {
+            players = getSpeakerOrderFromThisPlayer(imperialHolder, game);
+        } else {
+            players = game.getActionPhaseTurnOrder();
+            Collections.rotate(players, -players.indexOf(imperialHolder));
+        }
+
+        for (Player player : players) {
             String message = player.getRepresentationUnfogged() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 game.drawSecretObjective(player.getUserID());
@@ -428,6 +436,34 @@ public class Helper {
         return null;
     }
 
+    public static List<Player> getNonInitiativeOrder(Game game) {
+        if (!game.isOmegaPhaseMode()) {
+            return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
+        }
+
+        List<Player> arrayPlayers = new ArrayList<Player>();
+        arrayPlayers.addAll(PriorityTrackHelper.GetPriorityTrack(game).stream().filter(Objects::nonNull).toList());
+        return arrayPlayers;
+    }
+
+    public static List<Player> getNonInitiativeOrderFromPlayer(Player player, Game game) {
+        var players = getNonInitiativeOrder(game);
+        if (player != null && players.indexOf(player) != -1) {
+            Collections.rotate(players, -players.indexOf(player));
+        }
+        return players;
+    }
+
+    public static int getPlayerNonInitiativeNumber(Player player, Game game) {
+        if (!game.isOmegaPhaseMode() && game.getSpeaker() == null) {
+            return 1;
+        } else if (game.isOmegaPhaseMode() && player.getPriorityPosition() < 1) {
+            return 1;
+        }
+        var players = getNonInitiativeOrder(game);
+        return players.indexOf(player) + 1;
+    }
+
     public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game game) {
         List<Player> players = new ArrayList<>();
         boolean found = false;
@@ -454,50 +490,50 @@ public class Helper {
         return players;
     }
 
-    public static int getPlayerSpeakerNumber(Player player, Game game) {
-        if (game.isOmegaPhaseMode()) {
-            if (player.getPriorityPosition() < 1) return 1;
-            return player.getPriorityPosition();
-        }
+    // private static int getPlayerSpeakerNumber(Player player, Game game) {
+    //     if (game.isOmegaPhaseMode()) {
+    //         if (player.getPriorityPosition() < 1) return 1;
+    //         return player.getPriorityPosition();
+    //     }
 
-        Player speaker;
-        if (game.getPlayer(game.getSpeakerUserID()) != null) {
-            speaker = game.getPlayers().get(game.getSpeakerUserID());
-        } else {
-            return 1;
-        }
-        List<Player> players = new ArrayList<>();
-        boolean found = false;
-        for (Player p2 : game.getRealPlayers()) {
-            if (p2 == speaker) {
-                found = true;
-                players.add(speaker);
-            } else {
-                if (found) {
-                    players.add(p2);
-                }
-            }
-        }
+    //     Player speaker;
+    //     if (game.getPlayer(game.getSpeakerUserID()) != null) {
+    //         speaker = game.getPlayers().get(game.getSpeakerUserID());
+    //     } else {
+    //         return 1;
+    //     }
+    //     List<Player> players = new ArrayList<>();
+    //     boolean found = false;
+    //     for (Player p2 : game.getRealPlayers()) {
+    //         if (p2 == speaker) {
+    //             found = true;
+    //             players.add(speaker);
+    //         } else {
+    //             if (found) {
+    //                 players.add(p2);
+    //             }
+    //         }
+    //     }
 
-        for (Player p2 : game.getRealPlayers()) {
-            if (p2 == speaker) {
-                found = false;
-            } else {
-                if (found) {
-                    players.add(p2);
-                }
-            }
-        }
-        int count = 1;
-        for (Player p2 : players) {
-            if (player == p2) {
-                return count;
-            } else {
-                count++;
-            }
-        }
-        return count;
-    }
+    //     for (Player p2 : game.getRealPlayers()) {
+    //         if (p2 == speaker) {
+    //             found = false;
+    //         } else {
+    //             if (found) {
+    //                 players.add(p2);
+    //             }
+    //         }
+    //     }
+    //     int count = 1;
+    //     for (Player p2 : players) {
+    //         if (player == p2) {
+    //             return count;
+    //         } else {
+    //             count++;
+    //         }
+    //     }
+    //     return count;
+    // }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         var gameMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
