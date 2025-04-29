@@ -493,7 +493,11 @@ public class PlayStrategyCardService {
         if (!game.isOmegaPhaseMode()) {
             players = Helper.getNonInitiativeOrderFromPlayer(imperialHolder, game);
         } else {
-            players = PriorityTrackHelper.GetPriorityTrack(game);
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getNonInitiativeOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
             Collections.rotate(players, -players.indexOf(imperialHolder));
         }
         if (game.isQueueSO()) {

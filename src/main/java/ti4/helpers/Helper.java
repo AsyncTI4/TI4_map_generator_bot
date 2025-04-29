@@ -247,7 +247,11 @@ public class Helper {
         if (!game.isOmegaPhaseMode()) {
             players = getSpeakerOrderFromThisPlayer(imperialHolder, game);
         } else {
-            players = game.getActionPhaseTurnOrder();
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getNonInitiativeOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
             Collections.rotate(players, -players.indexOf(imperialHolder));
         }
 
@@ -489,51 +493,6 @@ public class Helper {
         }
         return players;
     }
-
-    // private static int getPlayerSpeakerNumber(Player player, Game game) {
-    //     if (game.isOmegaPhaseMode()) {
-    //         if (player.getPriorityPosition() < 1) return 1;
-    //         return player.getPriorityPosition();
-    //     }
-
-    //     Player speaker;
-    //     if (game.getPlayer(game.getSpeakerUserID()) != null) {
-    //         speaker = game.getPlayers().get(game.getSpeakerUserID());
-    //     } else {
-    //         return 1;
-    //     }
-    //     List<Player> players = new ArrayList<>();
-    //     boolean found = false;
-    //     for (Player p2 : game.getRealPlayers()) {
-    //         if (p2 == speaker) {
-    //             found = true;
-    //             players.add(speaker);
-    //         } else {
-    //             if (found) {
-    //                 players.add(p2);
-    //             }
-    //         }
-    //     }
-
-    //     for (Player p2 : game.getRealPlayers()) {
-    //         if (p2 == speaker) {
-    //             found = false;
-    //         } else {
-    //             if (found) {
-    //                 players.add(p2);
-    //             }
-    //         }
-    //     }
-    //     int count = 1;
-    //     for (Player p2 : players) {
-    //         if (player == p2) {
-    //             return count;
-    //         } else {
-    //             count++;
-    //         }
-    //     }
-    //     return count;
-    // }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
         var gameMessages = GameMessageManager.getAll(game.getName(), GameMessageType.ACTION_CARD);
