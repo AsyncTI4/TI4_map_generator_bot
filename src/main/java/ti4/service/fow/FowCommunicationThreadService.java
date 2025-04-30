@@ -67,6 +67,11 @@ public class FowCommunicationThreadService {
             && !game.isHiddenAgendaMode();
     }
 
+    private static boolean isHiddenAgenda(Game game) {
+        return game.getPhaseOfGame().startsWith("agenda") 
+            && game.isHiddenAgendaMode();
+    }
+
     private static Set<Player> getNeighbors(Game game, Player player) {
         if (areAllowedToTalkInAgenda(game)) {
             Set<Player> allPlayers = new HashSet<>(game.getRealPlayers());
@@ -114,7 +119,11 @@ public class FowCommunicationThreadService {
             boolean threadLocked = threadName.contains(NO_CHAR);
 
             String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
-            if (areNeighbors && threadLocked) {
+            if (!threadLocked && isHiddenAgenda(game)) {
+                //Reminder of Hidden Agenda mode
+                threadChannel.getManager().setArchived(false).queue(success -> 
+                    threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda **only** speaker is allowed to speak.").queue());
+            } else if (areNeighbors && threadLocked) {
                 //Allow talking
                 threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
                     .queue(nameUpdated -> threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda

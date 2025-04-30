@@ -79,7 +79,7 @@ public class SpinRingsHelper {
      */
     public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
         String[] customSpins = customSpinString.toLowerCase().split(" ");
-        StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## " + randomStatusMessage());
+        StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## ⚙️ " + randomStatusMessage());
         List<Tile> tilesToSet = new ArrayList<>();
 
         for (String spinString : customSpins) {
@@ -127,9 +127,7 @@ public class SpinRingsHelper {
                     updateHomeSystem(game, tile);
                 }
             }
-            if (!game.isFowMode()) {
-                spunMessage(sb, ring, direction, steps);
-            }
+            spunMessage(sb, ring, direction, steps, game);
         }
 
         for (Tile tile : tilesToSet) {
@@ -199,19 +197,17 @@ public class SpinRingsHelper {
         }
         game.rebuildTilePositionAutoCompleteList();
 
-        StringBuffer sb = new StringBuffer("## " + randomStatusMessage());
-        if (!game.isFowMode()) {
-            spunMessage(sb, 1, CW, 1);
-            spunMessage(sb, 2, CCW, 2);
-            spunMessage(sb, 3, CW, 3);
-        }
+        StringBuffer sb = new StringBuffer("## ⚙️ " + randomStatusMessage());
+        spunMessage(sb, 1, CW, 1, game);
+        spunMessage(sb, 2, CCW, 2, game);
+        spunMessage(sb, 3, CW, 3, game);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
     }
 
-    private static void spunMessage(StringBuffer sb, int ring, String direction, int steps) {
+    private static void spunMessage(StringBuffer sb, int ring, String direction, int steps, Game game) {
         sb.append("\n-# Ring ").append(ring).append(" ");
-        sb.append(direction.toUpperCase()).append(" for ");
-        sb.append(steps).append(" steps.");
+        sb.append(game.isFowMode() ? "?" : direction.toUpperCase()).append(" for ");
+        sb.append(game.isFowMode() ? "?" : steps).append(" steps.");
     }
 
     private static void updateHomeSystem(Game game, Tile tile) {
