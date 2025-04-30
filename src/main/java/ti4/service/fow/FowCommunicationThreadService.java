@@ -44,14 +44,11 @@ public class FowCommunicationThreadService {
         }
     }
 
-    public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> buttons) {
+    public static void checkNewNeighbors(Game game, Player player, List<Button> buttons) {
         if (!isActive(game)) return;
 
         Set<Player> neighbors = getNeighbors(game, player);
         Map<ThreadChannel, Player> commThreadsWithPlayer = findCommThreads(game, player);
-        
-        //Check existing threads
-        validateNeighbors(player, neighbors, commThreadsWithPlayer, new HashSet<>(), game);
 
         //Check if can find neighbors without a comm thread
         Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreadsWithPlayer);
