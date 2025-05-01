@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
@@ -21,14 +22,22 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        if (!FowCommunicationThreadService.isActive(getGame())) {
+        Player player = getPlayer();
+        Game game = getGame();
+
+        if (!FowCommunicationThreadService.isActive(game)) {
             MessageHelper.replyToMessage(event, "Bot managed communication threads are not enabled.\nEnable them with `/fow fow_options`");
             return;
         }
 
-        Player player = getPlayer();
+        Player commandUser = game.getPlayer(event.getUser().getId());
+        if (player != commandUser && !game.getPlayersWithGMRole().contains(commandUser)) {
+            MessageHelper.replyToMessage(event, "Only GM can use this for another player.");
+            return;
+        }
+
         List<Button> buttons = new ArrayList<>();
-        FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(getGame(), player, buttons);
+        FowCommunicationThreadService.checkNewNeighbors(game, player, buttons);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Communication threads with neighbors checked."
             + (buttons.isEmpty() ? " No new neighbors found." : ""), buttons);
     }

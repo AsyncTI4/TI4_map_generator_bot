@@ -3408,7 +3408,9 @@ public class AgendaHelper {
         boolean action = false;
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
-            FowCommunicationThreadService.checkAllCommThreads(game);
+            if (aCount == 1) {
+               FowCommunicationThreadService.checkAllCommThreads(game);
+            }
         } else {
             action = true;
         }
