@@ -106,7 +106,8 @@ public class FOWPlusService {
     //Remove ring buttons player has no tiles they can activate
     public static void filterRingButtons(List<Button> ringButtons, Player player, Game game) {
         Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
-        if (!visiblePositions.contains("000")) {
+        Tile centerTile = game.getTileByPosition("000");
+        if (!visiblePositions.contains("000") || centerTile != null && centerTile.getTileModel() != null && centerTile.getTileModel().isHyperlane()) {
             ringButtons.removeIf(b -> b.getId().contains("ringTile_000"));
         }
         if (Collections.disjoint(visiblePositions, Arrays.asList("tl", "tr", "bl", "br"))) {
