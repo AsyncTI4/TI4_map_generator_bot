@@ -122,6 +122,18 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("gledgeagent")) {
             buttons.add(Buttons.gray("getAgentSelection_gledgeagent", "Use Gledge Agent", FactionEmojis.gledge));
         }
+        if (player.hasUnexhaustedLeader("saaragent")) {
+            buttons.add(Buttons.gray("getAgentSelection_saaragent", "Use Saar Agent", FactionEmojis.Saar));
+        }
+        if (player.hasUnexhaustedLeader("qhetagent")) {
+            buttons.add(Buttons.gray("getAgentSelection_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
+        }
+        if (player.hasAbility("hired_guns")) {
+            buttons.add(Buttons.gray("fakeHiredGuns", "Sell Ships Via Hired Guns", FactionEmojis.nokar));
+        }
+        if (player.hasUnexhaustedLeader("ghostagent")) {
+            buttons.add(Buttons.gray("getAgentSelection_ghostagent", "Use Ghost Agent", FactionEmojis.Ghost));
+        }
         if (player.getPathTokenCounter() > 0) {
             buttons.add(Buttons.gray("redistributePath", "Redistribute 1 CC With Path", FactionEmojis.uydai));
         }

@@ -319,7 +319,21 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
         AddUnitService.addUnits(event, tile, game, player.getColor(), unit + " " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " Placed a " + unit + " on " + Helper.getPlanetRepresentation(planet, game));
+            player.getFactionEmoji() + " placed a " + unit + " on " + Helper.getPlanetRepresentation(planet, game));
+    }
+
+    @ButtonHandler("qhetMechProduce_")
+    public static void qhetMechProduce(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String planet = buttonID.split("_")[1];
+        Tile tile = game.getTile(AliasHandler.resolveTile(planet));
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "2 inf " + planet);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getFactionEmoji() + " produced 2 infantry on " + Helper.getPlanetRepresentation(planet, game));
+        ButtonHelper.deleteMessage(event);
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
+        Button DoneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to Pay 1r", buttons);
     }
 
     @ButtonHandler("removeAllStructures_")
@@ -1509,7 +1523,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 ActionCardHelper.sendActionCardInfo(game, player);
                 String message = "Use buttons to end turn or do another action.";
                 if (stalling) {
-                    if (player.hasUnit("yssaril_mech") && !ButtonHelper.isLawInPlay(game, "regulations")
+                    if (player.hasUnit("yssaril_mech") && !ButtonHelper.isLawInPlay(game, "articles_war")
                         && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
                         String message3 = "Use buttons to drop 1 mech on a planet or decline";
                         List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game,

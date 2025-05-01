@@ -371,6 +371,15 @@ public class ButtonHelperTacticalAction {
             FOWPlusService.resolveVoidActivation(player, game);
             message = "All units were lost.";
         }
+
+        if (player != game.getActivePlayer() && player.hasAbility("hired_guns") && !game.getStoredValue("hiredGunsInPlay").isEmpty()) {
+            ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " moved the ships to the active system. If a combat is underway," +
+                " press refresh picture to see the ships. \nWhen the active player rolls dice or assigns hits, they should be able to use these hired ships. "
+                + "\nWhen the player concludes the tactical action, these ships will automatically be replaced with the active players.");
+            return;
+        }
         List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
 
         List<Button> systemButtons;

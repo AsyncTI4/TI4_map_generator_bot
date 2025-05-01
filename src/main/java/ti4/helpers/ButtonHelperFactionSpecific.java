@@ -1449,6 +1449,21 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    @ButtonHandler("qhetInfRevival_")
+    public static void qhetInfRevival(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        if (player.getStasisInfantry() < 1) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getFactionEmoji() + " is out of infantry to revive.");
+            return;
+        }
+        Tile tile = game.getTile(AliasHandler.resolveTile(planet));
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
+        player.setStasisInfantry(player.getStasisInfantry() - 1);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game) + ". They have " + player.getStasisInfantry() + " infantry left to revive.");
+    }
+
     @ButtonHandler("deployMykoSD_")
     public static void deployMykoSD(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];

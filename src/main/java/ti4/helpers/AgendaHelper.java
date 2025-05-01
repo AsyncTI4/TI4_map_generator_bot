@@ -921,7 +921,7 @@ public class AgendaHelper {
         }
         for (Player player : game.getRealPlayers()) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts")
+                if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts") || p2.hasAbility("data_recovery")
                     || p2.hasAbility("fine_print") || p2.getDebtTokenCount(player.getColor()) < 1) {
                     continue;
                 }
@@ -3135,7 +3135,8 @@ public class AgendaHelper {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         Button flipNextAgenda = Buttons.blue("flip_agenda", "Flip Agenda #" + aCount);
-        List<Button> resActionRow = Arrays.asList(flipNextAgenda);
+        List<Button> resActionRow = new ArrayList<>();
+        resActionRow.add(flipNextAgenda);
         if (!game.isOmegaPhaseMode()) {
             Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
                 "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
