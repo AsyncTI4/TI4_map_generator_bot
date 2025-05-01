@@ -6212,7 +6212,7 @@ public class ButtonHelper {
     public static void acceptPath(ButtonInteractionEvent event, Game game, Player player) {
         deleteMessage(event);
 
-        player.setPathTokenCounter(Math.min(6, player.getPathTokenCounter() + 1));
+        player.setPathTokenCounter(Math.min(8, player.getPathTokenCounter() + 1));
         String msg1 = player.getRepresentation() + " chose to accept the path. Their current path token count is "
             + player.getPathTokenCounter();
         if (player.getPlanets().contains("uikos")) {

@@ -214,9 +214,9 @@ public class CombatRollService {
                     if (opponent.hasTech("vpw")) {
                         msg = player.getRepresentationUnfogged() + " you got hit by _Valkyrie Particle Weave_. You may autoassign 1 hit.";
                         buttons = new ArrayList<>();
-                        buttons.add(Buttons.green(opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                        buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat", "Manually Assign Hit" + (h == 1 ? "" : "s")));
-                        buttons.add(Buttons.gray(opponent.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_1", "Cancel a Hit"));
+                        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_1", "Cancel a Hit"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                     }
                 } else {
