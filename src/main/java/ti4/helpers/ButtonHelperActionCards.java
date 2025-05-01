@@ -1381,6 +1381,9 @@ public class ButtonHelperActionCards {
                 player.getRepresentationUnfogged() + " has melted the space dock that used to belong to "
                     + p2.getRepresentationUnfogged() + " in " + tile.getRepresentation() + ".");
         }
+        if (p2.hasAbility("data_recovery")) {
+            ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+        }
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1697,6 +1700,11 @@ public class ButtonHelperActionCards {
         if (amountToKill > 3) {
             amountToKill = 3;
         }
+        if (amountToKill > 0) {
+            if (p2.hasAbility("data_recovery")) {
+                ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+            }
+        }
         if (p2.hasInf2Tech()) {
             ButtonHelper.resolveInfantryDeath(p2, amountToKill);
             boolean cabalMech = false;
@@ -1819,6 +1827,11 @@ public class ButtonHelperActionCards {
                 && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, hits, "infantry", event);
             }
+            if (hits > 0) {
+                if (p2.hasAbility("data_recovery")) {
+                    ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+                }
+            }
         }
         String adjective = "";
         if (amount >= 5) {
@@ -1898,6 +1911,9 @@ public class ButtonHelperActionCards {
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), p2.getColor());
             var unit = new ParsedUnit(key, amount, planet);
             RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, unit);
+            if (p2.hasAbility("data_recovery")) {
+                ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+            }
         }
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
