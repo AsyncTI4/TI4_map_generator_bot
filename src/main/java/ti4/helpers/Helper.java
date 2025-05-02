@@ -248,7 +248,7 @@ public class Helper {
             players = getSpeakerOrderFromThisPlayer(imperialHolder, game);
         } else {
             if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getNonInitiativeOrder(game);
+                players = Helper.getSpeakerOrPriorityOrder(game);
             } else {
                 players = game.getActionPhaseTurnOrder();
             }
@@ -440,7 +440,7 @@ public class Helper {
         return null;
     }
 
-    public static List<Player> getNonInitiativeOrder(Game game) {
+    public static List<Player> getSpeakerOrPriorityOrder(Game game) {
         if (!game.isOmegaPhaseMode()) {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
@@ -450,21 +450,21 @@ public class Helper {
         return arrayPlayers;
     }
 
-    public static List<Player> getNonInitiativeOrderFromPlayer(Player player, Game game) {
-        var players = getNonInitiativeOrder(game);
+    public static List<Player> getSpeakerOrPriorityOrderFromPlayer(Player player, Game game) {
+        var players = getSpeakerOrPriorityOrder(game);
         if (player != null && players.indexOf(player) != -1) {
             Collections.rotate(players, -players.indexOf(player));
         }
         return players;
     }
 
-    public static int getPlayerNonInitiativeNumber(Player player, Game game) {
+    public static int getPlayerSpeakerOrPriorityNumber(Player player, Game game) {
         if (!game.isOmegaPhaseMode() && game.getSpeaker() == null) {
             return 1;
         } else if (game.isOmegaPhaseMode() && player.getPriorityPosition() < 1) {
             return 1;
         }
-        var players = getNonInitiativeOrder(game);
+        var players = getSpeakerOrPriorityOrder(game);
         return players.indexOf(player) + 1;
     }
 
