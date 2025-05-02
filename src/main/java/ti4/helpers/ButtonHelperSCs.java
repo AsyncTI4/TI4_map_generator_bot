@@ -222,10 +222,10 @@ public class ButtonHelperSCs {
         }
         List<Player> players;
         if (!game.isOmegaPhaseMode()) {
-            players = Helper.getNonInitiativeOrderFromPlayer(imperialHolder, game);
+            players = Helper.getSpeakerOrPriorityOrderFromPlayer(imperialHolder, game);
         } else {
             if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getNonInitiativeOrder(game);
+                players = Helper.getSpeakerOrPriorityOrder(game);
             } else {
                 players = game.getActionPhaseTurnOrder();
             }
