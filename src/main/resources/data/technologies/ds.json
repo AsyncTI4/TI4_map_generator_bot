@@ -337,7 +337,7 @@
         "requirements": "G",
         "faction": "kjalengard",
         "source": "ds",
-        "text": "At the start of combat in a system that contains a Glory token, gain 1 trade good.\nAfter a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice.",
+        "text": "Once per action, after a player produces 1 or more hits during a round of combat in a system that contains a Glory token, gain 1 trade good.\nAfter a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice.",
         "shortName": "Zhrgar Stimul'nts",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/zhrgar_stimulants.png?raw=true"
     },
