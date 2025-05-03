@@ -730,7 +730,7 @@
         "name": "Refabrication",
         "phase": "Any",
         "window": "After 1 of your non-fighter ships is destroyed",
-        "text": "Produce 1 ship of that type in a system that contains 1 of your units with PRODUCTION; reduce the cost of the produced ship by up to 4.",
+        "text": "Produce 1 ship of that type in a different system that contains 1 of your units with PRODUCTION; reduce the cost of the produced ship by up to 4.",
         "flavorText": "The production of the Van Hauge VI was completed in record time. As it left the docking bay, Dannel smiled—a rare occurrence these days. \"Glory to the Yin, my brothers. You have done us all proud.\"",
         "source": "action_deck_2"
     },

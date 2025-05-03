@@ -1,6 +1,5 @@
 package ti4.helpers;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,9 +15,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SequenceWriter;
+import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
@@ -36,7 +34,6 @@ import ti4.website.WebsiteOverlay;
 
 public class WebHelper {
 
-    private static final int STAT_BATCH_SIZE = 200;
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final S3AsyncClient s3AsyncClient = S3AsyncClient.builder().region(Region.US_EAST_1).build();
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -102,70 +99,42 @@ public class WebHelper {
     public static void putStats() {
         if (!sendingToWeb()) return;
 
-        String bucket = webProperties.getProperty("bucket");
-        if (bucket == null || bucket.isEmpty()) {
-            BotLogger.error("S3 bucket not configured.");
-            return;
-        }
-
+        List<GameStatsDashboardPayload> payloads = new ArrayList<>();
         List<String> badGames = new ArrayList<>();
-        int eligible = 0;
-        int uploaded = 0;
-        int currentBatchSize  = 0;
+        int count = 0;
 
-        try (var outputStream = new ByteArrayOutputStream(64 * 1024);
-            JsonGenerator jsonGenerator  = objectMapper.getFactory().createGenerator(outputStream)) {
-            jsonGenerator.writeStartArray(); // Writes "["
-
-            try (SequenceWriter sequenceWriter = objectMapper.writer().writeValues(jsonGenerator)) {
-                for (ManagedGame managedGame : GameManager.getManagedGames()) {
-                    if (managedGame.getRound() <= 2 && (!managedGame.isHasEnded() || !managedGame.isHasWinner())) {
-                        continue;
-                    }
-
-                    eligible++;
-
-                    try {
-                        sequenceWriter.write(new GameStatsDashboardPayload(managedGame.getGame()));
-                        uploaded++;
-                        currentBatchSize++;
-                        if (currentBatchSize == STAT_BATCH_SIZE) {
-                            sequenceWriter.flush();
-                            jsonGenerator.flush();
-                            currentBatchSize = 0;
-                        }
-                    } catch (Exception ex) {
-                        badGames.add(managedGame.getName());
-                        BotLogger.error(
-                            "Failed to create GameStatsDashboardPayload for game: `" + managedGame.getName() + '`', ex);
-                    }
+        for (ManagedGame managedGame : GameManager.getManagedGames()) {
+            if (managedGame.getRound() > 2 || managedGame.isHasEnded() && managedGame.isHasWinner()) {
+                count++;
+                try {
+                    var game = managedGame.getGame();
+                    GameStatsDashboardPayload payload = new GameStatsDashboardPayload(game);
+                    objectMapper.writeValueAsString(payload);
+                    payloads.add(new GameStatsDashboardPayload(game));
+                } catch (Exception e) {
+                    badGames.add(managedGame.getName());
+                    BotLogger.error("Failed to create GameStatsDashboardPayload for game: `" + managedGame.getName() + "`", e);
                 }
             }
+        }
 
-            jsonGenerator.writeEndArray(); // Writes "]"
-            jsonGenerator.flush();
+        String message = "# Statistics Upload\nOut of " + count + " eligible games, the statistics of " + payloads.size() + " games are being uploaded to the web server.";
+        if (count != payloads.size()) message += "\nBad Games:\n- " + StringUtils.join(badGames, "\n- ");
+        BotLogger.info(message);
 
-            String msg = "# Statistics Upload\nOut of " + eligible + " eligible games, the statistics of "
-                + uploaded + " games are being uploaded to the web server.";
-            if (eligible != uploaded) {
-                msg += "\nBad Games (first 10):\n- " + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));
-            }
-            BotLogger.info(msg);
-
-            PutObjectRequest req = PutObjectRequest.builder()
-                .bucket(bucket)
+        try {
+            String json = objectMapper.writeValueAsString(payloads);
+            PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(webProperties.getProperty("bucket"))
                 .key("statistics/statistics.json")
                 .contentType("application/json")
                 .cacheControl("no-cache, no-store, must-revalidate")
                 .build();
 
-            s3AsyncClient.putObject(req, AsyncRequestBody.fromBytes(outputStream.toByteArray()))
-                .whenComplete((result, ex) -> {
-                    if (ex != null) {
-                        BotLogger.error("Failed to upload game stats to S3.", ex);
-                    } else {
-                        BotLogger.info("Statistics upload complete.");
-                    }
+            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
+                .exceptionally(e -> {
+                    BotLogger.error("An exception occurred while performing an async send of game stats to the website.", e);
+                    return null;
                 });
         } catch (Exception e) {
             BotLogger.error("Could not put statistics to web server", e);
