@@ -1051,6 +1051,7 @@ public class StartCombatService {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "cheiranCommanderBlock_hm", "Block with Cheiran Commander", FactionEmojis.cheiran));
         }
+
         if (p1.hasTechReady("absol_x89") && isGroundCombat && p1 != game.getActivePlayer()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.green(finChecker + "exhaustTech_absol_x89", "X-89 Bacterial Weapon", TechEmojis.BioticTech));
@@ -1082,6 +1083,11 @@ public class StartCombatService {
                         String id = p.finChecker() + "utilizeSolCommander_" + unitH.getName();
                         String label = "Use Sol Commander on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Sol));
+                    }
+                    if (p.hasUnit("atokera") && isGroundCombat && p.getReadiedPlanets().contains(unitH.getName()) && unitH.getUnitCount(UnitType.Mech, p) > 0) {
+                        String id = p.finChecker() + "utilizeAtokeraMech_" + unitH.getName();
+                        String label = "Use Atokera Mech Ability on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, FactionEmojis.atokera));
                     }
                     if (p != game.getActivePlayer() && p.hasLeaderUnlocked("pharadnhero") && isGroundCombat && (unitH.getUnitCount(UnitType.Pds, p) > 0 || unitH.getUnitCount(UnitType.Spacedock, p) > 0)) {
                         String id = p.finChecker() + "utilizePharadnHero_" + unitH.getName();

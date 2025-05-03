@@ -25,7 +25,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -331,12 +330,12 @@ public class PlayStrategyCardService {
                         p2.addFollowedSC(scToPlay, event);
                         if (scToPlay == 8) {
                             String key3 = "potentialBlockers";
-                            if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-                                game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
                             }
 
                             String key = "factionsThatAreNotDiscardingSOs";
-                            game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
+                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
                         }
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
                             + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");

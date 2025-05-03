@@ -21,7 +21,7 @@ public class SusSlashCommandService {
 
     private static final List<String> HARMLESS_COMMANDS = List.of(
         Constants.HELP, Constants.STATISTICS, Constants.BOTHELPER, Constants.DEVELOPER, Constants.SEARCH, Constants.USER, Constants.SHOW_GAME,
-        Constants.CARDS_INFO, Constants.MILTY, Constants.BUTTON, "tigl", "map");
+        Constants.CARDS_INFO, Constants.MILTY, Constants.BUTTON, "tigl", "map", "all_info");
 
     private static final List<String> HARMLESS_SUBCOMMANDS = List.of(
         Constants.INFO, Constants.CREATE_GAME_BUTTON, "po_info", Constants.DICE_LUCK, Constants.SHOW_AC_DISCARD_LIST, "show_deck",

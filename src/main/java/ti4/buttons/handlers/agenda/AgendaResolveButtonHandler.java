@@ -73,6 +73,7 @@ class AgendaResolveButtonHandler {
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         String agID = "";
         List<Player> predictiveCheck = AgendaHelper.getLosingVoters(winner, game);
+        AgendaHelper.atokeraCommanderUnlockCheck(game);
         for (Player playerWL : predictiveCheck) {
             if (game.getStoredValue("riskedPredictive").contains(playerWL.getFaction())
                 && playerWL.hasTech("pi")) {
@@ -1020,6 +1021,12 @@ class AgendaResolveButtonHandler {
                 }
             } else {
                 message = rep + " you have a Rider to resolve.";
+
+            }
+            if (rid.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "cruiser", true) < 8) {
+                MessageHelper.sendMessageToChannel(rid.getCorrectChannel(), rid.getFactionEmoji() + " gets deploy 1 cruiser to a system that contains their ships.");
+                List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(rid, game, "cruiser", "placeOneNDone_skipbuild"));
+                MessageHelper.sendMessageToChannelWithButtons(rid.getCorrectChannel(), "Use buttons to deploy 1 cruiser to a system that contains your ships.", buttons);
             }
             if (game.isFowMode()) {
                 MessageHelper.sendPrivateMessageToPlayer(rid, game, message);

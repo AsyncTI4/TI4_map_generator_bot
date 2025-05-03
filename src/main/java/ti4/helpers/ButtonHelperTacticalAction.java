@@ -686,17 +686,17 @@ public class ButtonHelperTacticalAction {
             && !tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
             String msg = player.getRepresentationUnfogged()
                 + " automatically added 1 frontier token to the system due to the Particle Sieve (the Mortheus flagship).";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
 
         List<Button> button3 = ButtonHelperAgents.getL1Z1XAgentButtons(game, player);
         if (player.hasUnexhaustedLeader("l1z1xagent") && !button3.isEmpty() && !game.isL1Hero()) {
             String msg = player.getRepresentationUnfogged() + ", you can use buttons to resolve " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "I48S, the L1Z1Z" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, if you so wish.";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, button3);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button3);
         }
 
         if (tile.isAnomaly() && player.getCommodities() < player.getCommoditiesTotal() && player.getActionCards().containsKey("harness")) {
@@ -730,20 +730,20 @@ public class ButtonHelperTacticalAction {
         }
 
         // Send buttons to move
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you wish to move from.", systemButtons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Use buttons to select the first system you wish to move from.", systemButtons);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {
             List<Button> buttons = ButtonHelperFactionSpecific.getRohDhnaRecycleButtons(game, player);
             if (!buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     "Use buttons to select which unit to recycle", buttons);
             }
         }
         if (player.hasRelic("absol_plenaryorbital") && !tile.isHomeSystem() && !tile.isMecatol() && !player.hasUnit("plenaryorbital")) {
             List<Button> buttons4 = ButtonHelper.getAbsolOrbitalButtons(game, player);
             if (!buttons4.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     "You can place down the _Plenary Orbital_.",
                     buttons4);
             }
