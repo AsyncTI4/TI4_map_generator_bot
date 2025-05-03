@@ -1,25 +1,25 @@
 {
-    "id": "phar",
-    "tileId": "br2",
-    "name": "Phar",
+    "id": "magna",
+    "tileId": "br4",
+    "name": "Magna",
     "aliases": [
-        "phar",
-        "pharadn"
+        "magna",
+        "atokera"
     ],
     "positionInTile": {
         "x": 170.0,
         "y": 128.0
     },
-    "resources": 1,
-    "influence": 0,
-    "factionHomeworld": "pharadn",
+    "resources": 4,
+    "influence": 4,
+    "factionHomeworld": "atokera",
     "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
     "unitPositions": {
-        "unitHolderName": "phar",
+        "unitHolderName": "magna",
         "coordinateMap": {
             "control": [
                 {

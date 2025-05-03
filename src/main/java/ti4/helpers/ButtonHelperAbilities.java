@@ -1193,6 +1193,20 @@ public class ButtonHelperAbilities {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to select up to three ships", ButtonHelper.getTilesToMoveFrom(player, game, event));
     }
 
+    @ButtonHandler("startSimultaneousTacticalAction")
+    public static void startSimultaneousTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
+        ButtonHelper.deleteTheOneButton(event);
+        if (game.getActivePlayer() == null || game.getActivePlayer() == player || !player.getAllianceMembers().contains(game.getActivePlayer().getFaction())) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find a correct active player, please resolve manually");
+            return;
+        }
+        game.setStoredValue("allianceModeSimultaneousAction", player.getFaction() + "_" + game.getActivePlayer().getFaction());
+        ButtonHelperTacticalAction.selectActiveSystem(player, game, event, "ringTile_" + game.getActiveSystem());
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is doing a simultaenous tactical action with " + game.getActivePlayer().getRepresentation());
+        //MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to move ships", ButtonHelper.getTilesToMoveFrom(player, game, event));
+    }
+
     public static void pillageCheck(Player player, Game game) {
         if (canBePillaged(player, game, player.getTg())) {
             Player pillager = Helper.getPlayerFromAbility(game, "pillage");

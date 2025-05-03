@@ -454,7 +454,9 @@
             "dspharinf",
             "dspharb",
             "dsqhetinf",
-            "dsqhetcr"
+            "dsqhetcr",
+            "dsatokcr",
+            "dsatoky"
         ],
         "source": "ds"
     }

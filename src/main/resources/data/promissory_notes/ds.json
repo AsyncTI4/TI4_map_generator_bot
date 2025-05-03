@@ -410,5 +410,14 @@
         "playArea": false,
         "source": "ds",
         "text": "At the start of a round of combat: During this round of combat, up to 2 hits you produce cannot be canceled. [Note: this means that sustain damage cannot be used against these hits.] After that round of combat, return this card to the Qhet player."
+    },
+    {
+        "alias": "dspnatok",
+        "name": "Tri-Weave Shielding",
+        "faction": "atokera",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "At the start of invasion: Choose 1 unit you control in the active system; that unit gains PLANETARY SHIELD until the end of this action. Then, return this card to the Atokera player."
     }
 ]

@@ -61,6 +61,17 @@ import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperFactionSpecific {
 
+    @ButtonHandler("utilizeAtokeraMech_")
+    public static void utilizeAtokeraMech(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        ButtonHelper.deleteTheOneButton(event);
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        player.exhaustPlanet(planet);
+        unitHolder.removeAllUnitDamage(player.getColor());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmoji() + " repaired all of their units on " + Helper.getPlanetRepresentation(planet, game) + " by exhausting the planet (using the Atokera Mech Ability).");
+    }
+
     @ButtonHandler("gloryTech")
     public static void getTechFromGlory(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
