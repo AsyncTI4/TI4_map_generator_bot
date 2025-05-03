@@ -48,12 +48,12 @@ public class DiceLuckService {
             .filter(entry -> entry.getValue().getKey() > minimumExpectedHits && entry.getValue().getValue() > 0)
             .sorted(comparator)
             .limit(topLimit)
-            .forEach(entry  -> {
+            .forEach(entry -> {
                 var user = GameManager.getManagedPlayer(entry.getKey());
                 double expectedHits = entry.getValue().getKey();
                 int actualHits = entry.getValue().getValue();
                 if (expectedHits > 0 && actualHits > 0) {
-                    appendDiceLuck(sb, index, user.getName(), expectedHits, actualHits);
+                    appendDiceLuck(sb, index, user.getName(), expectedHits, actualHits, true);
                 }
             });
 
@@ -73,6 +73,10 @@ public class DiceLuckService {
         for (ManagedGame game : userGames) {
             getDiceLuckForGame(game.getGame(), playerDiceLucks, new HashMap<>());
         }
+        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
+        for (ManagedGame game : userGames) {
+            AverageTurnTimeService.getAverageTurnTimeForGame(game.getGame(), playerTurnTimes, new HashMap<>());
+        }
 
         StringBuilder sb = new StringBuilder();
         AtomicInteger index = new AtomicInteger(1);
@@ -82,8 +86,10 @@ public class DiceLuckService {
             if (expectedHitsToActualHits == null) continue;
             double expectedHits = expectedHitsToActualHits.getKey();
             int actualHits = expectedHitsToActualHits.getValue();
+            int turnCount = playerTurnTimes.get(user.getId()).getKey();
             if (expectedHits != 0 && actualHits != 0) {
-                appendDiceLuck(sb, index, user.getEffectiveName(), expectedHits, actualHits);
+                appendDiceLuck(sb, index, user.getEffectiveName(), expectedHits, actualHits, false);
+                appendDicePerTurn(sb, index, user.getEffectiveName(), expectedHits, turnCount);
             }
         }
         return sb.toString();
@@ -97,19 +103,19 @@ public class DiceLuckService {
 
         GamesPage.consumeAllGames(
             endedGamesFilter,
-            game -> getDiceLuckForGame(game, playerDiceLucks, playerAverageDiceLucks)
-        );
+            game -> getDiceLuckForGame(game, playerDiceLucks, playerAverageDiceLucks));
 
         return playerDiceLucks;
     }
 
-    private void getDiceLuckForGame(Game game, Map<String, Map.Entry<Double, Integer>> playerDiceLucks,
-                            Map<String, Set<Double>> playerAverageDiceLucks) {
+    private void getDiceLuckForGame(
+        Game game, Map<String, Map.Entry<Double, Integer>> playerDiceLucks,
+        Map<String, Set<Double>> playerAverageDiceLucks
+    ) {
         for (Player player : game.getRealPlayers()) {
             Map.Entry<Double, Integer> playerDiceLuck = Map.entry(player.getExpectedHitsTimes10() / 10.0, player.getActualHits());
             playerDiceLucks.merge(player.getUserID(), playerDiceLuck,
-                (oldEntry, newEntry) ->
-                    Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
+                (oldEntry, newEntry) -> Map.entry(oldEntry.getKey() + playerDiceLuck.getKey(), oldEntry.getValue() + playerDiceLuck.getValue()));
 
             if (playerDiceLuck.getKey() == 0) continue;
             Double averageDiceLuck = playerDiceLuck.getValue() / playerDiceLuck.getKey();
@@ -121,12 +127,24 @@ public class DiceLuckService {
         }
     }
 
-    private void appendDiceLuck(StringBuilder sb, AtomicInteger index, String playerName, double expectedHits, int actualHits) {
+    private void appendDiceLuck(StringBuilder sb, AtomicInteger index, String playerName, double expectedHits, int actualHits, boolean newLine) {
         double averageDiceLuck = actualHits / expectedHits;
         sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
         sb.append(String.format("%.2f", averageDiceLuck));
         sb.append("` ").append(playerName);
         sb.append("   [").append(actualHits).append("/").append(String.format("%.1f", expectedHits)).append(" actual/expected]");
+        if (newLine) {
+            sb.append("\n");
+        }
+        index.getAndIncrement();
+    }
+
+    private void appendDicePerTurn(StringBuilder sb, AtomicInteger index, String playerName, double expectedHits, int turns) {
+        double averageDiceLuck = expectedHits / turns;
+        sb.append("`").append(Helper.leftpad(String.valueOf(index.get()), 3)).append(". ");
+        sb.append(String.format("%.2f", averageDiceLuck));
+        sb.append("` ").append(playerName);
+        sb.append("   [").append(String.format("%.1f", expectedHits)).append("/").append(turns).append(" expected hits/turns]");
         sb.append("\n");
         index.getAndIncrement();
     }
