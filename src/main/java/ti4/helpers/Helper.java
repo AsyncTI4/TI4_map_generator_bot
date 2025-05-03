@@ -1343,6 +1343,12 @@ public class Helper {
                 if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValue++;
                 }
+                if (productionValue > 0 && player.hasAbility("synthesis")) {
+                    productionValue++;
+                }
+                if (unitModel.getBaseType().equalsIgnoreCase("cruiser") && player.hasUnit("atokera_cruiser") && player.hasAbility("synthesis")) {
+                    productionValue++;
+                }
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
         }
@@ -1366,6 +1372,9 @@ public class Helper {
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
                 planetUnitVal = 2;
             }
 
@@ -1376,6 +1385,9 @@ public class Helper {
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
             }
             if (token.contains("facilitycorefactory")) {
                 planetUnitVal += 1;
@@ -1383,11 +1395,17 @@ public class Helper {
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
             }
             if (token.contains("facilitynavalbase")) {
                 planetUnitVal += 3;
                 productionValueTotal += 3;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
                     productionValueTotal++;
                 }
             }
@@ -1408,6 +1426,9 @@ public class Helper {
             if (player.hasRelic("boon_of_the_cerulean_god")) {
                 productionValueTotal++;
             }
+            if (player.hasAbility("synthesis")) {
+                productionValueTotal++;
+            }
         } else {
             if (player.hasTech("absol_ie") && planetUnitVal < 1 && player.getPlanets().contains(uH.getName())) {
                 productionValueTotal += 1;
@@ -1420,6 +1441,14 @@ public class Helper {
                     && player.hasTech("dsbentg") && planetUnitVal < 1
                     && (!uH.getTokenList().isEmpty() || (Mapper.getPlanet(planet).getTechSpecialties() != null
                         && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty()))) {
+                    productionValueTotal += 1;
+                    if (player.hasRelic("boon_of_the_cerulean_god")) {
+                        productionValueTotal++;
+                    }
+                    planetUnitVal = 1;
+                }
+                if (player.getReadiedPlanets().contains(uH.getName())
+                    && player.hasAbility("synthesis") && planetUnitVal < 1) {
                     productionValueTotal += 1;
                     if (player.hasRelic("boon_of_the_cerulean_god")) {
                         productionValueTotal++;
