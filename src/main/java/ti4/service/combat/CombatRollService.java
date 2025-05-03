@@ -650,7 +650,7 @@ public class CombatRollService {
             }
             if (!player.getAllianceMembers().isEmpty() && opponent != null && player.getAllianceMembers().contains(opponent.getFaction())) {
                 for (Player p2 : opponents) {
-                    if (p2 != player && player.getAllianceMembers().contains(p2.getFaction())) {
+                    if (p2 != player && !player.getAllianceMembers().contains(p2.getFaction())) {
                         opponent = p2;
                     }
                 }

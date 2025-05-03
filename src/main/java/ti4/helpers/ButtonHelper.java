@@ -957,7 +957,7 @@ public class ButtonHelper {
                         + " by pressing this button. Please do not press this button until your alliance partner finishes moving, or else there could be a mess. Do announce that you intend to press it asap though so that others know.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.gray("startSimultaneousTacticalAction", "Do Simultaneous Action in " + activeSystem.getRepresentationForButtons()));
-                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
         }

@@ -730,7 +730,7 @@ public class ButtonHelperTacticalAction {
         }
 
         // Send buttons to move
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to select the first system you wish to move from.", systemButtons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Use buttons to select the first system you wish to move from.", systemButtons);
 
         // Resolve other abilities
         if (player.hasAbility("recycled_materials")) {
