@@ -932,5 +932,28 @@
         "baseUpgrade": "cr2",
         "source": "ds",
         "text": "Cost 2, Combat 6, Move 3, Capacity 2\nIf the active system contains another player's units, this unit may move through systems that contain ships controlled by different other players."
+    },
+    {
+        "alias": "dsatokcr",
+        "name": "Mirrorshard II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GRY",
+        "faction": "atokera",
+        "baseUpgrade": "cr2",
+        "source": "ds",
+        "text": "Cost 2, Combat 6, Move 3, Capacity 1, Production 1\nDEPLOY: During the agenda phase, after an outcome you voted for or predicted is resolved, place up to 1 cruiser in a system that contains your ships. "
+    },
+    {
+        "alias": "dsatoky",
+        "name": "Modular Designs",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "atokera",
+        "source": "ds",
+        "text": "Once during each of your actions, choose 1 of your units and 1 unit ability. That unit gains that unit ability with a value of 3, if applicable, until the end of that action. [Note: not currently automated by the bot]"
     }
 ]

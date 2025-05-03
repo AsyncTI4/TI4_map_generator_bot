@@ -878,5 +878,19 @@
         "window": "After you win a combat as the attacker",
         "windowEffect": "You may remove 2 of your opponent’s control tokens from your faction sheet to draw 1 secret objective, or 5 of those tokens to gain 1 command token and take 1 of their unscored secret objectives. ",
         "source": "ds"
+    },
+    {
+        "id": "synthesis",
+        "name": "Synthesis",
+        "faction": "atokera",
+        "permanentEffect": "Readied planets you control have PLANETARY SHIELD and PRODUCTION 0 as if they were units. Apply +1 to the PRODUCTION value of each of your units with PRODUCTION. ",
+        "source": "ds"
+    },
+    {
+        "id": "living_metals",
+        "name": "Living Metals",
+        "faction": "atokera",
+        "permanentEffect": "Agenda outcomes and action cards that have component actions cannot remove or destroy your units, or place other player’s units on planets you control. [Note: protects against ixthian] ",
+        "source": "ds"
     }
 ]

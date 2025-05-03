@@ -1,0 +1,14 @@
+{
+    "tileBack":"green",
+    "id": "01",
+    "name": "Magna - Atokera",
+    "aliases": [
+        "magna",
+        "atokera"
+    ],
+    "imagePath": "BR4_Magna.png",
+    "shipPositionsType": "TYPE01",
+    "wormholes": [],
+    "planets": ["magna"],
+    "source": "base"
+}

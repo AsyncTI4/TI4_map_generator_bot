@@ -938,6 +938,9 @@ public class ButtonHelperHeroes {
                     if (p2.hasInf2Tech()) {
                         ButtonHelper.resolveInfantryDeath(p2, amountInf);
                     }
+                    if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
+                        ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
+                    }
                     if (amountInf > 0) {
                         RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
                     }
@@ -948,13 +951,13 @@ public class ButtonHelperHeroes {
                     if (amountFF + amountInf > 0) {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                             p2.getRepresentation()
-                                + " heads up, a tile with your units in it got Armageddon'd by Gurno Aggero, the Saar hero, removing all fighters and infantry.");
+                                + " heads up, a tile with your units in it got Armageddon'd by Gurno Aggero, the Saar hero, destroying all fighters and infantry.");
                     }
                 }
 
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " removed all opposing infantry and fighters in "
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " destroyed all opposing infantry and fighters in "
             + tile.getRepresentationForButtons(game, player) + " using Gurno Aggero, the Saar hero.");
         ButtonHelper.deleteMessage(event);
     }

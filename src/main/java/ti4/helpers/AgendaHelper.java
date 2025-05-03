@@ -43,7 +43,6 @@ import ti4.cron.AutoPingCron;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -75,6 +74,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 
@@ -1868,7 +1868,7 @@ public class AgendaHelper {
                         }
                     }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight")
-                        || specificVote.contains("Radiance") || specificVote.contains("Tarrock Ability"))) {
+                        || winningR.hasTech("dsatokcr") || specificVote.contains("Radiance") || specificVote.contains("Tarrock Ability"))) {
 
                         MessageChannel channel = winningR.getCorrectChannel();
                         String identity = winningR.getRepresentationUnfogged();
@@ -2028,6 +2028,19 @@ public class AgendaHelper {
                                 UnitType.Mech);
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, game, tiles);
                         }
+                        if (specificVote.contains("Atokera Commander")) {
+                            if (!AgendaHelper.getWinningVoters(winner, game).contains(winningR) && !AgendaHelper.getLosingVoters(winner, game).contains(winningR)) {
+                                List<Button> buttons = ButtonHelper.getGainCCButtons(winningR);
+                                String message = identity + ", your current command tokens are "
+                                    + winningR.getCCRepresentation()
+                                    + ". Use buttons to gain command tokens.";
+                                game.setStoredValue("originalCCsFor" + winningR.getFaction(),
+                                    winningR.getCCRepresentation());
+                                MessageHelper.sendMessageToChannel(channel,
+                                    identity + " resolve Atokera Commander by using the button to gain 1 command token.");
+                                MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                            }
+                        }
                         if (specificVote.contains("Tarrock Ability")) {
                             String message = winningR.getFactionEmoji() + " drew a secret objective.";
                             game.drawSecretObjective(winningR.getUserID());
@@ -2172,6 +2185,44 @@ public class AgendaHelper {
             }
         }
         return losers;
+    }
+
+    public static void atokeraCommanderUnlockCheck(Game game) {
+        Map<String, String> outcomes = game.getCurrentAgendaVotes();
+        Player highestVoter = null;
+        int highestVote = 0;
+
+        for (String outcome : outcomes.keySet()) {
+            StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+
+            while (vote_info.hasMoreTokens()) {
+                String specificVote = vote_info.nextToken();
+                String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                Player voter = game.getPlayerFromColorOrFaction(faction.toLowerCase());
+                if (voter != null) {
+                    if (!specificVote.contains("Rider")
+                        && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity") && !specificVote.contains("Ability")) {
+                        try {
+                            int vote = Integer.parseInt(specificVote.split("_")[1]);
+                            if (vote == highestVote) {
+                                highestVoter = null;
+                            } else {
+                                if (vote > highestVote) {
+                                    vote = highestVote;
+                                    highestVoter = voter;
+                                }
+                            }
+                        } catch (Exception e) {
+                            //Not concerned about it not being an integer
+                        }
+                    }
+
+                }
+            }
+        }
+        if (highestVoter != null) {
+            CommanderUnlockCheckService.checkPlayer(highestVoter, "atokera");
+        }
     }
 
     public static List<Player> getPlayersWithMostPoints(Game game) {
@@ -2389,6 +2440,7 @@ public class AgendaHelper {
             if (thing.contains("dsghotg") && !prevoting) {
                 player.exhaustTech("dsghotg");
             }
+
             if (thing.contains("predictive")) {
                 game.setStoredValue("riskedPredictive",
                     game.getStoredValue("riskedPredictive") + player.getFaction());
@@ -2809,6 +2861,9 @@ public class AgendaHelper {
                         }
                         if (!game.isFowMode() && p2.hasAbility("future_sight")) {
                             outcomeSummaryBuilder.append(" (Future Sight)");
+                        }
+                        if (!game.isFowMode() && p2.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
+                            outcomeSummaryBuilder.append(" (Mirrorshard Deploy)");
                         }
                         outcomeSummaryBuilder.append(", ");
                     } else {
@@ -3409,7 +3464,7 @@ public class AgendaHelper {
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
             if (aCount == 1) {
-               FowCommunicationThreadService.checkAllCommThreads(game);
+                FowCommunicationThreadService.checkAllCommThreads(game);
             }
         } else {
             action = true;
