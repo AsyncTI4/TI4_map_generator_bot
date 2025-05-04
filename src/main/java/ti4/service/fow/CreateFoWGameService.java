@@ -318,8 +318,8 @@ public class CreateFoWGameService {
 
     private static boolean serverHasRoomForNewChannels(Guild guild, int playerCount) {
         int channelCount = guild.getChannels().size();
-        int channelMax = 500;
-        int channelsCountRequiredForNewGame = 1 + playerCount;
+        int channelMax = 495; //to keep 5 channels free always
+        int channelsCountRequiredForNewGame = playerCount + 2;
         if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
             BotLogger.warning(new BotLogger.LogMessageOrigin(guild), "`CreateFoWGameService.serverHasRoomForNewChannels` Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
             return false;
