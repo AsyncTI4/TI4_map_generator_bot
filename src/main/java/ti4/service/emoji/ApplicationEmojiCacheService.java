@@ -20,7 +20,7 @@ public class ApplicationEmojiCacheService {
         try {
             cache = PersistenceManager.readListFromJsonFile("emojis.json", CachedEmoji.class);
         } catch (Exception e) {
-            BotLogger.log("Failed to read json data for EmojiCache.", e);
+            BotLogger.error("Failed to read json data for EmojiCache.", e);
         }
         if (cache == null)
             return List.of();
@@ -31,7 +31,7 @@ public class ApplicationEmojiCacheService {
         try {
             PersistenceManager.writeObjectToJsonFile("emojis.json", cachedEmojis);
         } catch (Exception e) {
-            BotLogger.log("Failed to write json data for EmojiCache.", e);
+            BotLogger.error("Failed to write json data for EmojiCache.", e);
         }
     }
 

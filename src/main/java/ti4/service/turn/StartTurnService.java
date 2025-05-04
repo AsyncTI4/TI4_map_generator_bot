@@ -56,6 +56,8 @@ public class StartTurnService {
         game.setL1Hero(false);
         game.setStoredValue("lawsDisabled", "no");
         game.checkSOLimit(player);
+        game.removeStoredValue("hiredGunsInPlay");
+        game.removeStoredValue("allianceModeSimultaneousAction");
         game.setStoredValue("vaylerianHeroActive", "");
         game.setStoredValue("tnelisCommanderTracker", "");
         game.setStoredValue("planetsTakenThisRound", "");
@@ -98,6 +100,10 @@ public class StartTurnService {
         Helper.startOfTurnSaboWindowReminders(game, player);
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
 
+        if (game.isShowBanners()) {
+            BannerGenerator.drawFactionBanner(player);
+        }
+        game.removeStoredValue("violatedSystems");
         if (isFowPrivateGame) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, "started turn");
 
@@ -117,11 +123,8 @@ public class StartTurnService {
             ButtonHelperFactionSpecific.resolveMykoMechCheck(player, game);
 
             game.resetListOfTilesPinged();
+
         } else {
-            //checkhere
-            if (game.isShowBanners()) {
-                BannerGenerator.drawFactionBanner(player);
-            }
             MessageHelper.sendMessageToChannel(gameChannel, text);
             if (getMissedSCFollowsText(game, player) != null
                 && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
@@ -161,7 +164,7 @@ public class StartTurnService {
 
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
-        if (player.getStasisInfantry() > 0) {
+        if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf")) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry() + " infantry left to revive.";
@@ -173,6 +176,16 @@ public class StartTurnService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
                 player.setStasisInfantry(0);
             }
+        }
+        if (!game.getStoredValue("pathOf" + player.getFaction()).isEmpty()) {
+            String msg1 = player.getRepresentation() + "The Starlit path points you towards a " + game.getStoredValue("pathOf" + player.getFaction()) + ".";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
+            String msg = player.getRepresentation() + " use buttons to either accept or refuse the path";
+            List<Button> buttons = new ArrayList<>();
+            game.removeStoredValue("pathOf" + player.getFaction());
+            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "acceptPath", "Accept Path"));
+            buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "declinePath", "Refuse Path"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
         }
     }
 
@@ -230,9 +243,9 @@ public class StartTurnService {
             Button tacticalAction = Buttons.green(finChecker + "tacticalAction",
                 "Tactical Action (" + player.getTacticalCC() + ")");
             List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(player);
-            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2-acButtons.size();
-            if(game.isFowMode()){
-                numOfComponentActions+=acButtons.size();
+            int numOfComponentActions = ComponentActionHelper.getAllPossibleCompButtons(game, player, event).size() - 2 - acButtons.size();
+            if (game.isFowMode()) {
+                numOfComponentActions += acButtons.size();
             }
             Button componentAction = Buttons.green(finChecker + "componentAction", "Component Action (" + numOfComponentActions + ")");
 
@@ -304,6 +317,12 @@ public class StartTurnService {
                 }
             }
         }
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "uydaicommander")) {
+            startButtons.add(Buttons.gray("uydaiCommander", "Pay 1tg For Uydai Commander", FactionEmojis.uydai));
+        }
+        if (player.getPathTokenCounter() > 0) {
+            startButtons.add(Buttons.gray("redistributePath", "Redistribute 1 CC With Path", FactionEmojis.uydai));
+        }
         if (doneActionThisTurn) {
             ButtonHelperFactionSpecific.checkBlockadeStatusOfEverything(player, game, event);
             if (ButtonHelper.getEndOfTurnAbilities(player, game).size() > 1) {
@@ -321,6 +340,9 @@ public class StartTurnService {
             game.setJustPlayedComponentAC(false);
             if (player.getTechs().contains("cm")) {
                 startButtons.add(Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
+            }
+            if (player.getTechs().contains("dspharinf") && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game).isEmpty()) {
+                startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Inf", FactionEmojis.pharadn));
             }
             if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
@@ -353,6 +375,9 @@ public class StartTurnService {
         if (player.hasUnexhaustedLeader("hacanagent")) {
             startButtons.add(Buttons.gray(finChecker + "exhaustAgent_hacanagent", "Use Hacan Agent", FactionEmojis.Hacan));
         }
+        if (player.hasUnexhaustedLeader("pharadnagent")) {
+            startButtons.add(Buttons.gray(finChecker + "exhaustAgent_pharadnagent", "Use Pharadn Agent", FactionEmojis.pharadn));
+        }
         if (player.hasRelicReady("e6-g0_network")) {
             startButtons.add(Buttons.green(finChecker + "exhauste6g0network", "Exhaust E6-G0 Network Relic to Draw 1 Acton Card"));
         }
@@ -364,12 +389,14 @@ public class StartTurnService {
             .remove(game.getName(), GameMessageType.TURN)
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
-            startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
             FowCommunicationThreadService.checkAllCommThreads(game);
+            FowCommunicationThreadService.checkNewNeighbors(game, player, startButtons);
+            startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
+        } else {
+            startButtons.add(Buttons.gray("showMap", "Show Map"));
+            startButtons.add(Buttons.gray("showPlayerAreas", "Show Player Areas"));
         }
 
-        startButtons.add(Buttons.gray("showMap", "Show Map"));
-        startButtons.add(Buttons.gray("showPlayerAreas", "Show Player Areas"));
         if (!confirmed2ndAction && doneActionThisTurn) {
             startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
         }

@@ -1,5 +1,7 @@
 package ti4.service.combat;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,13 +12,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -47,8 +50,6 @@ import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @UtilityClass
 public class CombatRollService {
@@ -213,9 +214,9 @@ public class CombatRollService {
                     if (opponent.hasTech("vpw")) {
                         msg = player.getRepresentationUnfogged() + " you got hit by _Valkyrie Particle Weave_. You may autoassign 1 hit.";
                         buttons = new ArrayList<>();
-                        buttons.add(Buttons.green(opponent.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
+                        buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "autoAssignGroundHits_" + combatOnHolder.getName() + "_1", "Auto-assign Hit" + (h == 1 ? "" : "s")));
                         buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "deleteThis_groundcombat", "Manually Assign Hit" + (h == 1 ? "" : "s")));
-                        buttons.add(Buttons.gray(opponent.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_1", "Cancel a Hit"));
+                        buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "cancelGroundHits_" + tile.getPosition() + "_1", "Cancel a Hit"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
                     }
                 } else {
@@ -635,6 +636,24 @@ public class CombatRollService {
                 .findAny();
             if (activeOpponent.isPresent()) {
                 opponent = activeOpponent.get();
+            }
+            if (!game.getStoredValue("hiredGunsInPlay").isEmpty()) {
+                Player nokar = game.getPlayerFromColorOrFaction(game.getStoredValue("hiredGunsInPlay").split("_")[0]);
+                Player activePlay = game.getPlayerFromColorOrFaction(game.getStoredValue("hiredGunsInPlay").split("_")[1]);
+                if (player == nokar || player == activePlay) {
+                    for (Player p2 : opponents) {
+                        if (p2 != nokar && p2 != activePlay) {
+                            opponent = p2;
+                        }
+                    }
+                }
+            }
+            if (!player.getAllianceMembers().isEmpty() && opponent != null && player.getAllianceMembers().contains(opponent.getFaction())) {
+                for (Player p2 : opponents) {
+                    if (p2 != player && !player.getAllianceMembers().contains(p2.getFaction())) {
+                        opponent = p2;
+                    }
+                }
             }
         }
         return opponent;

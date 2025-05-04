@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.*;
+import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -19,7 +19,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import static java.util.function.Predicate.not;
 import java.util.stream.Collectors;
+
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,6 +34,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -40,9 +47,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -61,6 +65,7 @@ import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.helpers.settingsFramework.menus.DeckSettings;
 import ti4.helpers.settingsFramework.menus.GameSettings;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
@@ -85,12 +90,10 @@ import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
-
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
 
@@ -300,7 +303,7 @@ public class Game extends GameProperties {
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we can even see private fields.
-                    BotLogger.log("Unknown error exporting fields from Game.", e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(this), "Unknown error exporting fields from Game.", e);
                 }
             }
         }
@@ -345,7 +348,7 @@ public class Game extends GameProperties {
                     JsonNode json = ObjectMapperFactory.build().readTree(miltyJson);
                     miltySettings = new MiltySettings(this, json);
                 } catch (Exception e) {
-                    BotLogger.log("Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(), e);
+                    BotLogger.error(new BotLogger.LogMessageOrigin(this), "Failed loading milty draft settings for `" + getName() + "` " + Constants.jazzPing(), e);
                     MessageHelper.sendMessageToChannel(getActionsChannel(), "Milty draft settings failed to load. Resetting to default.");
                     miltySettings = new MiltySettings(this, null);
                 }
@@ -402,10 +405,31 @@ public class Game extends GameProperties {
             if (player.getTotalVictoryPoints() >= getVp()) {
                 if (winner == null) {
                     winner = player;
+                } else if (isOmegaPhaseMode()) {
+                    if (player.hasPriorityPosition() && !winner.hasPriorityPosition()) {
+                        winner = player;
+                    } else if (player.hasPriorityPosition() && winner.hasPriorityPosition()) {
+                        winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
+                    }
                 } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
                     winner = getLowestInitiativePlayer(player, winner);
                 } else {
                     return Optional.empty();
+                }
+            }
+        }
+        if (winner == null && isOmegaPhaseMode() && revealedPublicObjectives.containsKey(Constants.IMPERIUM_REX_ID)) {
+            // If no winner was found, but Imperium Rex is revealed, the player with the most VP wins (Priority Track is tie-breaker)
+            for (Player player : getRealPlayersNDummies()) {
+                if (player == null || !player.hasPriorityPosition())
+                    continue;
+
+                if (winner == null) {
+                    winner = player;
+                } else if (player.getTotalVictoryPoints() > winner.getTotalVictoryPoints()) {
+                    winner = player;
+                } else if (player.getTotalVictoryPoints() == winner.getTotalVictoryPoints()) {
+                    winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
                 }
             }
         }
@@ -631,7 +655,7 @@ public class Game extends GameProperties {
         if (botChannels.size() == 1) {
             return botChannels.getFirst();
         } else if (botChannels.size() > 1) {
-            BotLogger.log(getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), getName() + " appears to have more than one bot-map-updates channel:\n" + botChannels.stream().map(ThreadChannel::getJumpUrl).collect(Collectors.joining("\n")));
             return botChannels.getFirst();
         }
 
@@ -1162,8 +1186,25 @@ public class Game extends GameProperties {
         }
     }
 
+    public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
+        List<String> objectiveList = type == 1 ? publicObjectives1Peakable : publicObjectives2Peakable;
+        if (objectiveList.size() + 1 < sizeOfBottom) {
+            throw new IllegalArgumentException("Cannot shuffle in bottom objective, size of bottom exceeds new size of deck.");
+        }
+        if (sizeOfBottom < 1) {
+            throw new IllegalArgumentException("Size of bottom must be greater than 0.");
+        }
+        var insertPositionFromEnd = ThreadLocalRandom.current().nextInt(sizeOfBottom);
+        var insertPosition = objectiveList.size() - insertPositionFromEnd;
+        objectiveList.add(insertPosition, cardIdToShuffle);
+    }
+
     public void setUpPeakableObjectives(int num, int type) {
         if (type == 1) {
+            var maxSize = publicObjectives1.size() + publicObjectives1Peakable.size();
+            if (num > maxSize) {
+                num = maxSize;
+            }
             while (publicObjectives1Peakable.size() != num) {
                 if (publicObjectives1Peakable.size() > num) {
                     String id = publicObjectives1Peakable.removeLast();
@@ -1177,6 +1218,10 @@ public class Game extends GameProperties {
                 }
             }
         } else {
+            var maxSize = publicObjectives2.size() + publicObjectives2Peakable.size();
+            if (num > maxSize) {
+                num = maxSize;
+            }
             while (publicObjectives2Peakable.size() != num) {
                 if (publicObjectives2Peakable.size() > num) {
                     String id = publicObjectives2Peakable.removeLast();
@@ -1533,6 +1578,10 @@ public class Game extends GameProperties {
                 break;
             }
         }
+        return removeCustomPO(id);
+    }
+
+    public boolean removeCustomPO(String id) {
         if (!id.isEmpty()) {
             revealedPublicObjectives.remove(id);
             soToPoList.remove(id);
@@ -1816,6 +1865,10 @@ public class Game extends GameProperties {
                 break;
             }
         }
+        return addLaw(id, optionalText);
+    }
+
+    public boolean addLaw(String id, String optionalText) {
         if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
             int identifier = ThreadLocalRandom.current().nextInt(1000);
@@ -1993,6 +2046,10 @@ public class Game extends GameProperties {
         if (id.isEmpty()) {
             return false;
         }
+        if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
+            VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
+            return true;
+        }
         if ("warrant".equalsIgnoreCase(id)) {
             for (Player p2 : getRealPlayers()) {
                 if (ButtonHelper.isPlayerElected(this, p2, id)) {
@@ -2008,6 +2065,7 @@ public class Game extends GameProperties {
                 }
             }
         }
+
         laws.remove(id);
         lawsInfo.remove(id);
         addDiscardAgenda(id);
@@ -2016,6 +2074,10 @@ public class Game extends GameProperties {
 
     public boolean removeLaw(String id) {
         if (!id.isEmpty()) {
+            if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(id)) {
+                VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(this);
+                return true;
+            }
             if ("warrant".equalsIgnoreCase(id)) {
                 for (Player p2 : getRealPlayers()) {
                     if (ButtonHelper.isPlayerElected(this, p2, id)) {
@@ -2112,6 +2174,52 @@ public class Game extends GameProperties {
                 sentAgendas.remove(id);
                 return true;
             }
+        }
+        return false;
+    }
+
+    public boolean putAgendaBottom(String id) {
+        if (!id.isEmpty()) {
+            getAgendas().remove(id);
+            getAgendas().add(id);
+            sentAgendas.remove(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putExploreBottom(String id) {
+        if (!id.isEmpty()) {
+            explore.remove(id);
+            explore.add(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putRelicBottom(String id) {
+        if (!id.isEmpty()) {
+            relics.remove(id);
+            relics.add(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putACBottom(String id) {
+        if (!id.isEmpty()) {
+            getActionCards().remove(id);
+            getActionCards().add(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putSOBottom(String id) {
+        if (!id.isEmpty()) {
+            getSecretObjectives().remove(id);
+            getSecretObjectives().add(id);
+            return true;
         }
         return false;
     }
@@ -2360,7 +2468,7 @@ public class Game extends GameProperties {
         if (deck.isEmpty()) {
             shuffleDiscardsIntoExploreDeck(reqType);
             deck = getExplores(reqType, explore);
-            BotLogger.log("Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType
                 + " deck was empty, shuffling discards into deck.");
         } // end of migration code
 
@@ -2561,17 +2669,16 @@ public class Game extends GameProperties {
 
     @Nullable
     public Map<String, Integer> drawSpecificSecretObjective(String soID, String userID) {
-        if (!getSecretObjectives().isEmpty()) {
-            boolean remove = removeSOFromGame(soID);
-            if (remove) {
-                Player player = getPlayer(userID);
-                if (player != null) {
-                    player.setSecret(soID);
-                    return player.getSecrets();
-                }
-            }
+        boolean isRemoved = removeSOFromGame(soID);
+        if (!isRemoved) {
+            return null;
         }
-        return null;
+        Player player = getPlayer(userID);
+        if (player == null) {
+            return null;
+        }
+        player.setSecret(soID);
+        return player.getSecrets();
     }
 
     public void drawSpecificActionCard(String acID, String userID) {
@@ -3146,7 +3253,8 @@ public class Game extends GameProperties {
 
     public Tile getTileByPosition(String position) {
         if (position == null) return null;
-        return tileMap.get(position);
+        Tile tile = tileMap.get(position);
+        return tile == null && FOWPlusService.isActive(this) ? FOWPlusService.voidTile(position) : tile;
     }
 
     public boolean isTileDuplicated(String tileID) {
@@ -3406,7 +3514,7 @@ public class Game extends GameProperties {
 
         // Find duplicate PNs - PNs that are in multiple players' hands or play areas
         if (!Helper.findDuplicateInList(allPlayerHandPromissoryNotes).isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are duplicate promissory notes in the game:\n> `"
                 + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
 
@@ -3416,7 +3524,7 @@ public class Game extends GameProperties {
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (!unOwnedPromissoryNotes.isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `"
                 + unOwnedPromissoryNotes + "`");
             getPurgedPN().removeAll(unOwnedPromissoryNotes);
         }
@@ -3427,7 +3535,7 @@ public class Game extends GameProperties {
             for (String pnID : pns) {
                 if (unOwnedPromissoryNotes.contains(pnID)) {
                     player.removePromissoryNote(pnID);
-                    BotLogger.log("`" + getName() + "`: removed promissory note `" + pnID + "` from player `"
+                    BotLogger.info("`" + getName() + "`: removed promissory note `" + pnID + "` from player `"
                         + player.getUserName() + "` because nobody 'owned' it");
                 }
             }
@@ -3437,7 +3545,7 @@ public class Game extends GameProperties {
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (!missingPromissoryNotes.isEmpty()) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
+            BotLogger.warning(new BotLogger.LogMessageOrigin(this), "`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
             for (Player player : getPlayers().values()) {
                 PromissoryNoteHelper.checkAndAddPNs(this, player);
             }
@@ -4017,6 +4125,7 @@ public class Game extends GameProperties {
             || isExtraSecretMode()
             || isFowMode()
             || isAgeOfExplorationMode()
+            || isFacilitiesMode()
             || isMinorFactionsMode()
             || isLightFogMode()
             || isRedTapeMode()
@@ -4220,5 +4329,13 @@ public class Game extends GameProperties {
             teamMateIDs.remove(player.getUserID());
         }
         return teamMateIDs;
+    }
+
+    public List<String> peekAtSecrets(int count) {
+        var peekedSecrets = new ArrayList<String>();
+        for (int i = 0; i < count && i < getSecretObjectives().size(); i++) {
+            peekedSecrets.add(getSecretObjectives().get(i));
+        }
+        return peekedSecrets;
     }
 }

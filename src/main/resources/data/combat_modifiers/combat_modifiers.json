@@ -769,21 +769,6 @@
         "forCombatAbility": "combatround"
     },
     {
-        "alias": "plus_x_po_others_scored_always_mech",
-        "type": "mods",
-        "value": "+1",
-        "valueScalingType": "po_opponent_exclusively_scored",
-        "persistenceType": "ALWAYS",
-        "scope": "mf",
-        "related": [
-            {
-                "type": "unit",
-                "alias": "kyro_mech"
-            }
-        ],
-        "forCombatAbility": "combatround"
-    },
-    {
         "alias": "plus_half_unit_tech_always_mech",
         "type": "mods",
         "value": "+1",
@@ -1290,6 +1275,21 @@
             {
                 "type": "unit",
                 "alias": "veldyr_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    {
+        "alias": "plus_1_for_every_round_of_combat",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "ALWAYS",
+        "valueScalingType": "combat_round",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "uydai_mech"
             }
         ],
         "forCombatAbility": "combatround"

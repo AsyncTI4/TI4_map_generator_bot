@@ -672,7 +672,7 @@ public class ButtonHelperModifyUnits {
                         var unit = new ParsedUnit(unitKey, min, unitHolder.getName());
                         RemoveUnitService.removeUnit(event, tile, game, unit);
                         handleCabalEatsUnit(cabal, player, unitName, min, event, tile, game);
-                        if (player.hasAbility("heroism") && unitModel.getBaseType().equalsIgnoreCase("fighter")) {
+                        if (!spaceCannonOffence && player.hasAbility("heroism") && unitModel.getBaseType().equalsIgnoreCase("fighter")) {
                             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, min, unitName, event);
                         }
                         msg.append("> Destroyed ").append(min).append(" ").append(unitModel.getUnitEmoji()).append("\n");
@@ -790,8 +790,7 @@ public class ButtonHelperModifyUnits {
             if (p2 == player) {
                 continue;
             }
-            sdAmount = uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) + sdAmount
-                + uH.getUnitCount(UnitType.Spacedock, p2.getColor());
+            sdAmount += uH.getUnitCount(UnitType.Spacedock, p2.getColor());
             if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 RemoveUnitService.removeUnits(event, game.getTileFromPlanet(uH.getName()), game, p2.getColor(), sdAmount + " sd " + uH.getName());
                 RemoveUnitService.removeUnits(event, game.getTileFromPlanet(uH.getName()), game, p2.getColor(), sdAmount + " csd " + uH.getName());
@@ -1465,7 +1464,7 @@ public class ButtonHelperModifyUnits {
                 event.getMessage().delete().queue();
             } else {
                 event.getMessage().editMessage(Helper.buildProducedUnitsMessage(player, game)).queue(
-                    null, (error) -> BotLogger.log(MessageHelper.getRestActionFailureMessage(event.getMessageChannel(), "Failed to edit message", null, error)));
+                    null, (error) -> BotLogger.error(new BotLogger.LogMessageOrigin(event, player), MessageHelper.getRestActionFailureMessage(event.getMessageChannel(), "Failed to edit message", null, error), error));
             }
         }
         if ("sd".equalsIgnoreCase(unitID)) {
@@ -1666,10 +1665,12 @@ public class ButtonHelperModifyUnits {
         } else {
             if (orbitalDrop) {
                 List<Button> orbFollowUp = new ArrayList<>();
-                orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
-                orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Decline"));
+                if (player.hasUnit("sol_mech") && !ButtonHelper.isLawInPlay(game, "articles_war") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                    orbFollowUp.add(Buttons.green("orbitalMechDrop_" + planetName, "Pay 3r for Mech?"));
+                }
+                orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Finish Orbital Drop"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-                    ", you may pay 3 resources to drop a mech on the planet too", orbFollowUp);
+                    ", you may pay 3 resources to drop a mech on the planet too (if applicable)", orbFollowUp);
             }
         }
 
@@ -1740,6 +1741,18 @@ public class ButtonHelperModifyUnits {
             player.getFactionEmojiOrColor() + " undid landing of " + amount + " " + unitName + " on " + planetName + ".");
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
+
+    @ButtonHandler("vadenYellowTechUse")
+    public static void munitionsReserves(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        if (player.getTg() < 1) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + ", you only have "
+                + player.getTg() + " trade goods and thus can't use this tech.");
+            return;
+        }
+        String msg = player.getFactionEmoji() + " spent 1 trade good " + player.gainTG(-1) + " to generate 1 additional hit using Krovoz Strike Teams. " + p2.getRepresentation() + " Please assign it with the assign hits button.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @ButtonHandler("assCannonNDihmohn_")
@@ -2322,7 +2335,7 @@ public class ButtonHelperModifyUnits {
 
         List<Button> buttons = new ArrayList<>();
         List<Tile> tiles = new ArrayList<>(ButtonHelper.getTilesOfPlayersSpecificUnits(game, targetPlayer,
-            Units.UnitType.Spacedock, Units.UnitType.CabalSpacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
+            Units.UnitType.Spacedock, Units.UnitType.PlenaryOrbital, Units.UnitType.Warsun));
         for (Tile tile : tiles) {
             Button tileButton = Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling",
                 tile.getRepresentationForButtons(game, targetPlayer));

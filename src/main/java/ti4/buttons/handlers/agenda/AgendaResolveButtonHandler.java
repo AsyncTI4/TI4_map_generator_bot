@@ -29,6 +29,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
+import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
 import ti4.listeners.annotations.ButtonHandler;
@@ -72,6 +73,7 @@ class AgendaResolveButtonHandler {
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         String agID = "";
         List<Player> predictiveCheck = AgendaHelper.getLosingVoters(winner, game);
+        AgendaHelper.atokeraCommanderUnlockCheck(game);
         for (Player playerWL : predictiveCheck) {
             if (game.getStoredValue("riskedPredictive").contains(playerWL.getFaction())
                 && playerWL.hasTech("pi")) {
@@ -107,6 +109,9 @@ class AgendaResolveButtonHandler {
                     }
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
                     Helper.checkEndGame(game, player2);
+                }
+                if (Constants.VOICE_OF_THE_COUNCIL_ID.equalsIgnoreCase(agID)) {
+                    VoiceOfTheCouncilHelper.ElectVoiceOfTheCouncil(game, player2);
                 }
                 if ("warrant".equalsIgnoreCase(agID)) {
                     player2.flipSearchWarrant();
@@ -751,7 +756,7 @@ class AgendaResolveButtonHandler {
 
                 }
             }
-            if ("absol_artifact".equalsIgnoreCase(agID) ||"artifact".equalsIgnoreCase(agID) || "little_omega_artifact".equalsIgnoreCase(agID)) {
+            if ("absol_artifact".equalsIgnoreCase(agID) || "artifact".equalsIgnoreCase(agID) || "little_omega_artifact".equalsIgnoreCase(agID)) {
                 TextChannel watchParty = AgendaHelper.watchPartyChannel(game);
                 String watchPartyPing = AgendaHelper.watchPartyPing(game);
                 if (watchParty != null && !game.isFowMode()) {
@@ -772,12 +777,12 @@ class AgendaResolveButtonHandler {
                 } else {
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
                         "Against on _Ixthian Artifact_‽ Disgraceful.");
-                    if("absol_artifact".equalsIgnoreCase(agID)){
+                    if ("absol_artifact".equalsIgnoreCase(agID)) {
                         Integer poIndex = game.addCustomPO("Ixthian Rex Point", 1);
                         StringBuilder message = new StringBuilder();
                         message.append("Custom objective _Ixthian Rex Point_ has been added.\n");
                         for (Player playerWL : game.getRealPlayers()) {
-                            if(playerWL.getPlanets().contains("mr")){
+                            if (playerWL.getPlanets().contains("mr")) {
                                 game.scorePublicObjective(playerWL.getUserID(), poIndex);
                                 message.append(playerWL.getRepresentation()).append(" scored _Ixthian Rex Point_.\n");
                                 Helper.checkEndGame(game, playerWL);
@@ -1016,6 +1021,12 @@ class AgendaResolveButtonHandler {
                 }
             } else {
                 message = rep + " you have a Rider to resolve.";
+
+            }
+            if (rid.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "cruiser", true) < 8) {
+                MessageHelper.sendMessageToChannel(rid.getCorrectChannel(), rid.getFactionEmoji() + " gets deploy 1 cruiser to a system that contains their ships.");
+                List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(rid, game, "cruiser", "placeOneNDone_skipbuild"));
+                MessageHelper.sendMessageToChannelWithButtons(rid.getCorrectChannel(), "Use buttons to deploy 1 cruiser to a system that contains your ships.", buttons);
             }
             if (game.isFowMode()) {
                 MessageHelper.sendPrivateMessageToPlayer(rid, game, message);
@@ -1052,7 +1063,14 @@ class AgendaResolveButtonHandler {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
         RiftSetModeService.includeCrucibleAgendaButton(buttons, game);
-        buttons.add(Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)"));
+        if (!game.isOmegaPhaseMode()) {
+            buttons.add(Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)"));
+        } else {
+            Button electVoiceOfTheCouncil = Buttons.green("elect_voice_of_the_council", "Elect Voice of the Council");
+            buttons.add(electVoiceOfTheCouncil);
+            Button proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to scoring objectives");
+            buttons.add(proceedToScoring);
+        }
 
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);

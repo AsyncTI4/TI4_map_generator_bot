@@ -444,7 +444,7 @@
         "name": "Contagion",
         "faction": "kyro",
         "window": "After you resolve the primary or secondary ability of the \"Politics\" strategy card",
-        "windowEffect": "Before 3/31/24: Commit 1 infantry from your reinforcements to each of 2 planets that are in or adjacent to a system that contains a planet you control; resolve invasion on those planets. After 3/31/24: commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
+        "windowEffect": "Commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
         "source": "ds"
     },
     {
@@ -710,7 +710,7 @@
         "id": "binding_debts",
         "name": "Binding Debts",
         "faction": "vaden",
-        "permanentEffect": "Other players may place their control tokens on your faction sheet at any time.",
+        "permanentEffect": "Other players may place their control tokens on your faction sheet at any time. [Note: when you have this ability, you cannot use normal debt, as this ability utilizes the bot's debt system. Track normal debt manually if at all.]",
         "window": "At the start of the status phase",
         "windowEffect": "Each of your neighbors may give you 1 trade good to remove up to 2 of their control tokens from your faction sheet.",
         "source": "ds"
@@ -760,7 +760,7 @@
         "id": "corporate_entity",
         "name": "Corporate Entity",
         "faction": "veldyr",
-        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives.",
+        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives. [Note: they still count towards strengthen bonds and betray a friend, as they are promissory notes]",
         "source": "ds"
     },
     {
@@ -813,10 +813,84 @@
         "source": "ds"
     },
     {
+        "id": "prescience",
+        "name": "Prescience",
+        "faction": "uydai",
+        "permanentEffect": "At the end of your turn,if you have not passed, place 1 of the plan cards on your faction sheet, face down. At the start of your turn, reveal and resolve the plan card on your faction sheet, if able",
+        "source": "ds"
+    },
+    {
+        "id": "the_starlit_path",
+        "name": "The Starlit Path",
+        "faction": "uydai",
+        "window": "At the end of your turn",
+        "windowEffect": "You may return 6 path tokens from your faction sheet to your reinforcements to resolve the secondary ability of any strategy card without spending a command token.",
+        "source": "ds"
+    },
+    {
+        "id": "narrow_way",
+        "name": "Narrow Way",
+        "faction": "uydai",
+        "window": "At any time",
+        "windowEffect": "You may return 1 path token to your reinforcements to redistribute 1 of your command tokens.",
+        "source": "ds"
+    },
+    {
+        "id": "ancient_empire",
+        "name": "Ancient Empire",
+        "faction": "pharadn",
+        "permanentEffect": "During setup, place 1 tomb token on each of up to 14 planets. When you gain control of a planet that contains a tomb token, purge that token to capture 2 infantry from the supply. ",
+        "source": "ds"
+    },
+    {
+        "id": "dark_purpose",
+        "name": "Dark Purpose",
+        "faction": "pharadn",
+        "window": "When you score an objective",
+        "windowEffect": "Capture 2 infantry from the supply",
+        "source": "ds"
+    },
+    {
+        "id": "mark_of_pharadn",
+        "name": "Mark Of Pharadn",
+        "faction": "pharadn",
+        "permanentEffect": "Abilities that would place infantry from your reinforcements on planets instead allow you to produce those units. When you produce infantry, you must return 1 of your captured infantry to produce each of those units, instead of spending resources.",
+        "source": "ds"
+    },
+    {
         "id": "paranoia",
         "name": "Paranoia",
         "faction": "zelian",
         "permanentEffect": "Game effects other than your command tokens cannot prevent you from activating, or moving ships into, your home system.",
+        "source": "ds"
+    },
+    {
+        "id": "data_recovery",
+        "name": "Data Recovery",
+        "faction": "qhet",
+        "permanentEffect": "Game effects other than your command tokens cannot prevent you from activating, or moving ships into, your home system.",
+        "source": "ds"
+    },
+    {
+        "id": "black_ops",
+        "name": "Black Ops",
+        "faction": "qhet",
+        "window": "After you win a combat as the attacker",
+        "windowEffect": "You may remove 2 of your opponent’s control tokens from your faction sheet to draw 1 secret objective, or 5 of those tokens to gain 1 command token and take 1 of their unscored secret objectives. ",
+        "source": "ds"
+    },
+    {
+        "id": "synthesis",
+        "name": "Synthesis",
+        "faction": "atokera",
+        "permanentEffect": "Readied planets you control have PLANETARY SHIELD and PRODUCTION 0 as if they were units. Apply +1 to the PRODUCTION value of each of your units with PRODUCTION. ",
+        "source": "ds"
+    },
+    {
+        "id": "living_metals",
+        "name": "Living Metals",
+        "faction": "atokera",
+        "permanentEffect": "Agenda outcomes and action cards that have component actions cannot remove or destroy your units, or place other player’s units on planets you control. [Note: protects against ixthian] ",
         "source": "ds"
     }
 ]

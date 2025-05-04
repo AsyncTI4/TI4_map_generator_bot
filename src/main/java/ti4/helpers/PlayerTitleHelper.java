@@ -28,7 +28,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.green("bestowTitleStep1_A Mahact Puppet Master", "A Mahact Puppet Master"));
             buttons.add(Buttons.green("bestowTitleStep1_Intergalactic Bard", "Intergalactic Bard"));
 
-           // buttons.add(Buttons.blue("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
+            // buttons.add(Buttons.blue("bestowTitleStep1_Lightning Fast", "Lightning Fast"));
             buttons.add(Buttons.blue("bestowTitleStep1_Fortune Favored", "Fortune Favored"));
             buttons.add(Buttons.blue("bestowTitleStep1_Possesses Cursed Dice", "Possesses Cursed Dice"));
             buttons.add(Buttons.blue("bestowTitleStep1_A Great Hollywooder", "A Great Hollywooder"));
@@ -50,7 +50,7 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here (if you dont see them, try exiting discord and reopening it)", buttons);
         }
     }
 
@@ -70,8 +70,10 @@ public class PlayerTitleHelper {
     }
 
     @ButtonHandler(value = "bestowTitleStep2_")
-    public static void resolveBestowTitleStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveBestowTitleStep2(
+        Game game, Player player, ButtonInteractionEvent event,
+        String buttonID
+    ) {
         String title = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);

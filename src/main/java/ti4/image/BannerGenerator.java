@@ -84,6 +84,13 @@ public class BannerGenerator {
     }
 
     public static void drawPhaseBanner(String phase, int round, TextChannel channel) {
+        drawPhaseBanner(phase, round, channel, null);
+    }
+
+    public static void drawPhaseBanner(String phase, int round, TextChannel channel, String altPhaseName) {
+        if (altPhaseName == null) {
+            altPhaseName = phase;
+        }
         BufferedImage bannerImage = new BufferedImage(511, 331, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage = ImageHelper.readScaled(ResourceHelper.getInstance().getExtraFile(phase + "banner.png"), 511, 331);
 
@@ -91,13 +98,13 @@ public class BannerGenerator {
         bannerG.drawImage(backgroundImage, 0, 0, null);
         bannerG.setFont(Storage.getFont48());
         bannerG.setColor(Color.WHITE);
-        DrawingUtil.superDrawString(bannerG, phase.toUpperCase() + " PHASE", 255, 110, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Center, stroke8, Color.BLACK);
+        DrawingUtil.superDrawString(bannerG, altPhaseName.toUpperCase() + " PHASE", 255, 110, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Center, stroke8, Color.BLACK);
         bannerG.setFont(Storage.getFont32());
 
         String roundText = "ROUND " + StringHelper.numberToWords(round).toUpperCase();
         DrawingUtil.superDrawString(bannerG, roundText, 255, 221, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Center, stroke6, Color.BLACK);
 
-        String descr = "Start of " + phase + " phase, round " + round + ".";
+        String descr = "Start of " + altPhaseName + " phase, round " + round + ".";
         FileUpload fileUpload = FileUploadService.createFileUpload(bannerImage, phase + round + "banner").setDescription(descr);
         MessageHelper.sendFileUploadToChannel(channel, fileUpload);
     }

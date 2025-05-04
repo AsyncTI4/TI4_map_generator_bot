@@ -92,7 +92,9 @@ public class GameProperties {
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
+    private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
+    private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean allianceMode;
     private @ExportableField boolean communityMode;
     private @ExportableField boolean competitiveTIGLGame;
@@ -106,6 +108,7 @@ public class GameProperties {
     private @ExportableField boolean promisesPromisesMode;
     private @ExportableField boolean flagshippingMode;
     private @ExportableField boolean redTapeMode;
+    private @ExportableField boolean omegaPhaseMode;
     private @ExportableField boolean homebrew;
     private @ExportableField boolean homebrewSCMode;
     private @ExportableField String spinMode = "OFF";

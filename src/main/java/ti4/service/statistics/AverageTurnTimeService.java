@@ -94,7 +94,7 @@ public class AverageTurnTimeService {
         MessageHelper.sendMessageToThread(event.getChannel(), "Average Turn Time", sb.toString());
     }
 
-    private static void getAverageTurnTimeForGame(
+    public static void getAverageTurnTimeForGame(
         Game game, Map<String, Map.Entry<Integer, Long>> playerTurnTimes,
         Map<String, Set<Long>> playerAverageTurnTimes
     ) {

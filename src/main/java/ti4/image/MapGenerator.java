@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -19,17 +26,19 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
@@ -257,7 +266,7 @@ public class MapGenerator implements AutoCloseable {
                 try {
                     tileRingNumber = Integer.parseInt(tileRing);
                 } catch (Exception e) {
-                    BotLogger.log("Hitting an error");
+                    BotLogger.error("Hitting an error", e);
                 }
 
                 Tile setupTile = null;
@@ -324,7 +333,10 @@ public class MapGenerator implements AutoCloseable {
         for (String key : keys) {
             tilesToDisplay.remove(key);
             if (fowPlayer != null) {
-                tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
+                Tile fogTile = fowPlayer.buildFogTile(key, fowPlayer);
+                if (fogTile != null) {
+                    tilesToDisplay.put(key, fogTile);
+                }
             }
         }
     }
@@ -470,10 +482,13 @@ public class MapGenerator implements AutoCloseable {
         y = coord.y + 30;
         x = 10 + landscapeShift;
         int tempY = y;
-        y = drawObjectives(y + 180);
+        tempY = drawScoreTrack(tempY + 20);
+        if (game.isOmegaPhaseMode()) {
+            tempY = drawPriorityTrack(tempY);
+        }
+        y = drawObjectives(tempY);
         y = laws(y);
         y = events(y);
-        tempY = drawScoreTrack(tempY + 20);
         if (displayTypeBasic != DisplayType.stats) {
             playerInfo(game);
         }
@@ -504,7 +519,7 @@ public class MapGenerator implements AutoCloseable {
             BufferedImage resourceBufferedImage = ImageHelper.read(resourcePath);
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
-            BotLogger.log("Could not display play area: " + resourceName, e);
+            BotLogger.error("Could not display play area: " + resourceName, e);
         }
     }
 
@@ -575,14 +590,65 @@ public class MapGenerator implements AutoCloseable {
                     DrawingUtil.drawControlToken(graphics, controlTokenImage, DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlID), tokenX, tokenY, convertToGeneric, scale);
                 } catch (Exception e) {
                     // nothing
-                    BotLogger.log("Could not display player: " + player.getUserName(), e);
+                    BotLogger.error("Could not display player: " + player.getUserName(), e);
                 }
                 row++;
             }
             row = 0;
             col++;
         }
-        y += 180;
+        y += 160;
+        return y;
+    }
+
+    private int drawPriorityTrack(int y) {
+        int landscapeShift = (displayType == DisplayType.landscape ? mapWidth : 0);
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(stroke5);
+        graphics.setFont(Storage.getFont50());
+        int boxHeight = 95;
+        int boxWidth = 100;
+        int boxBuffer = -1;
+        int labelWidth = 360;
+        var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+        DrawingUtil.drawCenteredString(g2, "PRIORITY:", new Rectangle(landscapeShift, y, labelWidth, boxHeight), Storage.getFont64());
+        int trackXShift = landscapeShift + labelWidth;
+        for (int i = 0; i < priorityTrack.size(); i++) {
+            graphics.setColor(Color.WHITE);
+            Rectangle rect = new Rectangle(i * boxWidth + trackXShift, y, boxWidth, boxHeight / 2);
+            DrawingUtil.drawCenteredString(g2, Integer.toString(i + 1), rect, Storage.getFont50());
+            g2.setColor(ColorUtil.getSCColor(6, game, true));
+            g2.drawRect(i * boxWidth + trackXShift, y, boxWidth, boxHeight);
+        }
+
+        int colCount = priorityTrack.size() - 1;
+        int availableSpacePerColumn = (boxWidth - boxBuffer * 2) / colCount;
+        int availableSpacePerRow = boxHeight - boxBuffer * 2;
+        float scale = 0.7f;
+        for (Player player : priorityTrack) {
+            if (player == null) {
+                continue;
+            }
+            try {
+                String controlID = Mapper.getControlID(player.getColor());
+
+                BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
+                int tokenWidth = controlTokenImage == null ? 51 : controlTokenImage.getWidth(); // 51
+                int tokenHeight = controlTokenImage == null ? 33 : controlTokenImage.getHeight(); // 33
+                int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);
+                int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) * 3 / 4);
+
+                int spaceOnTrack = player.getPriorityPosition() - 1;
+                int firstX = Math.min(boxBuffer + /*(availableSpacePerColumn * col) +*/ centreHorizontally, boxWidth - tokenWidth - boxBuffer) + trackXShift;
+                int tokenX = spaceOnTrack * boxWidth + firstX;
+                int tokenY = y + boxBuffer + centreVertically;
+                DrawingUtil.drawControlToken(graphics, controlTokenImage, player, tokenX, tokenY, false, scale);
+            } catch (Exception e) {
+                // nothing
+                BotLogger.error("Could not display player: " + player.getUserName(), e);
+            }
+        }
+        y += boxHeight + 20;
         return y;
     }
 
@@ -1330,15 +1396,17 @@ public class MapGenerator implements AutoCloseable {
                     }
                 } else if (offBoardHighlighting == 1) {
                     BufferedImage bufferedImage = ImageHelper.read(traitFiles.getFirst());
-                    bufferedImage = ImageHelper.scale(
-                        bufferedImage,
-                        (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
-                    graphics.drawImage(
-                        bufferedImage,
-                        miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
-                        miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
-                            + (player.isSpeaker() ? 30 : 0),
-                        null);
+                    if (bufferedImage != null) {
+                        bufferedImage = ImageHelper.scale(
+                            bufferedImage,
+                            (float) Math.sqrt(24000.0f / bufferedImage.getWidth() / bufferedImage.getHeight()));
+                        graphics.drawImage(
+                            bufferedImage,
+                            miscTile.x + (TILE_WIDTH - bufferedImage.getWidth()) / 2,
+                            miscTile.y + (SPACE_FOR_TILE_HEIGHT - bufferedImage.getHeight()) / 2
+                                + (player.isSpeaker() ? 30 : 0),
+                            null);
+                    }
                 }
             } else if (displayType == DisplayType.techskips) {
                 List<String> techFiles = new ArrayList<>();
@@ -1772,7 +1840,7 @@ public class MapGenerator implements AutoCloseable {
                 }
             }
         } catch (Exception e) {
-            BotLogger.log("Ignored exception during map generation", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored exception during map generation", e);
         }
     }
 
@@ -1787,6 +1855,12 @@ public class MapGenerator implements AutoCloseable {
 
         // Objective 1
         List<Objective> objectives = Objective.retrievePublic1(game);
+        List<Objective> secondHalfObjectives = null;
+        if (game.isOmegaPhaseMode()) {
+            int splitSize = objectives.size() / 2;
+            secondHalfObjectives = objectives.stream().skip(splitSize).toList();
+            objectives = objectives.stream().limit(splitSize).toList();
+        }
         int maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
         int boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
 
@@ -1802,6 +1876,9 @@ public class MapGenerator implements AutoCloseable {
         y = top;
 
         objectives = Objective.retrievePublic2(game);
+        if (game.isOmegaPhaseMode()) {
+            objectives.addAll(secondHalfObjectives);
+        }
         maxTextWidth = ObjectiveBox.getMaxTextWidth(game, graphics, objectives);
         boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
         for (Objective objective : objectives) {
@@ -1936,7 +2013,7 @@ public class MapGenerator implements AutoCloseable {
                 }
 
             } catch (Exception e) {
-                BotLogger.log("Could not paint agenda icon", e);
+                BotLogger.error("Could not paint agenda icon", e);
             }
 
             if (!secondColumn) {
@@ -1992,7 +2069,7 @@ public class MapGenerator implements AutoCloseable {
             try {
                 paintEventIcon(y, x);
             } catch (Exception e) {
-                BotLogger.log("Could not paint event icon", e);
+                BotLogger.error("Could not paint event icon", e);
             }
 
             if (!secondColumn) {
@@ -2057,7 +2134,7 @@ public class MapGenerator implements AutoCloseable {
             BufferedImage tileImage = new TileGenerator(game, event, displayType).draw(tile, step);
             graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (Exception exception) {
-            BotLogger.log(
+            BotLogger.error(
                 "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(),
                 exception);
         }

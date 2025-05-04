@@ -91,7 +91,7 @@ public class AliasHandler {
                 aliasProperties.load(input);
                 aliasProperties.forEach((x, y) -> map.put(x.toString(), y.toString()));
             } catch (IOException e) {
-                BotLogger.log("Could not read alias file", e);
+                BotLogger.error("Could not read alias file", e);
             }
         }
     }
@@ -124,7 +124,7 @@ public class AliasHandler {
                     }
                 }
             } catch (IOException e) {
-                BotLogger.log("Could not read alias file", e);
+                BotLogger.error("Could not read alias file", e);
             }
         }
     }
@@ -152,7 +152,7 @@ public class AliasHandler {
                     }
                 }
             } catch (IOException e) {
-                BotLogger.log(errorMessage);
+                BotLogger.error(errorMessage, e);
             }
         }
     }

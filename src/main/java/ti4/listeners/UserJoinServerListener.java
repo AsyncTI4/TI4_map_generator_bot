@@ -1,12 +1,14 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nonnull;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -40,9 +42,18 @@ public class UserJoinServerListener extends ListenerAdapter {
 
     private void handleGuildMemberJoin(GuildMemberJoinEvent event) {
         try {
+            if (event.getGuild() == AsyncTI4DiscordBot.guildPrimary) {
+                TextChannel welcomeChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("welcome-and-waving", true).stream()
+                    .findFirst().orElse(null);
+                if (welcomeChannel != null) {
+                    MessageHelper.sendMessageToChannel(welcomeChannel, "**Welcome** " + event.getUser().getAsMention() + "! We're glad you're here as lucky number #" + event.getGuild().getMemberCount() + "!\n"
+                        + "To get started, check out the how to play documentation here: https://discord.com/channels/943410040369479690/947727176105623642/1349555940340404265. \n"
+                        + "If you ever have any questions or difficulty, ping the Bothelper role. It's full of helpful people who should be able to assist you.");
+                }
+            }
             checkIfNewUserIsInExistingGamesAndAutoAddRole(event.getGuild(), event.getUser());
         } catch (Exception e) {
-            BotLogger.log("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
+            BotLogger.error("Error in `UserJoinServerListener.onGuildMemberJoin`", e);
         }
     }
 

@@ -1,5 +1,7 @@
 package ti4.cron;
 
+import static java.util.function.Predicate.*;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.AgendaHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.manage.GameManager;
@@ -17,8 +20,6 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
-
-import static java.util.function.Predicate.not;
 
 @UtilityClass
 public class AutoPingCron {
@@ -108,7 +109,7 @@ public class AutoPingCron {
         try {
             handleAutoPing(game);
         } catch (Exception e) {
-            BotLogger.log("AutoPing failed for game: " + game.getName(), e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "AutoPing failed for game: " + game.getName(), e);
         }
     }
 
@@ -310,6 +311,11 @@ public class AutoPingCron {
             }
             if (!game.getStoredValue("queuedAfters").contains(p2.getFaction()) && !game.getStoredValue("declinedAfters").contains(p2.getFaction()) && !game.getStoredValue("queuedWhens").contains(p2.getFaction())) {
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"afters\".");
+            }
+            if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
+                if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).contains(p2)) {
+                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to decide on voting.");
+                }
             }
         }
 

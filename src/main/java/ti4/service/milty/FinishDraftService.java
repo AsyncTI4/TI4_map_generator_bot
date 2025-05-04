@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -19,11 +20,21 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
 @UtilityClass
 public class FinishDraftService {
+
+    public FactionModel determineKeleresFlavor(MiltyDraftManager manager, Game game) {
+        List<String> flavors = List.of("mentak", "xxcha", "argent");
+        List<String> valid = flavors.stream().filter(Predicate.not(manager::isFactionTaken)).toList();
+        String preset = game.getStoredValue("keleresFlavorPreset");
+        if (valid.contains(preset)) return Mapper.getFaction("keleres" + preset.charAt(0));
+        if (valid.size() == 1) return Mapper.getFaction(valid.getFirst());
+        return null;
+    }
 
     public void finishDraft(GenericInteractionCreateEvent event, MiltyDraftManager manager, Game game) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
@@ -42,23 +53,31 @@ public class FinishDraftService {
                 boolean speaker = picks.getPosition() == 1;
 
                 if (faction.startsWith("keleres")) {
-                    keleresExists = true;
-                    Set<String> allowed = new HashSet<>(Set.of("mentak", "xxcha", "argent"));
-                    for (PlayerDraft pd : manager.getDraft().values()) {
-                        allowed.remove(pd.getFaction());
+                    FactionModel preset = determineKeleresFlavor(manager, game);
+                    if (preset != null) {
+                        faction = preset.getAlias();
+                    } else {
+                        faction = null;
+                        keleresExists = true;
+                        Set<String> allowed = new HashSet<>(Set.of("mentak", "xxcha", "argent"));
+                        for (PlayerDraft pd : manager.getDraft().values()) {
+                            allowed.remove(pd.getFaction());
+                        }
+                        List<Button> buttons = new ArrayList<>();
+                        String message = player.getPing() + " choose a flavor of keleres:";
+                        for (String flavor : allowed) {
+                            String emoji = Mapper.getFaction(flavor).getFactionEmoji();
+                            String keleres = "keleres" + flavor.charAt(0);
+                            String id = String.format("setupStep5_%s_%s_%s_%s_%s", player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
+                            String msg = "Keleres (" + flavor + ")";
+                            Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
+                            buttons.add(butt);
+                        }
+                        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, buttons);
                     }
-                    List<Button> buttons = new ArrayList<>();
-                    String message = player.getPing() + " choose a flavor of keleres:";
-                    for (String flavor : allowed) {
-                        String emoji = Mapper.getFaction(flavor).getFactionEmoji();
-                        String keleres = "keleres" + flavor.charAt(0);
-                        String id = String.format("setupStep5_%s_%s_%s_%s_%s", player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
-                        String msg = "Keleres (" + flavor + ")";
-                        Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
-                        buttons.add(butt);
-                    }
-                    MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, buttons);
-                } else {
+                }
+
+                if (faction != null) {
                     MiltyService.secondHalfOfPlayerSetup(player, game, color, faction, pos, event, speaker);
                 }
             }
@@ -79,7 +98,7 @@ public class FinishDraftService {
                 error.append("\n").append(index).append(". ").append(d.getSlice().ttsString());
             }
             MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
-            BotLogger.log(e.getMessage(), e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game), e.getMessage(), e);
         }
     }
 }

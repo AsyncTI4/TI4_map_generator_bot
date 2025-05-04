@@ -58,6 +58,7 @@ import ti4.model.PublicObjectiveModel;
 import ti4.model.RelicModel;
 import ti4.model.SecretObjectiveModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.SourceModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.StrategyCardSetModel;
 import ti4.model.TechnologyModel;
@@ -99,12 +100,13 @@ public class Mapper {
     private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
     private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
     private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
+    private static final Map<String, SourceModel> sources = new HashMap<>();
 
     public static void init() {
         try {
             loadData();
         } catch (Exception e) {
-            BotLogger.log("Could not load data", e);
+            BotLogger.error("Could not load data", e);
         }
     }
 
@@ -137,6 +139,7 @@ public class Mapper {
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
         importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
+        importJsonObjectsFromFolder("sources", sources, SourceModel.class);
 
         duplicateObjectsForAllColors(promissoryNotes);
     }
@@ -148,7 +151,7 @@ public class Mapper {
             try (InputStream input = new FileInputStream(propFile)) {
                 properties.load(input);
             } catch (IOException e) {
-                BotLogger.log("Could not read .property file: " + propertyFileName, e);
+                BotLogger.error("Could not read .property file: " + propertyFileName, e);
                 throw e;
             }
         }
@@ -165,10 +168,10 @@ public class Mapper {
                 try {
                     importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
                 } catch (InvalidFormatException e) {
-                    BotLogger.log("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
+                    BotLogger.error("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
                     throw e;
                 } catch (Exception e) {
-                    BotLogger.log("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
+                    BotLogger.error("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
                 }
             }
         }
@@ -185,7 +188,7 @@ public class Mapper {
                 InputStream input = new FileInputStream(filePath);
                 allObjects = objectMapper.readValue(input, type);
             } catch (Exception e) {
-                BotLogger.log("Could not import JSON Objects from File: " + jsonFileName, e);
+                BotLogger.error("Could not import JSON Objects from File: " + jsonFileName, e);
                 throw e;
             }
         }
@@ -193,7 +196,7 @@ public class Mapper {
         List<String> badObjects = new ArrayList<>();
         for (T obj : allObjects) {
             if (objectMap.containsKey(obj.getAlias())) { //duplicate found
-                BotLogger.log("Duplicate **" + target.getSimpleName() + "** found: " + obj.getAlias());
+                BotLogger.warning("Duplicate **" + target.getSimpleName() + "** found: " + obj.getAlias());
             }
             objectMap.put(obj.getAlias(), obj);
             if (!obj.isValid()) {
@@ -201,7 +204,7 @@ public class Mapper {
             }
         }
         if (!badObjects.isEmpty())
-            BotLogger.log("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
+            BotLogger.warning("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
                 + String.join("\n> ", badObjects));
     }
 
@@ -223,7 +226,7 @@ public class Mapper {
                 objectMap.put(obj.getAlias(), obj);
             }
         } catch (Exception e) {
-            BotLogger.log("Failed duplicating colors: " + mostRecentObject, e);
+            BotLogger.error("Failed duplicating colors: " + mostRecentObject, e);
         }
     }
 
@@ -728,7 +731,7 @@ public class Mapper {
         if (tokenPath == null || !(new File(tokenPath).exists())) {
             tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
             if (tokenPath == null) {
-                BotLogger.log("Could not find token path: " + tokenID);
+                BotLogger.warning("Could not find token path: " + tokenID);
                 return null;
             }
         }
@@ -823,6 +826,7 @@ public class Mapper {
     }
 
     public static boolean isValidMapTemplate(String id) {
+        if (id == null) return false;
         return mapTemplates.containsKey(id);
     }
 
@@ -1005,5 +1009,17 @@ public class Mapper {
             }
         }
         return displayName;
+    }
+
+    public static Map<String, SourceModel> getSources() {
+        return new HashMap<>(sources);
+    }
+
+    public static boolean isValidSource(String sourceID) {
+        return sources.containsKey(sourceID);
+    }
+
+    public static SourceModel getSource(String sourceID) {
+        return sources.get(sourceID);
     }
 }

@@ -1,0 +1,58 @@
+[
+    {
+        "alias": "2025scptFinals",
+        "author": "SCPT Matt",
+        "descr": "Sitting outside of the slices is this strange, 7-system wide extra bit. It has gamma wormholes to start, and operates like a separate wormhole nexus. Once someone enters the area, you add alpha and beta wormholes to those systems that started with a gamma. Matt is completely off of his rocker for this one, let me tell ya folks.",
+        "playerCount": 6,
+        "templateTiles": [
+            { "pos": "000", "staticTileId": "18", "custodians": true },
+
+            { "pos": "101", "playerNumber": 1, "miltyTileIndex": 4 },
+            { "pos": "102", "playerNumber": 2, "miltyTileIndex": 4 },
+            { "pos": "103", "playerNumber": 3, "miltyTileIndex": 4 },
+            { "pos": "104", "playerNumber": 4, "miltyTileIndex": 4 },
+            { "pos": "105", "playerNumber": 5, "miltyTileIndex": 4 },
+            { "pos": "106", "playerNumber": 6, "miltyTileIndex": 4 },
+
+            { "pos": "201", "playerNumber": 1, "miltyTileIndex": 1 },
+            { "pos": "202", "playerNumber": 1, "miltyTileIndex": 3 },
+            { "pos": "203", "playerNumber": 2, "miltyTileIndex": 1 },
+            { "pos": "204", "playerNumber": 2, "miltyTileIndex": 3 },
+            { "pos": "205", "playerNumber": 3, "miltyTileIndex": 1 },
+            { "pos": "206", "playerNumber": 3, "miltyTileIndex": 3 },
+            { "pos": "207", "playerNumber": 4, "miltyTileIndex": 1 },
+            { "pos": "208", "playerNumber": 4, "miltyTileIndex": 3 },
+            { "pos": "209", "playerNumber": 5, "miltyTileIndex": 1 },
+            { "pos": "210", "playerNumber": 5, "miltyTileIndex": 3 },
+            { "pos": "211", "playerNumber": 6, "miltyTileIndex": 1 },
+            { "pos": "212", "playerNumber": 6, "miltyTileIndex": 3 },
+
+            { "pos": "301", "playerNumber": 1, "home": true },
+            { "pos": "302", "playerNumber": 1, "miltyTileIndex": 0 },
+            { "pos": "303", "playerNumber": 2, "miltyTileIndex": 2 },
+            { "pos": "304", "playerNumber": 2, "home": true },
+            { "pos": "305", "playerNumber": 2, "miltyTileIndex": 0 },
+            { "pos": "306", "playerNumber": 3, "miltyTileIndex": 2 },
+            { "pos": "307", "playerNumber": 3, "home": true },
+            { "pos": "308", "playerNumber": 3, "miltyTileIndex": 0 },
+            { "pos": "309", "playerNumber": 4, "miltyTileIndex": 2 },
+            { "pos": "310", "playerNumber": 4, "home": true },
+            { "pos": "311", "playerNumber": 4, "miltyTileIndex": 0 },
+            { "pos": "312", "playerNumber": 5, "miltyTileIndex": 2 },
+            { "pos": "313", "playerNumber": 5, "home": true },
+            { "pos": "314", "playerNumber": 5, "miltyTileIndex": 0 },
+            { "pos": "315", "playerNumber": 6, "miltyTileIndex": 2 },
+            { "pos": "316", "playerNumber": 6, "home": true },
+            { "pos": "317", "playerNumber": 6, "miltyTileIndex": 0 },
+            { "pos": "318", "playerNumber": 1, "miltyTileIndex": 2 },
+
+            { "pos": "528", "staticTileId": "65" },
+            { "pos": "529", "staticTileId": "46", "tokens": ["whgamma"] },
+            { "pos": "530", "staticTileId": "46" },
+            { "pos": "501", "staticTileId": "66" },
+            { "pos": "502", "staticTileId": "46" },
+            { "pos": "503", "staticTileId": "46", "tokens": ["whgamma"] },
+            { "pos": "504", "staticTileId": "69" }
+        ]
+    }
+]

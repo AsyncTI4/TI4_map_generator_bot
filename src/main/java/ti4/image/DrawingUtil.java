@@ -195,7 +195,11 @@ public class DrawingUtil {
             if (player == null) gameName = "Null Player";
             if (player != null && player.getGame() == null) gameName = "Null Game";
             if (player != null && player.getGame() != null) gameName = player.getGame().getName();
-            BotLogger.log("Ignored error during map generation for `" + gameName + "`", e);
+            if (player != null) {
+                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Ignored error during map generation for `" + gameName + "`", e);
+            } else {
+                BotLogger.error("Ignored error during map generation for `" + gameName + "`", e);
+            }
         }
     }
 
@@ -259,7 +263,7 @@ public class DrawingUtil {
             if (factionID.equalsIgnoreCase("fogalliance") || factionID.equalsIgnoreCase("generic")) {
                 return null;
             }
-            BotLogger.log("Could not find image file for faction icon: " + factionID);
+            BotLogger.warning("Could not find image file for faction icon: " + factionID);
         }
         return factionFile;
     }
@@ -273,7 +277,7 @@ public class DrawingUtil {
             if (user == null) return null;
             return ImageHelper.readURLScaled(user.getEffectiveAvatar().getUrl(), 32, 32);
         } catch (Exception e) {
-            BotLogger.log("Could not get Avatar", e);
+            BotLogger.error("Could not get Avatar", e);
         }
         return null;
     }
@@ -445,7 +449,7 @@ public class DrawingUtil {
             if (setOpacity)
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         } catch (Exception e) {
-            BotLogger.log("Could not display player's faction icon image", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not display player's faction icon image", e);
         }
     }
 
@@ -467,7 +471,7 @@ public class DrawingUtil {
             Graphics2D g2 = (Graphics2D) graphics;
             g2.drawImage(underlay, x, y, null);
         } catch (Exception e) {
-            BotLogger.log("Could not display player's faction icon image", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not display player's faction icon image", e);
         }
     }
 
@@ -490,13 +494,13 @@ public class DrawingUtil {
             while (width(g2, line) > maxWidth) {
                 int splitIndex = -1;
                 int nextSpace = line.indexOf(" ");
-    
+
                 // Prefer splitting at spaces
                 while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
                     splitIndex = nextSpace;
                     nextSpace = line.indexOf(" ", splitIndex + 1);
                 }
-    
+
                 // If no space is found or no valid split, break at max width
                 if (splitIndex == -1) {
                     for (int i = 1; i < line.length(); i++) {
@@ -506,11 +510,11 @@ public class DrawingUtil {
                         }
                     }
                 }
-    
+
                 finalSplit.add(line.substring(0, splitIndex).trim());
                 line = line.substring(splitIndex).trim();
             }
-    
+
             if (!line.isEmpty()) {
                 finalSplit.add(line);
             }

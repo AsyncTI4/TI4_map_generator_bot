@@ -53,7 +53,9 @@ public class SecretObjectiveInfoService {
         Button scoreB = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
         Button discardB = Buttons.red("get_so_discard_buttons", "Discard A Secret Objective");
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-        buttons.add(scoreB);
+        if(!game.getPhaseOfGame().isEmpty()){
+            buttons.add(scoreB);
+        }
         buttons.add(discardB);
         MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
     }

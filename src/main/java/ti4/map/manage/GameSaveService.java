@@ -70,7 +70,7 @@ class GameSaveService {
                 saveTile(writer, tile);
             }
         } catch (Exception e) {
-            BotLogger.log("Could not save map: " + game.getName(), e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not save map: " + game.getName(), e);
             return false;
         }
 
@@ -381,6 +381,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.RED_TAPE_MODE + " " + game.isRedTapeMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.OMEGA_PHASE_MODE + " " + game.isOmegaPhaseMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.STRAT_PINGS + " " + game.isStratPings());
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + game.isAbsolMode());
@@ -405,7 +407,11 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_EXPLORATION_MODE + " " + game.isAgeOfExplorationMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.FACILITIES_MODE + " " + game.isFacilitiesMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.MINOR_FACTIONS_MODE + " " + game.isMinorFactionsMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.HIDDEN_AGENDA_MODE + " " + game.isHiddenAgendaMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
@@ -595,6 +601,12 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.SARWEEN_COUNT + " " + player.getSarweenCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.PATH_TOKEN_COUNT + " " + player.getPathTokenCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 
             writeCards(player.getActionCards(), writer, Constants.AC);
@@ -795,6 +807,11 @@ class GameSaveService {
                 writer.write(System.lineSeparator());
             }
 
+            if (player.hasPriorityPosition()) {
+                writer.write(Constants.PRIORITY_TRACK + " " + player.getPriorityPosition());
+                writer.write(System.lineSeparator());
+            }
+
             writer.write(ENDPLAYER);
             writer.write(System.lineSeparator());
         }
@@ -912,7 +929,7 @@ class GameSaveService {
 
             writer.write(System.lineSeparator());
         } catch (Exception e) {
-            BotLogger.log("Error trying to save peeked public objective(s): " + constant, e);
+            BotLogger.error("Error trying to save peeked public objective(s): " + constant, e);
         }
     }
 

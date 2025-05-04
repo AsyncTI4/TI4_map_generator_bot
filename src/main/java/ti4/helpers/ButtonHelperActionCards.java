@@ -541,31 +541,33 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who took the planet from you.", buttons);
     }
+
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
         String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to resolve parley on. If it's not present (because the opponent took it already), try pressing UNDO, then /planet add it back to yourself, then try again";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
-            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix()+"resolveParleyStep2_" + planet,
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "resolveParleyStep2_" + planet,
                 Helper.getPlanetRepresentation(planet, game)));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
+
     @ButtonHandler("resolveParleyStep2")
     public static void resolveParleyStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String message = player.getRepresentationUnfogged() + " parleyed the planet of "+Helper.getPlanetRepresentationNoResInf(planet, game);
+        String message = player.getRepresentationUnfogged() + " parleyed the planet of " + Helper.getPlanetRepresentationNoResInf(planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         Tile tile = game.getTileFromPlanet(planet);
-        if(tile != null){
+        if (tile != null) {
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             UnitHolder planetUnitHolder = unitHolders.get(planet);
             UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
             if (planetUnitHolder != null && spaceUnitHolder != null) {
                 Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
                 for (Player player_ : game.getPlayers().values()) {
-                    if(player_== player || player.getAllianceMembers().contains(player_.getFaction())){
+                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
                         continue;
                     }
                     String color = player_.getColor();
@@ -575,7 +577,7 @@ public class ButtonHelperActionCards {
                 for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                     UnitKey key = unitEntry.getKey();
                     Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
-                    if(player_== player || player.getAllianceMembers().contains(player_.getFaction())){
+                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
                         continue;
                     }
                     if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
@@ -1252,7 +1254,7 @@ public class ButtonHelperActionCards {
         String message = switch (ThreadLocalRandom.current().nextInt(7)) {
             case 1 -> ", your representatives (all of them) fell out of some windows.";
             case 2 -> ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.";
-            case 3 -> ", your representatives were \"invited\" to \"experienced\" the \"sight-seeing\" Sea of Desolation \"tour\".";
+            case 3 -> ", your representatives were \"invited\" to \"experience\" the \"sight-seeing\" Sea of Desolation \"tour\".";
             case 4 -> ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).";
             case 5 -> ", your representatives have followed in a great tradition, and so have been stabbed 23 times.";
             case 6 -> ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.";
@@ -1335,8 +1337,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0
-                || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+            if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 if (!game.getTileFromPlanet(planet).isHomeSystem()) {
                     Tile tile = game.getTileFromPlanet(planet);
                     buttons.add(Buttons.gray(
@@ -1379,6 +1380,9 @@ public class ButtonHelperActionCards {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has melted the space dock that used to belong to "
                     + p2.getRepresentationUnfogged() + " in " + tile.getRepresentation() + ".");
+        }
+        if (p2.hasAbility("data_recovery")) {
+            ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1696,6 +1700,11 @@ public class ButtonHelperActionCards {
         if (amountToKill > 3) {
             amountToKill = 3;
         }
+        if (amountToKill > 0) {
+            if (p2.hasAbility("data_recovery")) {
+                ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+            }
+        }
         if (p2.hasInf2Tech()) {
             ButtonHelper.resolveInfantryDeath(p2, amountToKill);
             boolean cabalMech = false;
@@ -1818,6 +1827,11 @@ public class ButtonHelperActionCards {
                 && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, hits, "infantry", event);
             }
+            if (hits > 0) {
+                if (p2.hasAbility("data_recovery")) {
+                    ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+                }
+            }
         }
         String adjective = "";
         if (amount >= 5) {
@@ -1858,7 +1872,7 @@ public class ButtonHelperActionCards {
         int hits = 0;
         if (amount > 0) {
             StringBuilder msg = new StringBuilder(UnitEmojis.fighter + " rolled ");
-            int threshold = "action_deck_2".equals(game.getAcDeckID()) ? 7 : 6;
+            int threshold = 6;
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(threshold);
                 msg.append(d1.getResult()).append(", ");
@@ -1897,6 +1911,9 @@ public class ButtonHelperActionCards {
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), p2.getColor());
             var unit = new ParsedUnit(key, amount, planet);
             RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, unit);
+            if (p2.hasAbility("data_recovery")) {
+                ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+            }
         }
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -2096,7 +2113,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String acName = buttonID.split("_")[1];
+        String acName = buttonID.replace("resolveReverse_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);

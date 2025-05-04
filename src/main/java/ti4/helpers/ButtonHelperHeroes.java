@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,12 +9,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitKey;
@@ -39,6 +42,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.RiftSetModeService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
@@ -46,11 +50,10 @@ import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
+import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperHeroes {
 
@@ -459,6 +462,8 @@ public class ButtonHelperHeroes {
             + p2.getFactionEmojiOrColor()
             + ", who now owes a promissory note in return. Buttons have been sent to the players `#cards-info` thread to resolve.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        player.removeRelic(shipOrder);
+        p2.addRelic(shipOrder);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
         String message2 = p2.getRepresentationUnfogged()
             + " You have been given an Axis Order by Demi-Queen Mdcksssk, the Axis hero, and now must send a promissory note in return."
@@ -933,6 +938,9 @@ public class ButtonHelperHeroes {
                     if (p2.hasInf2Tech()) {
                         ButtonHelper.resolveInfantryDeath(p2, amountInf);
                     }
+                    if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
+                        ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
+                    }
                     if (amountInf > 0) {
                         RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
                     }
@@ -943,13 +951,13 @@ public class ButtonHelperHeroes {
                     if (amountFF + amountInf > 0) {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                             p2.getRepresentation()
-                                + " heads up, a tile with your units in it got Armageddon'd by Gurno Aggero, the Saar hero, removing all fighters and infantry.");
+                                + " heads up, a tile with your units in it got Armageddon'd by Gurno Aggero, the Saar hero, destroying all fighters and infantry.");
                     }
                 }
 
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " removed all opposing infantry and fighters in "
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " destroyed all opposing infantry and fighters in "
             + tile.getRepresentationForButtons(game, player) + " using Gurno Aggero, the Saar hero.");
         ButtonHelper.deleteMessage(event);
     }
@@ -961,7 +969,7 @@ public class ButtonHelperHeroes {
         buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos),
             "arboHeroBuild", "place");
         String message = player.getRepresentation() + " Use the buttons to produce units. ";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -981,6 +989,26 @@ public class ButtonHelperHeroes {
             }
         }
         return techPlanets;
+    }
+
+    @ButtonHandler("qhetHeroAbility_")
+    public static void qhetHeroAbility(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String thing = buttonID.split("_")[1];
+        ButtonHelper.deleteMessage(event);
+        if (thing.contains("command")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +
+                " is using their hero ability to gain a command token.");
+            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
+                + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +
+                " is using their hero ability to take another action.");
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Aciton buttons",
+                StartTurnService.getStartOfTurnButtons(player, game, true, event, true));
+        }
     }
 
     @ButtonHandler("purgeCeldauriHero_")
@@ -1112,16 +1140,21 @@ public class ButtonHelperHeroes {
             if (p.hasTech("dt2") || p.getUnitsOwned().contains("cabal_spacedock")
                 || p.getUnitsOwned().contains("cabal_spacedock2") || p.hasTech("absol_dt2") || p.getUnitsOwned().contains("absol_cabal_spacedock")
                 || p.getUnitsOwned().contains("absol_cabal_spacedock2")) {
-                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.CabalSpacedock,
-                    UnitType.Spacedock));
+                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p, UnitType.Spacedock));
             }
         }
 
         List<Tile> adjTiles = new ArrayList<>();
+
+        if (RiftSetModeService.isActive(game)) {
+            tiles = RiftSetModeService.getAllTilesWithRift(game);
+            adjTiles.addAll(tiles);
+        }
+
         for (Tile tile : tiles) {
             for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
                 Tile tileToAdd = game.getTileByPosition(pos);
-                if (!adjTiles.contains(tileToAdd) && !tile.getPosition().equalsIgnoreCase(pos)) {
+                if (!tileToAdd.getTileModel().isHyperlane() && !adjTiles.contains(tileToAdd) && !tile.getPosition().equalsIgnoreCase(pos)) {
                     adjTiles.add(tileToAdd);
                 }
             }
@@ -1131,6 +1164,7 @@ public class ButtonHelperHeroes {
             empties.add(Buttons.blue(finChecker + "cabalHeroTile_" + tile.getPosition(),
                 "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
+        SortHelper.sortButtonsByTitle(empties);
         return empties;
     }
 
@@ -1435,7 +1469,7 @@ public class ButtonHelperHeroes {
                 msg = msg
                     + "removed _Policy - The Environment: Preserve ➕_ and added _Policy - The Environment: Plunder ➖_.";
                 player.addAbility("policy_the_environment_plunder");
-            }else if (player.hasAbility("policy_the_environment_plunder")) {
+            } else if (player.hasAbility("policy_the_environment_plunder")) {
                 player.removeAbility("policy_the_environment_plunder");
                 msg = msg
                     + "removed _Policy - The Environment: Plunder ➖_ and added _Policy - The Environment: Preserve ➕_.";
@@ -1997,6 +2031,31 @@ public class ButtonHelperHeroes {
         if (game.getScPlayed().get(8) == null || !game.getScPlayed().get(8)) {
             scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
         }
+        scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
+
+        return scButtons;
+    }
+
+    public static List<Button> getSecondaryButtons(Game game) {
+        List<Button> scButtons = new ArrayList<>();
+        scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Spend & Gain Command Tokens"));
+        //scButtons.add(Buttons.red("leadershipExhaust", "Exhaust Planets"));
+
+        scButtons.add(Buttons.green("diploRefresh2", "Ready 2 Planets"));
+
+        scButtons.add(Buttons.gray("draw2 AC", "Draw 2 Action Cards", CardEmojis.ActionCard));
+
+        scButtons.add(Buttons.green("construction_spacedock", "Place 1 space dock", UnitEmojis.spacedock));
+        scButtons.add(Buttons.green("construction_pds", "Place 1 PDS", UnitEmojis.pds));
+
+        scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
+
+        scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
+
+        scButtons.add(Buttons.GET_A_TECH);
+
+        scButtons.add(Buttons.gray("non_sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
+
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
 
         return scButtons;

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.utils.StringUtils;
+import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.message.BotLogger;
 import ti4.model.AgendaModel;
@@ -38,7 +39,7 @@ public class GameStatsDashboardPayload {
         try {
             return mapper.writeValueAsString(this);
         } catch (Exception e) {
-            BotLogger.log("Could not get GameStatsDashboardPayload JSON for Game ", e);
+            BotLogger.error("Could not get GameStatsDashboardPayload JSON for Game ", e);
             return null;
         }
     }
@@ -132,6 +133,8 @@ public class GameStatsDashboardPayload {
             .forEach(customPublicVp -> {
                 if (customPublicVp.toLowerCase().contains("censure")) {
                     agendas.add("Political Censure");
+                } else if (customPublicVp.equalsIgnoreCase(Constants.VOICE_OF_THE_COUNCIL_PO)) {
+                    agendas.add(Constants.VOICE_OF_THE_COUNCIL_ID);
                 } else if (customPublicVp.toLowerCase().contains("mutiny")) {
                     agendas.add("Mutiny");
                 } else if (customPublicVp.toLowerCase().contains("seed")) {

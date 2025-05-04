@@ -36,7 +36,7 @@ public class StandardBagDraft extends BagDraft {
         return "standard_bag_draft";
     }
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral" };
+    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "qhet", "atokera" };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllLegalFactions();
@@ -89,7 +89,7 @@ public class StandardBagDraft extends BagDraft {
                     if (!draftableCollection.getValue().isEmpty()) {
                         bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
                     }
                 }
             }

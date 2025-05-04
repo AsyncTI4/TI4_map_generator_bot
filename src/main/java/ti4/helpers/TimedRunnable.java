@@ -2,11 +2,13 @@ package ti4.helpers;
 
 import java.util.Objects;
 
+import lombok.Getter;
 import org.apache.commons.lang3.time.StopWatch;
 import ti4.message.BotLogger;
 
 public class TimedRunnable implements Runnable {
 
+    @Getter
     private final String name;
     private final Runnable delegate;
     private final int warningThresholdSeconds;
@@ -32,7 +34,7 @@ public class TimedRunnable implements Runnable {
             stopWatch.stop();
             long secondsElapsed = stopWatch.getDuration().toSeconds();
             if (secondsElapsed >= warningThresholdSeconds) {
-                BotLogger.log("'" + name + "' took longer than " + warningThresholdSeconds + " seconds (" + secondsElapsed + ").");
+                BotLogger.warning("'" + name + "' took longer than " + warningThresholdSeconds + " seconds (" + secondsElapsed + ").");
             }
         }
     }

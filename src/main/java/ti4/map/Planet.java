@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -9,12 +9,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
+
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -22,10 +25,8 @@ import ti4.model.AttachmentModel;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
 import ti4.model.TechSpecialtyModel;
-import ti4.model.UnitModel;
 import ti4.model.TechnologyModel.TechnologyType;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import ti4.model.UnitModel;
 
 @JsonTypeName("planet")
 public class Planet extends UnitHolder {
@@ -150,10 +151,8 @@ public class Planet extends UnitHolder {
             resourcesOriginal = 2;
             influenceOriginal = 0;
         }
-
         AttachmentModel attachment = Mapper.getAttachmentInfo(tokenFileName);
         if (attachment != null) {
-
             resourcesModifier += attachment.getResourcesModifier();
             influenceModifier += attachment.getInfluenceModifier();
             for (String planetType : attachment.getPlanetTypes()) {

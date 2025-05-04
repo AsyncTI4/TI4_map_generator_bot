@@ -37,7 +37,8 @@ public class ButtonProcessor {
         BotLogger.logButton(event);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("ButtonProcessor task", gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorManager.runAsync("ButtonProcessor task " + event.getButton().getLabel() + " for " + gameName,
+            gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static void process(ButtonInteractionEvent event) {
@@ -60,7 +61,7 @@ public class ButtonProcessor {
                 saveRuntime = System.currentTimeMillis() - beforeTime;
             }
         } catch (Exception e) {
-            BotLogger.log(event, "Something went wrong with button interaction", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), "Something went wrong with button interaction", e);
         }
 
         runtimeWarningService.submitNewRuntime(event, startTime, System.currentTimeMillis(), contextRuntime, resolveRuntime, saveRuntime);

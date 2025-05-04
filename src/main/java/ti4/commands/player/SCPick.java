@@ -26,6 +26,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.BannerGenerator;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -118,6 +119,9 @@ class SCPick extends GameStateSubcommand {
         }
         if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
             game.setSCPlayed(scPicked, true);
+            for (Player p2 : game.getRealPlayers()) {
+                p2.addFollowedSC(scPicked);
+            }
         }
 
         boolean nextCorrectPing = false;
@@ -145,6 +149,9 @@ class SCPick extends GameStateSubcommand {
 
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
+            if (game.isOmegaPhaseMode()) {
+                PriorityTrackHelper.ClearPriorityTrack(game);
+            }
 
             for (Player p2 : game.getRealPlayers()) {
                 ButtonHelperActionCards.checkForAssigningCoup(game, p2);

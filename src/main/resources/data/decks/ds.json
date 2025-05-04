@@ -448,7 +448,15 @@
             "dsveldr",
             "dsvelddn",
             "dszelir",
-            "dszeliinf"
+            "dszeliinf",
+            "dsuydag",
+            "dsuydab",
+            "dspharinf",
+            "dspharb",
+            "dsqhetinf",
+            "dsqhetcr",
+            "dsatokcr",
+            "dsatoky"
         ],
         "source": "ds"
     }

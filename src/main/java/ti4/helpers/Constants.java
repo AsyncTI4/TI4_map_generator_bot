@@ -219,6 +219,7 @@ public class Constants {
     public static final String SEARCH_MY_GAMES = "my_games";
     public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
+    public static final String SEARCH_SOURCES = "sources";
 
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
     public static final String RELOAD_GAME = "reload_game";
@@ -710,6 +711,25 @@ public class Constants {
     public static final String PEEK_AT_STAGE1 = "peek_at_stage1";
     public static final String PEEK_AT_STAGE2 = "peek_at_stage2";
 
+    //Omega Phase bot commands and parameters
+    public static final String OMEGA_PHASE_COMMAND = "omegaphase";
+    public static final String SETUP_VOTC = "setup_voice_of_the_council";
+    public static final String ASSIGN_PLAYER_TO_VOTC = "assign_player_to_votc";
+    public static final String ASSIGN_PLAYER_PRIORITY = "assign_player_priority";
+    public static final String CLEAR_PRIORITY_TRACK = "clear_priority_track";
+    public static final String PRINT_PRIORITY_TRACK = "print_priority_track";
+    public static final String PEEK_AT_NEXT_OBJECTIVE = "peek_at_next_objective";
+    public static final String PRINT_OMEGA_PHASE_RULES = "print_omega_phase_rules";
+    public static final String PRIORITY_POSITION = "priority_position";
+    public static final String VOICE_OF_THE_COUNCIL_ID = "voice_of_the_council_omegaphase";
+    public static final String VOICE_OF_THE_COUNCIL_PO = "Voice of the Council";
+    public static final String RESET_VOICE_OF_THE_COUNCIL = "reset_voice_of_the_council";
+    public static final String ELECT_VOICE_OF_THE_COUNCIL = "elect_voice_of_the_council";
+    public static final String IMPERIUM_REX_ID = "imperium_rex_omegaphase";
+    //Omega Phase state keys
+    public static final String PRIORITY_TRACK = "priority_track";
+    public static final String OMEGA_PHASE_MODE = "omega_phase_mode";
+
     public static final String ADD_CUSTOM = "po_add_custom";
     public static final String MAKE_SO_INTO_PO = "so_into_po";
     public static final String SO_TO_PO = "so_to_po";
@@ -935,6 +955,7 @@ public class Constants {
 
     public static final String ABILITY = "ability";
     public static final String BAN_ABILITY = "ban_ability";
+    public static final String BAN_FACTION = "ban_faction";
     public static final String ABILITY_1 = "ability_1";
     public static final String ABILITY_2 = "ability_2";
     public static final String ABILITY_3 = "ability_3";
@@ -995,7 +1016,9 @@ public class Constants {
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String CC_LIMIT = "cc_limit";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";
+    public static final String FACILITIES_MODE = "facilities_mode";
     public static final String MINOR_FACTIONS_MODE = "minor_factions_mode";
+    public static final String HIDDEN_AGENDA_MODE = "hidden_agenda_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
@@ -1014,8 +1037,11 @@ public class Constants {
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
     public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
     public static final String LANEFIR_ATS_COUNT = "ats_count";
+    public static final String SET_PLANET_TRADEGOODS = "set_planet_tradegoods";
     public static final String PILLAGE_COUNT = "pillage_count";
     public static final String SARWEEN_COUNT = "sarween_count";
+    public static final String PATH_TOKEN_COUNT = "path_token_count";
+    public static final String HARVEST_COUNT = "harvest_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
     public static final String ZELIAN_HERO = "zelian_hero";

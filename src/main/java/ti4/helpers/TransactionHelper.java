@@ -218,8 +218,12 @@ public class TransactionHelper {
                                 }
                                 trans.append(CardEmojis.PN);
                                 if (!hidePrivateCardText) {
-                                    trans.append(" ").append(StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")))
-                                        .append(" _").append(Mapper.getPromissoryNote(id).getName()).append("_");
+                                    if (Mapper.getPromissoryNote(id) != null) {
+                                        trans.append(" ").append(StringUtils.capitalize(Mapper.getPromissoryNote(id).getColor().orElse("")))
+                                            .append(" _").append(Mapper.getPromissoryNote(id).getName()).append("_");
+                                    } else {
+                                        trans.append(" ").append("null pn info for " + id);
+                                    }
                                 }
                             }
                         }
@@ -405,6 +409,11 @@ public class TransactionHelper {
     public static void transaction(Player player, Game game) {
         List<Button> buttons = TransactionHelper.getPlayersToTransact(game, player);
         String message = player.getRepresentation() + " Use the buttons to select which player you wish to transact with";
+        if (game.isHiddenAgendaMode() && !game.getPhaseOfGame().toLowerCase().contains("action")) {
+            message = player.getRepresentation() + " this game is in hidden agenda mode, which does not allow transactions outside of the action phase. ";
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
+            return;
+        }
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
     }
 
@@ -670,10 +679,10 @@ public class TransactionHelper {
             player.addTransactionItem("sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail);
         }
 
-        if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("binding_debts")) {
+        if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("binding_debts") && !p2.hasAbility("data_recovery")) {
             int amount = Math.min(p2.getDebtTokenCount(p1.getColor()), Integer.parseInt(extraDetail));
             String clear = "sending" + receiver + "_receiving" + sender + "_ClearDebt_" + amount;
-            if(!player.getTransactionItems().contains(clear)){
+            if (!player.getTransactionItems().contains(clear)) {
                 player.addTransactionItem(clear);
             }
         }
@@ -943,7 +952,7 @@ public class TransactionHelper {
                 p2.setTg(p2.getTg() + tgAmount);
                 CommanderUnlockCheckService.checkPlayer(p2, "hacan");
                 message2 = ident + " sent " + tgAmount + " trade good" + (tgAmount == 1 ? "" : "s") + " to " + ident2 + ".";
-                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
+                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
                     message2 += "\n" + ident2 + " cleared " + amount + " debt tokens owned by " + ident + ".";
@@ -969,7 +978,7 @@ public class TransactionHelper {
                 CommanderUnlockCheckService.checkPlayer(p2, "hacan");
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " commodit" + (tgAmount == 1 ? "y" : "ies") + " to " + ident2 + ".";
-                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && oldWay) {
+                if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
                     p2.clearDebt(p1, amount);
                     message2 += "\n" + ident2 + " cleared " + amount + " debt token" + (amount == 1 ? "" : "s") + " owned by " + ident + ".";

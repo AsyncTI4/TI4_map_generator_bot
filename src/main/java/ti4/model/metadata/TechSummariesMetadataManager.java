@@ -66,7 +66,7 @@ public class TechSummariesMetadataManager {
             var techSummary = PersistenceManager.readObjectFromJsonFile(TECH_SUMMARIES_FILE, TechSummaries.class);
             return techSummary != null ? techSummary : new TechSummaries(new HashMap<>());
         } catch (IOException e) {
-            BotLogger.log("Failed to read json data for TechSummaries.", e);
+            BotLogger.error("Failed to read json data for TechSummaries.", e);
             return null;
         }
     }
@@ -75,7 +75,7 @@ public class TechSummariesMetadataManager {
         try {
             PersistenceManager.writeObjectToJsonFile(TECH_SUMMARIES_FILE, toPersist);
         } catch (Exception e) {
-            BotLogger.log("Failed to write json data for TechSummaries.", e);
+            BotLogger.error("Failed to write json data for TechSummaries.", e);
         }
     }
 

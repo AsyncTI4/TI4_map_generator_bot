@@ -43,7 +43,7 @@ public class ModalListener extends ListenerAdapter {
         event.deferEdit().queue();
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("ModalListener task", gameName, event.getMessageChannel(), () -> handleModal(event));
+        ExecutorManager.runAsync("ModalListener task for " + gameName, gameName, event.getMessageChannel(), () -> handleModal(event));
     }
 
     private void handleModal(@Nonnull ModalInteractionEvent event) {
@@ -55,7 +55,7 @@ public class ModalListener extends ListenerAdapter {
             }
         } catch (Exception e) {
             String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
-            BotLogger.log(message, e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), message, e);
         }
     }
 

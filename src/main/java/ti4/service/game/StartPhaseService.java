@@ -1,8 +1,8 @@
 package ti4.service.game;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import lombok.experimental.UtilityClass;
@@ -26,7 +26,9 @@ import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.PlayerTitleHelper;
 import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.StatusHelper;
 import ti4.helpers.StringHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -88,7 +90,9 @@ public class StartPhaseService {
                 game.setExplorationDeckID(deckModel.getAlias());
             }
             case "statusScoring" -> {
-                EndTurnService.showPublicObjectivesWhenAllPassed(event, game, game.getMainGameChannel());
+                StatusHelper.AnnounceStatusPhase(game);
+                StatusHelper.BeginScoring(event, game, event.getMessageChannel());
+                StatusHelper.HandleStatusPhaseMiddle(event, game, event.getMessageChannel());
                 game.updateActivePlayer(null);
             }
             case "endOfGameSummary" -> {
@@ -118,43 +122,45 @@ public class StartPhaseService {
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find phase: `" + phase + "`");
         }
     }
+
     public static List<Button> getQueueSCPickButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        String alreadyQueued = game.getStoredValue(player.getFaction()+"scpickqueue");
-        for(int x = 1; x < 9; x++){
-            String num = x+"";
-            if(alreadyQueued.contains(num)){
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
+        for (int x = 1; x < 9; x++) {
+            String num = x + "";
+            if (alreadyQueued.contains(num)) {
                 continue;
             }
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
-            buttons.add(Buttons.green("queueScPick_"+num, Helper.getSCName(x, game), scEmoji));
+            buttons.add(Buttons.green("queueScPick_" + num, Helper.getSCName(x, game), scEmoji));
         }
         buttons.add(Buttons.red("deleteButtons", "Decline to Queue"));
         buttons.add(Buttons.gray("restartSCQueue", "Restart Queue"));
         return buttons;
     }
+
     public static String getQueueSCMessage(Game game, Player player) {
-        int number = Helper.getPlayerSpeakerNumber(player, game);
-        String alreadyQueued = game.getStoredValue(player.getFaction()+"scpickqueue");
+        int number = Helper.getPlayerSpeakerOrPriorityNumber(player, game);
+        String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
         int numQueued = alreadyQueued.split("_").length;
-        if(alreadyQueued.isEmpty()){
+        if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        String msg = player.getRepresentation() +" you are #"+number+" pick in this strategy phase and so can queue "+number+" strategy cards (SCs). So "+
-        "far you have queued "+numQueued+" cards. ";
-        if(game.isFowMode()){
-            msg = player.getRepresentation() +" you can queue up to 8 cards. So "+
-            "far you have queued "+numQueued+" cards. ";
+        String msg = player.getRepresentation() + " you are #" + number + " pick in this strategy phase and so can queue " + number + " strategy cards (SCs). So " +
+            "far you have queued " + numQueued + " cards. ";
+        if (game.isFowMode()) {
+            msg = player.getRepresentation() + " you can queue up to 8 cards. So " +
+                "far you have queued " + numQueued + " cards. ";
         }
-        if(numQueued > 0){
+        if (numQueued > 0) {
             msg += "The queued SCs are as follows (in the order the bot will attempt to select them for you):\n";
             int count = 1;
-            for(String num : alreadyQueued.split("_")){
-                if(num.isEmpty()){
+            for (String num : alreadyQueued.split("_")) {
+                if (num.isEmpty()) {
                     continue;
                 }
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(Integer.parseInt(num));
-                msg += count+". "+Helper.getSCName(Integer.parseInt(num), game) + " "+scEmoji+"\n";
+                msg += count + ". " + Helper.getSCName(Integer.parseInt(num), game) + " " + scEmoji + "\n";
             }
         }
         return msg;
@@ -355,28 +361,45 @@ public class StartPhaseService {
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
         }
-        Player speaker;
-        if (game.getPlayer(game.getSpeakerUserID()) != null) {
-            speaker = game.getPlayers().get(game.getSpeakerUserID());
+        Player firstSCPicker;
+        if (!game.isOmegaPhaseMode()) {
+            if (game.getPlayer(game.getSpeakerUserID()) != null) {
+                firstSCPicker = game.getPlayers().get(game.getSpeakerUserID());
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed.");
+                return;
+            }
+            if (!firstSCPicker.getSCs().isEmpty() && game.getRealPlayers().size() > 1) {
+                firstSCPicker = Helper.getSpeakerOrderFromThisPlayer(firstSCPicker, game).get(1);
+            }
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Speaker not found. Can't proceed.");
-            return;
+            PriorityTrackHelper.PrintPriorityTrack(game);
+            var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+            var firstInPriorityOrder = priorityTrack.stream()
+                .filter(Objects::nonNull)
+                .filter(p -> p.getSCs().size() < game.getStrategyCardsPerPlayer())
+                .findFirst();
+            if (!firstInPriorityOrder.isPresent()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No player found on the Priority Track with fewer than the max SC cards. Can't offer anyone Strategy Cards.");
+                return;
+            }
+            firstSCPicker = firstInPriorityOrder.get();
         }
-        String message = speaker.getRepresentationUnfogged() + " is up to pick a strategy card.";
-        game.updateActivePlayer(speaker);
+        String message = firstSCPicker.getRepresentationUnfogged() + " is up to pick a strategy card.";
+        game.updateActivePlayer(firstSCPicker);
         game.setPhaseOfGame("strategy");
         FowCommunicationThreadService.checkAllCommThreads(game);
         String pickSCMsg = " Please use the buttons to pick a strategy card.";
         if (game.getLaws().containsKey("checks") || game.getLaws().containsKey("absol_checks")) {
             pickSCMsg = " Please use the buttons to pick the strategy card you wish to give to someone else.";
-        }else{
-            if(game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()){
+        } else {
+            if (game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()) {
                 for (Player player2 : game.getRealPlayers()) {
-                    int number = Helper.getPlayerSpeakerNumber(player2, game);
-                    if(number == 1 || (number == 8 && !game.isFowMode())){
+                    int number = Helper.getPlayerSpeakerOrPriorityNumber(player2, game);
+                    if (number == 1 || (number == 8 && !game.isFowMode()) || !player2.getSCs().isEmpty()) {
                         continue;
                     }
-                    String msg = player2.getRepresentation()+" in order to speed up the strategy phase, you can now offer the bot a ranked list of your desired"+
+                    String msg = player2.getRepresentation() + " in order to speed up the strategy phase, you can now offer the bot a ranked list of your desired" +
                         " strategy cards, which it will pick for you when it's your turn to pick. If you do not want to, that is fine, just decline.";
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), msg);
                     MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), getQueueSCMessage(game, player2), getQueueSCPickButtons(game, player2));
@@ -385,7 +408,7 @@ public class StartPhaseService {
         }
         ButtonHelperAbilities.giveKeleresCommsNTg(game, event);
         game.setStoredValue("startTimeOfRound" + game.getRound() + "Strategy", System.currentTimeMillis() + "");
-        MessageHelper.sendMessageToChannelWithButtons(speaker.getCorrectChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, speaker));
+        MessageHelper.sendMessageToChannelWithButtons(firstSCPicker.getCorrectChannel(), message + pickSCMsg, Helper.getRemainingSCButtons(game, firstSCPicker));
 
         if (!game.isFowMode()) {
             ButtonHelper.updateMap(game, event, "Start of the strategy phase for round #" + game.getRound() + ".");
@@ -562,7 +585,7 @@ public class StartPhaseService {
         }
         boolean custodiansTaken = game.isCustodiansScored();
         Button passOnAbilities;
-        if (custodiansTaken) {
+        if (custodiansTaken || game.isOmegaPhaseMode()) {
             passOnAbilities = Buttons.red("pass_on_abilities", "Ready For Agenda");
             message2 += """
                 This is the moment when you should resolve:\s
@@ -603,9 +626,6 @@ public class StartPhaseService {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
-        Collection<Player> activePlayers = game.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .toList();
 
         for (Player p2 : game.getRealPlayers()) {
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
@@ -616,6 +636,10 @@ public class StartPhaseService {
                     PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
                 }
             }
+        }
+
+        if (game.isOmegaPhaseMode()) {
+            PriorityTrackHelper.ClearPriorityTrack(game);
         }
 
         Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
@@ -634,6 +658,9 @@ public class StartPhaseService {
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(nextPlayer, game, event, msgExtra, fail, success);
+            if (game.isShowBanners()) {
+                BannerGenerator.drawFactionBanner(nextPlayer);
+            }
             msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             game.updateActivePlayer(nextPlayer);

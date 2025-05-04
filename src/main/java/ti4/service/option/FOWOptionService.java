@@ -6,9 +6,9 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
@@ -22,8 +22,9 @@ public class FOWOptionService {
         HIDE_TOTAL_VOTES("Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER("Hide voting order", "Hide player colors from vote order"),
         HIDE_PLAYER_NAMES("Hide real names", "Completely hide player Discord names on the map"),
-        STATUS_SUMMARY("Status summary", "Prints explores info a summary thread in status homework"),
-        
+        STATUS_SUMMARY("Status summary", "Prints explores info as summary thread in status homework"),
+        FOW_PLUS("FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details"),
+
         //Hidden from normal options
         RIFTSET_MODE("RiftSet Mode", "For Eronous to run fow300", false);
 
@@ -69,13 +70,17 @@ public class FOWOptionService {
     }
 
     public static void offerFOWOptionButtons(Game game, MessageChannel channel) {
+        offerFOWOptionButtons(game, channel, null);
+    }
+    
+    private static void offerFOWOptionButtons(Game game, MessageChannel channel, ButtonInteractionEvent event) {
         List<Button> optionButtons = new ArrayList<>();
-        StringBuilder sb = new StringBuilder("## FoW Options\n");
+        StringBuilder sb = new StringBuilder();
         for (FOWOption option : FOWOption.values()) {
             if (!option.isVisible()) continue;
 
             boolean currentValue = game.getFowOption(option);
-            sb.append("**").append(option.getTitle()).append("**: ").append(valueRepresentation(currentValue)).append("\n");
+            sb.append(valueRepresentation(currentValue)).append(" **").append(option.getTitle()).append("**\n");
             sb.append("-# ").append(option.getDescription()).append("\n");
 
             optionButtons.add(currentValue
@@ -83,7 +88,12 @@ public class FOWOptionService {
                 : Buttons.green("fowOption_true_" + option, "Enable " + option.getTitle()));
         }
         optionButtons.add(Buttons.gray("deleteButtons", "Done"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, sb.toString(), optionButtons);
+        if (event == null) {
+            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, sb.toString(), optionButtons);
+        } else {
+            List<List<ActionRow>> buttonRows = MessageHelper.getPartitionedButtonLists(optionButtons);
+            event.getHook().editOriginal(sb.toString()).setComponents(buttonRows.getFirst()).queue();
+        }
     }
 
     @ButtonHandler("fowOption_")
@@ -93,8 +103,7 @@ public class FOWOptionService {
         String option = parts[1];
 
         game.setFowOption(FOWOption.fromString(option), Boolean.parseBoolean(value));
-        ButtonHelper.deleteMessage(event);
-        offerFOWOptionButtons(game, event.getChannel());
+        offerFOWOptionButtons(game, event.getChannel(), event);
     }
 
     public static String valueRepresentation(boolean value) {

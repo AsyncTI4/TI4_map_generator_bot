@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitType;
@@ -123,7 +124,7 @@ public class ComponentActionHelper {
                         }
 
                     } else {
-                        Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName, factionEmoji);
+                        Button lButton = Buttons.gray(finChecker + prefix + "leader_" + leaderID, "Use " + leaderName + " (" + StringUtils.capitalize(leaderModel.getType()) + ")", factionEmoji);
                         compButtons.add(lButton);
                     }
 
@@ -177,7 +178,7 @@ public class ComponentActionHelper {
                 && !prom.getOwner().equalsIgnoreCase(p1.getColor())
                 && !p1.getPromissoryNotesInPlayArea().contains(pn) && prom.getText() != null) {
                 String pnText = prom.getText();
-                if (pnText.toLowerCase().contains("action:") && !"bmf".equalsIgnoreCase(pn)) {
+                if (pnText.toLowerCase().contains("action:") && !"bmf".equalsIgnoreCase(pn) && !"acq".equalsIgnoreCase(pn)) {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
                     Button pnButton = Buttons.red(finChecker + prefix + "pn_" + pn, "Use " + pnName);
@@ -204,6 +205,14 @@ public class ComponentActionHelper {
         }
         if (p1.hasAbility("orbital_drop") && p1.getStrategicCC() > 0) {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_orbitalDrop", "Orbital Drop", FactionEmojis.Sol);
+            compButtons.add(abilityButton);
+        }
+        if (ButtonHelperSCs.findUsedFacilities(game, p1).contains("facilitycorefactory")) {
+            Button abilityButton = Buttons.green(finChecker + "corefacilityAction", "Use Core Facility Action");
+            compButtons.add(abilityButton);
+        }
+        if (p1.hasLeader("pharadncommander") && !p1.hasLeaderUnlocked("pharadncommander") && ButtonHelperCommanders.getPharadnCommanderUnlockButtons(p1, game).size() > 5) {
+            Button abilityButton = Buttons.green("unlockPharadnCommander", "Unlock Commander", FactionEmojis.pharadn);
             compButtons.add(abilityButton);
         }
         if (p1.hasUnit("lanefir_mech") && !p1.getFragments().isEmpty()
@@ -248,7 +257,7 @@ public class ComponentActionHelper {
 
         // ACs
         List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play AC with Component Action ("+acButtons.size()+")");
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play AC with Component Action (" + acButtons.size() + ")");
         compButtons.add(acButton);
         compButtons.addAll(acButtons);
 

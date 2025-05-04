@@ -67,13 +67,13 @@ public class DataMigrationManager {
                     .addAll(migratedGames);
             }
         } catch (Exception e) {
-            BotLogger.log("Issue running migrations:", e);
+            BotLogger.error("Issue running migrations:", e);
         }
 
         for (Entry<String, List<String>> entry : migrationNamesToAppliedGameNames.entrySet()) {
             if (!entry.getValue().isEmpty()) {
                 String gameNames = String.join(", ", entry.getValue());
-                BotLogger.log(String.format("Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
+                BotLogger.info(String.format("Migration %s run on following maps successfully: \n%s", entry.getKey(), gameNames));
             }
         }
         return true;
@@ -84,7 +84,7 @@ public class DataMigrationManager {
         try {
             return Optional.of(LocalDate.parse(migrationDateString, MIGRATION_DATE_FORMATTER));
         } catch (Exception e) {
-            BotLogger.log(String.format(
+            BotLogger.error(String.format(
                 "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)", migrationDateString), e);
         }
         return Optional.empty();

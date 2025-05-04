@@ -264,7 +264,7 @@ public class CombatModHelper {
                 }
             }
             case Constants.MOD_PLANET_MR_LEGEND_HOME -> {
-                if (onTile.getId().equals(player.getFactionSetupInfo().getHomeSystem())) {
+                if (player.getHomeSystemTile() != null && onTile.getId().equals(player.getHomeSystemTile().getTileID())) {
                     meetsCondition = true;
                 }
                 if (onTile.getPlanets().stream().anyMatch(

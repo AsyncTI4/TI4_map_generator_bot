@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.CommandHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -63,8 +64,8 @@ public class ActionCardHelper {
 
     private static String getTrapCardInfo(Player player) {
         StringBuilder sb = new StringBuilder();
-        sb.append("_ _\n");
-        sb.append("**Trap Cards:**").append("\n");
+        sb.append("\n");
+        sb.append("Trap Cards:").append("\n");
         int index = 1;
         Map<String, Integer> trapCards = player.getTrapCards();
         Map<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
@@ -74,7 +75,7 @@ public class ActionCardHelper {
             } else {
                 for (Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
                     Integer value = trapCard.getValue();
-                    sb.append(index++).append("\\. ").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    sb.append(index++).append(". ").append(Helper.leftpad("(" + value, 4)).append(")`");
                     sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
                 }
             }
@@ -94,7 +95,7 @@ public class ActionCardHelper {
             if (representation == null) {
                 representation = planet;
             }
-            sb.append(" **__Planet: ").append(representation).append("**__");
+            sb.append("\n> Planet: ").append(representation).append("");
         }
         sb.append("\n");
         return sb.toString();
@@ -895,8 +896,13 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, player.getRepresentation(false,true)
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, (game.isFowMode() ? "" : player.getRepresentation(false, true))
                         + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
+                            VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                        }
+                    }
                 }
                 if (automationID.equals("hack")) {
                     game.setHasHackElectionBeenPlayed(true);
@@ -912,6 +918,11 @@ public class ActionCardHelper {
                 if (automationID.equals("assassin")) {
                     codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAssRepsStep1", buttonLabel));
                     MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
+                            VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);
+                        }
+                    }
                 }
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
@@ -940,9 +951,9 @@ public class ActionCardHelper {
 
         // Fog of war ping
         if (game.isFowMode()) {
-            String fowMessage = player.getRepresentation() + " played an action card: _" + actionCardTitle + "_.";
+            String fowMessage = player.getRepresentation() + " played an action card " + CardEmojis.ActionCard + ": _" + actionCardTitle + "_.";
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, fowMessage);
-            MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card: _" + actionCardTitle + "_.");
+            MessageHelper.sendPrivateMessageToPlayer(player, game, "Played action card " + CardEmojis.ActionCard + ": _" + actionCardTitle + "_.");
         }
         if (player.hasUnexhaustedLeader("cymiaeagent") && player.getStrategicCC() > 0) {
             Button cymiaeButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(), "Use Cymiae Agent", FactionEmojis.cymiae);
@@ -1236,7 +1247,6 @@ public class ActionCardHelper {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 // player has a space dock in the system
                 int numSd = unitHolder.getUnitCount(Units.UnitType.Spacedock, colorID);
-                numSd += unitHolder.getUnitCount(Units.UnitType.CabalSpacedock, colorID);
                 numSd += unitHolder.getUnitCount(Units.UnitType.PlenaryOrbital, colorID);
                 if (numSd > 0) {
                     hasSD = true;
