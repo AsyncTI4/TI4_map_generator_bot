@@ -109,7 +109,7 @@ public class CreateFoWGameService {
 
         Guild guild = findFoWGuildWithSpace(event.getGuild(), members.size() + 1);
         if (guild == null) {
-            MessageHelper.sendMessageToEventChannel(event, "All FoW Server are full. Can not host a new game - please contact @Bothelper to resolve.");
+            MessageHelper.sendMessageToEventChannel(event, "All FoW Servers are full. Can not host a new game - please contact @Bothelper.");
             return;
         }
 
@@ -165,6 +165,12 @@ public class CreateFoWGameService {
         long gameRoleGMID = roleGM.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
+        // CREATE GM CHANNEL
+        TextChannel gmChannel = guild.createTextChannel(newGMChannelName, category)
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleGMID, permission, 0)
+            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
+
         // CREATE Anon Announcements CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
             .syncPermissionOverrides()
@@ -174,12 +180,6 @@ public class CreateFoWGameService {
         sb.append(getInfoTextFromFile("FoWMainChannelIntro.txt"));
         MessageHelper.sendMessageToChannel(actionsChannel, sb.toString());
         newGame.setMainChannelID(actionsChannel.getId());
-
-        // CREATE GM CHANNEL
-        TextChannel gmChannel = guild.createTextChannel(newGMChannelName, category)
-            .syncPermissionOverrides()
-            .addRolePermissionOverride(gameRoleGMID, permission, 0)
-            .complete();// Must `complete` if we're using this channel as part of an interaction that saves the game
         
         sb = new StringBuilder(roleGM.getAsMention() + " - gm room\n");
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));

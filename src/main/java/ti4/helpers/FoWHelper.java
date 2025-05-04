@@ -597,10 +597,11 @@ public class FoWHelper {
             wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
         }
 
+        boolean ghostAgent = game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
         for (Tile tile_ : allTiles) {
             String position_ = tile_.getPosition();
 
-            if (wormholeTiles.contains(tile_.getTileID())) {
+            if (wormholeTiles.contains(tile_.getTileID()) || ghostAgent && doesTileHaveWHs(game, position_)) {
                 adjacentPositions.add(position_);
                 continue;
             }

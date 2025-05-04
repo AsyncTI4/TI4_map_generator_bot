@@ -53,6 +53,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -886,7 +887,7 @@ public class ExploreService {
     }
 
     public static void secondHalfOfExpInfo(List<String> types, MessageChannel channel, Player player, Game game, boolean overRide, boolean fullText) {
-        if (!RiftSetModeService.deckInfoAvailable(player, game)) {
+        if (!FOWPlusService.deckInfoAvailable(player, game) || !RiftSetModeService.deckInfoAvailable(player, game)) {
             return;
         }
         for (String currentType : types) {
