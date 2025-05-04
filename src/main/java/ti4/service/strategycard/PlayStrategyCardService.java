@@ -1,6 +1,7 @@
 package ti4.service.strategycard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
@@ -329,12 +330,12 @@ public class PlayStrategyCardService {
                         p2.addFollowedSC(scToPlay, event);
                         if (scToPlay == 8) {
                             String key3 = "potentialBlockers";
-                            if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
-                                game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
                             }
 
                             String key = "factionsThatAreNotDiscardingSOs";
-                            game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
+                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
                         }
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
                             + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
@@ -380,7 +381,11 @@ public class PlayStrategyCardService {
                     Button transaction = Buttons.blue("transaction", "Transaction");
                     scButtons.add(transaction);
                     scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1 Trade Good"));
-                    scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), "Send 1 Debt"));
+                    String label = "Send 1 Debt";
+                    if (player.hasAbility("binding_debts")) {
+                        label += " (Binding Debts)";
+                    }
+                    scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), label));
                 }
                 MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread.", scButtons);
 
@@ -487,8 +492,19 @@ public class PlayStrategyCardService {
         game.setStoredValue(key, "");
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
+        List<Player> players;
+        if (!game.isOmegaPhaseMode()) {
+            players = Helper.getSpeakerOrPriorityOrderFromPlayer(imperialHolder, game);
+        } else {
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getSpeakerOrPriorityOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
+            Collections.rotate(players, -players.indexOf(imperialHolder));
+        }
         if (game.isQueueSO()) {
-            for (Player player : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
+            for (Player player : players) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
                     || player.getSoScored() == player.getMaxSOCount()
                     || (player == imperialHolder && player.controlsMecatol(true) && !game.getPhaseOfGame().contains("agenda"))) {

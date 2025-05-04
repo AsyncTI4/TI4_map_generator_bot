@@ -530,13 +530,17 @@ public class ButtonHelperAgents {
         }
         if ("gledgeagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Durran, the Gledge" + ssruuSlash + " agent.";
-            MessageHelper.sendMessageToChannel(channel, exhaustText);
+
             String faction = rest.split("_")[1];
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            if (p2 == null)
+            if (p2 == null) {
+                MessageHelper.sendMessageToChannel(channel, exhaustText);
                 return;
+            }
+            MessageHelper.sendMessageToChannel(channel, exhaustText + " for use on " + p2.getRepresentationNoPing());
             p2.addSpentThing("Exhausted " + ssruuClever + "Durran, the Gledge" + ssruuSlash + " agent, for +3 PRODUCTION value.");
         }
+
         if ("uydaiagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Garstil, the Uydai" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
@@ -1048,6 +1052,12 @@ public class ButtonHelperAgents {
             buttons.add(Buttons.green("step2axisagent_destroyer", "Place 1 destroyer"));
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
+        if ("ghostagent".equalsIgnoreCase(agent) && game.isFowMode()) {
+            Set<String> currentWhs = FoWHelper.getTileWHs(game, game.getActiveSystem());
+            if (!currentWhs.isEmpty() && !currentWhs.contains(Constants.DELTA)) {
+                game.setStoredValue("ghostagent_active", game.getActiveSystem());
+            }
+        }
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
             if ("".equalsIgnoreCase(exhaustedMessage)) {
@@ -1082,8 +1092,8 @@ public class ButtonHelperAgents {
         for (Player p2 : game.getRealPlayers()) {
             if (p2.hasTech("tcs") && !p2.getExhaustedTechs().contains("tcs")) {
                 List<Button> buttons2 = new ArrayList<>();
-                buttons2.add(Buttons.green("exhaustTCS_" + agent + "_" + player.getFaction(), "Exhaust Temporal Command Suite to Ready " + agent));
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                buttons2.add(Buttons.green(p2.getFinsFactionCheckerPrefix() + "exhaustTCS_" + agent + "_" + player.getFaction(), "Exhaust Temporal Command Suite to Ready " + agent));
+                buttons2.add(Buttons.red(p2.getFinsFactionCheckerPrefix() + "deleteButtons", "Decline"));
                 String msg = p2.getRepresentationUnfogged()
                     + " you have the opportunity to exhaust _ Temporal Command Suite_ to ready " + agent
                     + " and potentially resolve a transaction.";
@@ -1703,7 +1713,7 @@ public class ButtonHelperAgents {
         }
 
         int infAmount = player.getCommoditiesTotal() - 1;
-        List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, infAmount + "gf", "placeOneNDone_skipbuild"));
+        List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(kyro, game, infAmount + "gf", "placeOneNDone_skipbuild"));
         String message = kyro.getRepresentationUnfogged() + "Use buttons to drop " + infAmount + " infantry on a planet";
         MessageHelper.sendMessageToChannelWithButtons(kyro.getCorrectChannel(), message, buttons);
     }

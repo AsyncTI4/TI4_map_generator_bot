@@ -1,0 +1,18 @@
+{
+    "id": "br3",
+    "name": "Qhet/Drakkol - Qhet Republic",
+    "aliases": [
+        "br3",
+        "qhet",
+        "drakkol"
+    ],
+    "imagePath": "BR3_Qhet.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "qhet",
+        "drakkol"
+    ],
+    "source": "ds",
+    "tileBack": "green"
+}

@@ -337,7 +337,7 @@
         "requirements": "G",
         "faction": "kjalengard",
         "source": "ds",
-        "text": "At the start of combat in a system that contains a Glory token, gain 1 trade good.\nAfter a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice.",
+        "text": "Once per action, after a player produces 1 or more hits during a round of combat in a system that contains a Glory token, gain 1 trade good.\nAfter a player rolls combat dice, you may exhaust this card to allow that player to reroll any number of those dice.",
         "shortName": "Zhrgar Stimul'nts",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/zhrgar_stimulants.png?raw=true"
     },
@@ -908,5 +908,52 @@
         "faction": "pharadn",
         "source": "ds",
         "text": "After you activate a system, you may choose 1 anomaly on the game board; that anomaly has no effect until the end of this tactical action."
+    },
+    {
+        "alias": "dsqhetinf",
+        "name": "Commando II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "qhet",
+        "baseUpgrade": "inf2",
+        "source": "ds",
+        "text": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the start of the status phase, place up to 2 units that are on this card on each planet that contains 1 or more of your structures.1(x2) 7; PLANETARY SHIELD"
+    },
+    {
+        "alias": "dsqhetcr",
+        "name": "Battlecruiser II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GRY",
+        "faction": "qhet",
+        "baseUpgrade": "cr2",
+        "source": "ds",
+        "text": "Cost 2, Combat 6, Move 3, Capacity 2\nIf the active system contains another player's units, this unit may move through systems that contain ships controlled by different other players."
+    },
+    {
+        "alias": "dsatokcr",
+        "name": "Mirrorshard II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GRY",
+        "faction": "atokera",
+        "baseUpgrade": "cr2",
+        "source": "ds",
+        "text": "Cost 2, Combat 6, Move 3, Capacity 1, Production 1\nDEPLOY: During the agenda phase, after an outcome you voted for or predicted is resolved, place up to 1 cruiser in a system that contains your ships. "
+    },
+    {
+        "alias": "dsatoky",
+        "name": "Modular Designs",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "atokera",
+        "source": "ds",
+        "text": "Once during each of your actions, choose 1 of your units and 1 unit ability. That unit gains that unit ability with a value of 3, if applicable, until the end of that action. [Note: not currently automated by the bot]"
     }
 ]

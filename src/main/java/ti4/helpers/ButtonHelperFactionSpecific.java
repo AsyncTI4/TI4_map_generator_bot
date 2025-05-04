@@ -61,6 +61,17 @@ import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperFactionSpecific {
 
+    @ButtonHandler("utilizeAtokeraMech_")
+    public static void utilizeAtokeraMech(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planet = buttonID.split("_")[1];
+        ButtonHelper.deleteTheOneButton(event);
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        player.exhaustPlanet(planet);
+        unitHolder.removeAllUnitDamage(player.getColor());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmoji() + " repaired all of their units on " + Helper.getPlanetRepresentation(planet, game) + " by exhausting the planet (using the Atokera Mech Ability).");
+    }
+
     @ButtonHandler("gloryTech")
     public static void getTechFromGlory(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
@@ -1447,6 +1458,21 @@ public class ButtonHelperFactionSpecific {
                     + " mech" + (amount == 1 ? "" : "s") + " that may replace infantry.",
                 buttons);
         }
+    }
+
+    @ButtonHandler("qhetInfRevival_")
+    public static void qhetInfRevival(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        if (player.getStasisInfantry() < 1) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getFactionEmoji() + " is out of infantry to revive.");
+            return;
+        }
+        Tile tile = game.getTile(AliasHandler.resolveTile(planet));
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
+        player.setStasisInfantry(player.getStasisInfantry() - 1);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game) + ". They have " + player.getStasisInfantry() + " infantry left to revive.");
     }
 
     @ButtonHandler("deployMykoSD_")

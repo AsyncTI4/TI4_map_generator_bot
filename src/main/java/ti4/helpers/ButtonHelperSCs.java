@@ -220,10 +220,21 @@ public class ButtonHelperSCs {
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
+        List<Player> players;
+        if (!game.isOmegaPhaseMode()) {
+            players = Helper.getSpeakerOrPriorityOrderFromPlayer(imperialHolder, game);
+        } else {
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getSpeakerOrPriorityOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
+            Collections.rotate(players, -players.indexOf(imperialHolder));
+        }
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         String message = " drew a secret objective.";
-        for (Player player2 : Helper.getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
+        for (Player player2 : players) {
             if (player2 == player) {
                 game.drawSecretObjective(player.getUserID());
                 if (player.hasAbility("plausible_deniability")) {

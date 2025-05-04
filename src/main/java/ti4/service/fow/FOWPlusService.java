@@ -33,10 +33,15 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 /*
-  * All 0b tiles hidden from the map.
-  * Can only activate tiles you can see.  
-  * Can activate any other tile with Blind Tile button which allows activating tiles without a tile
-    -> Will send ships into the void
+  To activate Extra Dark mode use /fow fow_options
+
+  * 0b tiles are hidden
+  * Adjacent hyperlanes that don't connect to the viewing tile are hidden
+  * Can only activate tiles you can see
+    * Can activate any other tile with Blind Tile button including tiles without a tile
+      -> Will send ships into the Void
+  * Other players stats areas are visible only by seeing their HS - PNs don't count
+  * To remove a token from the board, you need to see it
  */
 public class FOWPlusService {
     public static final String VOID_TILEID = "-1";
@@ -101,7 +106,8 @@ public class FOWPlusService {
     //Remove ring buttons player has no tiles they can activate
     public static void filterRingButtons(List<Button> ringButtons, Player player, Game game) {
         Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, player);
-        if (!visiblePositions.contains("000")) {
+        Tile centerTile = game.getTileByPosition("000");
+        if (!visiblePositions.contains("000") || centerTile != null && centerTile.getTileModel() != null && centerTile.getTileModel().isHyperlane()) {
             ringButtons.removeIf(b -> b.getId().contains("ringTile_000"));
         }
         if (Collections.disjoint(visiblePositions, Arrays.asList("tl", "tr", "bl", "br"))) {
@@ -138,4 +144,44 @@ public class FOWPlusService {
         game.resetCurrentMovedUnitsFrom1TacticalAction();
     }
 
+    //If the target position is void or hyperlane that does not connect to tile we are checking from
+    public static boolean shouldTraverseAdjacency(Game game, String position, int dirFrom) {
+        if (!isActive(game)) return true;
+
+        if (isVoid(game, position)) {
+            return false;
+        }
+
+        Tile targetTile = game.getTileByPosition(position);
+        if (targetTile.getTileModel() != null && targetTile.getTileModel().isHyperlane()) {
+            boolean hasHyperlaneConnection = false;
+            for (int i = 0; i < 6; i++) {
+                if (i == dirFrom) continue; //check all other sources except the one we came from
+
+                List<Boolean> targetHyperlaneData = targetTile.getHyperlaneData(i);
+                if (targetHyperlaneData != null && !targetHyperlaneData.isEmpty() && targetHyperlaneData.get(dirFrom)) {
+                    hasHyperlaneConnection = true;
+                    break;
+                }
+            }
+            if (!hasHyperlaneConnection) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    //Can only remove CCs from tiles that can be seen
+    public static boolean preventRemovingCCFromTile(Game game, Player player, Tile tile) {
+        return isActive(game) && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition());
+    }
+
+    //Hide explore and relic decks
+    public static boolean deckInfoAvailable(Player player, Game game) {
+        if (!isActive(game) || game.getPlayersWithGMRole().contains(player)) return true;
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available in FoW+ mode");
+        return false;
+    }
 }
