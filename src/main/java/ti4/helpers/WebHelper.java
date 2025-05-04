@@ -140,10 +140,10 @@ public class WebHelper {
 
             writer.flush();
 
-            String msg = "# Statistics Upload\nOut of " + eligible + " eligible games, the statistics of "
-                + uploaded + " games are being uploaded to the web server.";
+            String msg = String.format("# Uploading statistics to S3 (%s KB)... \nOut of %s eligible games, %s games are being uploaded.",
+                outputStream.size() * 1000, eligible, uploaded);
             if (eligible != uploaded) {
-                msg += "\nBad Games (first 10):\n- " + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));
+                msg += "\nBad games (first 10):\n- " + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));
             }
             BotLogger.info(msg);
 
