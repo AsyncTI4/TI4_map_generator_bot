@@ -112,7 +112,7 @@ public class WebHelper {
         int eligible = 0;
         int uploaded = 0;
         int currentBatchSize  = 0;
-
+      
         try (var outputStream = new ByteArrayOutputStream(1024 * 1024)) {
             try (SequenceWriter writer = objectMapper.writer().writeValuesAsArray(outputStream)) {
                 for (ManagedGame managedGame : GameManager.getManagedGames()) {
