@@ -62,7 +62,7 @@ public class PlayHeroService {
 
         if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())
             || "zealotshero".equals(playerLeader.getId()) || "nokarhero".equals(playerLeader.getId())
-            || "kolumehero".equals(playerLeader.getId())) {
+            || "kolumehero".equals(playerLeader.getId()) || "qhethero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);
             playerLeader.setActive(true);
             sb.append("\nLeader will be purged after status cleanup.");

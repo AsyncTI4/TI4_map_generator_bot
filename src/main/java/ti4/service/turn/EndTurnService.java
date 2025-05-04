@@ -102,6 +102,7 @@ public class EndTurnService {
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {
+            game.removeStoredValue("ghostagent_active");
             FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn");
         }
         ButtonHelper.checkFleetInEveryTile(mainPlayer, game, event);

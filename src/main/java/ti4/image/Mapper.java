@@ -826,6 +826,7 @@ public class Mapper {
     }
 
     public static boolean isValidMapTemplate(String id) {
+        if (id == null) return false;
         return mapTemplates.containsKey(id);
     }
 
@@ -1009,7 +1010,6 @@ public class Mapper {
         }
         return displayName;
     }
-
 
     public static Map<String, SourceModel> getSources() {
         return new HashMap<>(sources);

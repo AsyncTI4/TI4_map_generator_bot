@@ -62,6 +62,24 @@ public class OtherHeroButtonHandler {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("purgeAtokeraHero")
+    public static void purgeAtokeraHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
+        Leader playerLeader = player.unsafeGetLeader("atokerahero");
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                message + " - the Atokera hero, has been purged.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                " the Atokera hero, was not purged - something went wrong.");
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + " Unfortunately at this time the addition of ships to the ground is not automated. /move units can place them on the planet however, and they will roll dice as normal once there.");
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     @ButtonHandler("utilizePharadnHero_")
     public static void utilizePharadnHero(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];

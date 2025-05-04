@@ -243,7 +243,19 @@ public class Helper {
             return;
         }
 
-        for (Player player : getSpeakerOrderFromThisPlayer(imperialHolder, game)) {
+        List<Player> players;
+        if (!game.isOmegaPhaseMode()) {
+            players = getSpeakerOrderFromThisPlayer(imperialHolder, game);
+        } else {
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getSpeakerOrPriorityOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
+            Collections.rotate(players, -players.indexOf(imperialHolder));
+        }
+
+        for (Player player : players) {
             String message = player.getRepresentationUnfogged() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
                 game.drawSecretObjective(player.getUserID());
@@ -428,6 +440,34 @@ public class Helper {
         return null;
     }
 
+    public static List<Player> getSpeakerOrPriorityOrder(Game game) {
+        if (!game.isOmegaPhaseMode()) {
+            return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
+        }
+
+        List<Player> arrayPlayers = new ArrayList<Player>();
+        arrayPlayers.addAll(PriorityTrackHelper.GetPriorityTrack(game).stream().filter(Objects::nonNull).toList());
+        return arrayPlayers;
+    }
+
+    public static List<Player> getSpeakerOrPriorityOrderFromPlayer(Player player, Game game) {
+        var players = getSpeakerOrPriorityOrder(game);
+        if (player != null && players.indexOf(player) != -1) {
+            Collections.rotate(players, -players.indexOf(player));
+        }
+        return players;
+    }
+
+    public static int getPlayerSpeakerOrPriorityNumber(Player player, Game game) {
+        if (!game.isOmegaPhaseMode() && game.getSpeaker() == null) {
+            return 1;
+        } else if (game.isOmegaPhaseMode() && player.getPriorityPosition() < 1) {
+            return 1;
+        }
+        var players = getSpeakerOrPriorityOrder(game);
+        return players.indexOf(player) + 1;
+    }
+
     public static List<Player> getSpeakerOrderFromThisPlayer(Player player, Game game) {
         List<Player> players = new ArrayList<>();
         boolean found = false;
@@ -452,51 +492,6 @@ public class Helper {
             }
         }
         return players;
-    }
-
-    public static int getPlayerSpeakerNumber(Player player, Game game) {
-        if (game.isOmegaPhaseMode()) {
-            if (player.getPriorityPosition() < 1) return 1;
-            return player.getPriorityPosition();
-        }
-
-        Player speaker;
-        if (game.getPlayer(game.getSpeakerUserID()) != null) {
-            speaker = game.getPlayers().get(game.getSpeakerUserID());
-        } else {
-            return 1;
-        }
-        List<Player> players = new ArrayList<>();
-        boolean found = false;
-        for (Player p2 : game.getRealPlayers()) {
-            if (p2 == speaker) {
-                found = true;
-                players.add(speaker);
-            } else {
-                if (found) {
-                    players.add(p2);
-                }
-            }
-        }
-
-        for (Player p2 : game.getRealPlayers()) {
-            if (p2 == speaker) {
-                found = false;
-            } else {
-                if (found) {
-                    players.add(p2);
-                }
-            }
-        }
-        int count = 1;
-        for (Player p2 : players) {
-            if (player == p2) {
-                return count;
-            } else {
-                count++;
-            }
-        }
-        return count;
     }
 
     public static void startOfTurnSaboWindowReminders(Game game, Player player) {
@@ -1348,6 +1343,12 @@ public class Helper {
                 if (productionValue > 0 && player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValue++;
                 }
+                if (productionValue > 0 && player.hasAbility("synthesis")) {
+                    productionValue++;
+                }
+                if (unitModel.getBaseType().equalsIgnoreCase("cruiser") && player.hasUnit("atokera_cruiser") && player.hasAbility("synthesis")) {
+                    productionValue++;
+                }
                 productionValueTotal += productionValue * uH.getUnits().get(unit);
             }
         }
@@ -1371,6 +1372,9 @@ public class Helper {
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
                 planetUnitVal = 2;
             }
 
@@ -1381,6 +1385,9 @@ public class Helper {
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
             }
             if (token.contains("facilitycorefactory")) {
                 planetUnitVal += 1;
@@ -1388,11 +1395,17 @@ public class Helper {
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
                     productionValueTotal++;
                 }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
             }
             if (token.contains("facilitynavalbase")) {
                 planetUnitVal += 3;
                 productionValueTotal += 3;
                 if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
                     productionValueTotal++;
                 }
             }
@@ -1413,6 +1426,9 @@ public class Helper {
             if (player.hasRelic("boon_of_the_cerulean_god")) {
                 productionValueTotal++;
             }
+            if (player.hasAbility("synthesis")) {
+                productionValueTotal++;
+            }
         } else {
             if (player.hasTech("absol_ie") && planetUnitVal < 1 && player.getPlanets().contains(uH.getName())) {
                 productionValueTotal += 1;
@@ -1425,6 +1441,14 @@ public class Helper {
                     && player.hasTech("dsbentg") && planetUnitVal < 1
                     && (!uH.getTokenList().isEmpty() || (Mapper.getPlanet(planet).getTechSpecialties() != null
                         && !Mapper.getPlanet(planet).getTechSpecialties().isEmpty()))) {
+                    productionValueTotal += 1;
+                    if (player.hasRelic("boon_of_the_cerulean_god")) {
+                        productionValueTotal++;
+                    }
+                    planetUnitVal = 1;
+                }
+                if (player.getReadiedPlanets().contains(uH.getName())
+                    && player.hasAbility("synthesis") && planetUnitVal < 1) {
                     productionValueTotal += 1;
                     if (player.hasRelic("boon_of_the_cerulean_god")) {
                         productionValueTotal++;
