@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.image.TileGenerator;
@@ -115,7 +116,18 @@ public class MapTemplateHelper {
         }
         if (tileID != null) {
             tileID = AliasHandler.resolveTile(tileID);
-            return new Tile(tileID, tile.getPos());
+            Tile outputTile = new Tile(tileID, tile.getPos());
+            if (tile.getTokens() != null && !tile.getTokens().isEmpty()) {
+                for (String tokenData : tile.getTokens()) {
+                    String[] tokenParts = tokenData.split(":");
+                    String token = tokenParts[0], holder = "space";
+                    if (tokenParts.length > 1) holder = tokenParts[1];
+
+                    String tokenID = Mapper.getTokenID(token);
+                    outputTile.addToken(tokenID, holder);
+                }
+            }
+            return outputTile;
         }
         return null;
     }
@@ -193,7 +205,24 @@ public class MapTemplateHelper {
                 g2.drawImage(tileImg, pos.x + center.x - 100, pos.y + center.y - 100, null);
             }
         }
-
+        g2.setFont(Storage.getFont80());
+        int y = 100;
+        DrawingUtil.superDrawString(g2, "Template: " + model.getAlias(), 10, y, null, null, null, null, null);
+        y += 100;
+        if (model.getAuthor() != null) {
+            //g2.(Storage);
+            g2.setFont(Storage.getFont64());
+            DrawingUtil.superDrawString(g2, "Author: " + model.getAuthor(), 10, y, null, null, null, null, null);
+            y += 70;
+        }
+        if (model.getDescr() != null) {
+            g2.setFont(Storage.getFont48());
+            List<String> layout = DrawingUtil.layoutText(g2, model.getDescr(), 650);
+            for (String line : layout) {
+                DrawingUtil.superDrawString(g2, line, 20, y, null, null, null, null, null);
+                y += 70;
+            }
+        }
         return FileUploadService.createFileUpload(img, model.getAlias());
     }
 }

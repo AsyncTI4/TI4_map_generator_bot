@@ -25,6 +25,7 @@ public class MapTemplateModel implements ModelInterface {
         private Integer playerNumber;
         private Integer miltyTileIndex;
         private Boolean home;
+        private List<String> tokens;
 
         // This is the position the tile should be on the map
         private String pos;
