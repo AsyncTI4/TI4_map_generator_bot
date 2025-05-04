@@ -1137,5 +1137,59 @@
         ],
         "complexity": "High",
         "source": "ds"
+    },
+    {
+        "alias": "qhet",
+        "factionName": "Qhet Republic",
+        "homeSystem": "br3",
+        "startingFleet": "1 cv,2 ff,3 inf q, 1 sd q, 2 cr",
+        "commodities": 2,
+        "factionTech": ["dsqhetinf", "dsqhetcr"],
+        "startingTech": ["sr","sar"],
+        "homePlanets": ["qhet","drakkol"],
+        "abilities": ["data_recovery", "black_ops"],
+        "leaders": ["qhetagent", "qhetcommander", "qhethero"],
+        "promissoryNotes": ["dspnqhet"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "qhet_cruiser",
+            "carrier",
+            "dreadnought",
+            "qhet_flagship",
+            "qhet_infantry",
+            "qhet_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
+    },
+    {
+        "alias": "atokera",
+        "factionName": "Atokera Legacy",
+        "homeSystem": "br4",
+        "startingFleet": "1 cv,5 ff,3 inf m, 1 sd m, 1 dn",
+        "commodities": 3,
+        "factionTech": ["dsatoky", "dsatokcr"],
+        "startingTech": ["gls","md"],
+        "homePlanets": ["magna"],
+        "abilities": ["synthesis", "living_metals"],
+        "leaders": ["atokeraagent", "atokeracommander", "atokerahero"],
+        "promissoryNotes": ["dspnatok"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "atokera_cruiser",
+            "carrier",
+            "dreadnought",
+            "atokera_flagship",
+            "infantry",
+            "atokera_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
     }
 ]

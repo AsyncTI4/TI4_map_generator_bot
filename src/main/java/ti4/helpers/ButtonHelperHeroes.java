@@ -50,6 +50,7 @@ import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
+import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
@@ -937,6 +938,9 @@ public class ButtonHelperHeroes {
                     if (p2.hasInf2Tech()) {
                         ButtonHelper.resolveInfantryDeath(p2, amountInf);
                     }
+                    if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
+                        ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
+                    }
                     if (amountInf > 0) {
                         RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
                     }
@@ -947,13 +951,13 @@ public class ButtonHelperHeroes {
                     if (amountFF + amountInf > 0) {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                             p2.getRepresentation()
-                                + " heads up, a tile with your units in it got Armageddon'd by Gurno Aggero, the Saar hero, removing all fighters and infantry.");
+                                + " heads up, a tile with your units in it got Armageddon'd by Gurno Aggero, the Saar hero, destroying all fighters and infantry.");
                     }
                 }
 
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " removed all opposing infantry and fighters in "
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " destroyed all opposing infantry and fighters in "
             + tile.getRepresentationForButtons(game, player) + " using Gurno Aggero, the Saar hero.");
         ButtonHelper.deleteMessage(event);
     }
@@ -985,6 +989,26 @@ public class ButtonHelperHeroes {
             }
         }
         return techPlanets;
+    }
+
+    @ButtonHandler("qhetHeroAbility_")
+    public static void qhetHeroAbility(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String thing = buttonID.split("_")[1];
+        ButtonHelper.deleteMessage(event);
+        if (thing.contains("command")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +
+                " is using their hero ability to gain a command token.");
+            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
+                + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+            game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() +
+                " is using their hero ability to take another action.");
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Aciton buttons",
+                StartTurnService.getStartOfTurnButtons(player, game, true, event, true));
+        }
     }
 
     @ButtonHandler("purgeCeldauriHero_")

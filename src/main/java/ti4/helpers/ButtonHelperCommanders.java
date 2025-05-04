@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -111,6 +112,30 @@ public class ButtonHelperCommanders {
             ButtonHelper.deleteTheOneButton(event);
         }
 
+    }
+
+    @ButtonHandler("qhetCommander_")
+    public static void qhetCommander(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String systemPos = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(systemPos);
+        if (player.getTg() < 2) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required 2tgs");
+            return;
+        }
+        if (player.getStrategicCC() < 1) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required strategy CC");
+            return;
+        }
+        if (!CommandCounterHelper.hasCC(player, tile)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " the system does not have your CC in it");
+            return;
+        }
+        player.setTg(player.getTg() - 2);
+        player.setStrategicCC(player.getStrategicCC() - 1);
+        RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
+        resolveMuaatCommanderCheck(player, game, event);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " spent 2tg and a strategy CC to remove the command token from " + tile.getRepresentationForButtons());
     }
 
     @ButtonHandler("arboCommanderBuild_")

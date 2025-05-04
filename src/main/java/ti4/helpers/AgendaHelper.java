@@ -43,7 +43,6 @@ import ti4.cron.AutoPingCron;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -75,6 +74,7 @@ import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
 
@@ -422,10 +422,10 @@ public class AgendaHelper {
         String alreadyResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty()) {
             String lastPlayerToPlayAWhen = game.getStoredValue("lastPlayerToPlayAWhen");
-            List<Player> agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrder(game);
+            List<Player> agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrder(game);
             if (!lastPlayerToPlayAWhen.isEmpty()) {
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAWhen), game);
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
+                agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAWhen), game);
+                agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
             }
             for (Player player : agendaAbilityResolutionOrder) {
                 String factionsThatHavePassedOnWhens = game.getStoredValue("declinedWhens");
@@ -488,10 +488,10 @@ public class AgendaHelper {
         String whensResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty() && !whensResolved.isEmpty()) {
             String lastPlayerToPlayAnAfter = game.getStoredValue("lastPlayerToPlayAnAfter");
-            List<Player> agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrder(game);
+            List<Player> agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrder(game);
             if (!lastPlayerToPlayAnAfter.isEmpty()) {
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAnAfter), game);
-                agendaAbilityResolutionOrder = getAgendaAbilityResolutionOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
+                agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAnAfter), game);
+                agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
             }
             for (Player player : agendaAbilityResolutionOrder) {
                 String factionsThatHavePassedOnAfters = game.getStoredValue("declinedAfters");
@@ -671,8 +671,12 @@ public class AgendaHelper {
                 num++;
             }
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, false)
-            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ");
+        String msg = player.getRepresentation(true, false)
+            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ";
+        if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
+            msg += "The " + AgendaHelper.getPlayersWhoNeedToPreVoted(game).size() + " who still need to decide on voting were also reminded";
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
     }
 
@@ -917,7 +921,7 @@ public class AgendaHelper {
         }
         for (Player player : game.getRealPlayers()) {
             for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts")
+                if (p2 == player || (player.getTg() + player.getCommodities()) < 0 || p2.hasAbility("binding_debts") || p2.hasAbility("data_recovery")
                     || p2.hasAbility("fine_print") || p2.getDebtTokenCount(player.getColor()) < 1) {
                     continue;
                 }
@@ -1864,7 +1868,7 @@ public class AgendaHelper {
                         }
                     }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight")
-                        || specificVote.contains("Radiance") || specificVote.contains("Tarrock Ability"))) {
+                        || winningR.hasTech("dsatokcr") || specificVote.contains("Radiance") || specificVote.contains("Tarrock Ability"))) {
 
                         MessageChannel channel = winningR.getCorrectChannel();
                         String identity = winningR.getRepresentationUnfogged();
@@ -2024,6 +2028,19 @@ public class AgendaHelper {
                                 UnitType.Mech);
                             ButtonHelperFactionSpecific.resolveEdynAgendaStuffStep1(winningR, game, tiles);
                         }
+                        if (specificVote.contains("Atokera Commander")) {
+                            if (!AgendaHelper.getWinningVoters(winner, game).contains(winningR) && !AgendaHelper.getLosingVoters(winner, game).contains(winningR)) {
+                                List<Button> buttons = ButtonHelper.getGainCCButtons(winningR);
+                                String message = identity + ", your current command tokens are "
+                                    + winningR.getCCRepresentation()
+                                    + ". Use buttons to gain command tokens.";
+                                game.setStoredValue("originalCCsFor" + winningR.getFaction(),
+                                    winningR.getCCRepresentation());
+                                MessageHelper.sendMessageToChannel(channel,
+                                    identity + " resolve Atokera Commander by using the button to gain 1 command token.");
+                                MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                            }
+                        }
                         if (specificVote.contains("Tarrock Ability")) {
                             String message = winningR.getFactionEmoji() + " drew a secret objective.";
                             game.drawSecretObjective(winningR.getUserID());
@@ -2168,6 +2185,44 @@ public class AgendaHelper {
             }
         }
         return losers;
+    }
+
+    public static void atokeraCommanderUnlockCheck(Game game) {
+        Map<String, String> outcomes = game.getCurrentAgendaVotes();
+        Player highestVoter = null;
+        int highestVote = 0;
+
+        for (String outcome : outcomes.keySet()) {
+            StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+
+            while (vote_info.hasMoreTokens()) {
+                String specificVote = vote_info.nextToken();
+                String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                Player voter = game.getPlayerFromColorOrFaction(faction.toLowerCase());
+                if (voter != null) {
+                    if (!specificVote.contains("Rider")
+                        && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity") && !specificVote.contains("Ability")) {
+                        try {
+                            int vote = Integer.parseInt(specificVote.split("_")[1]);
+                            if (vote == highestVote) {
+                                highestVoter = null;
+                            } else {
+                                if (vote > highestVote) {
+                                    vote = highestVote;
+                                    highestVoter = voter;
+                                }
+                            }
+                        } catch (Exception e) {
+                            //Not concerned about it not being an integer
+                        }
+                    }
+
+                }
+            }
+        }
+        if (highestVoter != null) {
+            CommanderUnlockCheckService.checkPlayer(highestVoter, "atokera");
+        }
     }
 
     public static List<Player> getPlayersWithMostPoints(Game game) {
@@ -2385,6 +2440,7 @@ public class AgendaHelper {
             if (thing.contains("dsghotg") && !prevoting) {
                 player.exhaustTech("dsghotg");
             }
+
             if (thing.contains("predictive")) {
                 game.setStoredValue("riskedPredictive",
                     game.getStoredValue("riskedPredictive") + player.getFaction());
@@ -2806,6 +2862,9 @@ public class AgendaHelper {
                         if (!game.isFowMode() && p2.hasAbility("future_sight")) {
                             outcomeSummaryBuilder.append(" (Future Sight)");
                         }
+                        if (!game.isFowMode() && p2.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
+                            outcomeSummaryBuilder.append(" (Mirrorshard Deploy)");
+                        }
                         outcomeSummaryBuilder.append(", ");
                     } else {
                         String vote = specificVote.substring(specificVote.indexOf("_") + 1);
@@ -3131,7 +3190,8 @@ public class AgendaHelper {
             aCount = Integer.parseInt(agendaCount) + 1;
         }
         Button flipNextAgenda = Buttons.blue("flip_agenda", "Flip Agenda #" + aCount);
-        List<Button> resActionRow = Arrays.asList(flipNextAgenda);
+        List<Button> resActionRow = new ArrayList<>();
+        resActionRow.add(flipNextAgenda);
         if (!game.isOmegaPhaseMode()) {
             Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
                 "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
@@ -3403,7 +3463,9 @@ public class AgendaHelper {
         boolean action = false;
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
-            FowCommunicationThreadService.checkAllCommThreads(game);
+            if (aCount == 1) {
+                FowCommunicationThreadService.checkAllCommThreads(game);
+            }
         } else {
             action = true;
         }
@@ -3819,32 +3881,6 @@ public class AgendaHelper {
         } else {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
-    }
-
-    public static List<Player> getAgendaAbilityResolutionOrder(Game game) {
-        if (game.isOmegaPhaseMode()) {
-            List<Player> arrayPlayers = new ArrayList<Player>();
-            arrayPlayers.addAll(PriorityTrackHelper.GetPriorityTrack(game).stream().filter(Objects::nonNull).toList());
-            return arrayPlayers;
-        }
-        return Helper.getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
-
-    }
-
-    public static List<Player> getAgendaAbilityResolutionOrderFromPlayer(Player player, Game game) {
-        var votingOrder = getAgendaAbilityResolutionOrder(game);
-
-        if (player != null) {
-            Player initialFirstPlayer = votingOrder.get(0);
-            while (!votingOrder.get(0).getFaction().equalsIgnoreCase(player.getFaction())) {
-                votingOrder.add(votingOrder.remove(0));
-                if (votingOrder.get(0).getFaction().equalsIgnoreCase(initialFirstPlayer.getFaction())) {
-                    //If we loop back around, time to stop
-                    break;
-                }
-            }
-        }
-        return votingOrder;
     }
 
     @ButtonHandler("topAgenda_")

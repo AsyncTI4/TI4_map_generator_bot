@@ -196,11 +196,9 @@ public class HomebrewService {
                 //Temporary measure: Remove incompatible components
                 game.removeACFromGame("hack");
                 game.removeAgendaFromGame("incentive");
-                game.getSecretObjectives().remove("dtd");
                 //end
 
                 VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(game);
-                PriorityTrackHelper.CreateDefaultPriorityTrack(game);
                 OmegaPhaseModStatusHelper.PrintGreeting(game);
             }
         }

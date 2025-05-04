@@ -452,7 +452,11 @@
             "dsuydag",
             "dsuydab",
             "dspharinf",
-            "dspharb"
+            "dspharb",
+            "dsqhetinf",
+            "dsqhetcr",
+            "dsatokcr",
+            "dsatoky"
         ],
         "source": "ds"
     }

@@ -21,14 +21,14 @@ public class SusSlashCommandService {
 
     private static final List<String> HARMLESS_COMMANDS = List.of(
         Constants.HELP, Constants.STATISTICS, Constants.BOTHELPER, Constants.DEVELOPER, Constants.SEARCH, Constants.USER, Constants.SHOW_GAME,
-        Constants.CARDS_INFO, Constants.MILTY, Constants.BUTTON);
+        Constants.CARDS_INFO, Constants.MILTY, Constants.BUTTON, "tigl", "map", "all_info");
 
     private static final List<String> HARMLESS_SUBCOMMANDS = List.of(
         Constants.INFO, Constants.CREATE_GAME_BUTTON, "po_info", Constants.DICE_LUCK, Constants.SHOW_AC_DISCARD_LIST, "show_deck",
         Constants.TURN_STATS, Constants.SHOW_AC_REMAINING_CARD_COUNT, Constants.SHOW_HAND, Constants.SHOW_BAG, Constants.UNIT_INFO,
         Constants.TURN_END, Constants.PING_ACTIVE_PLAYER, Constants.CHANGE_COLOR, Constants.END, Constants.REMATCH, Constants.ABILITY_INFO,
         Constants.SPENDS, Constants.SHOW_TO_ALL, Constants.SHOW_ALL, Constants.SHOW_ALL_TO_ALL, Constants.SHOW_REMAINING,
-        Constants.CHECK_PRIVATE_COMMUNICATIONS, "cc", "law_info", "show_unplayed_ac", "undo", "show_discarded");
+        Constants.CHECK_PRIVATE_COMMUNICATIONS, "cc", "law_info", "show_unplayed_ac", "undo", "show_discarded", "observer", "turn_order");
 
     private static final List<String> EXCLUDED_GAMES = List.of("pbd1000", "pbd100two");
 
