@@ -151,6 +151,20 @@ In a seperate terminal, run:
 ```
 jdb -attach localhost:5005
 ```
+
+On Windows, you'll need Powershell, and you'll create a file called run_locally.ps1. Your file should look something like this. 
+
+```bash
+$env:DB_PATH="./storage"
+$env:RESOURCE_PATH="./src/main/resources"
+$jar_with_deps="<YOUR USER PATH?>/.m2/repository/me/terterro/TI4_map_generator_discord_bot/1.0-SNAPSHOT/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar"
+$discordBotKey="YOUR BOT KEY HERE"
+$discordUserID="YOUR USER ID HERE"
+$discordServerID="YOUR SERVER ID HERE"
+
+java -jar $jar_with_deps $discordBotKey $discordUserID $discordServerID
+```
+
 ## Run Container
 
 ### Windows 10, VS Code, Docker/Podman Desktop
