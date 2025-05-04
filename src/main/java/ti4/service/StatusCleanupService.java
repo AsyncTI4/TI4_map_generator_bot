@@ -91,6 +91,8 @@ public class StatusCleanupService {
         game.removeStoredValue("Public Disgrace");
         game.removeStoredValue("Public Disgrace Only");
         game.removeStoredValue("edynAgentPreset");
+        game.removeStoredValue("hiredGunsInPlay");
+        game.removeStoredValue("allianceModeSimultaneousAction");
         game.removeStoredValue("Coup");
         game.removeStoredValue("PublicExecution");
         game.setHasHadAStatusPhase(true);
