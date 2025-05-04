@@ -113,7 +113,7 @@ public class WebHelper {
         int uploaded = 0;
         int currentBatchSize  = 0;
 
-        try (var outputStream = new ByteArrayOutputStream(64 * 1024);
+        try (var outputStream = new ByteArrayOutputStream(1024 * 1024);
                 SequenceWriter writer = objectMapper.writer().writeValuesAsArray(outputStream)) {
             for (ManagedGame managedGame : GameManager.getManagedGames()) {
                 if (managedGame.getRound() <= 2 && (!managedGame.isHasEnded() || !managedGame.isHasWinner())) {
@@ -140,8 +140,8 @@ public class WebHelper {
 
             writer.flush();
 
-            String msg = String.format("# Uploading statistics to S3 (%s KB)... \nOut of %s eligible games, %s games are being uploaded.",
-                outputStream.size() * 1000, eligible, uploaded);
+            String msg = String.format("# Uploading statistics to S3 (%.2f MB)... \nOut of %d eligible games, %d games are being uploaded.",
+                outputStream.size() / (1024d * 1024d), eligible, uploaded);
             if (eligible != uploaded) {
                 msg += "\nBad games (first 10):\n- " + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));
             }
