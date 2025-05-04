@@ -36,6 +36,7 @@ import ti4.website.WebsiteOverlay;
 
 public class WebHelper {
 
+    private static final int INITIAL_STAT_BUFFER_SIZE = 1024 * 1024 * 100; // 100 MB
     private static final int STAT_BATCH_SIZE = 200;
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final S3AsyncClient s3AsyncClient = S3AsyncClient.builder().region(Region.US_EAST_1).build();
@@ -112,33 +113,34 @@ public class WebHelper {
         int eligible = 0;
         int uploaded = 0;
         int currentBatchSize  = 0;
-
-        try (var outputStream = new ByteArrayOutputStream(1024 * 1024);
-                SequenceWriter writer = objectMapper.writer().writeValuesAsArray(outputStream)) {
-            for (ManagedGame managedGame : GameManager.getManagedGames()) {
-                if (managedGame.getRound() <= 2 && (!managedGame.isHasEnded() || !managedGame.isHasWinner())) {
-                    continue;
-                }
-
-                eligible++;
-
-                try {
-                    JsonNode node = objectMapper.valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
-                    writer.write(node);
-                    uploaded++;
-                    currentBatchSize++;
-                    if (currentBatchSize == STAT_BATCH_SIZE) {
-                        writer.flush();
-                        currentBatchSize = 0;
+      
+        try (var outputStream = new ByteArrayOutputStream(INITIAL_STAT_BUFFER_SIZE)) {
+            try (SequenceWriter writer = objectMapper.writer().writeValuesAsArray(outputStream)) {
+                for (ManagedGame managedGame : GameManager.getManagedGames()) {
+                    if (managedGame.getRound() <= 2 && (!managedGame.isHasEnded() || !managedGame.isHasWinner())) {
+                        continue;
                     }
-                } catch (Exception ex) {
-                    badGames.add(managedGame.getName());
-                    BotLogger.error(
-                        String.format("Failed to create GameStatsDashboardPayload for game: `%s`", managedGame.getName()), ex);
-                }
-            }
 
-            writer.flush();
+                    eligible++;
+
+                    try {
+                        JsonNode node = objectMapper.valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
+                        writer.write(node);
+                        uploaded++;
+                        currentBatchSize++;
+                        if (currentBatchSize == STAT_BATCH_SIZE) {
+                            writer.flush();
+                            currentBatchSize = 0;
+                        }
+                    } catch (Exception ex) {
+                        badGames.add(managedGame.getName());
+                        BotLogger.error(
+                            String.format("Failed to create GameStatsDashboardPayload for game: `%s`", managedGame.getName()), ex);
+                    }
+                }
+
+                writer.flush();
+            }
 
             String msg = String.format("# Uploading statistics to S3 (%.2f MB)... \nOut of %d eligible games, %d games are being uploaded.",
                 outputStream.size() / (1024d * 1024d), eligible, uploaded);
