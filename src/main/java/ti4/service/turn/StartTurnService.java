@@ -57,6 +57,7 @@ public class StartTurnService {
         game.setStoredValue("lawsDisabled", "no");
         game.checkSOLimit(player);
         game.removeStoredValue("hiredGunsInPlay");
+        game.removeStoredValue("allianceModeSimultaneousAction");
         game.setStoredValue("vaylerianHeroActive", "");
         game.setStoredValue("tnelisCommanderTracker", "");
         game.setStoredValue("planetsTakenThisRound", "");
