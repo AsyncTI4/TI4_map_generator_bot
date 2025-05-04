@@ -140,8 +140,8 @@ public class WebHelper {
 
             writer.flush();
 
-            String msg = String.format("# Uploading statistics to S3 (%s MB)... \nOut of %s eligible games, %s games are being uploaded.",
-                outputStream.size() * 1_000_000L, eligible, uploaded);
+            String msg = String.format("# Uploading statistics to S3 (%.2f KB)... \nOut of %s eligible games, %s games are being uploaded.",
+                outputStream.size() / (1024d), eligible, uploaded);
             if (eligible != uploaded) {
                 msg += "\nBad games (first 10):\n- " + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));
             }
