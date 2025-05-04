@@ -333,8 +333,8 @@ public class MiltyService {
             game.setTile(tile);
         }
 
-        String statsAnchor = PositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
-        player.setPlayerStatsAnchorPosition(statsAnchor);
+        // String statsAnchor = PositionMapper.getEquivalentPositionAtRing(game.getRingCount(), positionHS);
+        player.setPlayerStatsAnchorPosition(positionHS);
 
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
