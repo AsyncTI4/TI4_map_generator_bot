@@ -395,7 +395,7 @@
     },
     {
         "alias": "dspnphar",
-        "name": " Death Binding",
+        "name": "Death Binding",
         "faction": "pharadn",
         "color": "",
         "playArea": true,
@@ -404,7 +404,7 @@
     },
     {
         "alias": "dspnqhet",
-        "name": " Death Binding",
+        "name": "Alloy Shipments",
         "faction": "qhet",
         "color": "",
         "playArea": false,
