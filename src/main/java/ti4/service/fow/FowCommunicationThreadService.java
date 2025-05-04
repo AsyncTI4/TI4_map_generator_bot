@@ -44,14 +44,11 @@ public class FowCommunicationThreadService {
         }
     }
 
-    public static void checkCommThreadsAndNewNeighbors(Game game, Player player, List<Button> buttons) {
+    public static void checkNewNeighbors(Game game, Player player, List<Button> buttons) {
         if (!isActive(game)) return;
 
         Set<Player> neighbors = getNeighbors(game, player);
         Map<ThreadChannel, Player> commThreadsWithPlayer = findCommThreads(game, player);
-        
-        //Check existing threads
-        validateNeighbors(player, neighbors, commThreadsWithPlayer, new HashSet<>(), game);
 
         //Check if can find neighbors without a comm thread
         Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreadsWithPlayer);
@@ -65,6 +62,11 @@ public class FowCommunicationThreadService {
         return game.getPhaseOfGame().startsWith("agenda") 
             && game.getFowOption(FOWOption.ALLOW_AGENDA_COMMS)
             && !game.isHiddenAgendaMode();
+    }
+
+    private static boolean isHiddenAgenda(Game game) {
+        return game.getPhaseOfGame().startsWith("agenda") 
+            && game.isHiddenAgendaMode();
     }
 
     private static Set<Player> getNeighbors(Game game, Player player) {
@@ -114,7 +116,11 @@ public class FowCommunicationThreadService {
             boolean threadLocked = threadName.contains(NO_CHAR);
 
             String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
-            if (areNeighbors && threadLocked) {
+            if (!threadLocked && isHiddenAgenda(game)) {
+                //Reminder of Hidden Agenda mode
+                threadChannel.getManager().setArchived(false).queue(success -> 
+                    threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda **only** speaker is allowed to speak.").queue());
+            } else if (areNeighbors && threadLocked) {
                 //Allow talking
                 threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
                     .queue(nameUpdated -> threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda

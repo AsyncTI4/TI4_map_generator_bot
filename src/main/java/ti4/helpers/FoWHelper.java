@@ -377,6 +377,10 @@ public class FoWHelper {
                 // the hyperlane doesn't exist & doesn't go that direction, skip.
                 continue;
             }
+            
+            if (!FOWPlusService.shouldTraverseAdjacency(game, position_, dirFrom)) {
+                continue;
+            }
 
             // explore that tile now!
             int direcetionFrom = naturalMapOnly ? -2 : dirFrom;
@@ -593,10 +597,12 @@ public class FoWHelper {
             wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
         }
 
+        boolean ghostAgent = player != null && player.isActivePlayer() 
+            && game.getStoredValue("ghostagent_active") != null && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
         for (Tile tile_ : allTiles) {
             String position_ = tile_.getPosition();
 
-            if (wormholeTiles.contains(tile_.getTileID())) {
+            if (wormholeTiles.contains(tile_.getTileID()) || ghostAgent && doesTileHaveWHs(game, position_)) {
                 adjacentPositions.add(position_);
                 continue;
             }

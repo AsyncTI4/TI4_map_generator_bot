@@ -56,6 +56,8 @@ public class StartTurnService {
         game.setL1Hero(false);
         game.setStoredValue("lawsDisabled", "no");
         game.checkSOLimit(player);
+        game.removeStoredValue("hiredGunsInPlay");
+        game.removeStoredValue("allianceModeSimultaneousAction");
         game.setStoredValue("vaylerianHeroActive", "");
         game.setStoredValue("tnelisCommanderTracker", "");
         game.setStoredValue("planetsTakenThisRound", "");
@@ -162,7 +164,7 @@ public class StartTurnService {
 
     public static void reviveInfantryII(Player player) {
         Game game = player.getGame();
-        if (player.getStasisInfantry() > 0) {
+        if (player.getStasisInfantry() > 0 && !player.hasTech("dsqhetinf")) {
             if (!ButtonHelper.getPlaceStatusInfButtons(game, player).isEmpty()) {
                 List<Button> buttons = ButtonHelper.getPlaceStatusInfButtons(game, player);
                 String msg = "Use buttons to revive infantry. You have " + player.getStasisInfantry() + " infantry left to revive.";
@@ -388,7 +390,7 @@ public class StartTurnService {
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
             FowCommunicationThreadService.checkAllCommThreads(game);
-            FowCommunicationThreadService.checkCommThreadsAndNewNeighbors(game, player, startButtons);
+            FowCommunicationThreadService.checkNewNeighbors(game, player, startButtons);
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
         } else {
             startButtons.add(Buttons.gray("showMap", "Show Map"));

@@ -20,6 +20,7 @@ import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -159,6 +160,10 @@ public class RelicHelper {
     }
 
     public static void showRemaining(MessageChannel channel, boolean over, Game game, Player player) {
+        if (!FOWPlusService.deckInfoAvailable(player, game)) {
+            return;
+        }
+
         List<String> allRelics = new ArrayList<>(game.getAllRelics());
 
         Integer deckCount = allRelics.size();
