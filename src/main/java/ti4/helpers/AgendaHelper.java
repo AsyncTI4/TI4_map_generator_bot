@@ -3951,7 +3951,7 @@ public class AgendaHelper {
     private static void recordPoliticsPlayer(Game game, Player player) {
         String politicsHolder = "round" + game.getRound() + "PoliticsHolder";
         if (game.getStoredValue(politicsHolder).isEmpty()) {
-            game.setStoredValue(politicsHolder, player.getRepresentation());
+            game.setStoredValue(politicsHolder, player.getRepresentation(false, false));
         }
     }
 
