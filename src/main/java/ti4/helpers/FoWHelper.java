@@ -597,7 +597,8 @@ public class FoWHelper {
             wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
         }
 
-        boolean ghostAgent = player.isActivePlayer() && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
+        boolean ghostAgent = player != null && player.isActivePlayer() 
+            && game.getStoredValue("ghostagent_active") != null && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
         for (Tile tile_ : allTiles) {
             String position_ = tile_.getPosition();
 
