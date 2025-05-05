@@ -635,7 +635,7 @@ public class Helper {
             .getStrategyCardModelByInitiative(sc)
             .map(StrategyCardModel::getImageFileName)
             .orElse("sadFace.png");
-        return "https://raw.githubusercontent.com/AsyncTI4/TI4_map_generator_bot/refs/heads/master/src/main/resources/strat_cards/" + scImagePath + ".png";
+        return "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/strat_cards/" + scImagePath + ".png";
     }
 
     public static Emoji getPlayerReactionEmoji(Game game, Player player, Message message) {

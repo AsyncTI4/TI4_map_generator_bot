@@ -8,7 +8,7 @@
         "source": "absol",
         "text": "Your ships can move into and through asteroid fields and retain their printed Move value when moving out of nebulae.\nWhen other players' units use SPACE CANNON against your units, apply -1 to the result of each die roll.",
         "homebrewReplacesID": "amd",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/AntimassDeflectors.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/AntimassDeflectors.png?raw=true"
     },
     {
         "alias": "absol_det",
@@ -19,7 +19,7 @@
         "source": "absol",
         "text": "After you perform a tactical action in a system that contains a frontier token, if you have 1 or more ships in that system, you may explore that token.\nYour ships can retreat into adjacent systems that do not contain other players' units, even if you do not have units or control planets in that system.",
         "homebrewReplacesID": "det",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/DarkEnergyTap.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/DarkEnergyTap.png?raw=true"
     },
     {
         "alias": "absol_gd",
@@ -31,7 +31,7 @@
         "source": "absol",
         "text": "During your tactical actions, apply +1 to the move value of each of your ships that moves through 1 or more systems adjacent to a gravity rift or supernova, or that moves through 1 or more wormholes.\nAfter you roll dice for your ships moving through a gravity rift, you may reroll any number of those dice.",
         "homebrewReplacesID": "gd",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/GravityDrive.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/GravityDrive.png?raw=true"
     },
     {
         "alias": "absol_sr",
@@ -43,7 +43,7 @@
         "source": "absol",
         "text": "During your tactical actions, your non-blockaded space docks in adjacent systems may use the PRODUCTION 1 ability in the active system if it does not contain other players' ships. If you have a space dock unit upgrade technology, they instead may use PRODUCTION 2. All units produced are placed in the space area.",
         "homebrewReplacesID": "sr",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/SlingRelay.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/SlingRelay.png?raw=true"
     },
     {
         "alias": "absol_fl",
@@ -55,7 +55,7 @@
         "source": "absol",
         "text": "Once per turn, after you perform a tactical action, you may take an additional tactical action. You may activate the same system for this second tactical action; in that case, ensure that only 1 of your command tokens total is in the system by returning the second command token to your reinforcements instead of placing it in the active system.",
         "homebrewReplacesID": "fl",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/FleetLogistics.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/FleetLogistics.png?raw=true"
     },
     {
         "alias": "absol_lwd",
@@ -67,7 +67,7 @@
         "source": "absol",
         "text": "Your ships can move through systems that contain other players' ships.",
         "homebrewReplacesID": "lwd",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/lightwave_deflector.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/lightwave_deflector.jpg?raw=true"
     },
     {
         "alias": "absol_nm",
@@ -78,7 +78,7 @@
         "source": "absol",
         "text": "The maximum number of action cards you can have in your hand is increased by 3\nAt the end of your turn, you may exhaust this card to draw 2 action cards.",
         "homebrewReplacesID": "nm",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/NeuralMotivator.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/NeuralMotivator.png?raw=true"
     },
     {
         "alias": "absol_pa",
@@ -89,7 +89,7 @@
         "source": "absol",
         "text": "You can use technology specialties on planets you control without exhausting them, even if those planets are exhausted.\nAt the end of your turn, you may discard 2 action cards to explore a readied planet you control.",
         "homebrewReplacesID": "pa",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/Psychoarchaeology.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/Psychoarchaeology.png?raw=true"
     },
     {
         "alias": "absol_dxa",
@@ -101,7 +101,7 @@
         "source": "absol",
         "text": "After you gain control of a planet, you may place 1 infantry from your reinforcements on that planet.\nIf you have an infantry unit upgrade technology, you may reroll any dice rolled as part of your infantry units' abilities.",
         "homebrewReplacesID": "dxa",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/DacxiveAnimators.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/DacxiveAnimators.png?raw=true"
     },
     {
         "alias": "absol_bs",
@@ -113,7 +113,7 @@
         "source": "absol",
         "text": "You may exhaust this card at the end of your turn to ready 1 of your other technologies.",
         "homebrewReplacesID": "bs",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/Biostims.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/Biostims.png?raw=true"
     },
     {
         "alias": "absol_hm",
@@ -125,7 +125,7 @@
         "source": "absol",
         "text": "Once per turn, after you perform an action, you may take a component action. \nYou may exhaust this card at the end of your turn to gain 1 command token.",
         "homebrewReplacesID": "hm",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/HyperMetabolism.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/HyperMetabolism.png?raw=true"
     },
     {
         "alias": "absol_x89",
@@ -137,7 +137,7 @@
         "source": "absol",
         "text": "When your units use BOMBARDMENT, the first hit may be used to produce and assign 1 hit against each ground force on the planet.\nAt the start of a round of ground combat on a planet you control, you may exhaust this card to destroy all ground forces on the planet.",
         "homebrewReplacesID": "x89",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/X89BacterialWeapons.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/X89BacterialWeapons.png?raw=true"
     },
     {
         "alias": "absol_st",
@@ -148,7 +148,7 @@
         "source": "absol",
         "text": "'When you produce units, reduce the combined cost of the produced units by 1, plus an additional 1 for every 10 of the combined cost.\nDuring the production step of your tactical actions, you may spend 1 resource to repair 1 of your damaged units in the active system, or all of your damaged units in the active system if that system contains 1 or more of your space docks.",
         "homebrewReplacesID": "st",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/SarweenTools.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/SarweenTools.png?raw=true"
     },
     {
         "alias": "absol_techquantumcore",
@@ -159,7 +159,7 @@
         ],
         "source": "absol",
         "text": "During the movement step of your tactical actions, you may move 1 of your structures from a system that does not contain 1 of your command tokens to a planet you control in the active system.\nWhen an opponent commits ground forces to a planet that contains 1 or more of your structures, you may destroy 1 structure on that planet to return the committed units to the space area.  If you do, purge this card",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/QuantumCore.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/QuantumCore.png?raw=true"
     },
     {
         "alias": "absol_sdn",
@@ -170,7 +170,7 @@
         "source": "absol",
         "text": "When you activate a system as part of a tactical action, you may explore 1 planet in that system that contains 1 or more of your units.\nWhenever you would resolve an exploration card, you may instead discard that card and gain 1 trade good.",
         "homebrewReplacesID": "sdn",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/ScanlinkDroneNetwork.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/ScanlinkDroneNetwork.png?raw=true"
     },
     {
         "alias": "absol_gls",
@@ -182,7 +182,7 @@
         "source": "absol",
         "text": "When a player would resolve a retreat, your units may first use SPACE CANNON against the retreating player’s ships in the active system.\nYou may exhaust this card before 1 or more of your units use SPACE CANNON; hits produced by those units must be assigned to non-fighter ships if able.",
         "homebrewReplacesID": "gls",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/GravitonLaserSystems.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/GravitonLaserSystems.png?raw=true"
     },
     {
         "alias": "absol_pi",
@@ -194,7 +194,7 @@
         "source": "absol",
         "text": "At the start of your turn, you may exhaust this card to redistribute your command tokens.\nWhen you cast votes during the agenda phase, you may cast 3 additional votes",
         "homebrewReplacesID": "pi",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/PredictiveIntelligence.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/PredictiveIntelligence.png?raw=true"
     },
     {
         "alias": "absol_td",
@@ -206,7 +206,7 @@
         "source": "absol",
         "text": "You may exhaust this card at the start of your turn during the action phase; remove up to 4 of your ground forces from the game board and place them on 1 or more planets you control.\nYou may exhaust this card at the start of a round of ground combat on a planet you control. If you do, at the end of that combat round, you may remove all of your ground forces from that planet and place them on another planet you control.",
         "homebrewReplacesID": "td",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/TransitDiodes.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/TransitDiodes.png?raw=true"
     },
     {
         "alias": "absol_ie",
@@ -218,7 +218,7 @@
         "source": "absol",
         "text": "You may treat each planet with a planet trait that contains 1 or more of your structures as having any planet trait.\nEach planet you control gains the PRODUCTION 1 ability as if it were a unit.",
         "homebrewReplacesID": "ie",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/IntegratedEconomy.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/IntegratedEconomy.png?raw=true"
     },
     {
         "alias": "absol_ps",
@@ -229,7 +229,7 @@
         "source": "absol",
         "text": "When 1 or more of your units use unit abilities, 1 of those units may roll 1 additional die.\nWhen the result of your non-fighter ships' combat roll exceeds that ship's combat value by 3 or more, your opponent cannot assign that hit to a fighter unless they first destroy 1 of their fighters in the active system.",
         "homebrewReplacesID": "ps",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/PlasmaScoring.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/PlasmaScoring.png?raw=true"
     },
     {
         "alias": "absol_aida",
@@ -240,7 +240,7 @@
         "source": "absol",
         "text": "When you research a unit upgrade technology, you may exhaust this card to ignore any 1 prerequisite.\nWhen you pass, you may spend 6 influence to research a unit upgrade technology.",
         "homebrewReplacesID": "aida",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/AIDevelopmentAlgorithm.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/AIDevelopmentAlgorithm.png?raw=true"
     },
     {
         "alias": "absol_md",
@@ -252,7 +252,7 @@
         "source": "absol",
         "text": "At the start of ground combat on a planet you control that contains 1 or more of your structures, you may produce 1 hit per structure and assign them to your opponent's ground forces.\nAfter you perform a tactical action, you may exhaust this card and spend 4 resources to place a structure on a planet you control in the active system.",
         "homebrewReplacesID": "md",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/MagenDefenseGrid.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/MagenDefenseGrid.png?raw=true"
     },
     {
         "alias": "absol_sar",
@@ -264,7 +264,7 @@
         "source": "absol",
         "text": "You may produce 1 additional mech for their cost. [Note: think of mechs as now similar to fighters and infantry, buy 2 for the price of 1]\nACTION: Exhaust this card to produce 1 ship in any system that contains 1 of your space docks.",
         "homebrewReplacesID": "sar",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/SelfAssemblyRoutines.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/SelfAssemblyRoutines.png?raw=true"
     },
     {
         "alias": "absol_da",
@@ -276,7 +276,7 @@
         "source": "absol",
         "text": "Your ships can move into and through asteroid fields.\nDuring each combat round, after you assign hits to your units, repair 1 of your damaged units that did not use SUSTAIN DAMAGE during this combat round.",
         "homebrewReplacesID": "da",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/DuraniumArmor.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/DuraniumArmor.png?raw=true"
     },
     {
         "alias": "absol_asc",
@@ -288,7 +288,7 @@
         "source": "absol",
         "text": "At the start of space combat, your opponent must destroy 1 of their non-fighter ships for every 3 of your non-fighter, non-Infantry ships in the active system.",
         "homebrewReplacesID": "asc",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/AssaultCannon.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/AssaultCannon.png?raw=true"
     },
     {
         "alias": "absol_sd2",
@@ -300,7 +300,7 @@
         "source": "absol",
         "text": "PRODUCTION X\nThis unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 5 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "sd2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/SpaceDockII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/SpaceDockII.png?raw=true"
     },
     {
         "alias": "absol_inf2",
@@ -312,7 +312,7 @@
         "source": "absol",
         "text": "Cost: 1(x2), Combat 7\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
         "homebrewReplacesID": "inf2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/infantry_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/infantry_2.jpg?raw=true"
     },
     {
         "alias": "absol_pds2",
@@ -324,7 +324,7 @@
         "source": "absol",
         "text": "PLANETARY SHIELD, SPACE CANNON 5\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.",
         "homebrewReplacesID": "pds2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/pds_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/pds_2.jpg?raw=true"
     },
     {
         "alias": "absol_ff2",
@@ -336,7 +336,7 @@
         "source": "absol",
         "text": "Cost: 1(x2), Combat 8, Move 2\nThis unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
         "homebrewReplacesID": "ff2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/fighter_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/fighter_2.jpg?raw=true"
     },
     {
         "alias": "absol_dd2",
@@ -348,7 +348,7 @@
         "source": "absol",
         "text": "Cost 1, Combat 8, Move 2\nANTI-FIGHTER BARRAGE 6(x3)\nWhen this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able.",
         "homebrewReplacesID": "dd2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/DestroyerII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/DestroyerII.png?raw=true"
     },
     {
         "alias": "absol_cr2",
@@ -360,7 +360,7 @@
         "source": "absol",
         "text": "Cost 2, Combat 6, Move 3, Capacity 1",
         "homebrewReplacesID": "cr2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/cruiser_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/cruiser_2.jpg?raw=true"
     },
     {
         "alias": "absol_cv2",
@@ -372,7 +372,7 @@
         "source": "absol",
         "text": "Cost 3, Combat 9, Move 2, Capacity 6",
         "homebrewReplacesID": "cv2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/carrier_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/carrier_2.jpg?raw=true"
     },
     {
         "alias": "absol_dn2",
@@ -384,7 +384,7 @@
         "source": "absol",
         "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
         "homebrewReplacesID": "dn2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/generic/dreadnought_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/dreadnought_2.jpg?raw=true"
     },
     {
         "alias": "absol_ws",
@@ -396,7 +396,7 @@
         "source": "absol",
         "text": "Cost 10, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD.",
         "homebrewReplacesID": "ws",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/generic/WarSun.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/generic/WarSun.png?raw=true"
     },
     {
         "alias": "absol_pm",
@@ -409,7 +409,7 @@
         "source": "absol",
         "text": "When you give another player 1 or more commodities, they gain an equal number of trade goods.",
         "homebrewReplacesID": "pm",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/ProductionBiomes.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/ProductionBiomes.png?raw=true"
     },
     {
         "alias": "absol_qdn",
@@ -422,7 +422,7 @@
         "source": "absol",
         "text": "When another player would choose a strategy card during the strategy phase, if you do not have a strategy card, you may exhaust this card, spend a token from your strategy pool, and give that player 1 trade good for each player that does not have a strategy card to choose your strategy card before them.",
         "homebrewReplacesID": "qdn",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/QuantumDatahubNode.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/QuantumDatahubNode.png?raw=true"
     },
     {
         "alias": "absol_ac2",
@@ -436,7 +436,7 @@
         "source": "absol",
         "text": "Cost 3, Combat 9, Move 2, Capacity 8\nSUSTAIN DAMAGE",
         "homebrewReplacesID": "ac2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/advanced_carrier_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/advanced_carrier_2.jpg?raw=true"
     },
     {
         "alias": "absol_so2",
@@ -450,7 +450,7 @@
         "source": "absol",
         "text": "Cost: 1(x2), Combat 6\nAfter this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet that contains 1 of your space docks.",
         "homebrewReplacesID": "so2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/SpecOpsII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/SpecOpsII.png?raw=true"
     },
     {
         "alias": "absol_l4",
@@ -463,7 +463,7 @@
         "source": "absol",
         "text": "During an invasion, units cannot use SPACE CANNON against your units.\nYou may exhaust this card at the start of a ground combat; your opponent cannot make combat rolls during the first combat round.",
         "homebrewReplacesID": "l4",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/L4Disruptors.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/L4Disruptors.png?raw=true"
     },
     {
         "alias": "absol_nes",
@@ -476,7 +476,7 @@
         "source": "absol",
         "text": "When 1 of your units uses SUSTAIN DAMAGE, cancel 2 hits instead of 1.",
         "homebrewReplacesID": "nes",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/noneuclidean_shielding.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/noneuclidean_shielding.jpg?raw=true"
     },
     {
         "alias": "absol_it",
@@ -489,7 +489,7 @@
         "source": "absol",
         "text": "You may spend 1 token from your strategy pool when one of your neighbors plays an action card; cancel that action card.",
         "homebrewReplacesID": "it",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/InstinctTraining.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/InstinctTraining.png?raw=true"
     },
     {
         "alias": "absol_nf",
@@ -502,7 +502,7 @@
         "source": "absol",
         "text": "After another player activates a system that contains 1 or more of your ships, you may exhaust this card and spend 1 token from your strategy pool; immediately end that player's turn.",
         "homebrewReplacesID": "nf",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/nullification_field.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/nullification_field.jpg?raw=true"
     },
     {
         "alias": "absol_scc",
@@ -515,7 +515,7 @@
         "source": "absol",
         "text": "During your tactical actions, you may treat systems that contain 1 or more of your space docks as adjacent.",
         "homebrewReplacesID": "scc",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/SpatialConduitCylinder.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/SpatialConduitCylinder.png?raw=true"
     },
     {
         "alias": "absol_ers",
@@ -528,7 +528,7 @@
         "source": "absol",
         "text": "When another player moves ships into a system that contains 1 or more of your structures, gain trade goods equal to the number of non-fighter ships that moved into that system.",
         "homebrewReplacesID": "ers",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/EResSiphons.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/EResSiphons.png?raw=true"
     },
     {
         "alias": "absol_vpw",
@@ -541,7 +541,7 @@
         "source": "absol",
         "text": "When you commit ground forces to a planet from 1 or more other planets, you may commit 2 ground forces from each planet.\nAfter making combat rolls during a round of ground combat, if your opponent produced 1 or more hits, you produce 1 additional hit.",
         "homebrewReplacesID": "vpw",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/ValkyrieParticleWeave.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/ValkyrieParticleWeave.png?raw=true"
     },
     {
         "alias": "absol_exo2",
@@ -555,7 +555,7 @@
         "source": "absol",
         "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 4(x2)\nThis unit cannot be destroyed by \"Direct Hit\" action cards. After a round of space combat, you may destroy this unit to destroy up to 2 ships in this system.",
         "homebrewReplacesID": "exo2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/exotrireme_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/exotrireme_2.jpg?raw=true"
     },
     {
         "alias": "absol_is",
@@ -568,7 +568,7 @@
         "source": "absol",
         "text": "When you research a technology, you may exhaust this card to ignore all prerequisites on that technology.\nACTION: You may exhaust this card and spend 1 command token from your strategy pool and 4 resources to research a technology.",
         "homebrewReplacesID": "is",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/Inheritancesystems.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/Inheritancesystems.png?raw=true"
     },
     {
         "alias": "absol_sdn2",
@@ -582,7 +582,7 @@
         "source": "absol",
         "text": "Cost 4, Combat 4, Move 2, Capacity 2\nSUSTAIN DAMAGE, BOMBARDMENT 4\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
         "homebrewReplacesID": "sdn2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/superdreadnought_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/superdreadnought_2.jpg?raw=true"
     },
     {
         "alias": "absol_ng",
@@ -595,7 +595,7 @@
         "source": "absol",
         "text": "After another player activates a system that contains 1 or more of your ships, you may force that player to remove 1 token from their fleet pool and return it to their reinforcements.\nDuring combat, when your opponent plays an action card, produce 1 hit; your opponent must assign it to 1 of their units.",
         "homebrewReplacesID": "ng",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/Neuroglaive.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/Neuroglaive.png?raw=true"
     },
     {
         "alias": "absol_hcf2",
@@ -609,7 +609,7 @@
         "source": "absol",
         "text": "Cost: 1(x2), Combat 7, Move 2\nThis unit may move without being transported. Fighters in excess of your ships' capacity count as 1/2 of a ship against your fleet pool.",
         "homebrewReplacesID": "hcf2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/hybrid_crystal_fighter_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/hybrid_crystal_fighter_2.jpg?raw=true"
     },
     {
         "alias": "absol_so",
@@ -622,7 +622,7 @@
         "source": "absol",
         "text": "At the end of each space combat in systems that contain or are adjacent to your ships, gain 1 commodity.\nIf you win a space combat, you may produce 1 ship of any type that was destroyed during that combat, and may spend commodities as resources.",
         "homebrewReplacesID": "so",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/SalvageOperations.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/SalvageOperations.png?raw=true"
     },
     {
         "alias": "absol_mc",
@@ -635,7 +635,7 @@
         "source": "absol",
         "text": "When you spend trade goods, every 2 trade goods spent are worth 3 resources or influence instead of 2.",
         "homebrewReplacesID": "mc",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/MirrorComputing.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/MirrorComputing.png?raw=true"
     },
     {
         "alias": "absol_tp",
@@ -648,7 +648,7 @@
         "source": "absol",
         "text": "During your turn of the action phase, players that have passed cannot play action cards.\nAt the start of a round of ground combat, you may discard 1 action card to apply -1 to the results of your opponent's die rolls during that combat round.",
         "homebrewReplacesID": "tp",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/TransparasteelPlating.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/TransparasteelPlating.png?raw=true"
     },
     {
         "alias": "absol_mi",
@@ -661,7 +661,7 @@
         "source": "absol",
         "text": "After 1 of your command tokens is placed in a system that contains another player's units, you may exhaust this card to look at that player's hand of action cards. Choose 1 of those cards and add it to your hand.",
         "homebrewReplacesID": "mi",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/MageonImplants.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/MageonImplants.png?raw=true"
     },
     {
         "alias": "absol_lgf",
@@ -674,7 +674,7 @@
         "source": "absol",
         "text": "During your tactical actions, you treat your home system and the Mecatol Rex system as if they each contained a gamma wormhole.",
         "homebrewReplacesID": "lgf",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/LazaxGateFolding.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/LazaxGateFolding.png?raw=true"
     },
     {
         "alias": "absol_htp",
@@ -687,7 +687,7 @@
         "source": "absol",
         "text": "During the Production step of your tactical actions, you may treat the resource value of any number of planets you control as if it were equal to that planet's influence value instead.",
         "homebrewReplacesID": "htp",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/faction/HegemonicTradePolicy?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/HegemonicTradePolicy?raw=true"
     },
     {
         "alias": "absol_mr",
@@ -700,7 +700,7 @@
         "source": "absol",
         "text": "Your ships can move into supernovas.\nEach supernova that contains 1 or more of your units gains the PRODUCTION 5 ability as if it were 1 of your units.",
         "homebrewReplacesID": "mr",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/magmus_reactor_omega.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/magmus_reactor_omega.jpg?raw=true"
     },
     {
         "alias": "absol_pws2",
@@ -713,7 +713,7 @@
         "source": "absol",
         "text": "Cost 8, Combat 3(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther player's units in this system lose PLANETARY SHIELD. This unit cannot be destroyed by \"Direct Hit\" action cards.",
         "homebrewReplacesID": "pws2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/PrototypeWarSunII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/PrototypeWarSunII.png?raw=true"
     },
     {
         "alias": "absol_yso",
@@ -726,7 +726,7 @@
         "source": "absol",
         "text": "After you produce units, place up to 2 infantry from your reinforcements on any planet you control or in any space area that contains 1 or more of your ships.",
         "homebrewReplacesID": "yso",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/yin_spinner_omega.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/yin_spinner_omega.jpg?raw=true"
     },
     {
         "alias": "absol_ic",
@@ -739,7 +739,7 @@
         "source": "absol",
         "text": "ACTION: Exhaust this card, choose a system and destroy any number of your cruisers or destroyers in adjacent systems. Generate 1 hit for each ship you destroyed; you opponent must assign those hits to their ships in the chosen system, and must assign them to non-fighter ships, if able.",
         "homebrewReplacesID": "ic",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/ImpulseCore.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/ImpulseCore.png?raw=true"
     },
     {
         "alias": "absol_cm",
@@ -752,7 +752,7 @@
         "source": "absol",
         "text": "At the start of your turn, you may exhaust this card to produce 1 unit at each of your space docks.\nApply +2 to your ship's combat rolls in asteroid fields.",
         "homebrewReplacesID": "cm",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/ChaosMapping.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/ChaosMapping.png?raw=true"
     },
     {
         "alias": "absol_ffac2",
@@ -766,7 +766,7 @@
         "source": "absol",
         "text": "Move 2, Capacity 6\nPRODUCTION 7\nThis unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed. 1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "ffac2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/FloatingFactoryII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/FloatingFactoryII.png?raw=true"
     },
     {
         "alias": "absol_wg",
@@ -779,7 +779,7 @@
         "source": "absol",
         "text": "ACTION: Exhaust this card to place or move up to 2 Creuss wormhole tokens into systems that contain a planet you control and/or non-home systems that do not contain another player's ships.",
         "homebrewReplacesID": "wg",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/WormholeGenerator.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/WormholeGenerator.png?raw=true"
     },
     {
         "alias": "absol_ds",
@@ -792,7 +792,7 @@
         "source": "absol",
         "text": "During each round of space combat in a system that contains 1 or more wormholes, you produce 1 additional hit.  Your opponent must assign this hit to 1 of their non-fighter ships, if able.",
         "homebrewReplacesID": "ds",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/DimensionalSplicer.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/DimensionalSplicer.png?raw=true"
     },
     {
         "alias": "absol_bio",
@@ -805,7 +805,7 @@
         "source": "absol",
         "text": "When you produce units in a system, you may exhaust this card and reduce the combined PRODUCTION value of your units in that system by up to half (rounded down) to reduce the combined cost of the produced units by the same amount.",
         "homebrewReplacesID": "bio",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/Bioplasmosis.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/Bioplasmosis.png?raw=true"
     },
     {
         "alias": "absol_lw2",
@@ -819,7 +819,7 @@
         "source": "absol",
         "text": "Cost: 1(x2), Combat 7\nPRODUCTION 2\nAfter this unit is destroyed, place the unit on this card.\nAt the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control.",
         "homebrewReplacesID": "lw2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/LetaniWarriorII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/LetaniWarriorII.png?raw=true"
     },
     {
         "alias": "absol_ht2",
@@ -833,7 +833,7 @@
         "source": "absol",
         "text": "Combat 6.\nPLANETARY SHIELD, SPACE CANNON 5, SUSTAIN DAMAGE, PRODUCTION 1\nThis unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
         "homebrewReplacesID": "ht2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/heltitan_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/heltitan_2.jpg?raw=true"
     },
     {
         "alias": "absol_se2",
@@ -847,7 +847,7 @@
         "source": "absol",
         "text": "Cost 2, Combat 6, Move 3, Capacity 2\nSUSTAIN DAMAGE",
         "homebrewReplacesID": "se2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/saturn_engine_2.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/saturn_engine_2.jpg?raw=true"
     },
     {
         "alias": "absol_as",
@@ -860,7 +860,7 @@
         "source": "absol",
         "text": "After you or one of your neighbors activates a system that is adjacent to an anomaly, you may apply +1 to the move value of all of that player's ships during this tactical action.",
         "homebrewReplacesID": "as",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/aetherstream.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/aetherstream.jpg?raw=true"
     },
     {
         "alias": "absol_vw",
@@ -873,7 +873,7 @@
         "source": "absol",
         "text": "At any time, you may look at the top card of the frontier exploration deck. After you do, you may exhaust this card to shuffle the frontier exploration deck.\nAfter a player moves ships into a system that contains 1 or more of your units, they must give you 1 promissory note from their hand, if able.",
         "homebrewReplacesID": "vw",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/Voidwatch.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/Voidwatch.png?raw=true"
     },
     {
         "alias": "absol_pfa",
@@ -886,7 +886,7 @@
         "source": "absol",
         "text": "After you explore a planet, ready that planet.",
         "homebrewReplacesID": "pfa",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/prefab_arcologies.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/prefab_arcologies.jpg?raw=true"
     },
     {
         "alias": "absol_sc",
@@ -899,7 +899,7 @@
         "source": "absol",
         "text": "At the start of a combat round, you may exhaust a relic fragment in your play area to apply +1 to the results of each of your units’ combat rolls during this combat round.",
         "homebrewReplacesID": "sc",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/Supercharge.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/Supercharge.png?raw=true"
     },
     {
         "alias": "absol_ah",
@@ -925,7 +925,7 @@
         "source": "absol",
         "text": "Cost 1, Combat 7, Move 2, Capacity 1\nANTI-FIGHTER BARRAGE 6(x3)\nWhen this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able. When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponents infantry in the space area of the active system.",
         "homebrewReplacesID": "swa2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/StrikeWingAlphaII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/StrikeWingAlphaII.png?raw=true"
     },
     {
         "alias": "absol_vtx",
@@ -938,7 +938,7 @@
         "source": "absol",
         "text": "ACTION: Exhaust this card to choose another player's non-structure unit in a system that is adjacent to 1 or more of your space docks. Capture 1 unit of that type from that player's reinforcements.",
         "homebrewReplacesID": "vtx",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/vortex.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/vortex.jpg?raw=true"
     },
     {
         "alias": "absol_dt2",
@@ -952,7 +952,7 @@
         "source": "absol",
         "text": "PRODUCTION 7\nThis system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 10 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.",
         "homebrewReplacesID": "dt2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/DimensionalTearII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/DimensionalTearII.png?raw=true"
     },
     {
         "alias": "absol_tcs",
@@ -965,7 +965,7 @@
         "source": "absol",
         "text": "At any time during the action phase, you may exhaust this card to perform a transaction with another player. As part of that transaction, you may ready that player's agent.",
         "homebrewReplacesID": "tcs",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/TemporalCommandSuite.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/TemporalCommandSuite.png?raw=true"
     },
     {
         "alias": "absol_m2",
@@ -978,7 +978,7 @@
         "source": "absol",
         "text": "Cost 8, Combat 5(x3), Move 3, Capacity 6\nSUSTAIN DAMAGE, ANTI-FIGHTER BARRAGE 5(x3)\nYou may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
         "homebrewReplacesID": "m2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/MemoriaII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/MemoriaII.png?raw=true"
     },
     {
         "alias": "absol_gr",
@@ -991,7 +991,7 @@
         "source": "absol",
         "text": "When you would cast votes during the agenda phase, you may exhaust 1 planet controlled by each other player whose command tokens are on the Mahact player’s command sheet. You may cast votes from these planets as if you controlled them, even if you would otherwise be prevented from voting.",
         "homebrewReplacesID": "gr",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/GeneticRecombination.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/GeneticRecombination.png?raw=true"
     },
     {
         "alias": "absol_cl2",
@@ -1005,7 +1005,7 @@
         "source": "absol",
         "text": "Cost: 1(x2), Combat 7\nAfter this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet that contains 1 of your structures.",
         "homebrewReplacesID": "cl2",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/CrimsonLegionnaireII.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/CrimsonLegionnaireII.png?raw=true"
     },
     {
         "alias": "absol_iihq",
@@ -1018,7 +1018,7 @@
         "source": "absol",
         "text": "You are neighbors with all players that have units or control planets in or adjacent to the Mecatol Rex system.\nGain the Custodia Vigilia planet card and its legendary planet ability card. You cannot lose these cards, and this card cannot have an X or Y assimilator token placed on it.\n\n[Custodia Vigilia is a 2/3 legendary planet with the ability:\nWhile you control Mecatol Rex, it gains SPACE CANNON 5 and PRODUCTION 3.\nGain 2 command tokens when another player scores Custodians VP using Imperial Primary.]",
         "homebrewReplacesID": "iihq",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/faction/iihq_modernization.jpg?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/iihq_modernization.jpg?raw=true"
     },
     {
         "alias": "absol_asn",
@@ -1031,6 +1031,6 @@
         "source": "absol",
         "text": "After you resolve the PRODUCTION abilities of 1 or more of your units, you may resolve the PRODUCTION ability of 1 of your other units in any system; the additional use does not trigger this ability.",
         "homebrewReplacesID": "asn",
-        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/absol/AgencySupplyNetwork.png?raw=true"
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/AgencySupplyNetwork.png?raw=true"
     }
 ]
