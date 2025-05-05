@@ -3626,10 +3626,16 @@ public class AgendaHelper {
             String politicsHolder = "round" + game.getRound() + "PoliticsHolder";
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
-                String message = "## " + game.getStoredValue(politicsHolder) + " had Politics and placed the agendas in this order: "
+                String message = "";
+                if(!game.getStoredValue(politicsHolder).isEmpty()){
+                    message = "## " + game.getStoredValue(politicsHolder) + " had Politics and placed the agendas in this order: "
                     + game.getStoredValue(key).replace("_", ", ") + ".";
+                }
+                else {
+                    message = "## The Politics player placed the agendas in this order: "
+                    + game.getStoredValue(key).replace("_", ", ") + ".";
+                }
                 MessageHelper.sendMessageToChannel(channel, message);
-
             }
         }
         for (Player player : game.getRealPlayers()) {
