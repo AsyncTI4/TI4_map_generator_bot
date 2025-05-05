@@ -164,6 +164,7 @@ public class ButtonProcessor {
                 case "checkTechSkipView" -> ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
                 case "checkAttachmView" -> ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
                 case "checkShiplessView" -> ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
+                case "checkUnlocked" -> ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
                 // Don't add anymore cases - use @ButtonHandler
                 default -> MessageHelper.sendMessageToEventChannel(event, "Button " + ButtonHelper.getButtonRepresentation(event.getButton()) + " pressed. This button does not do anything.");
             }

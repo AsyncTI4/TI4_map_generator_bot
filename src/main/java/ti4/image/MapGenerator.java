@@ -125,6 +125,7 @@ public class MapGenerator implements AutoCloseable {
         this.displayType = defaultIfNull(displayType);
         this.event = event;
 
+        // Get a control token to calculate needed width of objectives later based on number of players
         String controlID = Mapper.getControlID("red");
         BufferedImage bufferedImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), 0.45f);
         if (bufferedImage != null)
@@ -132,6 +133,7 @@ public class MapGenerator implements AutoCloseable {
         else
             scoreTokenSpacing = 30;
 
+        // Height of objectives section (=0 when there is 5 or less objectives in the column with most objectives)
         int stage1PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
             .filter(Mapper.getPublicObjectivesStage1()::containsKey).toList().size();
         int stage2PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
@@ -139,15 +141,20 @@ public class MapGenerator implements AutoCloseable {
         int otherObjCount = game.getRevealedPublicObjectives().size() - stage1PublicObjCount - stage2PublicObjCount;
         stage1PublicObjCount = game.getPublicObjectives1Peakable().size() + stage1PublicObjCount;
         stage2PublicObjCount = game.getPublicObjectives2Peakable().size() + stage2PublicObjCount;
-
         int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
         int heightOfObjectivesSection = Math.max((mostObjectivesInAColumn - 5) * 43, 0);
 
+        // Height of sections of players stats and agendas/events in play and objectives
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
         int heightOfPlayerAreasSection = getHeightOfPlayerAreasSection(game, playerCountForMap, heightOfObjectivesSection);
 
+        // Height of map section
         int mapHeight = getMapHeight(game);
+
+        // Width of map section
         mapWidth = Math.max(MINIMUM_WIDTH_OF_PLAYER_AREA, getMapWidth(game));
+
+        // Other things
         switch (this.displayType) {
             case stats:
                 heightForGameInfo = 40;
@@ -166,6 +173,7 @@ public class MapGenerator implements AutoCloseable {
             case techskips:
             case attachments:
             case shipless:
+            case unlocked:
                 heightForGameInfo = mapHeight;
                 height = mapHeight + SPACE_FOR_TILE_HEIGHT * 2;
                 displayTypeBasic = DisplayType.map;
@@ -184,29 +192,34 @@ public class MapGenerator implements AutoCloseable {
                 displayTypeBasic = DisplayType.all;
                 width = mapWidth;
         }
+
+        // Create image
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
     }
 
+    /** 
+     * Returns the height for the sections Objectives (above 5) + Laws + Events + Players + idk what EXTRA_Y is for
+    */
     private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
         final int typicalPlayerAreaHeight = 340;
         final int unrealPlayerHeight = 35;
-        int playerY = playerCountForMap * typicalPlayerAreaHeight;
+        int playersY = playerCountForMap * typicalPlayerAreaHeight;
         int unrealPlayers = game.getNotRealPlayers().size();
-        playerY += unrealPlayers * unrealPlayerHeight;
+        playersY += unrealPlayers * unrealPlayerHeight;
         for (Player player : game.getPlayers().values()) {
             if (player.isEliminated()) {
-                playerY -= 190;
+                playersY -= 190;
             } else if (player.getSecretsScored().size() >= 4) {
-                playerY += (player.getSecretsScored().size() - 4) * 43 + 23;
+                playersY += (player.getSecretsScored().size() - 4) * 43 + 23;
             }
-            playerY += (player.getTeamMateIDs().size() - 1) * unrealPlayerHeight;
+            playersY += (player.getTeamMateIDs().size() - 1) * unrealPlayerHeight;
         }
         final int columnsOfLaws = 2;
         final int lawHeight = 115;
         int lawsY = (game.getLaws().size() / columnsOfLaws + 1) * lawHeight;
         lawsY += (game.getEventsInEffect().size() / columnsOfLaws + 1) * lawHeight;
-        return playerY + lawsY + objectivesY + EXTRA_Y * 3;
+        return playersY + lawsY + objectivesY + EXTRA_Y * 3;
     }
 
     private DisplayType defaultIfNull(DisplayType displayType) {
@@ -246,7 +259,7 @@ public class MapGenerator implements AutoCloseable {
         if (displayTypeBasic != DisplayType.all && displayTypeBasic != DisplayType.map) {
             return;
         }
-        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
+        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);  
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
@@ -1790,9 +1803,9 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static void drawFleetCCOfPlayer(
-        Graphics graphics, String ccID, int x, int y, Player player,
-        boolean rightAlign
-    ) {
+                Graphics graphics, String ccID, int x, int y, Player player,
+                boolean rightAlign
+            ) {
         String ccPath = Mapper.getCCPath(ccID);
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
@@ -2168,10 +2181,20 @@ public class MapGenerator implements AutoCloseable {
         return new Point(x, y);
     }
 
+    /**
+     * Gives the number of rings of the map
+     * @param game
+     * @return between 3 and 8 (bounds based on constants)
+     */
     public static int getRingCount(Game game) {
         return Math.max(Math.min(game.getRingCount(), RING_MAX_COUNT), RING_MIN_COUNT);
     }
 
+    /**
+     * Gives the height of the map part of the image
+     * @param game
+     * @return space for the (number of rings + 1) + 2 * EXTRA_Y
+     */
     private static int getMapHeight(Game game) {
         int topMost = PositionMapper.getTopMostTileOffsetInGame(game);
         int bottomMost = PositionMapper.getBottomMostTileOffsetInGame(game);
@@ -2188,9 +2211,17 @@ public class MapGenerator implements AutoCloseable {
         return (getMapHeight(game) - EXTRA_Y) < (getMapPlayerCount(game) / 2 * PLAYER_STATS_HEIGHT + EXTRA_Y);
     }
 
+    /**
+     * Gives the width of the map part of the image
+     * TO DO: 
+     * - fix the "ringCount == minRingCount" ternary (see comment)
+     * - some variables are never used...
+     * @param game
+     * @return space for ring count + 2 * EXTRA_X + potential EXTRA_X
+     */
     private static int getMapWidth(Game game) {
         float ringCount = getRingCount(game);
-        ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1; // make it thick if it's a 3-ring? why? player areas?
+        ringCount += ringCount == RING_MIN_COUNT ? 1.5f : 1; // make it thick if it's a 3-ring? why? player areas? // also 1.5 * 3 > 1 * 4, weird! 1.5f -> 1.33f?
         int leftMost = PositionMapper.getLeftMostTileOffsetInGame(game);
         int rightMost = PositionMapper.getRightMostTileOffsetInGame(game);
         int leftToRightDistance = rightMost - leftMost;
@@ -2221,16 +2252,16 @@ public class MapGenerator implements AutoCloseable {
     }
 
     public static void addWebsiteOverlay(
-        List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y,
-        int width, int height
-    ) {
+                List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y,
+                int width, int height
+            ) {
         overlays.add(new WebsiteOverlay(dataModel, List.of(x, y, width, height)));
     }
 
     public static void addWebsiteOverlay(
-        List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w,
-        int h
-    ) {
+                List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w,
+                int h
+            ) {
         overlays.add(new WebsiteOverlay(title, text, List.of(x, y, w, h)));
     }
 
