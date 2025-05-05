@@ -2415,6 +2415,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         buttons.add(Buttons.green("checkTechSkipView", "Find Technology Specialties"));
         buttons.add(Buttons.blue("checkAttachmView", "Find Attachments"));
         buttons.add(Buttons.gray("checkShiplessView", "Show Map Without Ships"));
+        buttons.add(Buttons.gray("checkUnlocked", "Show Only Unlocked Units"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
     }
 

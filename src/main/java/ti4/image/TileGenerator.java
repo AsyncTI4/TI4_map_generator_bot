@@ -236,8 +236,9 @@ public class TileGenerator {
                 }
 
                 // ADD HEX BORDERS FOR CONTROL
+                // display type = unlocked forces border style = solid
                 Player controllingPlayer = game.getPlayerThatControlsTile(tile);
-                if (!game.getHexBorderStyle().equals("off") && controllingPlayer != null && !isSpiral) {
+                if ((!game.getHexBorderStyle().equals("off") || displayType == DisplayType.unlocked) && controllingPlayer != null && !isSpiral) {
                     int sideNum = 0;
                     List<Integer> openSides = new ArrayList<>();
                     for (String adj : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
@@ -247,12 +248,14 @@ public class TileGenerator {
                         sideNum++;
                     }
                     if (isFoWPrivate && this.fowPlayer == null) openSides.clear();
-                    BufferedImage border = DrawingUtil.hexBorder(game.getHexBorderStyle(), Mapper.getColor(controllingPlayer.getColor()), openSides);
+                    String hexBorderStyle = displayType == DisplayType.unlocked ? "solid" : game.getHexBorderStyle();
+                    BufferedImage border = DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
                     tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
                 }
 
                 setTextSize(tileGraphics);
 
+                // FoW stuff
                 if (isFoWPrivate && tile.hasFog(fowPlayer)) {
                     BufferedImage frogOfWar = ImageHelper.read(tile.getFowTilePath(fowPlayer));
                     tileGraphics.drawImage(frogOfWar, TILE_PADDING, TILE_PADDING, null);
@@ -278,6 +281,7 @@ public class TileGenerator {
                     }
                 }
 
+                // Draft Stuff
                 if (TileHelper.isDraftTile(tile.getTileModel())) {
                     String tileID = tile.getTileID();
                     String draftNum = tileID.replaceAll("[a-z]", "");
@@ -301,8 +305,11 @@ public class TileGenerator {
                     DrawingUtil.superDrawString(tileGraphics, draftColor, numX, numY, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Bottom, stroke6, Color.BLACK);
                 }
 
-                // pa_unitimage.png
                 // add icons to wormholes for agendas
+                // Worhmole recon:  For: alpha||beta WH systems are adjacent to each other 
+                // Travel ban:      For: alpha/beta WH have no effect during movement
+                // Nexus:           For: alpha/beta WH **in Nexus** have no effect during movement
+                // Shared research: For: Units can move through nebulae
                 boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
                 if ((ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban"))
                     && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA) || Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA))) {
@@ -1211,11 +1218,11 @@ public class TileGenerator {
     }
 
     private static void addBorderDecoration(
-        int direction,
-        String secondaryTile,
-        Graphics tileGraphics,
-        BorderAnomalyModel.BorderAnomalyType decorationType
-    ) {
+                int direction,
+                String secondaryTile,
+                Graphics tileGraphics,
+                BorderAnomalyModel.BorderAnomalyType decorationType
+            ) {
         Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
         if (decorationType == null) {
@@ -1453,11 +1460,11 @@ public class TileGenerator {
     }
 
     private static void addPlanetToken(
-        Tile tile,
-        Graphics tileGraphics,
-        UnitHolder unitHolder,
-        List<Rectangle> rectangles
-    ) {
+                Tile tile,
+                Graphics tileGraphics,
+                UnitHolder unitHolder,
+                List<Rectangle> rectangles
+            ) {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort((o1, o2) -> {
             if ((o1.contains("nanoforge") || o1.contains("titanspn"))) {
@@ -1590,11 +1597,11 @@ public class TileGenerator {
     }
 
     private static void oldFormatPlanetTokenAdd(
-        Tile tile,
-        Graphics tileGraphics,
-        UnitHolder unitHolder,
-        List<String> tokenList
-    ) {
+                Tile tile,
+                Graphics tileGraphics,
+                UnitHolder unitHolder,
+                List<String> tokenList
+            ) {
         int deltaY = 0;
         int offSet = 0;
         Point centerPosition = unitHolder.getHolderCenterPosition();
