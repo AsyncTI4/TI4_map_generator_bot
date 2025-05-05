@@ -1158,6 +1158,10 @@ public class Game extends GameProperties {
         savedButtons = savedButtonsPassed;
     }
 
+    /**
+     * 
+     * @return unrevealed Stage 1 Objectives
+     */
     public List<String> getPublicObjectives1Peakable() {
         return publicObjectives1Peakable;
     }
@@ -1166,6 +1170,10 @@ public class Game extends GameProperties {
         return publicObjectives2;
     }
 
+    /**
+     * 
+     * @return unrevealed Stage 2 Objectives
+     */
     public List<String> getPublicObjectives2Peakable() {
         return publicObjectives2Peakable;
     }

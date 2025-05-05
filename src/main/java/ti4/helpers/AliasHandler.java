@@ -24,55 +24,55 @@ import ti4.model.TileModel;
 
 public class AliasHandler {
 
+    private static final Map<String, String> actionCardAliasList = new HashMap<>();
+    private static final Map<String, String> agendaAliasList = new HashMap<>();
+    private static final Map<String, String> attachmentAliasList = new HashMap<>();
+    private static final Map<String, String> ccTokenAliasList = new HashMap<>();
+    private static final Map<String, String> explorationAliasList = new HashMap<>();
+    private static final Map<String, String> factionAliasList = new HashMap<>();
+    private static final Map<String, String> objectiveAliasList = new HashMap<>();
+    private static final Map<String, String> promissoryAliasList = new HashMap<>();
+    private static final Map<String, String> relicAliasList = new HashMap<>();
+    private static final Map<String, String> rulesLinks = new HashMap<>();
+    private static final Map<String, String> techAliasList = new HashMap<>();
     private static final Map<String, String> tilemapAliasList = new HashMap<>();
+    private static final Map<String, String> tokenAliasList = new HashMap<>();
     private static final Map<String, String> unitAliasList = new HashMap<>();
     @Getter
     private static final Map<String, String> unitListForHelp = new HashMap<>();
-    private static final Map<String, String> ccTokenAliasList = new HashMap<>();
-    private static final Map<String, String> attachmentAliasList = new HashMap<>();
-    private static final Map<String, String> tokenAliasList = new HashMap<>();
-    private static final Map<String, String> factionAliasList = new HashMap<>();
-    private static final Map<String, String> techAliasList = new HashMap<>();
-    private static final Map<String, String> actionCardAliasList = new HashMap<>();
-    private static final Map<String, String> agendaAliasList = new HashMap<>();
-    private static final Map<String, String> explorationAliasList = new HashMap<>();
-    private static final Map<String, String> relicAliasList = new HashMap<>();
-    private static final Map<String, String> objectiveAliasList = new HashMap<>();
-    private static final Map<String, String> promissoryAliasList = new HashMap<>();
     private static final Map<String, String> ttpgPositionAliasList = new HashMap<>();
     private static final Map<String, String> ttpgAttachmentAliasList = new HashMap<>();
     private static final Map<String, String> ttpgTokenAliasList = new HashMap<>();
     private static final Map<String, String> ttpgUnitAliasList = new HashMap<>();
-    private static final Map<String, String> rulesLinks = new HashMap<>();
-    private static final Map<String, String> allTileAliases = new HashMap<>();
-    private static final Map<String, String> allPlanetAliases = new HashMap<>();
+    private static final Map<String, String> allTileAliases = new HashMap<>(); // not assigned in init() but in initAliases() using TileHelper HashMaps
+    private static final Map<String, String> allPlanetAliases = new HashMap<>(); // not assigned in init() but in initAliases() using TileHelper HashMaps
 
-    private static final List<String> unitValuesList = new ArrayList<>();
     private static final List<String> factionAliasValuesList = new ArrayList<>();
+    private static final List<String> unitValuesList = new ArrayList<>();
 
     public static void init() {
-        readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
-        readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
-        readAliasFile("unit_alias.properties", unitListForHelp);
-        readAliasFile("cc_token_alias.properties", ccTokenAliasList, "Could not read CC token alias file");
-        readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
-        readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
-        readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
-        readAliasFile("tech_alias.properties", techAliasList, "Could not read tech alias file");
         readAliasFile("action_card_alias.properties", actionCardAliasList, "Could not read action card alias file");
         readAliasFile("agenda_alias.properties", agendaAliasList, "Could not read agenda alias file");
+        readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
+        readAliasFile("cc_token_alias.properties", ccTokenAliasList, "Could not read CC token alias file");
         readAliasFile("exploration_alias.properties", explorationAliasList, "Could not read exploration alias file");
-        readAliasFile("relic_alias.properties", relicAliasList, "Could not read relic alias file");
+        readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
+        readAliasFile("faction_alias.properties", factionAliasValuesList, false);
         readAliasFile("objective_alias.properties", objectiveAliasList, "Could not read objective alias file");
-        readAliasFile("promissory_alias.properties", promissoryAliasList, "Could not read promissory alias file");
+        // position_alias_old.properties is ignored
         readAliasFile("position_alias.properties", ttpgPositionAliasList, "Could not read TTPG position_alias file");
+        readAliasFile("promissory_alias.properties", promissoryAliasList, "Could not read promissory alias file");
+        readAliasFile("relic_alias.properties", relicAliasList, "Could not read relic alias file");
+        readAliasFile("rules_injection.properties", rulesLinks, "Could not read TTPG unit_alias file");
+        readAliasFile("tech_alias.properties", techAliasList, "Could not read tech alias file");
+        readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
+        readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
-        readAliasFile("rules_injection.properties", rulesLinks, "Could not read TTPG unit_alias file");
-
+        readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
+        readAliasFile("unit_alias.properties", unitListForHelp);
         readAliasFile("unit_alias.properties", unitValuesList, false);
-        readAliasFile("faction_alias.properties", factionAliasValuesList, false);
 
         initAliases();
     }
