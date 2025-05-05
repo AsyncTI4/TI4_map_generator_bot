@@ -128,5 +128,12 @@
         "influenceModifier": 1,
         "isFakeAttachment": true,
         "source": "ds"
+    },
+    {
+        "id":"pharadn_tomb_token",
+        "name":"Pharadn Tomb Token",
+        "imagePath":"token_tomb.png",
+        "isFakeAttachment": true,
+        "source": "ds"
     }
 ]
