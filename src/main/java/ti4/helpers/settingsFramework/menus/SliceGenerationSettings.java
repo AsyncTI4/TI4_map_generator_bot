@@ -22,6 +22,7 @@ import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
+import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.MiltyDraftEmojis;
 import ti4.service.emoji.MiscEmojis;
@@ -119,8 +120,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     public List<Button> specialButtons() {
         String idPrefix = menuAction + "_" + navId() + "_";
         List<Button> ls = new ArrayList<>(super.specialButtons());
-        ls.add(Buttons.gray(idPrefix + "scpt2025quals", "SCPT 2025 Qualifiers", "<:scpt:1289722139750039634>"));
-        ls.add(Buttons.gray(idPrefix + "scpt2025prelim", "SCPT 2025 Prelims", "<:scpt:1289722139750039634>"));
+        ls.add(Buttons.gray(idPrefix + "scpt2025finals", "SCPT 2025 Finals", "<:scpt:1289722139750039634>"));
         if (presetSlices == null) {
             ls.add(Buttons.red(idPrefix + "richPreset", "Rich galaxy", MiscEmojis.tg));
             ls.add(Buttons.red(idPrefix + "poorPreset", "Poor galaxy", MiscEmojis.comm));
@@ -132,8 +132,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         String error = switch (action) {
-            case "scpt2025quals" -> scpt2025quals();
-            case "scpt2025prelim" -> scpt2025prelim();
+            case "scpt2025finals" -> scpt2025finals(event);
             case "richPreset" -> richGalaxy();
             case "poorPreset" -> poorGalaxy();
             case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
@@ -199,41 +198,33 @@ public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private String scpt2025quals() {
-        int players = 6;
+    private String scpt2025finals(GenericInteractionCreateEvent event) {
+        Game game = null;
         if (getParent() instanceof MiltySettings ms) {
-            players = ms.getPlayerSettings().getGamePlayers().getKeys().size();
+            game = ms.getGame();
+            ms.getGameSettings().getMapTemplate().setChosenKey("2025scptFinals");
+            List<String> factions = new ArrayList<>(List.of("sol", "xxcha", "jolnar", "keleresm", "ghost", "naalu"));
+            ms.getPlayerSettings().getBanFactions().setKeys(List.of());
+            ms.getPlayerSettings().getPriFactions().setKeys(factions);
         }
-        //27,73,47,44,26;30,39,76,80,65;79,37,50,71,66;42,64,75,72,49;34,41,70,78,25;40,20,36,45,74
-        numSlices.setVal(players);
-        numFactions.setVal(players);
-        List<String> slices = new ArrayList<>(List.of("27,73,47,44,26", "30,39,76,80,65", "79,37,50,71,66", "42,64,75,72,49", "34,41,70,78,25", "40,20,36,45,74"));
-        Collections.shuffle(slices);
-        for (int i = players; i < 6; i++)
-            slices.removeFirst();
+        numSlices.setVal(6);
+        numFactions.setVal(6);
+        List<String> slices = new ArrayList<>(List.of(
+            "64,22,45,75,70",
+            "74,68,40,60,21",
+            "62,39,67,72,38",
+            "42,27,34,26,50",
+            "41,30,29,80,63",
+            "31,25,79,76,78"));
         String ttsString = String.join("|", slices);
-        return setPresetSlices(ttsString);
-    }
-
-    private String scpt2025prelim() {
-        int players = 6;
-        numSlices.setVal(players);
-        numFactions.setVal(players);
-
-        List<List<String>> allSlices = new ArrayList<>();
-        allSlices.add(new ArrayList<>(List.of("30,72,49,79,59", "29,66,50,80,31", "70,36,40,67,63", "73,76,48,45,26", "74,69,47,41,61", "37,65,46,68,64")));
-        allSlices.add(new ArrayList<>(List.of("28,19,25,43,47", "34,77,36,41,64", "37,60,39,50,67", "42,75,78,59,24", "76,66,40,62,44", "68,73,79,20,65", "46,71,63,31,26")));
-        allSlices.add(new ArrayList<>(List.of("63,40,72,46,68", "45,64,34,62,49", "36,25,24,50,41", "48,22,66,79,32", "39,61,59,43,71", "42,26,73,78,21", "47,70,65,44,19")));
-        allSlices.add(new ArrayList<>(List.of("33,62,41,25,32", "44,36,19,40,72", "45,70,35,64,78", "50,74,65,26,63", "69,21,23,79,49", "38,59,42,39,24")));
-
-        Collections.shuffle(allSlices);
-        List<String> slices = allSlices.getFirst();
-        Collections.shuffle(slices);
-        while (slices.size() > 6) {
-            slices.removeFirst();
+        if (game != null) {
+            String msg = "Howdy " + game.getPing() + ",\nThis map is WEIRD!!!\nPlease note that the map template was updated to `2025scptFinals`, ";
+            msg += "and the faction list was set to a default of: Sol, Xxcha, Jol Nar, Keleres, Creuss, and Naalu";
+            msg += "\nIf you want to play instead on a normal map, or with different factions, feel free to edit those settings accordingly.";
+            msg += "\nHave fun :)";
+            MessageHelper.sendMessageToEventChannel(event, msg);
         }
-        String tts = String.join("|", slices);
-        return setPresetSlices(tts);
+        return setPresetSlices(ttsString);
     }
 
     private String richGalaxy() {
