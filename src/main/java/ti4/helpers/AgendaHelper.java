@@ -1107,7 +1107,7 @@ public class AgendaHelper {
             if (game.isHiddenAgendaMode() && game.getStoredValue("Abstain On Agenda").contains(player.getFaction())) {
                 continue;
             }
-            if (game.getStoredValue("preVoting" + player.getFaction()).isEmpty()) {
+            if (game.getStoredValue("preVoting" + player.getFaction()).isEmpty() || game.getStoredValue("preVoting" + player.getFaction()).equalsIgnoreCase("0")) {
                 players.add(player);
             }
         }
@@ -1123,7 +1123,10 @@ public class AgendaHelper {
 
         boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty() && player != game.getActivePlayer();
         if (prevoting) {
-
+            if (votes.equalsIgnoreCase("0")) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You cannot pre-vote 0 votes. Pre-abstain if you wish to pre-abstain");
+                return;
+            }
             ButtonHelper.deleteMessage(event);
             game.setStoredValue("preVoting" + player.getFaction(), votes);
             List<Button> buttonsPV = new ArrayList<>();
