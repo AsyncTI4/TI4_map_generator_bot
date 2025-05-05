@@ -175,7 +175,7 @@ public class DiscordantStarsHelper {
         if (!player.isHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect") && uh != null && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
             String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
                 + ", you may resolve your _Policy - The People: Connect ➕_ ability."
-                + " You may move 1 iInfantry on " + planetModel.getName() + " to another planet you control.";
+                + " You may move 1 Infantry on " + planetModel.getName() + " to another planet you control.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelperAbilities.offerOlradinConnectButtons(player, game, planetModel.getId());
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve Ability", buttons);
