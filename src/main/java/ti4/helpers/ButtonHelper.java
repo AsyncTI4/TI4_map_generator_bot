@@ -6450,6 +6450,7 @@ public class ButtonHelper {
             msg += " on " + buttonID.split("_")[2];
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + ".");
+        game.setStoredValue(messageID, part2);
         if (game.isHiddenAgendaMode() && msg.toLowerCase().contains("abstain on")) {
             if (player.hasAbility("zeal")) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## The player with the zeal ability has decided to abstain.");
@@ -6462,7 +6463,7 @@ public class ButtonHelper {
                 }
             }
         }
-        game.setStoredValue(messageID, part2);
+
         deleteMessage(event);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("removePreset_" + messageID, "Remove The Preset"));
