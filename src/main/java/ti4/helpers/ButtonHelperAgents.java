@@ -1052,6 +1052,12 @@ public class ButtonHelperAgents {
             buttons.add(Buttons.green("step2axisagent_destroyer", "Place 1 destroyer"));
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
+        if ("ghostagent".equalsIgnoreCase(agent) && game.isFowMode()) {
+            Set<String> currentWhs = FoWHelper.getTileWHs(game, game.getActiveSystem());
+            if (!currentWhs.isEmpty() && !currentWhs.contains(Constants.DELTA)) {
+                game.setStoredValue("ghostagent_active", game.getActiveSystem());
+            }
+        }
         if (event instanceof ButtonInteractionEvent buttonEvent) {
             String exhaustedMessage = buttonEvent.getMessage().getContentRaw();
             if ("".equalsIgnoreCase(exhaustedMessage)) {

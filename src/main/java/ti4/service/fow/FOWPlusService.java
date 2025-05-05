@@ -176,4 +176,12 @@ public class FOWPlusService {
     public static boolean preventRemovingCCFromTile(Game game, Player player, Tile tile) {
         return isActive(game) && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition());
     }
+
+    //Hide explore and relic decks
+    public static boolean deckInfoAvailable(Player player, Game game) {
+        if (!isActive(game) || game.getPlayersWithGMRole().contains(player)) return true;
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available in FoW+ mode");
+        return false;
+    }
 }
