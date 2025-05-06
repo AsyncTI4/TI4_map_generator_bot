@@ -1057,9 +1057,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void movedNExplored(
-        ButtonInteractionEvent event, Player player, String buttonID, Game game,
-        MessageChannel mainGameChannel
-    ) {
+        ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = false;
         if (bID.startsWith("dsdihmy_")) {
@@ -1071,7 +1069,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             false);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
-            MessageHelper.sendMessageToChannel(mainGameChannel,
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 info[1] + " was exhausted by _Impressment Programs_.");
         }
         if (tile != null && player.getTechs().contains("dsdihmy")) {

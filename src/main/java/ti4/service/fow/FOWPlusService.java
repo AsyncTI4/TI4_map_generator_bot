@@ -64,10 +64,11 @@ public class FOWPlusService {
         return game.getTileByPosition(position).getTileID().equals(VOID_TILEID);
     }
 
+    //Only return a void tile if looking for a valid position without a tile
     public static Tile voidTile(String position) {
-        return new Tile(VOID_TILEID, position);
+        return PositionMapper.isTilePositionValid(position) ? new Tile(VOID_TILEID, position) : null;
     }
-  
+
     @ButtonHandler("blindTileSelection~MDL")
     public static void offerBlindActivation(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         TextInput position = TextInput.create(Constants.POSITION, "Position to activate", TextInputStyle.SHORT)

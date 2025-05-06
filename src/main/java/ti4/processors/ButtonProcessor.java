@@ -117,7 +117,7 @@ public class ButtonProcessor {
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             ReactionService.addReaction(event, game, player);
         } else if (buttonID.startsWith("movedNExplored_")) {
-            UnfiledButtonHandlers.movedNExplored(event, player, buttonID, game, mainGameChannel);
+            UnfiledButtonHandlers.movedNExplored(event, player, buttonID, game);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("strategicAction_")) {
