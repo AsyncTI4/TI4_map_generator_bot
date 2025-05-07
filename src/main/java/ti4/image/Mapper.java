@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,35 +109,35 @@ public class Mapper {
     }
 
     public static void loadData() throws Exception {
-        importJsonObjectsFromFolder("colors", colors, ColorModel.class);
-        importJsonObjectsFromFolder("factions", factions, FactionModel.class);
-        readData("decals.properties", decals);
-        readData("tokens.properties", tokens);
-        readData("special_case.properties", special_case);
-        readData("general.properties", general);
-        readData("hyperlanes.properties", hyperlaneAdjacencies);
-        importJsonObjectsFromFolder("explores", explore, ExploreModel.class);
-        importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class);
         importJsonObjectsFromFolder("abilities", abilities, AbilityModel.class);
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class);
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
-        importJsonObjectsFromFolder("events", events, EventModel.class);
-        importJsonObjectsFromFolder("public_objectives", publicObjectives, PublicObjectiveModel.class);
-        importJsonObjectsFromFolder("promissory_notes", promissoryNotes, PromissoryNoteModel.class);
-        importJsonObjectsFromFolder("relics", relics, RelicModel.class);
-        importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class);
-        importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class);
-        importJsonObjectsFromFolder("decks", decks, DeckModel.class);
-        importJsonObjectsFromFolder("units", units, UnitModel.class);
         importJsonObjectsFromFolder("attachments", attachments, AttachmentModel.class);
-        importJsonObjectsFromFolder("tokens", tokens2, TokenModel.class);
+        importJsonObjectsFromFolder("colors", colors, ColorModel.class);
+        importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
+        importJsonObjectsFromFolder("decks", decks, DeckModel.class);
+        importJsonObjectsFromFolder("events", events, EventModel.class);
+        importJsonObjectsFromFolder("explores", explore, ExploreModel.class);
+        importJsonObjectsFromFolder("factions", factions, FactionModel.class);
+        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
+        importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
+        importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class);
+        importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
+        importJsonObjectsFromFolder("promissory_notes", promissoryNotes, PromissoryNoteModel.class);
+        importJsonObjectsFromFolder("public_objectives", publicObjectives, PublicObjectiveModel.class);
+        importJsonObjectsFromFolder("relics", relics, RelicModel.class);
+        importJsonObjectsFromFolder("secret_objectives", secretObjectives, SecretObjectiveModel.class);
+        importJsonObjectsFromFolder("sources", sources, SourceModel.class);
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardSetModel.class);
         importJsonObjectsFromFolder("strategy_cards", strategyCards, StrategyCardModel.class);
-        importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
-        importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
-        importJsonObjectsFromFolder("map_templates", mapTemplates, MapTemplateModel.class);
-        importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
-        importJsonObjectsFromFolder("sources", sources, SourceModel.class);
+        importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class);
+        importJsonObjectsFromFolder("tokens", tokens2, TokenModel.class);
+        importJsonObjectsFromFolder("units", units, UnitModel.class);
+        readData("decals.properties", decals);
+        readData("general.properties", general);
+        readData("hyperlanes.properties", hyperlaneAdjacencies);
+        readData("special_case.properties", special_case);
+        readData("tokens.properties", tokens);
 
         duplicateObjectsForAllColors(promissoryNotes);
     }
@@ -338,21 +336,8 @@ public class Mapper {
         return TileHelper.getTileById(tileID).getImagePath();
     }
 
-    public static List<List<Boolean>> getHyperlaneData(String tileID) {
-        String property = hyperlaneAdjacencies.getProperty(tileID);
-        if (property == null)
-            return Collections.emptyList();
-
-        List<String> directions = Arrays.stream(property.split(";")).toList();
-        List<List<Boolean>> data = new ArrayList<>();
-        for (String dir : directions) {
-            List<String> info = Arrays.stream(dir.split(",")).toList();
-            List<Boolean> connections = new ArrayList<>();
-            for (String value : info)
-                connections.add("1".equals(value));
-            data.add(connections);
-        }
-        return data;
+    public static String getHyperlaneData(String tileID) {
+        return hyperlaneAdjacencies.getProperty(tileID);
     }
 
     public static Set<String> getWormholes(String tileID) {

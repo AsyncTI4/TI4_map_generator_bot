@@ -6642,7 +6642,9 @@ public class ButtonHelper {
             String message = player.getFactionEmoji() + " chose to Diplo the system containing "
                 + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", null);
+            if (!game.isFowMode()) {
+                ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", null);
+            }
         }
         deleteMessage(event);
     }
