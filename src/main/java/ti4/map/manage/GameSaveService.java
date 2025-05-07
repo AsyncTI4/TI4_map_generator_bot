@@ -31,6 +31,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
 
@@ -280,6 +281,15 @@ class GameSaveService {
         }
         writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
         writer.write(System.lineSeparator());
+
+        StringBuilder customHyperlaneData = new StringBuilder();
+        for (Map.Entry<String, String> entry : game.getCustomHyperlaneData().entrySet()) {
+            String encodedData = CustomHyperlaneService.encodeMatrix(entry.getValue());
+            customHyperlaneData.append(entry.getKey()).append(",").append(encodedData).append(";");
+        }
+        writer.write(Constants.CUSTOM_HYPERLANE_DATA + " " + customHyperlaneData);
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.REVERSE_SPEAKER_ORDER + " " + game.isReverseSpeakerOrder());
         writer.write(System.lineSeparator());
 

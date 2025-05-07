@@ -140,6 +140,9 @@ public class Game extends GameProperties {
     private Map<String, Integer> customPublicVP = new LinkedHashMap<>();
     private Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private Map<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
+    @Getter
+    @Setter
+    private Map<String, String> customHyperlaneData = new LinkedHashMap<>();
     @JsonProperty("adjacentTileOverrides")
     @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
@@ -1158,6 +1161,10 @@ public class Game extends GameProperties {
         savedButtons = savedButtonsPassed;
     }
 
+    /**
+     * 
+     * @return unrevealed Stage 1 Objectives
+     */
     public List<String> getPublicObjectives1Peakable() {
         return publicObjectives1Peakable;
     }
@@ -1166,6 +1173,10 @@ public class Game extends GameProperties {
         return publicObjectives2;
     }
 
+    /**
+     * 
+     * @return unrevealed Stage 2 Objectives
+     */
     public List<String> getPublicObjectives2Peakable() {
         return publicObjectives2Peakable;
     }

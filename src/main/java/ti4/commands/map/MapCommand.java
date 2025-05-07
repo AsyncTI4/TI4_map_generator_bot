@@ -29,7 +29,8 @@ public class MapCommand implements ParentCommand {
         new AddAdjacencyOverride(),
         new AddAdjacencyOverrideList(),
         new RemoveAdjacencyOverride(),
-        new RemoveCustomAdjacentTile()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new RemoveCustomAdjacentTile(),
+        new CustomHyperlanes()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {
