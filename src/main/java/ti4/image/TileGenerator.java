@@ -53,6 +53,7 @@ import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
+import ti4.service.map.CustomHyperlaneService;
 
 public class TileGenerator {
 
@@ -220,6 +221,12 @@ public class TileGenerator {
             case Tile -> {
                 BufferedImage image = ImageHelper.read(tile.getTilePath());
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
+
+                //Custom Hyperlane stuff
+                if (CustomHyperlaneService.isCustomHyperlaneTile(tile) && game.getCustomHyperlaneData().containsKey(tile.getPosition())) {
+                    BufferedImage hyperlanes = HyperlaneTileGenerator.generateHyperlaneTile(game, game.getCustomHyperlaneData().get(tile.getPosition()));
+                    tileGraphics.drawImage(hyperlanes, TILE_PADDING, TILE_PADDING, null);
+                }
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
                 if (tile.isAnomaly(game) && tileShipPositions != null) {

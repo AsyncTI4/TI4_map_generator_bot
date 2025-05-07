@@ -157,9 +157,7 @@ public class FOWPlusService {
         if (targetTile.getTileModel() != null && targetTile.getTileModel().isHyperlane()) {
             boolean hasHyperlaneConnection = false;
             for (int i = 0; i < 6; i++) {
-                if (i == dirFrom) continue; //check all other sources except the one we came from
-
-                List<Boolean> targetHyperlaneData = targetTile.getHyperlaneData(i);
+                List<Boolean> targetHyperlaneData = targetTile.getHyperlaneData(i, game);
                 if (targetHyperlaneData != null && !targetHyperlaneData.isEmpty() && targetHyperlaneData.get(dirFrom)) {
                     hasHyperlaneConnection = true;
                     break;

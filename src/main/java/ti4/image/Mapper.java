@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -338,21 +336,8 @@ public class Mapper {
         return TileHelper.getTileById(tileID).getImagePath();
     }
 
-    public static List<List<Boolean>> getHyperlaneData(String tileID) {
-        String property = hyperlaneAdjacencies.getProperty(tileID);
-        if (property == null)
-            return Collections.emptyList();
-
-        List<String> directions = Arrays.stream(property.split(";")).toList();
-        List<List<Boolean>> data = new ArrayList<>();
-        for (String dir : directions) {
-            List<String> info = Arrays.stream(dir.split(",")).toList();
-            List<Boolean> connections = new ArrayList<>();
-            for (String value : info)
-                connections.add("1".equals(value));
-            data.add(connections);
-        }
-        return data;
+    public static String getHyperlaneData(String tileID) {
+        return hyperlaneAdjacencies.getProperty(tileID);
     }
 
     public static Set<String> getWormholes(String tileID) {

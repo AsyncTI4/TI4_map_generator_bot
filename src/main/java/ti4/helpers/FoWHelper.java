@@ -331,7 +331,7 @@ public class FoWHelper {
             return tiles;
         }
 
-        List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
+        List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection, game);
         if (hyperlaneData != null && hyperlaneData.isEmpty() && !naturalMapOnly) {
             // We could not load the hyperlane data correctly, quit
             return tiles;

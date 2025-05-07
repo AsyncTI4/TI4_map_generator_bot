@@ -140,6 +140,9 @@ public class Game extends GameProperties {
     private Map<String, Integer> customPublicVP = new LinkedHashMap<>();
     private Map<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private Map<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
+    @Getter
+    @Setter
+    private Map<String, String> customHyperlaneData = new LinkedHashMap<>();
     @JsonProperty("adjacentTileOverrides")
     @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
