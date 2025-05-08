@@ -4392,6 +4392,9 @@ public class ButtonHelper {
         String thingToAdd = "box";
         for (String unit : displacedUnits.keySet()) {
             int amount = displacedUnits.get(unit);
+            if (amount < 1) {
+                continue;
+            }
             if (unit.contains("damaged")) {
                 unit = unit.replace("damaged", "");
             }
