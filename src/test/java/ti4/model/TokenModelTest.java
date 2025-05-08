@@ -22,7 +22,7 @@ public class TokenModelTest extends BaseTi4Test {
     @Test
     void testTokens() {
         beforeAll();
-        List<TokenModel> tokens = new ArrayList<>(Mapper.getTokens2());
+        List<TokenModel> tokens = new ArrayList<>(Mapper.getTokens());
         assertFalse(tokens.isEmpty(), "Did not import any tokens");
 
         Map<String, Predicate<TokenModel>> validators = new LinkedHashMap<>();
@@ -33,20 +33,20 @@ public class TokenModelTest extends BaseTi4Test {
         for (TokenModel token : tokens)
             for (Entry<String, Predicate<TokenModel>> e : validators.entrySet())
                 assertTrue(e.getValue().test(token), error(token, e.getKey()));
-        for (String token : Mapper.getTokens()) {
+        for (String token : Mapper.getTokensFromproperties()) {
             //assertTrue(tokenIsTokenModel(token), "Error: " + token + " is not represented in TokenModel.");
         }
     }
 
     private static boolean tokenExistsElsewhere(TokenModel token) {
-        return Mapper.getTokens().contains(token.getAlias());
+        return Mapper.getTokensFromproperties().contains(token.getAlias());
     }
 
     private static boolean tokenComplete(TokenModel token) {
-        return Mapper.getTokens().contains(token.getAlias());
+        return Mapper.getTokensFromproperties().contains(token.getAlias());
     }
 
     private static boolean tokenIsTokenModel(String token) {
-        return Mapper.getTokens2().stream().anyMatch(tok -> tok.getAlias().equalsIgnoreCase(token));
+        return Mapper.getTokens().stream().anyMatch(tok -> tok.getAlias().equalsIgnoreCase(token));
     }
 }

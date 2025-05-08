@@ -178,7 +178,7 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.TOKEN -> {
-                List<String> tokenNames = Mapper.getTokens().stream()
+                List<String> tokenNames = Mapper.getTokensFromproperties().stream()
                     .map(str -> {
                         if (Mapper.getAttachmentInfo(str) != null) {
                             return Mapper.getAttachmentInfo(str).getAutoCompleteName();

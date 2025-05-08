@@ -110,15 +110,6 @@
         ]
     },
     {
-        "source":"franken",
-        "name":"Franken",
-        "canal":"community",
-        "subcanal":"big homebrew",
-        "credits":"",
-        "data": [
-        ]
-    },
-    {
         "source":"monuments",
         "name":"Monuments+",
         "canal":"community",
@@ -131,10 +122,64 @@
         ]
     },
     {
+        "source":"franken",
+        "name":"Franken",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"",
+        "data": [
+        ]
+    },
+    {
+        "source":"action_deck_2",
+        "name":"Action Card Deck 2",
+        "canal":"community",
+        "subcanal":"lil homebrew",
+        "credits":"private.static.void",
+        "data": [
+            "Assets: https://i.imgur.com/sTuGJWi.jpeg",
+            "Assets & FAQ: https://drive.google.com/drive/folders/1B-uCJxnW18i8zsoq0tQC6x0bpsPNv7Ny",
+            "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=3358036285",
+            "Official channel: https://discord.com/channels/743629929484386395/1214775467123544134"
+        ]
+    },
+    {
+        "source":"lost_star_charts_of_ixth",
+        "name":"Lost Star Charts of Ixth",
+        "canal":"community",
+        "subcanal":"lil homebrew",
+        "credits":"unfulvio",
+        "data": [
+            "Assets: https://drive.google.com/drive/u/0/folders/1HinrGQ1i8gugvjVTouipRisr7hYYM5n-?ths=true",
+            "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=2841087923",
+            "Official channel: https://discord.com/channels/743629929484386395/1353893473815756981"
+        ]
+    },
+    {
+        "source":"promises_promises",
+        "name":"Promises, Promises",
+        "canal":"community",
+        "subcanal":"lil homebrew",
+        "credits":"bradleysigma",
+        "data": [
+            "Official channel: https://discord.com/channels/743629929484386395/1208453502896967790"
+        ]
+    },
+    {
+        "source":"eronous",
+        "name":"Ascendent Sun",
+        "canal":"community",
+        "subcanal":"personal projs",
+        "credits":"eronous",
+        "data": [
+            "Official channel: https://discord.com/channels/743629929484386395/1305897691682967552"
+        ]
+    },
+    {
         "source":"luminous",
         "name":"Luminous",
-        "canal":"personal projs",
-        "subcanal":"big homebrew",
+        "canal":"community",
+        "subcanal":"personal projs",
         "credits":"Blarknob",
         "data": [
             "Official channel: https://discord.com/channels/743629929484386395/1205395696950321172"
