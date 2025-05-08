@@ -1296,7 +1296,7 @@ public class TransactionHelper {
             stuffToTransButtons.add(Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(), "Fragments"));
         }
         if (p1 == player) {
-            stuffToTransButtons.add(Buttons.blue("newTransact_Details_" + p1.getFaction() + "_" + p2.getFaction() + "_~MDL", "Verbal Deal"));
+            stuffToTransButtons.add(Buttons.blue("newTransact_Details_" + p1.getFaction() + "_" + p2.getFaction() + "_~MDL", "Specify Deal"));
         }
         if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             stuffToTransButtons.add(Buttons.green("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
