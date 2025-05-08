@@ -69,36 +69,36 @@ import ti4.service.emoji.CardEmojis;
 public class Mapper {
     //private static final Properties colors = new Properties();
     private static final Properties decals = new Properties();
-    private static final Properties tokens = new Properties();
-    private static final Properties special_case = new Properties();
     private static final Properties general = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
+    private static final Properties special_case = new Properties();
+    private static final Properties tokens_fromProperties = new Properties();
 
     //TODO: Finish moving all files over from properties to json
-    private static final Map<String, ColorModel> colors = new HashMap<>();
-    private static final Map<String, DeckModel> decks = new HashMap<>();
-    private static final Map<String, ExploreModel> explore = new HashMap<>();
     private static final Map<String, AbilityModel> abilities = new HashMap<>();
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
-    private static final Map<String, EventModel> events = new HashMap<>();
-    private static final Map<String, FactionModel> factions = new HashMap<>();
-    private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
-    private static final Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
-    private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
-    private static final Map<String, RelicModel> relics = new HashMap<>();
-    private static final Map<String, TechnologyModel> technologies = new HashMap<>();
-    private static final Map<String, UnitModel> units = new HashMap<>();
     private static final Map<String, AttachmentModel> attachments = new HashMap<>();
-    private static final Map<String, TokenModel> tokens2 = new HashMap<>();
+    private static final Map<String, ColorModel> colors = new HashMap<>();
+    private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
+    private static final Map<String, DeckModel> decks = new HashMap<>();
+    private static final Map<String, EventModel> events = new HashMap<>();
+    private static final Map<String, ExploreModel> explores = new HashMap<>();
+    private static final Map<String, FactionModel> factions = new HashMap<>();
+    private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
+    private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
     private static final Map<String, LeaderModel> leaders = new HashMap<>();
+    private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
+    private static final Map<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
+    private static final Map<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
+    private static final Map<String, RelicModel> relics = new HashMap<>();
+    private static final Map<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
+    private static final Map<String, SourceModel> sources = new HashMap<>();
     private static final Map<String, StrategyCardSetModel> strategyCardSets = new HashMap<>();
     private static final Map<String, StrategyCardModel> strategyCards = new HashMap<>();
-    private static final Map<String, CombatModifierModel> combatModifiers = new HashMap<>();
-    private static final Map<String, DraftErrataModel> frankenErrata = new HashMap<>();
-    private static final Map<String, MapTemplateModel> mapTemplates = new HashMap<>();
-    private static final Map<String, GenericCardModel> genericCards = new HashMap<>();
-    private static final Map<String, SourceModel> sources = new HashMap<>();
+    private static final Map<String, TechnologyModel> technologies = new HashMap<>();
+    private static final Map<String, TokenModel> tokens = new HashMap<>();
+    private static final Map<String, UnitModel> units = new HashMap<>();
 
     public static void init() {
         try {
@@ -117,7 +117,7 @@ public class Mapper {
         importJsonObjectsFromFolder("combat_modifiers", combatModifiers, CombatModifierModel.class);
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
         importJsonObjectsFromFolder("events", events, EventModel.class);
-        importJsonObjectsFromFolder("explores", explore, ExploreModel.class);
+        importJsonObjectsFromFolder("explores", explores, ExploreModel.class);
         importJsonObjectsFromFolder("factions", factions, FactionModel.class);
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
@@ -131,13 +131,13 @@ public class Mapper {
         importJsonObjectsFromFolder("strategy_card_sets", strategyCardSets, StrategyCardSetModel.class);
         importJsonObjectsFromFolder("strategy_cards", strategyCards, StrategyCardModel.class);
         importJsonObjectsFromFolder("technologies", technologies, TechnologyModel.class);
-        importJsonObjectsFromFolder("tokens", tokens2, TokenModel.class);
+        importJsonObjectsFromFolder("tokens", tokens, TokenModel.class);
         importJsonObjectsFromFolder("units", units, UnitModel.class);
         readData("decals.properties", decals);
         readData("general.properties", general);
         readData("hyperlanes.properties", hyperlaneAdjacencies);
         readData("special_case.properties", special_case);
-        readData("tokens.properties", tokens);
+        readData("tokens.properties", tokens_fromProperties);
 
         duplicateObjectsForAllColors(promissoryNotes);
     }
@@ -428,7 +428,7 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
-        return tokens.getProperty(tokenID);
+        return tokens_fromProperties.getProperty(tokenID);
     }
 
     public static FactionModel getFaction(String factionID) {
@@ -467,12 +467,12 @@ public class Mapper {
         return new ArrayList<>(colors.values().stream().map(ColorModel::getName).toList());
     }
 
-    public static List<TokenModel> getTokens2() {
-        return new ArrayList<>(tokens2.values());
+    public static List<TokenModel> getTokens() {
+        return new ArrayList<>(tokens.values());
     }
 
-    public static List<String> getTokens() {
-        return Stream.of(attachments.keySet(), tokens.keySet()).flatMap(Collection::stream)
+    public static List<String> getTokensFromproperties() {
+        return Stream.of(attachments.keySet(), tokens_fromProperties.keySet()).flatMap(Collection::stream)
             .filter(String.class::isInstance)
             .map(String.class::cast)
             .sorted()
@@ -487,7 +487,7 @@ public class Mapper {
             tokensToName.put(value, key);
         }
 
-        for (Map.Entry<Object, Object> tokens : tokens.entrySet()) {
+        for (Map.Entry<Object, Object> tokens : tokens_fromProperties.entrySet()) {
             String key = (String) tokens.getKey();
             String value = (String) tokens.getValue();
             tokensToName.put(value, key);
@@ -550,7 +550,7 @@ public class Mapper {
     public static ExploreModel getExplore(String exploreId) {
         exploreId = exploreId.replace("extra1", "");
         exploreId = exploreId.replace("extra2", "");
-        return explore.get(exploreId);
+        return explores.get(exploreId);
     }
 
     public static RelicModel getRelic(String id) {
@@ -568,7 +568,7 @@ public class Mapper {
     }
 
     public static boolean isValidToken(String id) {
-        return getTokens().contains(id);
+        return getTokensFromproperties().contains(id);
     }
 
     public static AttachmentModel getAttachmentInfo(String id) {
@@ -844,11 +844,11 @@ public class Mapper {
     }
 
     public static Map<String, ExploreModel> getExplores() {
-        return new HashMap<>(explore);
+        return new HashMap<>(explores);
     }
 
     public static boolean isValidExplore(String exploreID) {
-        return explore.containsKey(exploreID);
+        return explores.containsKey(exploreID);
     }
 
     public static Map<String, RelicModel> getRelics() {
