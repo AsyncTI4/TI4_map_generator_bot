@@ -2,6 +2,7 @@ package ti4.map;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -238,8 +239,26 @@ public class Tile {
     }
 
     @JsonIgnore
-    public List<Boolean> getHyperlaneData(Integer sourceDirection) {
-        List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(tileID);
+    public List<Boolean> getHyperlaneData(Integer sourceDirection, Game game) {
+        String property = Mapper.getHyperlaneData(tileID);
+        if (property == null) {
+            property = game.getCustomHyperlaneData().get(position);
+        }
+
+        if (property == null) {
+            return null;
+        }
+
+        List<String> directions = Arrays.stream(property.split(";")).toList();
+        List<List<Boolean>> fullHyperlaneData = new ArrayList<>();
+        for (String dir : directions) {
+            List<String> info = Arrays.stream(dir.split(",")).toList();
+            List<Boolean> connections = new ArrayList<>();
+            for (String value : info)
+                connections.add("1".equals(value));
+            fullHyperlaneData.add(connections);
+        }
+
         if (fullHyperlaneData.isEmpty()) {
             return null;
         } else if (sourceDirection < 0 || sourceDirection > 5) {

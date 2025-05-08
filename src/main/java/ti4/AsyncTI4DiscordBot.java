@@ -212,11 +212,11 @@ public class AsyncTI4DiscordBot {
         BotLogger.info("LOADING DATA");
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Data"));
         ApplicationEmojiService.uploadNewEmojis();
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
+        TileHelper.init(); // load all /resources/planets/ and /resources/systems/ .json files, into 3 HashMaps (not 2)
+        PositionMapper.init(); // load all /resources/positions/ .properties files, each into 1 Properties
+        Mapper.init(); // load all /resources/data/ .json and .properties files, except logging.properties, each into 1 HashMap or Properties
+        AliasHandler.init(); // load all /resources/alias/ .properties files, except position_alias_old.properties, into
+        Storage.init(); // create directories for games files
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
@@ -225,7 +225,7 @@ public class AsyncTI4DiscordBot {
 
         // LOAD GAMES NAMES
         BotLogger.info("LOADING GAMES");
-        GameManager.initialize();
+        GameManager.initialize(); // load games, into 2 ConcurrentHashMaps: 1 for games and 1 for players
 
         // RUN DATA MIGRATIONS
         if (DataMigrationManager.runMigrations()) {

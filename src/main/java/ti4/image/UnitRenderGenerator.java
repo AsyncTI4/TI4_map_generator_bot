@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import ti4.ResourceHelper;
 import ti4.helpers.ButtonHelper;
@@ -119,6 +120,13 @@ public class UnitRenderGenerator {
             UnitKey unitKey = unitEntry.getKey();
             if (shouldSkipInvalidUnit(unitKey)) continue;
             if (shouldHideJailUnit(frogPlayer, unitKey)) continue;
+            
+            if (displayType == DisplayType.unlocked){ // diplay type = unlocked hides locked units (could be written in a single line, but left as is for now in case of debugging), also is highly dependable on CC file name, TO DO : create a function to get colorIDs from tileCCs
+                String unitEntryColorID = unitEntry.getKey().getColorID();
+                Set<String> tileCCs = tile.getSpaceUnitHolder().getCCList();
+                List<String> tileCCsColorIDs = tileCCs.stream().flatMap(str -> Stream.of(str.replace(".png","").replace("command_",""))).toList();
+                if (tileCCsColorIDs.contains(unitEntryColorID)) continue;
+            }
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             if (player == null) {

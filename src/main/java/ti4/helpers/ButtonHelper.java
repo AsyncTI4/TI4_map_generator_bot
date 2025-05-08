@@ -4392,6 +4392,9 @@ public class ButtonHelper {
         String thingToAdd = "box";
         for (String unit : displacedUnits.keySet()) {
             int amount = displacedUnits.get(unit);
+            if (amount < 1) {
+                continue;
+            }
             if (unit.contains("damaged")) {
                 unit = unit.replace("damaged", "");
             }
@@ -6450,6 +6453,7 @@ public class ButtonHelper {
             msg += " on " + buttonID.split("_")[2];
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg + ".");
+        game.setStoredValue(messageID, part2);
         if (game.isHiddenAgendaMode() && msg.toLowerCase().contains("abstain on")) {
             if (player.hasAbility("zeal")) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## The player with the zeal ability has decided to abstain.");
@@ -6462,7 +6466,7 @@ public class ButtonHelper {
                 }
             }
         }
-        game.setStoredValue(messageID, part2);
+
         deleteMessage(event);
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("removePreset_" + messageID, "Remove The Preset"));
@@ -6641,7 +6645,9 @@ public class ButtonHelper {
             String message = player.getFactionEmoji() + " chose to Diplo the system containing "
                 + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-            ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", null);
+            if (!game.isFowMode()) {
+                ButtonHelper.sendMessageToRightStratThread(player, game, message, "diplomacy", null);
+            }
         }
         deleteMessage(event);
     }
