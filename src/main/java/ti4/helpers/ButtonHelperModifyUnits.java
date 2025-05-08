@@ -614,7 +614,7 @@ public class ButtonHelperModifyUnits {
 
             boolean isNraShenanigans = thingToHit.equalsIgnoreCase("nraShenanigans");
             boolean isRemainingSustains = thingToHit.equalsIgnoreCase("remainingSustains");
-
+            if (isRemainingSustains && numSustains < 1) continue;
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
