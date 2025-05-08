@@ -38,7 +38,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;
@@ -73,6 +72,7 @@ import static ti4.map.manage.GamePersistenceKeys.UNITS;
 import ti4.message.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 @UtilityClass
@@ -332,6 +332,17 @@ class GameLoadService {
                     }
 
                     game.setCustomAdjacentTiles(adjacentTilesMigrated);
+                }
+                case Constants.CUSTOM_HYPERLANE_DATA -> {
+                    Map<String, String> customHyperlaneData = new LinkedHashMap<>();
+                    StringTokenizer hyperlaneToken = new StringTokenizer(info, ";");
+                    while (hyperlaneToken.hasMoreTokens()) {
+                        StringTokenizer hyperlaneData = new StringTokenizer(hyperlaneToken.nextToken(), ",");
+                        String position = hyperlaneData.nextToken();
+                        String value = CustomHyperlaneService.decodeMatrix(hyperlaneData.nextToken());
+                        customHyperlaneData.put(position, value);
+                    }
+                    game.setCustomHyperlaneData(customHyperlaneData);
                 }
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info))

@@ -1057,9 +1057,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void movedNExplored(
-        ButtonInteractionEvent event, Player player, String buttonID, Game game,
-        MessageChannel mainGameChannel
-    ) {
+        ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = false;
         if (bID.startsWith("dsdihmy_")) {
@@ -1071,7 +1069,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             false);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
-            MessageHelper.sendMessageToChannel(mainGameChannel,
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 info[1] + " was exhausted by _Impressment Programs_.");
         }
         if (tile != null && player.getTechs().contains("dsdihmy")) {
@@ -2415,6 +2413,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         buttons.add(Buttons.green("checkTechSkipView", "Find Technology Specialties"));
         buttons.add(Buttons.blue("checkAttachmView", "Find Attachments"));
         buttons.add(Buttons.gray("checkShiplessView", "Show Map Without Ships"));
+        buttons.add(Buttons.gray("checkUnlocked", "Show Only Unlocked Units"));
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
     }
 

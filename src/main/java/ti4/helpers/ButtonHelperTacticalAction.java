@@ -69,8 +69,12 @@ public class ButtonHelperTacticalAction {
                         unitkey = unit;
                     }
                     if (currentActivation.containsKey(unitkey)) {
-                        game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey,
-                            currentActivation.get(unitkey) - amount);
+                        if (currentActivation.get(unitkey) - amount == 0) {
+                            currentActivation.remove(unitkey);
+                        } else {
+                            game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey,
+                                currentActivation.get(unitkey) - amount);
+                        }
                     }
                     if (unitkey.contains("damaged")) {
                         unitkey = unitkey.replace("damaged", "");
@@ -261,8 +265,12 @@ public class ButtonHelperTacticalAction {
             currentSystem.remove(rest);
         }
         if (currentActivation.containsKey(unitName)) {
-            game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName,
-                currentActivation.get(unitName) + amount);
+            if (currentActivation.get(unitName) + amount == 0) {
+                currentActivation.remove(unitName);
+            } else {
+                game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName,
+                    currentActivation.get(unitName) + amount);
+            }
         } else {
             game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitName, amount);
         }
