@@ -2,6 +2,7 @@ package ti4.service.map;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,6 +21,7 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.helpers.SortHelper;
+import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
@@ -65,6 +67,9 @@ public class CustomHyperlaneService {
             sb.append("No custom hyperlane tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add custom tiles.");
         } else {
             SortHelper.sortButtonsByTitle(hyperlaneTileButtons);
+            hyperlaneTileButtons.add(Buttons.gray("customHyperlaneRefresh", "Refresh"));
+            hyperlaneTileButtons.add(Buttons.gray("customHyperlaneImport~MDL", "Import"));
+            hyperlaneTileButtons.add(Buttons.gray("customHyperlaneExport", "Export"));
             hyperlaneTileButtons.add(Buttons.DONE_DELETE_BUTTONS);
         }
 
@@ -76,6 +81,71 @@ public class CustomHyperlaneService {
         }
     }
   
+    @ButtonHandler("customHyperlaneRefresh")
+    public static void refreshHyperlaneButtons(ButtonInteractionEvent event, Game game) {
+        offerManageHyperlaneButtons(game, event, null);
+        event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("customHyperlaneExport")
+    public static void exportHyperlaneData(ButtonInteractionEvent event, Game game) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : game.getCustomHyperlaneData().entrySet()) {
+            sb.append(entry.getKey()).append(",").append(matrixToBinary(entry.getValue())).append("\n");
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+    }
+
+    @ButtonHandler("customHyperlaneImport~MDL")
+    public static void importHyperlaneData(ButtonInteractionEvent event, Game game) {
+        TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Data", TextInputStyle.PARAGRAPH)
+            .setPlaceholder("position,data as binary string\nposition,data as binary string");
+
+        Modal importDataModal = Modal.create("customHyperlaneImportSave_" + event.getMessageId(), "Import Data (overwrites existing)")
+            .addActionRow(data.build())
+            .build();
+
+        event.replyModal(importDataModal).queue();
+    }
+
+    @ModalHandler("customHyperlaneImportSave_")
+    public static void saveImportedHyperlaneData(ModalInteractionEvent event, Player player, Game game) {
+        String origMessageId = event.getModalId().replace("customHyperlaneImportSave_", "");
+        String importData = event.getValue(Constants.SETTING_VALUE).getAsString().replace("\n", " ");
+
+        Map<String, String> customHyperlaneData = new HashMap<>();
+        for (String dataRow : importData.split(" ")) {
+            String[] data = dataRow.split(",");
+            if (data.length != 2) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid data: `" + dataRow + "`");
+                return;
+            }
+
+            String position = data[0];
+            if (!PositionMapper.isTilePositionValid(position)) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: `" + position + "`");
+                return;
+            }
+            
+            String matrix = binaryToMatrix(data[1].trim());
+            if (!isValidConnectionMatrix(matrix)) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid connection matrix: `" + matrix + "`");
+                return;
+            }
+
+            customHyperlaneData.put(position, matrix);
+        }
+
+        if (!customHyperlaneData.isEmpty()) {
+            game.setCustomHyperlaneData(customHyperlaneData);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data imported.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Found nothing to import.");
+        }
+
+        offerManageHyperlaneButtons(game, event, origMessageId);
+    }
+
     @ButtonHandler("customHyperlaneEdit")
     public static void editHyperlaneData(ButtonInteractionEvent event, String buttonID, Game game) {
         String position = StringUtils.substringBetween(buttonID, "customHyperlaneEdit_", "~MDL");
@@ -115,7 +185,7 @@ public class CustomHyperlaneService {
                 return;
             }
 
-            hyperlaneData = normalizeMatrix(hyperlaneData);
+            hyperlaneData = normalizeMatrix(hyperlaneData); //force two-way connections
             customHyperlaneData.put(position, hyperlaneData);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data `" + hyperlaneData + "` added to " + position);
         }
@@ -123,7 +193,7 @@ public class CustomHyperlaneService {
         offerManageHyperlaneButtons(game, event, origMessageId);
     }
 
-    public static String encodeMatrix(String matrix) {
+    public static String matrixToBinary(String matrix) {
         StringBuilder binaryBuilder = new StringBuilder(36);
         String[] rows = matrix.split(";");
         for (String row : rows) {
@@ -131,15 +201,20 @@ public class CustomHyperlaneService {
                 binaryBuilder.append(val.trim());
             }
         }
+        return binaryBuilder.toString();
+    }
 
-        BigInteger bigInt = new BigInteger(binaryBuilder.toString(), 2);
+    public static String encodeMatrix(String matrix) {
+        String binaryString = matrixToBinary(matrix);
+        BigInteger bigInt = new BigInteger(binaryString, 2);
         return String.format("%09x", bigInt); // 9 hex chars = 36 bits
     }
 
-    public static String decodeMatrix(String hex) {
-        BigInteger bigInt = new BigInteger(hex, 16);
-        String binaryString = String.format("%36s", bigInt.toString(2)).replace(' ', '0'); // pad to 36 bits
-    
+    public static String binaryToMatrix(String binaryString) {
+        if (binaryString == null || binaryString.length() != 36) {
+            return "";
+        }
+
         StringBuilder matrixBuilder = new StringBuilder();
         for (int i = 0; i < 6; i++) {
             if (i > 0) matrixBuilder.append(";");
@@ -149,6 +224,12 @@ public class CustomHyperlaneService {
             }
         }
         return matrixBuilder.toString();
+    }
+
+    public static String decodeMatrix(String hex) {
+        BigInteger bigInt = new BigInteger(hex, 16);
+        String binaryString = String.format("%36s", bigInt.toString(2)).replace(' ', '0'); // pad to 36 bits
+        return binaryToMatrix(binaryString);
     }
 
     public static boolean isValidConnectionMatrix(String input) {
