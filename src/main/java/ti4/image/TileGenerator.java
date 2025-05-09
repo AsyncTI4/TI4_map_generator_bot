@@ -220,14 +220,10 @@ public class TileGenerator {
             case Setup -> {
             } // do nothing
             case Tile -> {
-                BufferedImage image = ImageHelper.read(tile.getTilePath());
+                BufferedImage image = CustomHyperlaneService.isCustomHyperlaneTile(tile)
+                    ? HyperlaneTileGenerator.generateHyperlaneTile(tile, game)
+                    : ImageHelper.read(tile.getTilePath());
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
-
-                //Custom Hyperlane stuff
-                if (CustomHyperlaneService.isCustomHyperlaneTile(tile) && game.getCustomHyperlaneData().containsKey(tile.getPosition())) {
-                    BufferedImage hyperlanes = HyperlaneTileGenerator.generateHyperlaneTile(game.getCustomHyperlaneData().get(tile.getPosition()));
-                    tileGraphics.drawImage(hyperlanes, TILE_PADDING, TILE_PADDING, null);
-                }
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
                 if (tile.isAnomaly(game) && tileShipPositions != null) {

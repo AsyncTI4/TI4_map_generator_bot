@@ -1,5 +1,8 @@
 package ti4.image;
 
+import ti4.ResourceHelper;
+import ti4.map.Game;
+import ti4.map.Tile;
 import ti4.service.map.CustomHyperlaneService;
 
 import java.awt.AlphaComposite;
@@ -17,12 +20,18 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 public class HyperlaneTileGenerator {
 
     private static final int CENTER_X = TileGenerator.TILE_WIDTH / 2;
     private static final int CENTER_Y = TileGenerator.TILE_HEIGHT / 2;
+
+    private static final List<String> RANDOM_BACKGROUNDS = List.of(
+      "hl_empty.png"
+        //need more different backgrounds
+    );
 
     public enum HLColor {
         BLUE(new Color(0, 180, 255), new Color(180, 200, 240)),
@@ -128,14 +137,17 @@ public class HyperlaneTileGenerator {
      * Connection matrix format: 0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0 
      * Generates the hyperlane as roundabout if any connections connect to itself
      */
-    public static BufferedImage generateHyperlaneTile(String matrix) {
-        BufferedImage hyperlane = new BufferedImage(TileGenerator.TILE_WIDTH, TileGenerator.TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = hyperlane.createGraphics();
-    
-        Set<Shape> shapes = new LinkedHashSet<>();
-    
+    public static BufferedImage generateHyperlaneTile(Tile tile, Game game) {
+        String matrix = game.getCustomHyperlaneData().get(tile.getPosition());
         boolean asRoundabout = CustomHyperlaneService.hasSelfConnection(matrix);
-        if (asRoundabout) {
+
+        BufferedImage hyperlane = getRandomTransformedBackground(tile, matrix);
+        Graphics2D g = hyperlane.createGraphics();
+
+        Set<Shape> shapes = new LinkedHashSet<>();
+   
+        //If no connection matrix, generate just the circle
+        if (asRoundabout || matrix == null) {
             shapes.add(ROUNDABOUT);
         }
 
@@ -165,6 +177,10 @@ public class HyperlaneTileGenerator {
     
     private static Set<List<Integer>> getConnectionsFromMatrix(String matrix, boolean selfConnections) {
         Set<List<Integer>> pairs = new HashSet<>();
+        if (matrix == null) {
+            return pairs;
+        }
+
         String[] rows = matrix.split(";");
         for (int i = 0; i < 6; i++) {
             String[] cols = rows[i].split(",");
@@ -175,6 +191,42 @@ public class HyperlaneTileGenerator {
             }
         }
         return pairs;
+    }
+
+    private static BufferedImage getRandomTransformedBackground(Tile tile, String seedKey) {
+        String tilePath = tile.getTilePath();
+        if (seedKey != null) {
+            String randomTile = RANDOM_BACKGROUNDS.get(new Random(seedKey.hashCode()).nextInt(RANDOM_BACKGROUNDS.size()));
+            tilePath = ResourceHelper.getInstance().getTileFile(randomTile);
+            if (tilePath == null) {
+                tilePath = tile.getTilePath();
+            }
+        }
+        BufferedImage original = ImageHelper.read(tilePath);
+
+        int w = original.getWidth();
+        int h = original.getHeight();
+
+        BufferedImage transformed = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = transformed.createGraphics();
+    
+        int transform = seedKey != null ? Math.abs(seedKey.hashCode()) % 4 : -1;
+        switch (transform) {
+            case 1: // Horizontal flip
+                g.drawImage(original, 0, 0, w, h, w, 0, 0, h, null);
+                break;
+            case 2: // Vertical flip
+                g.drawImage(original, 0, 0, w, h, 0, h, w, 0, null);
+                break;
+            case 3: // Both flips (180° rotate)
+                g.drawImage(original, 0, 0, w, h, w, h, 0, 0, null);
+                break;
+            default: // No transformation
+                g.drawImage(original, 0, 0, null);
+        }
+    
+        g.dispose();
+        return transformed;
     }
 
     //Connection rules to angles with shape cache

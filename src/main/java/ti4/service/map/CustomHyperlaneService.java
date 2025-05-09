@@ -286,6 +286,8 @@ public class CustomHyperlaneService {
 
     //If any direction connects to itself, we'll generate the tile as roundabout
     public static boolean hasSelfConnection(String matrix) {
+        if (matrix == null) return false;
+
         String[] rows = matrix.split(";");
         if (rows.length != 6) return false;
     
