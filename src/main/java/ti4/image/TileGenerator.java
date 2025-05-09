@@ -66,9 +66,10 @@ public class TileGenerator {
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
     private static final int TILE_EXTRA_WIDTH = 260;
     private static final int EXTRA_X = 100;
-    private static final int TILE_WIDTH = 345;
-    private static final int TILE_HEIGHT = 300;
     private static final int EXTRA_Y = 100;
+
+    public static final int TILE_WIDTH = 345;
+    public static final int TILE_HEIGHT = 300;
 
     private final Game game;
     private final GenericInteractionCreateEvent event;
@@ -224,7 +225,7 @@ public class TileGenerator {
 
                 //Custom Hyperlane stuff
                 if (CustomHyperlaneService.isCustomHyperlaneTile(tile) && game.getCustomHyperlaneData().containsKey(tile.getPosition())) {
-                    BufferedImage hyperlanes = HyperlaneTileGenerator.generateHyperlaneTile(game, game.getCustomHyperlaneData().get(tile.getPosition()));
+                    BufferedImage hyperlanes = HyperlaneTileGenerator.generateHyperlaneTile(game.getCustomHyperlaneData().get(tile.getPosition()));
                     tileGraphics.drawImage(hyperlanes, TILE_PADDING, TILE_PADDING, null);
                 }
 
