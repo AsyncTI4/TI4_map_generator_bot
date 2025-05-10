@@ -1460,6 +1460,20 @@ public class ButtonHelperFactionSpecific {
         }
     }
 
+    @ButtonHandler("startQhetInfRevival")
+    public static void startQhetInfRevival(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteTheOneButton(event);
+        List<Button> infButtons = new ArrayList<>();
+        for (String planet : ButtonHelper.getPlanetsWithUnits(player, game)) {
+            infButtons.add(Buttons.green("qhetInfRevival_" + planet, Helper.getPlanetRepresentation(planet, game)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use this button to put down an infantry on a planet with your units.", infButtons);
+        if (player.getStasisInfantry() > 1) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use these buttons to put a second infantry down if you want on the same planet.", infButtons);
+        }
+
+    }
+
     @ButtonHandler("qhetInfRevival_")
     public static void qhetInfRevival(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
@@ -1471,6 +1485,7 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getTile(AliasHandler.resolveTile(planet));
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
         player.setStasisInfantry(player.getStasisInfantry() - 1);
+        ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " placed 1 infantry on " + Helper.getPlanetRepresentation(planet, game) + ". They have " + player.getStasisInfantry() + " infantry left to revive.");
     }
