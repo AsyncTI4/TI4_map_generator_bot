@@ -46,7 +46,6 @@ public class CustomHyperlaneService {
     //Blue button   empty hyperlane tile without data
     private static void offerManageHyperlaneButtons(Game game, GenericInteractionCreateEvent event, String originalMessageId) {
         StringBuffer sb = new StringBuffer("### Manage Custom Hyperlanes\n");
-        sb.append("-# Edit Hyperlane data to `").append(HYPERLANE_TILEID).append("`tiles.\n");
 
         Map<String, String> customHyperlaneData = game.getCustomHyperlaneData();
         List<Button> hyperlaneTileButtons = new ArrayList<>();
@@ -64,7 +63,7 @@ public class CustomHyperlaneService {
         }
        
         if (hyperlaneTileButtons.isEmpty()) {
-            sb.append("No custom hyperlane tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add custom tiles.");
+            sb.append("No custom HL tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
         } else {
             SortHelper.sortButtonsByTitle(hyperlaneTileButtons);
             hyperlaneTileButtons.add(Buttons.gray("customHyperlaneRefresh", "Refresh"));
