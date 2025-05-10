@@ -20,10 +20,6 @@ import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.message.MessageHelper;
-import ti4.model.AbilityModel;
-import ti4.model.ActionCardModel;
-import ti4.model.EmbeddableModel;
-import ti4.model.ModelInterface;
 import ti4.model.Source.ComponentSource;
 import ti4.model.SourceModel;
 
@@ -75,12 +71,26 @@ class SearchSources extends Subcommand {
         List<MessageEmbed> messageEmbeds2 = Mapper.getSources().values().stream()
             .filter(model -> model.search(sourceString, source))
             .filter(model -> canalBool == null || canalBool == model.isCanalOfficial())
+            .sorted((r1, r2) -> { // should sort by canal then subcanal (null values before non-null values)
+                if(r1.getCanal().equals(r2.getCanal()))
+                    if (r1.getSubcanal() == null && r2.getSubcanal() == null) return 0;
+                    else if (r1.getSubcanal() == null) return -1;
+                    else if (r2.getSubcanal() == null) return 1;
+                    else return r1.getSubcanal().compareTo(r2.getSubcanal());
+                else return -r1.getCanal().compareTo(r2.getName());
+            })
+            //.sorted((r1, r2) -> (r1.getCanal()+r1.getSubcanal()).compareTo((r2.getCanal()+r2.getSubcanal())))
             .map(model -> model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds2);
     }
 
-
+    /**
+     * Used in '/search sources',
+     * Gives a Map with the number of occurrences in each \resources\ .json file for a specific source
+     * @param compSource
+     * @return
+     */
     private HashMap<String, Integer> getOccurrencesByCompType(ComponentSource compSource) {
         HashMap<String, Integer> occurrences = new HashMap<>();
         occurrences.put("Abilities", getAbilitiesSources(compSource).size());
@@ -113,6 +123,9 @@ class SearchSources extends Subcommand {
 
     // ##################################################
     // Transfer all this section to Mapper.java?
+    // ##################################################
+    // All those functions get the list sources in a \resources\ .json file for a specific source, or list all sources when no specific source
+
     private List<String> getAbilitiesSources(ComponentSource CompSource) {
         return Mapper.getAbilities().values().stream() // Collection<AbilityModel> -> Stream<>
             .filter(model -> model.searchSource(CompSource))
@@ -207,7 +220,7 @@ class SearchSources extends Subcommand {
             .map(model -> model.getSource().toString()).toList();
     }
     private List<String> getTokensSources(ComponentSource CompSource) {
-        return Mapper.getTokens2().stream() // List<TokenModel> -> Stream<>
+        return Mapper.getTokens().stream() // List<TokenModel> -> Stream<>
             .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
             .map(model -> model.getSource().toString()).toList();
     }
@@ -228,6 +241,13 @@ class SearchSources extends Subcommand {
     }
     // ##################################################
 
+    /**
+     * Used in '/search sources', and bypasses the standard execution it,
+     * 1. List all distinct sources in \resources\ .json files (except sources.json) and count their occurrences,
+     * 2. List sources from that previous list that have no match in sources.json (missing entries in sources.json),
+     * 3. List sources from sources.json that have no match in the first list (missing entries in \resources\ .json files (except sources.json), or wrong entry in sources.json)
+     * @param event
+     */
     private void checkSources(SlashCommandInteractionEvent event) {
         List<String> abilitySources = getAbilitiesSources(null);
         List<String> actioncardSources = getActionCardsSources(null);

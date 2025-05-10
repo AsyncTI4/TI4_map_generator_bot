@@ -15,11 +15,11 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     
     private ComponentSource source; // unique identifiying name
     private String name; // Long fancy name
-    private String canal; // Must be "official" or "community"
+    private String canal; // Must be "official" or "community", must be non null
     private String subcanal; // Sub value of canal when canal = "community"
     private String credits; // Creator/Responsible.s
     private String description; // Content list (aggregated by component types)
-    private List<String> data; // Links to rules, content, discussion channels, etc.
+    private List<String> data; // Links to rules, content, discussion/help channels, etc.
 
     public boolean isValid() {
         return source != null && name != null && canal != null;

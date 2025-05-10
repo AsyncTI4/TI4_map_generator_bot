@@ -232,7 +232,7 @@ public class RegexHelper {
 
     /** @return group "token" */
     public static String tokenRegex() {
-        Set<String> tokens = new HashSet<>(Mapper.getTokens());
+        Set<String> tokens = new HashSet<>(Mapper.getTokensFromproperties());
         return regexBuilder("token", tokens);
     }
 }

@@ -22,3 +22,6 @@ TI4_map_generator_discord_bot.iml
 .DS_Store
 *.swp
 /src/test/java/ti4/image/static/tileLayout/temp
+.classpath
+runlocally clean.ps1
+runlocally.ps1
