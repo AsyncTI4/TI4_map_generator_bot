@@ -35,6 +35,7 @@ import ti4.service.button.ReactionService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
@@ -1120,7 +1121,9 @@ public class ButtonHelperSCs {
     public static String deductCC(Game game, Player player, int scNum) {
         int strategicCC = player.getStrategicCC();
         if (strategicCC == 0) {
-            return " have 0 command tokens in strategy pool, can't follow.";
+            String msg = " have 0 command tokens in strategy pool, **can't follow.**";
+            GMService.logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() + msg);
+            return msg;
         }
 
         strategicCC--;

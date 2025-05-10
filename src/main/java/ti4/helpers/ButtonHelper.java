@@ -4930,9 +4930,7 @@ public class ButtonHelper {
                             } else {
                                 messageBuilder.append(" (distance exceeds move value (").append(distance).append(" > ")
                                     .append(moveValue).append("), __does not have _Gravity Drive___)");
-                                if (game.isFowMode()) {
-                                    GMService.logPlayerActivity(game, player, messageBuilder.toString());
-                                }
+                                GMService.logPlayerActivity(game, player, messageBuilder.toString());
                             }
                             if (player.getTechs().contains("dsgledb")) {
                                 messageBuilder.append(" (has _Lightning Drives_ for +1 movement if not transporting)");
