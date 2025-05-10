@@ -794,7 +794,6 @@ class AgendaResolveButtonHandler {
             }
             if ("seed_empire".equalsIgnoreCase(agID)) {
                 List<Player> winOrLose;
-                StringBuilder message = new StringBuilder();
                 Integer poIndex;
                 poIndex = game.addCustomPO("Seed of an Empire", 1);
                 if ("for".equalsIgnoreCase(winner)) {
@@ -803,20 +802,18 @@ class AgendaResolveButtonHandler {
                     winOrLose = AgendaHelper.getPlayersWithLeastPoints(game);
 
                 }
-                message.append("Custom objective _Seed of an Empire_ has been added.\n");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Custom objective _Seed of an Empire_ has been added.");
                 for (Player playerWL : winOrLose) {
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
-                    message.append(playerWL.getRepresentation()).append(" scored _Seed of an Empire_.\n");
+                    MessageHelper.sendMessageToChannel(playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
                     Helper.checkEndGame(game, playerWL);
                     if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
                         break;
                     }
                 }
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
             }
             if ("absol_seeds".equalsIgnoreCase(agID)) {
                 List<Player> winOrLose;
-                StringBuilder message = new StringBuilder();
                 Integer poIndex;
                 poIndex = game.addCustomPO("Seed of an Empire", 1);
                 if ("for".equalsIgnoreCase(winner)) {
@@ -825,15 +822,15 @@ class AgendaResolveButtonHandler {
                     winOrLose = AgendaHelper.getPlayersWithLeastPoints(game);
 
                 }
-                message.append("Custom public objective _Seed of an Empire_ has been added.\n");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Custom public objective _Seed of an Empire_ has been added.");
                 if (winOrLose.size() == 1) {
                     Player playerWL = winOrLose.getFirst();
                     game.scorePublicObjective(playerWL.getUserID(), poIndex);
-                    message.append(playerWL.getRepresentation()).append(" scored _Seed of an Empire_\n");
+                    MessageHelper.sendMessageToChannel(playerWL.getCorrectChannel(), playerWL.getRepresentation() + " scored _Seed of an Empire_.");
                     Helper.checkEndGame(game, playerWL);
                     if ("for".equalsIgnoreCase(winner)) {
                         game.setSpeakerUserID(playerWL.getUserID());
-                        message.append(playerWL.getRepresentation()).append(" was made speaker and so must give each other player that voted \"for\" a promissory note.\n");
+                        MessageHelper.sendMessageToChannel(playerWL.getCorrectChannel(), playerWL.getRepresentation() + " was made speaker and so must give each other player that voted \"for\" a promissory note.");
                         for (Player p2 : AgendaHelper.getWinningVoters(winner, game)) {
                             if (p2 != playerWL) {
                                 MessageHelper.sendMessageToChannelWithButtons(playerWL.getCardsInfoThread(), "You owe " + p2.getRepresentation() +
@@ -845,12 +842,10 @@ class AgendaResolveButtonHandler {
                         playerWL.setFleetCC(playerWL.getFleetCC() + 1);
                         playerWL.setTacticalCC(playerWL.getTacticalCC() + 1);
                         playerWL.setStrategicCC(playerWL.getStrategicCC() + 1);
-                        message.append(playerWL.getRepresentation()).append(" drew some action cards and has had a command token placed in each command pool.\n");
-
+                        MessageHelper.sendMessageToChannel(playerWL.getCorrectChannel(), playerWL.getRepresentation() + " drew some action cards and has had a command token placed in each command pool.");
                     }
 
                 }
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
             }
             if ("plowshares".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
