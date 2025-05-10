@@ -8,7 +8,7 @@
         "abilityWindow": "When an outcome you predicted or cast 5 or more votes for would be resolved:",
         "abilityText": "You may place 1 infantry from your reinforcements on a planet that does not contain other players’ units and is adjacent to a planet you control.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "argentenvoy",
@@ -19,7 +19,7 @@
         "abilityWindow": "When a player with readied planets abstains:",
         "abilityText": "You may force that player to remove 1 token from their tactic pool and return it to their reinforcements.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "cabalenvoy",
@@ -30,7 +30,7 @@
         "abilityWindow": "After an outcome is resolved:",
         "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may capture 1 unit from your reinforcements with a cost less than or equal to the number of players that cast votes for the resolved outcome.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "ghostenvoy",
@@ -41,7 +41,7 @@
         "abilityWindow": "Before an outcome is resolved:",
         "abilityText": "You may exhaust this card to choose a player who voted for that outcome. If you predicted or cast 5 or more votes for another outcome, you may place or move a Creuss wormhole token into a non-home system that contains a planet that player controls.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "empyreanenvoy",
@@ -52,7 +52,7 @@
         "abilityWindow": "After an agenda is revealed:",
         "abilityText": "You may predict aloud an outcome of this agenda. If your prediction is correct, you may place a frontier token in a system that does not contain any planets and does not already have a frontier token.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "hacanenvoy",
@@ -63,7 +63,7 @@
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
         "abilityText": "Each other player that voted for that agenda may gain 1 trade good.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "jolnarenvoy",
@@ -74,7 +74,7 @@
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
         "abilityText": "Place a control token on a technology you own. Players must place 1 trade good on this card to research technologies with your control tokens. At the end of the status phase, gain the trade goods on this card.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "keleresenvoy",
@@ -85,7 +85,7 @@
         "abilityWindow": "When a “Directive” agenda is resolved:",
         "abilityText": "You may exhaust this card and spend a command token from your strategy pool to ignore the effects of that agenda.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "l1z1xenvoy",
@@ -96,7 +96,7 @@
         "abilityWindow": "After an outcome is resolved:",
         "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may exhaust this card and remove 1 of your dreadnoughts adjacent to Mecatol Rex from the board to discard the agenda instead; it is resolved with no effect and is not replaced.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "letnevenvoy",
@@ -107,7 +107,7 @@
         "abilityWindow": "After an outcome is resolved:",
         "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may choose a system that contains 1 of your space docks. Replace 1 of your non-fighter ships in that system with a dreadnought from your reinforcements, or place 1 cruiser or destroyer in that system.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "mahactenvoy",
@@ -118,7 +118,7 @@
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
         "abilityText": "You may exhaust this card to choose a player who can vote who did not vote for that outcome. Replace 1 command token in your fleet pool with 1 from that player’s reinforcements if it does not already contain 1 of that player's tokens.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "mentakenvoy",
@@ -129,7 +129,7 @@
         "abilityWindow": "You may exhaust this card before a player casts votes:",
         "abilityText": "That player must cast at least 1 vote for an outcome of your choice, if able, or give you 2 trade goods or 1 promissory note.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "muaatenvoy",
@@ -140,7 +140,7 @@
         "abilityWindow": "After an outcome is resolved:",
         "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may gain a command token and place it in your strategy pool.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "naaluenvoy",
@@ -151,7 +151,7 @@
         "abilityWindow": "After the speaker abstains or votes on an agenda:",
         "abilityText": "You may exhaust 1 planet you control and cast additional votes equal to its influence value.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "naazenvoy",
@@ -162,7 +162,7 @@
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
         "abilityText": "You may look at the top card of an exploration deck. If it is a relic fragment, you may exhaust this card to gain it.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "nekroenvoy",
@@ -173,7 +173,7 @@
         "abilityWindow": "After an agenda is revealed:",
         "abilityText": "Choose an outcome and a player. If that player votes for that outcome, they cast additional votes equal to the number of technologies that player owns that you also own.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "nomadenvoy",
@@ -184,7 +184,7 @@
         "abilityWindow": "After the speaker abstains or votes on an agenda you cast 5 or more votes on:",
         "abilityText": "You may exhaust this card to change your vote to abstain, then ready up to 3 planets you control.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "sardakkenvoy",
@@ -195,7 +195,7 @@
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
         "abilityText": "You may place 2 fighters from your reinforcements in a system that contains 1 or more of your ships.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "saarenvoy",
@@ -206,7 +206,7 @@
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
         "abilityText": "You may move 1 of your ships to an adjacent system that contains 1 or more of your ships or space docks.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "solenvoy",
@@ -217,7 +217,7 @@
         "abilityWindow": "After an outcome you predicted or cast 5 or more votes for is resolved:",
         "abilityText": "You may ready each planet you control in 1 system.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "titansenvoy",
@@ -228,7 +228,7 @@
         "abilityWindow": "After an outcome is resolved:",
         "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may exhaust this card and choose a player who voted for the resolved outcome. Place or move 1 sleeper token onto a non-home planet that player controls that does not have a sleeper token.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "winnuenvoy",
@@ -239,7 +239,7 @@
         "abilityWindow": "When you cast votes:",
         "abilityText": "Choose either your home planet or Mecatol Rex. If you control that planet, you can vote using its influence value without exhausting it, even if it is exhausted.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "xxchaenvoy",
@@ -250,7 +250,7 @@
         "abilityWindow": "At the end of the agenda phase:",
         "abilityText": "You may exhaust this card to look at the top 3 cards of the agenda deck, then choose 1 to reveal. Players vote on this agenda.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "yinenvoy",
@@ -261,7 +261,7 @@
         "abilityWindow": "When you cast votes:",
         "abilityText": "You may remove 1 infantry from a planet you control to exhaust 1 adjacent planet controlled by another player and cast additional votes equal to that planet’s influence value.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     },
     {
         "id": "yssarilenvoy",
@@ -272,6 +272,6 @@
         "abilityWindow": "When another player discards an action card during the agenda phase:",
         "abilityText": "You may exhaust this card and discard an action card to take that action card from the discard pile.",
         "unlockCondition": "At the start of the agenda phase",
-        "source": "voice_of_the_council"
+        "source": "voices_of_the_council"
     }
 ]
