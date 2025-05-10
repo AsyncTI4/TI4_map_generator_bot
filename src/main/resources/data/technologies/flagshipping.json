@@ -1,10 +1,13 @@
 [
     {
-        "alias": "CoW",
+        "alias": "sigma_cow",
         "name": "The Changer of Ways",
         "types": ["WARFARE"],
         "requirements": "RR",
+        "faction": "nomad",
         "source": "flagshipping",
-        "text": "At the start of any space combat, you may choose 1 participating unit with the SUSTAIN DAMAGE ability; repair or damage that unit."
+        "text": "At the start of any space combat, you may choose 1 participating unit with the SUSTAIN DAMAGE ability; repair or damage that unit.",
+        "shortName": "Changer of Ways",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/misc_homebrew/changer_of_ways.png?raw=true"
     }
 ]

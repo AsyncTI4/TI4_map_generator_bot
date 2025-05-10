@@ -1,22 +1,20 @@
 package ti4.map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.awt.Point;
+import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
-
+import org.junit.jupiter.api.Test;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SpaceTest extends BaseTi4Test {
     private final String expectedName = "space";
@@ -34,14 +32,14 @@ public class SpaceTest extends BaseTi4Test {
         Space space = new Space(expectedName, expectedHolderCenterPosition);
 
         space.addUnit(expectedUnitKey, expectedUnitCount);
-        space.addUnitDamage(expectedUnitKey, expectedUnitDamage);
+        space.addDamagedUnit(expectedUnitKey, expectedUnitDamage);
         space.addCC(expectedCommandCounter);
         space.addControl(expectedControl);
         space.addToken(expectedToken);
-        
+
         return space;
     }
-    
+
     @Test
     public void testSpaceHasNoUnexpectedProperties() throws Exception {
         // Given        
@@ -54,8 +52,7 @@ public class SpaceTest extends BaseTi4Test {
             "unitsDamage",
             "commandCounterList",
             "controlList",
-            "tokenList"
-        ));
+            "tokenList"));
 
         // When
         JsonValidator.assertAvailableJsonAttributes(space, knownJsonAttributes);

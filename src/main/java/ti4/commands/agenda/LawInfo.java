@@ -1,20 +1,20 @@
 package ti4.commands.agenda;
 
-import ti4.generator.Mapper;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+class LawInfo extends GameStateSubcommand {
 
-public class LawInfo extends AgendaSubcommandData {
     public LawInfo() {
-        super("law_info", "Show laws in play");
+        super("law_info", "Show laws in play", false, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        var game = getActiveGame();
+        var game = getGame();
         var stringBuilder = new StringBuilder();
-
         stringBuilder.append("__**Laws Currently in Play:**__\n");
         int lawNumber = 1;
         for (var law : game.getLaws().entrySet()) {

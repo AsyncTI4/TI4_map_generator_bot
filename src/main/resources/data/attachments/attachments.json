@@ -1,14 +1,14 @@
 [
     {
         "id": "biotic",
+        "name": "Biotic Research Facility",
         "imagePath": "attachment_biotic.png",
-        "techSpeciality": [
-            "biotic"
-        ],
+        "techSpeciality": ["biotic"],
         "source": "pok"
     },
     {
         "id": "bioticstat",
+        "name": "Biotic Research Facility",
         "imagePath": "attachment_bioticstat.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
@@ -16,14 +16,14 @@
     },
     {
         "id": "cybernetic",
+        "name": "Cybernetic Research Facility",
         "imagePath": "attachment_cybernetic.png",
-        "techSpeciality": [
-            "cybernetic"
-        ],
+        "techSpeciality": ["cybernetic"],
         "source": "pok"
     },
     {
         "id": "cyberneticstat",
+        "name": "Cybernetic Research Facility",
         "imagePath": "attachment_cyberneticstat.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
@@ -31,6 +31,7 @@
     },
     {
         "id": "dmz",
+        "name": "Demilitarized Zone",
         "imagePath": "attachment_dmz.png",
         "token": "dmz_large",
         "source": "pok"
@@ -77,14 +78,14 @@
     },
     {
         "id": "propulsion",
+        "name": "Propulsion Research Facility",
         "imagePath": "attachment_propulsion.png",
-        "techSpeciality": [
-            "propulsion"
-        ],
+        "techSpeciality": ["propulsion"],
         "source": "pok"
     },
     {
         "id": "propulsionstat",
+        "name": "Propulsion Research Facility",
         "imagePath": "attachment_propulsionstat.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
@@ -114,29 +115,26 @@
         "imagePath": "attachment_titanspn.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
-        "planetTypes": [
-            "cultural",
-            "industrial",
-            "hazardous"
-        ],
+        "planetTypes": ["cultural", "industrial", "hazardous"],
         "source": "pok"
     },
     {
         "id": "tombofemphidia",
+        "name": "Tomb of Emphidia",
         "imagePath": "attachment_tombofemphidia.png",
         "influenceModifier": 1,
         "source": "pok"
     },
     {
         "id": "warfare",
+        "name": "Warfare Research Facility",
         "imagePath": "attachment_warfare.png",
-        "techSpeciality": [
-            "warfare"
-        ],
+        "techSpeciality": ["warfare"],
         "source": "pok"
     },
     {
         "id": "warfarestat",
+        "name": "Warfare Research Facility",
         "imagePath": "attachment_warfarestat.png",
         "resourcesModifier": 1,
         "influenceModifier": 1,
@@ -151,12 +149,14 @@
     },
     {
         "id": "custodiavigilia1",
+        "name": "Custodia Vigilia",
         "imagePath": "attachment_custodiavigilia_1.png",
         "isFakeAttachment": true,
         "source": "codex3"
     },
     {
         "id": "custodiavigilia2",
+        "name": "Custodia Vigilia",
         "imagePath": "attachment_custodiavigilia_2.png",
         "isFakeAttachment": true,
         "source": "codex3"

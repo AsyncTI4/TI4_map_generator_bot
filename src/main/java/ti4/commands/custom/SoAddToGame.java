@@ -1,38 +1,35 @@
 package ti4.commands.custom;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+import ti4.commands.GameStateSubcommand;
+import ti4.image.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 
-public class SoAddToGame extends CustomSubcommandData {
+class SoAddToGame extends GameStateSubcommand {
+
     public SoAddToGame() {
-        super(Constants.ADD_SO_TO_GAME, "Add SO to game");
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret ID").setRequired(true).setAutoComplete(true));
+        super(Constants.ADD_SO_TO_GAME, "Add a secret objective to the game", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        String soID = event.getOption(Constants.SO_ID, null, OptionMapping::getAsString);
-        if (soID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify SO");
-            return;
-        }
+        Game game = getGame();
+        String soID = event.getOption(Constants.SO_ID).getAsString();
         if (!Mapper.getSecretObjectives().containsKey(soID)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid SO ID");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid secret objective ID.");
             return;
         }
 
         game.addSOToGame(soID);
         if (game.getSecretObjectives().contains(soID)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SO added to game deck");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective added to game deck.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SO was not added for an unknown reason");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Secret objective was not added for an unknown reason.");
         }
     }
 }

@@ -1,0 +1,37 @@
+on: workflow_dispatch
+name: HeapDump
+concurrency:
+  group: "HeapDump"
+jobs:
+  save:
+    name: HeapDump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Executing remote SSH commands to manage heap dump
+        uses: appleboy/ssh-action@master
+        env:
+          AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
+          AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          envs: AWS_KEY, AWS_SECRET
+          script: |
+            HEAP_DUMP_DIR="~/ti4bot/heap_dump"
+            
+            echo "Deleting old heap dumps..."
+            rm -f "$HEAP_DUMP_DIR"/*.hprof
+            
+            echo "Finding Java process PID..."
+            PID=$(ps -ef | grep java | grep -v grep | awk '{print $2}')
+            if [ -z "$PID" ]; then
+              echo "No Java process found. Exiting."
+              exit 1
+            fi
+            
+            echo "Creating new heap dump for PID $PID..."
+            /usr/bin/jmap -dump:live,file=$HEAP_DUMP_DIR/heapdump_$(date +%Y%m%d%H%M%S).hprof $PID
+            
+            echo "Heap dump process completed."

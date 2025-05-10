@@ -3,7 +3,7 @@
     "name": "Alpha Beta Nova",
     "aliases": [
         "alphabetanova",
-        "4260"
+        "4276"
     ],
     "imagePath": "d123.png",
     "shipPositionsType": "TYPE08",
@@ -35,5 +35,6 @@
     ],
     "planets": [],
     "isSupernova": true,
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "red"
 }

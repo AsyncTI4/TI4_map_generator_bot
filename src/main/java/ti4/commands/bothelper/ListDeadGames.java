@@ -1,8 +1,5 @@
 package ti4.commands.bothelper;
 
-import java.util.Date;
-import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,90 +7,106 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.AsyncTI4DiscordBot;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.game.ManagedGameService;
 
-public class ListDeadGames extends BothelperSubcommandData {
+class ListDeadGames extends Subcommand {
+
+    private static final String WARNING_MESSAGE = " this is a warning that this game will be cleaned up tomorrow, " +
+        "unless someone takes a turn. You can ignore this if you want it deleted. Ping Fin if this should not be done.";
+
     public ListDeadGames() {
         super(Constants.LIST_DEAD_GAMES, "List games that haven't moved in 2+ months but still have channels");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Delete with with DELETE, otherwise warning").setRequired(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         OptionMapping option = event.getOption(Constants.CONFIRM);
         boolean delete = "DELETE".equals(option.getAsString());
-        StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         StringBuilder sb = new StringBuilder("Dead Channels\n");
+        StringBuilder sb2 = new StringBuilder("Dead Roles\n");
         int channelCount = 0;
         int roleCount = 0;
-        for (Game game : mapList.values()) {
-            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(new Date().getTime())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
+        for (ManagedGame game : GameManager.getManagedGames()) {
+            if (Helper.getDateDifference(game.getCreationDate(), Helper.getDateRepresentation(System.currentTimeMillis())) < 30 || !game.getName().contains("pbd") || game.getName().contains("test")) {
                 continue;
             }
             if (game.getName().contains("pbd1000") || game.getName().contains("pbd2863") || game.getName().contains("pbd3000") || game.getName().equalsIgnoreCase("pbd104") || game.getName().equalsIgnoreCase("pbd100") || game.getName().equalsIgnoreCase("pbd100two")) {
                 continue;
             }
-            long milliSinceLastTurnChange = new Date().getTime()
-                - game.getLastActivePlayerChange().getTime();
+            long milliSinceLastTurnChange = System.currentTimeMillis() - game.getLastActivePlayerChange();
 
-            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange().getTime() && milliSinceLastTurnChange < 1259600000l) {
+            // TODO: we really shouldn't use these magical numbers.
+            if (game.isHasEnded() && game.getEndedDate() < game.getLastActivePlayerChange() && milliSinceLastTurnChange < 1259600000L) {
                 continue;
             }
-            boolean warned = false;
-            if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000l) {
-                if (game.getActionsChannel() != null && !game.getActionsChannel().getName().equalsIgnoreCase(game.getName() + "-actions")) {
-                    continue;
-                }
-
-                if (game.getActionsChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getActionsChannel().getParentCategory()) && game.getActionsChannel().getParentCategory() != null && !game.getActionsChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
-                    sb.append(game.getActionsChannel().getJumpUrl() + "\n");
-                    channelCount++;
-                    if (delete) {
-                        game.getActionsChannel().delete().queue();
-                    } else {
-                        warned = true;
-                        MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
-                    }
-                }
-                if (game.getTableTalkChannel() != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(game.getTableTalkChannel().getParentCategory()) && !game.getTableTalkChannel().getParentCategory().getName().toLowerCase().contains("limbo")) {
-                    if (game.getTableTalkChannel().getName().contains(game.getName() + "-")) {
-                        sb.append(game.getTableTalkChannel().getJumpUrl() + "\n");
-                        channelCount++;
-                        if (delete) {
-                            game.getTableTalkChannel().delete().queue();
-                        } else if (!warned) {
-                            MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " this is a warning that this game will be cleaned up tomorrow, unless someone takes a turn. You can ignore this if you want it deleted. Ping fin if this should not be done. ");
-                        }
-                    }
+            if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
+                if (game.getActionsChannel() != null) {
+                    channelCount += sendMessageToChannel(game, sb, delete);
                 }
                 Guild guild = game.getGuild();
-                if (!AsyncTI4DiscordBot.guilds.contains(guild)) {
+                if (guild == null) {
                     continue;
                 }
-                if (guild != null) {
-                    Role r = null;
-                    for (Role role : guild.getRoles()) {
-                        if (game.getName().equals(role.getName().toLowerCase())) {
-                            sb2.append(role.getName() + "\n");
-                            r = role;
-                            roleCount++;
-                            break;
-                        }
+                Role r = null;
+                for (Role role : guild.getRoles()) {
+                    if (game.getName().equals(role.getName().toLowerCase())) {
+                        sb2.append(role.getName()).append("\n");
+                        r = role;
+                        roleCount++;
+                        break;
                     }
-                    if (r != null && delete) {
-                        r.delete().queue();
-                    }
+                }
+                if (r != null && delete) {
+                    r.delete().queue();
                 }
             }
 
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString() + "Channel Count = " + channelCount);
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb2.toString() + "Role Count =" + roleCount);
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb + "Channel Count = " + channelCount);
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb2 + "Role Count =" + roleCount);
     }
 
+    private static int sendMessageToChannel(ManagedGame game, StringBuilder sb, boolean delete) {
+        var actionsChannel = game.getActionsChannel();
+        if (actionsChannel == null || !actionsChannel.getName().equalsIgnoreCase(game.getName() + "-actions")) {
+            return 0;
+        }
+
+        boolean warned = false;
+        int channelCount = 0;
+
+        if (AsyncTI4DiscordBot.getAvailablePBDCategories().contains(actionsChannel.getParentCategory()) &&
+                actionsChannel.getParentCategory() != null && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            sb.append(actionsChannel.getJumpUrl()).append("\n");
+            channelCount++;
+            if (delete) {
+                actionsChannel.delete().queue();
+            } else {
+                warned = true;
+                MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
+            }
+        }
+
+        var tableTalkChannel = game.getTableTalkChannel();
+        if (tableTalkChannel != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory()) &&
+                tableTalkChannel.getParentCategory() != null && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            if (tableTalkChannel.getName().contains(game.getName() + "-")) {
+                sb.append(tableTalkChannel.getJumpUrl()).append("\n");
+                channelCount++;
+                if (delete) {
+                    tableTalkChannel.delete().queue();
+                } else if (!warned) {
+                    MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
+                }
+            }
+        }
+
+        return channelCount;
+    }
 }

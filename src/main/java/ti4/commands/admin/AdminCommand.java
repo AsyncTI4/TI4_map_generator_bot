@@ -1,81 +1,46 @@
 package ti4.commands.admin;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.AsyncTI4DiscordBot;
-import ti4.commands.Command;
+import ti4.commands.CommandHelper;
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 
-public class AdminCommand implements Command {
+public class AdminCommand implements ParentCommand {
 
-    private final Collection<AdminSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+        new DeleteGame(),
+        new DisableBot(),
+        new ReloadMapperObjects(),
+        new RestoreGame(),
+        new DeletePersistenceManagerFile(),
+        new CardsInfoForPlayer(),
+        new UpdateThreadArchiveTime()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return ParentCommand.super.accept(event) &&
+            CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
+    }
+
+    @Override
+    public String getName() {
         return Constants.ADMIN;
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        if (event.getName().equals(getActionID())) {
-            Member member = event.getMember();
-            if (member != null) {
-                List<Role> roles = member.getRoles();
-                for (Role role : AsyncTI4DiscordBot.adminRoles) {
-                    if (roles.contains(role)) {
-                        return true;
-                    }
-                }
-                MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Admin role.");
-                return false;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (AdminSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                break;
-            }
-        }
-    }
-
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Admin";
     }
 
-    private Collection<AdminSubcommandData> getSubcommands() {
-        Collection<AdminSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new SaveMaps());
-        subcommands.add(new SaveMap());
-        subcommands.add(new ResetEmojiCache());
-        subcommands.add(new ResetImageCache());
-        subcommands.add(new ReloadMap());
-        subcommands.add(new ReloadMapperObjects());
-        subcommands.add(new RestoreGame());
-        subcommands.add(new CardsInfoForPlayer());
-        subcommands.add(new UpdateThreadArchiveTime());
-        return subcommands;
-    }
-
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
     }
 }

@@ -1,6 +1,6 @@
 {
     "id": "d32",
-    "name": "ShiHalaum (MykoMentori)",
+    "name": "ShiHalaum - MykoMentori",
     "aliases": [
         "d32",
         "shi",
@@ -18,5 +18,6 @@
     "planets": [
         "shihalaum"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

@@ -1,17 +1,13 @@
 package ti4.commands.statistics;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
+import ti4.service.statistics.LifeTimeRecordService;
 
-public class LifetimeRecord extends StatisticsSubcommandData {
+class LifetimeRecord extends Subcommand {
 
     public LifetimeRecord() {
         super(Constants.LIFETIME_RECORD, "Dice luck and average turn time for all games of specific players");
@@ -27,23 +23,6 @@ public class LifetimeRecord extends StatisticsSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        List<User> members = new ArrayList<>();
-
-        for (int i = 1; i <= 8; i++) {
-            if (Objects.nonNull(event.getOption("player" + i))) {
-                User member = event.getOption("player" + i).getAsUser();
-                if (member != null)
-                    members.add(member);
-            } else {
-                break;
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        DiceLuck luck = new DiceLuck();
-        AverageTurnTime time = new AverageTurnTime();
-        sb.append(luck.getSelectUsersDiceLuck(members, luck.getAllPlayersDiceLuck(false)));
-        sb.append(time.getSelectUsersTurnTimes(members, time.getAllPlayersTurnTimes(false)));
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        LifeTimeRecordService.queueReply(event);
     }
-
 }

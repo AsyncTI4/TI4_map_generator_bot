@@ -11,6 +11,7 @@
     },
     "resources": 2,
     "influence": 3,
+    "techSpecialties": ["CYBERNETIC"],
     "planetTypes": [
         "HAZARDOUS"
     ],

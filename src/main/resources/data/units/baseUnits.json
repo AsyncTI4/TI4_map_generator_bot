@@ -11,13 +11,15 @@
         "cost": 2,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/cruiser.png?raw=true"
     },
     {
         "id": "cruiser2",
         "baseType": "cruiser",
         "asyncId": "ca",
         "name": "Cruiser II",
+        "subtitle": "Stasis Capsules",
         "upgradesFromUnitId": "cruiser",
         "requiredTechId": "cr2",
         "source": "base",
@@ -27,7 +29,8 @@
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/cruiser_2.jpg?raw=true"
     },
     {
         "id": "carrier",
@@ -42,13 +45,15 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/carrier.png?raw=true"
     },
     {
         "id": "carrier2",
         "baseType": "carrier",
         "asyncId": "cv",
         "name": "Carrier II",
+        "subtitle": "XRD Transporters",
         "upgradesFromUnitId": "carrier",
         "requiredTechId": "cv2",
         "source": "base",
@@ -58,7 +63,8 @@
         "cost": 3,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/carrier_2.jpg?raw=true"
     },
     {
         "id": "destroyer",
@@ -74,13 +80,15 @@
         "combatDieCount": 1,
         "afbHitsOn": 9,
         "afbDieCount": 2,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/destroyer.png?raw=true"
     },
     {
         "id": "destroyer2",
         "baseType": "destroyer",
         "asyncId": "dd",
         "name": "Destroyer II",
+        "subtitle": "Automated Defense Turrets",
         "upgradesFromUnitId": "destroyer",
         "requiredTechId": "dd2",
         "source": "base",
@@ -91,7 +99,8 @@
         "combatDieCount": 1,
         "afbHitsOn": 6,
         "afbDieCount": 3,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/destroyer_2.jpg?raw=true"
     },
     {
         "id": "dreadnought",
@@ -110,13 +119,15 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/dreadnought.png?raw=true"
     },
     {
         "id": "dreadnought2",
         "baseType": "dreadnought",
         "asyncId": "dn",
         "name": "Dreadnought II",
+        "subtitle": "Type IV Drive",
         "upgradesFromUnitId": "dreadnought",
         "requiredTechId": "dn2",
         "source": "base",
@@ -131,7 +142,8 @@
         "sustainDamage": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/dreadnought_2.jpg?raw=true"
     },
     {
         "id": "fighter",
@@ -144,13 +156,15 @@
         "cost": 0.5,
         "combatHitsOn": 9,
         "combatDieCount": 1,
-        "isShip": true
+        "isShip": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/fighter.png?raw=true"
     },
     {
         "id": "fighter2",
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Fighter II",
+        "subtitle": "Advanced Fighters",
         "upgradesFromUnitId": "fighter",
         "requiredTechId": "ff2",
         "source": "base",
@@ -160,7 +174,8 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+        "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/fighter_2.jpg?raw=true"
     },
     {
         "id": "flagship",
@@ -176,7 +191,8 @@
         "combatDieCount": 2,
         "sustainDamage": true,
         "canBeDirectHit": true,
-        "isShip": true
+        "isShip": true,
+        "imageURL": ""
     },
     {
         "id": "infantry",
@@ -189,13 +205,15 @@
         "cost": 0.5,
         "combatHitsOn": 8,
         "combatDieCount": 1,
-        "isGroundForce": true
+        "isGroundForce": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/infantry.png?raw=true"
     },
     {
         "id": "infantry2",
         "baseType": "infantry",
         "asyncId": "gf",
         "name": "Infantry II",
+        "subtitle": "Gen Synthesis",
         "upgradesFromUnitId": "infantry",
         "requiredTechId": "inf2",
         "source": "base",
@@ -204,7 +222,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home."
+        "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/infantry_2.jpg?raw=true"
     },
     {
         "id": "pds",
@@ -216,21 +235,25 @@
         "spaceCannonHitsOn": 6,
         "spaceCannonDieCount": 1,
         "planetaryShield": true,
-        "isStructure": true
+        "isStructure": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/pds.png?raw=true"
     },
     {
         "id": "pds2",
         "baseType": "pds",
         "asyncId": "pd",
         "name": "PDS II",
+        "subtitle": "Deep Space Cannon",
         "upgradesFromUnitId": "pds",
         "requiredTechId": "pds2",
         "source": "base",
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true,
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
         "planetaryShield": true,
-        "isStructure": true
+        "isStructure": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/pds_2.jpg?raw=true"
     },
     {
         "id": "spacedock",
@@ -240,26 +263,42 @@
         "upgradesToUnitId": "spacedock2",
         "source": "base",
         "productionValue": "+2",
+        "basicProduction": "res",
         "capacityValue": 3,
-        "isStructure": true
+        "isStructure": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/spacedock.png?raw=true",
+        "ability": "This unit's PRODUCTION value is equal to 2 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
     },
     {
         "id": "spacedock2",
         "baseType": "spacedock",
         "asyncId": "sd",
         "name": "Space Dock II",
+        "subtitle": "Enviro Compensator",
         "upgradesFromUnitId": "spacedock",
         "requiredTechId": "sd2",
         "source": "base",
         "productionValue": "+4",
+        "basicProduction": "res",
         "capacityValue": 3,
-        "isStructure": true
+        "isStructure": true,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/spacedock_2.jpg?raw=true",
+        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
+    },
+    {
+        "id": "nowarsun",
+        "baseType": "warsun",
+        "asyncId": "ws",
+        "name": "Not a War Sun Yet",
+        "source": "base",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/generic/warsun_0.png?raw=true"
     },
     {
         "id": "warsun",
         "baseType": "warsun",
         "asyncId": "ws",
         "name": "War Sun",
+        "subtitle": "Mobile Base",
         "requiredTechId": "ws",
         "source": "base",
         "moveValue": 2,
@@ -273,7 +312,8 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player's units in this system lose PLANETARY SHIELD."
+        "ability": "Other player's units in this system lose PLANETARY SHIELD.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/warsun.jpg?raw=true"
     },
     {
         "id": "mech",
@@ -287,5 +327,21 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true
+    },
+    {
+        "id": "monument",
+        "baseType": "monument",
+        "asyncId": "monument",
+        "name": "Factionless Monument",
+        "source": "monuments",
+        "isStructure": true,
+        "isMonument": true
+    },
+    {
+        "id": "lady",
+        "baseType": "lady",
+        "asyncId": "lady",
+        "name": "Fake Lady Flagship Basetype",
+        "source": "ds"
     }
 ]

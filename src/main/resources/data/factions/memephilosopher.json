@@ -1,0 +1,45 @@
+[
+    {
+        "alias": "netharii",
+        "factionName": "The Netharii Keepers",
+        "homeSystem": "mp01",
+        "startingFleet": "2 carrier, 1 destroyer, 2 fighter, inf a, inf v, sd v",
+        "commodities": 3,
+        "factionTech": [
+            "ne_inf2",
+            "ne_qed"
+        ],
+        "startingTech": ["td"],
+        "homePlanets": [
+            "astrea",
+            "vigilum"
+        ],
+        "abilities": [
+            "eternal_watchers",
+            "limited_presence",
+            "immovable_guardians",
+            "eon_beam"
+        ],
+        "leaders": [
+            "nethariiagent",
+            "nethariicommander",
+            "nethariihero"
+        ],
+        "promissoryNotes": [
+            "nethariipn"
+        ],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "netharii_fs",
+            "netharii_inf",
+            "netharii_mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "memephilosopher"
+    }
+]

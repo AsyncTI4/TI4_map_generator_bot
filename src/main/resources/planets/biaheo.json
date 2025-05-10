@@ -1,0 +1,113 @@
+{
+    "id": "biaheo",
+    "tileId": "d17",
+    "name": "Biaheo",
+    "aliases": [
+        "biaheo",
+        "blaheo",
+        "bia"
+    ],
+    "positionInTile": {
+        "x": 136.0,
+        "y": 94.0
+    },
+    "resources": 3,
+    "influence": 0,
+    "factionHomeworld": "mortheus",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "biaheo",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 97.0,
+                    "y": 78.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 68.0,
+                    "y": 113.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 102.0,
+                    "y": 105.0
+                },
+                {
+                    "x": 119.0,
+                    "y": 105.0
+                },
+                {
+                    "x": 136.0,
+                    "y": 105.0
+                },
+                {
+                    "x": 111.0,
+                    "y": 116.0
+                },
+                {
+                    "x": 129.0,
+                    "y": 116.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 104.0,
+                    "y": 34.0
+                },
+                {
+                    "x": 122.0,
+                    "y": 34.0
+                },
+                {
+                    "x": 97.0,
+                    "y": 47.0
+                },
+                {
+                    "x": 115.0,
+                    "y": 47.0
+                },
+                {
+                    "x": 133.0,
+                    "y": 47.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 116.0,
+                    "y": 75.0
+                },
+                {
+                    "x": 83.0,
+                    "y": 75.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 35.0,
+                    "y": 82.0
+                },
+                {
+                    "x": 159.0,
+                    "y": 36.0
+                },
+                {
+                    "x": 167.0,
+                    "y": 67.0
+                },
+                {
+                    "x": 159.0,
+                    "y": 98.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "ds"
+}

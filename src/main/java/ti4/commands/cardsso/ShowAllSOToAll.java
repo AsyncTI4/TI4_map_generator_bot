@@ -7,26 +7,21 @@ import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.SecretObjectiveInfoService;
 
-public class ShowAllSOToAll extends SOCardsSubcommandData {
+class ShowAllSOToAll extends GameStateSubcommand {
+
     public ShowAllSOToAll() {
-        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all Secret Objectives to all players");
+        super(Constants.SHOW_ALL_TO_ALL, "Show all Secret Objectives to all players", true, true);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Player player = getPlayer();
 
         StringBuilder sb = new StringBuilder();
 
@@ -35,7 +30,7 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         List<String> secretObjectives = new ArrayList<>(player.getSecrets().keySet());
         Collections.shuffle(secretObjectives);
         Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
-        for (String id : game.getSoToPoList()) {
+        for (String id : getGame().getSoToPoList()) {
             scoredSecretObjective.remove(id);
         }
 
@@ -44,13 +39,13 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;
         for (String so : secretObjectives) {
-            sb.append(index).append(" - ").append(SOInfo.getSecretObjectiveRepresentation(so)).append("\n");
+            sb.append(index).append(" - ").append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so)).append("\n");
             player.setSecret(so);
             index++;
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
         for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SOInfo.getSecretObjectiveRepresentation(so.getKey())).append("\n");
+            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(so.getKey())).append("\n");
             index++;
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

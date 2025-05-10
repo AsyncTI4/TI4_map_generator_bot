@@ -1,6 +1,6 @@
 {
     "id": "d05",
-    "name": "AysisRest/Solitude (Lanefir)",
+    "name": "AysisRest/Solitude - Lanefir",
     "aliases": [
         "d05",
         "aysis",
@@ -19,5 +19,6 @@
         "aysisrest",
         "solitude"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

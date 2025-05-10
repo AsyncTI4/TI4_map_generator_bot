@@ -9,10 +9,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
-import ti4.generator.Mapper;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.image.Mapper;
+import ti4.buttons.Buttons;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.ListSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
@@ -20,16 +23,19 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.FactionModel;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
+@JsonIgnoreProperties({ "messageId" })
 public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private BooleanSetting presetDraftOrder;
+    private final BooleanSetting presetDraftOrder;
     private ListSetting<Player> gamePlayers;
-    private ListSetting<FactionModel> banFactions, priFactions;
+    private final ListSetting<FactionModel> banFactions;
+    private final ListSetting<FactionModel> priFactions;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -85,7 +91,7 @@ public class PlayerFactionSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
         ls.add(gamePlayers);
         ls.add(presetDraftOrder);
         ls.add(banFactions);
@@ -99,12 +105,53 @@ public class PlayerFactionSettings extends SettingsMenu {
             List<ComponentSource> sources = m.getSourceSettings().getFactionSources();
             Map<String, FactionModel> allFactions = Mapper.getFactions().stream()
                 .filter(model -> sources.contains(model.getSource()))
-                .collect(Collectors.toMap(f -> f.getAlias(), f -> f));
+                .filter(model -> !model.getAlias().contains("keleres") || model.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
+                .collect(Collectors.toMap(FactionModel::getAlias, f -> f));
             banFactions.setAllValues(allFactions);
             priFactions.setAllValues(allFactions);
 
             if (m.getGame().getPlayers().size() != gamePlayers.getAllValues().size())
                 gamePlayers.setAllValues(m.getGame().getPlayers());
         }
+    }
+
+    @Override
+    public List<Button> specialButtons() {
+        String idPrefix = menuAction + "_" + navId() + "_";
+        List<Button> ls = new ArrayList<>(super.specialButtons());
+
+        if (parent != null && parent instanceof MiltySettings ms) {
+            if (ms.getSourceSettings().getDiscoStars().isVal())
+                ls.add(Buttons.red(idPrefix + "dsFactionsOnly", "Only DS Factions", SourceEmojis.DiscordantStars));
+        }
+        return ls;
+    }
+
+    @Override
+    public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
+        String error = switch (action) {
+            case "dsFactionsOnly" -> prioritizeDSFactions();
+            default -> null;
+        };
+
+        return (error == null ? "success" : error);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    // Specific Implementation
+    // ---------------------------------------------------------------------------------------------------------------------------------
+    private String prioritizeDSFactions() {
+        if (parent != null && parent instanceof MiltySettings ms) {
+            if (!ms.getSourceSettings().getDiscoStars().isVal())
+                return "Discordant stars is not enabled";
+
+            List<String> newKeys = new ArrayList<>();
+            for (FactionModel model : priFactions.getAllValues().values()) {
+                if (model.getSource() == ComponentSource.ds)
+                    newKeys.add(model.getAlias());
+            }
+            priFactions.setKeys(newKeys);
+        }
+        return null;
     }
 }

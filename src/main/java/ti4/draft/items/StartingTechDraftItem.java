@@ -6,11 +6,12 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
+import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 
 public class StartingTechDraftItem extends DraftItem {
     public StartingTechDraftItem(String itemId) {
@@ -28,10 +29,10 @@ public class StartingTechDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return getFaction().getFactionName() + " Starting Tech";
+        return getFaction().getFactionName() + " Starting Technology";
     }
 
-    public static Map<String, String> selectableStartingTechs = Map.ofEntries(
+    public static final Map<String, String> selectableStartingTechs = Map.ofEntries(
         Map.entry("winnu", "Choose any 1 technology that has no prerequisites."),
         Map.entry("argent", "Choose 2 of the following: :Biotictech: Neural Motivator, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring"),
         Map.entry("keleresa", "Choose 2 non-faction technologies owned by other players."),
@@ -76,8 +77,8 @@ public class StartingTechDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        return Emojis.UnitTechSkip;
+    public TI4Emoji getItemEmoji() {
+        return TechEmojis.UnitTechSkip;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
@@ -89,7 +90,7 @@ public class StartingTechDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.STARTINGTECH, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.STARTINGTECH, faction.getAlias()));
         }
         return allItems;
     }

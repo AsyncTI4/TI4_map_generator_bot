@@ -2,7 +2,6 @@
     "id": "gen",
     "tileId": "d12",
     "name": "Gen",
-    "shortName": null,
     "aliases": [
         "gen"
     ],

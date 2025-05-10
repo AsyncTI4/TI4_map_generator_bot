@@ -1,7 +1,7 @@
 package ti4.helpers;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Array;
@@ -323,7 +323,7 @@ public class DiscordWebhook {
                 builder.append(++i == entrySet.size() ? "}" : ",");
             }
 
-            return builder.toString();
+            return builder.toString().replace("\n", "\\n");
         }
 
         private String quote(String string) {

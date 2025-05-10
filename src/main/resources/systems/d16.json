@@ -1,6 +1,6 @@
 {
     "id": "d16",
-    "name": "Louk/Auldane (Celdauri)",
+    "name": "Louk/Auldane - Celdauri",
     "aliases": [
         "d16",
         "louk",
@@ -16,5 +16,6 @@
         "louk",
         "auldane"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

@@ -2,7 +2,7 @@
     "id": "alioprima",
     "tileId": "71",
     "name": "Alio Prima",
-    "shortName": null,
+    "shrinkNamePNAttach": true,
     "aliases": [
         "alioprima",
         "alio_prima",

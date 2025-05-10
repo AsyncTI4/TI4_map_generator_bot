@@ -1,6 +1,6 @@
 {
     "id": "d34",
-    "name": "Susuros (Kollecc)",
+    "name": "Susuros - Kollecc",
     "aliases": [
         "d34",
         "susuros",
@@ -17,5 +17,6 @@
     "planets": [
         "susuros"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

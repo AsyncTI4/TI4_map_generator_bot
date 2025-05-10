@@ -8,5 +8,6 @@
     "wormholes": [null],
     "planets": ["bunker"],
     "isAsteroidField": true,
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "red"
 }

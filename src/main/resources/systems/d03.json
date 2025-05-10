@@ -1,6 +1,6 @@
 {
     "id": "d03",
-    "name": "Edyn/Ekko/Okke (Edyn)",
+    "name": "Edyn/Ekko/Okke - Edyn",
     "aliases": [
         "d03",
         "edyn",
@@ -19,5 +19,6 @@
         "edyn",
         "okke"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

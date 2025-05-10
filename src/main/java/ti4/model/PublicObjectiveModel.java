@@ -1,17 +1,20 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 @Data
 public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
@@ -33,9 +36,19 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
             && source != null;
     }
 
+    @JsonIgnore
+    public TI4Emoji getObjectiveEmoji() {
+        return CardEmojis.getObjectiveEmoji(Integer.toString(points));
+    }
+
+    @JsonIgnore
     public String getRepresentation() {
-        String emoji = Emojis.getEmojiFromDiscord("Public" + points + "alt");
-        return emoji + "**__" + name + "__**: " + text + " (" + points + " VP)";
+        return getRepresentation(true);
+    }
+
+    @JsonIgnore
+    public String getRepresentation(boolean vps) {
+        return getObjectiveEmoji() + "_" + name + "_ - " + text + (vps ? " (" + points + " VP)" : "");
     }
 
     public static final Comparator<PublicObjectiveModel> sortByPointsAndName = (po1, po2) -> {
@@ -54,7 +67,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        String title = Emojis.getEmojiFromDiscord("Public" + points + "alt") + "__**" + getName() + "**__" + getSource().emoji();
+        String title = getObjectiveEmoji() + "__**" + getName() + "**__" + getSource().emoji();
         eb.setTitle(title);
 
         //DESCRIPTION

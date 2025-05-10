@@ -3,16 +3,16 @@ package ti4.commands.special;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.leaders.CommanderUnlockCheck;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
+import ti4.service.leader.CommanderUnlockCheckService;
 
-public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
+class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
+
     public AddFactionCCToFleetSupply() {
-        super(Constants.ADD_CC_TO_FS, "Add Faction CC to Fleet Supply");
+        super(Constants.ADD_CC_TO_FS, "Add Faction Command Token to Fleet Pool");
     }
 
     @Override
@@ -21,8 +21,6 @@ public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
             player.addMahactCC(color);
             Helper.isCCCountCorrect(event, game, color);
         }
-        CommanderUnlockCheck.checkPlayer(player, game, "mahact", event);
-        GameSaveLoadManager.saveMap(game, event);
-
+        CommanderUnlockCheckService.checkPlayer(player, "mahact");
     }
 }

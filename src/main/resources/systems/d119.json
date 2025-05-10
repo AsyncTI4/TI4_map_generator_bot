@@ -3,7 +3,7 @@
     "name": "Beta Nebula",
     "aliases": [
         "betanebula",
-        "4256"
+        "4272"
     ],
     "imagePath": "d119.png",
     "shipPositionsType": "TYPE08",
@@ -34,5 +34,6 @@
     ],
     "planets": [],
     "isNebula": true,
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "red"
 }

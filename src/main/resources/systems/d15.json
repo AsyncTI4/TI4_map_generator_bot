@@ -1,6 +1,6 @@
 {
     "id": "d15",
-    "name": "Orad/Poh (Zealots)",
+    "name": "Orad/Poh - Zealots",
     "aliases": [
         "d15",
         "poh",
@@ -18,5 +18,6 @@
         "poh",
         "orad"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

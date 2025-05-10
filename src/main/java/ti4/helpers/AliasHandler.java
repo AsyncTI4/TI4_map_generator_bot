@@ -12,13 +12,11 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
+import lombok.Getter;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.ColorModel;
 import ti4.model.PlanetModel;
@@ -26,56 +24,55 @@ import ti4.model.TileModel;
 
 public class AliasHandler {
 
-    private static final Map<String, String> tilemapAliasList = new HashMap<>();
-    private static final Map<String, String> unitAliasList = new HashMap<>();
-    private static final Map<String, String> unitListForHelp = new HashMap<>();
-    private static final Map<String, String> cctokenAliasList = new HashMap<>();
-    private static final Map<String, String> attachmentAliasList = new HashMap<>();
-    private static final Map<String, String> tokenAliasList = new HashMap<>();
-    private static final Map<String, String> factionAliasList = new HashMap<>();
-    private static final Map<String, String> colorAliasList = new HashMap<>();
-    private static final Map<String, String> techAliasList = new HashMap<>();
     private static final Map<String, String> actionCardAliasList = new HashMap<>();
     private static final Map<String, String> agendaAliasList = new HashMap<>();
+    private static final Map<String, String> attachmentAliasList = new HashMap<>();
+    private static final Map<String, String> ccTokenAliasList = new HashMap<>();
     private static final Map<String, String> explorationAliasList = new HashMap<>();
-    private static final Map<String, String> relicAliasList = new HashMap<>();
+    private static final Map<String, String> factionAliasList = new HashMap<>();
     private static final Map<String, String> objectiveAliasList = new HashMap<>();
     private static final Map<String, String> promissoryAliasList = new HashMap<>();
+    private static final Map<String, String> relicAliasList = new HashMap<>();
+    private static final Map<String, String> rulesLinks = new HashMap<>();
+    private static final Map<String, String> techAliasList = new HashMap<>();
+    private static final Map<String, String> tilemapAliasList = new HashMap<>();
+    private static final Map<String, String> tokenAliasList = new HashMap<>();
+    private static final Map<String, String> unitAliasList = new HashMap<>();
+    @Getter
+    private static final Map<String, String> unitListForHelp = new HashMap<>();
     private static final Map<String, String> ttpgPositionAliasList = new HashMap<>();
     private static final Map<String, String> ttpgAttachmentAliasList = new HashMap<>();
     private static final Map<String, String> ttpgTokenAliasList = new HashMap<>();
     private static final Map<String, String> ttpgUnitAliasList = new HashMap<>();
-    private static final Map<String, String> rulesLinks = new HashMap<>();
-    private static final Map<String, String> allTileAliases = new HashMap<>();
-    private static final Map<String, String> allPlanetAliases = new HashMap<>();
+    private static final Map<String, String> allTileAliases = new HashMap<>(); // not assigned in init() but in initAliases() using TileHelper HashMaps
+    private static final Map<String, String> allPlanetAliases = new HashMap<>(); // not assigned in init() but in initAliases() using TileHelper HashMaps
 
-    private static final List<String> unitValuesList = new ArrayList<>();
     private static final List<String> factionAliasValuesList = new ArrayList<>();
+    private static final List<String> unitValuesList = new ArrayList<>();
 
     public static void init() {
-        readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
-        readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
-        readAliasFile("unit_alias.properties", unitListForHelp);
-        readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read CC token alias file");
-        readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
-        readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
-        readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
-        readAliasFile("color_alias.properties", colorAliasList, "Could not read color alias file");
-        readAliasFile("tech_alias.properties", techAliasList, "Could not read tech alias file");
         readAliasFile("action_card_alias.properties", actionCardAliasList, "Could not read action card alias file");
         readAliasFile("agenda_alias.properties", agendaAliasList, "Could not read agenda alias file");
+        readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
+        readAliasFile("cc_token_alias.properties", ccTokenAliasList, "Could not read CC token alias file");
         readAliasFile("exploration_alias.properties", explorationAliasList, "Could not read exploration alias file");
-        readAliasFile("relic_alias.properties", relicAliasList, "Could not read relic alias file");
+        readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
+        readAliasFile("faction_alias.properties", factionAliasValuesList, false);
         readAliasFile("objective_alias.properties", objectiveAliasList, "Could not read objective alias file");
-        readAliasFile("promissory_alias.properties", promissoryAliasList, "Could not read promissory alias file");
+        // position_alias_old.properties is ignored
         readAliasFile("position_alias.properties", ttpgPositionAliasList, "Could not read TTPG position_alias file");
+        readAliasFile("promissory_alias.properties", promissoryAliasList, "Could not read promissory alias file");
+        readAliasFile("relic_alias.properties", relicAliasList, "Could not read relic alias file");
+        readAliasFile("rules_injection.properties", rulesLinks, "Could not read TTPG unit_alias file");
+        readAliasFile("tech_alias.properties", techAliasList, "Could not read tech alias file");
+        readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
+        readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
-        readAliasFile("rules_injection.properties", rulesLinks, "Could not read TTPG unit_alias file");
-
+        readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
+        readAliasFile("unit_alias.properties", unitListForHelp);
         readAliasFile("unit_alias.properties", unitValuesList, false);
-        readAliasFile("faction_alias.properties", factionAliasValuesList, false);
 
         initAliases();
     }
@@ -94,7 +91,7 @@ public class AliasHandler {
                 aliasProperties.load(input);
                 aliasProperties.forEach((x, y) -> map.put(x.toString(), y.toString()));
             } catch (IOException e) {
-                BotLogger.log("Could not read alias file", e);
+                BotLogger.error("Could not read alias file", e);
             }
         }
     }
@@ -127,7 +124,7 @@ public class AliasHandler {
                     }
                 }
             } catch (IOException e) {
-                BotLogger.log("Could not read alias file", e);
+                BotLogger.error("Could not read alias file", e);
             }
         }
     }
@@ -155,19 +152,20 @@ public class AliasHandler {
                     }
                 }
             } catch (IOException e) {
-                BotLogger.log(errorMessage);
+                BotLogger.error(errorMessage, e);
             }
         }
     }
 
     public static void initAliases() {
-        TileHelper.getAllTiles().values().forEach(AliasHandler::addNewTileAliases);
-        TileHelper.getAllPlanets().values().forEach(AliasHandler::addNewPlanetAliases);
+        TileHelper.getAllTileModels().forEach(AliasHandler::addNewTileAliases);
+        TileHelper.getAllPlanetModels().forEach(AliasHandler::addNewPlanetAliases);
     }
 
     public static void addNewPlanetAliases(PlanetModel planetModel) {
         Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
             .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
+        allPlanetAliases.put(planetModel.getId(), planetModel.getId()); // add the planet itself to aliashandler
     }
 
     public static void addNewTileAliases(TileModel tileModel) {
@@ -181,13 +179,14 @@ public class AliasHandler {
         if ("mirage".equalsIgnoreCase(name)) {
             return name;
         }
+        if (TileHelper.getTileById(name) != null) { // name is already an ID
+            return name;
+        }
         String tileId = allTileAliases.get(name.toLowerCase());
         if (tileId != null) {
             return tileId;
-        } else {
-            System.out.println("Could not find an alias for Tile: " + name);
-            return name;
         }
+        return name;
     }
 
     /**
@@ -218,16 +217,8 @@ public class AliasHandler {
         return Objects.requireNonNullElse(aliasID, name);
     }
 
-    public static List<String> getUnitValuesList() {
-        return unitValuesList;
-    }
-
-    public static Map<String, String> getUnitListForHelp() {
-        return unitListForHelp;
-    }
-
     public static List<String> getPlanetKeyList() {
-        return TileHelper.getAllPlanets().values().stream()
+        return TileHelper.getAllPlanetModels().stream()
             .map(PlanetModel::getId)
             .toList();
     }
@@ -240,10 +231,9 @@ public class AliasHandler {
         String aliasID = allPlanetAliases.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
-        } else {
-            System.out.println("Could not find an alias for Planet: " + name);
-            return name;
         }
+        if (!"space".equals(name)) System.out.println("Could not find an alias for Planet: " + name);
+        return name;
     }
 
     public static String resolveAttachment(String name) {
@@ -256,7 +246,7 @@ public class AliasHandler {
     }
 
     public static String resolveToken(String name) {
-        String aliasID = cctokenAliasList.get(name.toLowerCase());
+        String aliasID = ccTokenAliasList.get(name.toLowerCase());
         //System.out.println("Could not find an alias for Token: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
@@ -309,12 +299,6 @@ public class AliasHandler {
         return Objects.requireNonNullElse(aliasID, name);
     }
 
-    public static String resolveTTPGToken(String name) {
-        String aliasID = ttpgTokenAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for TTPGToken: " + name);
-        return Objects.requireNonNullElse(aliasID, name);
-    }
-
     public static String resolveTTPGUnit(String name) {
         String aliasID = ttpgUnitAliasList.get(name.toLowerCase());
         if (aliasID != null) {
@@ -342,18 +326,6 @@ public class AliasHandler {
     public static String resolveTTPGPosition(String position) {
         // System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
         return ttpgPositionAliasList.get(position);
-    }
-
-    public static Map<String, String> getPlanetAliasEntryList() {
-        return TileHelper.getAllPlanets().values().stream()
-            .collect(Collectors.toMap(PlanetModel::getId,
-                planetModel -> StringUtils.join(Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>()), ", ")));
-    }
-
-    public static Map<String, String> getTileAliasEntryList() {
-        return TileHelper.getAllTiles().values().stream()
-            .collect(Collectors.toMap(TileModel::getId,
-                tileModel -> StringUtils.join(Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }
 
     public static String getFactionAliasEntryList(String faction) {

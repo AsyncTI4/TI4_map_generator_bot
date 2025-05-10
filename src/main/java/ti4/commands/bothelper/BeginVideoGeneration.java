@@ -1,19 +1,20 @@
 package ti4.commands.bothelper;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.amazonaws.services.batch.AWSBatch;
 import com.amazonaws.services.batch.AWSBatchClientBuilder;
 import com.amazonaws.services.batch.model.SubmitJobRequest;
-
-import java.util.Map;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class BeginVideoGeneration extends BothelperSubcommandData {
+class BeginVideoGeneration extends Subcommand {
+
     public BeginVideoGeneration (){
         super(Constants.BEGIN_VIDEO_GEN, "Kickoff Video Process in AWS");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Name of the Game to video-ize.").setRequired(true).setAutoComplete(true));

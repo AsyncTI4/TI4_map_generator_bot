@@ -5,13 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ti4.commands.milty.MiltyDraftHelper;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.draft.items.*;
-import ti4.generator.Mapper;
+import ti4.draft.items.BlueTileDraftItem;
+import ti4.draft.items.HomeSystemDraftItem;
+import ti4.draft.items.RedTileDraftItem;
+import ti4.draft.items.SpeakerOrderDraftItem;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftManager;
 
 public class StandardBagDraft extends BagDraft {
     public StandardBagDraft(Game owner) {
@@ -33,7 +36,7 @@ public class StandardBagDraft extends BagDraft {
         return "standard_bag_draft";
     }
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral" };
+    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "qhet", "atokera" };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllLegalFactions();
@@ -84,9 +87,9 @@ public class StandardBagDraft extends BagDraft {
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
                     if (!draftableCollection.getValue().isEmpty()) {
-                        bag.Contents.add(draftableCollection.getValue().remove(0));
+                        bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
                     }
                 }
             }

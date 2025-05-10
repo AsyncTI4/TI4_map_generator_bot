@@ -1,30 +1,29 @@
 package ti4.helpers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.TileHelper;
+import lombok.experimental.UtilityClass;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.image.PositionMapper;
+import ti4.image.TileHelper;
 import ti4.map.Game;
+import ti4.map.Leader;
+import ti4.map.Player;
 
+@UtilityClass
 public class RegexHelper {
 
-    private static String regexBuilder(String groupname, Set<String> options) {
-        StringBuilder sb = new StringBuilder("(?<").append(groupname).append(">(");
-        sb.append(String.join("|", options));
-        sb.append("))");
-        return sb.toString();
+    public static String regexBuilder(String groupname, Collection<String> options) {
+        return "(?<" + groupname + ">(" + String.join("|", options) + "))";
     }
 
     private static String regexBuilder(String groupname, String pattern) {
-        StringBuilder sb = new StringBuilder("(?<").append(groupname).append(">");
-        sb.append(pattern).append(")");
-        return sb.toString();
+        return "(?<" + groupname + ">" + pattern + ")";
     }
 
     private static Set<String> legalColors(Game game) {
@@ -49,15 +48,11 @@ public class RegexHelper {
     }
 
     public static String optional(String regex) {
-        StringBuilder sb = new StringBuilder("(").append(regex).append(")?");
-        return sb.toString();
+        return "(" + regex + ")?";
     }
 
     public static String oneOf(List<String> regex) {
-        StringBuilder sb = new StringBuilder("(");
-        sb.append("(").append(String.join(")|(", regex)).append(")");
-        sb.append(")");
-        return sb.toString();
+        return "(" + "(" + String.join(")|(", regex) + ")" + ")";
     }
 
     /**
@@ -92,6 +87,7 @@ public class RegexHelper {
     public static String unitTypeRegex(String group) {
         Set<String> types = new HashSet<>();
         Arrays.asList(UnitType.values()).forEach(x -> types.add(x.getValue()));
+        types.add("csd");
         return regexBuilder(group, types);
     }
 
@@ -135,15 +131,32 @@ public class RegexHelper {
 
     /** @return group "tileID" matching any legal tile ID in the bot */
     public static String tileIDRegex() {
-        return regexBuilder("tileID", TileHelper.getAllTiles().keySet());
+        return regexBuilder("tileID", TileHelper.getAllTileIds());
     }
 
-    /** @return group matching any planet on the map, and also "space" */
+    /** @return group matching any planet name in the game */
+    public static String planetNameRegex(Game game, String group) {
+        Set<String> planets = new HashSet<>(game.getPlanets());
+        game.getPlanetsInfo().values().stream().forEach(p -> planets.add(p.getName()));
+        return regexBuilder(group, planets);
+    }
+
+    /** @return group matching any unitholder name on the map, and also "space" */
     public static String unitHolderRegex(Game game, String group) {
-        Set<String> unitholders = new HashSet<>();
-        unitholders.addAll(game.getPlanets());
+        Set<String> unitholders = new HashSet<>(game.getPlanets());
+        game.getPlanetsInfo().values().stream()
+            .filter(p -> game.getTileFromPlanet(p.getName()) != null)
+            .forEach(p -> unitholders.add(p.getName()));
         unitholders.add("space");
         return regexBuilder(group, unitholders);
+    }
+
+    /** @return group "ability" */
+    public static String factionAbilityRegex(Game game) {
+        Set<String> abilities = new HashSet<>();
+        for (Player p : game.getRealPlayers())
+            abilities.addAll(p.getAbilities());
+        return regexBuilder("ability", abilities);
     }
 
     /** @return group "relic" */
@@ -152,15 +165,63 @@ public class RegexHelper {
         return regexBuilder("relic", relics);
     }
 
+    /** @return group "tech" */
+    public static String techRegex(Game game) {
+        Set<String> techs = new HashSet<>(Mapper.getDeck(game.getTechnologyDeckID()).getNewDeck());
+        return regexBuilder("tech", techs);
+    }
+
+    /** @return group "agent". Includes JR */
+    public static String agentRegex(Game game) {
+        Set<String> agents = new HashSet<>();
+        for (Player p : game.getRealPlayers()) {
+            for (Leader l : p.getLeaders()) {
+                if (l.getType().equals("agent")) {
+                    agents.add(l.getId());
+                }
+            }
+        }
+        List<String> relicDeck = Mapper.getDeck(game.getRelicDeckID()).getNewDeck();
+        if (relicDeck.contains("titanprototype")) agents.add("titanprototype");
+        if (relicDeck.contains("absol_jr")) agents.add("absol_jr");
+        return regexBuilder("agent", agents);
+    }
+
+    /** @return group "leader". DOES NOT include JR */
+    public static String leaderRegex(Game game) {
+        Set<String> leaders = new HashSet<>();
+        for (Player p : game.getRealPlayers()) {
+            for (Leader l : p.getLeaders()) {
+                leaders.add(l.getId());
+            }
+        }
+        return regexBuilder("leader", leaders);
+    }
+
     /** @return group "ac" */
     public static String acRegex(Game game) {
         Set<String> allACs = new HashSet<>();
         if (game != null) {
+            allACs.addAll(Mapper.getDeck(game.getAcDeckID()).getNewDeck());
             allACs.addAll(game.getActionCards());
             allACs.addAll(game.getDiscardActionCards().keySet());
         } else {
             allACs.addAll(Mapper.getActionCards().keySet());
         }
+        return regexBuilder("ac", allACs);
+    }
+
+    /** @return group "ac" */
+    public static String acRegex(Game game, Player player) {
+        Set<String> allACs = new HashSet<>();
+        if (game != null) {
+            allACs.addAll(Mapper.getDeck(game.getAcDeckID()).getNewDeck());
+            allACs.addAll(game.getActionCards());
+            allACs.addAll(game.getDiscardActionCards().keySet());
+        } else {
+            allACs.addAll(Mapper.getActionCards().keySet());
+        }
+        allACs.addAll(player.getActionCards().values().stream().map(Object::toString).toList());
         return regexBuilder("ac", allACs);
     }
 
@@ -171,22 +232,7 @@ public class RegexHelper {
 
     /** @return group "token" */
     public static String tokenRegex() {
-        Set<String> tokens = new HashSet<>(Mapper.getTokens());
+        Set<String> tokens = new HashSet<>(Mapper.getTokensFromproperties());
         return regexBuilder("token", tokens);
-    }
-
-    // TODO (Jazz): Use this
-    /** format "__{Pfstkx}" @return groups ["type", "free", "swap", "tgsOnly", "share", "faction"] */
-    public static String techMenuSuffixRegex() {
-        String regex = "__\\{";
-        List<String> groups = new ArrayList<>();
-        groups.add(regexBuilder("type", "[PBCWUA]"));
-        groups.add(regexBuilder("free", "f?"));
-        groups.add(regexBuilder("swap", "s?"));
-        groups.add(regexBuilder("tgsOnly", "t?"));
-        groups.add(regexBuilder("share", "k?"));
-        regex += String.join("", groups);
-        regex += "\\}";
-        return regex;
     }
 }

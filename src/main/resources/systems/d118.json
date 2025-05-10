@@ -3,7 +3,7 @@
     "name": "DS Empty 2",
     "aliases": [
         "dsempty2",
-        "4255"
+        "4271"
     ],
     "imagePath": "d118.png",
     "shipPositionsType": "TYPE08",
@@ -31,5 +31,6 @@
     ],
     "wormholes": null,
     "planets": [],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "red"
 }

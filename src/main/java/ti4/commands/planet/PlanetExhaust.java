@@ -8,6 +8,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class PlanetExhaust extends PlanetAddRemove {
+
     public PlanetExhaust() {
         super(Constants.PLANET_EXHAUST, "Exhaust Planet");
     }
@@ -25,7 +26,8 @@ public class PlanetExhaust extends PlanetAddRemove {
         if (!player.getPlanets().contains(planet)) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " the bot doesn't think you have planet by the name of " + planet);
         }
-        if (!player.hasPlanetReady(planet)) return;
+        if (!player.hasPlanetReady(planet))
+            return;
         if (triggerOlradin) {
             DiscordantStarsHelper.handleOlradinPoliciesWhenExhaustingPlanets(game, player, planet);
         }

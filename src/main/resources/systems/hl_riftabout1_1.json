@@ -1,6 +1,7 @@
 {
     "id": "hl_riftabout1_1",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "riftabout1_1"
     ],
@@ -22,5 +23,6 @@
     ],
     "wormholes": [],
     "planets": [],
-    "source": "andcat"
+    "source": "andcat",
+    "tileBack": "black"
 }

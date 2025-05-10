@@ -1,19 +1,18 @@
 package ti4.commands.tech;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
+import ti4.service.tech.PlayerTechService;
 
-public class TechRefresh extends TechAddRemove {
+class TechRefresh extends TechAddRemove {
+
     public TechRefresh() {
-        super(Constants.TECH_REFRESH, "Ready Tech");
+        super(Constants.TECH_REFRESH, "Ready a technology");
     }
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
-        player.refreshTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied tech: " + Mapper.getTech(techID).getRepresentation(false));
+        PlayerTechService.refreshTech(event, player, techID);
     }
 }

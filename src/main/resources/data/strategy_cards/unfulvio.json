@@ -1,0 +1,16 @@
+[
+    {
+        "id": "unfulvio9intrigue",
+        "initiative": 9,
+        "name": "Intrigue",
+        "primaryTexts": [
+            "Secretly look at the next unrevealed public objective; You may reveal it.",
+            "Perform the secondary ability of 1 readied strategy card, incuding this, spending a command token from your reinforcements instead of your strategy pool."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to secretly look at the next unrevealed public objective."
+        ],
+        "source": "unfulvio",
+        "imageURL": "https://ti4ultimate.com/resources/images/en-US/cards/strategy/Leadership.webp"
+    }
+]

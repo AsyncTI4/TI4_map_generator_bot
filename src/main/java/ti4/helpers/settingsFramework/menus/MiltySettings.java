@@ -7,17 +7,16 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.milty.StartMilty;
-import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.ChoiceSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.milty.MiltyService;
 
 @Getter
 public class MiltySettings extends SettingsMenu {
@@ -25,18 +24,16 @@ public class MiltySettings extends SettingsMenu {
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings
-    private ChoiceSetting<DraftingMode> draftMode;
+    private final ChoiceSetting<DraftingMode> draftMode;
 
     // Categories
-    private GameSettings gameSettings;
-    private SliceGenerationSettings sliceSettings;
-    //private FrankenSettings frankenSettings;
-    private PlayerFactionSettings playerSettings;
-    private SourceSettings sourceSettings;
-
+    private final GameSettings gameSettings;
+    private final SliceGenerationSettings sliceSettings;
+    private final PlayerFactionSettings playerSettings;
+    private final SourceSettings sourceSettings;
     // Bonus Attributes
     @JsonIgnore
-    private Game game;
+    private final Game game;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Constructor & Initialization
@@ -47,8 +44,8 @@ public class MiltySettings extends SettingsMenu {
 
         // Initialize default values
         draftMode = new ChoiceSetting<>("DraftType", "Draft Type", "milty");
-        draftMode.setEmoji(Emojis.sliceA);
-        draftMode.setAllValues(Arrays.asList(DraftingMode.values()).stream().collect(Collectors.toMap(DraftingMode::toString, x -> x)));
+        draftMode.setEmoji(MiltyDraftEmojis.sliceA);
+        draftMode.setAllValues(Arrays.stream(DraftingMode.values()).collect(Collectors.toMap(DraftingMode::toString, x -> x)));
         draftMode.setShow(DraftingMode::toString);
 
         // Get the correct JSON node for initialization if applicable.
@@ -65,8 +62,12 @@ public class MiltySettings extends SettingsMenu {
         gameSettings = new GameSettings(game, json, this);
         sourceSettings = new SourceSettings(game, json, this);
         //frankenSettings = new FrankenSettings(game, json, this);
-        sliceSettings = new SliceGenerationSettings(game, json, this);
         playerSettings = new PlayerFactionSettings(game, json, this);
+        sliceSettings = new SliceGenerationSettings(game, json, this);
+
+        if (json != null && json.has("messageId")) {
+            this.setMessageId(json.get("messageId").asText(null));
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -86,9 +87,8 @@ public class MiltySettings extends SettingsMenu {
 
     @Override
     protected List<SettingInterface> settings() {
-        List<SettingInterface> implemented = new ArrayList<>();
         // implemented.add(draftMode);
-        return implemented;
+        return new ArrayList<>();
     }
 
     @Override
@@ -118,7 +118,7 @@ public class MiltySettings extends SettingsMenu {
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
     public enum DraftingMode {
-        none, milty, franken, twilightfalls;
+        none, milty, franken;
 
         public String show() {
             return switch (this) {
@@ -140,7 +140,6 @@ public class MiltySettings extends SettingsMenu {
     }
 
     protected String startMilty(GenericInteractionCreateEvent event) {
-        String errorMessage = StartMilty.startFromSettings(event, this);
-        return errorMessage;
+        return MiltyService.startFromSettings(event, this);
     }
 }

@@ -4,7 +4,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.message.BotLogger;
@@ -13,14 +16,12 @@ public class Storage {
 
     public static final String ENV_VAR_RESOURCE_PATH = "RESOURCE_PATH";
     public static final String ENV_VAR_DB_PATH = "DB_PATH";
-    public static final String MAPS_UNDO = "/maps/undo/";
-    public static final String MAPS = "/maps/";
-    public static final String MAPS_JSON = "/maps_json/";
-    public static final String DELETED_MAPS = "/deletedmaps/";
+    public static final String GAMES_UNDO = "/maps/undo/";
+    public static final String GAMES_PATH = "/maps/";
+    public static final String DELETED_GAMES_PATH = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
 
     private static String resourcePath = null;
-    private static String storagePath = null;
 
     private static Font EMOJI_FONT_40;
 
@@ -233,12 +234,12 @@ public class Storage {
         Font tiFont = null;
         String resource = getResourcePath();
         if (resource == null) return null;
-        File file = new File(resource + "/font/SLIDER.TTF");
+        File file = new File(resource + "/font/Slider_TI4.ttf");
         try (InputStream inputStream = new FileInputStream(file)) {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             tiFont = tiFont.deriveFont(size);
         } catch (Exception e) {
-            BotLogger.log("Could not load font", e);
+            BotLogger.error("Could not load font", e);
         }
         return tiFont;
     }
@@ -252,7 +253,7 @@ public class Storage {
             font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             font = font.deriveFont(size);
         } catch (Exception e) {
-            BotLogger.log("Could not load font", e);
+            BotLogger.error("Could not load font", e);
         }
         return font;
     }
@@ -263,23 +264,42 @@ public class Storage {
     }
 
     @NotNull
-    public static File getMapUndoStorage(String mapName) {
-        return new File(getStoragePath() + MAPS_UNDO + mapName);
+    @SneakyThrows
+    public static Path getGameUndo(String gameName, String fileName) {
+        var path = Path.of(getStoragePath() + GAMES_UNDO + gameName + File.separator + fileName);
+        Files.createDirectories(path.getParent());
+        return path;
     }
 
     @NotNull
-    public static File getMapUndoDirectory() {
-        return new File(getStoragePath() + MAPS_UNDO);
+    @SneakyThrows
+    public static Path getGameUndoDirectory(String gameName) {
+        Path directory = Path.of(getStoragePath() + GAMES_UNDO + gameName);
+        Files.createDirectories(directory);
+        return directory;
     }
 
     @NotNull
-    public static File getMapImageStorage(String mapName) {
-        return new File(getStoragePath() + MAPS + mapName);
+    @SneakyThrows
+    public static Path getBaseGameUndoDirectory() {
+        Path directory = Path.of(getStoragePath() + GAMES_UNDO);
+        Files.createDirectories(directory);
+        return directory;
     }
 
     @NotNull
-    public static File getMapImageDirectory() {
-        var file = new File(getStoragePath() + MAPS);
+    public static File getGameFile(String gameName) {
+        return new File(getStoragePath() + GAMES_PATH + gameName);
+    }
+
+    @NotNull
+    public static Path getGamePath(String gameName) {
+        return Path.of(getStoragePath() + GAMES_PATH + gameName);
+    }
+
+    @NotNull
+    public static File getGamesDirectory() {
+        var file = new File(getStoragePath() + GAMES_PATH);
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -287,13 +307,8 @@ public class Storage {
     }
 
     @NotNull
-    public static File getMapStorage(String mapName) {
-        return new File(getStoragePath() + MAPS + mapName);
-    }
-
-    @NotNull
-    public static File getDeletedMapStorage(String mapName) {
-        return new File(getStoragePath() + DELETED_MAPS + mapName);
+    public static File getDeletedGame(String gameName) {
+        return new File(getStoragePath() + DELETED_GAMES_PATH + gameName);
     }
 
     @NotNull
@@ -306,27 +321,16 @@ public class Storage {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
 
-    @NotNull
-    public static File getMapsJSONDirectory() {
-        return new File(getStoragePath() + MAPS_JSON);
-    }
-
-    @NotNull
-    public static File getMapsJSONStorage(String fileName) {
-        return new File(getStoragePath() + MAPS_JSON + fileName);
-    }
-
     public static void init() {
         String resource = getStoragePath();
         if (resource != null) {
-            createDirectory(resource, DELETED_MAPS);
-            createDirectory(resource, MAPS);
-            createDirectory(resource, MAPS_JSON);
-            createDirectory(resource, TTPG_EXPORTS);
+            createDirectory(DELETED_GAMES_PATH);
+            createDirectory(GAMES_PATH);
+            createDirectory(TTPG_EXPORTS);
         }
     }
 
-    private static void createDirectory(String resource, String directoryName) {
+    private static void createDirectory(String directoryName) {
         File directory = new File(getStoragePath() + directoryName);
         if (!directory.exists()) {
             directory.mkdir();
@@ -341,19 +345,7 @@ public class Storage {
     }
 
     public static String getStoragePath() {
-        if (storagePath != null) {
-            return storagePath;
-        }
-
         return System.getenv(ENV_VAR_DB_PATH);
-    }
-
-    /**
-     * Allows for storage path overrides instead of using env var. Likely only useful
-     * for testing.
-     */
-    public static void setStoragePath(@Nullable String path) {
-        storagePath = path;
     }
 
     @Nullable

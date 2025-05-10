@@ -1,0 +1,160 @@
+[
+    {
+        "id": "starchartcultural",
+        "name": "Star Chart",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random; place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "starcharthazardous",
+        "name": "Star Chart",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random; place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "starchartindustrial",
+        "name": "Star Chart",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random; place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "starchartfrontier",
+        "name": "Star Chart",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "This card may be exchanged as part of a transaction. ACTION: Purge 2 of your Star Charts to draw 1 system tile with a blue-colored back at random; place that tile at the edge of the game board, adjacent to at least 2 other systems.",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "forgottentradestation",
+        "name": "Forgotten Trade Station",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "For each planet in this system, gain 1 trade good.",
+        "flavorText": "*\"Oh, thank the stars!\" the merchant gushed over comms. \"We haven't had fresh food in weeks!\"*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "distinguishedadmiral",
+        "name": "Distinguished Admiral",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Redistribute up to 1 command token, or spend 1 influence to gain 1 command token.",
+        "flavorText": "*\"Very well,\" said the old Celdauri officer. \"Let's take a look at these plans.\"*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "councilpreserve",
+        "name": "Council Preserve",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: When you exhaust this planet to cast votes, cast 5 additional votes.",
+        "attachmentId": "council_preserve",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "seedyspaceport",
+        "name": "Seedy Spaceport",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, ready your agent or draw 1 action card.",
+        "flavorText": "*There are safer places to find a merc, but that sort of place doesn't attract the sort of operation the Emoress had tasked Za-trè with recruiting.*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "warforgeruins",
+        "name": "War Forge Ruins",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, place 1 mech or 2 infantry from your reinforcements on this planet.",
+        "flavorText": "*Magma spurted through cracks in the surface, but the exploratory team knew the risk was worth the reward.*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "scorcheddepot",
+        "name": "Scorched Depot",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "If you have at least 1 mech on this planet, or if you remove 1 infantry from this planet, remove 1 command token from this system or redistribute 1 of your command tokens.",
+        "flavorText": "*Magma spurted through cracks in the surface, but the exploratory team knew the risk was worth the reward.*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "arcaneshieldemitter",
+        "name": "Arcane Shield Emitter",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "ATTACH: Return all infantry on this planet to the space area or destroy them. This planet cannot be bombarded. Infantry cannot be committed to, produced on, or placed on this planet.",
+        "attachmentId": "arcane_shield",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "arcanecitadel",
+        "name": "Arcane Citadel",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "ATTACH: When you exhaust this planet, place 1 infantry from your reinforcements on this planet. Apply +1 to each of your unit's combat rolls on this planet.",
+        "attachmentId": "arcane_citadel",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "hiddenlaboratory",
+        "name": "Hidden Laboratory",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Explore the frontier deck in this system.",
+        "flavorText": "*Hadd Halftail hadn't been searching for a laboratorym but was happy to claim the secrets she had stumbled upon.*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "ancientshipyard",
+        "name": "Ancient Shipyard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Place up to 1 cruiser from your reinforcements in this system if it contains no other players' ships.",
+        "flavorText": "*Alva was pleased to discover the cruiser's systems were still operational. \"A grand welcome awaits us,\" she said to her twin.*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "orbitalfoundries",
+        "name": "Orbital Foundries",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "ATTACH: This planet has a PRODUCTION value of 2 as if it were a unit.",
+        "attachmentId": "orbital_foundries",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "folderspace",
+        "name": "Folded Space",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place 1 command token from your reinforcements in your fleet pool and move any number of your units in this system to the space area of another system that contains no other players' ships.",
+        "flavorText": "*Captain Kask ordered the fleet through the scintilating gate. There was no path back, but at least they'd be with allies.*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "suspiciouswreckage",
+        "name": "Suspicious Wreckage",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Choose 2 other players, each of those players must give you 1 promissory note from their hand.",
+        "flavorText": "*The abandoned ships provided a trove of compromising diplomatic communications.*",
+        "source": "uncharted_space"
+    },
+    {
+        "id": "darkvisions",
+        "name": "Dark Visions",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Look at the top card of each exploration deck, discard any number of those cards and explore up to 1 planet you control. Then, shuffle each exploration deck.",
+        "flavorText": "*If you stare too long into the voids between the stars, you may find that the voids begin to whisper.*",
+        "source": "uncharted_space"
+    }
+]

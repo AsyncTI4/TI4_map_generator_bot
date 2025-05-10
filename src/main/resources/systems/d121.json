@@ -6,7 +6,7 @@
         "rocksrift",
         "riftasteroid",
         "riftrocks",
-        "4258"
+        "4274"
     ],
     "imagePath": "d121.png",
     "shipPositionsType": "TYPE08",
@@ -36,5 +36,6 @@
     "planets": [],
     "isAsteroidField": true,
     "isGravityRift": true,
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "red"
 }

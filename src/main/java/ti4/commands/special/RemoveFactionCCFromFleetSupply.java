@@ -1,16 +1,16 @@
 package ti4.commands.special;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
 import ti4.map.Player;
 
-import java.util.List;
+class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFleet {
 
-public class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFleet {
     public RemoveFactionCCFromFleetSupply() {
-        super(Constants.REMOVE_CC_FROM_FS, "Remove Faction CC from Fleet Supply");
+        super(Constants.REMOVE_CC_FROM_FS, "Remove faction command token from fleet pool");
     }
 
     @Override
@@ -18,6 +18,5 @@ public class RemoveFactionCCFromFleetSupply extends AddRemoveFactionCCToFromFlee
         for (String color : colors) {
             player.removeMahactCC(color);
         }
-        GameSaveLoadManager.saveMap(game, event);
     }
 }

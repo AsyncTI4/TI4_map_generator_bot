@@ -11,14 +11,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.commands.combat.StartCombat;
-import ti4.commands.units.AddUnits;
-import ti4.generator.GenerateTile;
-import ti4.generator.Mapper;
+import ti4.commands.GameStateSubcommand;
+import ti4.image.Mapper;
+import ti4.image.TileGenerator;
+import ti4.image.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RegexHelper;
@@ -30,22 +29,23 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.combat.StartCombatService;
+import ti4.service.emoji.ColorEmojis;
 
-public class SystemInfo extends SpecialSubcommandData {
+class SystemInfo extends GameStateSubcommand {
+
     public SystemInfo() {
-        super(Constants.SYSTEM_INFO, "Info for system (all units)");
+        super(Constants.SYSTEM_INFO, "Info for system (all units)", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.EXTRA_RINGS, "Show additional rings around the selected system for context (Max 2)").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_4, "System/Tile name").setRequired(false).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_5, "System/Tile name").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EXTRA_RINGS, "Show additional rings around the selected system for context (Max 2)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_4, "System/Tile name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_5, "System/Tile name").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-
         int context = 0;
         OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);
         if (ringsMapping != null) {
@@ -59,12 +59,13 @@ public class SystemInfo extends SpecialSubcommandData {
             context = newContext;
         }
 
+        Game game = getGame();
         for (OptionMapping tileOption : event.getOptions()) {
             if (tileOption == null || tileOption.getName().equals(Constants.EXTRA_RINGS)) {
                 continue;
             }
-            String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-            Tile tile = AddUnits.getTile(event, tileID, game);
+            String tileID = tileOption.getAsString().toLowerCase();
+            Tile tile = TileHelper.getTile(event, tileID, game);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
                 continue;
@@ -94,7 +95,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 boolean hasCC = false;
                 for (String cc : unitHolder.getCCList()) {
                     if (!hasCC) {
-                        sb.append("Command Counters: ");
+                        sb.append("Command Tokens: ");
                         hasCC = true;
                     }
                     appendFactionIcon(game, sb, cc, privateGame);
@@ -140,50 +141,50 @@ public class SystemInfo extends SpecialSubcommandData {
                     Player player = game.getPlayerFromColorOrFaction(color);
                     if (player == null) continue;
                     UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
-                    sb.append(player.getFactionEmojiOrColor()).append(Emojis.getColorEmojiWithName(color));
+                    sb.append(player.getFactionEmojiOrColor()).append(ColorEmojis.getColorEmojiWithName(color));
                     sb.append(" `").append(unitEntry.getValue()).append("x` ");
                     if (unitModel != null) {
-                        sb.append(Emojis.getEmojiFromDiscord(unitModel.getBaseType())).append(" ").append(unitModel.getName()).append("\n");
+                        sb.append(unitModel.getUnitEmoji()).append(" ");
+                        sb.append(privateGame ? unitModel.getBaseType() : unitModel.getName()).append("\n");
                     } else {
                         sb.append(unitKey).append("\n");
                     }
                 }
                 sb.append("----------\n");
             }
-            FileUpload systemWithContext = GenerateTile.getInstance().saveImage(game, context, tile.getPosition(), event);
+            FileUpload systemWithContext = new TileGenerator(game, event, null, context, tile.getPosition()).createFileUpload();
             MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
             MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, "System", false);
-            if (!game.isFowMode()) {
-                for (Player player : game.getRealPlayers()) {
-
-                    if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                        continue;
+            if (game.isFowMode()) {
+                return;
+            }
+            for (Player player : game.getRealPlayers()) {
+                if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                    continue;
+                }
+                List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile);
+                if (!players.isEmpty() && !player.getAllianceMembers().contains(players.get(0).getFaction()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                    Player player2 = players.get(0);
+                    if (player2 == player) {
+                        player2 = players.get(1);
                     }
-                    List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, game, tile);
-                    if (players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction()) && FoWHelper.playerHasShipsInSystem(player, tile)) {
-                        Player player2 = players.get(0);
-                        if (player2 == player) {
-                            player2 = players.get(1);
-                        }
-                        List<Button> buttons = StartCombat.getGeneralCombatButtons(game, tile.getPosition(), player, player2, "space", event);
-                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
-                        return;
-                    } else {
-                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                            if (unitHolder instanceof Planet) {
-                                if (ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName()).size() > 1) {
-                                    List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
-                                    List<Button> buttons = StartCombat.getGeneralCombatButtons(game, tile.getPosition(), listP.get(0), listP.get(1), "ground", event);
-                                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
-                                    return;
-                                }
+                    List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, tile.getPosition(), player, player2, "space", event);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
+                    return;
+                } else {
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        if (unitHolder instanceof Planet) {
+                            if (ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName()).size() > 1) {
+                                List<Player> listP = ButtonHelper.getPlayersWithUnitsOnAPlanet(game, tile, unitHolder.getName());
+                                List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, tile.getPosition(), listP.get(0), listP.get(1), "ground", event);
+                                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), " ", buttons);
+                                return;
                             }
                         }
                     }
-
                 }
-            }
 
+            }
         }
     }
 
@@ -195,16 +196,11 @@ public class SystemInfo extends SpecialSubcommandData {
             String colorID = tokenMatch.group("color");
             String color = Mapper.getColorName(colorID);
             Player player = game.getPlayerFromColorOrFaction(color);
-            if (privateGame != null && privateGame) {
+            if ((privateGame != null && privateGame) || player == null) {
                 sb.append(" (").append(color).append(") ");
             } else {
                 sb.append(player.getFactionEmoji()).append(" ").append(" (").append(color).append(") ");
             }
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        super.reply(event);
     }
 }

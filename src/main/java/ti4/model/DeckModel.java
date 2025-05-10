@@ -1,23 +1,90 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.commons.lang3.StringUtils;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 
 public class DeckModel implements ModelInterface, EmbeddableModel {
 
     private String alias;
     private String name;
-    private String type;
+    private DeckType type;
     private String description;
     private List<String> cardIDs;
     private ComponentSource source;
+
+    public enum DeckType {
+        @JsonProperty("action_card")
+        ACTION_CARD,
+
+        @JsonProperty("agenda")
+        AGENDA,
+
+        @JsonProperty("event")
+        EVENT,
+
+        @JsonProperty("explore")
+        EXPLORE,
+
+        @JsonProperty("public_stage_1_objective")
+        PUBLIC_STAGE_1_OBJECTIVE,
+
+        @JsonProperty("public_stage_2_objective")
+        PUBLIC_STAGE_2_OBJECTIVE,
+
+        @JsonProperty("relic")
+        RELIC,
+
+        @JsonProperty("secret_objective")
+        SECRET_OBJECTIVE,
+
+        @JsonProperty("technology")
+        TECHNOLOGY,
+
+        @JsonEnumDefaultValue
+        OTHER;
+
+        public TI4Emoji deckEmoji() {
+            return switch (this) {
+                case ACTION_CARD -> CardEmojis.ActionCard;
+                case AGENDA -> CardEmojis.Agenda;
+                case EVENT -> null;
+                case EXPLORE -> CardEmojis.FrontierCard;
+                case PUBLIC_STAGE_1_OBJECTIVE -> CardEmojis.Public1;
+                case PUBLIC_STAGE_2_OBJECTIVE -> CardEmojis.Public2;
+                case RELIC -> CardEmojis.RelicCard;
+                case SECRET_OBJECTIVE -> CardEmojis.SecretObjective;
+                case TECHNOLOGY -> TechEmojis.NonUnitTechSkip;
+                case OTHER -> null;
+            };
+        }
+
+        public String typeName() {
+            return switch (this) {
+                case ACTION_CARD -> "Action Card Deck";
+                case AGENDA -> "Agenda Deck";
+                case EXPLORE -> "Exploration Deck";
+                case PUBLIC_STAGE_1_OBJECTIVE -> "Stage 1 Deck";
+                case PUBLIC_STAGE_2_OBJECTIVE -> "Stage 2 Deck";
+                case RELIC -> "Relic Deck";
+                case SECRET_OBJECTIVE -> "Secrets Deck";
+                case TECHNOLOGY -> "Technology Deck";
+                case EVENT -> "Ignis Aurora Event Deck";
+                case OTHER -> "other deck";
+            };
+        }
+    }
 
     public boolean isValid() {
         return alias != null
@@ -36,7 +103,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
         return name;
     }
 
-    public String getType() {
+    public DeckType getType() {
         return type;
     }
 
@@ -100,7 +167,7 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        return getAlias().contains(searchString) || getName().contains(searchString) || getType().contains(searchString) || getDescription().contains(searchString);
+        return getAlias().contains(searchString) || getName().contains(searchString) || getType().toString().contains(searchString) || getDescription().contains(searchString);
     }
 
     @Override
@@ -114,15 +181,14 @@ public class DeckModel implements ModelInterface, EmbeddableModel {
 
     private String getTypeEmoji() {
         return switch (getType()) {
-            case "technology" -> Emojis.NonUnitTechSkip;
-            case "agenda" -> Emojis.Agenda;
-            case "event" -> "";
-            case "action_card" -> Emojis.ActionCard;
-            case "public_stage_1_objective" -> Emojis.Public1;
-            case "public_stage_2_objective" -> Emojis.Public2;
-            case "secret_objective" -> Emojis.SecretObjective;
-            case "relic" -> Emojis.RelicCard;
-            case "explore" -> Emojis.FrontierCard + Emojis.CulturalCard + Emojis.IndustrialCard + Emojis.HazardousCard;
+            case TECHNOLOGY -> TechEmojis.NonUnitTechSkip.toString();
+            case AGENDA -> CardEmojis.Agenda.toString();
+            case ACTION_CARD -> CardEmojis.ActionCard.toString();
+            case PUBLIC_STAGE_1_OBJECTIVE -> CardEmojis.Public1.toString();
+            case PUBLIC_STAGE_2_OBJECTIVE -> CardEmojis.Public2.toString();
+            case SECRET_OBJECTIVE -> CardEmojis.SecretObjective.toString();
+            case RELIC -> CardEmojis.RelicCard.toString();
+            case EXPLORE -> CardEmojis.FrontierCard.toString() + CardEmojis.CulturalCard + CardEmojis.IndustrialCard + CardEmojis.HazardousCard;
             default -> "";
         };
     }

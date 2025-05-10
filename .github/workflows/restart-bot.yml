@@ -12,26 +12,26 @@ jobs:
       env:
         AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
         AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+        DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        DISCORD_BOT_USERID: ${{ secrets.DISCORD_BOT_USERID }}
+        REPO_DISPATCH_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
       with:
-        host: ${{ secrets.SSH_HOST }}
-        username: root
-        password: ${{ secrets.SSH_PASSWORD }}
-        port: 22
-        script_stop: true
-        envs: AWS_KEY, AWS_SECRET
+        host: ${{ secrets.HOSTINGER_SSH_HOST }}
+        username: ${{ secrets.HOSTINGER_SSH_USER }}
+        password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+        port: ${{ secrets.HOSTINGER_SSH_PORT }}
+        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN
         script: |
-          cd /root/ti4bot
+          cd /app
           ./scheduled_upload.sh
-          cd /root/ti4bot/TI4_map_generator_bot
+          cd ${{ vars.HOST_TI4_REPO_DIR }}
           echo "Building docker image..."
           docker version
           docker build --build-arg BOT_KEY=$DISCORD_BOT_KEY --build-arg USER=$DISCORD_USER --build-arg SERVER=$DISCORD_SERVER --build-arg SERVER2=$DISCORD_SERVER2 --build-arg AWS_SECRET=$AWS_SECRET --build-arg AWS_KEY=$AWS_KEY -t tibot .
-          echo "Restarting TIBot... giving 300 seconds to shutdown"
-          docker stop $(docker ps -q) --time 300
-          cd /root/ti4bot
-          ./scheduled_upload.sh
-          cd /root
-          ./docker_run.sh
+          echo "Restarting TIBot... giving 600 seconds to shutdown"
+          docker stop $(docker ps -q) --time 600
+          echo "Starting Container..."
+          docker run -v ${{ vars.HOST_TI4_SAVES_DIR }}:/opt/STORAGE -d --restart unless-stopped -m 7g -e REPO_DISPATCH_TOKEN=$REPO_DISPATCH_TOKEN tibot $DISCORD_BOT_TOKEN $DISCORD_BOT_USERID 943410040369479690 847560709730730064 1062139934745559160 1090910555327434774 1145823841227112598 1176104225932058694 1209956332380229672 1250131684393881610 1312882116597518416
           echo "Cleaning up docker stuff..."
           docker rm $(docker ps --filter status=exited -q) || true
           docker rmi -f $(docker images --filter "dangling=true" -q) || true

@@ -1,83 +1,43 @@
 package ti4.commands.statistics;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 
-public class StatisticsCommand implements Command {
+public class StatisticsCommand implements ParentCommand {
 
-    private final Collection<StatisticsSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+        new GameStatistics(),
+        new PlayerStatistics(),
+        new AverageTurnTime(),
+        new MedianTurnTime(),
+        new CompareAFKTimes(),
+        new DiceLuck(),
+        new LifetimeRecord(),
+        new FactionRecordOfTech(),
+        new FactionRecordOfSCPick(),
+        new GameWinsWithOtherFactions(),
+        new StellarConverterStatistics(),
+        new ListTitlesGiven(),
+        new ExportToCSV()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.STATISTICS;
     }
 
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        StatisticsSubcommandData executedCommand = null;
-        for (StatisticsSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                executedCommand = subcommand;
-                break;
-            }
-        }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
-    }
-
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Statistics";
     }
 
-    private Collection<StatisticsSubcommandData> getSubcommands() {
-        Collection<StatisticsSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new GameStats());
-        subcommands.add(new PlayerStats());
-        subcommands.add(new AverageTurnTime());
-        subcommands.add(new MedianTurnTime());
-        subcommands.add(new CompareAFKTimes());
-        subcommands.add(new DiceLuck());
-        subcommands.add(new LifetimeRecord());
-        subcommands.add(new FactionRecordOfTech());
-        subcommands.add(new FactionRecordOfSCPick());
-        subcommands.add(new GameWinsWithOtherFactions());
-        subcommands.add(new StellarConverter());
-        subcommands.add(new ListTitlesGiven());
-
-        return subcommands;
-    }
-
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
     }
 }

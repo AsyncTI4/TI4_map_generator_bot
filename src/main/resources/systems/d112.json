@@ -6,7 +6,7 @@
         "moln",
         "ry",
         "mo",
-        "4247"
+        "4263"
     ],
     "imagePath": "d112.png",
     "shipPositionsType": "TYPE05",
@@ -33,5 +33,6 @@
         "rysaa",
         "moln"
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }

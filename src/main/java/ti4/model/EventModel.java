@@ -1,18 +1,17 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import software.amazon.awssdk.utils.StringUtils;
-
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
+import software.amazon.awssdk.utils.StringUtils;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 
 @Data
@@ -104,7 +103,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
-        if (getText().length() > 0) {
+        if (!getText().isEmpty()) {
             String arg = getText().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
         }
@@ -125,7 +124,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
 
         StringBuilder sb = new StringBuilder();
         if (numericalID != null) sb.append("(").append(numericalID).append(") ");
-        sb.append(Emojis.EventCard).append("__**").append(getName()).append("**__").append(getSource().emoji());
+        sb.append("__**").append(getName()).append("**__").append(getSource().emoji());
         eb.setTitle(sb.toString());
 
         eb.setColor(Color.black);

@@ -1,18 +1,14 @@
 package ti4.model;
 
-import lombok.Data;
-import ti4.generator.Mapper;
-import ti4.model.Source.ComponentSource;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+import ti4.image.Mapper;
+import ti4.model.Source.ComponentSource;
 
 @Data
 public class StrategyCardSetModel implements ModelInterface {
@@ -36,19 +32,6 @@ public class StrategyCardSetModel implements ModelInterface {
         return alias;
     }
 
-    /**
-     * @deprecated This method is deprecated and only here to support legacy code.
-     */
-    @JsonIgnore
-    @Deprecated
-    public Map<Integer, String> getCardValues() {
-        Map<Integer, String> cardValues = new LinkedHashMap<>();
-        for (String scID : scIDs) {
-            cardValues.put(Mapper.getStrategyCard(scID).getInitiative(), Mapper.getStrategyCard(scID).getName());
-        }
-        return cardValues;
-    }
-
     @JsonIgnore
     public List<StrategyCardModel> getStrategyCardModels() {
         return scIDs.stream()
@@ -62,7 +45,7 @@ public class StrategyCardSetModel implements ModelInterface {
             .filter(sc -> sc.getInitiative() == scNumber)
             .map(StrategyCardModel::getName)
             .findFirst()
-            .orElse("Name Unknown - Invalid SC Number: " + scNumber);
+            .orElse("Name Unknown - Invalid Strategy Card Initiative Number: " + scNumber);
     }
 
     public Optional<String> getDescription() {
@@ -86,5 +69,9 @@ public class StrategyCardSetModel implements ModelInterface {
     @JsonIgnore
     public boolean isGroupedSet() {
         return getStrategyCardModels().stream().anyMatch(sc -> sc.getGroup().isPresent());
+    }
+    
+    public boolean searchSource(ComponentSource searchSource) {
+        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
     }
 }

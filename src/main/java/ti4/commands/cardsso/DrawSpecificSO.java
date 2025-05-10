@@ -1,60 +1,48 @@
 package ti4.commands.cardsso;
 
-import net.dv8tion.jda.api.entities.User;
+import java.util.Map;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-import ti4.map.GameSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.SecretObjectiveInfoService;
 
-import java.util.Map;
-
-public class DrawSpecificSO extends SOCardsSubcommandData {
+class DrawSpecificSO extends GameStateSubcommand {
 
     public DrawSpecificSO() {
-        super(Constants.DRAW_SPECIFIC_SO, "Draw specific SO");
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "SO ID").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do draw SO. Default yourself").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge SO instead of drawing it").setRequired(false));
+        super(Constants.DRAW_SPECIFIC_SO, "Draw specific secret objective", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player who draws the secret objective (default is you)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge the secret objective instead of drawing it"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        OptionMapping option = event.getOption(Constants.SO_ID);
+        Game game = getGame();
+        String soId = event.getOption(Constants.SO_ID).getAsString();
         OptionMapping optionPurge = event.getOption(Constants.PURGE_SO);
-        if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "SO ID needs to be specified");
-            return;
-        }
-        User user;
-        if (playerOption == null) {
-            //  MessageHelper.sendMessageToEventChannel(event, "Player option was null");
-            // return;
-            user = event.getUser();
-        } else {
-            user = playerOption.getAsUser();
-        }
         if (optionPurge != null && "YES".equals(optionPurge.getAsString())) {
-            if (game.removeSOFromGame(option.getAsString())) {
-                MessageHelper.sendMessageToEventChannel(event, "Purged specified SO");
+            if (game.removeSOFromGame(soId)) {
+                MessageHelper.sendMessageToEventChannel(event, "Purged specified secret objective.");
             } else {
-                MessageHelper.sendMessageToEventChannel(event, "Failed to purge specified SO");
+                MessageHelper.sendMessageToEventChannel(event, "Failed to purge specified secret objective.");
             }
             return;
         }
 
-        Map<String, Integer> secrets = game.drawSpecificSecretObjective(option.getAsString(), user.getId());
+        Player player = getPlayer();
+        Map<String, Integer> secrets = game.drawSpecificSecretObjective(soId, player.getUserID());
         if (secrets == null) {
-            MessageHelper.sendMessageToEventChannel(event, "SO not retrieved");
+            MessageHelper.sendMessageToEventChannel(event, "Secret objective not retrieved");
             return;
         }
-        GameSaveLoadManager.saveMap(game, event);
-        MessageHelper.sendMessageToEventChannel(event, "SO sent to user's hand - please check `/ac info`");
-        SOInfo.sendSecretObjectiveInfo(game, game.getPlayer(user.getId()));
+        MessageHelper.sendMessageToEventChannel(event, "Secret objective sent to player's hand");
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
     }
 }

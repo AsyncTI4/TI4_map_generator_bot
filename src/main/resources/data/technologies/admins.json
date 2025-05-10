@@ -16,6 +16,6 @@
         "faction": "admins",
         "baseUpgrade": "sd2",
         "source": "admins",
-        "text": "Up to 4 fighters in this system do not count towards your ships' capacity. PRODUCTION 7, DEEP SPACE CANNON 7"
+        "text": "PRODUCTION 7, SPACE CANNON 7\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's system.\nUp to 4 fighters in this system do not count towards your ships' capacity."
     }
 ]

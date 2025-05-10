@@ -2,7 +2,8 @@
     "id": "archontauk",
     "tileId": "92new",
     "name": "Archon Tau Keleres",
-    "shortName": null,
+    "shortName": "Archon Tau",
+    "shrinkNamePNAttach": true,
     "aliases": [
         "archontauk",
         "archontaukeleres",

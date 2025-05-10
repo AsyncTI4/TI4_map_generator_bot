@@ -13,9 +13,11 @@
         "name": "Articles of War",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: All mechs lose their printed abilities except for Sustain Damage.",
+        "text1": "For: All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
         "text2": "Against: Each player that voted \"For\" gains 3 trade goods.",
-        "mapText": "All mechs lose their printed abilities except for Sustain Damage.",
+        "forEmoji": "SadMech",
+        "againstEmoji": "tg",
+        "mapText": "All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
         "source": "pok"
     },
     {
@@ -25,6 +27,8 @@
         "target": "For/Against",
         "text1": "For: When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (or a player who does not have 2 in a three- or four-player game), if able.",
         "text2": "Against: Each player readies only 3 of their planets at the end of this agenda phase.",
+        "forEmoji": "🔄",
+        "againstEmoji": "ExhaustedPlanet",
         "mapText": "When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (2 in 3p and 4p games), if able.",
         "source": "pok"
     },
@@ -71,6 +75,8 @@
         "target": "For/Against",
         "text1": "For: Alpha and beta wormholes in the wormhole nexus have no effect during movement.",
         "text2": "Against: Place a gamma wormhole token in the Mecatol Rex system.",
+        "forEmoji": "⛔",
+        "againstEmoji": "WHgamma",
         "mapText": "Alpha and beta wormholes in the wormhole nexus have no effect during movement.",
         "source": "pok"
     },
@@ -100,6 +106,8 @@
         "target": "For/Against",
         "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase. each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
         "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" exhausts all of their cultural planets.",
+        "forEmoji": "🗳️",
+        "againstEmoji": "ExhaustedPlanet",
         "mapText": "Players cannot exhaust planets to cast votes during the agenda phase. each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
         "source": "pok"
     },

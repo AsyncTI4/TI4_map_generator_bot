@@ -1,6 +1,6 @@
 {
     "id": "75",
-    "name": "Loki/Ashtroth/Abaddon (Devils)",
+    "name": "Loki/Ashtroth/Abaddon - Devils",
     "aliases": [
         "75",
         "abaddon",
@@ -20,29 +20,13 @@
     "imagePath": "75_Abaddon.png",
     "shipPositionsType": "TYPE06",
     "spaceTokenLocations": [
-        {
-            "x": 250.0,
-            "y": 90.0
-        },
-        {
-            "x": 80.0,
-            "y": 10.0
-        },
-        {
-            "x": 135.0,
-            "y": 105.0
-        },
-        {
-            "x": 80.0,
-            "y": 185.0
-        }
+        { "x": 250.0, "y": 90.0 },
+        { "x": 80.0, "y": 10.0 },
+        { "x": 135.0, "y": 105.0 },
+        { "x": 80.0, "y": 185.0 }
     ],
     "wormholes": [],
-    "planets": [
-        "loki",
-        "abaddon",
-        "ashtroth"
-    ],
+    "planets": ["loki", "abaddon", "ashtroth"],
     "source": "pok",
     "tileBack": "blue"
 }

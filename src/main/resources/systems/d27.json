@@ -1,6 +1,6 @@
 {
     "id": "d27",
-    "name": "Axis (Shipwrights)",
+    "name": "Axis - Shipwrights",
     "aliases": [
         "d27",
         "axis",
@@ -34,5 +34,6 @@
     "planets": [
         "axis"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

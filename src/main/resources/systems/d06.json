@@ -1,6 +1,6 @@
 {
     "id": "d06",
-    "name": "Alesna/Azle (Kolume)",
+    "name": "Alesna/Azle - Kolume",
     "aliases": [
         "d06",
         "azle",
@@ -17,5 +17,6 @@
         "alesna",
         "azle"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

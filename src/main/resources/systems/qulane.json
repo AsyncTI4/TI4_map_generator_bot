@@ -1,6 +1,6 @@
 {
     "id": "qulane",
-    "name": "Kull/Minaluk (Qulane)",
+    "name": "Kull/Minaluk - Qulane",
     "aliases": [
         "qulane",
         "seers",
@@ -31,5 +31,6 @@
         "kull",
         "minaluk"
     ],
-    "source": "ignis_aurora"
+    "source": "ignis_aurora",
+    "tileBack": "green"
 }

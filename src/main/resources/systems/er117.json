@@ -5,7 +5,7 @@
         "er117",
         "cahgaris"
     ],
-    "imagePath": "er_116_async.png",
+    "imagePath": "er_117_async.png",
     "planets": [
         "cahgaris"
     ],
@@ -35,5 +35,6 @@
     "isSupernova": false,
     "isNebula": false,
     "isGravityRift": false,
-    "source": "eronous"
+    "source": "eronous",
+    "tileBack": "blue"
 }

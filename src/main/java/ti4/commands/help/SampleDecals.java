@@ -1,11 +1,7 @@
 package ti4.commands.help;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -17,15 +13,19 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
-import ti4.commands.player.ChangeUnitDecal;
-import ti4.generator.MapGenerator;
-import ti4.generator.Mapper;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.ImageHelper;
 import ti4.helpers.Storage;
+import ti4.image.DrawingUtil;
+import ti4.image.ImageHelper;
+import ti4.image.MapGenerator;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.service.UnitDecalService;
+import ti4.service.image.FileUploadService;
 
-public class SampleDecals extends HelpSubcommandData {
+class SampleDecals extends Subcommand {
+
     public SampleDecals() {
         super(Constants.SAMPLE_DECALS, "Show a sample image of dreadnoughts with various decals.");
         addOptions(new OptionData(OptionType.STRING, Constants.DECAL_HUE, "Category of decals to show (default: all)").setAutoComplete(true));
@@ -34,25 +34,24 @@ public class SampleDecals extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<String> decals = Mapper.getDecals().stream()
-            .filter(decalID -> ChangeUnitDecal.userMayUseDecal(event.getUser().getId(), decalID))
+            .filter(decalID -> UnitDecalService.userMayUseDecal(event.getUser().getId(), decalID))
             .collect(Collectors.toList());
-        ;
+
         OptionMapping input = event.getOption(Constants.DECAL_HUE);
-        if (input == null || input.getAsString().equals("ALL") || input.getAsString().equals("")) {
-        } else if (input.getAsString().equals("Other")) {
-            List<String> others = Arrays.asList(new String[] { "cb_10", "cb_10", "cb_52", "cb_81" });
-            decals = decals.stream()
-                .filter(decalID -> others.contains(decalID))
-                .collect(Collectors.toList());
-            ;
-        } else {
-            decals = decals.stream()
-                .filter(decalID -> Mapper.getDecalName(decalID).contains(input.getAsString()))
-                .collect(Collectors.toList());
-            ;
+        if (input != null && !input.getAsString().equals(Constants.ALL) && !input.getAsString().isEmpty()) {
+            if (input.getAsString().equals("Other")) {
+                List<String> others = List.of("cb_10", "cb_11", "cb_52", "cb_81");
+                decals = decals.stream()
+                    .filter(others::contains)
+                    .collect(Collectors.toList());
+            } else {
+                decals = decals.stream()
+                    .filter(decalID -> Mapper.getDecalName(decalID).contains(input.getAsString()))
+                    .collect(Collectors.toList());
+            }
         }
         Collections.sort(decals);
-        if (decals.size() == 0) {
+        if (decals.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No decals found. Something has probably gone wrong.");
             return;
         }
@@ -90,28 +89,26 @@ public class SampleDecals extends HelpSubcommandData {
             int mid = -1;
             int i = label.indexOf(" ");
             while (i >= 0) {
-                if (Math.abs(label.length() / 2.0 - 0.5 - mid) + (n % 2) > Math.abs(label.length() / 2.0 - 0.5 - i)) // the (n%2) means that tie breaks will alternate each decal, hopefully reducing collisions
-                {
+                if (Math.abs(label.length() / 2.0 - 0.5 - mid) + (n % 2) > Math.abs(label.length() / 2.0 - 0.5 - i)) { // the (n%2) means that tie breaks will alternate each decal, hopefully reducing collisions
                     mid = i;
                 }
                 i = label.indexOf(" ", i + 1);
             }
 
             graphic.setFont(bigFont);
-            MapGenerator.superDrawString(graphic, (mid == -1 ? label : label.substring(0, mid)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + SPACING,
+            DrawingUtil.superDrawString(graphic, (mid == -1 ? label : label.substring(0, mid)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + SPACING,
                 Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                 stroke, Color.BLACK);
-            MapGenerator.superDrawString(graphic, (mid == -1 ? "" : label.substring(mid + 1)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+            DrawingUtil.superDrawString(graphic, (mid == -1 ? "" : label.substring(mid + 1)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
                 Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                 stroke, Color.BLACK);
             graphic.setFont(smallFont);
-            MapGenerator.superDrawString(graphic, d, x + DREADWIDTH / 2, y + DREADSUBHIGHT + 2 * LINEHEIGHT + SPACING,
+            DrawingUtil.superDrawString(graphic, d, x + DREADWIDTH / 2, y + DREADSUBHIGHT + 2 * LINEHEIGHT + SPACING,
                 Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
                 stroke, Color.BLACK);
 
             n += 1;
             if (n >= PERROW) {
-                //MessageHelper.sendMessageToEventChannel(event, d + ": " + x + ", " + y + "\n" + "sample/" + d + "_dn_wht.png");
                 n = 0;
                 x = left;
                 y += DREADTEXHIGHT;
@@ -120,7 +117,7 @@ public class SampleDecals extends HelpSubcommandData {
             }
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = MapGenerator.uploadToDiscord(coloursImage, 1.0f, "decal_sample_" + top + "_" + left)
+        FileUpload fileUpload = FileUploadService.createFileUpload(coloursImage, "decal_sample_" + top + "_" + left)
             .setDescription("Decal samples for units.");
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
     }

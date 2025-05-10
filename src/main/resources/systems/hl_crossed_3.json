@@ -1,6 +1,7 @@
 {
     "id": "hl_crossed_3",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "crossed_3"
     ],
@@ -22,5 +23,6 @@
     ],
     "wormholes": [],
     "planets": [],
-    "source": "andcat"
+    "source": "andcat",
+    "tileBack": "black"
 }

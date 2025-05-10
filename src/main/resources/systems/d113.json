@@ -6,7 +6,7 @@
         "sal",
         "gwiyun",
         "gwi",
-        "4248"
+        "4264"
     ],
     "imagePath": "d113.png",
     "shipPositionsType": "TYPE05",
@@ -32,5 +32,6 @@
         "salin",
         "gwiyun"
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }

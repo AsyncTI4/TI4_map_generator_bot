@@ -1,6 +1,7 @@
 {
     "id": "89b",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "89b0"
     ],
@@ -22,5 +23,6 @@
     ],
     "wormholes": [],
     "planets": [],
-    "source": "pok"
+    "source": "pok",
+    "tileBack": "black"
 }

@@ -1,6 +1,6 @@
 {
     "id": "d26",
-    "name": "Vadarian/Norvus (Vaden)",
+    "name": "Vadarian/Norvus - Vaden",
     "aliases": [
         "d26",
         "vadarian",
@@ -17,5 +17,6 @@
         "vadarian",
         "norvus"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

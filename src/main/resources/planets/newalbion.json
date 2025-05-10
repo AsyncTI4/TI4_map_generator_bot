@@ -2,7 +2,7 @@
     "id": "newalbion",
     "tileId": "27",
     "name": "New Albion",
-    "shortName": null,
+    "shrinkNamePNAttach": true,
     "aliases": [
         "newalbion",
         "new_albion",

@@ -1,5 +1,23 @@
 [
     {
+        "ItemCategory": "ABILITY",
+        "ItemId": "military_industrial_complex",
+        "AdditionalComponents": [
+            "ABILITY:arms_dealers"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:axiscommander",
+            "HERO:axishero"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "arms_dealers",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
         "ItemCategory": "COMMANDER",
         "ItemId": "axiscommander",
         "Undraftable": true,
@@ -13,29 +31,27 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "arms_dealers",
+        "ItemId": "ancient_blueprints",
         "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "military_industrial_complex",
-        "OptionalSwaps": [
-            "HERO:axishero",
-            "COMMANDER:axiscommander"
-        ],
         "source": "ds"
     },
     {
         "ItemCategory": "FLAGSHIP",
         "ItemId": "bentor_flagship",
-        "Undraftable": true,
+        "AdditionalComponents": [
+            "ABILITY:ancient_blueprints"
+        ],
         "source": "ds"
     },
     {
         "ItemCategory": "AGENT",
         "ItemId": "bentoragent",
-        "Undraftable": true,
+        "AdditionalComponents": [
+            "ABILITY:ancient_blueprints"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:bentorcommander"
+        ],
         "source": "ds"
     },
     {
@@ -47,16 +63,30 @@
     {
         "ItemCategory": "MECH",
         "ItemId": "bentor_mech",
-        "Undraftable": true,
+        "AdditionalComponents": [
+            "ABILITY:ancient_blueprints"
+        ],
         "source": "ds"
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "ancient_blueprints",
-        "OptionalSwaps": [
-            "AGENT:bentoragent",
-            "COMMANDER:bentorcommander",
-            "MECH:bentor_mech"
+        "ItemId": "byssus",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "cheiranagent",
+        "AdditionalComponents": [
+            "ABILITY:byssus"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "autonetic_memory",
+        "AdditionalComponents": [
+            "ABILITY:cybernetic_madness"
         ],
         "source": "ds"
     },
@@ -73,12 +103,6 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "HERO",
-        "ItemId": "edynhero",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
         "ItemCategory": "ABILITY",
         "ItemId": "decree",
         "Undraftable": true,
@@ -91,11 +115,33 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "HERO",
+        "ItemId": "edynhero",
+        "alternateText": "Midir - Living Will (The Edyn Mandate) | Golden Order - Peace Eternal\nACTION: For each system with your mechs on the game board, draw 1 agenda. Reveal and resolve each agenda in any order as if you had cast 1 vote for an outcome of your choice. Other players cannot resolve abilities during this action.\n\nThen, purge this card.",
+        "source": "ds"
+    },
+    {
         "ItemCategory": "MECH",
         "ItemId": "edyn_mech",
         "OptionalSwaps": [
-            "HERO:edynhero",
-            "ABILITY:radiance"
+            "ABILITY:radiance",
+            "ABILITY:decree"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "rally_to_the_cause",
+        "OptionalSwaps": [
+            "MECH:freesystems_mech"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "diplomats",
+        "AdditionalComponents": [
+            "ABILITY:free_people"
         ],
         "source": "ds"
     },
@@ -119,17 +165,11 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "rally_to_the_cause",
+        "ItemId": "the_lady_and_the_lord",
         "OptionalSwaps": [
-            "MECH:freesystems_mech"
-        ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "diplomats",
-        "AdditionalComponents": [
-            "ABILITY:free_people"
+            "COMMANDER:gheminacommander",
+            "HERO:gheminaherolady",
+            "HERO:gheminaherolord"
         ],
         "source": "ds"
     },
@@ -141,31 +181,39 @@
     },
     {
         "ItemCategory": "HERO",
+        "ItemId": "gheminaherolady",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HERO",
         "ItemId": "gheminaherolord",
         "Undraftable": true,
         "source": "ds"
     },
     {
-        "ItemCategory": "FLAGSHIP",
-        "ItemId": "ghemina_flagship_lord",
+        "ItemCategory": "ABILITY",
+        "ItemId": "mobile_command",
         "Undraftable": true,
         "source": "ds"
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "the_lady_and_the_lord",
-        "OptionalSwaps": [
-            "COMMANDER:gheminacommander"
-        ],
-        "AdditionalComponents": [
-            "FLAGSHIP:ghemina_flagship_lord",
-            "HERO:gheminaherolord"
-        ],
+        "ItemId": "abyssal_embrace",
+        "Undraftable": true,
         "source": "ds"
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "celestial_reclamation",
+        "ItemId": "spawning_grounds",
+        "OptionalSwaps": [
+            "ABILITY:mobile_command"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "ghoti",
         "Undraftable": true,
         "source": "ds"
     },
@@ -179,25 +227,7 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "probability_algorithms",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "limited_vision",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "PN",
-        "ItemId": "dspnauge",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "HERO",
-        "ItemId": "augershero",
+        "ItemId": "celestial_reclamation",
         "Undraftable": true,
         "source": "ds"
     },
@@ -215,38 +245,44 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "HOMESYSTEM",
-        "ItemId": "ghoti",
+        "ItemCategory": "ABILITY",
+        "ItemId": "limited_vision",
         "Undraftable": true,
         "source": "ds"
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "spawning_grounds",
+        "ItemId": "probability_algorithms",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "PN",
+        "ItemId": "dspnauge",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "augershero",
         "Undraftable": true,
         "source": "ds"
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "mobile_command",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "abyssal_embrace",
+        "ItemId": "glory",
         "AdditionalComponents": [
-            "ABILITY:spawning_grounds",
-            "ABILITY:mobile_command",
-            "HOMESYSTEM:ghoti"
+            "ABILITY:valor"
         ],
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "TECH",
-        "ItemId": "dskjalg",
-        "Undraftable": true,
+        "OptionalSwaps": [
+            "ABILITY:heroism",
+            "FLAGSHIP:kjalengard_flagship",
+            "TECH:dskjalg",
+            "AGENT:kjalengardagent",
+            "COMMANDER:kjalengardcommander",
+            "HERO:kjalengardhero",
+            "MECH:kjalengard_mech"
+        ],
         "source": "ds"
     },
     {
@@ -258,6 +294,18 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "valor",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "kjalengard_flagship",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dskjalg",
         "Undraftable": true,
         "source": "ds"
     },
@@ -286,48 +334,41 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "FLAGSHIP",
-        "ItemId": "kjalengard_flagship",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "glory",
-        "OptionalSwaps": [
-            "TECH:dskjalg",
-            "AGENT:kjalengardagent",
-            "COMMANDER:kjalengardcommander",
-            "HERO:kjalengardhero",
-            "MECH:kjalengard_mech"
-        ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "FLAGSHIP",
-        "ItemId": "kollecc_flagship",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
         "ItemCategory": "MECH",
         "ItemId": "kollecc_mech",
-        "Undraftable": true,
+        "AdditionalComponents": [
+            "ABILITY:shroud_of_lith"
+        ],
         "source": "ds"
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "cloaked_fleets",
-        "Undraftable": true,
+        "AdditionalComponents": [
+            "ABILITY:shroud_of_lith"
+        ],
         "source": "ds"
     },
     {
         "ItemCategory": "ABILITY",
         "ItemId": "shroud_of_lith",
-        "OptionalSwaps": [
-            "ABILITY:cloaked_fleets",
-            "FLAGSHIP:kollecc_flagship",
-            "MECH:kollecc_mech"
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "kollecc_flagship",
+        "AdditionalComponents": [
+            "ABILITY:shroud_of_lith"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "contagion",
+        "AdditionalComponents": [
+            "ABILITY:plague_reservoir",
+            "ABILITY:subversive"
         ],
         "source": "ds"
     },
@@ -350,6 +391,18 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "TECH",
+        "ItemId": "dslaner",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "iconoclasm",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
         "ItemCategory": "COMMANDER",
         "ItemId": "lanefircommander",
         "Undraftable": true,
@@ -357,13 +410,20 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "subterfuge",
-        "Undraftable": true,
+        "ItemId": "cunning",
+        "AdditionalComponents": [
+            "ABILITY:subterfuge"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:lizhocommander",
+            "HERO:lizhohero",
+            "MECH:lizho_mech"
+        ],
         "source": "ds"
     },
     {
-        "ItemCategory": "HERO",
-        "ItemId": "lizhohero",
+        "ItemCategory": "ABILITY",
+        "ItemId": "subterfuge",
         "Undraftable": true,
         "source": "ds"
     },
@@ -374,20 +434,18 @@
         "source": "ds"
     },
     {
+        "ItemCategory": "HERO",
+        "ItemId": "lizhohero",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
         "ItemCategory": "MECH",
         "ItemId": "lizho_mech",
         "Undraftable": true,
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "cunning",
-        "AdditionalComponents": [
-            "ABILITY:subterfuge"
-        ],
-        "source": "ds"
-    },
-    {   
         "ItemCategory": "STARTINGFLEET",
         "ItemId": "khrask",
         "Undraftable": true,
@@ -395,14 +453,27 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "combat_drones",
+        "ItemId": "privileged_citizenry",
         "Undraftable": true,
         "source": "ds"
     },
     {
+        "ItemCategory": "TECH",
+        "ItemId": "dsmirvpds",
+        "AdditionalComponents": [
+            "ABILITY:privileged_citizenry"
+        ],
+        "source": "ds"
+    },
+    {
         "ItemCategory": "ABILITY",
-        "ItemId": "privileged_citizenry",
-        "Undraftable": true,
+        "ItemId": "prescient_memories",
+        "AdditionalComponents": [
+            "ABILITY:divination"
+        ],
+        "OptionalSwaps": [
+            "AGENT:mykomentoriagent"
+        ],
         "source": "ds"
     },
     {
@@ -425,25 +496,22 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "prescient_memories",
-        "AdditionalComponents": [
-            "ABILITY:divination"
-        ],
-        "OptionalSwaps": [
-            "AGENT:mykomentoriagent"
-        ],
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "singularity_point",
         "Undraftable": true,
         "source": "ds"
     },
     {
-        "ItemCategory": "HERO",
-        "ItemId": "nivynhero",
+        "ItemCategory": "ABILITY",
+        "ItemId": "celestial_guides",
         "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "nivyn",
+        "OptionalSwaps": [
+            "ABILITY:celestial_guides"
+        ],
         "source": "ds"
     },
     {
@@ -459,23 +527,25 @@
             "ABILITY:singularity_point"
         ],
         "OptionalSwaps": [
-            "HERO:nivynhero",
             "TECH:dsnivymf"
         ],
         "source": "ds"
     },
     {
-        "ItemCategory": "COMMANDER",
-        "ItemId": "nokarcommander",
-        "Undraftable": true,
+        "ItemCategory": "ABILITY",
+        "ItemId": "hired_guns",
+        "AdditionalComponents": [
+            "ABILITY:desperados"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:nokarcommander"
+        ],
         "source": "ds"
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "hired_guns",
-        "OptionalSwaps": [
-            "COMMANDER:nokarcommander"
-        ],
+        "ItemId": "desperados",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -500,12 +570,6 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "MECH",
-        "ItemId": "rohdhna_mech",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
         "ItemCategory": "ABILITY",
         "ItemId": "recycled_materials",
         "OptionalSwaps": [
@@ -515,13 +579,27 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "stealth_insertion",
+        "ItemId": "orbital_foundries",
         "Undraftable": true,
         "source": "ds"
     },
     {
         "ItemCategory": "TECH",
-        "ItemId": "dstnely",
+        "ItemId": "dsrohdws",
+        "AdditionalComponents": [
+            "ABILITY:orbital_foundries"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "rohdhna_mech",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "stealth_insertion",
         "Undraftable": true,
         "source": "ds"
     },
@@ -535,8 +613,19 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "collateralized_loans",
+        "ItemId": "fine_print",
         "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "collateralized_loans",
+        "AdditionalComponents": [
+            "ABILITY:fine_print"
+        ],
+        "OptionalSwaps": [
+            "MECH:vaden_mech"
+        ],
         "source": "ds"
     },
     {
@@ -546,15 +635,15 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "COMMANDER",
-        "ItemId": "vadencommander",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
         "ItemCategory": "HERO",
         "ItemId": "vadenhero",
-        "Undraftable": true,
+        "AdditionalComponents": [
+            "ABILITY:binding_debts",
+            "ABILITY:fine_print"
+        ],
+        "OptionalSwaps": [
+            "MECH:vaden_mech"
+        ],
         "source": "ds"
     },
     {
@@ -564,17 +653,39 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "fine_print",
+        "ItemCategory": "COMMANDER",
+        "ItemId": "vadencommander",
         "AdditionalComponents": [
-            "ABILITY:collateralized_loans",
-            "ABILITY:binding_debts"
+            "ABILITY:fine_print"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "corporate_entity",
+        "AdditionalComponents": [
+            "PN:dspnveld1",
+            "PN:dspnveld2",
+            "PN:dspnveld3",
+            "PN:dspnveld4",
+            "ABILITY:holding_company"
         ],
         "OptionalSwaps": [
-            "MECH:vaden_mech",
-            "HERO:vadenhero",
-            "COMMANDER:vadencommander"
+            "HERO:veldyrhero",
+            "COMMANDER:veldyrcommander"
         ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "holding_company",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "targeted_acquisition",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -602,18 +713,6 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "targeted_acquisition",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "holding_company",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
         "ItemCategory": "COMMANDER",
         "ItemId": "veldyrcommander",
         "Undraftable": true,
@@ -623,25 +722,6 @@
         "ItemCategory": "HERO",
         "ItemId": "veldyrhero",
         "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "HOMESYSTEM",
-        "ItemId": "veldyr",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "corporate_entity",
-        "AdditionalComponents": [
-            "ABILITY:holding_company"
-        ],
-        "OptionalSwaps": [
-            "HERO:veldyrhero",
-            "COMMANDER:veldyrcommander",
-            "PN:dspnveld1"
-        ],
         "source": "ds"
     },
     {
@@ -661,6 +741,86 @@
         "ItemId": "zelian",
         "AdditionalComponents": [
             "ABILITY:paranoia"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"the_starlit_path",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"narrow_way",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"prescience",
+        "AdditionalComponents": [
+            "ABILITY:the_starlit_path",
+            "ABILITY:narrow_way"
+        ],
+        "OptionalSwaps": [
+            "HOMESYSTEM:uydai"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "uydai",
+        "Undraftable": true,
+        "source": "ds"
+    },       
+    {
+        "ItemCategory": "HOMESYSTEM",
+        "ItemId": "pharadn",
+        "Undraftable": true,
+        "source": "ds"
+    },  
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"ancient_empire",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"dark_purpose",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId":"mark_of_pharadn",
+        "Undraftable": true,
+        "source": "ds"
+    }, 
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "pharadncommander",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "pharadnhero",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dspharinf",
+        "AdditionalComponents": [
+            "ABILITY:ancient_empire",
+            "ABILITY:dark_purpose",
+            "ABILITY:mark_of_pharadn"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:pharadncommander",
+            "HERO:pharadnhero"
         ],
         "source": "ds"
     }

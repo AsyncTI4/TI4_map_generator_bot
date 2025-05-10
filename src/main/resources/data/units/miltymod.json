@@ -69,7 +69,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This ship's system contains a delta wormhole. During movement, this ship may move before or after your other ships.",
+        "ability": "This ship's system contains a delta wormhole.\nDuring movement, this ship may move before or after your other ships.",
         "homebrewReplacesID": "ghost_flagship"
     },
     {
@@ -231,7 +231,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "homebrewReplacesID": "naalu_fighter2",
-        "ability": "This unit may move without being transported. Each fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
+        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
     },
     {
         "id": "miltymod_saar_spacedock",
@@ -245,7 +245,7 @@
         "productionValue": 4,
         "capacityValue": 4,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.",
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
         "homebrewReplacesID": "saar_spacedock"
     },
     {
@@ -261,7 +261,7 @@
         "productionValue": 6,
         "capacityValue": 6,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed.",
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.",
         "homebrewReplacesID": "saar_spacedock2"
     },
     {
@@ -517,7 +517,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
         "homebrewReplacesID": "fighter2"
     },
     {
@@ -575,6 +575,8 @@
         "upgradesToUnitId": "miltymod_spacedock2",
         "source": "miltymod",
         "productionValue": "+2",
+        "basicProduction": "res",
+        "ability": "This unit's PRODUCTION value is equal to 2 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity.",
         "capacityValue": 3,
         "isStructure": true,
         "homebrewReplacesID": "spacedock"
@@ -588,9 +590,10 @@
         "requiredTechId": "miltymod_sd2",
         "source": "miltymod",
         "productionValue": "+5",
+        "basicProduction": "res",
         "capacityValue": 5,
         "isStructure": true,
-        "ability": "When you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system.",
+        "ability": "This unit's PRODUCTION value is equal to 5 more than the resource value of this planet.\nUp to 5 fighters in this system do not count against your ships' capacity.\nWhen you use this unit's PRODUCTION ability, you may place the produced units on any planet in this system.",
         "homebrewReplacesID": "spacedock2"
     },
     {

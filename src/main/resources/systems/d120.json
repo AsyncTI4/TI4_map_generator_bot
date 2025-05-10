@@ -3,7 +3,7 @@
     "name": "Asteroid Nebula",
     "aliases": [
         "asteroidnebula",
-        "4257"
+        "4273"
     ],
     "imagePath": "d120.png",
     "shipPositionsType": "TYPE08",
@@ -33,5 +33,6 @@
     "planets": [],
     "isAsteroidField": true,
     "isNebula": true,
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "red"
 }

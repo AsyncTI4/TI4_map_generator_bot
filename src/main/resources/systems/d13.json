@@ -1,6 +1,6 @@
 {
     "id": "d13",
-    "name": "Kroll/Idyn/Cyrra (FreeSystems)",
+    "name": "Kroll/Idyn/Cyrra - FreeSystems",
     "aliases": [
         "d13",
         "idyn",
@@ -22,5 +22,6 @@
         "idyn",
         "cyrra"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

@@ -1,6 +1,6 @@
 {
     "id": "d21",
-    "name": "Discordia (Tnelis)",
+    "name": "Discordia - Tnelis",
     "aliases": [
         "d21",
         "discordia",
@@ -15,5 +15,6 @@
     "planets": [
         "discordia"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

@@ -1,13 +1,14 @@
 package ti4.selections.selectmenus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import ti4.listeners.context.SelectionMenuContext;
 import ti4.selections.Selection;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BigSelectDemo implements Selection {
 
@@ -28,7 +29,7 @@ public class BigSelectDemo implements Selection {
     }
 
     @Override
-    public void execute(StringSelectInteractionEvent event) {
+    public void execute(StringSelectInteractionEvent event, SelectionMenuContext context) {
         List<String> values = event.getValues();
 
         List<String> keepValues = new ArrayList<>();
@@ -57,7 +58,6 @@ public class BigSelectDemo implements Selection {
     }
 
     public static void serveDemoSelectMenu(GenericInteractionCreateEvent event, List<String> preselected, int startIdx) {
-
         StringSelectMenu.Builder menuBuilder = StringSelectMenu.create(selectionID);
         int padding = 0;
         if (preselected != null) {

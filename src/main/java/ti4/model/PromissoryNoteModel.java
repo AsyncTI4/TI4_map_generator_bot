@@ -1,22 +1,27 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
+import org.apache.commons.lang3.StringUtils;
+import ti4.image.Mapper;
+import ti4.map.Game;
+import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
 
 @Data
 public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNoteModel>, EmbeddableModel {
     private String alias;
     private String name;
+    private String shortName;
+    private Boolean shrinkName;
     private String faction;
     private String color;
     private Boolean playArea;
@@ -27,10 +32,13 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     private String homebrewReplacesID;
     private String imageURL;
     private List<String> searchTags = new ArrayList<>();
-    private boolean dupe = false;
+    private PromissoryNoteModel sourcePNModel; // used for duped promissory notes, to know their source
 
+    /**
+     * @return true if this is duplicated from a generic colour promissory note
+     */
     public boolean isDupe() {
-        return dupe;
+        return sourcePNModel != null;
     }
 
     public boolean isColorable() {
@@ -40,18 +48,21 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     @Override
     public PromissoryNoteModel duplicateAndSetColor(ColorModel newColor) {
         PromissoryNoteModel pn = new PromissoryNoteModel();
-        pn.setAlias(this.alias.replaceAll("<color>", newColor.getName()));
+        pn.setAlias(this.alias.replace("<color>", newColor.getName()));
         pn.setName(this.name);
+        pn.setShortName(this.shortName);
+        pn.setShrinkName(this.shrinkName);
         pn.setFaction(this.faction);
         pn.setColor(newColor.getName());
         pn.setPlayArea(this.playArea);
+        pn.setPlayImmediately(this.playImmediately);
         pn.setAttachment(this.attachment);
         pn.setSource(this.source);
-        String newText = getText().replaceAll("<color>", newColor.getName());
+        String newText = getText().replace("<color>", "<" + newColor.getName() + ">");
         pn.setText(newText);
         pn.setHomebrewReplacesID(this.homebrewReplacesID);
         pn.setSearchTags(new ArrayList<>(searchTags));
-        pn.setDupe(true);
+        pn.setSourcePNModel(this);
         return pn;
     }
 
@@ -61,6 +72,24 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             && (faction != null || color != null)
             && text != null
             && source != null;
+    }
+
+    public String getID() {
+        return getAlias();
+    }
+
+    public String getShortName() {
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(shortName).orElse(getName());
+        }
+        return Optional.ofNullable(shortName).orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShortName());
+    }
+
+    public boolean getShrinkName() {
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(shrinkName).orElse(false);
+        }
+        return Optional.ofNullable(shrinkName).orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getFaction() {
@@ -115,9 +144,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
         //TITLE
         StringBuilder title = new StringBuilder();
-        title.append(Emojis.PN);
-        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
-        title.append("__**").append(getName()).append("**__");
+        title.append(CardEmojis.PN);
+        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(FactionEmojis.getFactionIcon(getFaction().get()));
+        title.append("_").append(getName()).append("_");
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             title.append(" (");
             if (color.equals("<color>")) {
@@ -160,9 +189,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
     public String getNameRepresentation() {
         StringBuilder sb = new StringBuilder();
-        if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(Emojis.getFactionIconFromDiscord(getFaction().get()));
-        sb.append(Emojis.PN);
-        sb.append(" ").append(getName()).append("");
+        if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(FactionEmojis.getFactionIcon(getFaction().get()));
+        sb.append(CardEmojis.PN);
+        sb.append(" ").append(getName());
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             sb.append(" (");
             if (color.equals("<color>")) {
@@ -174,6 +203,19 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         }
         sb.append(getSource().emoji());
         return sb.toString();
+    }
+
+    public String getTextFormatted(Game game) {
+        String formattedText = getText();
+        formattedText = formattedText.replace("\n", "\n> ");
+        StringBuilder replaceText = new StringBuilder();
+        Player pnOwner = game.getPNOwner(getID());
+        if (pnOwner != null && pnOwner.isRealPlayer()) {
+            if (!game.isFowMode()) replaceText.append(pnOwner.getFactionEmoji()); // add Owner's Faction Emoji
+            replaceText.append(pnOwner.getColor());
+            formattedText = formattedText.replaceAll("<" + pnOwner.getColor() + ">", replaceText.toString());
+        }
+        return formattedText;
     }
 
     public boolean isNotWellKnown() {
@@ -201,5 +243,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
     public String getAutoCompleteName() {
         return getName() + " (" + getFactionOrColor() + ") [" + getSource() + "]";
+    }
+
+    public boolean getPlayImmediately() {
+        return Optional.ofNullable(playImmediately).orElse(false);
     }
 }

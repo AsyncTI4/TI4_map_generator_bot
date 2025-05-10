@@ -1,0 +1,24 @@
+[
+    {
+        "alias": "ne_inf2",
+        "name": "Sentinel II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "netharii",
+        "source": "memephilosopher",
+        "text": "Cost 1, Combat 5\nThis unit can only use SPACE CANNON if on a planet. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system."
+    },
+    {
+        "alias": "ne_qed",
+        "name": "Quantum Entanglement Drive",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "netharii",
+        "source": "memephilosopher",
+        "text": "Exhaust this card. Systems with sentinels are considered adjacent during this tactical action."
+    }
+]

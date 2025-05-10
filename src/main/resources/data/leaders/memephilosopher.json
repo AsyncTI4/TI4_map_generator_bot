@@ -1,0 +1,38 @@
+[
+    {
+        "id": "nethariiagent",
+        "faction": "netharii",
+        "type": "agent",
+        "name": "Aethra",
+        "title": "Tribune",
+        "abilityName": "Tribute in Loss",
+        "abilityWindow": "When a player loses a planet",
+        "abilityText": "Exhaust this card and the owner of that planet gains two trade goods",
+        "unlockCondition": "Always Unlocked",
+        "source": "memephilosopher"
+    },
+    {
+        "id": "nethariicommander",
+        "faction": "netharii",
+        "type": "commander",
+        "name": "Zenith",
+        "title": "Warden",
+        "abilityName": "Last Stand",
+        "abilityWindow": "During combat",
+        "abilityText": "Once per ground combat, when one of your infantry is destroyed, you may place it on any other planet you control.",
+        "unlockCondition": "Have infantry in 6 non-home planets",
+        "source": "memephilosopher"
+    },
+    {
+        "id": "nethariihero",
+        "faction": "netharii",
+        "type": "hero",
+        "name": "Korrin",
+        "title": "Elder",
+        "abilityName": "Eternal Presence",
+        "abilityWindow": "ACTION:",
+        "abilityText": "During this game round, you can ignore your Limited Presence restriction. At the end of the round, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "memephilosopher"
+    }
+]

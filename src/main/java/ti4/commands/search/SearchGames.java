@@ -1,11 +1,11 @@
 package ti4.commands.search;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.entities.User;
@@ -13,14 +13,16 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.manage.GameManager;
 import ti4.message.MessageHelper;
 
-public class SearchGames extends SearchSubcommandData {
+class SearchGames extends Subcommand {
 
     public SearchGames() {
         super(Constants.SEARCH_GAMES, "List all games");
@@ -41,7 +43,6 @@ public class SearchGames extends SearchSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map<String, Game> mapList = GameManager.getInstance().getGameNameToGame();
         boolean includeNormalGames = event.getOption(Constants.NORMAL_GAME, false, OptionMapping::getAsBoolean);
         boolean includeTIGLGames = event.getOption(Constants.TIGL_GAME, false, OptionMapping::getAsBoolean);
         boolean includeCommunityGames = event.getOption(Constants.COMMUNITY_MODE, false, OptionMapping::getAsBoolean);
@@ -57,70 +58,97 @@ public class SearchGames extends SearchSubcommandData {
         String searchFactions = event.getOption(Constants.SEARCH_FACTIONS, "", OptionMapping::getAsString).toLowerCase();
         User searchUser = event.getOption(Constants.SEARCH_USERS, null, OptionMapping::getAsUser);
 
-        List<Entry<String, Game>> normalGames = mapList.entrySet().stream().filter(map -> map.getValue().isNormalGame()).toList();
-        List<Entry<String, Game>> tIGLGames = mapList.entrySet().stream().filter(map -> map.getValue().isCompetitiveTIGLGame()).toList();
-        List<Entry<String, Game>> communityGames = mapList.entrySet().stream().filter(map -> map.getValue().isCommunityMode()).toList();
-        List<Entry<String, Game>> allianceGames = mapList.entrySet().stream().filter(map -> map.getValue().isAllianceMode()).toList();
-        List<Entry<String, Game>> foWGames = mapList.entrySet().stream().filter(map -> map.getValue().isFowMode()).toList();
-        List<Entry<String, Game>> absolGames = mapList.entrySet().stream().filter(map -> map.getValue().isAbsolMode()).toList();
-        List<Entry<String, Game>> miltyModGames = mapList.entrySet().stream().filter(map -> map.getValue().isMiltyModMode()).toList();
-        List<Entry<String, Game>> dSGames = mapList.entrySet().stream().filter(map -> map.getValue().isDiscordantStarsMode()).toList();
-        List<Entry<String, Game>> frankenGames = mapList.entrySet().stream().filter(map -> map.getValue().isFrankenGame()).toList();
-        List<Entry<String, Game>> endedGames = mapList.entrySet().stream().filter(map -> map.getValue().isHasEnded()).toList();
-        List<Entry<String, Game>> searchNameGames = mapList.entrySet().stream().filter(map -> map.getValue().getCustomName().toLowerCase().contains(searchName)).toList();
-        List<Entry<String, Game>> searchTagGames = mapList.entrySet().stream().filter(map -> map.getValue().getGameModesText().toLowerCase().contains(searchTags)).toList();
-        List<Entry<String, Game>> searchFactionGames = mapList.entrySet().stream().filter(map -> map.getValue().getRealAndEliminatedPlayers().stream().map(p -> p.getFaction().toLowerCase()).anyMatch(s -> s.contains(searchFactions))).toList();
-        List<Entry<String, Game>> searchUserGames = mapList.entrySet().stream().filter(map -> map.getValue().hasUser(searchUser)).toList();
-        
-        
-        List<Entry<String, Game>> filteredListOfMaps = new ArrayList<>();
-        if (includeNormalGames) filteredListOfMaps.addAll(normalGames);
-        if (includeTIGLGames) filteredListOfMaps.addAll(tIGLGames);
-        if (includeCommunityGames) filteredListOfMaps.addAll(communityGames);
-        if (includeAllianceGames) filteredListOfMaps.addAll(allianceGames);
-        if (includeFoWGames) filteredListOfMaps.addAll(foWGames);
-        if (includeAbsolGames) filteredListOfMaps.addAll(absolGames);
-        if (includeMiltyModGames) filteredListOfMaps.addAll(miltyModGames);
-        if (includeDSGames) filteredListOfMaps.addAll(dSGames);
-        if (includeFrankenGames) filteredListOfMaps.addAll(frankenGames);
-        if (!searchName.isEmpty()) filteredListOfMaps.addAll(searchNameGames);
-        if (!searchTags.isEmpty()) filteredListOfMaps.addAll(searchTagGames);
-        if (!searchFactions.isEmpty()) filteredListOfMaps.addAll(searchFactionGames);
-        if (searchUser != null) filteredListOfMaps.addAll(searchUserGames);
-        if (!includeEndedGames) filteredListOfMaps.removeIf(g -> g.getValue().isHasEnded());
+        Predicate<Game> normalGamesPredicate = Game::isNormalGame;
+        Predicate<Game> tIGLGamesPredicate = Game::isCompetitiveTIGLGame;
+        Predicate<Game> communityGamesPredicate = Game::isCommunityMode;
+        Predicate<Game> allianceGamesPredicate = Game::isAllianceMode;
+        Predicate<Game> foWGamesPredicate = Game::isFowMode;
+        Predicate<Game> absolGamesPredicate = Game::isAbsolMode;
+        Predicate<Game> miltyModGamesPredicate = Game::isMiltyModMode;
+        Predicate<Game> dSGamesPredicate = Game::isDiscordantStarsMode;
+        Predicate<Game> frankenGamesPredicate = Game::isFrankenGame;
+        Predicate<Game> endedGamesPredicate = Game::isHasEnded;
+        Predicate<Game> searchNamePredicate = game -> game.getCustomName().toLowerCase().contains(searchName);
+        Predicate<Game> searchTagPredicate = game -> game.getGameModesText().toLowerCase().contains(searchTags);
+        Predicate<Game> searchFactionPredicate = game ->
+            game.getRealAndEliminatedPlayers().stream()
+                .map(player -> player.getFaction().toLowerCase())
+                .anyMatch(faction -> faction.contains(searchFactions));
+        Predicate<Game> searchUserPredicate = game -> game.hasUser(searchUser);
 
-        Set<Entry<String, Game>> filteredSetOfMaps = new HashSet<>(filteredListOfMaps);
+        AtomicInteger normalGamesCount = new AtomicInteger();
+        AtomicInteger tIGLGamesCount = new AtomicInteger();
+        AtomicInteger communityGamesCount = new AtomicInteger();
+        AtomicInteger allianceGamesCount = new AtomicInteger();
+        AtomicInteger foWGamesCount = new AtomicInteger();
+        AtomicInteger absolGamesCount = new AtomicInteger();
+        AtomicInteger miltyModGamesCount = new AtomicInteger();
+        AtomicInteger dSGamesCount = new AtomicInteger();
+        AtomicInteger frankenGamesCount = new AtomicInteger();
+        AtomicInteger endedGamesCount = new AtomicInteger();
+        AtomicInteger searchNameGamesCount = new AtomicInteger();
+        AtomicInteger searchTagGamesCount = new AtomicInteger();
+        AtomicInteger searchFactionGamesCount = new AtomicInteger();
+        AtomicInteger searchUserGamesCount = new AtomicInteger();
 
-        int totalGames = mapList.size();
+        Map<Predicate<Game>, AtomicInteger> predicatesToCounts = new LinkedHashMap<>();
+        if (includeNormalGames) predicatesToCounts.put(normalGamesPredicate, normalGamesCount);
+        if (includeTIGLGames) predicatesToCounts.put(tIGLGamesPredicate, tIGLGamesCount);
+        if (includeCommunityGames) predicatesToCounts.put(communityGamesPredicate, communityGamesCount);
+        if (includeAllianceGames) predicatesToCounts.put(allianceGamesPredicate, allianceGamesCount);
+        if (includeFoWGames) predicatesToCounts.put(foWGamesPredicate, foWGamesCount);
+        if (includeAbsolGames) predicatesToCounts.put(absolGamesPredicate, absolGamesCount);
+        if (includeMiltyModGames) predicatesToCounts.put(miltyModGamesPredicate, miltyModGamesCount);
+        if (includeDSGames) predicatesToCounts.put(dSGamesPredicate, dSGamesCount);
+        if (includeFrankenGames) predicatesToCounts.put(frankenGamesPredicate, frankenGamesCount);
+        if (includeEndedGames) predicatesToCounts.put(endedGamesPredicate, endedGamesCount);
+        if (!searchName.isEmpty()) predicatesToCounts.put(searchNamePredicate, searchNameGamesCount);
+        if (!searchTags.isEmpty()) predicatesToCounts.put(searchTagPredicate, searchTagGamesCount);
+        if (!searchFactions.isEmpty()) predicatesToCounts.put(searchFactionPredicate, searchFactionGamesCount);
+        if (searchUser != null) predicatesToCounts.put(searchUserPredicate, searchUserGamesCount);
+
+        if (predicatesToCounts.isEmpty()) {
+            MessageHelper.replyToMessage(event, "You must include at least one filter.");
+            return;
+        }
+
+        Set<String> filteredGameNames = new HashSet<>();
+        StringBuilder gameText = new StringBuilder();
+        GamesPage.consumeAllGames(
+            predicatesToCounts.keySet().stream().reduce(Predicate::and).get(),
+            game -> filterGamesAndBuildText(gameText, game, predicatesToCounts, filteredGameNames)
+        );
 
         StringBuilder sb = new StringBuilder("__**Search Games:**__\n");
-        sb.append("-# Statistics:\n");
-        sb.append("-# > Total Games: `").append(totalGames).append("`\n");
-        sb.append("-# > Games Found: `").append(filteredSetOfMaps.size()).append("`\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeNormalGames)).append("includeNormalGames (").append(normalGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeTIGLGames)).append("includeTIGLGames (").append(tIGLGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeCommunityGames)).append("includeCommunityGames (").append(communityGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeAllianceGames)).append("includeAllianceGames (").append(allianceGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeFoWGames)).append("includeFoWGames (").append(foWGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeAbsolGames)).append("includeAbsolGames (").append(absolGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeMiltyModGames)).append("includeMiltyModGames (").append(miltyModGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeDSGames)).append("includeDSGames (").append(dSGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeFrankenGames)).append("includeFrankenGames (").append(frankenGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(includeEndedGames)).append("includeEndedGames (").append(endedGames.size()).append("/").append(totalGames).append(")\n");
-
-        sb.append("-# > ").append(trueFalseEmoji(!searchName.isEmpty())).append("gamesWithName `").append(searchName).append("` (").append(searchNameGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(!searchTags.isEmpty())).append("gamesWithTag `").append(searchTags).append("` (").append(searchTagGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(!searchFactions.isEmpty())).append("gamesWithFaction `").append(searchFactions).append("` (").append(searchFactionGames.size()).append("/").append(totalGames).append(")\n");
-        sb.append("-# > ").append(trueFalseEmoji(searchUser != null)).append("gamesWithUser `").append(searchUser != null ? searchUser.getEffectiveName() : "").append("` (").append(searchUserGames.size()).append("/").append(totalGames).append(")\n");
-
-        if (filteredSetOfMaps.isEmpty()) {
+        if (filteredGameNames.isEmpty()) {
             sb.append("No games match the selected filters.");
         } else {
-            sb.append(filteredSetOfMaps.stream()
-                .filter(map -> includeEndedGames || !map.getValue().isHasEnded())
-                .sorted(Map.Entry.comparingByKey())
-                .map(map -> getRepresentationText(mapList, map.getKey()))
-                .collect(Collectors.joining("\n")));
+            int totalGames = GameManager.getGameCount();
+
+            Map<Predicate<Game>, Integer> predicatesToIntegerCounts = predicatesToCounts.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
+
+            sb.append("-# Statistics:\n");
+            sb.append("-# > Total Games: `").append(totalGames).append("`\n");
+            sb.append("-# > Games Found: `").append(filteredGameNames.size()).append("`\n");
+            sb.append("-# Statistics:\n");
+            sb.append("-# > Total Games: `").append(totalGames).append("`\n");
+            sb.append("-# > Games Found: `").append(filteredGameNames.size()).append("`\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeNormalGames)).append("includeNormalGames (").append(predicatesToIntegerCounts.getOrDefault(normalGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeTIGLGames)).append("includeTIGLGames (").append(predicatesToIntegerCounts.getOrDefault(tIGLGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeCommunityGames)).append("includeCommunityGames (").append(predicatesToIntegerCounts.getOrDefault(communityGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeAllianceGames)).append("includeAllianceGames (").append(predicatesToIntegerCounts.getOrDefault(allianceGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeFoWGames)).append("includeFoWGames (").append(predicatesToIntegerCounts.getOrDefault(foWGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeAbsolGames)).append("includeAbsolGames (").append(predicatesToIntegerCounts.getOrDefault(absolGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeMiltyModGames)).append("includeMiltyModGames (").append(predicatesToIntegerCounts.getOrDefault(miltyModGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeDSGames)).append("includeDSGames (").append(predicatesToIntegerCounts.getOrDefault(dSGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeFrankenGames)).append("includeFrankenGames (").append(predicatesToIntegerCounts.getOrDefault(frankenGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(includeEndedGames)).append("includeEndedGames (").append(predicatesToIntegerCounts.getOrDefault(endedGamesPredicate, 0)).append("/").append(totalGames).append(")\n");
+
+            sb.append("-# > ").append(trueFalseEmoji(!searchName.isEmpty())).append("gamesWithName `").append(searchName).append("` (").append(predicatesToIntegerCounts.getOrDefault(searchNamePredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(!searchTags.isEmpty())).append("gamesWithTag `").append(searchTags).append("` (").append(predicatesToIntegerCounts.getOrDefault(searchTagPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(!searchFactions.isEmpty())).append("gamesWithFaction `").append(searchFactions).append("` (").append(predicatesToIntegerCounts.getOrDefault(searchFactionPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append("-# > ").append(trueFalseEmoji(searchUser != null)).append("gamesWithUser `").append(searchUser != null ? searchUser.getEffectiveName() : "").append("` (").append(predicatesToIntegerCounts.getOrDefault(searchUserPredicate, 0)).append("/").append(totalGames).append(")\n");
+            sb.append(gameText);
         }
 
         String message = sb.toString();
@@ -128,13 +156,25 @@ public class SearchGames extends SearchSubcommandData {
         MessageHelper.sendMessageToThread(event.getChannel(), "Search Games", message);
     }
 
-    private String trueFalseEmoji(boolean bool) {
+    private static void filterGamesAndBuildText(StringBuilder stringBuilder, Game game, Map<Predicate<Game>, AtomicInteger> predicateCountMap,
+                                                Set<String> filteredGameNames) {
+        for (Map.Entry<Predicate<Game>, AtomicInteger> entry : predicateCountMap.entrySet()) {
+            if (entry.getKey().test(game)) {
+                entry.getValue().incrementAndGet();
+                if (!filteredGameNames.contains(game.getName())) {
+                    filteredGameNames.add(game.getName());
+                    appendGameRepresentation(game, stringBuilder);
+                }
+            }
+        }
+    }
+
+    private static String trueFalseEmoji(boolean bool) {
         return bool ? "✅" : "❌";
     }
 
-    private String getRepresentationText(Map<String, Game> mapList, String mapName) {
-        Game game = mapList.get(mapName);
-        StringBuilder sb = new StringBuilder("- **" + mapName + "**").append(" ");
+    private static void appendGameRepresentation(Game game, StringBuilder sb) {
+        sb.append("- **").append(game.getName()).append("**").append(" ");
         sb.append("`").append(game.getCreationDate()).append("`-`");
         if (game.isHasEnded() && game.getEndedDate() > 100) {
             sb.append(Helper.getDateRepresentation(game.getEndedDate()));
@@ -149,6 +189,6 @@ public class SearchGames extends SearchSubcommandData {
         }
         sb.append(" [").append(game.getGameModesText()).append("] ");
         if (game.isHasEnded()) sb.append(" ENDED");
-        return sb.toString();
+        sb.append("\n");
     }
 }

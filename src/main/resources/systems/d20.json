@@ -1,6 +1,6 @@
 {
     "id": "d20",
-    "name": "Drah/Trykk (Ghemina)",
+    "name": "Drah/Trykk - Ghemina",
     "aliases": [
         "d20",
         "drah",
@@ -20,5 +20,6 @@
         "drah",
         "trykk"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

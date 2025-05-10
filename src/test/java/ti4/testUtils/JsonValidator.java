@@ -1,8 +1,5 @@
 package ti4.testUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -12,14 +9,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ti4.json.ObjectMapperFactory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Utility test class that allows us to validate our source files are correctly configured
  * for JSON save/restore.
  */
 public final class JsonValidator<T> {
     private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
-    
-    private JsonValidator() {}
+
+    private JsonValidator() {
+    }
 
     /**
      * Subjects the provided object to a save/restore JSON loop where we serialize the object to

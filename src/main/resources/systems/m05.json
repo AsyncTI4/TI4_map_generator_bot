@@ -33,5 +33,6 @@
     "planets": [
         "shanh"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

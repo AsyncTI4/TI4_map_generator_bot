@@ -1,93 +1,92 @@
 [
-  {
-    "alias": "sigma_biotic_break",
-    "name": "Biotic Breakthrough",
-    "phase": "Action",
-    "window": "When you research a technology",
-    "text": "Ignore 1 of that technology's green prerequisites.",
-    "flavorText": "The vivisection of one of the Psychic Frogs of Gamma Eridius proved quite educational.",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_cyber_break",
-    "name": "Cybernetic Breakthrough",
-    "phase": "Action",
-    "window": "When you research a technology",
-    "text": "Ignore 1 of that technology's yellow prerequisites.",
-    "flavorText": "The debate over tabs vs spaces was finally settled, and so the rate of software production sky-rocketed.",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_propulsion_break",
-    "name": "Propulsion Breakthrough",
-    "phase": "Action",
-    "window": "When you research a technology",
-    "text": "Ignore 1 of that technology's blue prerequisites.",
-    "flavorText": "You can't go faster than the speed of light. That's why scientists increased the speed of light in 2208.",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_warfare_break",
-    "name": "Warfare Breakthrough",
-    "phase": "Action",
-    "window": "When you research a technology",
-    "text": "Ignore 1 of that technology's red prerequisites.",
-    "flavorText": "The junker had found it buried on Xanhact, and was selling it for scrap. Luckily, one of our operatives recognised it for what it was, and was able to obtain it before it was melted down.",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_call_up",
-    "name": "Call Up Reinforcements",
-    "phase": "Action",
-    "window": "At the end of a round of space combat",
-    "text": "Place 2 fighters from your reinforcements into the active system.",
-    "flavorText": "This is what we've waited for;\nThis is it, boys, this is war.",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_death_pods",
-    "name": "Death Pods",
-    "phase": "Action",
-    "window": "When 1 of your non-fighter ships is destroyed",
-    "text": "Place a number of fighters in the destroyed ship's system equal to its cost.",
-    "flavorText": "Death pods are like life pods, but with attached weapons.",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_dogfight",
-    "name": "Dogfight",
-    "phase": "Action",
-    "window": "At the start of a space combat",
-    "text": "Each fighter in the active system gains the ANTI-FIGHTER BARRAGE ability until the end of the combat, with a value equal to its combat value.",
-    "flavorText": "Red Baron, eh? Sounds like poor Daz spend too much time in the sun.",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_flying_squad",
-    "name": "Flying Squad",
-    "phase": "Action",
-    "window": "After another player activates a system containing your units and no other players' ships",
-    "text": "Move any number of your ships from 1 adjacent system into the activated system. Then, place a command token from your reinforcements into that system.",
-    "flavorText": "Action stations, action stations. Set condition one throughout the ship. This is not a drill.",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_quislings",
-    "name": "Quislings",
-    "phase": "Action",
-    "window": "After you gain control of a planet",
-    "text": "Spend any amount of influence to place 1 infantry on that planet for each influence spent.",
-    "flavorText": "\"And I, for one, welcome our new N'orr overlords!\"",
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_omnibus_bill",
-    "name": "Omnibus Bill",
-    "phase": "Agenda",
-    "window": "When a \"For\"/\"Against\" agenda is revealed",
-    "text": "Reveal agenda cards from the top of the deck until another \"For\"/\"Against\" agenda is revealed; discard the rest. Players vote on both the original and new agenda as though they were 1 agenda card with combined outcomes.",
-    "flavorText": "\"All in favor of the amended wormhole travel and executive appointments bill?\"",
-    "source": "sigma"
-  }
+    {
+        "alias": "sigma_biotic_break",
+        "name": "Biotic Breakthrough",
+        "phase": "Action",
+        "window": "When you research a technology",
+        "text": "Ignore 1 of that technology's green prerequisites.",
+        "flavorText": "The vivisection of one of the Psychic Frogs of Gamma Eridius proved quite educational.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_cyber_break",
+        "name": "Cybernetic Breakthrough",
+        "phase": "Action",
+        "window": "When you research a technology",
+        "text": "Ignore 1 of that technology's yellow prerequisites.",
+        "flavorText": "The debate over tabs vs spaces was finally settled, and so the rate of software production sky-rocketed.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_propulsion_break",
+        "name": "Propulsion Breakthrough",
+        "phase": "Action",
+        "window": "When you research a technology",
+        "text": "Ignore 1 of that technology's blue prerequisites.",
+        "flavorText": "You can't go faster than the speed of light. That's why scientists increased the speed of light in 2208.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_warfare_break",
+        "name": "Warfare Breakthrough",
+        "phase": "Action",
+        "window": "When you research a technology",
+        "text": "Ignore 1 of that technology's red prerequisites.",
+        "flavorText": "The junker had found it buried on Xanhact, and was selling it for scrap. Luckily, one of our operatives recognised it for what it was, and was able to obtain it before it was melted down.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_call_up",
+        "name": "Call Up Reinforcements",
+        "phase": "Action",
+        "window": "At the end of a round of space combat",
+        "text": "Place 2 fighters from your reinforcements into the active system.",
+        "flavorText": "This is what we've waited for;\nThis is it, boys, this is war.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_death_pods",
+        "name": "Death Pods",
+        "phase": "Action",
+        "window": "When 1 of your non-fighter ships is destroyed",
+        "text": "Place a number of fighters in the destroyed ship's system equal to its cost.",
+        "flavorText": "Death pods are like life pods, but with attached weapons.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_dogfight",
+        "name": "Dogfight",
+        "phase": "Action",
+        "window": "At the start of a space combat",
+        "text": "Each fighter in the active system gains the ANTI-FIGHTER BARRAGE ability until the end of the combat, with a value equal to its combat value.",
+        "flavorText": "Red Baron, eh? Sounds like poor Daz spend too much time in the sun.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_flying_squad",
+        "name": "Flying Squad",
+        "phase": "Action",
+        "window": "After another player activates a system containing your units and no other players' ships",
+        "text": "Move any number of your ships from 1 adjacent system into the activated system. Then, place a command token from your reinforcements into that system.",
+        "flavorText": "Action stations, action stations. Set condition one throughout the ship. This is not a drill.",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_quislings",
+        "name": "Quislings",
+        "phase": "Action",
+        "window": "After you gain control of a planet",
+        "text": "Spend any amount of influence to place 1 infantry on that planet for each influence spent.",
+        "flavorText": "\"And I, for one, welcome our new N'orr overlords!\"",
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_omnibus_bill",
+        "name": "Omnibus Bill",
+        "phase": "Agenda",
+        "window": "When a \"For\"/\"Against\" agenda is revealed",
+        "text": "Reveal agenda cards from the top of the deck until another \"For\"/\"Against\" agenda is revealed; discard the rest. Players vote on both the original and new agenda as though they were 1 agenda card with combined outcomes.",
+        "flavorText": "\"All in favor of the amended wormhole travel and executive appointments bill?\"",
+        "source": "sigma"
+    }
 ]
-

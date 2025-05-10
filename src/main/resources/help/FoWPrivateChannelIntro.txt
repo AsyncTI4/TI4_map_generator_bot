@@ -1,0 +1,21 @@
+This channel is for you to take actions in the game.
+
+__**General Tips:**__
+> Ping your GM here for any questions.
+> Run all commands here, never in the main channel.
+> After your faction is set up, use `/show_game` to view the map.
+
+__**Communication Tips:**__
+> In FoW, you may only talk to neighbors—ask your GM if this includes the Agenda phase.
+> Use `tored Hello neighbor!` to anonymously message red.
+> Use Open Comms button located with Start/End Turn buttons to suggest private communications to neighbors, or
+> `/fow check_private_communications`to show the button.
+
+__**Action Card Tips:**__
+> `/fow whisper anon:y` – Anonymously notify a player they are the target.
+> `/fow ping_system` – Announce a system/planet target to players who can see that system.
+> `/fow announce anon:y` – Make a public announcement to the main channel.
+
+__**Combat tips:**__
+> Each participant gets their own combat thread; spectators get a thread to spectate the interraction.
+> Messages in the combat thread relay between threads, so you can talk normally; no need to whisper.

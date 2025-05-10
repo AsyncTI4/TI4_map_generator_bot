@@ -12,13 +12,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.bothelper.CreateGameChannels;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
+import ti4.map.manage.GameManager;
+import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 
-public class Observer extends GameSubcommandData {
+class Observer extends Subcommand {
+
     public Observer() {
         super(Constants.OBSERVER, "Add or remove observers to game channels");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "The game name I.E. pbd###-xxxxxx").setRequired(true).setAutoComplete(true));
@@ -32,7 +34,7 @@ public class Observer extends GameSubcommandData {
         String gameName = event.getOption("game_name", null, OptionMapping::getAsString);
         String addOrRemove = event.getOption("add_remove", "", OptionMapping::getAsString).toLowerCase();
 
-        if (!GameManager.getInstance().isValidGame(gameName)) {
+        if (!GameManager.isValid(gameName)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game not found: " + gameName);
             return;
         }
@@ -42,12 +44,12 @@ public class Observer extends GameSubcommandData {
             return;
         }
 
-        Game game = GameManager.getInstance().getGame(gameName);
+        ManagedGame game = GameManager.getManagedGame(gameName);
         Guild guild = game.getGuild();
         Member member = guild.getMemberById(user.getId());
 
         // INVITE TO GAME SERVER IF MISSING
-        if (!CreateGameChannels.inviteUsersToServer(guild, List.of(member), event.getChannel()).isEmpty()) {
+        if (!CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel()).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User was not a member of the Game's server (" + guild.getName() + ")\nPlease run this command again once the user joins the server.");
             return;
         }
@@ -58,11 +60,11 @@ public class Observer extends GameSubcommandData {
         GuildChannel tableTalk = game.getTableTalkChannel();
         GuildChannel actionsChannel = game.getActionsChannel();
         if ("add".equals(addOrRemove)) {
-            addObserver(event, member.getUser().getId(), tableTalk);
-            addObserver(event, member.getUser().getId(), actionsChannel);
-        } else if ("remove".equals(addOrRemove)) {
-            removeObserver(event, member.getUser().getId(), tableTalk);
-            removeObserver(event, member.getUser().getId(), actionsChannel);
+            addObserver(event, member.getUser().getId(), tableTalk, false);
+            addObserver(event, member.getUser().getId(), actionsChannel, false);
+        } else {
+            removeObserver(event, member.getUser().getId(), tableTalk, false);
+            removeObserver(event, member.getUser().getId(), actionsChannel, false);
         }
 
         channels.remove(tableTalk);
@@ -72,23 +74,25 @@ public class Observer extends GameSubcommandData {
         for (GuildChannel channel : channels) {
             if (channel.getName().contains(gameName)) {
                 if ("add".equals(addOrRemove)) {
-                    addObserver(event, member.getUser().getId(), channel);
-                } else if ("remove".equals(addOrRemove)) {
-                    removeObserver(event, member.getUser().getId(), channel);
+                    addObserver(event, member.getUser().getId(), channel, game.isFowMode());
+                } else {
+                    removeObserver(event, member.getUser().getId(), channel, game.isFowMode());
                 }
             }
         }
     }
 
-    private void addObserver(SlashCommandInteractionEvent event, String userID, GuildChannel channel) {
+    private void addObserver(SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
         if (channel == null) return;
         Guild guild = channel.getGuild();
         Member user = guild.getMemberById(userID);
         channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
-        MessageHelper.sendMessageToEventChannel(event, "Observer permissions granted on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());
+        if (!skipMessage) {
+            MessageHelper.sendMessageToEventChannel(event, "Observer permissions granted on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());
+        }
     }
 
-    private void removeObserver(SlashCommandInteractionEvent event, String userID, GuildChannel channel) {
+    private void removeObserver(SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
         if (channel == null) return;
         // clear permissions instead of revoking permissions.
         // This resets the member's perms to the default value, 
@@ -96,6 +100,8 @@ public class Observer extends GameSubcommandData {
         Guild guild = channel.getGuild();
         Member user = guild.getMemberById(userID);
         channel.getPermissionContainer().upsertPermissionOverride(user).clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
-        MessageHelper.sendMessageToEventChannel(event, "Observer permissions revoked on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());
+        if (!skipMessage) {
+            MessageHelper.sendMessageToEventChannel(event, "Observer permissions revoked on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());
+        }
     }
 }

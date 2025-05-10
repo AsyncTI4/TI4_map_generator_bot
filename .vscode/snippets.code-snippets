@@ -1,0 +1,10 @@
+{
+    "ButtonHandler": {
+        "scope": "java",
+        "prefix": "bh",
+        "body": [
+            "@ButtonHandler(\"${1:buttonID.startsWith}\")"
+        ],
+        "description": "Adds a ButtonHandler annotation"
+    }
+}

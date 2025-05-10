@@ -1,6 +1,6 @@
 {
     "id": "d25",
-    "name": "Ellas (Nivyn)",
+    "name": "Ellas - Nivyn",
     "aliases": [
         "d25",
         "ellas",
@@ -20,5 +20,6 @@
         "ellas"
     ],
     "isGravityRift": true,
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

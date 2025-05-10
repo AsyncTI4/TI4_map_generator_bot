@@ -1,25 +1,25 @@
 package ti4.helpers;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 
 public class TIGLHelper {
 
@@ -29,7 +29,7 @@ public class TIGLHelper {
         AGENT("Async Rank - Agent", 2), //
         COMMANDER("Async Rank - Commander", 3), //
         HERO("Async Rank - Hero", 4), //
-        EMPEROR("Async Rank - Galactic Emperor", 5), //
+        EMPEROR("Async Rank - Galactic Emperor", 99), // this is only obtainable once per TIGL season, not per HERO rankup game
         HERO_ARBOREC("Async Rank - Letani Miasmiala", -1), //
         HERO_ARGENT("Async Rank - Mirik Aun Sissiri", -1), //
         HERO_CABAL("Async Rank - It Feeds on Carrion", -1), //
@@ -54,7 +54,7 @@ public class TIGLHelper {
         HERO_SOL("Async Rank - Jace X, 4th Air Legion", -1), //
         HERO_TITANS("Async Rank - Ul the Progenitor", -1), //
         HERO_WINNU("Async Rank - Mathis Mathinus", -1), //
-        HERO_XXCHA("Async Rank - Xxekir Grom", -1),//
+        HERO_XXCHA("Async Rank - Xxekir Grom", -1), //
         HERO_YIN("Async Rank - Dannel of the Tenth", -1), //
         HERO_YSSARIL("Async Rank - Kyver, Blade and Key", -1);
 
@@ -88,7 +88,7 @@ public class TIGLHelper {
             if (roles.isEmpty()) {
                 return null;
             }
-            return roles.get(0);
+            return roles.getFirst();
         }
 
         public TIGLRank getNextRank() {
@@ -97,8 +97,7 @@ public class TIGLHelper {
                 case MINISTER -> TIGLRank.AGENT;
                 case AGENT -> TIGLRank.COMMANDER;
                 case COMMANDER -> TIGLRank.HERO;
-                case HERO -> TIGLRank.EMPEROR;
-                case EMPEROR -> TIGLRank.EMPEROR;
+                case HERO, EMPEROR -> TIGLRank.EMPEROR;
                 default -> null;
             };
         }
@@ -123,20 +122,26 @@ public class TIGLHelper {
     private static final String TIGL_ADMIN_THREAD = "tigl-admin";
 
     public static boolean validateTIGLness() {
+        String testing = System.getenv("TESTING");
+        if (testing != null) return false;
+
         boolean tiglProblem = false;
-        for (TIGLRank rank : TIGLRank.values()) {
-            if (rank.getRole() == null) {
-                BotLogger.log("TIGLHelper.validateTIGLness: missing Role: `" + rank.name + "`");
-                tiglProblem = true;
-            }
-        }
         if (getTIGLChannel() == null) {
-            BotLogger.log("TIGLHelper.validateTIGLness: missing channel: `" + TIGL_CHANNEL_NAME + "`");
+            BotLogger.warning("TIGLHelper.validateTIGLness: missing channel: `" + TIGL_CHANNEL_NAME + "`");
             tiglProblem = true;
         }
         if (getTIGLAdminThread() == null) {
-            BotLogger.log("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
+            BotLogger.warning("TIGLHelper.validateTIGLness: missing thread: `" + TIGL_ADMIN_THREAD + "`");
             tiglProblem = true;
+        }
+        if (!AsyncTI4DiscordBot.guildPrimaryID.equals(Constants.ASYNCTI4_HUB_SERVER_ID)) {
+            return tiglProblem;
+        }
+        for (TIGLRank rank : TIGLRank.values()) {
+            if (rank.getRole() == null) {
+                BotLogger.warning("TIGLHelper.validateTIGLness: missing Role: `" + rank.name + "`");
+                tiglProblem = true;
+            }
         }
         return tiglProblem;
     }
@@ -158,7 +163,7 @@ public class TIGLHelper {
     }
 
     public static void sendTIGLSetupText(Game game) {
-        String message = "# " + Emojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
+        String message = "# " + MiscEmojis.TIGL + "TIGL\nThis game has been flagged as a Twilight Imperium Global League (TIGL) Game!\n" +
             "Please ensure you have all:\n" +
             "- [Signed up for TIGL](https://forms.gle/QQKWraMyd373GsLN6) - there is no need to confirm your signup was successful\n" +
             "- Read and accepted the TIGL [Code of Conduct](https://discord.com/channels/943410040369479690/1003741148017336360/1155173892734861402)\n" +
@@ -199,7 +204,7 @@ public class TIGLHelper {
     }
 
     private static TIGLRank getLowestCommonRankBetweenPlayers(List<User> users) {
-        TIGLRank lowestRank = TIGLRank.EMPEROR;
+        TIGLRank lowestRank = TIGLRank.HERO;
         for (User user : users) {
             TIGLRank rank = getUsersHighestTIGLRank(user);
             if (lowestRank.getIndex() > rank.getIndex()) {
@@ -216,7 +221,7 @@ public class TIGLHelper {
         }
         return hubMember.getRoles().stream()
             .filter(r -> getAllTIGLRoles().contains(r))
-            .map(r -> getTIGLRankFromRole(r))
+            .map(TIGLHelper::getTIGLRankFromRole)
             .filter(Objects::nonNull)
             .sorted(Comparator.comparing(TIGLRank::getIndex))
             .toList();
@@ -227,7 +232,7 @@ public class TIGLHelper {
         if (ranks.isEmpty()) {
             return TIGLRank.UNRANKED;
         }
-        return ranks.get(ranks.size() - 1);
+        return ranks.getLast();
     }
 
     private static boolean allUsersAreMembersOfHubServer(List<User> users) {
@@ -253,7 +258,7 @@ public class TIGLHelper {
     private static void crownNewHero(User user, String faction) {
         TIGLRank heroRank = TIGLRank.fromString("hero_" + faction);
         if (heroRank == null || heroRank.getRole() == null) {
-            BotLogger.log("TIGLHelper.dethroneHero - faction role not found: " + faction);
+            BotLogger.warning("TIGLHelper.dethroneHero - faction role not found: " + faction);
             return;
         }
         Role heroRole = heroRank.getRole();
@@ -270,7 +275,7 @@ public class TIGLHelper {
             AsyncTI4DiscordBot.guildPrimary.removeRoleFromMember(member, heroRank.getRole()).queueAfter(10, TimeUnit.SECONDS);
         }
         AsyncTI4DiscordBot.guildPrimary.addRoleToMember(user, heroRank.getRole()).queue();
-        MessageHelper.sendMessageToChannel(getTIGLChannel(), Emojis.getEmojiFromDiscord(faction + "hero"));
+        MessageHelper.sendMessageToChannel(getTIGLChannel(), LeaderEmojis.getLeaderEmoji(faction + "hero").toString());
         MessageHelper.sendMessageToChannel(getTIGLChannel(), sb.toString());
         // do stuff
     }
@@ -297,9 +302,9 @@ public class TIGLHelper {
         if (channels.isEmpty()) {
             return null;
         } else if (channels.size() > 1) {
-            BotLogger.log("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `" + TIGL_CHANNEL_NAME + "`");
+            BotLogger.warning("TIGLHelper.getTIGLChannel: there appears to be more than one TIGL Channel: `" + TIGL_CHANNEL_NAME + "`");
         }
-        return channels.get(0);
+        return channels.getFirst();
     }
 
     private static ThreadChannel getTIGLAdminThread() {

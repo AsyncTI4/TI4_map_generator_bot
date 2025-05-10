@@ -2,7 +2,6 @@
     "id": "tralloc",
     "tileId": "m02",
     "name": "Tralloc",
-    "shortName": null,
     "aliases": ["tralloc", "m02", "m2"],
     "positionInTile": {
         "x": 170.0,

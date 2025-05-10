@@ -5,12 +5,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
-import ti4.helpers.CombatRollType;
+import org.apache.commons.lang3.StringUtils;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.service.combat.CombatRollType;
 
 @Data
 public class CombatModifierModel implements ModelInterface {
@@ -25,7 +24,7 @@ public class CombatModifierModel implements ModelInterface {
     private String scope;
     private String scopeExcept;
     private String condition;
-    private String forCombatAbility;
+    private CombatRollType forCombatAbility;
     private Boolean applyEachForQuantity = false;
     private Boolean applyToOpponent = false;
 
@@ -33,7 +32,8 @@ public class CombatModifierModel implements ModelInterface {
         return type != null
             && value != null
             && persistenceType != null
-            && related != null;
+            && related != null
+            && forCombatAbility != null;
     }
 
     public boolean isRelevantTo(String relatedType, String relatedAlias) {
@@ -55,9 +55,8 @@ public class CombatModifierModel implements ModelInterface {
             }
             if ("_best_".equals(scope)) {
                 List<UnitModel> sortedAllUnits = new ArrayList<>(allUnits);
-                sortedAllUnits.sort(
-                    Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
-                isInScope = Objects.equals(sortedAllUnits.get(0).getAsyncId(), unit.getAsyncId());
+                sortedAllUnits.sort(Comparator.comparingInt(a -> a.getCombatDieHitsOnForAbility(rollType, player, game)));
+                isInScope = Objects.equals(sortedAllUnits.getFirst().getAsyncId(), unit.getAsyncId());
             }
             if ("_ship_".equals(scope)) {
                 isInScope = unit.getIsShip();

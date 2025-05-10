@@ -1,8 +1,9 @@
 package ti4.helpers;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Arrays;
 import java.util.Objects;
+
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ToStringHelper {

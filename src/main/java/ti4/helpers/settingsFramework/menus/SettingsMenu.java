@@ -7,13 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -25,6 +20,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.helpers.Constants;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.json.ObjectMapperFactory;
@@ -44,17 +41,17 @@ import ti4.message.MessageHelper;
  * <i>- *no buttons added if there are no settings in this menu</i>
  */
 @Getter
-@JsonIgnoreProperties({ "menuName", "menuNav", "menuAction", "description", "parent", "messageID" })
 public abstract class SettingsMenu {
     // Prefix "Jazz Menu Framework"
-    protected static final String menuNav = "jmfN";
-    protected static final String menuAction = "jmfA";
+    protected static final @JsonIgnore String menuNav = "jmfN";
+    protected static final @JsonIgnore String menuAction = "jmfA";
 
-    protected String menuId = null;
-    protected String menuName = null;
-    protected List<String> description = new ArrayList<>();
-    protected SettingsMenu parent = null;
-    private String messageID = null;
+    protected final @JsonIgnore String menuName;
+    protected final @JsonIgnore List<String> description = new ArrayList<>();
+    protected final @JsonIgnore SettingsMenu parent;
+
+    protected final String menuId;
+    protected String messageId = null;
 
     protected SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
         this.menuId = menuId;
@@ -86,7 +83,7 @@ public abstract class SettingsMenu {
 
     /** Action Handler. Returns null on a success */
     protected String resetSettings() {
-        if (enabledSettings().size() == 0) return "No settings to reset.";
+        if (enabledSettings().isEmpty()) return "No settings to reset.";
         for (SettingInterface setting : enabledSettings())
             setting.reset();
         return null;
@@ -116,9 +113,9 @@ public abstract class SettingsMenu {
             sb.append(setting.longSummary(pad, lastSettingTouched));
             sb.append("\n");
         }
-        if (enabledSettings().size() > 0) sb.append("\n"); // extra line for formatting
+        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
 
-        if (categories().size() > 0) {
+        if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();
             for (SettingsMenu cat : categories()) {
                 catStrings.add(cat.shortSummaryString(false));
@@ -139,11 +136,10 @@ public abstract class SettingsMenu {
 
     public String shortSummaryString(boolean shortDescrOnly) {
         StringBuilder sb = new StringBuilder("**__" + menuName + ":__**");
-        if (description != null) {
-            for (String line : description) {
-                sb.append("\n- *").append(line).append("*");
-                if (shortDescrOnly) break;
-            }
+        for (String line : description) {
+            sb.append("\n- *").append(line).append("*");
+            if (shortDescrOnly)
+                break;
         }
         if (shortDescrOnly) return sb.toString();
 
@@ -159,7 +155,7 @@ public abstract class SettingsMenu {
     public void postMessageAndButtons(GenericInteractionCreateEvent event) {
         String newSummary = menuSummaryString(null);
         List<Button> buttons = getPaginatedButtons(0);
-        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, this::setMessageID);
+        MessageHelper.splitAndSentWithAction(newSummary, event.getMessageChannel(), buttons, this::setMessageId);
     }
 
     public void parseButtonInput(ButtonInteractionEvent event) {
@@ -184,7 +180,6 @@ public abstract class SettingsMenu {
         List<String> parts = Arrays.asList(originalId.split("_"));
         if (parts.size() < 3) {
             buttonFailed(event, "This button is not formatted properly.", true);
-            return;
         } else {
             String buttonType = parts.get(0);
             String pathString = parts.get(1);
@@ -205,7 +200,7 @@ public abstract class SettingsMenu {
 
     protected void buttonFailed(GenericInteractionCreateEvent event, String userMsg, boolean pingJazz) {
         if (pingJazz) {
-            BotLogger.log(event, userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), userMsg + "\n" + Constants.jazzPing() + " Menu Framework button has failed.");
             userMsg += "\n> *Jazz has been pinged to take a look.*";
         }
         if (event instanceof ButtonInteractionEvent buttonEvent)
@@ -216,29 +211,39 @@ public abstract class SettingsMenu {
             stringEvent.getHook().sendMessage(userMsg).setEphemeral(true).queue();
     }
 
-    public void setMessageID(String messageID) {
-        this.messageID = messageID;
+    public String getMessageId() {
+        if (this.parent != null) {
+            return this.parent.getMessageId();
+        }
+        return this.messageId;
     }
 
-    @JsonIgnore
-    private void setMessageID(Message msg) {
-        if (Objects.equals(this.messageID, msg.getId())) return;
-        this.messageID = msg.getId();
-        for (SettingsMenu cat : categories())
-            cat.setMessageID(msg);
-        if (this.parent != null)
-            this.parent.setMessageID(msg);
+    public void setMessageId(String messageId) {
+        if (Objects.equals(this.messageId, messageId)) return;
+        this.messageId = messageId;
+        for (SettingsMenu cat : categories()) {
+            if (cat != null) {
+                cat.setMessageId(messageId);
+            }
+        }
+        if (parent != null) {
+            parent.setMessageId(messageId);
+        }
+    }
+
+    private void setMessageId(Message msg) {
+        setMessageId(msg.getId());
     }
 
     private boolean handleButtonPress(GenericInteractionCreateEvent event, String buttonType, String action, List<String> path) {
         List<String> remainingPath = new ArrayList<>(path); // copy to prevent pointer shenanigans
-        if (remainingPath.size() > 0) {
-            String menu = remainingPath.get(0);
+        if (!remainingPath.isEmpty()) {
+            String menu = remainingPath.getFirst();
             if (menu.equals(menuId)) {
-                remainingPath.remove(0);
-                if (remainingPath.size() > 0) {
+                remainingPath.removeFirst();
+                if (!remainingPath.isEmpty()) {
                     for (SettingsMenu child : categories()) {
-                        if (remainingPath.get(0).equals(child.getMenuId())) {
+                        if (remainingPath.getFirst().equals(child.getMenuId())) {
                             // found the path
                             return child.handleButtonPress(event, buttonType, action, remainingPath);
                         }
@@ -280,7 +285,7 @@ public abstract class SettingsMenu {
                 break;
             } else if (action.contains("_")) {
                 String actionID = action.split("_")[0];
-                if (actionID.length() > 0 && actionID.endsWith(setting.getId())) {
+                if (!actionID.isEmpty() && actionID.endsWith(setting.getId())) {
                     err = setting.modify(event, action);
                     settingTouched = setting.getId();
                     found = true;
@@ -322,9 +327,7 @@ public abstract class SettingsMenu {
 
         // Edit the existing message, if able
         if (event instanceof ButtonInteractionEvent buttonEvent) {
-            if (this.messageID == null) {
-                this.setMessageID(buttonEvent.getMessage());
-            }
+            setMessageId(buttonEvent.getMessage());
             buttonEvent.getHook().editOriginal(newSummary).setComponents(actionRows).queue();
         } else if (event instanceof ModalInteractionEvent modalEvent) {
             if (modalEvent.getMessage() != null) {
@@ -332,7 +335,7 @@ public abstract class SettingsMenu {
             }
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
             selectEvent.getGuildChannel()
-                .editMessageById(this.messageID, newSummary)
+                .editMessageById(getMessageId(), newSummary)
                 .setComponents(actionRows)
                 .queue(Consumers.nop(), BotLogger::catchRestError);
         }
@@ -379,7 +382,7 @@ public abstract class SettingsMenu {
             if (allottedSpace < 3) {
                 // This shouldn't ever happen as I don't really expect to ever see more than 7 other buttons,
                 // which means allotted space should always be >= 18
-                BotLogger.log("NOT ENOUGH SPACE FOR BUTTONS IN MENU: " + navId());
+                BotLogger.error("NOT ENOUGH SPACE FOR BUTTONS IN MENU: " + navId());
                 return Collections.emptyList();
             }
             List<List<Button>> paginated = ListUtils.partition(allButtons, allottedSpace - 2);
@@ -409,7 +412,7 @@ public abstract class SettingsMenu {
             .flatMap(setting -> new ArrayList<>(setting.getButtons(prefixID)).stream())
             .toList();
         List<Button> output = new ArrayList<>();
-        if (settingButtons.size() > 0)
+        if (!settingButtons.isEmpty())
             output.add(Button.of(ButtonStyle.DANGER, prefixID + "reset", "Reset to default settings"));
         output.addAll(settingButtons);
         return output;
@@ -419,10 +422,9 @@ public abstract class SettingsMenu {
     public String json() {
         ObjectMapper mapper = ObjectMapperFactory.build();
         try {
-            String val = mapper.writeValueAsString(this);
-            return val;
+            return mapper.writeValueAsString(this);
         } catch (Exception e) {
-            BotLogger.log("Error mapping to json:", e);
+            BotLogger.error("Error mapping to json:", e);
         }
         return null;
     }

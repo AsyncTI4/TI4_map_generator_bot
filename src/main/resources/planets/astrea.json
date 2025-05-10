@@ -1,0 +1,108 @@
+{
+    "id": "astrea",
+    "tileId": "mp01",
+    "name": "Astrea",
+    "aliases": [
+        "astrea"
+    ],
+    "positionInTile": {
+        "x": 225.0,
+        "y": 205.0
+    },
+    "resources": 1,
+    "influence": 2,
+    "planetType": "FACTION",
+    "factionHomeworld": "netharii",
+    "unitPositions": {
+        "unitHolderName": "astrea",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 184.0,
+                    "y": 192.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 155.0,
+                    "y": 227.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 189.0,
+                    "y": 219.0
+                },
+                {
+                    "x": 206.0,
+                    "y": 219.0
+                },
+                {
+                    "x": 223.0,
+                    "y": 219.0
+                },
+                {
+                    "x": 198.0,
+                    "y": 230.0
+                },
+                {
+                    "x": 216.0,
+                    "y": 230.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 191.0,
+                    "y": 148.0
+                },
+                {
+                    "x": 209.0,
+                    "y": 148.0
+                },
+                {
+                    "x": 184.0,
+                    "y": 161.0
+                },
+                {
+                    "x": 202.0,
+                    "y": 161.0
+                },
+                {
+                    "x": 220.0,
+                    "y": 161.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 203.0,
+                    "y": 189.0
+                },
+                {
+                    "x": 170.0,
+                    "y": 189.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 122.0,
+                    "y": 196.0
+                },
+                {
+                    "x": 246.0,
+                    "y": 150.0
+                },
+                {
+                    "x": 254.0,
+                    "y": 181.0
+                },
+                {
+                    "x": 246.0,
+                    "y": 212.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "WIP",
+    "source": "memephilosopher"
+}

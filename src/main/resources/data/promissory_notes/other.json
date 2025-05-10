@@ -6,7 +6,7 @@
         "color": "",
         "playArea": false,
         "source": "admins",
-        "text": "Action: move one of your structures to another eligible area that contains one or more of your units and place a command token from you reinforcements in that system. Then, return this card to the Admins player."
+        "text": "ACTION: move one of your structures to another eligible area that contains one or more of your units and place a command token from you reinforcements in that system. Then, return this card to the Admins player."
     },
     {
         "alias": "qulaneafterssight",
@@ -15,7 +15,7 @@
         "color": "",
         "playArea": false,
         "source": "ignis_aurora",
-        "text": "When you declare a retreat: Choose one ship in the active system. That ship does not participate in the combat round and cannot be assigned hits. At the end of the combat round, return this card to the Qulane player."
+        "text": "After you resolve a retreat: You may remove your command token from the system to which your units retreated. Then return this card to the Qulane player."
     },
     {
         "alias": "royal_coregency",

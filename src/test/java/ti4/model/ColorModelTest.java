@@ -1,21 +1,23 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
+import ti4.image.Mapper;
+import ti4.service.emoji.ColorEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.MiscEmojis;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ColorModelTest extends BaseTi4Test {
     @Test
@@ -40,9 +42,9 @@ public class ColorModelTest extends BaseTi4Test {
 
     private static boolean isDefault(String emoji) {
         if (emoji == null) return true;
-        if (Emojis.GoodDogs.contains(emoji)) return true;
-        if (!emoji.contains("<")) return true;
-        return false;
+        for (TI4Emoji doggy : MiscEmojis.goodDogs())
+            if (emoji.contains(doggy.toString())) return true;
+        return !emoji.contains("<");
     }
 
     private static void checkEmojisConfig(ColorModel color) {
@@ -54,25 +56,25 @@ public class ColorModelTest extends BaseTi4Test {
         // }
 
         // Verify the emoji file
-        String r1 = Emojis.getColorEmoji(color.getAlias());
-        String r2 = Emojis.getColorEmoji(color.getName());
-        String r3 = Emojis.getColorEmojiWithName(color.getAlias());
-        String r4 = Emojis.getColorEmojiWithName(color.getName());
-        assertTrue(!isDefault(r1), color.getAlias() + " is missing configuration in `Emojis::getColorEmoji.");
-        assertTrue(!isDefault(r2), color.getName() + " is missing configuration in `Emojis::getColorEmoji.");
-        assertTrue(!isDefault(r3), color.getAlias() + " is missing configuration in `Emojis::getColorEmojiWithName.");
-        assertTrue(!isDefault(r4), color.getName() + " is missing configuration in `Emojis::getColorEmojiWithName.");
+        String r1 = ColorEmojis.getColorEmoji(color.getAlias()).toString();
+        String r2 = ColorEmojis.getColorEmoji(color.getName()).toString();
+        String r3 = ColorEmojis.getColorEmojiWithName(color.getAlias());
+        String r4 = ColorEmojis.getColorEmojiWithName(color.getName());
+        assertFalse(isDefault(r1), color.getAlias() + " is missing configuration in `ColorEmojis.getColorEmoji.");
+        assertFalse(isDefault(r2), color.getName() + " is missing configuration in `ColorEmojis.getColorEmoji.");
+        assertFalse(isDefault(r3), color.getAlias() + " is missing configuration in `ColorEmojis.getColorEmojiWithName.");
+        assertFalse(isDefault(r4), color.getName() + " is missing configuration in `ColorEmojis.getColorEmojiWithName.");
     }
 
     private static String unitPath(UnitKey uk, boolean eyes) {
         String fileName = uk.getFileName(eyes);
-        String path = ResourceHelper.getInstance().getResourceFromFolder("units/", fileName, "");
-        assertTrue(path != null, "Could not find unit file: " + fileName);
+        String path = ResourceHelper.getResourceFromFolder("units/", fileName);
+        assertNotNull(path, "Could not find unit file: " + fileName);
         return path;
     }
 
     private static void checkUnitImages(ColorModel color) {
-        List<UnitType> unitsToTest = List.of(UnitType.Spacedock, UnitType.Pds, UnitType.CabalSpacedock,
+        List<UnitType> unitsToTest = List.of(UnitType.Spacedock, UnitType.Pds,
             UnitType.Infantry, UnitType.Fighter, UnitType.Mech,
             UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought,
             UnitType.Flagship, UnitType.Warsun);
@@ -94,7 +96,7 @@ public class ColorModelTest extends BaseTi4Test {
             Mapper.getSweepID(color.getAlias()));
         for (String id : tokenIDs) {
             String path = Mapper.getCCPath(id);
-            assertTrue(path != null, "Could not find token file: " + id);
+            assertNotNull(path, "Could not find token file: " + id);
         }
     }
 }

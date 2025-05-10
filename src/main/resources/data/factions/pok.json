@@ -6,12 +6,28 @@
         "startingFleet": "cv,2 dd,2 ff,3 inf v,2 inf a, pds y,sd v",
         "commodities": 3,
         "factionTech": ["ah", "swa2"],
-        "startingTech": [],
+        "startingTechOptions": ["nm", "st", "ps"],
+        "startingTechAmount": 2,
         "homePlanets": ["valk", "ylir", "avar"],
         "abilities": ["zeal", "raid_formation"],
         "leaders": ["argentagent", "argentcommander", "argenthero"],
         "promissoryNotes": ["ambuscade"],
-        "units": ["fighter", "argent_destroyer", "cruiser", "carrier", "dreadnought", "argent_flagship", "infantry", "argent_mech", "pds", "spacedock"],
+        "units": [
+            "fighter",
+            "argent_destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "argent_flagship",
+            "infantry",
+            "argent_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArgentFlight_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArgentFlight_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArgentFlight",
         "source": "pok"
     },
     {
@@ -27,7 +43,22 @@
         "abilities": ["devour", "amalgamation", "riftmeld"],
         "leaders": ["cabalagent", "cabalcommander", "cabalhero"],
         "promissoryNotes": ["crucible"],
-        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "cabal_flagship", "infantry", "cabal_mech", "pds", "cabal_spacedock"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "cabal_flagship",
+            "infantry",
+            "cabal_mech",
+            "pds",
+            "cabal_spacedock"
+        ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheVuilRaithCabal_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheVuilRaithCabal",
         "source": "pok"
     },
     {
@@ -42,7 +73,22 @@
         "abilities": ["voidborn", "aetherpassage", "dark_whispers"],
         "leaders": ["empyreanagent", "empyreancommander", "empyreanhero"],
         "promissoryNotes": ["dark_pact", "blood_pact"],
-        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "empyrean_flagship", "infantry", "empyrean_mech", "pds", "spacedock"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "empyrean_flagship",
+            "infantry",
+            "empyrean_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmpyrean_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmpyrean_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmpyrean",
         "source": "pok"
     },
     {
@@ -58,7 +104,22 @@
         "abilities": ["edict", "imperia", "hubris"],
         "leaders": ["mahactagent", "mahactcommander", "mahacthero"],
         "promissoryNotes": ["scepter"],
-        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "mahact_flagship", "mahact_infantry", "mahact_mech", "pds", "spacedock"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "mahact_flagship",
+            "mahact_infantry",
+            "mahact_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMahactGeneSorcerers_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMahactGeneSorcerers_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheMahactGeneSorcerers",
         "source": "pok"
     },
     {
@@ -72,9 +133,30 @@
         "startingTech": ["sr"],
         "homePlanets": ["arcturus"],
         "abilities": ["the_company", "future_sight"],
-        "leaders": ["nomadagentmercer", "nomadagentthundarian", "nomadagentartuno", "nomadcommander", "nomadhero"],
+        "leaders": [
+            "nomadagentmercer",
+            "nomadagentthundarian",
+            "nomadagentartuno",
+            "nomadcommander",
+            "nomadhero"
+        ],
         "promissoryNotes": ["cavalry"],
-        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "nomad_flagship", "infantry", "nomad_mech", "pds", "spacedock"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "nomad_flagship",
+            "infantry",
+            "nomad_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNomad_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNomad_FactionSheetBack.webp",
+        "wikiURL": "",
         "source": "pok"
     },
     {
@@ -90,7 +172,23 @@
         "abilities": ["distant_suns", "fabrication"],
         "leaders": ["naazagent", "naazcommander", "naazhero"],
         "promissoryNotes": ["bmf"],
-        "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "naaz_flagship", "infantry", "naaz_mech", "naaz_mech_space", "pds", "spacedock"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "naaz_flagship",
+            "infantry",
+            "naaz_mech",
+            "naaz_mech_space",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "Low",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaazRokhaAlliance_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaazRokhaAlliance_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNaazRokhaAlliance",
         "source": "pok"
     },
     {
@@ -106,7 +204,22 @@
         "abilities": ["terragenesis", "awaken", "coalescence"],
         "leaders": ["titansagent", "titanscommander", "titanshero"],
         "promissoryNotes": ["terraform"],
-        "units": ["fighter", "destroyer", "titans_cruiser", "carrier", "dreadnought", "titans_flagship", "infantry", "titans_mech", "titans_pds", "spacedock"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "titans_cruiser",
+            "carrier",
+            "dreadnought",
+            "titans_flagship",
+            "infantry",
+            "titans_mech",
+            "titans_pds",
+            "spacedock"
+        ],
+        "complexity": "Moderate",
+        "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTitansOfUl_FactionSheet.webp",
+        "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheTitansOfUl_FactionSheetBack.webp",
+        "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheTitansOfUl",
         "source": "pok"
-      }
+    }
 ]

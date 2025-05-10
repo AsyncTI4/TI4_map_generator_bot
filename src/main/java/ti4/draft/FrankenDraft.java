@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ti4.commands.milty.MiltyDraftHelper;
-import ti4.commands.milty.MiltyDraftManager;
 import ti4.draft.items.AbilityDraftItem;
 import ti4.draft.items.AgentDraftItem;
 import ti4.draft.items.BlueTileDraftItem;
@@ -22,10 +20,12 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftManager;
 
 public class FrankenDraft extends BagDraft {
     public FrankenDraft(Game owner) {
@@ -48,14 +48,26 @@ public class FrankenDraft extends BagDraft {
         return "franken";
     }
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral" };
+    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "qhet", "atokera" };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllFrankenLegalFactions();
+        String[] results = game.getStoredValue("bannedFactions").split("finSep");
         if (!game.isDiscordantStarsMode()) {
             factionSet.removeIf(factionModel -> factionModel.getSource().isDs() && !factionModel.getSource().isPok());
         }
+        factionSet.removeIf(factionModel -> contains(results, factionModel.getAlias()));
+
         return factionSet;
+    }
+
+    public static boolean contains(String[] array, String target) {
+        for (String str : array) {
+            if (str.equalsIgnoreCase(target)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static List<FactionModel> getAllFrankenLegalFactions() {
@@ -113,9 +125,9 @@ public class FrankenDraft extends BagDraft {
                 for (int j = 0; j < categoryLimit; j++) {
                     // ... and add it to the player's bag.
                     if (!draftableCollection.getValue().isEmpty()) {
-                        bag.Contents.add(draftableCollection.getValue().remove(0));
+                        bag.Contents.add(draftableCollection.getValue().removeFirst());
                     } else {
-                        BotLogger.log("Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Game: `" + game.getName() + "` error - empty franken draftableCollection: " + category.name());
                     }
                 }
             }

@@ -430,5 +430,59 @@
             "spacedock"
         ],
         "source": "franken"
+    },
+    {
+        "alias": "franken17",
+        "factionName": "Franken 17",
+        "shortTag": "FK17",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 0,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "flagship",
+            "infantry",
+            "mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "franken"
+    },
+    {
+        "alias": "franken18",
+        "factionName": "Franken 18",
+        "shortTag": "FK18",
+        "homeSystem": "",
+        "startingFleet": "",
+        "commodities": 0,
+        "factionTech": [],
+        "startingTech": [],
+        "homePlanets": [],
+        "abilities": [],
+        "leaders": [],
+        "promissoryNotes": [],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "flagship",
+            "infantry",
+            "mech",
+            "pds",
+            "spacedock"
+        ],
+        "source": "franken"
     }
 ]

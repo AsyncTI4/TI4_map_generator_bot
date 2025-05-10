@@ -1,38 +1,54 @@
 package ti4.commands.units;
 
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.CommandHelper;
+import ti4.commands.GameStateCommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Tile;
 
-public class RemoveAllUnitDamage extends RemoveAllUnits {
+public class RemoveAllUnitDamage extends GameStateCommand {
 
-    @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Game game) {
-        tile.removeAllUnitDamage(color);
+    public RemoveAllUnitDamage() {
+        super(true, true);
     }
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.REMOVE_ALL_UNIT_DAMAGE;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-            Commands.slash(getActionID(), "Remove all unit damage from map")
-                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true)));
+    public String getDescription() {
+        return "Removal all unit damages from the map";
     }
 
     @Override
-    protected String getActionDescription() {
-        return "";
+    public List<OptionData> getOptions() {
+        return List.of(
+            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                .setAutoComplete(true),
+            new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
+        );
+    }
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        Game game = getGame();
+
+        Tile tile = CommandHelper.getTile(event, game);
+        if (tile == null) return;
+
+        String color = getPlayer().getColor();
+        tile.removeAllUnitDamage(color);
+
+        UnitCommandHelper.handleGenerateMapOption(event, game);
     }
 }

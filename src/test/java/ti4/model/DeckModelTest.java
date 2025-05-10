@@ -1,14 +1,14 @@
 package ti4.model;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
+import ti4.model.DeckModel.DeckType;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeckModelTest extends BaseTi4Test {
     @Test
@@ -21,15 +21,14 @@ public class DeckModelTest extends BaseTi4Test {
 
     private static boolean validateCardIDs(DeckModel deckModel) {
         return switch (deckModel.getType()) {
-            case "technology" -> validateTechDeck(deckModel);
-            case "agenda" -> validateAgendaDeck(deckModel);
-            case "event" -> validateEventDeck(deckModel);
-            case "action_card" -> validateActionCardDeck(deckModel);
-            case "secret_objective" -> validateSecretObjectiveDeck(deckModel);
-            case "public_stage_1_objective", "public_stage_2_objective" -> validatePublicObjectiveDecks(deckModel);
-            case "relic" -> validateRelicDeck(deckModel);
-            case "explore" -> validateExploreDecks(deckModel);
-            case "template" -> true;
+            case DeckType.TECHNOLOGY -> validateTechDeck(deckModel);
+            case DeckType.AGENDA -> validateAgendaDeck(deckModel);
+            case DeckType.EVENT -> validateEventDeck(deckModel);
+            case DeckType.ACTION_CARD -> validateActionCardDeck(deckModel);
+            case DeckType.SECRET_OBJECTIVE -> validateSecretObjectiveDeck(deckModel);
+            case DeckType.PUBLIC_STAGE_1_OBJECTIVE, DeckType.PUBLIC_STAGE_2_OBJECTIVE -> validatePublicObjectiveDecks(deckModel);
+            case DeckType.RELIC -> validateRelicDeck(deckModel);
+            case DeckType.EXPLORE -> validateExploreDecks(deckModel);
             default -> false;
         };
     }
@@ -42,7 +41,7 @@ public class DeckModelTest extends BaseTi4Test {
             if (!Mapper.getTechs().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
-       System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
         return false;
     }
 
@@ -54,7 +53,7 @@ public class DeckModelTest extends BaseTi4Test {
             if (!Mapper.getAgendas().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
-       System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
         return false;
     }
 
@@ -66,7 +65,7 @@ public class DeckModelTest extends BaseTi4Test {
             if (!Mapper.getEvents().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
-       System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
         return false;
     }
 
@@ -78,7 +77,7 @@ public class DeckModelTest extends BaseTi4Test {
             if (!Mapper.getActionCards().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
-       System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
         return false;
     }
 
@@ -90,7 +89,7 @@ public class DeckModelTest extends BaseTi4Test {
             if (!Mapper.getSecretObjectives().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
-       System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
         return false;
     }
 
@@ -102,7 +101,7 @@ public class DeckModelTest extends BaseTi4Test {
             if (!Mapper.getPublicObjectives().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
-       System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
         return false;
     }
 
@@ -114,7 +113,7 @@ public class DeckModelTest extends BaseTi4Test {
             if (!Mapper.getRelics().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
-       System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
         return false;
     }
 
@@ -126,7 +125,7 @@ public class DeckModelTest extends BaseTi4Test {
             if (!Mapper.getExplores().containsKey(cardID))
                 missingCardIDs.add(cardID);
         }
-       System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
+        System.out.println("Deck **" + deckModel.getName() + "** failed validation due to invalid card IDs: `" + missingCardIDs + "`");
         return false;
     }
 }

@@ -1,30 +1,35 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
 
 @Data
 public class FactionModel implements ModelInterface, EmbeddableModel {
     private String alias;
     private String factionName;
+    private String shortName;
     private String shortTag;
     private String homeSystem;
     private String startingFleet;
     private int commodities;
+    private String complexity;
     private List<String> factionTech;
     private List<String> startingTech;
+    private List<String> startingTechOptions;
+    private Integer startingTechAmount;
     private List<String> homePlanets;
     private List<String> abilities;
     private List<String> leaders;
@@ -35,6 +40,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private String factionSheetFrontImageURL;
     private String factionSheetBackImageURL;
     private String factionReferenceImageURL;
+    private String wikiURL;
 
     public boolean isValid() {
         return alias != null
@@ -42,7 +48,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             && homeSystem != null
             && startingFleet != null
             && factionTech != null
-            && startingTech != null
+            && (startingTech != null || (startingTechOptions != null && startingTechAmount != null))
             && homePlanets != null
             && abilities != null
             && leaders != null
@@ -52,8 +58,12 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getFactionEmoji() {
-        if (homebrewReplacesID != null) return Emojis.getFactionIconFromDiscord(homebrewReplacesID);
-        return Emojis.getFactionIconFromDiscord(getAlias());
+        if (homebrewReplacesID != null) return FactionEmojis.getFactionIcon(homebrewReplacesID).toString();
+        return FactionEmojis.getFactionIcon(getAlias()).toString();
+    }
+
+    public String getShortName() {
+        return Optional.ofNullable(shortName).orElse(getFactionName().replace("The ", ""));
     }
 
     public String getShortTag() {
@@ -65,7 +75,16 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     }
 
     public List<String> getStartingTech() {
+        if (startingTech == null) return null;
         return new ArrayList<>(startingTech);
+    }
+
+    public int finalStartingTechAmount() {
+        int amount = 0;
+        if (getStartingTech() != null) amount += getStartingTech().size();
+        if (getStartingTechAmount() != null) amount += getStartingTechAmount();
+        if (getAlias().startsWith("keleres")) amount += 2;
+        return amount;
     }
 
     public List<String> getHomePlanets() {
@@ -92,8 +111,43 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(homebrewReplacesID);
     }
 
+    public String getComplexity() {
+        return Optional.ofNullable(complexity).orElse("Not added to bot yet");
+    }
+
     public Optional<String> getFactionSheetFrontImageURL() {
         return Optional.ofNullable(factionSheetFrontImageURL);
+    }
+
+    public Optional<String> getFactionSheetBackImageURL() {
+        return Optional.ofNullable(factionSheetBackImageURL);
+    }
+
+    public Optional<String> getFactionReferenceImageURL() {
+        return Optional.ofNullable(factionReferenceImageURL);
+    }
+
+    public Optional<String> getWikiURL() {
+        return Optional.ofNullable(wikiURL);
+    }
+
+    public String getLinksText() {
+        StringBuilder sb = new StringBuilder();
+        getFactionSheetFrontImageURL().ifPresent(url -> sb.append("[Faction Sheet Front](").append(url).append(")\n"));
+        getFactionSheetBackImageURL().ifPresent(url -> sb.append("[Faction Sheet Back](").append(url).append(")\n"));
+        getFactionReferenceImageURL().ifPresent(url -> sb.append("[Quick Reference Card](").append(url).append(")\n"));
+        getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")\n"));
+        return sb.toString();
+    }
+
+    public String getFactionSheetMessage() {
+        if (getFactionSheetFrontImageURL().isEmpty() && getFactionSheetBackImageURL().isEmpty()) return null;
+
+        StringBuilder sb = new StringBuilder("## Faction Sheet: ");
+        getFactionSheetFrontImageURL().ifPresent(url -> sb.append("[Front](").append(url).append(") "));
+        getFactionSheetBackImageURL().ifPresent(url -> sb.append("[Back](").append(url).append(") "));
+        getWikiURL().ifPresent(url -> sb.append("[Wiki Link](").append(url).append(")"));
+        return sb.toString();
     }
 
     @Override
@@ -104,16 +158,13 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeAliases) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
+        // TITLE
         eb.setTitle(getFactionTitle());
+        getWikiURL().ifPresent(eb::setUrl);
 
-        //DESCRIPTION
-        StringBuilder description = new StringBuilder();
-        eb.setDescription(description.toString());
+        getFactionSheetFrontImageURL().ifPresent(eb::setImage);
 
-        if (getFactionSheetFrontImageURL().isPresent()) eb.setImage(getFactionSheetFrontImageURL().get());
-
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         if (includeAliases) footer.append("\nAliases: ").append(AliasHandler.getFactionAliasEntryList(getAlias()));
@@ -127,14 +178,10 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE - [FactionEmoji] Sardakk N'orr [SourceEmoji]
-        StringBuilder title = new StringBuilder();
-        title.append(getFactionEmoji()).append(" ").append(getFactionNameWithSourceEmoji());
-        eb.setTitle(title.toString());
+        eb.setTitle(getFactionEmoji() + " " + getFactionNameWithSourceEmoji());
 
         // DESCRIPTION - <Commodity><Commodity><Commodity>
-        StringBuilder desc = new StringBuilder();
-        desc.append("\n").append(StringUtils.repeat(Emojis.comm, getCommodities()));
-        eb.setDescription(desc.toString());
+        eb.setDescription("\n" + MiscEmojis.comm(getCommodities()));
 
         // FIELDS
         // Abilities
@@ -143,11 +190,11 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             AbilityModel model = Mapper.getAbility(id);
             sb.append(model.getName()).append(":");
             if (model.getPermanentEffect().isPresent()) {
-                String effect = model.getPermanentEffect().get().replaceAll("\n", "");
+                String effect = model.getPermanentEffect().get().replace("\n", "");
                 sb.append("\n> - ").append(effect);
             }
-            if (model.getWindow().isPresent()) {
-                String effect = model.getWindowEffect().get().replaceAll("\n", "");
+            if (model.getWindow().isPresent() && model.getWindowEffect().isPresent()) {
+                String effect = model.getWindowEffect().get().replace("\n", "");
                 sb.append("\n> ").append(model.getWindow().get()).append(":");
                 sb.append("\n> - ").append(effect);
             }
@@ -170,7 +217,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
             UnitModel model = Mapper.getUnit(id);
             if (model.getFaction().isEmpty()) continue;
             sb.append(model.getUnitEmoji()).append(" ").append(model.getName());
-            if (model.getAbility().isPresent()) sb.append("\n> ").append(model.getAbility());
+            if (model.getAbility().isPresent()) sb.append("\n> ").append(model.getAbility().get());
             sb.append("\n");
         }
         eb.addField("__Units__", sb.toString(), false);
@@ -192,8 +239,31 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         eb.addField("__Leaders__", sb.toString(), false);
 
         sb = new StringBuilder();
-        sb.append(getStartingFleet() + "\n");
+        sb.append(Helper.getUnitListEmojis(getStartingFleet())).append("\n");
         eb.addField("__Starting Fleet__", sb.toString(), false);
+
+        sb = new StringBuilder();
+        if (getStartingTech() != null && !getStartingTech().isEmpty()) {
+            for (String id : getStartingTech()) {
+                TechnologyModel model = Mapper.getTech(id);
+                sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
+                //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+            }
+        } else {
+            if (getStartingTechOptions() != null && getStartingTechAmount() != 0 && !getStartingTechOptions().isEmpty()) {
+                sb.append("\nPick ").append(getStartingTechAmount()).append(" of the following:\n");
+                for (String id : getStartingTechOptions()) {
+                    TechnologyModel model = Mapper.getTech(id);
+                    sb.append(model.getCondensedReqsEmojis(false)).append(" ").append(model.getName());
+                    //sb.append("\n> ").append(model.getText().replace("\n","\n> ")).append("\n");
+                }
+            }
+        }
+        if (getFactionName().toLowerCase().contains("keleres")) {
+            sb = new StringBuilder();
+            sb.append("Choose 2 tech owned by other players.");
+        }
+        eb.addField("__Starting Tech__", sb.toString(), false);
 
         return eb.build();
     }

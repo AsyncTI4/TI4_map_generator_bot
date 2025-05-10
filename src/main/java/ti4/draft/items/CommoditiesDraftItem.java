@@ -1,14 +1,15 @@
 package ti4.draft.items;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
-import ti4.model.DraftErrataModel;
-import ti4.model.FactionModel;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import ti4.draft.DraftItem;
+import ti4.image.Mapper;
+import ti4.model.DraftErrataModel;
+import ti4.model.FactionModel;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 public class CommoditiesDraftItem extends DraftItem {
     public CommoditiesDraftItem(String itemId) {
@@ -42,8 +43,8 @@ public class CommoditiesDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        return Emojis.comm;
+    public TI4Emoji getItemEmoji() {
+        return MiscEmojis.comm;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
@@ -55,7 +56,7 @@ public class CommoditiesDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
-            allItems.add(DraftItem.Generate(Category.COMMODITIES, faction.getAlias()));
+            allItems.add(DraftItem.generate(Category.COMMODITIES, faction.getAlias()));
         }
         return allItems;
     }

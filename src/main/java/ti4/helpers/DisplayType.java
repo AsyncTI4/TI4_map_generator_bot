@@ -16,7 +16,9 @@ public enum DisplayType {
     techskips("technology_specialties"),
     attachments("attachments"),
     shipless("shipless"),
-    landscape("landscape");
+    googly("googly"),
+    landscape("landscape"),
+    unlocked("unlocked"); // Master Display Type = Map, force HexBorder = Solid, hide locked units (have a CC of their colour in their system)
 
     public final String value;
 

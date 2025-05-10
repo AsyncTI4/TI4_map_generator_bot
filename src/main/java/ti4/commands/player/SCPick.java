@@ -6,70 +6,66 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.cardspn.PlayPN;
-import ti4.commands.game.StartPhase;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.status.ListTurnOrder;
-import ti4.generator.MapGenerator;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.PromissoryNoteHelper;
+import ti4.helpers.StringHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.image.BannerGenerator;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.ListTurnOrderService;
+import ti4.service.player.PlayerStatsService;
+import ti4.service.strategycard.PickStrategyCardService;
+import ti4.service.turn.EndTurnService;
+import ti4.service.turn.StartTurnService;
+import ti4.settings.users.UserSettingsManager;
 
-public class SCPick extends PlayerSubcommandData {
+class SCPick extends GameStateSubcommand {
+
     public SCPick() {
-        super(Constants.SC_PICK, "Pick a Strategy Card");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #").setRequired(true));
+        super(Constants.SC_PICK, "Pick a strategy card", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC2, "2nd choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC4, "4th"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC5, "5th"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC6, "6th"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd choice"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC4, "4th choice"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC5, "5th choice"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC6, "6th choice"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
 
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
+        Game game = getGame();
 
         Collection<Player> activePlayers = game.getRealPlayers();
-        if (activePlayers.size() == 0) {
-            MessageHelper.sendMessageToEventChannel(event, "No active players found");
+        if (activePlayers.isEmpty()) {
+            MessageHelper.sendMessageToEventChannel(event, "No active players found.");
             return;
         }
 
         int maxSCsPerPlayer = game.getStrategyCardsPerPlayer();
         if (maxSCsPerPlayer <= 0) maxSCsPerPlayer = 1;
 
+        Player player = getPlayer();
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
             MessageHelper.sendMessageToEventChannel(event, "Player may not pick another strategy card. Max strategy cards per player for this game is " + maxSCsPerPlayer + ".");
@@ -79,7 +75,7 @@ public class SCPick extends PlayerSubcommandData {
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scPicked = option.getAsInt();
 
-        boolean pickSuccessful = Stats.pickSC(event, game, player, option);
+        boolean pickSuccessful = PlayerStatsService.pickSC(event, game, player, option);
         Set<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
             if (game.isFowMode()) {
@@ -87,7 +83,7 @@ public class SCPick extends PlayerSubcommandData {
                 int c = 0;
                 while (playerSCs.isEmpty() && c < 5 && !pickSuccessful) {
                     if (event.getOption(scs[c]) != null) {
-                        pickSuccessful = Stats.pickSC(event, game, player, event.getOption(scs[c]));
+                        pickSuccessful = PlayerStatsService.pickSC(event, game, player, event.getOption(scs[c]));
                     }
                     playerSCs = player.getSCs();
                     c++;
@@ -103,136 +99,6 @@ public class SCPick extends PlayerSubcommandData {
             return;
         }
         secondHalfOfSCPick(event, player, game, scPicked);
-    }
-
-    public static List<Button> getPlayerOptionsForChecksNBalances(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
-        List<Button> buttons = new ArrayList<>();
-        List<Player> activePlayers = game.getRealPlayers();
-
-        int maxSCsPerPlayer = game.getStrategyCardsPerPlayer();
-        if (maxSCsPerPlayer < 1) {
-            maxSCsPerPlayer = 1;
-        }
-        int minNumOfSCs = 10;
-        for (Player p2 : activePlayers) {
-            if (p2.getSCs().size() < minNumOfSCs) {
-                minNumOfSCs = p2.getSCs().size();
-            }
-        }
-        if (minNumOfSCs == maxSCsPerPlayer) {
-            return buttons;
-        }
-        for (Player p2 : activePlayers) {
-            if (p2 == player) {
-                continue;
-            }
-            if (p2.getSCs().size() < maxSCsPerPlayer) {
-                if (game.isFowMode()) {
-                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), p2.getColor()));
-                } else {
-                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
-                }
-            }
-        }
-        if (buttons.size() == 0) {
-            buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ").withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
-        }
-
-        return buttons;
-    }
-
-    public static void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game game, int scPicked) {
-        List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, game, scPicked);
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
-
-        for (Player playerStats : game.getRealPlayers()) {
-            if (playerStats.getSCs().contains(scPicked)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getSCName(scPicked, game) + " is already picked.");
-                return;
-            }
-        }
-        Integer tgCount = scTradeGoods.get(scPicked);
-        if (tgCount != null && tgCount != 0) {
-            int tg = player.getTg();
-            tg += tgCount;
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game));
-            if (game.isFowMode()) {
-                String messageToSend = Emojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " TG" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scPicked, game);
-                FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
-            }
-            player.setTg(tg);
-            CommanderUnlockCheck.checkPlayer(player, game, "hacan", event);
-            ButtonHelperAbilities.pillageCheck(player, game);
-            game.setScTradeGood(scPicked, 0);
-            if (scPicked == 2 && game.isRedTapeMode()) {
-                for (int x = 0; x < tgCount; x++) {
-                    ButtonHelper.offerRedTapeButtons(game, player);
-                }
-            }
-        }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation(true, true) + " chose which player to give this stratgy card to.", buttons);
-        event.getMessage().delete().queue();
-    }
-
-    public static void resolvePt2ChecksNBalances(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String scPicked = buttonID.split("_")[1];
-        int scpick = Integer.parseInt(scPicked);
-        String factionPicked = buttonID.split("_")[2];
-        Player p2 = game.getPlayerFromColorOrFaction(factionPicked);
-
-        Stats.secondHalfOfPickSC(event, game, p2, scpick);
-
-        String recipientMessage = p2.getRepresentation(true, true) + " was given " + Helper.getSCName(scpick, game)
-            + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
-
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getColor() + " was given " + Helper.getSCName(scpick, game));
-
-        }
-        event.getMessage().delete().queue();
-        List<Button> buttons = getPlayerOptionsForChecksNBalances(event, player, game, scpick);
-        if (buttons.size() == 0) {
-            Set<Integer> scPickedList = new HashSet<>();
-            for (Player player_ : game.getRealPlayers()) {
-                scPickedList.addAll(player_.getSCs());
-            }
-
-            //ADD A TG TO UNPICKED SC
-            game.incrementScTradeGoods();
-
-            for (int sc : scPickedList) {
-                game.setScTradeGood(sc, 0);
-            }
-            StartPhase.startActionPhase(event, game);
-            game.setStoredValue("willRevolution", "");
-        } else {
-            boolean foundPlayer = false;
-            Player privatePlayer = null;
-            List<Player> players = game.getRealPlayers();
-            if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
-                Collections.reverse(players);
-            }
-            for (Player p3 : players) {
-                if (p3.getFaction().equalsIgnoreCase(game.getStoredValue("politicalStabilityFaction"))) {
-                    continue;
-                }
-                if (foundPlayer) {
-                    privatePlayer = p3;
-                    foundPlayer = false;
-                }
-                if (p3 == player) {
-                    foundPlayer = true;
-                }
-            }
-            if (privatePlayer == null) {
-                privatePlayer = game.getRealPlayers().get(0);
-            }
-            game.setPhaseOfGame("strategy");
-            game.updateActivePlayer(privatePlayer);
-            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                privatePlayer.getRepresentation(true, true) + "Use buttons to pick which strategy card you want to give someone else.", Helper.getRemainingSCButtons(event, game, privatePlayer));
-        }
     }
 
     public static void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Game game, int scPicked) {
@@ -253,6 +119,9 @@ public class SCPick extends PlayerSubcommandData {
         }
         if (!game.getStoredValue("exhaustedSC" + scPicked).isEmpty()) {
             game.setSCPlayed(scPicked, true);
+            for (Player p2 : game.getRealPlayers()) {
+                p2.addFollowedSC(scPicked);
+            }
         }
 
         boolean nextCorrectPing = false;
@@ -264,7 +133,7 @@ public class SCPick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentation(true, true) + " to pick strategy card.";
+                msgExtra += player_.getRepresentationUnfogged() + " is up to pick their strategy card.";
                 game.setPhaseOfGame("strategy");
                 privatePlayer = player_;
                 allPicked = false;
@@ -280,17 +149,20 @@ public class SCPick extends PlayerSubcommandData {
 
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
+            if (game.isOmegaPhaseMode()) {
+                PriorityTrackHelper.ClearPriorityTrack(game);
+            }
 
             for (Player p2 : game.getRealPlayers()) {
                 ButtonHelperActionCards.checkForAssigningCoup(game, p2);
                 if (game.getStoredValue("Play Naalu PN") != null && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
                     if (!p2.getPromissoryNotesInPlayArea().contains("gift") && p2.getPromissoryNotes().containsKey("gift")) {
-                        PlayPN.resolvePNPlay("gift", p2, game, event);
+                        PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
                     }
                 }
             }
 
-            msgExtra += "\nAll players picked strategy cards.";
+            msgExtra += "\nAll players have picked strategy cards.";
             Set<Integer> scPickedList = new HashSet<>();
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
@@ -303,24 +175,11 @@ public class SCPick extends PlayerSubcommandData {
                 game.setScTradeGood(sc, 0);
             }
 
-            Player nextPlayer = null;
-            int lowestSC = 100;
-            for (Player player_ : activePlayers) {
-                int playersLowestSC = player_.getLowestSC();
-                String scNumberIfNaaluInPlay = game.getSCNumberIfNaaluInPlay(player_, Integer.toString(playersLowestSC));
-                if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                    nextPlayer = player_; //no further processing, this player has the 0 token
-                    break;
-                }
-                if (playersLowestSC < lowestSC) {
-                    lowestSC = playersLowestSC;
-                    nextPlayer = player_;
-                }
-            }
+            Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + nextPlayer.getRepresentation() + " is up for an action";
+                msgExtra += "\n" + nextPlayer.getRepresentation() + " is first in initiative order.";
                 privatePlayer = nextPlayer;
                 game.updateActivePlayer(nextPlayer);
                 ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
@@ -340,7 +199,9 @@ public class SCPick extends PlayerSubcommandData {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = "" + privatePlayer.getRepresentation(true, true) + " UP NEXT";
+                BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
+                msgExtra = privatePlayer.getRepresentationUnfogged() + ", it is now your turn (your "
+                    + StringHelper.ordinal(privatePlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -349,60 +210,48 @@ public class SCPick extends PlayerSubcommandData {
 
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
             } else {
-                privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
+                privatePlayer.setInRoundTurnCount(privatePlayer.getInRoundTurnCount() + 1);
                 if (game.isShowBanners()) {
-                    MapGenerator.drawBanner(privatePlayer);
+                    BannerGenerator.drawFactionBanner(privatePlayer);
                 }
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.",
-                    TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
-                if (privatePlayer.getStasisInfantry() > 0) {
-                    if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
-                        MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                            "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
-                            ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                    } else {
-                        privatePlayer.setStasisInfantry(0);
-                        MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                            + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
-
-                    }
-                }
-
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to do turn.",
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
+                StartTurnService.reviveInfantryII(privatePlayer);
             }
 
         } else {
-            if (allPicked) {
-                ListTurnOrder.turnOrder(event, game);
-            }
-            if (!msgExtra.isEmpty()) {
-                if (!allPicked) {
-                    game.updateActivePlayer(privatePlayer);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra + "\nUse buttons to pick your strategy card.", Helper.getRemainingSCButtons(event, game, privatePlayer));
-                    game.setPhaseOfGame("strategy");
-                } else {
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
-                    privatePlayer.setTurnCount(privatePlayer.getTurnCount() + 1);
-                    if (game.isShowBanners()) {
-                        MapGenerator.drawBanner(privatePlayer);
-                    }
-                    MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "\n Use Buttons to do turn.",
-                        TurnStart.getStartOfTurnButtons(privatePlayer, game, false, event));
-                    if (privatePlayer.getStasisInfantry() > 0) {
-                        if (ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer).size() > 0) {
-                            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                                "Use buttons to revive infantry. You have " + privatePlayer.getStasisInfantry() + " infantry left to revive.",
-                                ButtonHelper.getPlaceStatusInfButtons(game, privatePlayer));
-                        } else {
-                            privatePlayer.setStasisInfantry(0);
-                            MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation()
-                                + " You had infantry II to be revived, but the bot couldn't find planets you own in your HS to place them, so per the rules they now disappear into the ether.");
-
-                        }
-                    }
-                    game.setPhaseOfGame("action");
+            if (!allPicked) {
+                game.updateActivePlayer(privatePlayer);
+                game.setPhaseOfGame("strategy");
+                PickStrategyCardService.checkForForcePickLastStratCard(event, privatePlayer, game, msgExtra);
+            } else {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
+                if (game.isShowBanners()) {
+                    BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
                 }
+                game.setPhaseOfGame("action");
+                ListTurnOrderService.turnOrder(event, game);
+                privatePlayer.setInRoundTurnCount(privatePlayer.getInRoundTurnCount() + 1);
+                if (game.isShowBanners()) {
+                    BannerGenerator.drawFactionBanner(privatePlayer);
+                }
+                String text = player.getRepresentationUnfogged() + ", it is now your turn (your "
+                    + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
+                Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
+                if (nextPlayer != null && !game.isFowMode()) {
+                    if (nextPlayer == player) {
+                        text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+                    } else {
+                        String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
+                        text += "\n-# " + ping + " will start their turn once you've ended yours.";
+                    }
+                }
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), text);
+                StartTurnService.reviveInfantryII(privatePlayer);
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Use buttons to do turn.",
+                    StartTurnService.getStartOfTurnButtons(privatePlayer, game, false, event));
             }
         }
         if (allPicked) {
@@ -411,14 +260,14 @@ public class SCPick extends PlayerSubcommandData {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " you have the opportunity to use QDN", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Quantum Datahub Node_.", buttons);
                 }
                 buttons = new ArrayList<>();
                 if (game.getLaws().containsKey("arbiter") && game.getLawsInfo().get("arbiter").equalsIgnoreCase(p2.getFaction())) {
                     buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter"));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(),
-                        p2.getRepresentation(true, true) + " you have the opportunity to use Imperial Arbiter", buttons);
+                        p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_.", buttons);
                 }
             }
         }

@@ -4,27 +4,31 @@
         "name": "Moontree Staff",
         "text": "During the agenda phase, after an outcome that you voted for or predicted is resolved, gain 1 command token.\nAt the end of the agenda phase, you may purge this card to gain the speaker token.",
         "source": "sigma",
-        "flavourText": "*The moontree was the symbol of the Galactic Council, and graced the Imperial Gardens on Mecatol Rex. The greatest ambassadors were granted a staff of moontree wood, as a symbol of their rank.*"
+        "flavourText": "*The moontree was the symbol of the Galactic Council, and graced the Imperial Gardens on Mecatol Rex. The greatest ambassadors were granted a staff of moontree wood, as a symbol of their rank.*",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/misc_homebrew/moontree_staff.jpg?raw=true"
     },
     {
         "alias": "sigma_mirror_engine",
         "name": "Mirror Engine",
         "text": "When 1 or more of your units use PRODUCTION, apply +2 to their total PRODUCTION value. You may produce 1 additional fighter and infantry for their cost.",
         "source": "sigma",
-        "flavourText": "*Word of advice: if you meet yourself, don't make eye contact. That'll wipe out time. Entirely. Forward and backward.*"
+        "flavourText": "*Word of advice: if you meet yourself, don't make eye contact. That'll wipe out time. Entirely. Forward and backward.*",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/misc_homebrew/mirror_engine.jpg?raw=true"
     },
     {
         "alias": "sigma_phoenix",
         "name": "Phoenix",
         "text": "After 1 of your units is destroyed: You may exhaust this card to produce a unit of the same type at any of your space docks; reduce the cost by 4 resources. If you have ships in the active system, you may place the unit in that system, even if another player has units there.",
         "source": "sigma",
-        "flavourText": "*\"But you were dead!\"\n\"I got better.\"*"
+        "flavourText": "*\"But you were dead!\"\n\"I got better.\"*",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/misc_homebrew/phoenix.png?raw=true"
     },
     {
         "alias": "sigma_forgotten",
         "name": "The Forgotten",
-        "text": "ACTION: Exhaust this card to produce up to 2 units in any system that that contains 1 of your space docks. Reduce the combined cost of the produced units by 8. This, give this card to another player.",
+        "text": "ACTION: Exhaust this card to produce up to 2 units in any system that that contains 1 of your space docks. Reduce the combined cost of the produced units by 8. Then, give this card to another player.",
         "source": "sigma",
-        "flavourText": "*With the ability to access alternate realities, The Forgotten seemd to have a prefernce for thos in which it remained undiscovered, at least for a few extra years.*"
+        "flavourText": "*With the ability to access alternate realities, The Forgotten seemd to have a prefernce for thos in which it remained undiscovered, at least for a few extra years.*",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/misc_homebrew/the_forgotten.png?raw=true"
     }
 ]
