@@ -3626,12 +3626,19 @@ public class AgendaHelper {
 
         if (!action && aCount == 1) {
             pingAboutDebt(game);
+            String politicsHolder = "round" + game.getRound() + "PoliticsHolder";
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
-                String message = "## The Politics player did the following with the agendas that they looked at: "
+                String message = "";
+                if(!game.getStoredValue(politicsHolder).isEmpty()){
+                    message = "## " + game.getStoredValue(politicsHolder) + " had Politics and placed the agendas in this order: "
                     + game.getStoredValue(key).replace("_", ", ") + ".";
+                }
+                else {
+                    message = "## The Politics player placed the agendas in this order: "
+                    + game.getStoredValue(key).replace("_", ", ") + ".";
+                }
                 MessageHelper.sendMessageToChannel(channel, message);
-
             }
         }
         for (Player player : game.getRealPlayers()) {
@@ -3886,15 +3893,19 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("topAgenda_")
-    public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
         AgendaHelper.putTop(Integer.parseInt(agendaNumID), game);
+
         String key = "round" + game.getRound() + "AgendaPlacement";
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "top");
         } else {
             game.setStoredValue(key, game.getStoredValue(key) + "_top");
         }
+
+        recordPoliticsPlayer(game, player);
+
         AgendaModel agenda = Mapper.getAgenda(game.lookAtTopAgenda(0));
         Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
         MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
@@ -3926,7 +3937,7 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("bottomAgenda_")
-    public static void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
         AgendaHelper.putBottom(Integer.parseInt(agendaNumID), game);
         AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
@@ -3941,7 +3952,16 @@ public class AgendaHelper {
         } else {
             game.setStoredValue(key, game.getStoredValue(key) + "_bottom");
         }
+
+        recordPoliticsPlayer(game, player);
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void recordPoliticsPlayer(Game game, Player player) {
+        String politicsHolder = "round" + game.getRound() + "PoliticsHolder";
+        if (game.getStoredValue(politicsHolder).isEmpty()) {
+            game.setStoredValue(politicsHolder, player.getRepresentation(false, false));
+        }
     }
 
     @ButtonHandler("proceedToVoting")
