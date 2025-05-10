@@ -93,7 +93,7 @@ class SearchSources extends Subcommand {
         occurrences.put("Events", getEventsSources(compSource).size());
         occurrences.put("Explores", getExploresSources(compSource).size());
         occurrences.put("Factions", getFactionsSources(compSource).size());
-        occurrences.put("Draft Errata", getDraftErratasSources(compSource).size());
+        occurrences.put("Draft Errata", getDraftErratasSources(compSource).size()); // Draft Errata is related to files in \data\franken_errata\*
         occurrences.put("Generic Cards", getGenericCardsSources(compSource).size());
         occurrences.put("Leaders", getLeadersSources(compSource).size());
         //occurrences.put("Map Templates", get...(compSource).size());

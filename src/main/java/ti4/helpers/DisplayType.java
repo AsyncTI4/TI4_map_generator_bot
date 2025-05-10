@@ -17,7 +17,8 @@ public enum DisplayType {
     attachments("attachments"),
     shipless("shipless"),
     googly("googly"),
-    landscape("landscape");
+    landscape("landscape"),
+    unlocked("unlocked");
 
     public final String value;
 
