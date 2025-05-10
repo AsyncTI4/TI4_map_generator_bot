@@ -919,7 +919,7 @@
         "faction": "qhet",
         "baseUpgrade": "inf2",
         "source": "ds",
-        "text": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the start of the status phase, place up to 2 units that are on this card on each planet that contains 1 or more of your structures.1(x2) 7; PLANETARY SHIELD"
+        "text": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the end of your turn, place up to 2 units that are on this card on 1 planet that contains your units..1(x2) 7; PLANETARY SHIELD"
     },
     {
         "alias": "dsqhetcr",

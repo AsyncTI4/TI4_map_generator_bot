@@ -175,7 +175,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 (totalAmount <= 10 ? UnitEmojis.infantry.toString().repeat(totalAmount)
                     : UnitEmojis.infantry + "×" + totalAmount)
-                    + " died and auto-revived. You will be prompted to place them on planets containing your structures at the start of the status phase.");
+                    + " died and auto-revived. You will be able to place up to two of these infantry on a planet with your units at the end of your turn.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
         }
@@ -4380,7 +4380,7 @@ public class ButtonHelper {
             return new ArrayList<>();
         }
         if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
-            && game.getStoredValue("vaylerianHeroActive").isEmpty() && (player == game.getActivePlayer() || !game.getStoredValue("allianceModeSimultaneousAction").isEmpty())) {
+            && game.getStoredValue("vaylerianHeroActive").isEmpty() && ((player == game.getActivePlayer() && tile.getPosition().equalsIgnoreCase(game.getActiveSystem())) || !game.getStoredValue("allianceModeSimultaneousAction").isEmpty())) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 player.setTacticalCC(player.getTacticalCC() + 1);
             }
@@ -4421,7 +4421,7 @@ public class ButtonHelper {
 
         List<Button> buttons = ButtonHelper.getLandingTroopsButtons(player, game, event, tile);
         Button concludeMove;
-        if (game.isNaaluAgent() || player == game.getActivePlayer() || !game.getStoredValue("allianceModeSimultaneousAction").isEmpty()) {
+        if (game.isNaaluAgent() || (player == game.getActivePlayer() && tile.getPosition().equalsIgnoreCase(game.getActiveSystem())) || !game.getStoredValue("allianceModeSimultaneousAction").isEmpty()) {
             concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done Landing Troops");
         } else {
             concludeMove = Buttons.red(finChecker + "deleteButtons", "Done Resolving");

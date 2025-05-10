@@ -113,6 +113,7 @@ public class VoteButtonHandler {
     public static void tiedPlanets(ButtonInteractionEvent event, String buttonID, Game game) {
         buttonID = buttonID.replace("tiedPlanets_", "");
         buttonID = buttonID.replace("resolveAgendaVote_outcomeTie*_", "");
+        buttonID = buttonID.replace("agendaResolution_", "");
         String factionOrColor = buttonID;
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Chose to break tie for one of " + factionOrColor

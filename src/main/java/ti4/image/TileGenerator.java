@@ -1225,11 +1225,11 @@ public class TileGenerator {
     }
 
     private static void addBorderDecoration(
-                int direction,
-                String secondaryTile,
-                Graphics tileGraphics,
-                BorderAnomalyModel.BorderAnomalyType decorationType
-            ) {
+        int direction,
+        String secondaryTile,
+        Graphics tileGraphics,
+        BorderAnomalyModel.BorderAnomalyType decorationType
+    ) {
         Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
         if (decorationType == null) {
@@ -1467,11 +1467,11 @@ public class TileGenerator {
     }
 
     private static void addPlanetToken(
-                Tile tile,
-                Graphics tileGraphics,
-                UnitHolder unitHolder,
-                List<Rectangle> rectangles
-            ) {
+        Tile tile,
+        Graphics tileGraphics,
+        UnitHolder unitHolder,
+        List<Rectangle> rectangles
+    ) {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort((o1, o2) -> {
             if ((o1.contains("nanoforge") || o1.contains("titanspn"))) {
@@ -1563,6 +1563,11 @@ public class TileGenerator {
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
             return false;
         }
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility("synthesis") && player.getReadiedPlanets().contains(unitHolder.getName())) {
+                return true;
+            }
+        }
 
         Map<Units.UnitKey, Integer> units = unitHolder.getUnits();
 
@@ -1604,11 +1609,11 @@ public class TileGenerator {
     }
 
     private static void oldFormatPlanetTokenAdd(
-                Tile tile,
-                Graphics tileGraphics,
-                UnitHolder unitHolder,
-                List<String> tokenList
-            ) {
+        Tile tile,
+        Graphics tileGraphics,
+        UnitHolder unitHolder,
+        List<String> tokenList
+    ) {
         int deltaY = 0;
         int offSet = 0;
         Point centerPosition = unitHolder.getHolderCenterPosition();

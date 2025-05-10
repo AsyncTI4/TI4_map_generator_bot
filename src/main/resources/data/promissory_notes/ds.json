@@ -400,7 +400,7 @@
         "color": "",
         "playArea": true,
         "source": "ds",
-        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nAt the start of a round of combat, you may exhaust this card to place 2 infantry from your reinforcements on a planet you control. \nOnce per combat, after 1 of your infantry is destroyed, the Pharad'n player may capture that unit."
+        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nWhen 1 of your opponent’s units would be destroyed during combat, you may exhaust this card to replace that unit with 1 ground force of the same unit type from your reinforcements instead. Then, the Pharad'n player captures 1 infantry from their reinforcements."
     },
     {
         "alias": "dspnqhet",
