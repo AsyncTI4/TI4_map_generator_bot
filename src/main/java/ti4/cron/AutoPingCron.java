@@ -241,7 +241,7 @@ public class AutoPingCron {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), poMsg + "please indicate if you are scoring a public objective");
             }
             if (!game.isFowMode() && (soMsg.length() > 0)) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), poMsg + "please indicate if you are scoring a secret objective");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), soMsg + "please indicate if you are scoring a secret objective");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
