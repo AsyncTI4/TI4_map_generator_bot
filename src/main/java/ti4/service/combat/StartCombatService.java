@@ -551,7 +551,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
                     "you may use the button unlock the system or draw 1 AC (Qhet Hero Ability).", buttons);
             }
-            if (player.hasAbility("data_recovery")) {
+            if (player.hasAbility("data_recovery") && player != game.getActivePlayer()) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "dataRecovery_" + otherPlayer.getColor(), "Grab 1 Control Token", FactionEmojis.qhet));
