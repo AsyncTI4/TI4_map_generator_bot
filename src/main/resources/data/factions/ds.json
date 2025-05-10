@@ -1147,7 +1147,7 @@
         "factionTech": ["dsqhetinf", "dsqhetcr"],
         "startingTech": ["sr","sar"],
         "homePlanets": ["qhet","drakkol"],
-        "abilities": ["data_recovery", "black_ops"],
+        "abilities": ["data_recovery", "black_ops", "tempest_squads"],
         "leaders": ["qhetagent", "qhetcommander", "qhethero"],
         "promissoryNotes": ["dspnqhet"],
         "units": [

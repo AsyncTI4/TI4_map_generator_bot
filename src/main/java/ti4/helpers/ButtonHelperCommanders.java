@@ -114,28 +114,27 @@ public class ButtonHelperCommanders {
 
     }
 
-    @ButtonHandler("qhetCommander_")
-    public static void qhetCommander(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("qhetHero_")
+    public static void qhetHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String systemPos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(systemPos);
-        if (player.getTg() < 2) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required 2tgs");
-            return;
-        }
-        if (player.getStrategicCC() < 1) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required strategy CC");
-            return;
-        }
+        // if (player.getTg() < 2) {
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required 2tgs");
+        //     return;
+        // }
+        // if (player.getStrategicCC() < 1) {
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required strategy CC");
+        //     return;
+        // }
         if (!CommandCounterHelper.hasCC(player, tile)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " the system does not have your CC in it");
             return;
         }
-        player.setTg(player.getTg() - 2);
-        player.setStrategicCC(player.getStrategicCC() - 1);
+        // player.setTg(player.getTg() - 2);
+        // player.setStrategicCC(player.getStrategicCC() - 1);
         RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
-        resolveMuaatCommanderCheck(player, game, event);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " spent 2tg and a strategy CC to remove the command token from " + tile.getRepresentationForButtons());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " remove the command token from " + tile.getRepresentationForButtons() + " using their hero ability");
     }
 
     @ButtonHandler("arboCommanderBuild_")
