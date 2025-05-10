@@ -3188,7 +3188,7 @@ public class ButtonHelper {
         }
         if (player.getStasisInfantry() > 0 && player.hasTech("dsqhetinf")) {
             endButtons.add(Buttons.red(finChecker + "startQhetInfRevival", "Revive Up To 2 Infantry"));
-            
+        }
         if (!player.hasAbility("arms_dealers")) {
             for (String shipOrder : getPlayersShipOrders(player)) {
                 if (!Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought",
