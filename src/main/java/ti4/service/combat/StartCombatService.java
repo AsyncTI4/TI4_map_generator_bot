@@ -337,7 +337,7 @@ public class StartCombatService {
                         Player pharadn = game.getPNOwner("dspnphar");
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(Buttons.green(pharadn.getFinsFactionCheckerPrefix() + "capture1Pharad", "Capture 1 Infantry", FactionEmojis.pharadn));
-                        MessageHelper.sendMessageToChannelWithButtons(threadChannel, pharadn.getRepresentation() + " you can use this button when/if a " + player.getFactionEmoji() + " infantry dies to capture one infantry, per the power of your PN.", buttons);
+                        MessageHelper.sendMessageToChannelWithButtons(threadChannel, pharadn.getRepresentation() + " you can use this button when/if " + player.getFactionEmoji() + " uses your PN power.", buttons);
                     }
                 }
             }
@@ -543,18 +543,19 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
                     "you may use the button to resolve S'ula Mentarion, the Mentak commander.", buttons);
             }
-            if (game.playerHasLeaderUnlockedOrAlliance(player, "qhetcommander")) {
+            if (player.getLeader("qhethero").map(Leader::isActive).orElse(false)) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(finChecker + "qhetCommander_" + tile.getPosition(), "Pay to Unlock " + tile.getRepresentationForButtons(), FactionEmojis.qhet));
+                buttons.add(Buttons.gray(finChecker + "qhetHero_" + tile.getPosition(), "Unlock " + tile.getRepresentationForButtons(), FactionEmojis.qhet));
+                buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card", FactionEmojis.qhet));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
-                    "you may use the button to spend 1 command token from your strategy pool and 2 trade goods to unlock the system (Qhet commander Ability).", buttons);
+                    "you may use the button unlock the system or draw 1 AC (Qhet Hero Ability).", buttons);
             }
             if (player.hasAbility("data_recovery")) {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "dataRecovery_" + otherPlayer.getColor(), "Grab 1 Control Token", FactionEmojis.qhet));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you lose the combat, " +
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you lose a unit in this combat, " +
                     "you may use the button to grab one of the opponents control tokens using data recovery.", buttons);
             }
             if (player.hasAbility("black_ops") && player == game.getActivePlayer()) {
@@ -570,13 +571,9 @@ public class StartCombatService {
                         "you may use the button to cash in 2 of the control tokens you hold in order to draw an SO. Or turn in 5 control tokens to get a CC and an opponent SO.", buttons);
                 }
             }
-            if (player.getLeader("qhethero").map(Leader::isActive).orElse(false)) {
-                String finChecker = "FFCC_" + player.getFaction() + "_";
-                buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(finChecker + "qhetHeroAbility_commandtoken", "Gain 1 CC"));
-                buttons.add(Buttons.gray(finChecker + "qhetHeroAbility_additionalAction", "Do additional Action"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win a combat during this action " +
-                    "you may use the button (at the end of the action) to either do an additional action or gain 1 command token.", buttons);
+            if (game.playerHasLeaderUnlockedOrAlliance(player, "qhetcommander") && player == game.getActivePlayer()) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win a combat during this action " +
+                    "you may take an additional action (Qhet Commander Ability)");
             }
             if (player.getPromissoryNotes().keySet().contains("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
@@ -971,12 +968,12 @@ public class StartCombatService {
         if (isSpaceCombat && p1.hasAbility("foresight") && p1.getStrategicCC() > 0) {
             buttons.add(Buttons.red("retreat_" + pos + "_foresight", "Foresight", FactionEmojis.Naalu));
         }
-        if (p2.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty() && !game.isFowMode()) {
-            buttons.add(Buttons.gray(p2.getFinsFactionCheckerPrefix() + "pharadnPNUse", "Get 2 Inf On A Planet You Control", FactionEmojis.pharadn));
-        }
-        if (p1.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty()) {
-            buttons.add(Buttons.gray(p1.getFinsFactionCheckerPrefix() + "pharadnPNUse", "Get 2 Inf On A Planet You Control", FactionEmojis.pharadn));
-        }
+        // if (p2.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty() && !game.isFowMode()) {
+        //     buttons.add(Buttons.gray(p2.getFinsFactionCheckerPrefix() + "pharadnPNUse", "Get 2 Inf On A Planet You Control", FactionEmojis.pharadn));
+        // }
+        // if (p1.getPromissoryNotesInPlayArea().contains("dspnphar") && game.getStoredValue("pharadnPNUsed").isEmpty()) {
+        //     buttons.add(Buttons.gray(p1.getFinsFactionCheckerPrefix() + "pharadnPNUse", "Get 2 Inf On A Planet You Control", FactionEmojis.pharadn));
+        // }
         boolean gheminaCommanderApplicable = false;
         if (tile.getPlanetUnitHolders().isEmpty()) {
             gheminaCommanderApplicable = true;
