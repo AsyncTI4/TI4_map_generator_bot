@@ -1944,6 +1944,23 @@ public class ButtonHelper {
         return planets;
     }
 
+    public static List<String> getPlanetsWithUnits(Player player, Game game) {
+        List<String> planets = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
+                continue;
+            }
+            Planet p = (Planet) getUnitHolderFromPlanetName(planet, game);
+            if (p != null && (p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
+                || p.getUnitCount(UnitType.Pds, player.getColor()) > 0
+                || p.getUnitCount(UnitType.Infantry, player.getColor()) > 0
+                || (p.getUnitCount(UnitType.Mech, player.getColor()) > 0))) {
+                planets.add(planet);
+            }
+        }
+        return planets;
+    }
+
     public static int getNumberOfSpacedocksNotInOrAdjacentHS(Player player, Game game) {
         int count = 0;
         Tile hs = player.getHomeSystemTile();
@@ -3169,6 +3186,9 @@ public class ButtonHelper {
         if (player.getTechs().contains("absol_pi") && !player.getExhaustedTechs().contains("absol_pi")) {
             endButtons.add(Buttons.red(finChecker + "exhaustTech_absol_pi", "Exhaust Predictive Intelligence"));
         }
+        if (player.getStasisInfantry() > 0 && player.hasTech("dsqhetinf")) {
+            endButtons.add(Buttons.red(finChecker + "startQhetInfRevival", "Revive Up To 2 Infantry"));
+            
         if (!player.hasAbility("arms_dealers")) {
             for (String shipOrder : getPlayersShipOrders(player)) {
                 if (!Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought",

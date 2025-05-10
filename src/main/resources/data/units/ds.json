@@ -441,7 +441,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This system is a Sigil. Place an Edyn Sigil token beneath this unit as a reminder. Game effects cannot prevent you from using this ability.",
+        "ability": "This system is a Sigil anomaly. Place an Edyn Sigil token beneath this unit as a reminder. Game effects cannot prevent you from using this ability.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/mechs/rune_bearer.png?raw=true"
     },
     {
