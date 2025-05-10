@@ -5,10 +5,14 @@ import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.service.map.CustomHyperlaneService;
 
+import static ti4.image.TileGenerator.TILE_HEIGHT;
+import static ti4.image.TileGenerator.TILE_WIDTH;
+
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
@@ -25,8 +29,8 @@ import java.util.Set;
 
 public class HyperlaneTileGenerator {
 
-    private static final int CENTER_X = TileGenerator.TILE_WIDTH / 2;
-    private static final int CENTER_Y = TileGenerator.TILE_HEIGHT / 2;
+    private static final float CENTER_X = TILE_WIDTH / 2.0f;
+    private static final float CENTER_Y = TILE_HEIGHT / 2.0f;
 
     private static final List<String> RANDOM_BACKGROUNDS = List.of(
       "hl_empty.png"
@@ -52,7 +56,7 @@ public class HyperlaneTileGenerator {
     private enum HLStroke {
         GLOW(20, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f)),
         GAP(10, AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f)),
-        CORE(4, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f));
+        CORE(4, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
 
         final float width;
         final AlphaComposite composite;
@@ -99,30 +103,30 @@ public class HyperlaneTileGenerator {
 
     //Shape templates
     private static final Shape STRAIGHT_LINE_TEMPLATE = new Line2D.Float(
-        172, 0,
-        172, 300
+        CENTER_X, 0,
+        CENTER_X, TILE_HEIGHT
     );
- 
+
     private static final Shape SMALL_CURVE_TEMPLATE = new QuadCurve2D.Float(
-        172, 0,
-        203.5f, 93.75f, 
-        298, 75
+        CENTER_X, 0,
+        218.7f, 69.98f, 
+        302, 75 //302.4038f, 75
     );
 
     private static final Shape LARGE_CURVE_TEMPLATE = new QuadCurve2D.Float(
-        172, 0,
-        166.5f, 153.5f, 
-        298, 224
+        CENTER_X, 0,
+        181.2f, 144.98f,
+        302, 225 //302.4038f, 225.0f
     );
 
     private static final Shape ROUNDABOUT = new Ellipse2D.Float(
-          112, 90, 
+          112.5f, 90, 
           120, 120
     );
 
     private static final Shape ROUNDABOUT_CONNECTOR_TEMPLATE = new Line2D.Float(
-        172, 0,
-        172, 90
+        CENTER_X, 0,
+        CENTER_X, 90
     );
 
     //Map connections to templates
@@ -143,6 +147,8 @@ public class HyperlaneTileGenerator {
 
         BufferedImage hyperlane = getRandomTransformedBackground(tile, matrix);
         Graphics2D g = hyperlane.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
         Set<Shape> shapes = new LinkedHashSet<>();
    
@@ -175,6 +181,7 @@ public class HyperlaneTileGenerator {
         for (Shape shape : shapes) g.draw(shape);
     }
     
+    //If looking for selfConnections, return only those
     private static Set<List<Integer>> getConnectionsFromMatrix(String matrix, boolean selfConnections) {
         Set<List<Integer>> pairs = new HashSet<>();
         if (matrix == null) {
@@ -193,36 +200,27 @@ public class HyperlaneTileGenerator {
         return pairs;
     }
 
-    private static BufferedImage getRandomTransformedBackground(Tile tile, String seedKey) {
+    //Randomize hyperlane tile background based on matrix, or use default if no matrix present
+    private static BufferedImage getRandomTransformedBackground(Tile tile, String matrix) {
         String tilePath = tile.getTilePath();
-        if (seedKey != null) {
-            String randomTile = RANDOM_BACKGROUNDS.get(new Random(seedKey.hashCode()).nextInt(RANDOM_BACKGROUNDS.size()));
+        if (matrix != null) {
+            String randomTile = RANDOM_BACKGROUNDS.get(new Random(matrix.hashCode()).nextInt(RANDOM_BACKGROUNDS.size()));
             tilePath = ResourceHelper.getInstance().getTileFile(randomTile);
             if (tilePath == null) {
                 tilePath = tile.getTilePath();
             }
         }
+
         BufferedImage original = ImageHelper.read(tilePath);
-
-        int w = original.getWidth();
-        int h = original.getHeight();
-
-        BufferedImage transformed = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage transformed = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = transformed.createGraphics();
     
-        int transform = seedKey != null ? Math.abs(seedKey.hashCode()) % 4 : -1;
+        int transform = matrix != null ? Math.abs(matrix.hashCode()) % 4 : -1;
         switch (transform) {
-            case 1: // Horizontal flip
-                g.drawImage(original, 0, 0, w, h, w, 0, 0, h, null);
-                break;
-            case 2: // Vertical flip
-                g.drawImage(original, 0, 0, w, h, 0, h, w, 0, null);
-                break;
-            case 3: // Both flips (180° rotate)
-                g.drawImage(original, 0, 0, w, h, w, h, 0, 0, null);
-                break;
-            default: // No transformation
-                g.drawImage(original, 0, 0, null);
+            case 1 -> g.drawImage(original, 0, 0, TILE_WIDTH, TILE_HEIGHT, TILE_WIDTH, 0, 0, TILE_HEIGHT, null); // Horizontal flip
+            case 2 -> g.drawImage(original, 0, 0, TILE_WIDTH, TILE_HEIGHT, 0, TILE_HEIGHT, TILE_WIDTH, 0, null); // Vertical flip
+            case 3 -> g.drawImage(original, 0, 0, TILE_WIDTH, TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, 0, null); // Both flips (180° rotate)
+            default -> g.drawImage(original, 0, 0, null);  // No transformation
         }
     
         g.dispose();
