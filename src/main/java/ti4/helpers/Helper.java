@@ -1106,6 +1106,7 @@ public class Helper {
         }
         int tg = player.getSpentTgsThisWindow();
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
+
         int bestRes = 0;
         int keleresAgent = 0;
         for (String thing : spentThings) {
@@ -1143,12 +1144,21 @@ public class Helper {
                             bestRes = planet.getResources();
                         }
                     }
+                    int gledgeMech = 0;
+                    if (player.hasUnit("gledge_mech") && !xxchaHero) {
+                        gledgeMech = planet.getUnitCount(UnitType.Mech, player);
+                        res += Math.min(gledgeMech, planet.getInfluence());
+                    }
                     if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
                         if (xxchaHero) {
                             msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
                             res += planet.getSumResourcesInfluence();
                         } else {
-                            msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game)).append("\n");
+                            if (Math.min(gledgeMech, planet.getInfluence()) > 0) {
+                                msg.append(getPlanetRepresentationPlusEmojiPlusResourceInfluence(thing, game)).append("\n");
+                            } else {
+                                msg.append(getPlanetRepresentationPlusEmojiPlusResources(thing, game)).append("\n");
+                            }
                             res += planet.getResources();
                         }
                     } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {

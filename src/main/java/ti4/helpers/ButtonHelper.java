@@ -175,7 +175,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 (totalAmount <= 10 ? UnitEmojis.infantry.toString().repeat(totalAmount)
                     : UnitEmojis.infantry + "×" + totalAmount)
-                    + " died and auto-revived. You will be prompted to place them on planets containing your structures at the start of the status phase.");
+                    + " died and auto-revived. You will be able to place up to two of these infantry on a planet with your units at the end of your turn.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
         }
@@ -1944,6 +1944,23 @@ public class ButtonHelper {
         return planets;
     }
 
+    public static List<String> getPlanetsWithUnits(Player player, Game game) {
+        List<String> planets = new ArrayList<>();
+        for (String planet : player.getPlanetsAllianceMode()) {
+            if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
+                continue;
+            }
+            Planet p = (Planet) getUnitHolderFromPlanetName(planet, game);
+            if (p != null && (p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
+                || p.getUnitCount(UnitType.Pds, player.getColor()) > 0
+                || p.getUnitCount(UnitType.Infantry, player.getColor()) > 0
+                || (p.getUnitCount(UnitType.Mech, player.getColor()) > 0))) {
+                planets.add(planet);
+            }
+        }
+        return planets;
+    }
+
     public static int getNumberOfSpacedocksNotInOrAdjacentHS(Player player, Game game) {
         int count = 0;
         Tile hs = player.getHomeSystemTile();
@@ -3169,6 +3186,9 @@ public class ButtonHelper {
         if (player.getTechs().contains("absol_pi") && !player.getExhaustedTechs().contains("absol_pi")) {
             endButtons.add(Buttons.red(finChecker + "exhaustTech_absol_pi", "Exhaust Predictive Intelligence"));
         }
+        if (player.getStasisInfantry() > 0 && player.hasTech("dsqhetinf")) {
+            endButtons.add(Buttons.red(finChecker + "startQhetInfRevival", "Revive Up To 2 Infantry"));
+        }
         if (!player.hasAbility("arms_dealers")) {
             for (String shipOrder : getPlayersShipOrders(player)) {
                 if (!Helper.getTileWithShipsNTokenPlaceUnitButtons(player, game, "dreadnought",
@@ -4380,7 +4400,7 @@ public class ButtonHelper {
             return new ArrayList<>();
         }
         if (!game.isNaaluAgent() && !game.isL1Hero() && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
-            && game.getStoredValue("vaylerianHeroActive").isEmpty() && (player == game.getActivePlayer() || !game.getStoredValue("allianceModeSimultaneousAction").isEmpty())) {
+            && game.getStoredValue("vaylerianHeroActive").isEmpty() && ((player == game.getActivePlayer() && tile.getPosition().equalsIgnoreCase(game.getActiveSystem())) || !game.getStoredValue("allianceModeSimultaneousAction").isEmpty())) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 player.setTacticalCC(player.getTacticalCC() + 1);
             }
@@ -4421,7 +4441,7 @@ public class ButtonHelper {
 
         List<Button> buttons = ButtonHelper.getLandingTroopsButtons(player, game, event, tile);
         Button concludeMove;
-        if (game.isNaaluAgent() || player == game.getActivePlayer() || !game.getStoredValue("allianceModeSimultaneousAction").isEmpty()) {
+        if (game.isNaaluAgent() || (player == game.getActivePlayer() && tile.getPosition().equalsIgnoreCase(game.getActiveSystem())) || !game.getStoredValue("allianceModeSimultaneousAction").isEmpty()) {
             concludeMove = Buttons.red(finChecker + "doneLanding_" + tile.getPosition(), "Done Landing Troops");
         } else {
             concludeMove = Buttons.red(finChecker + "deleteButtons", "Done Resolving");
@@ -4910,9 +4930,7 @@ public class ButtonHelper {
                             } else {
                                 messageBuilder.append(" (distance exceeds move value (").append(distance).append(" > ")
                                     .append(moveValue).append("), __does not have _Gravity Drive___)");
-                                if (game.isFowMode()) {
-                                    GMService.logPlayerActivity(game, player, messageBuilder.toString());
-                                }
+                                GMService.logPlayerActivity(game, player, messageBuilder.toString());
                             }
                             if (player.getTechs().contains("dsgledb")) {
                                 messageBuilder.append(" (has _Lightning Drives_ for +1 movement if not transporting)");

@@ -66,9 +66,10 @@ public class TileGenerator {
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
     private static final int TILE_EXTRA_WIDTH = 260;
     private static final int EXTRA_X = 100;
-    private static final int TILE_WIDTH = 345;
-    private static final int TILE_HEIGHT = 300;
     private static final int EXTRA_Y = 100;
+
+    public static final int TILE_WIDTH = 345;
+    public static final int TILE_HEIGHT = 300;
 
     private final Game game;
     private final GenericInteractionCreateEvent event;
@@ -219,14 +220,10 @@ public class TileGenerator {
             case Setup -> {
             } // do nothing
             case Tile -> {
-                BufferedImage image = ImageHelper.read(tile.getTilePath());
+                BufferedImage image = CustomHyperlaneService.isCustomHyperlaneTile(tile)
+                    ? HyperlaneTileGenerator.generateHyperlaneTile(tile, game)
+                    : ImageHelper.read(tile.getTilePath());
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
-
-                //Custom Hyperlane stuff
-                if (CustomHyperlaneService.isCustomHyperlaneTile(tile) && game.getCustomHyperlaneData().containsKey(tile.getPosition())) {
-                    BufferedImage hyperlanes = HyperlaneTileGenerator.generateHyperlaneTile(game, game.getCustomHyperlaneData().get(tile.getPosition()));
-                    tileGraphics.drawImage(hyperlanes, TILE_PADDING, TILE_PADDING, null);
-                }
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
                 if (tile.isAnomaly(game) && tileShipPositions != null) {
@@ -1225,11 +1222,11 @@ public class TileGenerator {
     }
 
     private static void addBorderDecoration(
-                int direction,
-                String secondaryTile,
-                Graphics tileGraphics,
-                BorderAnomalyModel.BorderAnomalyType decorationType
-            ) {
+        int direction,
+        String secondaryTile,
+        Graphics tileGraphics,
+        BorderAnomalyModel.BorderAnomalyType decorationType
+    ) {
         Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
         if (decorationType == null) {
@@ -1467,11 +1464,11 @@ public class TileGenerator {
     }
 
     private static void addPlanetToken(
-                Tile tile,
-                Graphics tileGraphics,
-                UnitHolder unitHolder,
-                List<Rectangle> rectangles
-            ) {
+        Tile tile,
+        Graphics tileGraphics,
+        UnitHolder unitHolder,
+        List<Rectangle> rectangles
+    ) {
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort((o1, o2) -> {
             if ((o1.contains("nanoforge") || o1.contains("titanspn"))) {
@@ -1563,6 +1560,11 @@ public class TileGenerator {
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
             return false;
         }
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility("synthesis") && player.getReadiedPlanets().contains(unitHolder.getName())) {
+                return true;
+            }
+        }
 
         Map<Units.UnitKey, Integer> units = unitHolder.getUnits();
 
@@ -1604,11 +1606,11 @@ public class TileGenerator {
     }
 
     private static void oldFormatPlanetTokenAdd(
-                Tile tile,
-                Graphics tileGraphics,
-                UnitHolder unitHolder,
-                List<String> tokenList
-            ) {
+        Tile tile,
+        Graphics tileGraphics,
+        UnitHolder unitHolder,
+        List<String> tokenList
+    ) {
         int deltaY = 0;
         int offSet = 0;
         Point centerPosition = unitHolder.getHolderCenterPosition();
