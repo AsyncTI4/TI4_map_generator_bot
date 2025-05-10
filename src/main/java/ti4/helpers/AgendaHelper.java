@@ -444,7 +444,7 @@ public class AgendaHelper {
                         }
 
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                            "The game is currently waiting on " + num + ((num > 1) ? " people" : " person") + " to decide on \"whens\".");
+                            "The game is currently waiting on " + pluralPerson(num) + " to decide on \"whens\".");
                     } else {
                         game.setStoredValue("queuedWhens",
                             game.getStoredValue("queuedWhens").replace(player.getFaction() + "_", ""));
@@ -509,7 +509,7 @@ public class AgendaHelper {
                             num++;
                         }
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                            "The game is currently waiting on " + num + ((num > 1) ? " people" : " person") + " to decide on \"afters\".");
+                            "The game is currently waiting on " + pluralPerson(num) + " to decide on \"afters\".");
                         return; // The person up has not yet decided whether to queue or not queue an after
                     } else {
                         game.setStoredValue("queuedAfters",
@@ -672,12 +672,17 @@ public class AgendaHelper {
             }
         }
         String msg = player.getRepresentation(true, false)
-            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ";
+            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + pluralPerson(num) + "). They have been pinged in their private thread. ";
         if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
-            msg += "The " + AgendaHelper.getPlayersWhoNeedToPreVoted(game).size() + " who still need to decide on voting were also reminded";
+            msg += "The " + pluralPerson(AgendaHelper.getPlayersWhoNeedToPreVoted(game).size()) + " who still need to decide on voting were also reminded";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
+    }
+
+    private static String pluralPerson(int num){
+        String result = num + ((num > 1) ? " people" : " person");
+        return result;
     }
 
     @ButtonHandler("queueAWhen")
@@ -1142,7 +1147,7 @@ public class AgendaHelper {
                     if (getPlayersWhoNeedToPreVoted(game).isEmpty()) {
                         startTheVoting(game);
                     } else {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Game needs " + getPlayersWhoNeedToPreVoted(game).size() + " more people to pre-vote before voting will start");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Game needs " + pluralPerson(getPlayersWhoNeedToPreVoted(game).size()) + " to pre-vote before voting will start");
                     }
                 }
 
