@@ -1,0 +1,56 @@
+[
+    {
+        "id": "minent",
+        "name": "Minor Entropic Field",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 1 command token and 1 trade good.",
+        "flavorText": "*After the Naaz-Rokha's discoveries in the wake of the Acheron event, various enterprising corporations quickly sought to stake their claims in areas well suited to entropic field harvesting.*",
+        "source": "codex3"
+    },
+    {
+        "id": "ent",
+        "name": "Entropic Field",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 1 command token and 2 trade goods.",
+        "flavorText": "*Several destroyers, a light cruiser, and even a pair of Eidolons patrolled the field during major extraction operations. One could never be too careful.*",
+        "source": "codex3"
+    },
+    {
+        "id": "majent",
+        "name": "Major Entropic Field",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 1 command token and 3 trade goods.",
+        "flavorText": "Jaset had worked the field for several months before the dreams began to bleed into waking hours. Voices. Flashes of red. Dust-filled caverns that went deep into the planet's core. He'd blink and rub his eyes and carry on with his work. Exhaustion, he told himself. Nothing more.",
+        "source": "codex3"
+    },
+    {
+        "id": "kel1",
+        "name": "Keleres Ship",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 2 command tokens.",
+        "flavorText": "*The stranded Keleres were grateful for the resupply, and offered to assist the research team in any way that they could.*",
+        "source": "codex3"
+    },
+    {
+        "id": "kel2",
+        "name": "Keleres Ship",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Gain 2 command tokens.",
+        "flavorText": "*The* Hinterlight *moved steadily toward the distress beacon, broadcasting their own response on all channels.*",
+        "source": "codex3"
+    },
+    {
+        "id": "dw",
+        "name": "Dead World",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Draw 1 relic.",
+        "flavorText": "*The* Best Guess *drifted through the debris. Layers of rock and...metal? It was all being held together by some kind of electric field—the same field that had hidden it from their scanners. With a growing sense of unease, they hastened their salvage.*",
+        "source": "codex3"
+    }
+]

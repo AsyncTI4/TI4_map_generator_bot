@@ -1,0 +1,304 @@
+[
+    {
+        "id": "imperialresearchinstitute",
+        "name": "Imperial Research Institute",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: This planet gains a non-unit technology specialty (exhaust this planet to ignore one prerequisite on any non-unit upgrade).",
+        "attachmentId": "imperialinstitute",
+        "source": "asteroid"
+    },
+    {
+        "id": "tradeoffice",
+        "name": "Trade Office",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: Whenever you exhaust this planet, gain 1 commodity.",
+        "attachmentId": "lloyd_traderoute",
+        "source": "asteroid"
+    },
+    {
+        "id": "spyagency",
+        "name": "Spy Agency",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: Whenever you ready this planet, draw 1 action card, or 2 if you have the Neural Motivators technology.",
+        "attachmentId": "lloyd_interplanetaryhub",
+        "source": "asteroid"
+    },
+    {
+        "id": "galacticheritagesite",
+        "name": "Galactic Heritage Site",
+        "type": "Cultural",
+        "resolution": "Attach",
+        "text": "ATTACH: While this planet has no units on it, it is worth a point to whoever controls it.",
+        "attachmentId": "galacticheritagesite",
+        "source": "asteroid"
+    },
+    {
+        "id": "distinguishedcouncilor",
+        "name": "Distinguished Councilor",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "You may purge your agent and replace it with this card. While this card is your agent, it counts as a point.",
+        "source": "asteroid"
+    },
+    {
+        "id": "talentedofficer1",
+        "name": "Talented Officer",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Redistribute up to 1 command token, or spend 1 influence to gain 1 command token.",
+        "source": "asteroid"
+    },
+    {
+        "id": "talentedofficer2",
+        "name": "Talented Officer",
+        "type": "Cultural",
+        "resolution": "Instant",
+        "text": "Redistribute up to 1 command token, or spend 1 influence to gain 1 command token.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf1",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf2",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf3",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf4",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf5",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "acrf6",
+        "name": "Cultural Relic Fragment",
+        "type": "Cultural",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your cultural relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "weaponsresearchfacility",
+        "name": "Weapons Research Facility",
+        "type": "Hazardous",
+        "resolution": "Attach",
+        "text": "ATTACH: This planet gains a unit technology specialty (exhaust this planet to ignore one prerequisite on any unit upgrade).",
+        "attachmentId": "weapon",
+        "source": "asteroid"
+    },
+    {
+        "id": "freighterconversion1",
+        "name": "Freighter Conversion",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place this card face-up in your play area, you may capture one of your carrier units from the board or your reserves. Place a captured carrier on this card. While you have a carrier on this card, your commodity value is increased by 1. At any time, you may return one of your carriers you have captured to your reserves. If this card does not have a captured carrier on it, purge this card.",
+        "source": "asteroid"
+    },
+    {
+        "id": "freighterconversion2",
+        "name": "Freighter Conversion",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "Place this card face-up in your play area, you may capture one of your carrier units from the board or your reserves. Place a captured carrier on this card. While you have a carrier on this card, your commodity value is increased by 1. At any time, you may return one of your carriers you have captured to your reserves. If this card does not have a captured carrier on it, purge this card.",
+        "source": "asteroid"
+    },
+    {
+        "id": "bootstrapping1",
+        "name": "Bootstrapping",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "You may remove a mech or remove an infantry and pay 2 resources to place a structure onto this planet.",
+        "source": "asteroid"
+    },
+    {
+        "id": "bootstrapping2",
+        "name": "Bootstrapping",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "You may remove a mech or remove an infantry and pay 2 resources to place a structure onto this planet.",
+        "source": "asteroid"
+    },
+    {
+        "id": "wormholegenerator1",
+        "name": "Wormhole Generator",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "You may place a non-delta wormhole token of your choice in this sytem. If you do, gain 1 trade good for each player that is your neighbor.",
+        "source": "asteroid"
+    },
+    {
+        "id": "wormholegenerator2",
+        "name": "Wormhole Generator",
+        "type": "Hazardous",
+        "resolution": "Instant",
+        "text": "You may place a non-delta wormhole token of your choice in this sytem. If you do, gain 1 trade good for each player that is your neighbor.",
+        "source": "asteroid"
+    },
+    {
+        "id": "ahrf1",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "ahrf2",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "ahrf3",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "ahrf4",
+        "name": "Hazardous Relic Fragment",
+        "type": "Hazardous",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your hazardous relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "constructionyard1",
+        "name": "Construction Yard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Choose a ship in this system. You may replace that ship with one from your reinforcements that costs up to 1 more than the replaced ship.",
+        "source": "asteroid"
+    },
+    {
+        "id": "constructionyard2",
+        "name": "Construction Yard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Choose a ship in this system. You may replace that ship with one from your reinforcements that costs up to 1 more than the replaced ship.",
+        "source": "asteroid"
+    },
+    {
+        "id": "constructionyard3",
+        "name": "Construction Yard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Choose a ship in this system. You may replace that ship with one from your reinforcements that costs up to 1 more than the replaced ship.",
+        "source": "asteroid"
+    },
+    {
+        "id": "constructionyard4",
+        "name": "Construction Yard",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "Choose a ship in this system. You may replace that ship with one from your reinforcements that costs up to 1 more than the replaced ship.",
+        "source": "asteroid"
+    },
+    {
+        "id": "abandonedkeel1",
+        "name": "Abandoned Keel",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may produce 1 non-fighter ship or 2 fighters in this system, spending commodities as if they were trade goods.",
+        "source": "asteroid"
+    },
+    {
+        "id": "abandonedkeel2",
+        "name": "Abandoned Keel",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may produce 1 non-fighter ship or 2 fighters in this system, spending commodities as if they were trade goods.",
+        "source": "asteroid"
+    },
+    {
+        "id": "abandonedkeel3",
+        "name": "Abandoned Keel",
+        "type": "Industrial",
+        "resolution": "Instant",
+        "text": "You may produce 1 non-fighter ship or 2 fighters in this system, spending commodities as if they were trade goods.",
+        "source": "asteroid"
+    },
+    {
+        "id": "lazaxmanufactorum",
+        "name": "Lazax Manufactorum",
+        "type": "Industrial",
+        "resolution": "Attach",
+        "text": "ATTACH: While this planet has a spacedock, it is legendary and worth a point to whoever controls it. Any structures on this planet are treated as though you had their unit upgrade technologies if you do not have them. When you produce units in this system, reduce the combined cost of the produced units by 1.",
+        "attachmentId": "manufactorum",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf1",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf2",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf3",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf4",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    },
+    {
+        "id": "airf5",
+        "name": "Industrial Relic Fragment",
+        "type": "Industrial",
+        "resolution": "Fragment",
+        "text": "ACTION: Purge 3 of your industrial relic fragments to gain 1 relic.",
+        "source": "asteroid"
+    }
+]

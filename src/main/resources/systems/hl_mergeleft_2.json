@@ -1,6 +1,7 @@
 {
     "id": "hl_mergeleft_2",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "mergeleft_2"
     ],
@@ -22,5 +23,6 @@
     ],
     "wormholes": [],
     "planets": [],
-    "source": "andcat"
+    "source": "andcat",
+    "tileBack": "black"
 }

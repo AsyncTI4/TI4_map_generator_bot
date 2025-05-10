@@ -6,9 +6,10 @@ import java.nio.file.Paths;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;
+import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 
-public class DiscordantStars extends HelpSubcommandData {
+class DiscordantStars extends Subcommand {
 
     public DiscordantStars() {
         super("discordant_stars", "Display DS Help Text");

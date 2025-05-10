@@ -5,7 +5,8 @@
         "faction": "argent",
         "playArea": false,
         "source": "pok",
-        "text": "When 1 or more of your units make a roll for a unit ability: Choose 1 of those units to roll 1 additional die. Then, return this card to the Argent player."
+        "text": "When 1 or more of your units make a roll for a unit ability: Choose 1 of those units to roll 1 additional die. Then, return this card to the Argent player.",
+        "shrinkName": true
     },
     {
         "alias": "war_funding",
@@ -29,7 +30,8 @@
         "faction": "muaat",
         "playArea": false,
         "source": "base",
-        "text": "Action: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player."
+        "text": "ACTION: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player.",
+        "shrinkName": true
     },
     {
         "alias": "convoys",
@@ -38,7 +40,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "base",
-        "text": "Action: Place this card faceup in your play area. While this card is in your play area, you may negotiate transactions with players who are not your neighbor.  If you activate a system that contains 1 or more of the Hacan player's units, return this card to the Hacan player."
+        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, you may negotiate transactions with players who are not your neighbor.  If you activate a system that contains 1 or more of the Hacan player's units, return this card to the Hacan player."
     },
     {
         "alias": "blood_pact",
@@ -47,7 +49,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "pok",
-        "text": "Action: Place this card faceup in your play area. When you and the Empyrean player cast votes for the same outcome, cast 4 additional votes for that outcome. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
+        "text": "ACTION: Place this card faceup in your play area. When you and the Empyrean player cast votes for the same outcome, cast 4 additional votes for that outcome. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
     },
     {
         "alias": "ms",
@@ -71,7 +73,9 @@
         "faction": "l1z1x",
         "playArea": false,
         "source": "base",
-        "text": "When you gain command tokens during the status phase: Gain 1 additional command token. Then, return this card to the L1Z1X player."
+        "text": "When you gain command tokens during the status phase: Gain 1 additional command token. Then, return this card to the L1Z1X player.",
+        "shortName": "Cybernetic Enh'nc'm'nts",
+        "shrinkName": true
     },
     {
         "alias": "scepter",
@@ -88,7 +92,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "base",
-        "text": "Action: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their Pillage faction ability against you. If you activate a system that contains 1 or more of the Mentak player's units, return this card to the Mentak player."
+        "text": "ACTION: Place this card faceup in your play area. While this card is in your play area, the Mentak player cannot use their Pillage faction ability against you. If you activate a system that contains 1 or more of the Mentak player's units, return this card to the Mentak player."
     },
     {
         "alias": "gift",
@@ -97,7 +101,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "base",
-        "text": "At the end of the Strategy Phase: Place this card faceup in your play area and place the Naalu '0' token on your strategy card, you are the first in initiative order. The Naalu player cannot use his Telepathic faction ability during this game round. Return this card to the Naalu player at the end of the status phase."
+        "text": "At the end of the Strategy Phase: Place this card faceup in your play area and place the Naalu '0' token on your strategy card, you are the first in initiative order. The Naalu player cannot use their Telepathic faction ability during this game round. Return this card to the Naalu player at the end of the status phase."
     },
     {
         "alias": "bmf",
@@ -105,7 +109,9 @@
         "faction": "naaz",
         "playArea": false,
         "source": "pok",
-        "text": "Action: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player."
+        "text": "ACTION: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player.",
+        "shortName": "Black M'rk't Forgery",
+        "shrinkName": true
     },
     {
         "alias": "antivirus",
@@ -122,7 +128,7 @@
         "faction": "nomad",
         "playArea": false,
         "source": "pok",
-        "text": "At the start of a space combat against a player other than the Nomad: During this combat, treat 1 of your non-fighter ships as if it has the Sustain Damage ability, combat value, and Anti-Fighter Barrage value of the Nomad's flagship. Return this card to the Nomad player at the end of the combat."
+        "text": "At the start of a space combat against a player other than the Nomad: During this combat, treat 1 of your non-fighter ships as if it has the SUSTAIN DAMAGE ability, combat value, and ANTI-FIGHTER BARRAGE value of the Nomad's flagship. Return this card to the Nomad player at the end of the combat."
     },
     {
         "alias": "tekklar",
@@ -140,7 +146,7 @@
         "playImmediately": false,
         "attachment": "titanspn",
         "source": "pok",
-        "text": "Action: Attach this card to a non-home planet you control other than Mecatol Rex. Its resource and influence values are each increased by 1, and it is treated as having all 3 planet traits (cultural, hazardous, and industrial)."
+        "text": "ACTION: Attach this card to a non-home planet you control other than Mecatol Rex. Its resource and influence values are each increased by 1, and it is treated as having all 3 planet traits (cultural, hazardous, and industrial)."
     },
     {
         "alias": "ra",
@@ -156,7 +162,7 @@
         "faction": "cabal",
         "playArea": false,
         "source": "pok",
-        "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement, apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player."
+        "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement, apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player. [Note: This promissory note will only ever add +1 movement total, regardless of how many gravity rifts you pass through]"
     },
     {
         "alias": "acq",
@@ -164,7 +170,8 @@
         "faction": "winnu",
         "playArea": false,
         "source": "base",
-        "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player."
+        "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player.",
+        "shortName": "Acqui\n-escence"
     },
     {
         "alias": "favor",
@@ -205,7 +212,7 @@
         "playArea": true,
         "playImmediately": false,
         "source": "pok",
-        "text": "Action: Place this card faceup in your play area. When you give a number of commodities to the Empyrean player equal to your maximum commodity value, you each gain 1 trade good. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
+        "text": "ACTION: Place this card faceup in your play area. When you give a number of commodities to the Empyrean player equal to your maximum commodity value, you each gain 1 trade good. If you activate a system that contains 1 or more of the Empyrean player's units, return this card to the Empyrean player."
     },
     {
         "alias": "rider",

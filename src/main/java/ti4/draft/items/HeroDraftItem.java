@@ -6,11 +6,11 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
+import ti4.image.Mapper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
+import ti4.service.emoji.TI4Emoji;
 
 public class HeroDraftItem extends DraftItem {
     public HeroDraftItem(String itemId) {
@@ -44,13 +44,12 @@ public class HeroDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-
+    public TI4Emoji getItemEmoji() {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            return Emojis.getEmojiFromDiscord(leader.getID());
+            return leader.getLeaderEmoji();
         }
-        return "";
+        return null;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
@@ -66,7 +65,7 @@ public class HeroDraftItem extends DraftItem {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf((String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
-                allItems.add(DraftItem.Generate(Category.HERO, leader));
+                allItems.add(DraftItem.generate(Category.HERO, leader));
             }
         }
         return allItems;

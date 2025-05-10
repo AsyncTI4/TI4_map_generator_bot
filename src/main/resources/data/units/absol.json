@@ -1,7 +1,7 @@
 [
     {
         "id": "plenaryorbital",
-        "baseType": "spacedock",
+        "baseType": "plenaryorbital",
         "asyncId": "plenaryorbital",
         "name": "Plenary Orbital",
         "source": "absol",
@@ -10,11 +10,12 @@
         "fleetSupplyBonus": 2,
         "planetaryShield": true,
         "isStructure": true,
-        "ability": "Deploy: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that does not contain a space dock. The planet this card is attached to contains this unit. Up to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in the system do not count against your fleet pool.  This unit cannot be affected by opponent's action cards.  When this unit is destroyed or removed, purge this card."
+        "ability": "DEPLOY: After you activate a system, attach this card to a non-home planet other than Mecatol Rex you control in that system that does not contain a space dock. The planet this card is attached to contains this unit.\nUp to 8 fighters in this system do not count against your ships' capacity. Up to 2 non-fighter ships in the system do not count against your fleet pool.\nThis unit cannot be affected by opponent's action cards.\nWhen this unit is destroyed or removed, purge this card.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/PlenaryOrbital.jpg?raw=true"
     },
     {
         "id": "tyrantslament",
-        "baseType": "flagship",
+        "baseType": "tyrantslament",
         "asyncId": "tyrantslament",
         "name": "Tyrant's Lament",
         "source": "absol",
@@ -28,7 +29,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Deploy: At the end of your turn, you may place this unit in any system that contains your ships. When this unit is removed or captured, purge this card. This unit is not affected by action cards, anomalies, or your faction abilities or technologies."
+        "ability": "DEPLOY: At the end of your turn, you may place this unit in any system that contains your ships.\nWhen this unit is removed or captured, purge this card.\nThis unit is not affected by action cards, anomalies, or your faction abilities or technologies.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/TyrantsLament.jpg?raw=true"
     },
     {
         "id": "absol_xxcha_mech",
@@ -44,8 +46,10 @@
         "spaceCannonHitsOn": 8,
         "spaceCannonDieCount": 1,
         "sustainDamage": true,
+        "isGroundForce": true,
         "ability": "When this unit uses SUSTAIN DAMAGE, cancel 2 hits instead of 1.",
-        "homebrewReplacesID": "xxcha_mech"
+        "homebrewReplacesID": "xxcha_mech",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/Indomitus.png?raw=true"
     },
     {
         "id": "absol_yssaril_mech",
@@ -60,8 +64,26 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit may be committed to planets from space areas and planets in or adjacent to the active system.",
-        "homebrewReplacesID": "yssaril_mech"
+        "ability": "This unit can be committed from planets in the active system and from planets and space areas in adjacent systems that do not contain 1 of your command tokens.",
+        "homebrewReplacesID": "yssaril_mech",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/BlackshadeInfiltrator.png?raw=true"
+    },
+    {
+        "id": "absol_muaat_mech",
+        "baseType": "mech",
+        "asyncId": "mf",
+        "name": "Ember Colossus",
+        "source": "absol",
+        "faction": "muaat",
+        "capacityUsed": 1,
+        "cost": 2,
+        "combatHitsOn": 6,
+        "combatDieCount": 1,
+        "sustainDamage": true,
+        "isGroundForce": true,
+        "ability": "When you use your STAR FORGE faction ability or your flagship component action in this system or an adjacent system, you may place 1 infantry from your reinforcements with this unit.",
+        "homebrewReplacesID": "muaat_mech",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/BlackshadeInfiltrator.png?raw=true"
     },
     {
         "id": "absol_yin_mech",
@@ -77,7 +99,8 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "You may use the Indoctrination ability on this planet without spending influence.",
-        "homebrewReplacesID": "yin_mech"
+        "homebrewReplacesID": "yin_mech",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/MoyinsAshes.png?raw=true"
     },
     {
         "id": "absol_saar_mech",
@@ -93,7 +116,8 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "DEPLOY:  After you gain control of a planet, you may spend 1 trade good to replace 1 infantry on that planet with 1 mech.",
-        "homebrewReplacesID": "saar_mech"
+        "homebrewReplacesID": "saar_mech",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/ScavengerZeta.png?raw=true"
     },
     {
         "id": "absol_arborec_mech",
@@ -110,8 +134,9 @@
         "planetaryShield": true,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit may count as a structure when it is on a planet; DEPLOY:  When you would place a structure on a planet, you may place 1 mech on that planet instead.",
-        "homebrewReplacesID": "arborec_mech"
+        "ability": "This unit may count as a structure when it is on a planet.\nDEPLOY: When you would place a structure on a planet, you may place 1 mech on that planet instead.",
+        "homebrewReplacesID": "arborec_mech",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/LetaniBehemoth.png?raw=true"
     },
     {
         "id": "absol_keleres_mech",
@@ -127,7 +152,8 @@
         "sustainDamage": true,
         "isGroundForce": true,
         "ability": "Once per invasion, other players must spend 1 influence per mech to commit ground forces to this planet.",
-        "homebrewReplacesID": "keleres_mech"
+        "homebrewReplacesID": "keleres_mech",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/Omniopiares.png?raw=true"
     },
     {
         "id": "absol_naaz_mech_space",
@@ -141,8 +167,9 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "If this unit is in the space area of the active system, it is also a ship. At the end of a space battle in the active system, flip this card.",
-        "homebrewReplacesID": "naaz_mech_space"
+        "ability": "If this unit is in the space area of the active system, it is also a ship.\nAt the end of a space battle in the active system, flip this card.",
+        "homebrewReplacesID": "naaz_mech_space",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/ZGravEidolon.png?raw=true"
     },
     {
         "id": "absol_spacedock2",
@@ -153,10 +180,13 @@
         "requiredTechId": "absol_sd2",
         "source": "absol",
         "productionValue": "+4",
+        "basicProduction": "res",
         "capacityValue": 5,
         "fleetSupplyBonus": 1,
         "isStructure": true,
-        "homebrewReplacesID": "spacedock2"
+        "ability": "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 5 fighters in this system do not count against your ships' capacity.1 non-fighter ship in this system does not count against your fleet pool",
+        "homebrewReplacesID": "spacedock2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/SpaceDockII.png?raw=true"
     },
     {
         "id": "absol_infantry2",
@@ -172,7 +202,8 @@
         "combatDieCount": 1,
         "isGroundForce": true,
         "ability": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home.",
-        "homebrewReplacesID": "infantry2"
+        "homebrewReplacesID": "infantry2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/infantry_2.jpg?raw=true"
     },
     {
         "id": "absol_pds2",
@@ -185,9 +216,11 @@
         "spaceCannonHitsOn": 5,
         "spaceCannonDieCount": 1,
         "deepSpaceCannon": true,
+        "ability": "You may use this unit's SPACE CANNON against ships that are in adjacent systems.",
         "planetaryShield": true,
         "isStructure": true,
-        "homebrewReplacesID": "pds2"
+        "homebrewReplacesID": "pds2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/pds_2.jpg?raw=true"
     },
     {
         "id": "absol_fighter2",
@@ -203,8 +236,9 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
-        "homebrewReplacesID": "fighter2"
+        "ability": "This unit may move without being transported.\nFighters in excess of your ships' capacity count against your fleet pool.",
+        "homebrewReplacesID": "fighter2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/fighter_2.jpg?raw=true"
     },
     {
         "id": "absol_destroyer2",
@@ -222,8 +256,9 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
+        "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able.",
         "homebrewReplacesID": "destroyer2",
-        "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able."
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/DestroyerII.png?raw=true"
     },
     {
         "id": "absol_cruiser2",
@@ -240,7 +275,8 @@
         "combatHitsOn": 6,
         "combatDieCount": 1,
         "isShip": true,
-        "homebrewReplacesID": "cruiser2"
+        "homebrewReplacesID": "cruiser2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/cruiser_2.jpg?raw=true"
     },
     {
         "id": "absol_carrier2",
@@ -257,7 +293,8 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "isShip": true,
-        "homebrewReplacesID": "carrier2"
+        "homebrewReplacesID": "carrier2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/carrier_2.jpg?raw=true"
     },
     {
         "id": "absol_dreadnought2",
@@ -279,7 +316,8 @@
         "canBeDirectHit": false,
         "isShip": true,
         "homebrewReplacesID": "dreadnought2",
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/dreadnought_2.jpg?raw=true"
     },
     {
         "id": "absol_warsun",
@@ -299,8 +337,9 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
+        "ability": "Other players' units in this system lose PLANETARY SHIELD.",
         "homebrewReplacesID": "warsun",
-        "ability": "Other players' units in this system lose PLANETARY SHIELD."
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/absol/WarSun.png?raw=true"
     },
     {
         "id": "absol_sol_carrier2",
@@ -320,7 +359,8 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "homebrewReplacesID": "sol_carrier2"
+        "homebrewReplacesID": "sol_carrier2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/advanced_carrier_2.jpg?raw=true"
     },
     {
         "id": "absol_sol_infantry2",
@@ -337,7 +377,8 @@
         "combatDieCount": 1,
         "isGroundForce": true,
         "ability": "After this unit is destroyed, roll 1 die. If the result is 5 or greater, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet you control in your home system.",
-        "homebrewReplacesID": "sol_infantry2"
+        "homebrewReplacesID": "sol_infantry2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/SpecOpsII.png?raw=true"
     },
     {
         "id": "absol_sardakk_dreadnought2",
@@ -358,8 +399,9 @@
         "bombardDieCount": 2,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards. After a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
-        "homebrewReplacesID": "sardakk_dreadnought2"
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.\nAfter a round of space combat, you may destroy this unit to destroy up to 2 ships in the system.",
+        "homebrewReplacesID": "sardakk_dreadnought2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/exotrireme_2.jpg?raw=true"
     },
     {
         "id": "absol_l1z1x_dreadnought2",
@@ -381,7 +423,8 @@
         "sustainDamage": true,
         "isShip": true,
         "homebrewReplacesID": "l1z1x_dreadnought2",
-        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards."
+        "ability": "This unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/superdreadnought_2.jpg?raw=true"
     },
     {
         "id": "absol_naalu_fighter2",
@@ -399,7 +442,8 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "homebrewReplacesID": "naalu_fighter2",
-        "ability": "This unit may move without being transported. Each fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool."
+        "ability": "This unit may move without being transported.\nEach fighter in excess of your ships' capacity counts as 1/2 of a ship against your fleet pool.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/hybrid_crystal_fighter_2.jpg?raw=true"
     },
     {
         "id": "absol_muaat_warsun2",
@@ -422,8 +466,9 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": false,
         "isShip": true,
-        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.This unit cannot be destroyed by \"Direct Hit\" action cards.",
-        "homebrewReplacesID": "muaat_warsun2"
+        "ability": "Other players' units in this system lose the PLANETARY SHIELD ability.\nThis unit cannot be destroyed by \"Direct Hit\" action cards.",
+        "homebrewReplacesID": "muaat_warsun2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/PrototypeWarSunII.png?raw=true"
     },
     {
         "id": "absol_saar_spacedock2",
@@ -439,8 +484,9 @@
         "capacityValue": 6,
         "fleetSupplyBonus": 1,
         "isStructure": true,
-        "ability": "This unit is placed in the space area instead of on a planet. This unit can move and retreat as if it were a ship. If this unit is blockaded, it is destroyed. 1 non-fighter ship in this system does not count against your fleet pool.",
-        "homebrewReplacesID": "saar_spacedock2"
+        "ability": "This unit is placed in the space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nIf this unit is blockaded, it is destroyed.\n1 non-fighter ship in this system does not count against your fleet pool.",
+        "homebrewReplacesID": "saar_spacedock2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/FloatingFactoryII.png?raw=true"
     },
     {
         "id": "absol_arborec_infantry2",
@@ -457,8 +503,9 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed, place the unit on this card. At the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control and return the rest to your reinforcements.",
-        "homebrewReplacesID": "arborec_infantry2"
+        "ability": "After this unit is destroyed, place the unit on this card. At the start of your next turn, for every 2 units that are on this card, place 1 on a planet you control.",
+        "homebrewReplacesID": "arborec_infantry2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/LetaniWarriorII.png?raw=true"
     },
     {
         "id": "absol_titans_pds2",
@@ -479,8 +526,9 @@
         "sustainDamage": true,
         "isStructure": true,
         "isGroundForce": true,
-        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
-        "homebrewReplacesID": "titans_pds2"
+        "ability": "This unit is treated as both a structure and a ground force. It cannot be transported.\nYou may use this unit's SPACE CANNON against ships that are adjacent to this unit's systems.",
+        "homebrewReplacesID": "titans_pds2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/heltitan_2.jpg?raw=true"
     },
     {
         "id": "absol_titans_cruiser2",
@@ -499,7 +547,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "homebrewReplacesID": "titans_cruiser2"
+        "homebrewReplacesID": "titans_cruiser2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/saturn_engine_2.jpg?raw=true"
     },
     {
         "id": "absol_argent_destroyer2",
@@ -519,8 +568,9 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able. When this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
-        "homebrewReplacesID": "argent_destroyer2"
+        "ability": "When this unit generates a hit on a combat roll, your opponent must destroy 1 fighter in the active system, if able.\nWhen this unit uses ANTI-FIGHTER BARRAGE, each result of 9 or 10 also destroys 1 of your opponent's infantry in the space area of the active system.",
+        "homebrewReplacesID": "argent_destroyer2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/StrikeWingAlphaII.png?raw=true"
     },
     {
         "id": "absol_cabal_spacedock2",
@@ -534,13 +584,14 @@
         "productionValue": 7,
         "fleetSupplyBonus": 1,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 10 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.",
-        "homebrewReplacesID": "cabal_spacedock2"
+        "ability": "PRODUCTION 7. This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 10 fighters in this system do not count against your ships' capacity. 1 non-fighter ship in this system does not count against your fleet pool.",
+        "homebrewReplacesID": "cabal_spacedock2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/DimensionalTearII.png?raw=true"
     },
     {
         "id": "absol_cabal_spacedock2Alt",
         "baseType": "spacedock",
-        "asyncId": "csd",
+        "asyncId": "sd",
         "name": "Dimensional Tear II",
         "upgradesFromUnitId": "cabal_spacedock",
         "requiredTechId": "absol_dt2",
@@ -548,7 +599,7 @@
         "faction": "cabal",
         "productionValue": 7,
         "isStructure": true,
-        "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 12 fighters in this system do not count against your ships' capacity.",
+        "ability": "PRODUCTION 7. This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder.\nUp to 12 fighters in this system do not count against your ships' capacity.",
         "homebrewReplacesID": "cabal_spacedock2"
     },
     {
@@ -572,7 +623,8 @@
         "canBeDirectHit": true,
         "isShip": true,
         "ability": "You may treat this unit as if it were adjacent to systems that contain 1 or more of your mechs.",
-        "homebrewReplacesID": "nomad_flagship2"
+        "homebrewReplacesID": "nomad_flagship2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/MemoriaII.png?raw=true"
     },
     {
         "id": "absol_mahact_infantry2",
@@ -589,6 +641,7 @@
         "combatDieCount": 1,
         "isGroundForce": true,
         "ability": "After this unit is destroyed, gain 2 commodities or convert 1 of your commodities to a trade good. Then, place the unit on this card. At the start of your next turn, place each unit that is on this card on a planet that contains 1 of your structures.",
-        "homebrewReplacesID": "mahact_infantry2"
+        "homebrewReplacesID": "mahact_infantry2",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/absol/faction/CrimsonLegionnaireII.png?raw=true"
     }
 ]

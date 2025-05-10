@@ -1,98 +1,39 @@
 package ti4.commands.planet;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
-import ti4.generator.MapGenerator;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.message.MessageHelper;
 
-public class PlanetCommand implements Command {
+public class PlanetCommand implements ParentCommand {
 
-    private final Collection<PlanetSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+            new PlanetAdd(),
+            new PlanetRemove(),
+            new PlanetExhaust(),
+            new PlanetRefresh(),
+            new PlanetExhaustAbility(),
+            new PlanetRefreshAbility(),
+            new PlanetRefreshAll(),
+            new PlanetExhaustAll(),
+            new PlanetInfo()
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.PLANET;
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        if (event.getName().equals(getActionID())) {
-            String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-                return false;
-            }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (!userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        PlanetSubcommandData executedCommand = null;
-        for (PlanetSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                executedCommand = subcommand;
-                break;
-            }
-        }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
-
-        MapGenerator.saveImageToWebsiteOnly(game, event);
-    }
-
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Add/remove/exhaust/ready/spend planets";
     }
 
-    private Collection<PlanetSubcommandData> getSubcommands() {
-        Collection<PlanetSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new PlanetAdd());
-        subcommands.add(new PlanetRemove());
-        subcommands.add(new PlanetExhaust());
-        subcommands.add(new PlanetRefresh());
-        subcommands.add(new PlanetExhaustAbility());
-        subcommands.add(new PlanetRefreshAbility());
-        subcommands.add(new PlanetRefreshAll());
-        subcommands.add(new PlanetExhaustAll());
-        subcommands.add(new PlanetInfo());
-
+    @Override
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
     }
-
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
-    }
-
 }

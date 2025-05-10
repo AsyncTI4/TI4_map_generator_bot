@@ -1,70 +1,23 @@
 package ti4.commands.special;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.tokens.AddCC;
-import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.message.MessageHelper;
+import ti4.helpers.DiploSystemHelper;
 
-public class DiploSystem extends SpecialSubcommandData {
+class DiploSystem extends GameStateSubcommand {
+
     public DiploSystem() {
-        super(Constants.DIPLO_SYSTEM, "Diplomacy a system");
+        super(Constants.DIPLO_SYSTEM, "Diplo (lock down) a system", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player that is Diplo'ing"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color that is Diplo'ing").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-
-        OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
-            return;
-        }
-
-        diploSystem(event, game, player, tileOption.getAsString().toLowerCase());
-    }
-
-    public static boolean diploSystem(GenericInteractionCreateEvent event, Game game, Player player, String tileToResolve) {
-        String tileID = AliasHandler.resolveTile(tileToResolve);
-
-        Tile tile = game.getTile(tileID);
-        if (tile == null) {
-            tile = game.getTileByPosition(tileID);
-        }
-        if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
-            return false;
-        }
-
-        for (Player player_ : game.getPlayers().values()) {
-            if (player_ != player && player_.isRealPlayer() && !player.getAllianceMembers().contains(player_.getFaction())) {
-                String color = player_.getColor();
-                if (Mapper.isValidColor(color)) {
-                    AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, game, color);
-                }
-            }
-        }
-
-        return true;
+        DiploSystemHelper.diploSystem(event, getGame(), getPlayer(), event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
     }
 }

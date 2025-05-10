@@ -1,20 +1,18 @@
 package ti4.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
-public interface Command {
-    String getActionID();
+public interface Command  {
 
-    //If command can be executed for given command text
-    boolean accept(SlashCommandInteractionEvent event);
+    default boolean accept(SlashCommandInteractionEvent event) {
+        return event.getName().equals(getName());
+    }
 
-    //Command action execution method
+    default void preExecute(SlashCommandInteractionEvent event) {}
+
     void execute(SlashCommandInteractionEvent event);
 
-    void registerCommands(CommandListUpdateAction commands);
+    default void postExecute(SlashCommandInteractionEvent event) {}
 
-    default void postExecute(SlashCommandInteractionEvent event) {
-        event.getHook().deleteOriginal().submit();
-    }
+    String getName();
 }

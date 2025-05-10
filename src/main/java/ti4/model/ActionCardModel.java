@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,8 +8,8 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
 
 @Data
 public class ActionCardModel implements ModelInterface, EmbeddableModel {
@@ -21,6 +21,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String text;
     private String flavorText;
     private String imageURL;
+    private String automationID;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
 
@@ -33,23 +34,37 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
             && source != null;
     }
 
+    public String getNameRepresentation() {
+        return CardEmojis.ActionCard + "_" + name + "_";
+    }
+
     public String getRepresentation() {
-        return getRepresentationJustName() + ": _" + window + ":_ " + text + "\n";
+        return getRepresentationJustName() + " - " + window + ": " + text + "\n";
     }
 
     public String getRepresentationJustName() {
-        return Emojis.ActionCard + "__**" + name + "**__ *(" + phase + " Phase)*";
+        return CardEmojis.ActionCard + "_" + name + "_";
+    }
+
+    public String getRepresentationJustText() {
+        return getWindow() + ": " + getText();
     }
 
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false, false);
     }
 
+    public String getAutomationID() {
+        if (automationID == null)
+            return alias;
+        return automationID;
+    }
+
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        String title = Emojis.ActionCard + "__**" + getName() + "**__" + getSource().emoji();
+        String title = CardEmojis.ActionCard + "__**" + getName() + "**__" + getSource().emoji();
         eb.setTitle(title);
 
         //DESCRIPTION

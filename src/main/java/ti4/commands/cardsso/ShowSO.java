@@ -6,57 +6,48 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.info.SecretObjectiveInfoService;
 
-public class ShowSO extends SOCardsSubcommandData {
+class ShowSO extends GameStateSubcommand {
+
     public ShowSO() {
-        super(Constants.SHOW_SO, "Show a Secret Objective to a player");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the SO (action/agenda/status). Default false"));
+        super(Constants.SHOW_SO, "Show a Secret Objective to a player", true, true);
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID, which is found between ()").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Target faction or color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color (defaults to you)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ONLY_PHASE, "Show only the phase of the secret objective (action/agenda/status). Default false"));
 
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-        OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Please select what Secret Objective to show");
-            return;
-        }
-
-        int soIndex = option.getAsInt();
+        Player player = getPlayer();
+        int soIndex = event.getOption(Constants.SECRET_OBJECTIVE_ID).getAsInt();
         String soID = null;
         for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
             if (so.getValue().equals(soIndex)) {
                 soID = so.getKey();
             }
         }
-        boolean onlyPhase = false;
-        if (event.getOption(Constants.ONLY_PHASE) != null && event.getOption(Constants.ONLY_PHASE).getAsBoolean()) {
-            onlyPhase = true;
-        }
 
         if (soID == null) {
-            MessageHelper.sendMessageToEventChannel(event, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToEventChannel(event, "No such secret objective ID found, please retry.");
             return;
         }
-        String info = SOInfo.getSecretObjectiveRepresentation(soID);
+
+        String info = SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID);
+        boolean onlyPhase = event.getOption(Constants.ONLY_PHASE, false, OptionMapping::getAsBoolean);
         if (onlyPhase) {
             info = Mapper.getSecretObjective(soID).getPhase();
         }
+        Game game = getGame();
         String sb = "Game: " + game.getName() + "\n" +
             "Player: " + player.getUserName() + "\n" +
             "Showed Secret Objectives:" + "\n" +
@@ -64,14 +55,14 @@ public class ShowSO extends SOCardsSubcommandData {
 
         player.setSecret(soID);
 
-        Player player_ = Helper.getPlayer(game, null, event);
-        if (player_ == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player not found");
+        Player targetPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
+        if (targetPlayer == null) {
+            MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
 
-        MessageHelper.sendMessageToEventChannel(event, "SO shown to player");
-        SOInfo.sendSecretObjectiveInfo(game, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, game, sb);
+        MessageHelper.sendMessageToEventChannel(event, "Secret objective shown to player.");
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, sb);
     }
 }

@@ -1,5 +1,7 @@
 package ti4.commands.bothelper;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -9,11 +11,14 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.TimeUtil;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.message.BotLogger;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.message.MessageHelper;
 
-public class ArchiveOldThreads extends BothelperSubcommandData {
+class ArchiveOldThreads extends Subcommand {
+
     public ArchiveOldThreads() {
         super(Constants.ARCHIVE_OLD_THREADS, "Archive a number of the oldest active threads");
         addOptions(new OptionData(OptionType.INTEGER, Constants.THREAD_COUNT, "Number of threads to archive (1 to 1000)").setRequired(true));
@@ -26,35 +31,26 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
             return;
         }
         MessageHelper.sendMessageToEventChannel(event, "Archiving " + threadCount + " threads");
-        MessageHelper.sendMessageToEventChannel(event, ListOldThreads.getOldThreadsMessage(event.getGuild(), threadCount));
+        MessageHelper.sendMessageToEventChannel(event, getOldThreadsMessage(event.getGuild(), threadCount));
 
-        archiveOldThreads(event.getGuild(), threadCount);
+        ThreadArchiveHelper.archiveOldThreads(event.getGuild(), threadCount);
     }
 
-    public static void archiveOldThreads(Guild guild, Integer threadCount) {
-
-        // Try gathering all threads that are not bot-map or cards-info threads
-        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream()
-            .filter(ListOldThreads.filter)
-            .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates") && !threadChannel.getName().contains("cards-info"))
-            .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-            .limit(threadCount)
-            .toList();
-
-        // If there are less channels in the list than requested to close, include cards-info threads
-        if (threadChannels.size() < (threadCount - 1)) {
-            threadChannels = guild.getThreadChannels().stream()
-                .filter(ListOldThreads.filter)
-                .filter(threadChannel -> !threadChannel.getName().contains("bot-map-updates"))
+    private static String getOldThreadsMessage(Guild guild, Integer channelCount) {
+        List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        threadChannels = threadChannels.stream()
+                .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
                 .sorted(Comparator.comparing(MessageChannel::getLatestMessageId))
-                .limit(threadCount)
+                .limit(channelCount)
                 .toList();
-        }
 
+        StringBuilder sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
-            threadChannel.getManager()
-                .setArchived(true)
-                .queue(null, BotLogger::catchRestError);
+            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
+            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            sb.append("> `").append(latestActivityTime).append(" (").append(duration.toHours()).append(" hours ago)`  ").append(threadChannel.getAsMention()).append(" **")
+                    .append(threadChannel.getName()).append("** from channel **").append(threadChannel.getParentChannel().getName()).append("**\n");
         }
+        return sb.toString();
     }
 }

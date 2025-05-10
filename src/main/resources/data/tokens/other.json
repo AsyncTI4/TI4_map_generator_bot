@@ -1,0 +1,186 @@
+[
+    {
+        "id": "anomaly",
+        "imagePath": "token_anomalydummy.png",
+        "spaceOrPlanet": "space",
+        "isAnomaly": true,
+        "isRift": false,
+        "isNebula": false,
+        "source": "other"
+    },
+    {
+        "id": "big_obelisk",
+        "imagePath": "token_big_obelisk.png",
+        "source": "other"
+    },
+    {
+        "id": "consulate",
+        "imagePath": "token_consulate.png",
+        "spaceOrPlanet": "planet",
+        "aliasList": ["consulate", "token_consulate"],
+        "source": "oath_of_kings"
+    },
+    {
+        "id": "creussepsilon",
+        "imagePath": "token_creussepsilon.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["EPSILON"],
+        "source": "other"
+    },
+    {
+        "id": "custom_eronous_whepsilon",
+        "imagePath": "token_custom_eronous_whepsilon.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["CUSTOM_ERONOUS_WHEPSILON"],
+        "source": "eronous"
+    },
+    {
+        "id": "custom_eronous_wheta",
+        "imagePath": "token_custom_eronous_wheta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["CUSTOM_ERONOUS_WHETA"],
+        "source": "eronous"
+    },
+    {
+        "id": "custom_eronous_whiota",
+        "imagePath": "token_custom_eronous_whiota.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["CUSTOM_ERONOUS_WHIOTA"],
+        "source": "eronous"
+    },
+    {
+        "id": "custom_eronous_whtheta",
+        "imagePath": "token_custom_eronous_whtheta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["CUSTOM_ERONOUS_WHTHETA"],
+        "source": "eronous"
+    },
+    {
+        "id": "custom_eronous_whzeta",
+        "imagePath": "token_custom_eronous_whzeta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["CUSTOM_ERONOUS_WHZETA"],
+        "source": "eronous"
+    },
+    {
+        "id": "customempyrean",
+        "imagePath": "token_empyrean.png",
+        "source": "other"
+    },
+    {
+        "id": "customkollecc",
+        "imagePath": "token_ds_customkollecc.png",
+        "source": "other"
+    },
+    {
+        "id": "customnivyn",
+        "imagePath": "token_ds_customnivyn.png",
+        "source": "other"
+    },
+    {
+        "id": "customnokar",
+        "imagePath": "token_ds_customnokar.png",
+        "source": "other"
+    },
+    {
+        "id": "customtnelis",
+        "imagePath": "token_ds_customtnelis.png",
+        "source": "other"
+    },
+    { "id": "customwinnu", "imagePath": "token_winnu.png", "source": "other" },
+    {
+        "id": "speaker",
+        "imagePath": "token_speaker.png",
+        "aliasList": ["speaker", "token_speaker"],
+        "source": "other"
+    },
+    {
+        "id": "installation",
+        "imagePath": "token_installation.png",
+        "source": "asteroid"
+    },
+    {
+        "id": "whalpha",
+        "imagePath": "token_whalpha.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["ALPHA"],
+        "source": "other"
+    },
+    {
+        "id": "whbeta",
+        "imagePath": "token_whbeta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["BETA"],
+        "source": "other"
+    },
+    {
+        "id": "whchampion",
+        "imagePath": "token_whchampion.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["WHCHAMPION"],
+        "source": "eronous"
+    },
+    {
+        "id": "whdelta",
+        "imagePath": "token_whdelta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["DELTA"],
+        "source": "other"
+    },
+    {
+        "id": "whepsilon",
+        "imagePath": "token_whepsilon.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["EPSILON"],
+        "source": "other"
+    },
+    {
+        "id": "wheta",
+        "imagePath": "token_wheta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["ETA"],
+        "source": "other"
+    },
+    {
+        "id": "whgamma",
+        "imagePath": "token_whgamma.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["GAMMA"],
+        "source": "other"
+    },
+    {
+        "id": "whnarrows",
+        "imagePath": "token_whnarrows.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["WHNARROWS"],
+        "source": "eronous"
+    },
+    {
+        "id": "whprobability",
+        "imagePath": "token_whprobability.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["WHPROBABILITY"],
+        "source": "eronous"
+    },
+    {
+        "id": "whvoyage",
+        "imagePath": "token_whvoyage.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["WHVOYAGE"],
+        "source": "eronous"
+    },
+    {
+        "id": "whzeta",
+        "imagePath": "token_whzeta.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["ZETA"],
+        "source": "other"
+    },
+    {
+        "id": "vortex",
+        "imagePath": "token_vortex.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["VORTEX"],
+        "source": "eronous"
+    }
+]

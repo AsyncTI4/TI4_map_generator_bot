@@ -1,110 +1,54 @@
 package ti4.commands.custom;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.message.MessageHelper;
 
-public class CustomCommand implements Command {
+public class CustomCommand implements ParentCommand {
 
-    private final Collection<CustomSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new SoRemoveFromGame(),
+                    new SoAddToGame(),
+                    new AgendaRemoveFromGame(),
+                    new ACRemoveFromGame(),
+                    new SCAddToGame(),
+                    new SCRemoveFromGame(),
+                    new PoRemoveFromGame(),
+                    new PoSetDeck(),
+                    new DiscardSpecificAgenda(),
+                    new SetThreadName(),
+                    new PeekAtObjectiveDeck(),
+                    new PeekAtSecretDeck(),
+                    new PeekAtStage1(),
+                    new PeekAtStage2(),
+                    new SetUpPeakableObjectives(),
+                    new SwapStage1(),
+                    new ShuffleBackInUnrevealedObj(),
+                    new SwapStage2(),
+                    new RevealSpecificStage1(),
+                    new RevealSpecificStage2(),
+                    new SpinTilesInRings(),
+                    new OfferAutoPassOptions(),
+                    new ChangeToBaseGame(),
+                    new CustomizationOptions())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CUSTOM;
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        if (event.getName().equals(getActionID())) {
-            String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-                return false;
-            }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (userActiveGame != null && !userActiveGame.getPlayerIDs().contains(userID) && !userActiveGame.isCommunityMode()) {
-                MessageHelper.replyToMessage(event,
-                    "You're not a player of the game, please call function /join gameName");
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        CustomSubcommandData executedCommand = null;
-        for (CustomSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                executedCommand = subcommand;
-                break;
-            }
-        }
-        if (executedCommand == null) {
-            reply(event);
-        } else {
-            executedCommand.reply(event);
-        }
-    }
-
-    public static void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
-    }
-
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Custom";
     }
 
-    private Collection<CustomSubcommandData> getSubcommands() {
-        Collection<CustomSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new SoRemoveFromGame());
-        subcommands.add(new SoAddToGame());
-        subcommands.add(new AgendaRemoveFromGame());
-        subcommands.add(new ACRemoveFromGame());
-        subcommands.add(new SCAddToGame());
-        subcommands.add(new SCRemoveFromGame());
-        subcommands.add(new PoRemoveFromGame());
-        subcommands.add(new DiscardSpecificAgenda());
-        // subcommands.add(new FixSODeck());
-        subcommands.add(new SetThreadName());
-        subcommands.add(new PeakAtObjectiveDeck());
-        subcommands.add(new PeakAtStage1());
-        subcommands.add(new PeakAtStage2());
-        subcommands.add(new SetUpPeakableObjectives());
-        subcommands.add(new SwapStage1());
-        subcommands.add(new ShuffleBackInUnrevealedObj());
-        subcommands.add(new SwapStage2());
-        subcommands.add(new RevealSpecificStage1());
-        subcommands.add(new RevealSpecificStage2());
-        subcommands.add(new SpinTilesInRings());
-        subcommands.add(new OfferAutoPassOptions());
-        subcommands.add(new OfferAFKTimeOptions());
-        subcommands.add(new ChangeToBaseGame());
-        subcommands.add(new CustomizationOptions());
-        return subcommands;
-    }
-
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
     }
 }

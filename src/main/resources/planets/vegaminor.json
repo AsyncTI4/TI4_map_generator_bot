@@ -2,7 +2,7 @@
     "id": "vegaminor",
     "tileId": "74",
     "name": "Vega Minor",
-    "shortName": null,
+    "shrinkNamePNAttach": true,
     "aliases": [
         "vegaminor",
         "vgamn",

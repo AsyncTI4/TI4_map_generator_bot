@@ -1,25 +1,32 @@
 package ti4.model;
 
-import ti4.helpers.Emojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.SourceEmojis;
+import ti4.service.emoji.TI4Emoji;
 
 public class Source {
 
     public enum ComponentSource {
+        // IF YOU CHANGE THE ENUM VALUE FOR A SOURCE
+        //   then you must change that value for all occurrences in .json files (including sources.json)
+        //   any oversight of an occurrence will make the bot unable to complete Mapper.loadData() at start up, and thus a bunch of Mapper Map objects will be empty
+        // IF YOU ARE LOOKING FOR ALL OCCURRENCES OF A SOURCE ACROSS THE .json FILES
+        //   then you can run the '/search sources' which also look for occurrences (for now it counts occurrences by folder)
 
         // official
         base, pok, codex1, codex2, codex3,
 
         //big homebrew
-        ds, absol, franken, uncharted_space,
+        ds, absol, franken, uncharted_space, monuments,
 
         // lil homebrew
-        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises, 
+        lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises,
 
         // async homebrew
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma,
+        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, riftset, omega_phase,
 
         // catchall
         other;
@@ -65,26 +72,31 @@ public class Source {
         }
 
         public String emoji() {
-            return switch (this) {
-                case base, pok, codex1, codex2, codex3 -> "";
-                case absol -> Emojis.Absol;
-                case ds -> Emojis.DiscordantStars;
-                case uncharted_space -> Emojis.UnchartedSpace;
-                case eronous -> Emojis.Eronous;
-                case admins -> Emojis.AdminsFaction;
-                case ignis_aurora, pbd2000 -> Emojis.IgnisAurora;
-                case keleresplus -> Emojis.KeleresPlus;
-                case project_pi -> Emojis.ProjectPi;
-                case flagshipping -> Emojis.Flagshipping;
-                case promises_promises -> Emojis.PromisesPromises;
-                case miltymod -> Emojis.MiltyMod;
-                case lazax -> Emojis.Lazax;
-                case neutral -> Emojis.Neutral;
-                case salliance -> Emojis.StrategicAlliance;
-                default -> "";
+            TI4Emoji emoji = switch (this) {
+                case absol -> SourceEmojis.Absol;
+                case ds -> SourceEmojis.DiscordantStars;
+                case uncharted_space -> SourceEmojis.UnchartedSpace;
+                case eronous, riftset -> SourceEmojis.Eronous;
+                case admins -> FactionEmojis.AdminsFaction;
+                case ignis_aurora, pbd2000 -> SourceEmojis.IgnisAurora;
+                case keleresplus -> SourceEmojis.KeleresPlus;
+                case project_pi -> SourceEmojis.ProjectPi;
+                case flagshipping -> SourceEmojis.Flagshipping;
+                case promises_promises -> SourceEmojis.PromisesPromises;
+                case miltymod -> SourceEmojis.MiltyMod;
+                case lazax -> FactionEmojis.Lazax;
+                case neutral -> FactionEmojis.Neutral;
+                case salliance -> SourceEmojis.StrategicAlliance;
+                case monuments -> SourceEmojis.Monuments;
+                default -> null;
             };
+            return emoji == null ? "" : emoji.toString();
         }
 
+        /**
+         * Switch to Source Model and \data\sources\ once they are completed
+         * @return
+         */
         public String prettyName() {
             return switch (this) {
                 case base -> "Twilight Imperium 4th Edition (Base Game)";
@@ -94,9 +106,11 @@ public class Source {
                 case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
                 case ds -> "Discordant Stars [Homebrew]";
                 case absol -> "Absol's Mod [Homebrew]";
-                case flagshipping -> "Flagshipping";
-                case promises_promises -> "Promises Promises";
+                case flagshipping -> "Flagshipping [Homebrew]";
+                case promises_promises -> "Promises Promises [Homebrew]";
                 case franken -> "Franken Draft [Homebrew Game Mode]";
+                case monuments -> "Monuments+ [Homebrew]";
+                case omega_phase -> "Omega Phase [Homebrew]";
                 default -> toString();
             };
         }

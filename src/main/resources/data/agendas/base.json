@@ -6,6 +6,8 @@
         "target": "For/Against",
         "text1": "For: After a player researches a technology, that player must destroy 1 of their non-fighter ships.",
         "text2": "Against: At the start of the next strategy phase, each player chooses and exhausts 1 planet for each technology that they own.",
+        "forEmoji": "💥",
+        "againstEmoji": "ExhaustedPlanet",
         "mapText": "After a player researches a technology, that player must destroy 1 of their non-fighter ships.",
         "source": "base"
     },
@@ -25,6 +27,8 @@
         "target": "For/Against",
         "text1": "For: Each player destroys all but 2 of their dreadnoughts and all but 4 of their cruisers.",
         "text2": "Against: At the start of the next strategy phase, each player exhausts each of their planets that have a technology specialty.",
+        "forEmoji": "💥",
+        "againstEmoji": "ExhaustedPlanet",
         "source": "base"
     },
     {
@@ -70,9 +74,9 @@
         "name": "Conventions of War",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Players cannot use Bombardment against units that are on cultural planets.",
+        "text1": "For: Players cannot use BOMBARDMENT against units that are on cultural planets.",
         "text2": "Against: Each player that voted \"Against\" discards all of their action cards.",
-        "mapText": "Players cannot use Bombardment against units that are on cultural planets.",
+        "mapText": "Players cannot use BOMBARDMENT against units that are on cultural planets.",
         "source": "base"
     },
     {
@@ -82,6 +86,8 @@
         "target": "For/Against",
         "text1": "For: Each player returns all of their trade goods to the supply. Then, each player gains 5 trade goods.",
         "text2": "Against: Each player returns all of their trade goods to the supply.",
+        "forEmoji": "5️⃣",
+        "againstEmoji": "0️⃣",
         "source": "base"
     },
     {
@@ -89,8 +95,10 @@
         "name": "Enforced Travel Ban",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: Alpha and beta wormholes have no effect during movement.",
+        "text1": "For: Alpha and beta wormholes have no effect during movement. [Note: this only affects normal wormhole adjacency. Ghost agent, other agenda laws, and the AC lost star chart will overrule this.]",
         "text2": "Against: Destroy each PDS in or adjacent to a system that contains a wormhole.",
+        "forEmoji": "⛔",
+        "againstEmoji": "💥",
         "mapText": "Alpha and beta wormholes have no effect during movement.",
         "source": "base"
     },
@@ -121,6 +129,8 @@
         "target": "For/Against",
         "text1": "For: Each player can have any number of PDS units on planets they control.",
         "text2": "Against: Each player destroys 1 of their PDS units.",
+        "forEmoji": "♾️",
+        "againstEmoji": "💥",
         "mapText": "Each player can have any number of PDS units on planets they control.",
         "source": "base"
     },
@@ -141,6 +151,8 @@
         "target": "For/Against",
         "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.",
         "text2": "Against: Draw and reveal 1 stage II public from the deck and place it near the public objectives.",
+        "forEmoji": "Public1alt",
+        "againstEmoji": "Public2alt",
         "source": "base"
     },
     {
@@ -150,6 +162,8 @@
         "target": "For/Against",
         "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units in Mecatol Rex's system, and each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their own units in each of those systems.",
         "text2": "Against: No effect.",
+        "forEmoji": "TechExplode",
+        "againstEmoji": "🚫",
         "source": "base"
     },
     {
@@ -186,9 +200,9 @@
         "name": "Minister of Industry",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. When the owner of this card places a space dock in a system, their units in that system may use their Production abilities.",
+        "text1": "The elected player gains this card. When the owner of this card places a space dock in a system, their units in that system may use their PRODUCTION abilities.",
         "text2": "",
-        "mapText": "When you place a space dock in a system, your units in that system may use their Production abilities.",
+        "mapText": "When you place a space dock in a system, your units in that system may use their PRODUCTION abilities.",
         "source": "base"
     },
     {
@@ -247,6 +261,8 @@
         "target": "For/Against",
         "text1": "For: Each player that voted \"For\" gains 1 victory point.",
         "text2": "Against: Each player that voted \"For\" loses 1 victory point.",
+        "forEmoji": "➕",
+        "againstEmoji": "➖",
         "source": "base"
     },
     {
@@ -256,6 +272,7 @@
         "target": "For/Against",
         "text1": "(When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.) For: Discard all laws from play. At the start of the next strategy phase, each player exhausts each planet in their home system.",
         "text2": "Against: No effect.",
+        "againstEmoji": "🚫",
         "source": "base"
     },
     {
@@ -263,7 +280,7 @@
         "name": "Prophecy of Ixth",
         "type": "Law",
         "target": "Elect Player",
-        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses Production, they discard this card unless they produce 2 or more fighters.",
+        "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
         "text2": "",
         "mapText": "Apply +1 to the result of your fighter's combat rolls. When you use PRODUCTION, discard this card unless you produce 2 or more fighters.",
         "source": "base"
@@ -282,9 +299,10 @@
         "name": "Publicize Weapon Schematics",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose Sustain Damage.",
+        "text1": "For: If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose SUSTAIN DAMAGE.",
         "text2": "Against: Each player that owns a war sun technology discards all of their action cards.",
-        "mapText": "If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose Sustain Damage.",
+        "forEmoji": "CrackedWarSun",
+        "mapText": "If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose SUSTAIN DAMAGE.",
         "source": "base"
     },
     {
@@ -294,6 +312,7 @@
         "target": "For/Against",
         "text1": "For: When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
         "text2": "Against: No effect.",
+        "againstEmoji": "🚫",
         "mapText": "When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
         "source": "base"
     },
@@ -313,6 +332,8 @@
         "target": "For/Against",
         "text1": "For: Each player's units can move through nebulae.",
         "text2": "Against: Each player places a command token from their reinforcements in their home system, if able.",
+        "forEmoji": "ThroughAnomaly",
+        "againstEmoji": "🔒",
         "mapText": "Each player's units can move through nebulae.",
         "source": "base"
     },
@@ -341,6 +362,8 @@
         "target": "For/Against",
         "text1": "For: All systems that contain either an alpha or beta wormhole are adjacent to each other.",
         "text2": "Against: Each player places a command token from their reinforcements in each system that contains a wormhole and 1 or more of their ships.",
+        "forEmoji": "MixedWormhole",
+        "againstEmoji": "🔒",
         "mapText": "All systems that contain either an alpha or beta wormhole are adjacent to each other.",
         "source": "base"
     },
@@ -387,6 +410,8 @@
         "target": "For/Against",
         "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase. Each player may cast 1 vote on each agenda instead.",
         "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" exhausts all of their cultural planets.",
+        "forEmoji": "🗳️",
+        "againstEmoji": "ExhaustedPlanet",
         "source": "base"
     },
     {

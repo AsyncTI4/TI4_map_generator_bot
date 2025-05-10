@@ -1,0 +1,45 @@
+# Bot Messages
+- Card names should be `_italicised_`;
+- Unit abilities should be `ALL CAPS`;
+- Strategy cards and faction abilities should be `**bolded**`;
+- Leaders should be written as `Name, the Faction rank`;
+	- If the player has Ssruu, the leader should be written as `Clever, Clever Name, the Faction/Yssaril rank`;
+	- Nomad agents are `Name, a Nomad agent` (indefinite) and Naaz-Rokha leaders are `Name, the Naaz-Rokha Ranks` (plural);
+- Flagships should be written as `the Name (the Faction flagship)`;
+	- Other faction units should be written as `a Name (Faction unittype)`
+- Emphasis and list item text headers should be `__underlined__`;
+- Agenda outcomes should be `"For"` and `"Against"`;
+- Reminder text should be `-# small text` on a new line;
+- Text should be in sentence case;
+- Text should read as a proper sentence (including period);
+  - Messages that ping a player should usually begin with "@player, [message...]", with the first word of message not being capitalised;
+- Abbreviations should be avoided;
+	- Use "command token from [their] tactic pool" etc.;
+- Bot commands should be ``` `teletext` ```;
+- Reference to the cards info thread should be ``` `#cards-info` thread```
+# Buttons
+- Text should be in Title Case;
+- Ability use should be `Use AbilitySource`;
+	- Any clarifications (e.g. faction, source type, effect) should be in the message e.g. `you may use the Faction AbilitySource technology to do whatever.`;
+- Abbreviations should be used if required for text length reasons;
+	- Use "Tactic Token" instead of "Tactic CC" etc.;
+- Leader names should be written as `Faction Rank`;
+- No text formatting;
+- No period;
+# Data
+- For unit upgrade technologies, attributes on a single line in title case without period, keyword abilities on a single line in all caps without period, text abilities on another line(s)
+    - E.g. war sun "Cost 12, Combat 3(x3), Move 2, Capacity 6\nSUSTAIN DAMAGE, BOMBARDMENT 3(x3)\nOther players' units in this system lose PLANETARY SHIELD."
+    - E.g. space dock "PRODUCTION X\nThis unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
+- For unit themselves, no attributes or keyword abilities in ability text field(s) - these are taken from dedicated data fields
+    - E.g. war sun "Other players' units in this system lose PLANETARY SHIELD."
+    - E.g. space dock "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
+- for technologies and unit abilities, split unrelated abilities by a single newline
+# Vocabulary
+- Short faction names should be what appears on their promissory notes/unit upgrades;
+  - In particular, "N'orr", "Creuss", "Vuil'raith", "Ul";
+- "~~want~~ _wish_"
+- "~~person~~ _player_"
+- "~~refresh~~ _ready_ card"
+- "~~tech~~ _technology_";
+- "technology ~~skip~~ _specialty_";
+- "~~own~~ _control_ a planet";

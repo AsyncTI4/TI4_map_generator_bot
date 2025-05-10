@@ -5,43 +5,48 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
-
 import ti4.buttons.Buttons;
-import ti4.commands.milty.MiltyDraftHelper;
-import ti4.commands.milty.MiltyDraftSlice;
-import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.settings.BooleanSetting;
 import ti4.helpers.settingsFramework.settings.IntegerRangeSetting;
 import ti4.helpers.settingsFramework.settings.IntegerSetting;
 import ti4.helpers.settingsFramework.settings.SettingInterface;
 import ti4.map.Game;
+import ti4.message.MessageHelper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.MiltyDraftEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.milty.MiltyDraftHelper;
+import ti4.service.milty.MiltyDraftSlice;
 
 // This is a sub-menu
 @Getter
+@JsonIgnoreProperties({ "messageId" })
 public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private IntegerSetting numSlices, numFactions;
-    private BooleanSetting extraWorms;
-    private IntegerSetting minimumRes, minimumInf;
-    private IntegerRangeSetting totalValue, numLegends;
+    private final IntegerSetting numSlices;
+    private final IntegerSetting numFactions;
+    private final BooleanSetting extraWorms;
+    private final IntegerSetting minimumRes;
+    private final IntegerSetting minimumInf;
+    private final IntegerRangeSetting totalValue;
+    private final IntegerRangeSetting numLegends;
 
     // This is handled fully manually as there's a lot of validation to do
     private String presetSlices = null;
+    @JsonIgnore
     private List<MiltyDraftSlice> parsedSlices;
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -61,11 +66,11 @@ public class SliceGenerationSettings extends SettingsMenu {
         numLegends = new IntegerRangeSetting("Legends", "Legendary Count", 1, 0, 2, 2, 0, 20, 1);
 
         // Emojis
-        minimumRes.setEmoji(Emojis.resources);
-        minimumInf.setEmoji(Emojis.influence);
-        totalValue.setEmoji(Emojis.ResInf);
-        extraWorms.setEmoji(Emojis.WHalpha);
-        numLegends.setEmoji(Emojis.LegendaryPlanet);
+        minimumRes.setEmoji(MiscEmojis.resources);
+        minimumInf.setEmoji(MiscEmojis.influence);
+        totalValue.setEmoji(MiscEmojis.ResInf);
+        extraWorms.setEmoji(MiscEmojis.WHalpha);
+        numLegends.setEmoji(MiscEmojis.LegendaryPlanet);
 
         // Other Initialization
         minimumRes.setExtraInfo("(this value does not account for flexibly spent planets (you may be used to those appearing as +0.5))");
@@ -85,6 +90,10 @@ public class SliceGenerationSettings extends SettingsMenu {
             totalValue.initialize(json.get("totalValue"));
             extraWorms.initialize(json.get("extraWorms"));
             numLegends.initialize(json.get("numLegends"));
+
+            if (json.has("presetSlices")) {
+                setPresetSlices(json.get("presetSlices").asText(null));
+            }
         }
     }
 
@@ -93,7 +102,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     @Override
     public List<SettingInterface> settings() {
-        List<SettingInterface> ls = new ArrayList<SettingInterface>();
+        List<SettingInterface> ls = new ArrayList<>();
         ls.add(numFactions);
         if (presetSlices != null) {
             return ls;
@@ -110,19 +119,20 @@ public class SliceGenerationSettings extends SettingsMenu {
     @Override
     public List<Button> specialButtons() {
         String idPrefix = menuAction + "_" + navId() + "_";
-        List<Button> ls = new ArrayList<>();
-        ls.addAll(super.specialButtons());
-        ls.add(Buttons.gray(idPrefix + "scpt2025quals", "SCPT 2025 Qualifiers", "<:scpt:1289722139750039634>"));
-        ls.add(Button.of(ButtonStyle.DANGER, idPrefix + "richPreset", "Rich galaxy", Emoji.fromFormatted(Emojis.tg)));
-        ls.add(Button.of(ButtonStyle.DANGER, idPrefix + "poorPreset", "Poor galaxy", Emoji.fromFormatted(Emojis.comm)));
-        ls.add(Button.of(ButtonStyle.SECONDARY, idPrefix + "presetSlices~MDL", "Use preset slices", Emoji.fromFormatted(Emojis.sliceA)));
+        List<Button> ls = new ArrayList<>(super.specialButtons());
+        ls.add(Buttons.gray(idPrefix + "scpt2025finals", "SCPT 2025 Finals", "<:scpt:1289722139750039634>"));
+        if (presetSlices == null) {
+            ls.add(Buttons.red(idPrefix + "richPreset", "Rich galaxy", MiscEmojis.tg));
+            ls.add(Buttons.red(idPrefix + "poorPreset", "Poor galaxy", MiscEmojis.comm));
+        }
+        ls.add(Buttons.blue(idPrefix + "presetSlices~MDL", "Use preset slices", MiltyDraftEmojis.sliceA));
         return ls;
     }
 
     @Override
     public String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
         String error = switch (action) {
-            case "scpt2025quals" -> scpt2025quals();
+            case "scpt2025finals" -> scpt2025finals(event);
             case "richPreset" -> richGalaxy();
             case "poorPreset" -> poorGalaxy();
             case "presetSlices~MDL" -> getPresetSlicesFromUser(event);
@@ -147,9 +157,9 @@ public class SliceGenerationSettings extends SettingsMenu {
             sb.append("\n");
         }
         if (presetSlices != null) sb.append("> Using preset slices: ").append(presetSlices).append("\n");
-        if (enabledSettings().size() > 0) sb.append("\n"); // extra line for formatting
+        if (!enabledSettings().isEmpty()) sb.append("\n"); // extra line for formatting
 
-        if (categories().size() > 0) {
+        if (!categories().isEmpty()) {
             List<String> catStrings = new ArrayList<>();
             for (SettingsMenu cat : categories()) {
                 catStrings.add(cat.shortSummaryString(false));
@@ -188,19 +198,32 @@ public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Specific Implementation
     // ---------------------------------------------------------------------------------------------------------------------------------
-    private String scpt2025quals() {
-        int players = 6;
+    private String scpt2025finals(GenericInteractionCreateEvent event) {
+        Game game = null;
         if (getParent() instanceof MiltySettings ms) {
-            players = ms.getPlayerSettings().getGamePlayers().getKeys().size();
+            game = ms.getGame();
+            ms.getGameSettings().getMapTemplate().setChosenKey("2025scptFinals");
+            List<String> factions = new ArrayList<>(List.of("sol", "xxcha", "jolnar", "keleresm", "ghost", "naalu"));
+            ms.getPlayerSettings().getBanFactions().setKeys(List.of());
+            ms.getPlayerSettings().getPriFactions().setKeys(factions);
         }
-        //27,73,47,44,26;30,39,76,80,65;79,37,50,71,66;42,64,75,72,49;34,41,70,78,25;40,20,36,45,74
-        numSlices.setVal(players);
-        numFactions.setVal(players);
-        List<String> slices = new ArrayList<>(List.of("27,73,47,44,26", "30,39,76,80,65", "79,37,50,71,66", "42,64,75,72,49", "34,41,70,78,25", "40,20,36,45,74"));
-        Collections.shuffle(slices);
-        for (int i = players; i < 6; i++)
-            slices.remove(0);
+        numSlices.setVal(6);
+        numFactions.setVal(6);
+        List<String> slices = new ArrayList<>(List.of(
+            "64,22,45,75,70",
+            "74,68,40,60,21",
+            "62,39,67,72,38",
+            "42,27,34,26,50",
+            "41,30,29,80,63",
+            "31,25,79,76,78"));
         String ttsString = String.join("|", slices);
+        if (game != null) {
+            String msg = "Howdy " + game.getPing() + ",\nThis map is WEIRD!!!\nPlease note that the map template was updated to `2025scptFinals`, ";
+            msg += "and the faction list was set to a default of: Sol, Xxcha, Jol Nar, Keleres, Creuss, and Naalu";
+            msg += "\nIf you want to play instead on a normal map, or with different factions, feel free to edit those settings accordingly.";
+            msg += "\nHave fun :)";
+            MessageHelper.sendMessageToEventChannel(event, msg);
+        }
         return setPresetSlices(ttsString);
     }
 
@@ -258,6 +281,10 @@ public class SliceGenerationSettings extends SettingsMenu {
     }
 
     private String setPresetSlices(String sliceString) {
+        if (sliceString == null || sliceString.isEmpty()) {
+            return null;
+        }
+
         List<ComponentSource> sources = new ArrayList<>();
         int players = 6;
         presetSlices = sliceString;

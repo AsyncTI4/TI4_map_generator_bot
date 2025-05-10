@@ -2,7 +2,6 @@
     "id": "tarrock",
     "tileId": "d102",
     "name": "Tarrock",
-    "shortName": null,
     "aliases": [
         "tarrock",
         "tar",
@@ -19,7 +18,7 @@
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Council Black Site",
-    "legendaryAbilityText": "Before 1/22/24: You may exhaust this card at the end of your turn to look at the top card of the agenda deck; place that card on the top or bottom of the agenda deck.\n After 1/22/24: After an agenda is revealed, you may exhaust this card to predict aloud an outcome of that agenda. If your prediction is correct, draw 1 secret objective.",
+    "legendaryAbilityText": "After an agenda is revealed, you may exhaust this card to predict aloud an outcome of that agenda. If your prediction is correct, draw 1 secret objective.",
     "unitPositions": {
         "unitHolderName": "tarrock",
         "coordinateMap": {

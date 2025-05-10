@@ -1,6 +1,7 @@
 [
     {
         "id": "encryptionkey",
+        "name": "Encryption Key",
         "imagePath": "attachment_encryptionkey.png",
         "techSpeciality": [
             "biotic",
@@ -12,54 +13,63 @@
     },
     {
         "id": "gledgebase",
+        "name": "Gledge Base",
         "imagePath": "attachment_gledgebase.png",
         "resourcesModifier": 2,
         "source": "ds"
     },
     {
         "id": "lizhotrap",
+        "name": "Lizho Trap",
         "imagePath": "attachment_lizhotrap.png",
         "isFakeAttachment": true,
         "source": "ds"
     },
     {
         "id": "lizhotrap2",
+        "name": "Lizho Trap",
         "imagePath": "attachment_lizhotrap2.png",
         "isFakeAttachment": true,
         "source": "ds"
     },
     {
         "id": "lizhotrap3",
+        "name": "Lizho Trap",
         "imagePath": "attachment_lizhotrap3.png",
         "isFakeAttachment": true,
         "source": "ds"
     },
     {
         "id": "lizhotrap4",
+        "name": "Lizho Trap",
         "imagePath": "attachment_lizhotrap4.png",
         "isFakeAttachment": true,
         "source": "ds"
     },
     {
         "id": "lizhotrap5",
+        "name": "Lizho Trap",
         "imagePath": "attachment_lizhotrap5.png",
         "isFakeAttachment": true,
         "source": "ds"
     },
     {
         "id": "lizhotrap6",
+        "name": "Lizho Trap",
         "imagePath": "attachment_lizhotrap6.png",
         "isFakeAttachment": true,
         "source": "ds"
     },
     {
         "id": "lizhotrap1",
+        "name": "Lizho Trap",
         "imagePath": "attachment_lizhotrap1.png",
         "isFakeAttachment": true,
         "source": "ds"
     },
     {
         "id": "veldyrtaxhaven",
+        "name": "Tax Haven",
         "imagePath": "attachment_veldyrtaxhaven.png",
         "influenceModifier": 1,
         "isFakeAttachment": true,
@@ -67,6 +77,7 @@
     },
     {
         "id": "veldyrbroadcasthub",
+        "name": "Broadcast Hub",
         "imagePath": "attachment_veldyrbroadcasthub.png",
         "influenceModifier": 1,
         "isFakeAttachment": true,
@@ -74,6 +85,7 @@
     },
     {
         "id": "veldyrreservebank",
+        "name": "Reserve Bank",
         "imagePath": "attachment_veldyrreservebank.png",
         "resourcesModifier": 1,
         "isFakeAttachment": true,
@@ -81,6 +93,7 @@
     },
     {
         "id": "veldyrorbitalshipyard",
+        "name": "Orbital Shipyard",
         "imagePath": "attachment_veldyrorbitalshipyard.png",
         "resourcesModifier": 1,
         "isFakeAttachment": true,
@@ -88,11 +101,13 @@
     },
     {
         "id": "automatons",
+        "name": "Automatons",
         "imagePath": "attachment_automatons.png",
         "source": "ds"
     },
     {
         "id": "garden_worlds",
+        "name": "Garden World",
         "imagePath": "attachment_garden_worlds.png",
         "resourcesModifier": 1,
         "isFakeAttachment": true,
@@ -100,6 +115,7 @@
     },
     {
         "id": "olradin_mech_res",
+        "name": "Exemplar Resource",
         "imagePath": "attachment_olradin_mech_res.png",
         "resourcesModifier": 1,
         "isFakeAttachment": true,
@@ -107,8 +123,16 @@
     },
     {
         "id": "olradin_mech_inf",
+        "name": "Exemplar Influence",
         "imagePath": "attachment_olradin_mech_inf.png",
         "influenceModifier": 1,
+        "isFakeAttachment": true,
+        "source": "ds"
+    },
+    {
+        "id":"pharadn_tomb_token",
+        "name":"Pharadn Tomb Token",
+        "imagePath":"token_tomb.png",
         "isFakeAttachment": true,
         "source": "ds"
     }

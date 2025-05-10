@@ -3,13 +3,13 @@ package ti4.model;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.FactionEmojis;
 
 @Data
 public class GenericCardModel implements ModelInterface, EmbeddableModel {
     public enum CardType {
-        trap;
+        trap
     }
 
     String alias;
@@ -50,8 +50,7 @@ public class GenericCardModel implements ModelInterface, EmbeddableModel {
 
     public String cardTypeEmoji() {
         return switch (cardType) {
-            case trap -> Emojis.lizho;
-            default -> "";
+            case trap -> FactionEmojis.lizho.toString();
         };
     }
 

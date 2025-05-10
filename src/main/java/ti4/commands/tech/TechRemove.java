@@ -1,24 +1,18 @@
 package ti4.commands.tech;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
+import ti4.service.tech.PlayerTechService;
 
-public class TechRemove extends TechAddRemove {
+class TechRemove extends TechAddRemove {
+
     public TechRemove() {
-        super(Constants.TECH_REMOVE, "Remove Tech");
+        super(Constants.TECH_REMOVE, "Remove a technology");
     }
 
     @Override
     public void doAction(Player player, String techID, SlashCommandInteractionEvent event) {
-        removeTech(event, player, techID);
-    }
-
-    public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
-        player.removeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " removed tech: " + Mapper.getTech(techID).getRepresentation(false));
+        PlayerTechService.removeTech(event, player, techID);
     }
 }

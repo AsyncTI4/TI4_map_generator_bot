@@ -38,7 +38,8 @@
         "permanentEffect": "You may not give your commodities to other players as part of a transaction.",
         "window": "After you gain 1 or more commodities",
         "windowEffect": "You may spend a number of commodities equal to the combined cost listed on any number of Axis Order cards in your reinforcements to place those cards in your play area.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Military Industr'l Cx"
     },
     {
         "id": "ancient_blueprints",
@@ -69,7 +70,8 @@
         "name": "Industrialists",
         "faction": "celdauri",
         "permanentEffect": "During setup, place the Celdauri space dock token in your reinforcements, the Celdauri space dock token is a fourth space dock unit.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Indust-\nrialists"
     },
     {
         "id": "projection_of_power",
@@ -152,7 +154,8 @@
         "name": "Enlightenment (Outdated Ability - please remove this ability and add 'radiance')",
         "faction": "edyn",
         "permanentEffect": "During setup, purge your \"Support for the Throne\" promissory note. You may score up to 1 public objective a second time.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Enlight\n-enment"
     },
     {
         "id": "grace",
@@ -176,7 +179,8 @@
         "faction": "edyn",
         "window": "After the \"Second Agenda\" step of the agenda phase",
         "windowEffect": "Look at the top card of the agenda deck. Then, you may ready all planets to repeat the Second Agenda step for a third agenda.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Royal\nDecree"
     },
     {
         "id": "black_markets",
@@ -200,7 +204,8 @@
         "faction": "florzen",
         "window": "At the start of a space combat",
         "windowEffect": "You may remove up to 2 fighters you control in a system adjacent to the active system. Then, choose 1 player participating in that combat; that player places the same number of fighters from their reinforcements in the active system.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Mercen\n-aries"
     },
     {
         "id": "diplomats",
@@ -268,7 +273,8 @@
         "name": "Celestial Reclamation",
         "faction": "gledge",
         "window": "Planets that contain Core tokens have a base resource value of 2 and influence value of 0. Core tokens cannot be removed from the planet that contains them.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Celestial Reclamatn"
     },
     {
         "id": "deep_mining",
@@ -404,13 +410,14 @@
         "id": "starfall_gunnery",
         "name": "Starfall Gunnery",
         "faction": "kolume",
+        "permanentEffect": "During each of your actions, up to 3 of your non-fighter ships gain SPACE CANNON 8.",
         "window": "During movement, while you are not the active player",
-        "windowEffect": "You may only use 1 of your unit's SPACE CANNON. During each of your actions, up to 3 of your non-fighter ships gain SPACE CANNON 8.",
+        "windowEffect": "You may only use 1 of your unit's SPACE CANNON.",
         "source": "ds"
     },
     {
         "id": "fervor",
-        "name": "Zealous",
+        "name": "Fervor",
         "faction": "kortali",
         "window": "When you spend a command token to resolve the secondary ability of the \"Warfare\" strategy card",
         "windowEffect": "You may resolve the primary ability instead.",
@@ -437,7 +444,7 @@
         "name": "Contagion",
         "faction": "kyro",
         "window": "After you resolve the primary or secondary ability of the \"Politics\" strategy card",
-        "windowEffect": "Before 3/31/24: Commit 1 infantry from your reinforcements to each of 2 planets that are in or adjacent to a system that contains a planet you control; resolve invasion on those planets. After 3/31/24: commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
+        "windowEffect": "Commit 1 infantry from your reinforcements to a planet that is in or adjacent to a system that contains a planet you control; resolve invasion on that planet.",
         "source": "ds"
     },
     {
@@ -556,7 +563,7 @@
         "id": "celestial_guides",
         "name": "Celestial Guides",
         "faction": "nivyn",
-        "permanentEffect": "Your units do not roll for gravity rifts. You may ignore the movement effects of anomalies in systems that are adjacent to 1 or more structures you control.",
+        "permanentEffect": "Your units do not roll for gravity rifts. You may ignore the movement effects of anomalies in systems that contain or are adjacent to 1 or more of your structures.",
         "source": "ds"
     },
     {
@@ -606,7 +613,7 @@
     },
     {
         "id": "policy_the_economy_empower",
-        "name": "Policy: The Economy - Empower (+)",
+        "name": "Policy - The Economy: Empower ➕",
         "faction": "olradin",
         "window": "Once per action, after you exhaust an industrial or legendary planet you control",
         "windowEffect": "Gain 1 commodity.",
@@ -614,7 +621,7 @@
     },
     {
         "id": "policy_the_economy_exploit",
-        "name": "Policy: The Economy - Exploit (-)",
+        "name": "Policy - The Economy: Exploit ➖",
         "faction": "olradin",
         "permanentEffect": "Place the \"2\" commodity token on your faction sheet, your commodity value is 2.",
         "window": "Once per action, after you exhaust an industrial planet you control",
@@ -623,7 +630,7 @@
     },
     {
         "id": "policy_the_environment_plunder",
-        "name": "Policy: The Environment - Plunder (-)",
+        "name": "Policy - The Environment: Plunder ➖",
         "faction": "olradin",
         "window": "When 1 or more of your units use PRODUCTION",
         "windowEffect": "Reduce the PRODUCTION value of 1 of those units by 2.\\nOnce per action, after you explore a hazardous planet, you may remove 1 unit from that planet to explore that planet.",
@@ -631,7 +638,7 @@
     },
     {
         "id": "policy_the_environment_preserve",
-        "name": "Policy: The Environment - Preserve (+)",
+        "name": "Policy - The Environment: Preserve ➕",
         "faction": "olradin",
         "window": "Once per action, after you exhaust a hazardous or legendary planet you control",
         "windowEffect": "You may reveal the top card of the exploration deck that matches 1 of those planets; if it is a relic fragment, gain it, otherwise discard that card.",
@@ -639,7 +646,7 @@
     },
     {
         "id": "policy_the_people_connect",
-        "name": "Policy: The People - Connect (+)",
+        "name": "Policy - The People: Connect ➕",
         "faction": "olradin",
         "window": "Once per action, after you exhaust a cultural or legendary planet you control",
         "windowEffect": "You may move 1 infantry on that planet to another planet you control.",
@@ -647,7 +654,7 @@
     },
     {
         "id": "policy_the_people_control",
-        "name": "Policy: The People - Control (-)",
+        "name": "Policy - The People: Control ➖",
         "faction": "olradin",
         "permanentEffect": "You cannot perform transactions during the agenda phase.",
         "window": "During the agenda phase, after you cast votes on an agenda",
@@ -703,7 +710,7 @@
         "id": "binding_debts",
         "name": "Binding Debts",
         "faction": "vaden",
-        "permanentEffect": "Other players may place their control tokens on your faction sheet at any time.",
+        "permanentEffect": "Other players may place their control tokens on your faction sheet at any time. [Note: when you have this ability, you cannot use normal debt, as this ability utilizes the bot's debt system. Track normal debt manually if at all.]",
         "window": "At the start of the status phase",
         "windowEffect": "Each of your neighbors may give you 1 trade good to remove up to 2 of their control tokens from your faction sheet.",
         "source": "ds"
@@ -714,7 +721,8 @@
         "faction": "vaden",
         "window": "After 1 of your opponent's ships is destroyed during a round of space combat",
         "windowEffect": "You may remove 1 of that player's control tokens from your faction sheet to place 1 ship of that type from your reinforcements in the active system.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Collateral\n-ized Loans"
     },
     {
         "id": "fine_print",
@@ -752,7 +760,7 @@
         "id": "corporate_entity",
         "name": "Corporate Entity",
         "faction": "veldyr",
-        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives.",
+        "permanentEffect": "During setup, take the additional Veldyr faction promissory notes; you have 4 faction promissory notes. Branch Office attachments do not count toward scoring objectives. [Note: they still count towards strengthen bonds and betray a friend, as they are promissory notes]",
         "source": "ds"
     },
     {
@@ -785,7 +793,8 @@
         "faction": "zealots",
         "window": "Once per agenda phase, after an agenda is revealed, if you are not the speaker",
         "windowEffect": "You may choose to vote after the speaker on that agenda.",
-        "source": "ds"
+        "source": "ds",
+        "shortName": "Conspir\n-ators"
     },
     {
         "id": "biophobic",
@@ -804,10 +813,91 @@
         "source": "ds"
     },
     {
+        "id": "prescience",
+        "name": "Prescience",
+        "faction": "uydai",
+        "permanentEffect": "At the end of your turn,if you have not passed, place 1 of the plan cards on your faction sheet, face down. At the start of your turn, reveal and resolve the plan card on your faction sheet, if able",
+        "source": "ds"
+    },
+    {
+        "id": "the_starlit_path",
+        "name": "The Starlit Path",
+        "faction": "uydai",
+        "window": "At the end of your turn",
+        "windowEffect": "You may return 6 path tokens from your faction sheet to your reinforcements to resolve the secondary ability of any strategy card without spending a command token.",
+        "source": "ds"
+    },
+    {
+        "id": "narrow_way",
+        "name": "Narrow Way",
+        "faction": "uydai",
+        "window": "At any time",
+        "windowEffect": "You may return 1 path token to your reinforcements to redistribute 1 of your command tokens.",
+        "source": "ds"
+    },
+    {
+        "id": "ancient_empire",
+        "name": "Ancient Empire",
+        "faction": "pharadn",
+        "permanentEffect": "During setup, place 1 tomb token on each of up to 14 planets. When you gain control of a planet that contains a tomb token, purge that token to capture 2 infantry from the supply. ",
+        "source": "ds"
+    },
+    {
+        "id": "dark_purpose",
+        "name": "Dark Purpose",
+        "faction": "pharadn",
+        "window": "When you score an objective",
+        "windowEffect": "When you score an objective, gain 1 command token.",
+        "source": "ds"
+    },
+    {
+        "id": "mark_of_pharadn",
+        "name": "Mark Of Pharadn",
+        "faction": "pharadn",
+        "permanentEffect": "Abilities that would place infantry from your reinforcements on planets instead allow you to produce those units. When you produce infantry, you must return 1 of your captured infantry to produce each of those units, instead of spending resources.",
+        "source": "ds"
+    },
+    {
         "id": "paranoia",
         "name": "Paranoia",
         "faction": "zelian",
         "permanentEffect": "Game effects other than your command tokens cannot prevent you from activating, or moving ships into, your home system.",
+        "source": "ds"
+    },
+    {
+        "id": "data_recovery",
+        "name": "Data Recovery",
+        "faction": "qhet",
+        "permanentEffect": "Once per action, after 1 or more of your units is destroyed, you may place 1 of the active player’s control tokens on your faction sheet.",
+        "source": "ds"
+    },
+    {
+        "id": "tempest_squads",
+        "name": "Data Recovery",
+        "faction": "qhet",
+        "permanentEffect": "While you are the active player, 2 infantry in the active system do not count against your ships’ capacity. [Note: think of this as sort of like a mild Sardakk hero]",
+        "source": "ds"
+    },
+    {
+        "id": "black_ops",
+        "name": "Black Ops",
+        "faction": "qhet",
+        "window": "After you win a combat as the attacker",
+        "windowEffect": "You may remove 2 of your opponent’s control tokens from your faction sheet to draw 1 secret objective, or 5 of those tokens to gain 1 command token and take 1 of their unscored secret objectives. ",
+        "source": "ds"
+    },
+    {
+        "id": "synthesis",
+        "name": "Synthesis",
+        "faction": "atokera",
+        "permanentEffect": "Readied planets you control have PLANETARY SHIELD and PRODUCTION 0 as if they were units. Apply +1 to the PRODUCTION value of each of your units with PRODUCTION. ",
+        "source": "ds"
+    },
+    {
+        "id": "living_metals",
+        "name": "Living Metals",
+        "faction": "atokera",
+        "permanentEffect": "Agenda outcomes and action cards that have component actions cannot remove or destroy your units, or place other player’s units on planets you control. [Note: protects against ixthian] ",
         "source": "ds"
     }
 ]

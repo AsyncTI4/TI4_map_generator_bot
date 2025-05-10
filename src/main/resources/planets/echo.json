@@ -2,7 +2,6 @@
     "id": "echo",
     "tileId": "d101",
     "name": "Echo",
-    "shortName": null,
     "aliases": [
         "echo",
         "ech"
@@ -18,7 +17,7 @@
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": "Bi-Phasic Generators",
-    "legendaryAbilityText": "You may exhaust this card at the end of your turn to place 1 frontier token in a system that does not contain a planet.",
+    "legendaryAbilityText": "You may exhaust this card at the end of your turn to place 1 frontier token in a system that does not contain a planet. [Note: only 1 frontier token can be in a system at any time]",
     "unitPositions": {
         "unitHolderName": "echo",
         "coordinateMap": {

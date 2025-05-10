@@ -1,21 +1,24 @@
 package ti4.listeners;
 
-import java.util.Date;
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import lombok.NonNull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.AsyncTI4DiscordBot;
+import ti4.executors.ExecutorManager;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
 import ti4.map.Game;
 import ti4.message.BotLogger;
+import ti4.service.game.GameNameService;
 
 public class ModalListener extends ListenerAdapter {
+
     public static ModalListener instance = null;
 
     private final Map<String, Consumer<ModalContext>> knownModals = new HashMap<>();
@@ -31,24 +34,28 @@ public class ModalListener extends ListenerAdapter {
     }
 
     @Override
-    public void onModalInteraction(@NonNull ModalInteractionEvent event) {
+    public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
             event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
             return;
         }
+
         event.deferEdit().queue();
-        long startTime = new Date().getTime();
+
+        String gameName = GameNameService.getGameNameFromChannel(event);
+        ExecutorManager.runAsync("ModalListener task for " + gameName, gameName, event.getMessageChannel(), () -> handleModal(event));
+    }
+
+    private void handleModal(@Nonnull ModalInteractionEvent event) {
         try {
             ModalContext context = new ModalContext(event);
             if (context.isValid()) {
                 resolveModalInteractionEvent(context);
+                context.save();
             }
         } catch (Exception e) {
-            BotLogger.log(event, "Something went wrong with button interaction", e);
-        }
-        long endTime = new Date().getTime();
-        if (endTime - startTime > 3000) {
-            BotLogger.log(event, "This button command took longer than 3000 ms (" + (endTime - startTime) + ")");
+            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            BotLogger.error(new BotLogger.LogMessageOrigin(event), message, e);
         }
     }
 
@@ -70,7 +77,7 @@ public class ModalListener extends ListenerAdapter {
         return false;
     }
 
-    private void resolveModalInteractionEvent(@NonNull ModalContext context) {
+    private void resolveModalInteractionEvent(@Nonnull ModalContext context) {
         String modalID = context.getModalID();
         Game game = context.getGame();
 
@@ -79,5 +86,15 @@ public class ModalListener extends ListenerAdapter {
         if (modalID.startsWith("jmfA_")) {
             game.initializeMiltySettings().parseInput(context);
         }
+    }
+
+    public static String getModalDebugText(ModalInteractionEvent event) {
+        StringBuilder output = new StringBuilder("INPUT:\n```\n" +
+            "MenuID: " + event.getModalId());
+        for (ModalMapping field : event.getValues()) {
+            output.append("\n> Field: ").append(field.getId()).append(" => ").append(field.getAsString());
+        }
+        output.append("\n```");
+        return output.toString();
     }
 }

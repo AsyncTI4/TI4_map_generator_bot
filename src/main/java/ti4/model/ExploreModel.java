@@ -8,8 +8,8 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.ExploreEmojis;
 
 @Data
 public class ExploreModel implements ModelInterface, EmbeddableModel {
@@ -30,7 +30,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
             && name != null
             && type != null
             && resolution != null
-            && List.of("Fragment", "Attach", "Instant", "Token").contains(resolution)
+            && List.of("Fragment", "Attach", "Instant", "Token", "Leader").contains(resolution)
             && text != null
             && source != null;
     }
@@ -59,7 +59,7 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
     public String textRepresentation() {
         StringBuilder sb = new StringBuilder(getTypeEmoji()).append(" ");
         if (source != null) sb.append(source.emoji()).append(" ");
-        sb.append("**__").append(getName()).append("__**\n> ");
+        sb.append("_").append(getName()).append("_\n> ");
         sb.append(getText().replaceAll("\n(> )?", "\n> "));
         return sb.toString();
     }
@@ -113,10 +113,10 @@ public class ExploreModel implements ModelInterface, EmbeddableModel {
 
     private String getTypeEmoji() {
         return switch (getType().toLowerCase()) {
-            case "cultural" -> Emojis.Cultural;
-            case "hazardous" -> Emojis.Hazardous;
-            case "industrial" -> Emojis.Industrial;
-            case "frontier" -> Emojis.Frontier;
+            case "cultural" -> ExploreEmojis.Cultural.toString();
+            case "hazardous" -> ExploreEmojis.Hazardous.toString();
+            case "industrial" -> ExploreEmojis.Industrial.toString();
+            case "frontier" -> ExploreEmojis.Frontier.toString();
             default -> "";
         };
     }

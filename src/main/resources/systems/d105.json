@@ -6,7 +6,7 @@
         "in",
         "swog",
         "sw",
-        "4249"
+        "4265"
     ],
     "imagePath": "d105.png",
     "shipPositionsType": "TYPE05",
@@ -33,5 +33,6 @@
         "inan",
         "swog"
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }

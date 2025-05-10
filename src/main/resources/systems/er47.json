@@ -1,10 +1,10 @@
 {
     "id": "er47",
-    "name": "Ioda Kappa",
+    "name": "Iota Kappa",
     "aliases": [
-        "er42",
-        "iodakappa",
-        "kappaioda"
+        "er47",
+        "iotakappa",
+        "kappaiota"
     ],
     "imagePath": "er_47_async.png",
     "planets": [],
@@ -32,7 +32,7 @@
         }
     ],
     "wormholes": [
-        null,
+        "IOTA",
         "KAPPA"
     ],
     "isAsteroidField": false,
@@ -40,5 +40,6 @@
     "isNebula": false,
     "isGravityRift": false,
     "source": "eronous",
-    "valid": true
+    "valid": true,
+    "tileBack": "red"
 }

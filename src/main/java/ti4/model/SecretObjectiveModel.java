@@ -1,6 +1,6 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -9,8 +9,8 @@ import java.util.Optional;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.helpers.Emojis;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
 
 @Data
 public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
@@ -49,7 +49,7 @@ public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        String title = Emojis.SecretObjective + "__**" + getName() + "**__" + getSource().emoji();
+        String title = CardEmojis.SecretObjective + "__**" + getName() + "**__" + getSource().emoji();
         eb.setTitle(title);
 
         //DESCRIPTION

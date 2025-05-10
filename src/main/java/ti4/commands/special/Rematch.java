@@ -3,30 +3,26 @@ package ti4.commands.special;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.helpers.ButtonHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.game.RematchService;
 
-public class Rematch extends SpecialSubcommandData {
+class Rematch extends GameStateSubcommand {
+
     public Rematch() {
-        super(Constants.REMATCH, "New game, same players");
+        super(Constants.REMATCH, "Create a new game with the same players and channels as the current game", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
         if ("YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
-            ButtonHelper.rematch(game, event);
+            RematchService.rematch(game, event);
         } else {
             MessageHelper.sendMessageToEventChannel(event, "Please type YES.");
         }
-
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-
     }
 }

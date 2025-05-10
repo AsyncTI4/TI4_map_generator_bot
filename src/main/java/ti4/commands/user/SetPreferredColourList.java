@@ -6,12 +6,14 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import ti4.generator.Mapper;
+import ti4.commands.Subcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
 import ti4.message.MessageHelper;
+import ti4.settings.users.UserSettingsManager;
 
-public class SetPreferredColourList extends UserSubcommandData {
+class SetPreferredColourList extends Subcommand {
 
     public SetPreferredColourList() {
         super("set_preferred_colours", "Set your preferred colour list");
@@ -20,18 +22,23 @@ public class SetPreferredColourList extends UserSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        List<String> colourList = Helper.getListFromCSV(event.getOption("colour_list", null, OptionMapping::getAsString).toLowerCase());
-        colourList = new ArrayList<>(colourList.stream().map(AliasHandler::resolveColor).toList());
+        List<String> colors = Helper.getListFromCSV(event.getOption("colour_list", null, OptionMapping::getAsString).toLowerCase());
+        colors = new ArrayList<>(colors.stream().map(AliasHandler::resolveColor).toList());
+
         List<String> badColours = new ArrayList<>();
-        for (String colour : colourList) {
+        for (String colour : colors) {
             if (!Mapper.isValidColor(colour)) {
                 badColours.add(colour);
             }
         }
-        colourList.removeAll(badColours);
-        getUserSettings().setPreferredColourList(colourList);
+        colors.removeAll(badColours);
+
+        var userSettings = UserSettingsManager.get(event.getUser().getId());
+        userSettings.setPreferredColors(colors);
+        UserSettingsManager.save(userSettings);
+
         StringBuilder sb = new StringBuilder();
-        sb.append("Preferred Colour List updated to: `").append(colourList).append("`");
+        sb.append("Preferred Colour List updated to: `").append(colors).append("`");
         if (!badColours.isEmpty()) {
             sb.append("\nThe following colours were invalid and were not added: `").append(badColours).append("`");
         }

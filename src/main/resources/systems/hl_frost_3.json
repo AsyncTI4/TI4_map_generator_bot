@@ -1,6 +1,7 @@
 {
     "id": "hl_frost_3",
     "name": "Hyperlane",
+    "isHyperlane": true,
     "aliases": [
         "frost_3"
     ],
@@ -22,5 +23,6 @@
     ],
     "wormholes": [],
     "planets": [],
-    "source": "andcat"
+    "source": "andcat",
+    "tileBack": "black"
 }

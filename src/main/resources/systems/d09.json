@@ -1,6 +1,6 @@
 {
     "id": "d09",
-    "name": "LastStop (Gledge)",
+    "name": "LastStop - Gledge",
     "aliases": [
         "d09",
         "laststop",
@@ -17,5 +17,6 @@
     "planets": [
         "laststop"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

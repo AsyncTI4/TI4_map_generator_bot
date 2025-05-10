@@ -1,20 +1,22 @@
 package ti4.helpers;
 
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 import lombok.Getter;
+import ti4.AsyncTI4DiscordBot;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
+
+import org.jetbrains.annotations.Nullable;
 
 public class Units {
 
-    private static final String emdash = "—";
+    private static final String EMDASH = "—";
+    private static final Pattern UNIT_PATTERN = Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
 
     /**
      * <H3>
@@ -29,6 +31,7 @@ public class Units {
      */
     @Data
     public static class UnitKey {
+
         private UnitType unitType;
         private String colorID;
 
@@ -45,24 +48,31 @@ public class Units {
             return unitType.plainName();
         }
 
-        public String unitEmoji() {
+        public TI4Emoji unitEmoji() {
             return unitType.getUnitTypeEmoji();
         }
 
         @JsonIgnore
         public String getFileName() {
-            return getFileName(ThreadLocalRandom.current().nextInt(Constants.EYE_CHANCE) == 0);
+            if (AsyncTI4DiscordBot.testingMode) return getFileName(false);
+            return getFileName(RandomHelper.isOneInX(Constants.EYE_CHANCE));
         }
 
         public String getFileName(boolean eyes) {
             if (unitType == UnitType.Destroyer && eyes) {
                 return String.format("%s_dd_eyes.png", colorID);
             }
-            if (UnitType.TyrantsLament == unitType || UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
+            if (UnitType.Lady == unitType || UnitType.Cavalry == unitType) {
                 return String.format("%s_%s.png", colorID, "fs");
             }
+            if (UnitType.TyrantsLament == unitType) {
+                return "TyrantsLament.png";
+            }
             if (UnitType.PlenaryOrbital == unitType) {
-                return String.format("%s_%s.png", colorID, "sd");
+                return "PlenaryOrbital.png";
+            }
+            if (UnitType.Monument == unitType) {
+                return getColor() + "_monument.png";
             }
 
             return String.format("%s_%s.png", colorID, asyncID());
@@ -78,7 +88,7 @@ public class Units {
         }
 
         public String outputForSave() {
-            return String.format("%s%s%s", colorID, emdash, asyncID());
+            return String.format("%s%s%s", colorID, EMDASH, asyncID());
         }
 
         public UnitKey(@JsonProperty("unitType") UnitType unitType, @JsonProperty("colorID") String colorID) {
@@ -87,10 +97,14 @@ public class Units {
         }
     }
 
+    /**
+     * UnitType - aka {@link UnitModel.getAsyncId()} - is a list of all the units in the game.
+     */
     public enum UnitType {
-        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), CabalSpacedock("csd"), // ground based
+        Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), Monument("monument"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships
-        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"); //relics
+        PlenaryOrbital("plenaryorbital"), TyrantsLament("tyrantslament"), Lady("lady"), Cavalry("cavalry"), //relics
+        StarfallPds("starfallpds");
 
         @Getter
         public final String value;
@@ -100,63 +114,63 @@ public class Units {
         }
 
         public String humanReadableName() {
-            return switch (value) {
-                case "gf" -> "Infantry";
-                case "mf" -> "Mech";
-                case "pd" -> "PDS";
-                case "sd" -> "Space Dock";
-                case "csd" -> "Dimensional Tear";
-                case "ff" -> "Fighter";
-                case "dd" -> "Destroyer";
-                case "ca" -> "Cruiser";
-                case "cv" -> "Carrier";
-                case "dn" -> "Dreadnought";
-                case "fs" -> "Flagship";
-                case "ws" -> "War Sun";
-                case "plenaryorbital" -> "Plenary Orbital";
-                case "tyrantslament" -> "Tyrant's Lament";
-                case "cavalry" -> "The Cavalry";
-                case "lady" -> "The Lady";
-                default -> null;
+            return switch (this) {
+                case Infantry -> "Infantry";
+                case Mech -> "Mech";
+                case Pds, StarfallPds -> "PDS";
+                case Spacedock -> "Space Dock";
+                case Fighter -> "Fighter";
+                case Destroyer -> "Destroyer";
+                case Cruiser -> "Cruiser";
+                case Carrier -> "Carrier";
+                case Dreadnought -> "Dreadnought";
+                case Flagship -> "Flagship";
+                case Warsun -> "War Sun";
+                case PlenaryOrbital -> "Plenary Orbital";
+                case TyrantsLament -> "Tyrant's Lament";
+                case Cavalry -> "The Cavalry";
+                case Lady -> "The Lady";
+                case Monument -> "Monument";
             };
         }
 
         public String plainName() {
-            return switch (value) {
-                case "gf" -> "infantry";
-                case "mf" -> "mech";
-                case "pd" -> "pds";
-                case "sd" -> "spacedock";
-                case "csd" -> "cabalspacedock";
-                case "ff" -> "fighter";
-                case "dd" -> "destroyer";
-                case "ca" -> "cruiser";
-                case "cv" -> "carrier";
-                case "dn" -> "dreadnought";
-                case "fs" -> "flagship";
-                case "ws" -> "warsun";
-                case "plenaryorbital" -> "plenaryorbital";
-                case "tyrantslament" -> "tyrantslament";
-                case "cavalry" -> "cavalry";
-                case "lady" -> "lady";
-                default -> null;
+            return switch (this) {
+                case Infantry -> "infantry";
+                case Mech -> "mech";
+                case Pds, StarfallPds -> "pds";
+                case Spacedock -> "spacedock";
+                case Fighter -> "fighter";
+                case Destroyer -> "destroyer";
+                case Cruiser -> "cruiser";
+                case Carrier -> "carrier";
+                case Dreadnought -> "dreadnought";
+                case Flagship -> "flagship";
+                case Warsun -> "warsun";
+                case PlenaryOrbital -> "plenaryorbital";
+                case TyrantsLament -> "tyrantslament";
+                case Cavalry -> "cavalry";
+                case Lady -> "lady";
+                case Monument -> "monument";
             };
         }
 
-        public String getUnitTypeEmoji() {
-            return switch (value) {
-                case "gf" -> Emojis.infantry;
-                case "mf" -> Emojis.mech;
-                case "pd" -> Emojis.pds;
-                case "sd", "csd", "plenaryorbital" -> Emojis.spacedock;
-                case "ff" -> Emojis.fighter;
-                case "dd" -> Emojis.destroyer;
-                case "ca" -> Emojis.cruiser;
-                case "cv" -> Emojis.carrier;
-                case "dn" -> Emojis.dreadnought;
-                case "fs", "tyrantslament", "lady", "cavalry" -> Emojis.flagship;
-                case "ws" -> Emojis.warsun;
-                default -> null;
+        public TI4Emoji getUnitTypeEmoji() {
+            return switch (this) {
+                case Infantry -> UnitEmojis.infantry;
+                case Mech -> UnitEmojis.mech;
+                case Pds, StarfallPds -> UnitEmojis.pds;
+                case Spacedock -> UnitEmojis.spacedock;
+                case PlenaryOrbital -> UnitEmojis.PlenaryOrbital;
+                case Fighter -> UnitEmojis.fighter;
+                case Destroyer -> UnitEmojis.destroyer;
+                case Cruiser -> UnitEmojis.cruiser;
+                case Carrier -> UnitEmojis.carrier;
+                case Dreadnought -> UnitEmojis.dreadnought;
+                case Flagship, Cavalry, Lady -> UnitEmojis.flagship;
+                case TyrantsLament -> UnitEmojis.TyrantsLament;
+                case Warsun -> UnitEmojis.warsun;
+                case Monument -> UnitEmojis.Monument;
             };
         }
 
@@ -166,15 +180,27 @@ public class Units {
         }
     }
 
-    private static final String unitRegex() {
-        return RegexHelper.colorRegex(null) + emdash + RegexHelper.unitTypeRegex();
-    }
-
     public static UnitType findUnitType(String unitType) {
-        for (UnitType t : UnitType.values()) {
-            if (t.value.equalsIgnoreCase(unitType)) return t;
-        }
-        return null;
+        return switch (unitType) {
+            case "gf" -> UnitType.Infantry;
+            case "mf" -> UnitType.Mech;
+            case "pd", "pds" -> UnitType.Pds;
+            case "sd", "csd" -> UnitType.Spacedock;
+            case "monument" -> UnitType.Monument;
+            case "ff" -> UnitType.Fighter;
+            case "dd" -> UnitType.Destroyer;
+            case "ca" -> UnitType.Cruiser;
+            case "cv" -> UnitType.Carrier;
+            case "dn" -> UnitType.Dreadnought;
+            case "fs" -> UnitType.Flagship;
+            case "ws" -> UnitType.Warsun;
+            case "plenaryorbital" -> UnitType.PlenaryOrbital;
+            case "tyrantslament" -> UnitType.TyrantsLament;
+            case "lady" -> UnitType.Lady;
+            case "cavalry" -> UnitType.Cavalry;
+            case "starfallpds" -> UnitType.StarfallPds;
+            default -> null;
+        };
     }
 
     public static UnitKey getUnitKey(String unitType, String colorID) {
@@ -183,13 +209,17 @@ public class Units {
         return new UnitKey(u, colorID);
     }
 
+    public static UnitKey getUnitKey(UnitType unitType, String colorID) {
+        return new UnitKey(unitType, colorID);
+    }
+
     @Nullable
     public static UnitKey parseID(String id) {
         if (id.contains(".png")) {
-            id = id.replace(".png", "").replace("_", emdash);
+            id = id.replace(".png", "").replace("_", EMDASH);
         }
 
-        Matcher unitParser = Pattern.compile(unitRegex()).matcher(id);
+        Matcher unitParser = UNIT_PATTERN.matcher(id);
         if (unitParser.matches()) {
             String colorID = unitParser.group("color");
             String unitType = unitParser.group("unittype");

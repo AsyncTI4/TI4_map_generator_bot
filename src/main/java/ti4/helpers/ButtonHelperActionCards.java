@@ -9,27 +9,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.SentACRandom;
-import ti4.commands.cardsso.SOInfo;
-import ti4.commands.explore.ExploreFrontier;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.commands.special.NaaluCommander;
-import ti4.commands.tokens.AddCC;
-import ti4.commands.tokens.RemoveCC;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveUnits;
-import ti4.generator.Mapper;
+import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -40,11 +28,21 @@ import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
+import ti4.service.explore.ExploreService;
+import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.planet.FlipTileService;
+import ti4.service.unit.AddUnitService;
+import ti4.service.unit.ParsedUnit;
+import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperActionCards {
 
-    public static List<Button> getTilesToScuttle(Player player, Game game, GenericInteractionCreateEvent event,
-        int tgAlready) {
+    public static List<Button> getTilesToScuttle(Player player, Game game, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -60,8 +58,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getTilesToLuckyShot(Player player, Game game,
-        GenericInteractionCreateEvent event) {
+    public static List<Button> getTilesToLuckyShot(Player player, Game game) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
@@ -88,8 +85,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getUnitsToScuttle(Player player, Game game, GenericInteractionCreateEvent event,
-        Tile tile, int tgAlready) {
+    public static List<Button> getUnitsToScuttle(Player player, Tile tile, int tgAlready) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier,
             UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun);
@@ -121,20 +117,17 @@ public class ButtonHelperActionCards {
                     damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
                 }
 
-                EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     String buttonID = finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "damaged" + "_"
                         + tgAlready;
-                    Button validTile2 = Buttons.red(buttonID, "Remove A Damaged " + prettyName);
-                    validTile2 = validTile2.withEmoji(emoji);
+                    Button validTile2 = Buttons.red(buttonID, "Remove A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
-                totalUnits = totalUnits - damagedUnits;
+                totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(
                         finChecker + "scuttleOn_" + tile.getPosition() + "_" + unitName + "_" + tgAlready,
-                        "Remove " + x + " " + prettyName);
-                    validTile2 = validTile2.withEmoji(emoji);
+                        "Remove " + x + " " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
             }
@@ -142,8 +135,7 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static List<Button> getUnitsToLuckyShot(Player player, Game game, GenericInteractionCreateEvent event,
-        Tile tile) {
+    public static List<Button> getUnitsToLuckyShot(Player player, Game game, Tile tile) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
         Set<UnitType> allowedUnits = Set.of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Dreadnought);
 
@@ -178,19 +170,16 @@ public class ButtonHelperActionCards {
                     damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
                 }
 
-                EmojiUnion emoji = Emoji.fromFormatted(unitKey.unitEmoji());
                 for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
                     String buttonID = finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName + "damaged"
                         + "_" + unitKey.getColor();
-                    Button validTile2 = Buttons.red(buttonID, "Destroy A Damaged " + prettyName);
-                    validTile2 = validTile2.withEmoji(emoji);
+                    Button validTile2 = Buttons.red(buttonID, "Destroy A Damaged " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
-                totalUnits = totalUnits - damagedUnits;
+                totalUnits -= damagedUnits;
                 for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
                     Button validTile2 = Buttons.red(finChecker + "luckyShotOn_" + tile.getPosition() + "_" + unitName
-                        + "_" + unitKey.getColor(), "Destroy " + x + " " + prettyName);
-                    validTile2 = validTile2.withEmoji(emoji);
+                        + "_" + unitKey.getColor(), "Destroy " + x + " " + prettyName, unitKey.unitEmoji());
                     buttons.add(validTile2);
                 }
             }
@@ -198,29 +187,30 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
-    public static void resolveScuttleStart(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("startToScuttleAUnit_")
+    public static void resolveScuttleStart(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
-        List<Button> buttons = getTilesToScuttle(player, game, event, tgAlready);
+        List<Button> buttons = getTilesToScuttle(player, game, tgAlready);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            player.getRepresentation(true, true) + " Use buttons to select a system to Scuttle in", buttons);
+            player.getRepresentationUnfogged() + " Use buttons to select the system containing a unit you wish to _Scuttle_.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("startToLuckyShotAUnit_")
     public static void resolveLuckyShotStart(Player player, Game game, ButtonInteractionEvent event) {
-
-        List<Button> buttons = getTilesToLuckyShot(player, game, event);
-        if (buttons.size() == 0) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation(true, true)
-                + " no systems to Lucky Shot in found. Remember you can't Lucky Shot yourself. Report bug if in error. If not an error, please take a different action");
+        List<Button> buttons = getTilesToLuckyShot(player, game);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged()
+                + " no systems to _Lucky Shot_ at found. Remember you can't _Lucky Shot_ your own units."
+                + " Report bug if in error. If not an error, please take a different action.");
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            player.getRepresentation(true, true) + " Use buttons to select system to Lucky Shot in", buttons);
+            player.getRepresentationUnfogged() + " Use buttons to select system to _Lucky Shot_ at.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveLuckyShotRemoval(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("luckyShotOn_")
+    public static void resolveLuckyShotRemoval(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         String color = buttonID.split("_")[3];
@@ -232,10 +222,11 @@ public class ButtonHelperActionCards {
             damaged = true;
         }
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), p2.getColor());
-        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, p2.getColor(), damaged, game);
-        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " owned by "
-            + ButtonHelper.getIdentOrColor(p2, game) + " in tile " + tile.getRepresentationForButtons(game, player)
-            + " was removed via the Lucky Shot AC";
+        var parsedUnit = new ParsedUnit(unitKey);
+        RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
+        String msg = (damaged ? "A damaged " : "") + unitKey.unitEmoji() + " owned by "
+            + p2.getFactionEmojiOrColor() + " in tile " + tile.getRepresentationForButtons(game, player)
+            + " was removed via the _Lucky Shot_ action card. How lucky!";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
@@ -243,41 +234,41 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveScuttleEnd(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("endScuttle_")
+    public static void resolveScuttleEnd(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int tgAlready = Integer.parseInt(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " TGs increased by " + tgAlready + " (" + player.getTg() + "->"
-                + (player.getTg() + tgAlready) + ")");
+            player.getFactionEmoji() + " trade goods increased by " + tgAlready + " (" + player.getTg() + "->"
+                + (player.getTg() + tgAlready) + ").");
         player.setTg(player.getTg() + tgAlready);
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, tgAlready);
+        ButtonHelperAgents.resolveArtunoCheck(player, tgAlready);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveScuttleTileSelection(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("scuttleIn_")
+    public static void resolveScuttleTileSelection(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
         int tgAlready = Integer.parseInt(buttonID.split("_")[2]);
-        List<Button> buttons = getUnitsToScuttle(player, game, event, tile, tgAlready);
+        List<Button> buttons = getUnitsToScuttle(player, tile, tgAlready);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            player.getRepresentation(true, true) + " Use buttons to select which unit to Scuttle", buttons);
+            player.getRepresentationUnfogged() + " Use buttons to select which unit to _Scuttle_.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveLuckyShotTileSelection(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("luckyShotIn_")
+    public static void resolveLuckyShotTileSelection(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
-        List<Button> buttons = getUnitsToLuckyShot(player, game, event, tile);
+        List<Button> buttons = getUnitsToLuckyShot(player, game, tile);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            player.getRepresentation(true, true) + " Use buttons to select which unit to Lucky Shot", buttons);
+            player.getRepresentationUnfogged() + ", use buttons to select which unit you wish to hit with _Lucky Shot_.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveScuttleRemoval(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("scuttleOn_")
+    public static void resolveScuttleRemoval(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         int tgAlready = Integer.parseInt(buttonID.split("_")[3]);
@@ -290,32 +281,34 @@ public class ButtonHelperActionCards {
             damaged = true;
         }
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
-        new RemoveUnits().removeStuff(event, tile, 1, "space", unitKey, player.getColor(), damaged, game);
-        String msg = (damaged ? "A damaged " : "") + Emojis.getEmojiFromDiscord(unit.toLowerCase()) + " in tile "
-            + tile.getRepresentation() + " was removed via the Scuttle AC by "
-            + player.getFactionEmoji();
+        var parsedUnit = new ParsedUnit(unitKey);
+        RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
+        String msg = (damaged ? "A damaged " : "") + unitKey.unitEmoji() + " in tile "
+            + tile.getRepresentation() + " was removed via the _Scuttle_ action card by "
+            + player.getFactionEmoji() + ".";
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).get(0);
+        UnitModel removedUnit = player.getUnitsByAsyncID(unitKey.asyncID()).getFirst();
         if (tgAlready > 0) {
-            tgAlready = tgAlready + (int) removedUnit.getCost();
+            tgAlready += (int) removedUnit.getCost();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getFactionEmoji() + " TGs increased by " + tgAlready + " (" + player.getTg() + "->"
-                    + (player.getTg() + tgAlready) + ")");
+                player.getFactionEmoji() + " trade goods increased by " + tgAlready + " (" + player.getTg() + "->"
+                    + (player.getTg() + tgAlready) + ").");
             player.setTg(player.getTg() + tgAlready);
             ButtonHelperAbilities.pillageCheck(player, game);
-            ButtonHelperAgents.resolveArtunoCheck(player, game, tgAlready);
+            ButtonHelperAgents.resolveArtunoCheck(player, tgAlready);
         } else {
-            tgAlready = tgAlready + (int) removedUnit.getCost();
-            buttons.add(Buttons.green("startToScuttleAUnit_" + tgAlready, "Scuttle another Unit"));
-            buttons.add(Buttons.red("endScuttle_" + tgAlready, "End Scuttle"));
+            tgAlready += (int) removedUnit.getCost();
+            buttons.add(Buttons.green("startToScuttleAUnit_" + tgAlready, "Scuttle Another Unit"));
+            buttons.add(Buttons.red("endScuttle_" + tgAlready, "Finished Scuttling"));
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                player.getRepresentation(true, true) + " Use buttons to Scuttle another unit or end Scuttling.",
+                player.getRepresentationUnfogged() + " Use buttons to _Scuttle_ another unit or to end Scuttling.",
                 buttons);
         }
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("checkForAllACAssignments")
     public static void checkForAllAssignmentACs(Game game, Player player) {
         checkForAssigningCoup(game, player);
         checkForAssigningPublicDisgrace(game, player);
@@ -323,75 +316,78 @@ public class ButtonHelperActionCards {
         checkForPlayingSummit(game, player);
     }
 
+    @ButtonHandler("resolveCounterStroke")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
-        RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()),
-            game);
-        String message = player.getFactionEmoji() + " removed their CC from tile " + game.getActiveSystem()
-            + " using Counterstroke and gained it to their tactic pool";
+        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
+        String message = player.getFactionEmoji() + " removed their command token from tile " + game.getActiveSystem()
+            + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
-        RemoveCC.removeCC(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]),
-            game);
-        String message = player.getFactionEmoji() + " removed their CC from tile " + buttonID.split("_")[1]
-            + " using Counterstroke and gained it to their tactic pool";
+    @ButtonHandler("resolveCounterStroke_")
+    public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
+        String message = player.getFactionEmoji() + " removed their command token from tile " + buttonID.split("_")[1]
+            + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveSummit")
     public static void resolveSummit(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-        String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-            + ". Use buttons to gain CCs";
+        String message2 = player.getRepresentation() + "! Your current command tokens are " + player.getCCRepresentation()
+            + ". Use buttons to gain command tokens.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveWarEffort")
     public static void resolveWarEffort(Game game, Player player, ButtonInteractionEvent event) {
-        List<Button> buttons = new ArrayList<>(
-            Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
-        String message = "Use buttons to put 1 cruiser with your ships";
+        List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
+        String message = "Use buttons to place 1 cruiser with your other ships.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveFreeTrade")
     public static void resolveFreeTrade(Game game, Player player, ButtonInteractionEvent event) {
-        Button convert2CommButton = Buttons.green("convert_2_comms_stay", "Convert 2 Commodities Into TG")
-            .withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button get2CommButton = Buttons.blue("gain_2_comms_stay", "Gain 2 Commodities")
-            .withEmoji(Emoji.fromFormatted(Emojis.comm));
+        Button convert2CommButton = Buttons.green("convert_2_comms_stay", "Convert 2 Commodities Into Trade Goods", MiscEmojis.Wash);
+        Button get2CommButton = Buttons.blue("gain_2_comms_stay", "Gain 2 Commodities", MiscEmojis.comm);
         List<Button> buttons = List.of(convert2CommButton, get2CommButton,
-            Buttons.red("deleteButtons", "Done resolving"));
+            Buttons.red("deleteButtons", "Done Resolving"));
         String message = "Use buttons to gain or convert commodities as appropriate. You may trade in this window/in between gaining commodities.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolvePreparation")
     public static void resolvePreparation(Game game, Player player, ButtonInteractionEvent event) {
-        String message = "Use button to draw " + (player.hasAbility("scheming") ? "2 ACs" : "1 AC");
         List<Button> buttons = new ArrayList<>();
+        String message;
         if (player.hasAbility("scheming")) {
-            buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 ACs (With Scheming)"));
+            message = "Use button to draw 2 action cards (**Scheming** increases this from the normal 1 action card).";
+            buttons.add(Buttons.green("draw_2_ACDelete", "Draw 2 Action Cards"));
         } else {
-            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 AC"));
+            message = "Use button to draw 1 action card.";
+            buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card"));
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
+    @ButtonHandler("resolveRally")
     public static void resolveRally(Game game, Player player, ButtonInteractionEvent event) {
-        String message = player.getFactionEmoji() + " gained 2 fleet CC (" + player.getFleetCC() + "->"
-            + (player.getFleetCC() + 2) + ") using Rally";
+        String message = player.getFactionEmoji() + " gained command tokens to their fleet pool (" + player.getFleetCC() + "->"
+            + (player.getFleetCC() + 2) + ") using _Rally_.";
         player.setFleetCC(player.getFleetCC() + 2);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         ButtonHelper.deleteMessage(event);
-        if (game.getLaws().keySet().contains("regulations") && player.getFleetCC() > 4) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that there is Fleet Regulations in place, which is limiting fleet pool to 4");
+        if (game.getLaws().containsKey("regulations") && player.getFleetCC() > 4) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + ", reminder that _Fleet Regulations_ is a law, which is limiting fleet pool to 4 tokens.");
         }
     }
 
@@ -400,20 +396,20 @@ public class ButtonHelperActionCards {
         Set<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(game, player);
         for (String type : types) {
             if ("industrial".equals(type)) {
-                buttons.add(Buttons.green("arcExp_industrial", "Explore Industrials X 3"));
+                buttons.add(Buttons.green("arcExp_industrial", "Explore Industrials Thrice"));
             }
             if ("cultural".equals(type)) {
-                buttons.add(Buttons.blue("arcExp_cultural", "Explore Culturals X 3"));
+                buttons.add(Buttons.blue("arcExp_cultural", "Explore Culturals Thrice"));
             }
             if ("hazardous".equals(type)) {
-                buttons.add(Buttons.red("arcExp_hazardous", "Explore Hazardous X 3"));
+                buttons.add(Buttons.red("arcExp_hazardous", "Explore Hazardous Thrice"));
             }
         }
         return buttons;
     }
 
-    public static void resolveArcExpButtons(Game game, Player player, String buttonID,
-        ButtonInteractionEvent event, String trueIdentity) {
+    @ButtonHandler("arcExp_")
+    public static void resolveArcExpButtons(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.replace("arcExp_", "");
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 3; i++) {
@@ -422,15 +418,23 @@ public class ButtonHelperActionCards {
             sb.append(card.textRepresentation()).append(System.lineSeparator());
             String cardType = card.getResolution();
             if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
-                sb.append(trueIdentity).append(" Gained relic fragment\n");
+                sb.append(player.getRepresentationUnfogged()).append(" gained a relic fragment.\n");
                 player.addFragment(cardID);
                 game.purgeExplore(cardID);
             }
         }
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
-        CommanderUnlockCheck.checkPlayer(player, game, "kollecc", event);
+        CommanderUnlockCheckService.checkPlayer(player, "kollecc");
 
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("getRepealLawButtons")
+    public static void getRepealLawButtons(ButtonInteractionEvent event, Player player, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+            "Use buttons to select which law you wish to repeal.",
+            ButtonHelperActionCards.getRepealLawButtons(game, player));
         ButtonHelper.deleteMessage(event);
     }
 
@@ -440,6 +444,14 @@ public class ButtonHelperActionCards {
             lawButtons.add(Buttons.green("repealLaw_" + game.getLaws().get(law), Mapper.getAgendaTitle(law)));
         }
         return lawButtons;
+    }
+
+    @ButtonHandler("getDivertFundingButtons")
+    public static void getDivertFundingButtons(ButtonInteractionEvent event, Player player, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+            "Use buttons to select which technology you wish to return.",
+            ButtonHelperActionCards.getDivertFundingLoseTechOptions(player, game));
+        ButtonHelper.deleteMessage(event);
     }
 
     public static List<Button> getDivertFundingLoseTechOptions(Player player, Game game) {
@@ -454,42 +466,39 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    @ButtonHandler("divertFunding@")
     public static void divertFunding(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String techOut = buttonID.split("@")[1];
         player.removeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " removed the tech " + techM1.getName());
-        resolveResearch(game, player, buttonID, event);
+            player.getFactionEmoji() + " removed the technology " + techM1.getName() + ".");
+        resolveResearch(game, player, event);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("forwardSupplyBaseStep2_")
     public static void resolveForwardSupplyBaseStep2(Player hacan, Game game, ButtonInteractionEvent event, String buttonID) {
         Player player = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player == null) {
             MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), "Could not resolve target player, please resolve manually.");
             return;
         }
-        int oldTg = player.getTg();
-        player.setTg(oldTg + 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdentOrColor(player, game) + " gained 1TG due to Forward Supply Base (" + oldTg
-                + "->" + player.getTg() + ")");
+            player.getRepresentationNoPing() + " gained 1 trade good due to _Forward Supply Base_ " + player.gainTG(1) + ".");
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), ButtonHelper.getIdentOrColor(player, game) + " gained 1TG due to Forward Supply Base");
+            MessageHelper.sendMessageToChannel(hacan.getCorrectChannel(), player.getFactionEmojiOrColor() + " gained 1 trade good due to _Forward Supply Base_.");
         }
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 1);
+        ButtonHelperAgents.resolveArtunoCheck(player, 1);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("forwardSupplyBase")
     public static void resolveForwardSupplyBaseStep1(Player player, Game game, ButtonInteractionEvent event) {
-        int oldTg = player.getTg();
-        player.setTg(oldTg + 3);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " gained 3TGs (" + oldTg + "->" + player.getTg() + ")");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " gained 3 trade goods due to _Forward Supply Base_ " + player.gainTG(3) + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, 3);
+        ButtonHelperAgents.resolveArtunoCheck(player, 3);
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -498,28 +507,23 @@ public class ButtonHelperActionCards {
             if (game.isFowMode()) {
                 buttons.add(Buttons.gray("forwardSupplyBaseStep2_" + p2.getFaction(), p2.getColor()));
             } else {
-                Button button = Buttons.gray("forwardSupplyBaseStep2_" + p2.getFaction(), " ");
-                String factionEmojiString = p2.getFactionEmoji();
-                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                Button button = Buttons.gray("forwardSupplyBaseStep2_" + p2.getFaction(), null, p2.getFactionEmoji());
                 buttons.add(button);
             }
         }
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " choose who should get 1TG", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", choose who should get the other trade good.", buttons);
     }
 
+    @ButtonHandler("resolveReparationsStep1")
     public static void resolveReparationsStep1(Player player, Game game, ButtonInteractionEvent event) {
-
-        String message = player.getRepresentation(true, true) + " Click the names of the planet you wish to ready";
-
+        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to ready.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             buttons.add(Buttons.gray("khraskHeroStep4Ready_" + player.getFaction() + "_" + planet,
                 Helper.getPlanetRepresentation(planet, game)));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -535,12 +539,64 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who took the planet from you", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who took the planet from you.", buttons);
     }
 
-    public static void resolveDiplomaticPressureStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveParleyStep1")
+    public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
+        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to resolve parley on. If it's not present (because the opponent took it already), try pressing UNDO, then /planet add it back to yourself, then try again";
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : player.getPlanets()) {
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "resolveParleyStep2_" + planet,
+                Helper.getPlanetRepresentation(planet, game)));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveParleyStep2")
+    public static void resolveParleyStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String message = player.getRepresentationUnfogged() + " parleyed the planet of " + Helper.getPlanetRepresentationNoResInf(planet, game);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        Tile tile = game.getTileFromPlanet(planet);
+        if (tile != null) {
+            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
+            UnitHolder planetUnitHolder = unitHolders.get(planet);
+            UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
+            if (planetUnitHolder != null && spaceUnitHolder != null) {
+                Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
+                for (Player player_ : game.getPlayers().values()) {
+                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
+                        continue;
+                    }
+                    String color = player_.getColor();
+                    planetUnitHolder.removeAllUnits(color);
+                }
+                Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
+                for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    UnitKey key = unitEntry.getKey();
+                    Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
+                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
+                        continue;
+                    }
+                    if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
+                        Integer count = spaceUnits.get(key);
+                        if (count == null) {
+                            count = unitEntry.getValue();
+                        } else {
+                            count += unitEntry.getValue();
+                        }
+                        spaceUnits.put(key, count);
+                    }
+                }
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveDiplomaticPressureStep1")
+    public static void resolveDiplomaticPressureStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -557,12 +613,12 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to force to give you a PN",
+            player.getRepresentationUnfogged() + ", tell the bot who you wish to force to give you a promissory note.",
             buttons);
     }
 
-    public static void resolveReactorMeltdownStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveReactorMeltdownStep1")
+    public static void resolveReactorMeltdownStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -579,39 +635,34 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to play Reactor Meltdown on",
+            player.getRepresentationUnfogged() + " tell the bot who you wish to play _Reactor Meltdown_ on.",
             buttons);
     }
 
-    public static void resolveFrontlineDeployment(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
-        String message = player.getRepresentation(true, true)
-            + " Click the names of the planet you wish to drop 3 infantry on";
-        List<Button> buttons = new ArrayList<>(
-            Helper.getPlanetPlaceUnitButtons(player, game, "3gf", "placeOneNDone_skipbuild"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons);
+    @ButtonHandler("resolveFrontline")
+    public static void resolveFrontlineDeployment(Player player, Game game, ButtonInteractionEvent event) {
+        String message = player.getRepresentationUnfogged() + ", choose which planet you wish to drop 3 infantry on.";
+        List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "3gf", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveUnexpectedAction(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
-
+    @ButtonHandler("resolveUnexpected")
+    public static void resolveUnexpectedAction(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpected");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.",
-            buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveDistinguished")
     public static void resolveDistinguished(Player player, Game game, ButtonInteractionEvent event) {
         player.addSpentThing("distinguished_5");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " added 5 votes to your vote total");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", added 5 votes to your vote total.");
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveUprisingStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveUprisingStep1")
+    public static void resolveUprisingStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -628,12 +679,12 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot whose planet you want to uprise",
+            player.getRepresentationUnfogged() + ", tell the bot whose planet you wish to _Uprise_ against their oppressors.",
             buttons);
     }
 
-    public static void resolveAssRepsStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveAssRepsStep1") // don't skip ass day
+    public static void resolveAssRepsStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -650,11 +701,11 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you want to assassinate", buttons);
+            player.getRepresentationUnfogged() + ", tell the bot who you wish to be assassinated.", buttons);
     }
 
-    public static void resolveSignalJammingStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveSignalJammingStep1")
+    public static void resolveSignalJammingStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -671,15 +722,19 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot whose CC you want to place down",
+            player.getRepresentationUnfogged() + " tell the bot which player you wish to have a command token placed.",
             buttons);
     }
 
-    public static void resolveSeizeArtifactStep1(Player player, Game game, ButtonInteractionEvent event,
-        String kolleccTech) {
+    @ButtonHandler("resolveSeizeArtifactStep1")
+    public static void resolveSeizeArtifactStep1(Player player, Game game, ButtonInteractionEvent event) {
+        resolveSeizeArtifactStep1(player, game, event, "no");
+    }
+
+    public static void resolveSeizeArtifactStep1(Player player, Game game, ButtonInteractionEvent event, String kolleccTech) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
-            if (p2 == player || !player.getNeighbouringPlayers().contains(p2)) {
+            if (p2 == player || !player.getNeighbouringPlayers(true).contains(p2)) {
                 continue;
             }
             if (game.isFowMode()) {
@@ -694,12 +749,12 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which neighbor you are stealing from",
+            player.getRepresentationUnfogged() + " tell the bot which neighbor you wish to loot.",
             buttons);
     }
 
-    public static void resolvePlagueStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolvePlagueStep1")
+    public static void resolvePlagueStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -716,37 +771,39 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot whose planet you want to Plague.",
+            player.getRepresentationUnfogged() + " tell the bot who controls the planet that you wish to _Plague_.",
             buttons);
     }
 
+    @ButtonHandler("resolveEBSStep1_")
     public static void resolveEBSStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         game.setStoredValue("EBSFaction", player.getFaction());
         if (buttonID.contains("_")) {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_spacecannonoffence");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
         }
         game.setStoredValue("EBSFaction", "");
 
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveBlitz_")
     public static void resolveBlitz(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         game.setStoredValue("BlitzFaction", player.getFaction());
         if (buttonID.contains("_")) {
             ButtonHelper.resolveCombatRoll(player, game, event,
                 "combatRoll_" + buttonID.split("_")[1] + "_space_bombardment");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using /roll");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
         }
         game.setStoredValue("BlitzFaction", "");
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveMicrometeoroidStormStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveMicrometeoroidStormStep1")
+    public static void resolveMicrometeoroidStormStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -763,48 +820,52 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot whose fighters you want to hit",
+            player.getRepresentationUnfogged() + " tell the bot whose fighters you wish to experience inclement space weather.",
             buttons);
     }
 
-    public static void resolveGhostShipStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveGhostShipStep1")
+    public static void resolveGhostShipStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = getGhostShipButtons(game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile you wish to place a Ghost Ship in",
+            player.getRepresentationUnfogged() + " tell the bot which tile you wish to place the _Ghost Ship_ in.",
             buttons);
     }
 
-    public static void resolveProbeStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveProbeStep1")
+    public static void resolveProbeStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = getProbeButtons(game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile you wish to Exploration Probe", buttons);
+            player.getRepresentationUnfogged() + " tell the bot which tile you wish to _Exploration Probe_.", buttons);
     }
 
+    @ButtonHandler("ghostShipStep2_")
     public static void resolveGhostShipStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        tile = MoveUnits.flipMallice(event, tile, game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "destroyer", game);
+        tile = FlipTileService.flipTileIfNeeded(event, tile, game);
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "destroyer");
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " put 1 destroyer in " + tile.getRepresentation());
+            player.getFactionEmoji() + " placed 1 destroyer into " + tile.getRepresentation() + ".");
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
-        CommanderUnlockCheck.checkPlayer(p2, game, "empyrean", event);
+        CommanderUnlockCheckService.checkPlayer(p2, "empyrean");
+        CommanderUnlockCheckService.checkPlayer(player, "ghost", "ghoti");
     }
 
+    @ButtonHandler("probeStep2_")
     public static void resolveProbeStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        new ExploreFrontier().expFront(event, tile, game, player);
+        ExploreService.expFront(event, tile, game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " explored the frontier token in " + tile.getRepresentation());
+            player.getFactionEmoji() + " explored the frontier token in " + tile.getRepresentation() + ".");
     }
 
+    @ButtonHandler("resolveCrippleDefensesStep1")
     public static void resolveCrippleDefensesStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
@@ -822,12 +883,12 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot whose planet you want to cripple",
+            player.getRepresentationUnfogged() + " tell the bot which player controls the planet you wish to cripple.",
             buttons);
     }
 
-    public static void resolveInfiltrateStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveInfiltrateStep1")
+    public static void resolveInfiltrateStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -844,11 +905,12 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot whose planet you are infiltrating",
+            player.getRepresentationUnfogged() + " tell the bot which player controls the planet you are infiltrating.",
             buttons);
     }
 
-    public static void resolveSpyStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("resolveSpyStep1")
+    public static void resolveSpyStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -865,57 +927,58 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who to steal a random AC from",
+            player.getRepresentationUnfogged() + " tell the bot which player you wish to purloin a random action card from.",
             buttons);
     }
 
-    public static void resolvePSStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("resolvePSStep1")
+    public static void resolvePSStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         game.setStoredValue("politicalStabilityFaction", player.getFaction());
         for (Integer sc : game.getSCList()) {
             if (sc <= 0)
                 continue; // some older games have a 0 in the list of SCs
-            Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
             Button button;
             String label = Helper.getSCName(sc, game);
-            if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                && !game.isHomebrewSCMode()) {
-                button = Buttons.gray("psStep2_" + sc, label).withEmoji(scEmoji);
+            TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+            if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                button = Buttons.gray("psStep2_" + sc, label, scEmoji);
             } else {
-                button = Buttons.gray("psStep2_" + sc, "" + sc + " " + label);
+                button = Buttons.gray("psStep2_" + sc, sc + " " + label);
             }
             buttons.add(button);
         }
         if (game.getRealPlayers().size() < 5) {
-            buttons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+            buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which strategy card(s) you used to have.", buttons);
+            player.getRepresentationUnfogged() + " tell the bot which strategy card(s) you used to have.", buttons);
     }
 
-    public static void resolveImpersonation(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveImpersonation")
+    public static void resolveImpersonation(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
-        String message = player.getFactionEmoji() + " Drew A Secret Objective.";
+        String message = player.getFactionEmoji() + " drew a secret objective";
         game.drawSecretObjective(player.getUserID());
         if (player.hasAbility("plausible_deniability")) {
             game.drawSecretObjective(player.getUserID());
-            message = message + " Drew a second SO due to Plausible Deniability.";
+            message += ", and then drew a second secret objective due to **Plausible Deniability**";
         }
-        SOInfo.sendSecretObjectiveInfo(game, player, event);
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message + ".");
         buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            player.getRepresentation() + " Exhaust stuff to pay the 3 influence", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation()
+            + ", please pay the 3 influence for _Impersonation_.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("psStep2_")
     public static void resolvePSStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         int scNum = Integer.parseInt(buttonID.split("_")[1]);
         player.addSC(scNum);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you retained " + Helper.getSCName(scNum, game) + ".");
+            player.getRepresentationUnfogged() + " you retained " + Helper.getSCName(scNum, game) + ".");
         if (game.getRealPlayers().size() < 5) {
             ButtonHelper.deleteTheOneButton(event);
         } else {
@@ -923,8 +986,8 @@ public class ButtonHelperActionCards {
         }
     }
 
-    public static void resolveInsubStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveInsubStep1")
+    public static void resolveInsubStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player || p2.getTacticalCC() < 1) {
@@ -941,13 +1004,12 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true)
-                + " tell the bot which player you want to subtract a tactical CC from",
+            player.getRepresentationUnfogged() + ", please tell the bot which player you wish to remove a command token from the tactic pool of.",
             buttons);
     }
 
-    public static void resolveUnstableStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveUnstableStep1")
+    public static void resolveUnstableStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -964,11 +1026,12 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot whose planet you want to Unstable Planet",
+            player.getRepresentationUnfogged() + ", please tell the bot which player owns the to-be _Unstable Planet_.",
             buttons);
     }
 
-    public static void resolveABSStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("resolveABSStep1")
+    public static void resolveABSStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -985,12 +1048,12 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot whose cultural planets you want to exhaust",
+            player.getRepresentationUnfogged() + " tell the bot which player will have discovered some _Ancient Burial Sites_ upon their cultural planets.",
             buttons);
     }
 
-    public static void resolveSalvageStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveSalvageStep1")
+    public static void resolveSalvageStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = new ArrayList<>();
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -1007,89 +1070,89 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot who you're playing Salvage on", buttons);
+            player.getRepresentationUnfogged() + " tell the bot who you're playing _Salvage_ on.", buttons);
     }
 
-    public static void resolveInsubStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("insubStep2_")
+    public static void resolveInsubStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         p2.setTacticalCC(p2.getTacticalCC() - 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you subtracted 1 tactical CC from "
-                + ButtonHelper.getIdentOrColor(p2, game));
+            player.getRepresentationUnfogged() + " you removed 1 command from the tactic pool of " + p2.getFactionEmojiOrColor() + ".");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " you lost a tactic CC due to Insubordination ("
+            p2.getRepresentationUnfogged() + ", you lost a command token from your tactic pool due to _Insubordination_ ("
                 + (p2.getTacticalCC() + 1) + "->" + p2.getTacticalCC() + ").");
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveDiplomaticPressureStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("diplomaticPressureStep2_")
+    public static void resolveDiplomaticPressureStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
-        String message = p2.getRepresentation(true, true)
-            + " You have been forced to give a PN. Please select the PN you would like to send";
+        String message = p2.getRepresentationUnfogged() + ", you have been forced to give a promissory note. Please select which promissory note you would like to send.";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " sent buttons to resolve Diplomatic Pressure to "
-                + ButtonHelper.getIdentOrColor(p2, game));
+            player.getRepresentationUnfogged() + ", buttons for resolving _Diplomatic Pressure_ have been sent to " + p2.getFactionEmojiOrColor() + ".");
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("absStep2_")
     public static void resolveABSStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         for (String planet : p2.getPlanetsAllianceMode()) {
-            Planet p = (Planet) game.getPlanetsInfo().get(planet);
+            Planet p = game.getPlanetsInfo().get(planet);
             if (p != null && p.getPlanetTypes().contains("cultural")) {
                 p2.exhaustPlanet(planet);
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you exhausted all the cultural planets of "
-                + ButtonHelper.getIdentOrColor(p2, game));
+            player.getRepresentationUnfogged() + ", you exhausted all the cultural planets of " + p2.getFactionEmojiOrColor() + ".");
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your cultural planets were exhausted due to Ancient Burial Sites.");
+            p2.getRepresentationUnfogged() + ", your cultural planets were exhausted due to _Ancient Burial Sites_.");
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveSalvageStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("salvageStep2_")
+    public static void resolveSalvageStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int comm = p2.getCommodities();
         p2.setCommodities(0);
         player.setTg(player.getTg() + comm);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " stole the commodities (there were " + comm
-                + " comms to steal) of " + ButtonHelper.getIdentOrColor(player, game));
+            player.getRepresentationUnfogged() + " stole " + comm + "commodit " + (comm == 1 ? "y" : "ies")
+                + " from " + player.getFactionEmojiOrColor());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your commodities were stolen due to Salvage.");
+            p2.getRepresentationUnfogged() + " your commodities were somehow stolen with _Salvage_.");
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("spyStep2_")
     public static void resolveSpyStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true)
-                + " since stealing 1 AC reveals secret info, extra precaution has been taken and a button has been sent to "
-                + ButtonHelper.getIdentOrColor(p2, game)
-                + " cards info thread, they may press this button to send a random AC to you.");
+            player.getRepresentationUnfogged()
+                + " since stealing 1 action card reveals hidden information, extra precaution has been taken and a button has been sent to "
+                + p2.getFactionEmojiOrColor()
+                + " `#cards-info` thread. They may press this button to send a random action card to you.");
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("spyStep3_" + player.getFaction(), "Send random AC"));
+        buttons.add(Buttons.green("spyStep3_" + player.getFaction(), "Send Random Action Card"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
-            p2.getRepresentation(true, true)
-                + " you have been hit by" + (ThreadLocalRandom.current().nextInt(1000) == 0 ? ", you've been struck by" : "") + " an ability which forces you to send a random AC. Press the button to send a random AC to the person.",
+            p2.getRepresentationUnfogged()
+                + " you have been hit by" + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
+                + " an ability which forces you to send a random action card to another player. Press the button to send a random action card to that player.",
             buttons);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("spyStep3_")
     public static void resolveSpyStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        new SentACRandom().sendRandomACPart2(event, game, player, p2);
+        ActionCardHelper.sendRandomACPart2(event, game, player, p2);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveReparationsStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("reparationsStep2_")
+    public static void resolveReparationsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1104,26 +1167,27 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you want to exhaust", buttons);
+            player.getRepresentationUnfogged() + ", select the planet you wish to exhaust.", buttons);
     }
 
+    @ButtonHandler("resolveInsiderInformation")
     public static void resolveInsiderInformation(Player player, Game game, ButtonInteractionEvent event) {
-        NaaluCommander.sendTopAgendaToCardsInfoSkipCovert(game, player);
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Sent top agenda info to " + ButtonHelper.getIdentOrColor(player, game) + " cards info");
+        AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent info for the top card of the agenda deck to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("resolveEmergencyMeeting")
     public static void resolveEmergencyMeeting(Player player, Game game, ButtonInteractionEvent event) {
         game.shuffleAllAgendasBackIntoDeck();
-        DrawAgenda.drawAgenda(event, 3, game, player);
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            "Sent top 3 agendas to " + ButtonHelper.getIdentOrColor(player, game) + " cards info");
+        AgendaHelper.drawAgenda(3, game, player);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent info for the top three cards of the agenda deck to "
+            + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveSeizeArtifactStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("seizeArtifactStep2_")
+    public static void resolveSeizeArtifactStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         List<String> playerFragments = p2.getFragments();
@@ -1147,18 +1211,18 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the relic fragment you want to grab", buttons);
+            player.getRepresentationUnfogged() + " select the relic fragment you wish to nab.", buttons);
         if (buttonID.split("_").length > 2 && buttonID.split("_")[2].contains("yes")) {
             p2.setTg(p2.getTg() + 2);
             ButtonHelperAbilities.pillageCheck(p2, game);
-            ButtonHelperAgents.resolveArtunoCheck(p2, game, 2);
+            ButtonHelperAgents.resolveArtunoCheck(p2, 2);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                p2.getRepresentation() + " you gained 2TGs due to being hit by the tech Seeker Drones");
+                p2.getRepresentation() + " you gained 2 trade goods due to being hit by  _Seeker Drones_.");
         }
     }
 
-    public static void resolveUprisingStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("uprisingStep2_")
+    public static void resolveUprisingStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (p2.getReadiedPlanets().isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1176,25 +1240,34 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you want to exhaust", buttons);
+            player.getRepresentationUnfogged() + " select the planet you wish to exhaust.", buttons);
     }
 
-    public static void resolveAssRepsStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("assRepsStep2_")
+    public static void resolveAssRepsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            ButtonHelper.getIdentOrColor(player, game)
+            player.getFactionEmojiOrColor()
                 + " successfully assassinated all the representatives of "
-                + ButtonHelper.getIdentOrColor(p2, game));
+                + p2.getFactionEmojiOrColor() + ".");
+        String message = switch (ThreadLocalRandom.current().nextInt(7)) {
+            case 1 -> ", your representatives (all of them) fell out of some windows.";
+            case 2 -> ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.";
+            case 3 -> ", your representatives were \"invited\" to \"experience\" the \"sight-seeing\" Sea of Desolation \"tour\".";
+            case 4 -> ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).";
+            case 5 -> ", your representatives have followed in a great tradition, and so have been stabbed 23 times.";
+            case 6 -> ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.";
+            default -> ", your representatives got sent to the headsman.";
+        };
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your representatives got sent to the headsman");
-        game.setStoredValue("AssassinatedReps",
-            game.getStoredValue("AssassinatedReps") + p2.getFaction());
+            p2.getRepresentationUnfogged() + message);
+        game.setStoredValue("AssassinatedReps", game.getStoredValue("AssassinatedReps") + p2.getFaction());
+        game.setStoredValue("preVoting" + p2.getFaction(), "");
     }
 
-    public static void resolveSignalJammingStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("signalJammingStep2_")
+    public static void resolveSignalJammingStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -1205,13 +1278,14 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true)
-                + " the map is a big place, too big for the bot to offer all the options. Please tell the bot where the origin of the signal jam is coming from, to narrow it down a bit (origin must be a tile where your ships are) \n\n This tile you're selecting is the origin tile, after which you will be offered buttons to select that system or adjacent systems",
+            player.getRepresentationUnfogged()
+                + ", the map is a big place, too big for the bot to offer all the options. Please select a system that contains your ships. __This will not place the command token yet.__"
+                + " This tile you're selecting is the origin of _Signal Jamming_. After this, you will be offered buttons to select that system or an adjacent system, where the command token will be placed.",
             buttons);
     }
 
-    public static void resolveSignalJammingStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("signalJammingStep3_")
+    public static void resolveSignalJammingStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         List<Button> buttons = new ArrayList<>();
@@ -1229,27 +1303,33 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the tile you wish to jam.", buttons);
+            player.getRepresentationUnfogged() + " select the tile you wish to jam.", buttons);
     }
 
-    public static void resolveSignalJammingStep4(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("signalJammingStep4_")
+    public static void resolveSignalJammingStep4(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String pos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(pos);
-        AddCC.addCC(event, p2.getColor(), tile);
+        CommandCounterHelper.addCC(event, p2, tile);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you signal jammed the tile: "
-                + tile.getRepresentationForButtons(game, player));
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " you were signal jammed in tile: "
-                + tile.getRepresentationForButtons(game, p2));
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you _Signal Jam_'d the tile: "
+                    + tile.getRepresentationForButtons(game, player) + ".");
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + " you were _Signal Jam_'d in tile: "
+                    + tile.getRepresentationForButtons(game, p2) + ".");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " has _Signal Jam_'d " + p2.getRepresentationUnfogged()
+                    + " in tile " + tile.getRepresentationForButtons(game, p2) + ".");
+        }
 
     }
 
-    public static void resolveReactorMeltdownStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("reactorMeltdownStep2_")
+    public static void resolveReactorMeltdownStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanetsAllianceMode()) {
@@ -1257,8 +1337,7 @@ public class ButtonHelperActionCards {
                 continue;
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-            if (uH.getUnitCount(UnitType.CabalSpacedock, p2.getColor()) > 0
-                || uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
+            if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
                 if (!game.getTileFromPlanet(planet).isHomeSystem()) {
                     Tile tile = game.getTileFromPlanet(planet);
                     buttons.add(Buttons.gray(
@@ -1279,28 +1358,37 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the space dock you want to melt", buttons);
+            player.getRepresentationUnfogged() + ", please select the space dock you wish to melt.", buttons);
     }
 
-    public static void resolveReactorMeltdownStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("reactorMeltdownStep3_")
+    public static void resolveReactorMeltdownStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         Tile tile = game.getTileByPosition(buttonID.split("_")[2]);
         String unitHolderName = buttonID.split("_")[3];
         if ("space".equalsIgnoreCase(unitHolderName)) {
             unitHolderName = "";
         }
-        new RemoveUnits().unitParsing(event, p2.getColor(), tile, "sd " + unitHolderName, game);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you killed the space dock in " + tile.getRepresentation());
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your space dock in " + tile.getRepresentation() + " was melted.");
-        ButtonHelper.checkFleetAndCapacity(p2, game, tile, event);
+        RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "sd " + unitHolderName);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", you melted the space dock in " + tile.getRepresentation());
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + ", your space dock in " + tile.getRepresentation() + " was melted.");
+            ButtonHelper.checkFleetAndCapacity(p2, game, tile, event);
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " has melted the space dock that used to belong to "
+                    + p2.getRepresentationUnfogged() + " in " + tile.getRepresentation() + ".");
+        }
+        if (p2.hasAbility("data_recovery")) {
+            ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+        }
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolvePlagueStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("plagueStep2_")
+    public static void resolvePlagueStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
@@ -1309,11 +1397,11 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you want to Plague", buttons);
+            player.getRepresentationUnfogged() + " select the planet you wish to _Plague_.", buttons);
     }
 
-    public static void resolveMicrometeoroidStormStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("micrometeoroidStormStep2_")
+    public static void resolveMicrometeoroidStormStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
@@ -1324,25 +1412,21 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the tile you want to hit with the AC", buttons);
+            player.getRepresentationUnfogged() + " select the tile you wish to storm.", buttons);
     }
 
-    public static void resolveRefitTroops(Player player, Game game, ButtonInteractionEvent event, String buttonID,
-        String finChecker) {
-        List<Button> buttons = new ArrayList<>(
-            ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, finChecker));
-        String message = player.getRepresentation(true, true) + " Use buttons to replace 1 infantry with 1 mech";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons);
-        List<Button> buttons2 = new ArrayList<>(
-            ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, finChecker));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message,
-            buttons2);
+    @ButtonHandler("resolveRefitTroops")
+    public static void resolveRefitTroops(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "refit"));
+        String message = player.getRepresentationUnfogged() + ", use buttons to replace 1 infantry with 1 mech.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        List<Button> buttons2 = new ArrayList<>(ButtonHelperAbilities.getPlanetPlaceUnitButtonsForMechMitosis(player, game, "refit"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons2);
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveCrippleStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("crippleStep2_")
+    public static void resolveCrippleStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
@@ -1351,11 +1435,11 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you want to cripple", buttons);
+            player.getRepresentationUnfogged() + ", select the planet you wish to cripple.", buttons);
     }
 
-    public static void resolveInfiltrateStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("infiltrateStep2_")
+    public static void resolveInfiltrateStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
@@ -1364,16 +1448,17 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you want to Infiltrate", buttons);
+            player.getRepresentationUnfogged() + ", select the planet you wish to _Infiltrate_.", buttons);
     }
 
+    @ButtonHandler("resolveUpgrade_")
     public static void resolveUpgrade(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        new RemoveUnits().unitParsing(event, player.getColor(), tile, "cruiser", game);
-        new AddUnits().unitParsing(event, player.getColor(), tile, "dread", game);
+        RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "cruiser");
+        AddUnitService.addUnits(event, tile, game, player.getColor(), "dread");
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " replaced 1 cruiser with 1 dreadnought in " + tile.getRepresentation());
+            player.getFactionEmoji() + " replaced 1 cruiser with 1 dreadnought in " + tile.getRepresentation() + ".");
     }
 
     public static void checkForAssigningCoup(Game game, Player player) {
@@ -1384,19 +1469,20 @@ public class ButtonHelperActionCards {
         if (player.getActionCards().containsKey("coup")) {
             game.setStoredValue("Coup", "");
             String msg = player.getRepresentation()
-                + " you have the option to pre-assign which strategy card you will Coup. Coup is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + ", you have the option to pre-assign which strategy card you wish to Coup."
+                + " _Coup D'etat_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
                     continue; // some older games have a 0 in the list of SCs
-                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                 Button button;
-                String label = Helper.getSCName(sc, game);
-                if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                    && !game.isHomebrewSCMode()) {
-                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, label).withEmoji(scEmoji);
+                String label = "Coup " + Helper.getSCName(sc, game);
+                TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+                if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, label, scEmoji);
                 } else {
-                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, "" + sc + " " + label);
+                    button = Buttons.gray("resolvePreassignment_Coup_" + sc, sc + " " + label);
                 }
                 scButtons.add(button);
             }
@@ -1413,9 +1499,11 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("summit")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play Summit. Start of strategy phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + " you have the option to pre-play _Summit_."
+                + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("resolvePreassignment_Summit", "Pre-play Summit"));
+            buttons.add(Buttons.green("resolvePreassignment_Summit", "Pre-Play Summit"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
@@ -1428,23 +1516,29 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("investments")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play Manipulate Investments. Start of strat phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + " you have the option to pre-play _Manipulate Investments_."
+                + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("resolvePreassignment_Investments", "Pre-play Manipulate Investments"));
+            buttons.add(Buttons.green("resolvePreassignment_Investments", "Pre-Play Manipulate Investments"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
         if (player.getActionCards().containsKey("last_minute_deliberation")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play Last Minute Deliberation. End of Agenda phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + " you have the option to pre-play _Last Minute Deliberation_."
+                + " End-of-agenda-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("resolvePreassignment_LastMinuteDeliberation", "Pre-play Last Minute Deliberation"));
+            buttons.add(Buttons.green("resolvePreassignment_LastMinuteDeliberation", "Pre-Play Last Minute Deliberation"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
         if (player.getActionCards().containsKey("special_session")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play Special Session. End of Agenda phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + " you have the option to pre-play _Special Session_."
+                + " End-of-agenda-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("resolvePreassignment_SpecialSession", "Pre-play Special Session"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -1452,17 +1546,21 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("revolution")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play revolution. Start of strat phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + " you have the option to pre-play _Revolution_."
+                + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("resolvePreassignment_PreRevolution", "Pre-play Revolution"));
+            buttons.add(Buttons.green("resolvePreassignment_PreRevolution", "Pre-Play Revolution"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
         if (player.getActionCards().containsKey("deflection")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-play deflection. Start of strat phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now. Feel free to ignore this message if you don't intend to play it";
+                + " you have the option to pre-play _Deflection_."
+                + " Start-of-strategy-phase is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it any time soon.";
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("resolvePreassignment_Deflection", "Pre-play Deflection"));
+            buttons.add(Buttons.green("resolvePreassignment_Deflection", "Pre-Play Deflection"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
@@ -1475,20 +1573,21 @@ public class ButtonHelperActionCards {
         }
         if (player.getActionCards().containsKey("disgrace")) {
             String msg = player.getRepresentation()
-                + " you have the option to pre-assign which strategy card you will Public Disgrace. Public Disgrace is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
-                + " Feel free to ignore this message if you don't intend to play it or are unsure of the target. You will be given the option for it to only trigger on a particular person";
+                + " you have the option to pre-assign which strategy card you will Publicly Disgrace."
+                + " _Public Disgrace_ is an awkward timing window for async, so if you intend to play it, it's best to pre-play it now."
+                + " Feel free to ignore this message if you don't intend to play it any time soon or are unsure of the target. "
+                + " If you use these buttons, you will then be given the option for it to only trigger on a particular player.";
             List<Button> scButtons = new ArrayList<>();
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
                     continue; // some older games have a 0 in the list of SCs
-                Emoji scEmoji = Emoji.fromFormatted(Emojis.getSCBackEmojiFromInteger(sc));
                 Button button;
                 String label = Helper.getSCName(sc, game);
-                if (scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")
-                    && !game.isHomebrewSCMode()) {
-                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, label).withEmoji(scEmoji);
+                TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc);
+                if (scEmoji != CardEmojis.SCBackBlank && !game.isHomebrewSCMode()) {
+                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, label, scEmoji);
                 } else {
-                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, "" + sc + " " + label);
+                    button = Buttons.gray("resolvePreassignment_Public Disgrace_" + sc, sc + " " + label);
                 }
                 scButtons.add(button);
             }
@@ -1497,8 +1596,8 @@ public class ButtonHelperActionCards {
         }
     }
 
-    public static void resolveDecoyOperationStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveDecoyOperationStep1_")
+    public static void resolveDecoyOperationStep1(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (UnitHolder uH : tile.getUnitHolders().values()) {
@@ -1509,41 +1608,41 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true)
-                + " tell the bot which planet you want to resolve decoy operations on",
+            player.getRepresentationUnfogged() + ", please tell the bot which planet you wish to resolve _Decoy Operations_ on.",
             buttons);
     }
 
-    public static void resolveDecoyOperationStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("decoyOperationStep2_")
+    public static void resolveDecoyOperationStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         List<Button> buttons = ButtonHelper.getButtonsForMovingGroundForcesToAPlanet(game, planet, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " use buttons to move up to 2 troops", buttons);
+            player.getRepresentationUnfogged() + ", please use the buttons to move up to 2 ground forces.", buttons);
     }
 
-    public static void resolveEmergencyRepairs(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveEmergencyRepairs_")
+    public static void resolveEmergencyRepairs(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile.removeAllUnitDamage(player.getColor());
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " repaired all damaged units in " + tile.getRepresentation());
+            player.getFactionEmoji() + " repaired all their damaged units in " + tile.getRepresentation() + ".");
     }
 
-    public static void resolveTacticalBombardmentStep1(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("resolveTacticalBombardmentStep1")
+    public static void resolveTacticalBombardmentStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = getTacticalBombardmentButtons(game, player);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " tell the bot which tile you wish to tactically bombard in",
+            player.getRepresentationUnfogged() + ", please tell the bot which tile you wish to tactically bombard in.",
             buttons);
     }
 
-    public static void resolveTacticalBombardmentStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("tacticalBombardmentStep2_")
+    public static void resolveTacticalBombardmentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
+        int exhaustCount = 0;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             if (uH instanceof Planet) {
                 for (Player p2 : game.getRealPlayers()) {
@@ -1553,19 +1652,25 @@ public class ButtonHelperActionCards {
                     if (p2.getPlanets().contains(uH.getName())) {
                         p2.exhaustPlanet(uH.getName());
                         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                            p2.getRepresentation() + " Your planets in " + tile.getRepresentation()
-                                + " were exhausted");
+                            p2.getRepresentation() + ", your planets in " + tile.getRepresentation() + " were exhausted.");
+                        exhaustCount++;
                     }
                 }
             }
         }
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " exhausted all enemy planets in " + tile.getRepresentation());
+        if (game.isFowMode() && exhaustCount == 0) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                "In what must be a stroke of unfathomable genius, " + player.getRepresentationUnfogged()
+                    + " has tactically bombarded the interstellar medium in " + tile.getRepresentation() + ".");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getFactionEmoji() + " exhausted all enemy planets in " + tile.getRepresentation() + ".");
+        }
     }
 
-    public static void resolveUnstableStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("unstableStep2_")
+    public static void resolveUnstableStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getPlanets()) {
@@ -1576,26 +1681,32 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " select the planet you want to exhaust", buttons);
+            player.getRepresentationUnfogged() + " select the planet you wish to exhaust.", buttons);
     }
 
-    public static void resolveUnstableStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("unstableStep3_")
+    public static void resolveUnstableStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         ButtonHelper.deleteMessage(event);
+        boolean didExhaust = false;
         if (p2.getReadiedPlanets().contains(planet)) {
             p2.exhaustPlanet(planet);
+            didExhaust = true;
         }
-        int amountToKill = 3;
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
+        int amountToKill = uH.getUnitCount(UnitType.Infantry, p2.getColor());
         if (amountToKill > 3) {
             amountToKill = 3;
         }
+        if (amountToKill > 0) {
+            if (p2.hasAbility("data_recovery")) {
+                ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+            }
+        }
         if (p2.hasInf2Tech()) {
-            ButtonHelper.resolveInfantryDeath(game, p2, amountToKill);
+            ButtonHelper.resolveInfantryDeath(p2, amountToKill);
             boolean cabalMech = false;
             Tile tile = game.getTileFromPlanet(planet);
             if (p2.hasAbility("amalgamation")
@@ -1606,7 +1717,7 @@ public class ButtonHelperActionCards {
                 cabalMech = true;
             }
             if (p2.hasAbility("amalgamation")
-                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech)
+                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile) || cabalMech)
                 && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, amountToKill, "infantry", event);
             }
@@ -1614,31 +1725,43 @@ public class ButtonHelperActionCards {
         if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
             ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
         }
-        new RemoveUnits().unitParsing(event, p2.getColor(), game.getTileFromPlanet(planet),
-            amountToKill + " inf " + planet, game);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you exhausted " + planetRep
-                + " and killed " + amountToKill + " infantry there");
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your planet " + planetRep
-                + " was exhausted and " + amountToKill + " infantry were destroyed.");
+        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, p2.getColor(), amountToKill + " inf " + planet);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you exhausted " + planetRep
+                    + " and killed " + amountToKill + " infantry there.");
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + " your planet " + planetRep
+                    + " was exhausted and " + amountToKill + " infantry were destroyed.");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " has destabilised " + planetRep + ", " + (didExhaust ? "exhausting it" : "which was already exhausted")
+                    + ", and " + (amountToKill == 0 ? "did not kill any" : "killed " + amountToKill) + " infantry belonging to " + p2.getRepresentationUnfogged() + ".");
+        }
+
     }
 
-    public static void resolveSeizeArtifactStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("seizeArtifactStep3_")
+    public static void resolveSeizeArtifactStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String fragID = buttonID.split("_")[2];
         ButtonHelper.deleteMessage(event);
         p2.removeFragment(fragID);
         player.addFragment(fragID);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you gained the fragment " + fragID);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your fragment " + fragID + " was seized.");
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you gained the fragment " + fragID + ".");
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + " your fragment " + fragID + " was seized.");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " swiped the fragment " + fragID
+                    + " from the collection of " + p2.getRepresentationUnfogged() + ".");
+        }
     }
 
-    public static void resolveUprisingStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("uprisingStep3_")
+    public static void resolveUprisingStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
@@ -1648,17 +1771,23 @@ public class ButtonHelperActionCards {
         int oldTg = player.getTg();
         player.setTg(oldTg + resValue);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + resValue + "TG" + (resValue == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained " + resValue + " trade good" + (resValue == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, resValue);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you exhausted " + planetRep);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your planet " + planetRep + " was exhausted.");
+        ButtonHelperAgents.resolveArtunoCheck(player, resValue);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you exhausted " + planetRep);
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + " your planet " + planetRep + " was exhausted.");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " instigated an _Uprising_ on " + planetRep
+                    + ", exhausting it, much to the dismay of " + p2.getRepresentationUnfogged() + ".");
+        }
     }
 
-    public static void resolvePlagueStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("plagueStep3_")
+    public static void resolvePlagueStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
@@ -1667,7 +1796,7 @@ public class ButtonHelperActionCards {
         int amount = uH.getUnitCount(UnitType.Infantry, p2.getColor());
         int hits = 0;
         if (amount > 0) {
-            StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("infantry") + " rolled ");
+            StringBuilder msg = new StringBuilder(UnitEmojis.infantry + " rolled ");
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(6);
                 msg.append(d1.getResult()).append(", ");
@@ -1677,10 +1806,10 @@ public class ButtonHelperActionCards {
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), p2.getColor());
-            new RemoveUnits().removeStuff(event, game.getTileFromPlanet(planet), hits, planet, key, p2.getColor(),
-                false, game);
+            var parsedUnit = new ParsedUnit(key, hits, planet);
+            RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, parsedUnit);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
-            ButtonHelper.resolveInfantryDeath(game, p2, hits);
+            ButtonHelper.resolveInfantryDeath(p2, hits);
             if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
             }
@@ -1694,31 +1823,46 @@ public class ButtonHelperActionCards {
                 cabalMech = true;
             }
             if (p2.hasAbility("amalgamation")
-                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech)
+                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile) || cabalMech)
                 && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, hits, "infantry", event);
             }
+            if (hits > 0) {
+                if (p2.hasAbility("data_recovery")) {
+                    ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+                }
+            }
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you Plague'd " + planetRep + " and got " + hits + " hit" + (hits == 1 ? "" : ""));
         String adjective = "";
-        if (amount <= 3) {
-        } else if (hits == 0) {
-            adjective = "n inconsequential";
-        } else if (hits == amount) {
-            adjective = " catastrophic";
-        } else if (hits <= amount / 3) {
-            adjective = " minor";
-        } else if (hits <= 2 * amount / 3) {
-            adjective = " major";
+        if (amount >= 5) {
+            if (hits == 0) {
+                adjective = "n inconsequential";
+            } else if (hits == amount) {
+                adjective = " catastrophic";
+            } else if (hits <= amount / 3) {
+                adjective = " minor";
+            } else if (hits >= 2 * (amount + 1) / 3) {
+                adjective = " major";
+            } else if (hits * 2 == amount) {
+                adjective = " typical";
+            }
         }
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your planet " + planetRep + " suffered a"
-                + adjective + " Plague and you lost " + hits + " infantry.");
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", you _Plague_'d " + planetRep + " and got " + hits + " hit" + (hits == 1 ? "" : "s"));
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a"
+                    + adjective + " _Plague_ and you lost " + hits + " infantry.");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " has released a _Plague_ upon " + planetRep + ".\n"
+                    + p2.getRepresentationUnfogged() + ", your planet " + planetRep + " suffered a"
+                    + adjective + " _Plague_ and you lost " + hits + " infantry.");
+        }
     }
 
-    public static void resolveMicrometeoroidStormStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("micrometeoroidStormStep3_")
+    public static void resolveMicrometeoroidStormStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String tilePos = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(tilePos);
@@ -1727,8 +1871,8 @@ public class ButtonHelperActionCards {
         int amount = uH.getUnitCount(UnitType.Fighter, p2.getColor());
         int hits = 0;
         if (amount > 0) {
-            StringBuilder msg = new StringBuilder(Emojis.getEmojiFromDiscord("fighter") + " rolled ");
-            int threshold = "action_deck_2".equals(game.getAcDeckID()) ? 7 : 6;
+            StringBuilder msg = new StringBuilder(UnitEmojis.fighter + " rolled ");
+            int threshold = 6;
             for (int x = 0; x < amount; x++) {
                 Die d1 = new Die(threshold);
                 msg.append(d1.getResult()).append(", ");
@@ -1737,26 +1881,26 @@ public class ButtonHelperActionCards {
                 }
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
-            UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("fighter"), p2.getColor());
-            new RemoveUnits().removeStuff(event, tile, hits, "space", key, p2.getColor(),
-                false, game);
+            UnitKey key = Units.getUnitKey(UnitType.Fighter, p2.getColor());
+            var unitParsed = new ParsedUnit(key, hits, Constants.SPACE);
+            RemoveUnitService.removeUnit(event, tile, game, unitParsed);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
 
-            if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)) {
+            if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, hits, "fighter", event);
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you stormed "
+            player.getRepresentationUnfogged() + " you stormed "
                 + tile.getRepresentationForButtons(game, player) + " and got " + hits + " hit" + (hits == 1 ? "" : "s"));
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your fighter" + (amount == 1 ? "" : "s") + " in "
+            p2.getRepresentationUnfogged() + " your fighter" + (amount == 1 ? "" : "s") + " in "
                 + tile.getRepresentationForButtons(game, player) + " were hit by a storm and you lost "
                 + hits + " fighter" + (hits == 1 ? "" : "s") + ".");
     }
 
-    public static void resolveCrippleStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("crippleStep3_")
+    public static void resolveCrippleStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
@@ -1765,16 +1909,28 @@ public class ButtonHelperActionCards {
         int amount = uH.getUnitCount(UnitType.Pds, p2.getColor());
         if (amount > 0) {
             UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("pds"), p2.getColor());
-            new RemoveUnits().removeStuff(event, game.getTileFromPlanet(planet), amount, planet, key,
-                p2.getColor(), false, game);
+            var unit = new ParsedUnit(key, amount, planet);
+            RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, unit);
+            if (p2.hasAbility("data_recovery")) {
+                ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+            }
         }
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation(true, true) + " you crippled " + planetRep + " and killed " + amount + " PDS");
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentation(true, true) + " your planet " + planetRep + " was crippled and you lost " + amount
-                + " PDS.");
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you crippled " + planetRep
+                    + (amount > 0 ? " and killed " + amount + " PDS." : ". There were no PDS to kill."));
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + " your planet " + planetRep + " was crippled"
+                    + (amount > 0 ? " killing " + amount + " of your PDS." : ". There were no PDS to kill."));
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you crippled " + planetRep
+                    + (amount > 0 ? " and killed " + amount + "of " + p2.getRepresentationUnfogged() + " PDS."
+                        : ". There were no" + p2.getRepresentationUnfogged() + "PDS to kill."));
+        }
     }
 
+    @ButtonHandler("infiltrateStep3_")
     public static void resolveInfiltrateStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[2];
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
@@ -1782,57 +1938,63 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveReparationsStep3(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    @ButtonHandler("reparationsStep3_")
+    public static void resolveReparationsStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String planet = buttonID.split("_")[2];
         String planetRep = Helper.getPlanetRepresentation(planet, game);
         p2.exhaustPlanet(planet);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(true, true) + " you exhausted " + planetRep);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation(true, true) + " your planet " + planetRep + " was exhausted.");
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you exhausted " + planetRep + ".");
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " your planet " + planetRep + " was exhausted.");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " you exhausted "
+                + planetRep + " belonging to " + p2.getRepresentationUnfogged() + ".");
+        }
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void resolveResearch(Game game, Player player, String buttonID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("resolveResearch")
+    public static void resolveResearch(Game game, Player player, ButtonInteractionEvent event) {
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you may use the button to get your tech.",
+                player.getRepresentationUnfogged() + " you may use the button to research your technology.",
                 List.of(Buttons.GET_A_TECH));
         } else {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                + ". Use buttons to gain CCs";
+            String message2 = player.getRepresentation() + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
+                + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void focusedResearch(Game game, Player player, String buttonID,
-        ButtonInteractionEvent event) {
+    @ButtonHandler("focusedResearch")
+    public static void focusedResearch(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         if (player.getTg() < 4 && (!player.hasUnexhaustedLeader("keleresagent") || player.getCommodities() < 1)) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "You did not have 4tgs and thus cannot resolve focused research");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                + ", you do not have 4 trade goods, guttersnipe, and thus cannot resolve _Focused Research_.");
             return;
         } else {
-            int oldTg = player.getTg();
-            player.setTg(player.getTg() - 4);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " has spent 4tg (" + oldTg + " ->" + player.getTg() + ") on focused research");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false)
+                + " has spent 4 trade goods " + player.gainTG(-4) + " on _Focused Research_.");
         }
         if (!player.hasAbility("propagation")) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation(true, true) + " you may use the button to get your tech.",
+                player.getRepresentationUnfogged() + " you may use the button to get your technology.",
                 List.of(Buttons.GET_A_TECH));
         } else {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String message2 = player.getRepresentation() + "! Your current CCs are " + player.getCCRepresentation()
-                + ". Use buttons to gain CCs";
+            String message2 = player.getRepresentation() + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
+                + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         }
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("repealLaw_")
     public static void repealLaw(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String numID = buttonID.split("_")[1];
         String name = "";
@@ -1842,18 +2004,29 @@ public class ButtonHelperActionCards {
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " repealed " + Mapper.getAgendaTitle(name));
+            player.getFactionEmoji() + " repealed " + Mapper.getAgendaTitle(name) + ".");
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                Mapper.getAgendaTitle(name) + " was repealed");
+                Mapper.getAgendaTitle(name) + " was repealed.");
         }
         game.removeLaw(name);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("getPlagiarizeButtons")
+    public static void getPlagiarizeButtons(ButtonInteractionEvent event, Player player, Game game) {
+        game.setComponentAction(true);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select the technology you wish to acquire by violating intellectual property law.", ButtonHelperActionCards.getPlagiarizeButtons(game, player));
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
+        Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
+        buttons.add(doneExhausting);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Click the names of the planets you wish to exhaust to pay the 5 influence.", buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     public static List<Button> getPlagiarizeButtons(Game game, Player player) {
         List<String> techToGain = new ArrayList<>();
-        for (Player p2 : player.getNeighbouringPlayers()) {
+        for (Player p2 : player.getNeighbouringPlayers(true)) {
             techToGain = ButtonHelperAbilities.getPossibleTechForNekroToGainFromPlayer(player, p2, techToGain,
                 game);
         }
@@ -1938,8 +2111,9 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
-        String acName = buttonID.split("_")[1];
+        String acName = buttonID.replace("resolveReverse_", "");
         List<String> acStrings = new ArrayList<>(game.getDiscardActionCards().keySet());
         for (String acStringID : acStrings) {
             ActionCardModel actionCard = Mapper.getActionCard(acStringID);
@@ -1949,57 +2123,63 @@ public class ButtonHelperActionCards {
                     game.getDiscardActionCards().get(acStringID));
                 if (!picked) {
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "No such Action Card ID found, please retry");
+                        "No such action card ID found, please retry.");
                     return;
                 }
                 String sb = "Game: " + game.getName() + " " +
                     "Player: " + player.getUserName() + "\n" +
-                    "Picked card from Discards: " +
+                    "Card picked from discards: " +
                     Mapper.getActionCard(acStringID).getRepresentation() + "\n";
                 MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-                ACInfo.sendActionCardInfo(game, player);
+                ActionCardHelper.sendActionCardInfo(game, player);
             }
         }
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("economicInitiative")
     public static void economicInitiative(Player player, Game game, ButtonInteractionEvent event) {
         for (String planet : player.getPlanetsAllianceMode()) {
             if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
                 player.refreshPlanet(planet);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " readied each cultural planet");
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied each of their cultural planets.");
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("industrialInitiative")
     public static void industrialInitiative(Player player, Game game, ButtonInteractionEvent event) {
         int oldTg = player.getTg();
         int count = ButtonHelper.getNumberOfXTypePlanets(player, game, "industrial", true);
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(),
-            player.getFactionEmoji() + " gained " + count + "TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ")");
+            player.getFactionEmoji() + " gained " + count + " trade good" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ").");
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, count);
+        ButtonHelperAgents.resolveArtunoCheck(player, count);
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("miningInitiative")
     public static void miningInitiative(Player player, Game game, ButtonInteractionEvent event) {
         int oldTg = player.getTg();
         int count = 0;
+        StringBuilder bestPlanet = new StringBuilder();
         for (String planet : player.getPlanetsAllianceMode()) {
             Planet p = game.getPlanetsInfo().get(planet);
             if (p != null && p.getResources() > count) {
                 count = p.getResources();
+                bestPlanet = new StringBuilder(planet);
+            } else if (p != null && p.getResources() == count && !bestPlanet.toString().endsWith(" or whatever")) {
+                bestPlanet.append(" or whatever");
             }
         }
         player.setTg(oldTg + count);
         MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " gained " + count
-            + " TG" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from their highest resource planet");
+            + " trade goods" + (count == 1 ? "" : "s") + " (" + oldTg + "->" + player.getTg() + ") from mining " + bestPlanet + ".");
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperAgents.resolveArtunoCheck(player, game, count);
+        ButtonHelperAgents.resolveArtunoCheck(player, count);
         ButtonHelper.deleteMessage(event);
     }
 }

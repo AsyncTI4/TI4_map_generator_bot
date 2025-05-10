@@ -7,31 +7,34 @@ import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
+import ti4.helpers.SpinRingsHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.message.MessageHelper;
 
-public class CustomizationOptions extends CustomSubcommandData {
-    private List<Choice> verbChoices = Constants.VERBOSITY_OPTIONS.stream().map(v -> new Choice(v, v)).toList();
-    private List<Choice> onOff = List.of("ON", "OFF").stream().map(v -> new Choice(v, v)).toList();
-    private List<Choice> hexBorderChoices = List.of("off", "dash", "solid").stream().map(v -> new Choice(v, v)).toList();
+class CustomizationOptions extends GameStateSubcommand {
 
     public CustomizationOptions() {
-        super(Constants.CUSTOMIZATION, "Small Customization Options");
+        super(Constants.CUSTOMIZATION, "Small Customization Options", true, true);
+        List<Choice> onOff = CommandHelper.toChoices("ON", "OFF");
+        List<Choice> verbChoices = CommandHelper.toChoices(Constants.VERBOSITY_OPTIONS);
+        List<Choice> hexBorderChoices = CommandHelper.toChoices("off", "dash", "solid");
+
         addOptions(new OptionData(OptionType.STRING, Constants.TEXT_SIZE, "tint/small/medium/large (default = medium)").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Turn ON or OFF strategy card follow reminders at the start of turn").addChoices(onOff));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_FULL_COMPONENT_TEXT, "Show full text of components when using/exhausting"));
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").addChoices(verbChoices));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Turn ON or OFF pings for exceeding component limits").addChoices(onOff));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Turn ON or OFF the bot leaving your faction react on msgs").addChoices(onOff));
-        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin inner three rings at status cleanup. ON or OFF").addChoices(onOff));
+        addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin rings at status cleanup. ON for Fin logic, insert custom logic, OFF to turn off"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE,
-            "Reveal all objectives and diplo gets the power to pre-reveal"));
-        addOptions(
-            new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue SO Discards"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE, "Reveal all objectives and diplo gets the power to pre-reveal"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue secret objective discards"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
@@ -39,16 +42,13 @@ public class CustomizationOptions extends CustomSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.SHOW_HEX_BORDERS, "Show borders around systems with player ships").addChoices(hexBorderChoices));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HOMEBREW_MODE, "Mark the game as homebrew"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.INJECT_RULES_LINKS, "Have the bot inject helpful links to rules within it's output"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNDO_BUTTON, "Offer Undo Button"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW,
-            "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
-        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE,
-            "Swap player's owned units to units from another source").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FAST_SC_FOLLOW, "Consider People To Pass on SCs if they don't respond with X hours. Set X to 0 to turn off"));
+        addOptions(new OptionData(OptionType.STRING, Constants.UNIT_SOURCE, "Swap player's owned units to units from another source").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         OptionMapping stratPings = event.getOption(Constants.STRAT_PINGS);
         if (stratPings != null) {
@@ -81,16 +81,17 @@ public class CustomizationOptions extends CustomSubcommandData {
         OptionMapping shushing = event.getOption(Constants.SPIN_MODE);
         if (shushing != null) {
             String ccNP = shushing.getAsString();
-            if ("ON".equalsIgnoreCase(ccNP)) {
-                game.setSpinMode(true);
-            } else if ("OFF".equalsIgnoreCase(ccNP)) {
-                game.setSpinMode(false);
+            if ("ON".equalsIgnoreCase(ccNP) || "OFF".equalsIgnoreCase(ccNP) || SpinRingsHelper.validateSpinSettings(ccNP)) {
+                game.setSpinMode(ccNP.toUpperCase());
+                MessageHelper.replyToMessage(event, "Spin mode set to `" + ccNP + "`");
+            } else {
+                MessageHelper.replyToMessage(event, "Invalid spin settings: " + ccNP);
             }
         }
 
         String textSize = event.getOption(Constants.TEXT_SIZE, null, OptionMapping::getAsString);
         if (textSize != null)
-            getActiveGame().setTextSize(textSize);
+            game.setTextSize(textSize);
 
         Boolean showFullTextComponents = event.getOption(Constants.SHOW_FULL_COMPONENT_TEXT, null,
             OptionMapping::getAsBoolean);
@@ -158,18 +159,10 @@ public class CustomizationOptions extends CustomSubcommandData {
             }
         }
 
-        Boolean undo = event.getOption(Constants.UNDO_BUTTON, null, OptionMapping::getAsBoolean);
-        if (undo != null)
-            game.setUndoButtonOffered(undo);
-
         Integer fast = event.getOption(Constants.FAST_SC_FOLLOW, null, OptionMapping::getAsInt);
         if (fast != null) {
             game.setStoredValue("fastSCFollow", "" + fast);
-            if (fast == 0) {
-                game.setFastSCFollowMode(false);
-            } else {
-                game.setFastSCFollowMode(true);
-            }
+            game.setFastSCFollowMode(fast != 0);
 
         }
 

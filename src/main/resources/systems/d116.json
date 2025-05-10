@@ -5,7 +5,7 @@
         "sierpen",
         "mandle",
         "regnem",
-        "4252"
+        "4268"
     ],
     "imagePath": "d116.png",
     "shipPositionsType": "TYPE06",
@@ -33,5 +33,6 @@
         "mandle",
         "regnem"
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }

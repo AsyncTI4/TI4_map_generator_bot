@@ -2,22 +2,8 @@
     "id": "rigelii",
     "tileId": "76",
     "name": "Rigel II",
-    "shortName": null,
-    "aliases": [
-        "rigelii",
-        "rigel2",
-        "riglii",
-        "rigl2",
-        "rigel_2",
-        "r2",
-        "rigel ii",
-        "76_2",
-        "rii"
-    ],
-    "positionInTile": {
-        "x": 213.0,
-        "y": 88.0
-    },
+    "aliases": ["rigelii", "rigel2", "r2", "rigel ii", "76_2", "rii"],
+    "positionInTile": { "x": 214.0, "y": 89.0 },
     "resources": 1,
     "influence": 2,
     "factionHomeworld": null,
@@ -26,91 +12,10 @@
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
-    "unitPositions": {
+    "planetLayout": {
         "unitHolderName": "rigelii",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 176.0,
-                    "y": 75.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 144.0,
-                    "y": 41.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 181.0,
-                    "y": 102.0
-                },
-                {
-                    "x": 198.0,
-                    "y": 102.0
-                },
-                {
-                    "x": 215.0,
-                    "y": 102.0
-                },
-                {
-                    "x": 190.0,
-                    "y": 113.0
-                },
-                {
-                    "x": 208.0,
-                    "y": 113.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 183.0,
-                    "y": 31.0
-                },
-                {
-                    "x": 201.0,
-                    "y": 31.0
-                },
-                {
-                    "x": 176.0,
-                    "y": 44.0
-                },
-                {
-                    "x": 194.0,
-                    "y": 44.0
-                },
-                {
-                    "x": 212.0,
-                    "y": 44.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 195.0,
-                    "y": 72.0
-                },
-                {
-                    "x": 162.0,
-                    "y": 72.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 233.0,
-                    "y": 53.0
-                },
-                {
-                    "x": 241.0,
-                    "y": 84.0
-                },
-                {
-                    "x": 233.0,
-                    "y": 115.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
+        "resourcesLocation": "TopRight",
+        "centerPosition": { "x": 214, "y": 89 }
     },
     "contrastColor": "orange",
     "flavourText": "*Temperate world with expansive oceans. Covered in estates and resorts for the system's elite, with extensive fisheries that feed much of the rest of the system.*",

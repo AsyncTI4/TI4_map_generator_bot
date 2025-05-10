@@ -32,5 +32,6 @@
         "cyon",
         "bion"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

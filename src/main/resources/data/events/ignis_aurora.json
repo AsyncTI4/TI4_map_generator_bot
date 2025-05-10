@@ -62,7 +62,7 @@
         "category": "event",
         "categoryDescription": "permanent",
         "text": "During the status phase, if 1 player reaches 10 (14) points, the game does not end. Instead, complete the entire status phase. The player with the most points at the end of the status phase wins the game. If more than 1 player is tied with the most points, the winner is determined by speaker order.",
-        "mapText": "Once you begin the status phase, complete the entire phase. Then, the player with the most points wins (ties broken by speaker order).",
+        "mapText": "Once you begin the status phase, complete the entire phase. Then, the player with the most points wins (ties broken by speaker order). Players may exceed the 10/14 point limit.",
         "source": "ignis_aurora"
     },
     {
@@ -91,8 +91,8 @@
         "type": "Event",
         "category": "event",
         "categoryDescription": "permanent",
-        "text": "The production capacity of each space dock is increased by 1.",
-        "mapText": "The production capacity of each space dock is increased by 1.",
+        "text": "The PRODUCTION capacity of each space dock is increased by 1.",
+        "mapText": "The PRODUCTION capacity of each space dock is increased by 1.",
         "source": "ignis_aurora"
     },
     {
@@ -147,8 +147,8 @@
         "type": "Event",
         "category": "event",
         "categoryDescription": "permanent",
-        "text": "The player with the highest combined resources/influence gains Hester's Belt. If multiple player are tied, roll for possession (highest roll wins).",
-        "mapText": "DEAL WITH MANUALLY OR NEEDS SPECIAL IMPLEMENTATION",
+        "text": "The player with the highest combined resources/influence gains Hester's Belt. If multiple player are tied, roll for possession (highest roll wins). /nHester's Belt: At the end of the status phase, the owner of the belt may score 1 public objective if they qualify for it, draw 1 secret objective, or gain 2 command tokens. /nIf another player wins a combat against the owner of this card, they gain the card.",
+        "mapText": "Owner may score 1 PO, draw 1 SO, or gain 2 CCs (end of status phase)",
         "source": "ignis_aurora"
     },
     {

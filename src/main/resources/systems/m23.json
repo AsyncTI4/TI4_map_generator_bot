@@ -29,5 +29,6 @@
     "planets": [
         "auriya"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

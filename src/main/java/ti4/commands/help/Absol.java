@@ -6,9 +6,10 @@ import java.nio.file.Paths;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;
+import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 
-public class Absol extends HelpSubcommandData {
+class Absol extends Subcommand {
 
     public Absol() {
         super("absol", "Show Helpful Absol stuff");

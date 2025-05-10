@@ -4,11 +4,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 
-public class HowToMoveUnits extends HelpSubcommandData {
+class HowToMoveUnits extends Subcommand {
+
     public HowToMoveUnits() {
         super(Constants.HOW_TO_MOVE_UNITS, "How to move units using the /move_units command");
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXAMPLES_ONLY, "True to only show examples"));
@@ -59,18 +61,18 @@ public class HowToMoveUnits extends HelpSubcommandData {
 
             "## There are also four optional arguments that can sometimes be useful:\n" +
             "### 5. __faction_or_color__\n> By default, /move_units moves your own plastic. You can move other people's plastic (with their permission!) using this argument.\n" +
-            "### 6. __cc_use__\n> By default, /move_units places a token from your tactical pool in the “to” tile.\n" +
+            "### 6. __cc_use__\n> By default, /move_units places a token from your tactic pool in the “to” tile.\n" +
             "> - If you do not want that to happen for any reason, you can use other options:\n" +
             ">  - “r” uses from your reinforcements (e.g., if you are retreating)\n" +
             ">  - “No” doesn't place a token (e.g., for Transit Diodes)\n" +
-            "### 7. __priority_no_damage__\n> I have never used this, but if you want to prioritize moving units that have not sustained damage, you can select that here (e.g., you have 4 dreads, 2 sustained, and you want to move the two undamaged ones only)\n" +
+            "### 7. __prioritize_damaged__\n> I have never used this, but if you want to prioritize moving units that have not sustained damage, you can select that here (e.g., you have 4 dreads, 2 sustained, and you want to move the two undamaged ones only)\n" +
             "### 8. __no_mapgen__\n> 'True' to not produce a map image in the chat afterwards.\n" +
 
             "## Final notes:\n" +
             "- /move_units is really just doing /remove_units in the first tile and /add_units + /add_cc in the second tile, which has some interesting consequences.\n" +
             "- If you are using the ghosts commander with cruiser 2, the following would add all the fighters you'd gain (assuming this took you through a wormhole):\n" +
             " - `/move_units tile_name: creuss unit_names: 6 cr tile_name_to: 104 unit_names_to: 6cr, 6 ff`\n" +
-            "# " + Emojis.BLT + "\n";
+            "# " + MiscEmojis.BLT + "\n";
 
         String examples = """
             # Examples of the `/move_units` command:

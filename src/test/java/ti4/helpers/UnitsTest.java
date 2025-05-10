@@ -17,7 +17,7 @@ import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
 
 public class UnitsTest extends BaseTi4Test {
-    
+
     @Nested
     class UnitKeyTest {
         private final UnitType expectedUnitType = UnitType.Carrier;
@@ -36,8 +36,7 @@ public class UnitsTest extends BaseTi4Test {
             // try to conver the Java map to a JSON map (as maps only allow for string keys).
             Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
                 "unitType",
-                "colorID"
-            ));
+                "colorID"));
 
             // When
             JsonValidator.assertAvailableJsonAttributes(unitKey, knownJsonAttributes);

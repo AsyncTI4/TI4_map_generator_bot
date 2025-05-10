@@ -2,7 +2,6 @@
     "id": "nn",
     "tileId": "fin1",
     "name": "Necatol Nex",
-    "shortName": null,
     "aliases": ["nex", "necatol", "necatolnex", "nechatol"],
     "positionInTile": { "x": 170.0, "y": 150.0 },
     "resources": 1,

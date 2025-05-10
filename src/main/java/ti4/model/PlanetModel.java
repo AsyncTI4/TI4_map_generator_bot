@@ -1,28 +1,29 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.awt.Color;
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
-import net.dv8tion.jda.api.entities.sticker.StickerUnion;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.generator.TileHelper;
-import ti4.generator.UnitTokenPosition;
-import ti4.helpers.Emojis;
+import ti4.image.TileHelper;
+import ti4.image.UnitTokenPosition;
 import ti4.helpers.Stickers;
+import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 
 @Data
 public class PlanetModel implements ModelInterface, EmbeddableModel {
@@ -30,7 +31,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String tileId;
     private String name;
     private String shortName;
-    private List<String> aliases;
+    private Boolean shrinkName;
+    private String shortNamePNAttach;
+    private Boolean shrinkNamePNAttach;
+    private List<String> aliases = new ArrayList<>();
     private Point positionInTile;
     private int resources;
     private int influence;
@@ -44,7 +48,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private String legendaryAbilityFlavourText;
     private String basicAbilityText;
     private String flavourText;
-    private UnitTokenPosition unitPositions;
+    private UnitTokenPosition unitPositions; // phase this out
+    private PlanetLayoutModel planetLayout;
     private int spaceCannonDieCount;
     private int spaceCannonHitsOn;
     private List<String> searchTags = new ArrayList<>();
@@ -55,9 +60,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     public boolean isValid() {
         return id != null
             && name != null
-            && source != null
-            && aliases != null
-            && aliases.contains(name.toLowerCase().replace(" ", "")); // Alias list must contain the lowercase'd name
+            && source != null;
     }
 
     @JsonIgnore
@@ -65,14 +68,48 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         return getId();
     }
 
+    public String getShortName() {
+        return Optional.ofNullable(shortName).orElse(getName());
+    }
+
+    public boolean getShrinkName() {
+        return Optional.ofNullable(shrinkName).orElse(false);
+    }
+
+    public String getShortNamePNAttach() {
+        return Optional.ofNullable(shortNamePNAttach).orElse(getShortName());
+    }
+
+    public boolean getShrinkNamePNAttach() {
+        return Optional.ofNullable(shrinkNamePNAttach).orElse(getShrinkName());
+    }
+
+    @Deprecated
+    public Point getPositionInTile() {
+        if (positionInTile != null)
+            return positionInTile;
+        else if (planetLayout != null && planetLayout.getCenterPosition() != null) {
+            return planetLayout.getCenterPosition();
+        }
+        return null;
+    }
+
+    @Deprecated
     public PlanetTypeModel.PlanetType getPlanetType() {
         if (planetType != null) {
             return planetType;
         }
-        if (planetTypes.size() > 0) {
-            return planetTypes.get(0);
+        if (!getPlanetTypes().isEmpty()) {
+            return getPlanetTypes().getFirst();
         }
         return PlanetTypeModel.PlanetType.NONE;
+    }
+
+    public List<PlanetTypeModel.PlanetType> getPlanetTypes() {
+        List<PlanetType> types = new ArrayList<>();
+        if (planetTypes != null) types.addAll(planetTypes);
+        if (planetType != null) types.add(planetType);
+        return types;
     }
 
     @JsonIgnore
@@ -92,20 +129,22 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         sb.append(getEmoji()).append("__").append(getName()).append("__");
         eb.setTitle(sb.toString());
 
-        switch (getPlanetType()) {
-            case HAZARDOUS -> eb.setColor(Color.red);
-            case INDUSTRIAL -> eb.setColor(Color.green);
-            case CULTURAL -> eb.setColor(Color.blue);
-            default -> eb.setColor(Color.white);
+        if (getPlanetType() != null) {
+            switch (getPlanetType()) {
+                case HAZARDOUS -> eb.setColor(Color.red);
+                case INDUSTRIAL -> eb.setColor(Color.green);
+                case CULTURAL -> eb.setColor(Color.blue);
+                default -> eb.setColor(Color.white);
+            }
         }
 
-        TileModel tile = TileHelper.getTile(getTileId());
+        TileModel tile = TileHelper.getTileById(getTileId());
         sb = new StringBuilder();
         sb.append(getInfResEmojis()).append(getPlanetTypeEmoji()).append(getTechSpecialtyEmoji());
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
         if (getBasicAbilityText() != null) eb.addField("Ability:", getBasicAbilityText(), false);
-        if (getLegendaryAbilityName() != null) eb.addField(Emojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
+        if (getLegendaryAbilityName() != null) eb.addField(MiscEmojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
         if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
         if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
 
@@ -125,10 +164,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (StringUtils.isBlank(getLegendaryAbilityText())) return null; //no ability text, no embed
 
         EmbedBuilder eb = new EmbedBuilder();
-        StringBuilder sb = new StringBuilder();
 
-        sb.append(Emojis.LegendaryPlanet).append("__").append(getLegendaryAbilityName()).append("__");
-        eb.setTitle(sb.toString());
+        eb.setTitle(MiscEmojis.LegendaryPlanet + "__" + getLegendaryAbilityName() + "__");
         eb.setColor(Color.black);
 
         eb.setDescription(getLegendaryAbilityText());
@@ -143,15 +180,15 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     private String getInfResEmojis() {
-        return Emojis.getResourceEmoji(resources) + Emojis.getInfluenceEmoji(influence);
+        return MiscEmojis.getResourceEmoji(resources) + MiscEmojis.getInfluenceEmoji(influence);
     }
 
     @JsonIgnore
     private String getPlanetTypeEmoji() {
         return switch (getPlanetType()) {
-            case HAZARDOUS -> Emojis.Hazardous;
-            case INDUSTRIAL -> Emojis.Industrial;
-            case CULTURAL -> Emojis.Cultural;
+            case HAZARDOUS -> ExploreEmojis.Hazardous.toString();
+            case INDUSTRIAL -> ExploreEmojis.Industrial.toString();
+            case CULTURAL -> ExploreEmojis.Cultural.toString();
             default -> "";
         };
     }
@@ -162,12 +199,12 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
         for (TechSpecialty techSpecialty : getTechSpecialties()) {
             switch (techSpecialty) {
-                case BIOTIC -> sb.append(Emojis.BioticTech);
-                case CYBERNETIC -> sb.append(Emojis.CyberneticTech);
-                case PROPULSION -> sb.append(Emojis.PropulsionTech);
-                case WARFARE -> sb.append(Emojis.WarfareTech);
-                case UNITSKIP -> sb.append(Emojis.UnitTechSkip);
-                case NONUNITSKIP -> sb.append(Emojis.NonUnitTechSkip);
+                case BIOTIC -> sb.append(TechEmojis.BioticTech);
+                case CYBERNETIC -> sb.append(TechEmojis.CyberneticTech);
+                case PROPULSION -> sb.append(TechEmojis.PropulsionTech);
+                case WARFARE -> sb.append(TechEmojis.WarfareTech);
+                case UNITSKIP -> sb.append(TechEmojis.UnitTechSkip);
+                case NONUNITSKIP -> sb.append(TechEmojis.NonUnitTechSkip);
             }
         }
         return sb.toString();
@@ -196,17 +233,17 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public String getEmoji() {
-        return Emojis.getPlanetEmoji(getId());
+    public TI4Emoji getEmoji() {
+        return PlanetEmojis.getPlanetEmoji(getId());
     }
 
     @JsonIgnore
     public String getEmojiURL() {
-        Emoji emoji = Emoji.fromFormatted(getEmoji());
-        if (getEmoji().equals(Emojis.SemLore) && !getId().equals("semlore")) {
+        TI4Emoji emoji = getEmoji();
+        if (getEmoji().equals(PlanetEmojis.SemLore) && !getId().equals("semlore")) {
             return null;
         }
-        if (emoji instanceof CustomEmoji customEmoji) {
+        if (emoji.asEmoji() instanceof CustomEmoji customEmoji) {
             return customEmoji.getImageUrl();
         }
         return null;
@@ -215,8 +252,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     @JsonIgnore
     public String getStickerOrEmojiURL() {
         long ident = Stickers.getPlanetSticker(getId());
-        if (ident == -1)
-        {
+        if (ident == -1) {
             return getEmojiURL();
         }
         return AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();

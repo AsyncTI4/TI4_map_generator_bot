@@ -7,52 +7,37 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.leaders.CommanderUnlockCheck;
-import ti4.generator.Mapper;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 
-public abstract class TechAddRemove extends TechSubcommandData {
+abstract class TechAddRemove extends GameStateSubcommand {
+
     public TechAddRemove(String id, String description) {
-        super(id, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd Tech").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
-        // addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        super(id, description, true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th technology").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color with the technology").setAutoComplete(true));
 
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
-        player = Helper.getPlayer(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player could not be found");
-            return;
-        }
-
-        player = Helper.getPlayer(game, player, event);
-        if (player == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Player/Faction/Color could not be found in map:" + game.getName());
-            return;
-        }
+        Player player = getPlayer();
 
         parseParameter(event, player, event.getOption(Constants.TECH));
         parseParameter(event, player, event.getOption(Constants.TECH2));
         parseParameter(event, player, event.getOption(Constants.TECH3));
         parseParameter(event, player, event.getOption(Constants.TECH4));
 
-        CommanderUnlockCheck.checkPlayer(player, game, "nekro", event);
-        CommanderUnlockCheck.checkPlayer(player, game, "jolnar", event);
+        CommanderUnlockCheckService.checkPlayer(player, "nekro", "jolnar");
     }
 
     private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping techOption) {
@@ -65,13 +50,13 @@ public abstract class TechAddRemove extends TechSubcommandData {
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
                     .map(Map.Entry::getKey).toList();
                 if (possibleTechs.isEmpty()) {
-                    MessageHelper.sendMessageToEventChannel(event, "No matching Tech found");
+                    MessageHelper.sendMessageToEventChannel(event, "No matching technology found.");
                     return;
                 } else if (possibleTechs.size() > 1) {
-                    MessageHelper.sendMessageToEventChannel(event, "More that one matching Tech found");
+                    MessageHelper.sendMessageToEventChannel(event, "More that one matching technology found.");
                     return;
                 }
-                doAction(player, possibleTechs.get(0), event);
+                doAction(player, possibleTechs.getFirst(), event);
 
             }
         }

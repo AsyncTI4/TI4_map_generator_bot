@@ -2,117 +2,20 @@
     "id": "rigeliii",
     "tileId": "76",
     "name": "Rigel III",
-    "shortName": null,
-    "aliases": [
-        "rigeliii",
-        "rigel3",
-        "rigliii",
-        "rigl3",
-        "rigel_3",
-        "r3",
-        "rigel iii",
-        "76_1",
-        "riii"
-    ],
-    "positionInTile": {
-        "x": 81.0,
-        "y": 138.0
-    },
+    "aliases": ["rigeliii", "rigel3", "r3", "rigel iii", "76_1", "riii"],
+    "positionInTile": { "x": 83.0, "y": 139.0 },
     "resources": 1,
     "influence": 1,
     "factionHomeworld": null,
     "planetType": "INDUSTRIAL",
     "cardImagePath": null,
-    "techSpecialties": [
-        "BIOTIC"
-    ],
+    "techSpecialties": ["BIOTIC"],
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
-    "unitPositions": {
+    "planetLayout": {
         "unitHolderName": "rigeliii",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 43.0,
-                    "y": 126.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 20.0,
-                    "y": 99.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 48.0,
-                    "y": 153.0
-                },
-                {
-                    "x": 65.0,
-                    "y": 153.0
-                },
-                {
-                    "x": 82.0,
-                    "y": 153.0
-                },
-                {
-                    "x": 57.0,
-                    "y": 164.0
-                },
-                {
-                    "x": 75.0,
-                    "y": 164.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 50.0,
-                    "y": 82.0
-                },
-                {
-                    "x": 68.0,
-                    "y": 82.0
-                },
-                {
-                    "x": 43.0,
-                    "y": 95.0
-                },
-                {
-                    "x": 61.0,
-                    "y": 95.0
-                },
-                {
-                    "x": 79.0,
-                    "y": 95.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 62.0,
-                    "y": 123.0
-                },
-                {
-                    "x": 29.0,
-                    "y": 123.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 102.0,
-                    "y": 93.0
-                },
-                {
-                    "x": 110.0,
-                    "y": 124.0
-                },
-                {
-                    "x": 102.0,
-                    "y": 155.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": { "x": 83, "y": 139 }
     },
     "contrastColor": "orange",
     "flavourText": "*Outermost world of the Rigel system, and extensively settled despite cooler climates. Boasts a diverse range of industries and research institutions.*",

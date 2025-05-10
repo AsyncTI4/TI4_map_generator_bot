@@ -1,16 +1,17 @@
 package ti4.draft.items;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
-import ti4.model.DraftErrataModel;
-import ti4.model.FactionModel;
-import ti4.model.UnitModel;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import ti4.draft.DraftItem;
+import ti4.image.Mapper;
+import ti4.model.DraftErrataModel;
+import ti4.model.FactionModel;
+import ti4.model.UnitModel;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.UnitEmojis;
 
 public class FlagshipDraftItem extends DraftItem {
     public FlagshipDraftItem(String itemId) {
@@ -41,7 +42,8 @@ public class FlagshipDraftItem extends DraftItem {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Cost: ");
-        sb.append(unit.getCost());
+        float cost = unit.getCost();
+        sb.append(cost == (int) cost ? "" + (int) cost : "" + cost); // type shenanigans
         sb.append(" Combat: ");
         sb.append(unit.getCombatHitsOn());
         if (unit.getCombatDieCount() > 1) {
@@ -67,8 +69,8 @@ public class FlagshipDraftItem extends DraftItem {
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        return Emojis.flagship;
+    public TI4Emoji getItemEmoji() {
+        return UnitEmojis.flagship;
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions) {
@@ -83,7 +85,7 @@ public class FlagshipDraftItem extends DraftItem {
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
-            allItems.add(DraftItem.Generate(Category.FLAGSHIP, units.get(0)));
+            allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
     }

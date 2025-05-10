@@ -1,0 +1,17 @@
+[
+    {
+        "id": "monuments4construction",
+        "initiative": 4,
+        "name": "Construction",
+        "primaryTexts": [
+            "Place 1 PDS or 1 Space Dock on a planet you control.",
+            "Place 1 PDS on a planet you control.",
+            "Place your Monument on a planet you control that matches at least one of it's listed planetary requirements."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and place it in any system; you may place either 1 space dock or 1 PDS on a planet you control in that system"
+        ],
+        "colourHexCode": "#39b54a",
+        "source": "monuments"
+    }
+]

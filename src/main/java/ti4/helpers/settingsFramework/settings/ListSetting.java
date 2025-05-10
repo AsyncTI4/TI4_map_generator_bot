@@ -1,7 +1,6 @@
 package ti4.helpers.settingsFramework.settings;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,14 +10,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -28,6 +21,10 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
 import ti4.buttons.Buttons;
 import ti4.message.BotLogger;
 
@@ -40,8 +37,8 @@ public class ListSetting<T> extends SettingInterface {
     private Map<String, T> allValues = new HashMap<>();
     private Function<T, String> show;
     private Function<T, String> getEmoji;
-    private String includeLang = "include";
-    private String removeLang = "remove";
+    private String includeLang;
+    private String removeLang;
 
     public ListSetting(String id, String name, String include, String remove, Set<Entry<String, T>> allVals, Set<String> values, Set<String> defaults) {
         super(id, name);
@@ -105,9 +102,7 @@ public class ListSetting<T> extends SettingInterface {
     // ---------------------------------------------------------------------------------------------------------------------------------
     public void setAllValues(Map<String, T> values) {
         allValues.clear();
-        for (Map.Entry<String, T> entry : values.entrySet()) {
-            allValues.put(entry.getKey(), entry.getValue());
-        }
+        allValues.putAll(values);
         // remove keys that no longer exist
         keys = new HashSet<>(keys.stream().filter(k -> allValues.containsKey(k)).toList());
         defaultKeys = new HashSet<>(defaultKeys.stream().filter(k -> allValues.containsKey(k)).toList());
@@ -148,6 +143,7 @@ public class ListSetting<T> extends SettingInterface {
                 keys.addAll(itemsToAdd);
                 return null;
             } else {
+                if (itemsToAdd.isEmpty()) return null;
                 return "The items [" + String.join(",", itemsToAdd) + "] are already in the list.";
             }
         } else {
@@ -165,12 +161,13 @@ public class ListSetting<T> extends SettingInterface {
             }
             return "Could not complete action";
         } else if (event instanceof StringSelectInteractionEvent selectEvent) {
-            List<String> itemsToAdd = selectEvent.getValues();
-            if (CollectionUtils.containsAny(keys, itemsToAdd)) {
-                keys.removeAll(itemsToAdd);
+            List<String> itemsToRemove = selectEvent.getValues();
+            if (CollectionUtils.containsAny(keys, itemsToRemove)) {
+                itemsToRemove.forEach(keys::remove);
                 return null;
             } else {
-                return "The items [" + String.join(",", itemsToAdd) + "] are not in the list.";
+                if (itemsToRemove.isEmpty()) return null;
+                return "The items [" + String.join(",", itemsToRemove) + "] are not in the list.";
             }
         } else {
             return "Could not complete action. Invalid event?";
@@ -181,13 +178,13 @@ public class ListSetting<T> extends SettingInterface {
         String prefixID = buttonEvent.getButton().getId();
         List<ActionRow> rows = new ArrayList<>();
         int x = 0;
-        Collections.sort(entries, Comparator.comparing(e -> show.apply(e.getValue())));
+        entries.sort(Comparator.comparing(e -> show.apply(e.getValue())));
         for (List<Map.Entry<String, T>> menu : ListUtils.partition(entries, 25)) {
             List<SelectOption> options = menu.stream()
                 .map(entry -> SelectOption.of(show.apply(entry.getValue()), entry.getKey()))
                 .toList();
-            char start = options.get(0).getLabel().charAt(0);
-            char end = options.get(options.size() - 1).getLabel().charAt(0);
+            char start = options.getFirst().getLabel().charAt(0);
+            char end = options.getLast().getLabel().charAt(0);
             String placeholder = String.format("Select [%s-%s]", start, end);
             StringSelectMenu selectionMenu = StringSelectMenu.create(prefixID + "_" + x)
                 .addOptions(options)

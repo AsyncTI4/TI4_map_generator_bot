@@ -4,21 +4,21 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.milty.MiltyDraftManager;
 
-public class DebugMilty extends MiltySubcommandData {
-
-    private static final String debug = "debug";
+class DebugMilty extends GameStateSubcommand {
 
     public DebugMilty() {
-        super(debug, "Debug Milty Draft");
+        super( "debug", "Debug Milty Draft", false, false);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         MessageChannelUnion channel = event.getChannel();
         if (channel instanceof ThreadChannel thread) {

@@ -1,20 +1,20 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
+import ti4.image.Mapper;
+import ti4.service.emoji.ColorEmojis;
 
 @Data
 public class ColorModel implements ModelInterface {
 
     private String alias;
     private String name;
+    private String displayName;
     private List<String> aliases;
     private String textColor;
     private String hue;
@@ -29,6 +29,10 @@ public class ColorModel implements ModelInterface {
         if (primaryColorRef != null && primaryColorRef.equals(name)) return false;
         if (secondaryColorRef != null && secondaryColorRef.equals(name)) return false;
         return alias != null && name != null && textColor != null;
+    }
+
+    public String getDisplayName() {
+        return displayName == null ? name : displayName;
     }
 
     public Color getPrimaryColor() {
@@ -62,8 +66,8 @@ public class ColorModel implements ModelInterface {
     @JsonIgnore
     public String getRepresentation(boolean includeName) {
         if (includeName)
-            return Emojis.getColorEmojiWithName(name);
-        return Emojis.getColorEmoji(name);
+            return ColorEmojis.getColorEmojiWithName(name);
+        return ColorEmojis.getColorEmoji(name).toString();
     }
 
     @JsonIgnore

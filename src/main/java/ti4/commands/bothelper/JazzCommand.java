@@ -1,26 +1,23 @@
 package ti4.commands.bothelper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
-import ti4.helpers.ButtonHelper;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.settingsFramework.menus.MiltySettings;
-import ti4.json.ObjectMapperFactory;
-import ti4.map.Game;
-import ti4.map.Player;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 
-public class JazzCommand extends BothelperSubcommandData {
-
-    ObjectMapper mapper = ObjectMapperFactory.build();
+class JazzCommand extends Subcommand {
 
     public JazzCommand() {
         super("jazz_command", "jazzxhands");
@@ -29,20 +26,13 @@ public class JazzCommand extends BothelperSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         if (!jazzCheck(event)) return;
-        //sendJazzButton(event);
-
-        Game game = getActiveGame();
-        ButtonHelper.resolveSetupColorChecker(game);
+        sendJazzButton(event);
     }
 
     public static void sendJazzButton(GenericInteractionCreateEvent event) {
-        Emoji spinner = Emoji.fromFormatted(Emojis.scoutSpinner);
-        Button jazz = Buttons.green("jazzButton", spinner.getFormatted());
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), Constants.jazzPing() + " button", jazz);
-    }
-
-    public static void handleJazzButton(ButtonInteractionEvent event, Player p, Game game) {
-
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.gray("jazzButton", "Jazz button", MiscEmojis.ScoutSpinner));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Constants.jazzPing() + " button", buttons);
     }
 
     public static boolean jazzCheck(GenericInteractionCreateEvent event) {
@@ -58,11 +48,21 @@ public class JazzCommand extends BothelperSubcommandData {
     public String json(MiltySettings object) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            String val = mapper.writeValueAsString(object);
-            return val;
+            return mapper.writeValueAsString(object);
         } catch (Exception e) {
-            BotLogger.log("Error mapping to json: ", e);
+            BotLogger.error("Error mapping to json: ", e);
         }
         return null;
+    }
+
+    @ButtonHandler("jazzButton")
+    private static void jazzButton() {
+        AsyncTI4DiscordBot.jda.getGuildById("847560709730730064")
+            .getTextChannelById("1352824638354231439")
+            .sendMessage("```fix\nBorgJedi used /search my_titles player: @Mentak\n```").queue();
+
+        AsyncTI4DiscordBot.jda.getGuildById("847560709730730064")
+            .getTextChannelById("1352824638354231439")
+            .sendMessage("**__Mentak's Titles__**\n` 1.`**You Made Me Mad** x5 (g15, g15, g15, g15, g15)").queue();
     }
 }

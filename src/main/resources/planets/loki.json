@@ -2,16 +2,7 @@
     "id": "loki",
     "tileId": "75",
     "name": "Loki",
-    "shortName": null,
-    "aliases": [
-        "loki",
-        "lki",
-        "75_1"
-    ],
-    "positionInTile": {
-        "x": 83.0,
-        "y": 139.0
-    },
+    "aliases": ["loki", "lki", "75_1"],
     "resources": 1,
     "influence": 2,
     "factionHomeworld": null,
@@ -20,91 +11,10 @@
     "techSpecialties": null,
     "legendaryAbilityName": null,
     "legendaryAbilityText": null,
-    "unitPositions": {
+    "planetLayout": {
         "unitHolderName": "loki",
-        "coordinateMap": {
-            "control": [
-                {
-                    "x": 45.0,
-                    "y": 127.0
-                }
-            ],
-            "sd": [
-                {
-                    "x": 22.0,
-                    "y": 100.0
-                }
-            ],
-            "pd": [
-                {
-                    "x": 50.0,
-                    "y": 154.0
-                },
-                {
-                    "x": 67.0,
-                    "y": 154.0
-                },
-                {
-                    "x": 84.0,
-                    "y": 154.0
-                },
-                {
-                    "x": 59.0,
-                    "y": 165.0
-                },
-                {
-                    "x": 77.0,
-                    "y": 165.0
-                }
-            ],
-            "mf": [
-                {
-                    "x": 52.0,
-                    "y": 83.0
-                },
-                {
-                    "x": 70.0,
-                    "y": 83.0
-                },
-                {
-                    "x": 45.0,
-                    "y": 96.0
-                },
-                {
-                    "x": 63.0,
-                    "y": 96.0
-                },
-                {
-                    "x": 81.0,
-                    "y": 96.0
-                }
-            ],
-            "tkn_gf": [
-                {
-                    "x": 64.0,
-                    "y": 124.0
-                },
-                {
-                    "x": 31.0,
-                    "y": 124.0
-                }
-            ],
-            "att": [
-                {
-                    "x": 104.0,
-                    "y": 94.0
-                },
-                {
-                    "x": 112.0,
-                    "y": 125.0
-                },
-                {
-                    "x": 104.0,
-                    "y": 156.0
-                }
-            ]
-        },
-        "removeUnitCoordinate": true
+        "resourcesLocation": "BottomLeft",
+        "centerPosition": { "x": 83, "y": 139 }
     },
     "contrastColor": "orange",
     "flavourText": "*Cold and wracked with violent storms, Loki still hosts several Yssaril and human colonies, some of which have engaged in escalating shadow-conflicts.*",

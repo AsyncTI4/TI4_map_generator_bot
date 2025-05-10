@@ -1,17 +1,20 @@
 package ti4.model;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
+
+import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.CardEmojis;
 
 @Data
 public class AgendaModel implements ModelInterface, EmbeddableModel {
@@ -23,6 +26,8 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private String target;
     private String text1;
     private String text2;
+    private String forEmoji;
+    private String againstEmoji;
     private String mapText;
     private String imageURL;
     private ComponentSource source;
@@ -83,6 +88,14 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(text2).orElse("");
     }
 
+    public String getForEmoji() {
+        return Optional.ofNullable(forEmoji).orElse("👍");
+    }
+
+    public String getAgainstEmoji() {
+        return Optional.ofNullable(againstEmoji).orElse("👎");
+    }
+
     public String getMapText() {
         return Optional.ofNullable(mapText).orElse("");
     }
@@ -92,6 +105,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
             case "mutiny" -> "Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`\n";
             case "seed_empire" -> "Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`\n";
             case "censure" -> "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
+            case Constants.VOICE_OF_THE_COUNCIL_ID -> "Use this command to change the electee: `/omegaphase elect_voice_of_the_council`\n";
             default -> null;
         };
     }
@@ -108,11 +122,11 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
-        if (getText1().length() > 0) {
+        if (!getText1().isEmpty()) {
             String arg = getText1().replace("For:", "**For:**");
             sb.append("> ").append(arg).append("\n");
         }
-        if (getText2().length() > 0) {
+        if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "**Against:**");
             sb.append("> ").append(arg).append("\n");
         }
@@ -132,16 +146,16 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
         String name = getName() == null ? "" : getName();
-        eb.setTitle(Emojis.Agenda + "__" + name + "__" + getSource().emoji(), null);
+        eb.setTitle(CardEmojis.Agenda + "__" + name + "__" + getSource().emoji(), null);
         eb.setColor(Color.blue);
 
         // DESCRIPTION
         StringBuilder text = new StringBuilder("**" + getType() + ":** *" + getTarget() + "*\n");
-        if (getText1().length() > 0) {
+        if (!getText1().isEmpty()) {
             String arg = getText1().replace("For:", "__**For:**__");
             text.append(arg).append("\n");
         }
-        if (getText2().length() > 0) {
+        if (!getText2().isEmpty()) {
             String arg = getText2().replace("Against:", "__**Against:**__");
             text.append(arg).append("\n");
         }
@@ -154,7 +168,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     public static MessageEmbed agendaIsInSomeonesHandEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
         String name = "No info available";
-        eb.setTitle(Emojis.Agenda + "__" + name + "__", null);
+        eb.setTitle(CardEmojis.Agenda + "__" + name + "__", null);
         eb.setColor(Color.blue);
 
         // DESCRIPTION

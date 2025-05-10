@@ -1,72 +1,41 @@
 package ti4.commands.explore;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
 
-public class ExploreCommand implements Command {
+public class ExploreCommand implements ParentCommand {
 
-    private final Collection<ExploreSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new ExploreDiscardFromDeck(),
+                    new ExploreShuffleIntoDeckFromHand(),
+                    new ExploreDrawAndDiscard(),
+                    new ExploreRemoveFromGame(),
+                    new ExploreShuffleBackIntoDeck(),
+                    new ExploreInfo(),
+                    new ExplorePlanet(),
+                    new ExploreReset(),
+                    new ExploreFrontier(),
+                    new ExploreUse(),
+                    new ExploreShuffle(),
+                    new ExploreLookAtTop())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.EXPLORE;
     }
 
-    public String getActionDescription() {
+    public String getDescription() {
         return "Explore";
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (ExploreSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                break;
-            }
-        }
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
-    }
-
-    private Collection<ExploreSubcommandData> getSubcommands() {
-        Collection<ExploreSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ExploreDiscardFromDeck());
-        subcommands.add(new ExploreShuffleIntoDeckFromHand());
-        subcommands.add(new ExploreDrawAndDiscard());
-        subcommands.add(new ExploreRemoveFromGame());
-        subcommands.add(new ExploreShuffleBackIntoDeck());
-        subcommands.add(new ExploreInfo());
-        subcommands.add(new ExplorePlanet());
-        subcommands.add(new ExploreReset());
-        subcommands.add(new ExploreFrontier());
-        subcommands.add(new ExploreUse());
-        subcommands.add(new ExploreLookAtTop());
-
+    public Map<String, Subcommand> getSubcommands() {
         return subcommands;
-    }
-
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
     }
 }

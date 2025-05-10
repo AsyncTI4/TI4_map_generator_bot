@@ -4,7 +4,7 @@
     "aliases": [
         "fakrenn",
         "fak",
-        "4244"
+        "4260"
     ],
     "imagePath": "d109.png",
     "shipPositionsType": "TYPE05",
@@ -32,5 +32,6 @@
     "planets": [
         "fakrenn"
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }

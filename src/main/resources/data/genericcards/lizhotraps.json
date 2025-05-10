@@ -1,44 +1,44 @@
 [
-  {
-    "alias": "dshc_1_lizho",
-    "cardType": "trap",
-    "name": "Interference Grid",
-    "text": "While this card is attached, you may reveal this card at the start of a space combat in this system. Choose 1 player, apply -1 to each of that player's combat rolls during this combat. At te end ofthis tactical action, return this card to your reinforcements.",
-    "source": "ds"
-  },
-  {
-    "alias": "dshc_2_lizho",
-    "cardType": "trap",
-    "name": "Account Siphon",
-    "text": "While this card is attached, you may reveal this card after a player gains control of this planet. Take upto 2 trade goods or 3 commodities from that player. At the end of this tactical action, return this card to your reinforcements.",
-    "source": "ds"
-  },
-  {
-    "alias": "dshc_3_lizho",
-    "cardType": "trap",
-    "name": "Minefields",
-    "text": "While this card is attached, you may reveal this card after a player commits 1 or more units to this planet. Destroy up to 2 of that player's infantry on this planet. At the end of this tactical action, return this card to your reinforcements.",
-    "source": "ds"
-  },
-  {
-    "alias": "dshc_4_lizho",
-    "cardType": "trap",
-    "name": "Gravitic Inhibitor",
-    "text": "While this card is attached, you may reveal this card after a player activates this system, Until the end of this tactical action, that player cannot move more ships than 1 fewer than their fleet supply limit. At the end of this tactical action, return this card to your reinforcements.",
-    "source": "ds"
-  },
-  {
-    "alias": "dshc_5_lizho",
-    "cardType": "trap",
-    "name": "Saboteurs",
-    "text": "While this card is attached, you may reveal this card any time. Choose 1 non-carrier unit in this system. If it is not damaged and has the SUSTAIN DAMAGE ability, that unit becomes damaged. Otherwise destroy that unit. Then, return this card to your reinforcements. [Note: The DS designers think this trap should only be used by players who need a boost, and that it's OP/shouldnt be included if used by an experienced player]",
-    "source": "ds"
-  },
-  {
-    "alias": "dshc_6_lizho",
-    "cardType": "trap",
-    "name": "Feint",
-    "text": "While this card is attached, you may reveal this card at any time. Then, return this card to your reinforcements.",
-    "source": "ds"
-  }
+    {
+        "alias": "dshc_1_lizho",
+        "cardType": "trap",
+        "name": "Interference Grid",
+        "text": "While this card is attached, you may reveal this card at the start of a space combat in this system. Choose 1 player, apply -1 to each of that player's combat rolls during this combat. At te end ofthis tactical action, return this card to your reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "dshc_2_lizho",
+        "cardType": "trap",
+        "name": "Account Siphon",
+        "text": "While this card is attached, you may reveal this card after a player gains control of this planet. Take upto 2 trade goods or 3 commodities from that player. At the end of this tactical action, return this card to your reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "dshc_3_lizho",
+        "cardType": "trap",
+        "name": "Minefields",
+        "text": "While this card is attached, you may reveal this card after a player commits 1 or more units to this planet. Destroy up to 2 of that player's infantry on this planet. At the end of this tactical action, return this card to your reinforcements.",
+        "source": "ds"
+    },
+    {
+        "alias": "dshc_4_lizho",
+        "cardType": "trap",
+        "name": "Gravitic Inhibitor",
+        "text": "While this card is attached, you may reveal this card after a player activates this system, Until the end of this tactical action, that player cannot move more ships than 1 fewer than their fleet supply limit. At the end of this tactical action, return this card to your reinforcements. [Note: transported fighters do not count towards the limit for the purposes of this card]",
+        "source": "ds"
+    },
+    {
+        "alias": "dshc_5_lizho",
+        "cardType": "trap",
+        "name": "Saboteurs",
+        "text": "While this card is attached, you may reveal this card any time. Choose 1 non-carrier unit in this system. If it is not damaged and has the SUSTAIN DAMAGE ability, that unit becomes damaged. Otherwise destroy that unit. Then, return this card to your reinforcements. [Note: This trap is no longer official, and should not be used unless table allows it]",
+        "source": "ds"
+    },
+    {
+        "alias": "dshc_6_lizho",
+        "cardType": "trap",
+        "name": "Feint",
+        "text": "While this card is attached, you may reveal this card at any time. Then, return this card to your reinforcements.",
+        "source": "ds"
+    }
 ]

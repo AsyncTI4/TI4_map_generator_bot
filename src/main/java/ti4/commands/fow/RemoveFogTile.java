@@ -1,57 +1,55 @@
 package ti4.commands.fow;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.PositionMapper;
+import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.image.PositionMapper;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class RemoveFogTile extends FOWSubcommandData {
+class RemoveFogTile extends GameStateSubcommand {
+
     public RemoveFogTile() {
-        super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.");
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to remove from").setAutoComplete(true));
+        super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        Player player = game.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(game, player, event, null);
+        String positionMapping = event.getOption(Constants.POSITION, "", OptionMapping::getAsString);
 
-        MessageChannel channel = event.getChannel();
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(channel, "You're not a player of this game");
-            return;
+        List<Player> targetPlayers = CommandHelper.getTargetPlayersFromOption(getGame(), event);
+        if (targetPlayers.isEmpty()) {
+            targetPlayers.add(getPlayer());
         }
 
-        String positionMapping = event.getOption(Constants.POSITION, null, OptionMapping::getAsString);
-        if (positionMapping == null) {
-            MessageHelper.replyToMessage(event, "Specify position");
-            return;
-        }
+        Set<String> positions = new HashSet<>(Helper.getListFromCSV(positionMapping));
+        StringBuffer sb = new StringBuffer();
+        for (Player targetPlayer : targetPlayers) {
+            StringBuffer sb2 = new StringBuffer();
+            Set<String> positionsToRemove = Constants.ALL.equals(positionMapping) ? new HashSet<>(targetPlayer.getFogTiles().keySet()) : positions;
+            for (String position : positionsToRemove) {
+                if (!PositionMapper.isTilePositionValid(position)) {
+                    MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
+                    continue;
+                }
 
-        Player targetPlayer = Helper.getPlayer(game, player, event);
-        if (targetPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player to remove tiles from was not found.");
-            return;
-        }
-
-        String[] positions = positionMapping.replace(" ", "").split(",");
-        for (String position : positions) {
-            if (!PositionMapper.isTilePositionValid(position)) {
-                MessageHelper.replyToMessage(event, "Tile position is not allowed");
-                return;
+                //remove the custom tile from the player
+                targetPlayer.removeFogTile(position);
+                sb2.append(" ").append(position);
             }
-
-            //remove the custom tile from the player
-            targetPlayer.removeFogTile(position);
+            sb.append(targetPlayer.getRepresentation()).append(" removed fog tiles:").append(sb2.toString()).append("\n");
         }
-        GameSaveLoadManager.saveMap(game, event);
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 }

@@ -32,7 +32,7 @@ public class BorderAnomalyModel {
 
         BorderAnomalyType(String name, String fileName) {
             this.name = name;
-            imageFilePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
+            imageFilePath = ResourceHelper.getResourceFromFolder("borders/", fileName);
         }
 
         @Override
@@ -50,12 +50,10 @@ public class BorderAnomalyModel {
             return null;
         }
         Map<String, BorderAnomalyType> allTypes = Arrays.stream(BorderAnomalyType.values())
-            .collect(
-                Collectors.toMap(
-                    BorderAnomalyType::toSearchString,
-                    (t -> t)));
-        if (allTypes.containsKey(type.toLowerCase()))
+            .collect(Collectors.toMap(BorderAnomalyType::toSearchString, (t -> t)));
+        if (allTypes.containsKey(type.toLowerCase())) {
             return allTypes.get(type.toLowerCase());
+        }
         return null;
     }
 }

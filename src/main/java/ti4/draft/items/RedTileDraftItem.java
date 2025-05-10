@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.milty.MiltyDraftTile;
 import ti4.draft.DraftItem;
-import ti4.generator.Mapper;
-import ti4.generator.TileHelper;
-import ti4.helpers.Emojis;
-import ti4.model.*;
+import ti4.image.Mapper;
+import ti4.image.TileHelper;
+import ti4.model.DraftErrataModel;
+import ti4.model.PlanetModel;
+import ti4.model.PlanetTypeModel;
+import ti4.model.TechSpecialtyModel;
+import ti4.model.TileModel;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.milty.MiltyDraftManager;
+import ti4.service.milty.MiltyDraftTile;
 
 public class RedTileDraftItem extends DraftItem {
     public RedTileDraftItem(String itemId) {
@@ -20,13 +25,13 @@ public class RedTileDraftItem extends DraftItem {
     @JsonIgnore
     @Override
     public String getShortDescription() {
-        return TileHelper.getTile(ItemId).getName() + " (" + ItemId + ")";
+        return TileHelper.getTileById(ItemId).getName() + " (" + ItemId + ")";
     }
 
     @JsonIgnore
     @Override
     public String getLongDescriptionImpl() {
-        TileModel tile = TileHelper.getTile(ItemId);
+        TileModel tile = TileHelper.getTileById(ItemId);
         StringBuilder sb = new StringBuilder();
         List<String> planetIds = tile.getPlanets();
         if (planetIds.isEmpty()) {
@@ -37,7 +42,7 @@ public class RedTileDraftItem extends DraftItem {
             sb.append(", ");
         }
 
-        buildPlanetString(Mapper.getPlanet(planetIds.get(planetIds.size() - 1)), sb);
+        buildPlanetString(Mapper.getPlanet(planetIds.getLast()), sb);
 
         return sb.toString();
     }
@@ -48,7 +53,7 @@ public class RedTileDraftItem extends DraftItem {
         sb.append(" (");
         sb.append(planet.getResources()).append("/").append(planet.getInfluence());
         if (planet.isLegendary()) {
-            sb.append("/").append(Emojis.LegendaryPlanet);
+            sb.append("/").append(MiscEmojis.LegendaryPlanet);
         }
         if (planet.getTechSpecialties() != null) {
             for (var spec : planet.getTechSpecialties()) {
@@ -59,35 +64,24 @@ public class RedTileDraftItem extends DraftItem {
     }
 
     private String planetTypeEmoji(PlanetTypeModel.PlanetType type) {
-        return switch (type) {
-            case CULTURAL -> Emojis.Cultural;
-            case HAZARDOUS -> Emojis.Hazardous;
-            case INDUSTRIAL -> Emojis.Industrial;
-            default -> Emojis.GoodDog;
-        };
+        return type.getEmoji();
     }
 
     private String techSpecEmoji(TechSpecialtyModel.TechSpecialty type) {
-        return switch (type) {
-            case BIOTIC -> Emojis.BioticTech;
-            case CYBERNETIC -> Emojis.CyberneticTech;
-            case PROPULSION -> Emojis.PropulsionTech;
-            case WARFARE -> Emojis.WarfareTech;
-            default -> Emojis.GoodDog;
-        };
+        return type.getEmoji();
     }
 
     @JsonIgnore
     @Override
-    public String getItemEmoji() {
-        return Emojis.Supernova;
+    public TI4Emoji getItemEmoji() {
+        return MiscEmojis.Supernova;
     }
 
     public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
         List<DraftItem> allItems = new ArrayList<>();
         for (MiltyDraftTile tile : draftManager.getRed()) {
-            allItems.add(DraftItem.Generate(Category.REDTILE,
-                    tile.getTile().getTileID()));
+            allItems.add(DraftItem.generate(Category.REDTILE,
+                tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.REDTILE);
         return allItems;

@@ -2,7 +2,6 @@
     "id": "nix",
     "tileId": "er100",
     "name": "Nix",
-    "shortName": null,
     "aliases": [
         "nix"
     ],

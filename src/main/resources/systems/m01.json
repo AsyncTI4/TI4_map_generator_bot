@@ -31,5 +31,6 @@
     "planets": [
         "altor"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

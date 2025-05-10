@@ -23,6 +23,7 @@ public class GameProperties {
     private @ExportableField int strategyCardsPerPlayer = 1;
     private @ExportableField int round = 1;
     private @ExportableField int vp = 10;
+    private @ExportableField long startedDate;
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
@@ -80,32 +81,37 @@ public class GameProperties {
     private boolean showUnitTags;
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
-    private boolean undoButtonOffered = true;
-    private String hexBorderStyle = "off";
+    private boolean showOwnedPNsInPlayerArea = false;
+    private String hexBorderStyle = "off"; // values are off/dash/solid
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
-    private long autoPingSpacer;
-    private List<String> tags = new ArrayList<String>();
+    private int autoPingSpacer;
+    private List<String> tags = new ArrayList<>();
 
     // Game modes / homebrew flags
     private @ExportableField boolean baseGameMode; // TODO: Make this obsolete
     private @ExportableField boolean prophecyOfKings = true;
     private @ExportableField boolean ageOfExplorationMode;
+    private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
+    private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean allianceMode;
     private @ExportableField boolean communityMode;
     private @ExportableField boolean competitiveTIGLGame;
     private @ExportableField boolean fowMode;
     private @ExportableField boolean lightFogMode;
+    private @ExportableField boolean cptiExploreMode;
     private @ExportableField boolean absolMode;
     private @ExportableField boolean discordantStarsMode;
+    private @ExportableField boolean unchartedSpaceStuff;
     private @ExportableField boolean miltyModMode;
     private @ExportableField boolean promisesPromisesMode;
     private @ExportableField boolean flagshippingMode;
     private @ExportableField boolean redTapeMode;
+    private @ExportableField boolean omegaPhaseMode;
     private @ExportableField boolean homebrew;
     private @ExportableField boolean homebrewSCMode;
-    private @ExportableField boolean spinMode;
+    private @ExportableField String spinMode = "OFF";
     private @ExportableField boolean fastSCFollowMode;
     private @ExportableField boolean extraSecretMode;
     private @ExportableField boolean votcMode;
@@ -113,18 +119,14 @@ public class GameProperties {
 
     // Discord Snowflakes
     private @ExportableField String guildID;
-    private String speaker = "";
+    private String speakerUserID = "";
     private String activePlayerID;
     private String launchPostThreadID;
     private @ExportableField String botMapUpdatesThreadID;
     private @ExportableField String tableTalkChannelID;
     private @ExportableField String mainChannelID;
     private String savedChannelID;
-    private String bagDraftStatusMessageID;
-    private String latestAfterMsg = "";
-    private String latestWhenMsg = "";
-    private String latestTransactionMsg = "";
-    private String latestUpNextMsg = "";
+    private @ExportableField List<String> fogOfWarGMIDs = new ArrayList<>(1); // Game Masters
 
     // More complex objects below
     private @ExportableField String mapString;
@@ -133,6 +135,10 @@ public class GameProperties {
     private List<String> secretObjectives;
     private List<String> actionCards;
     private List<String> agendas;
-    private List<String> events;
+    private List<String> events; // ignis_aurora
 
+    // Misc Helpers
+    public String getID() {
+        return getName();
+    }
 }

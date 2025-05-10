@@ -4,7 +4,6 @@
     "aliases": [
         "99omega",
         "omega",
-        "99",
         "o99",
         "99o"
     ],
@@ -31,5 +30,6 @@
     "planets": [
         "99omega"
     ],
-    "source": "asteroid"
+    "source": "asteroid",
+    "tileBack": "blue"
 }

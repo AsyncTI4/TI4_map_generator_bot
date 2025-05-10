@@ -1,6 +1,6 @@
 {
     "id": "d10",
-    "name": "Avicenna (Kyro)",
+    "name": "Avicenna - Kyro",
     "aliases": [
         "d10",
         "avicenna",
@@ -18,5 +18,6 @@
     "planets": [
         "avicenna"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

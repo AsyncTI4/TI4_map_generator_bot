@@ -2,7 +2,6 @@
     "id": "avicenna",
     "tileId": "d10",
     "name": "Avicenna",
-    "shortName": null,
     "aliases": [
         "avicenna"
     ],
@@ -13,7 +12,7 @@
     "resources": 4,
     "influence": 0,
     "factionHomeworld": "kyro",
-    "planetType": "NONE",
+    "planetType": "FACTION",
     "cardImagePath": null,
     "techSpecialties": null,
     "legendaryAbilityName": null,

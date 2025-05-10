@@ -1,68 +1,75 @@
 package ti4.commands.special;
 
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.uncategorized.ShowGame;
-import ti4.commands.units.AddRemoveUnits;
-import ti4.generator.PositionMapper;
-import ti4.helpers.AliasHandler;
+import ti4.commands.CommandHelper;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.RiftSetModeService;
 
-public class SwapTwoSystems extends SpecialSubcommandData {
+class SwapTwoSystems extends GameStateSubcommand {
+
     public SwapTwoSystems() {
-        super(Constants.SWAP_SYSTEMS, "Swap two systems");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to").setRequired(true).setAutoComplete(true));
+        super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to or RND").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
-        OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
+        Game game = getGame();
+        String from = event.getOption(Constants.TILE_NAME).getAsString();
+        String to = event.getOption(Constants.TILE_NAME_TO).getAsString();
+
+        Tile tileFrom = "RND".equalsIgnoreCase(from) ? getRandomTile() : CommandHelper.getTile(event, game);
+        if (tileFrom == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find tile: " + from);
             return;
         }
 
-        OptionMapping tileOptionTo = event.getOption(Constants.TILE_NAME_TO);
-        if (tileOptionTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
-            return;
-        }
-        String tile1ID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile1 = AddRemoveUnits.getTile(event, tile1ID, game);
-        if (tile1 == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tile1ID + "`. Tile not found");
+        Tile tileTo = "RND".equalsIgnoreCase(to) ? getRandomTile() : CommandHelper.getTile(event, game, to);
+        if (tileTo == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find tile: " + to);
             return;
         }
 
-        String tile2ID = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
-        Tile tile2 = AddRemoveUnits.getTile(event, tile2ID, game);
+        String positionFrom = tileFrom.getPosition();
 
-        String positionFrom = tile1.getPosition();
-        String positionTo = tile2ID; //need to validate position
+        // tile exists, so swap
+        String positionTo = tileTo.getPosition();
+        tileTo.setPosition(positionFrom);
+        game.setTile(tileTo);
 
-        if (tile2 != null) { // tile exists, so swap
-            positionTo = tile2.getPosition();
-            tile2.setPosition(positionFrom);
-            game.setTile(tile2);
-        } else if (!PositionMapper.isTilePositionValid(positionTo)) { // tile does not exist, so validate the TO position
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid Tile To position: " + positionTo);
-            return;
-        } else {
-            //game.removeTile(positionFrom);
-        }
-
-        tile1.setPosition(positionTo);
-        game.setTile(tile1);
+        tileFrom.setPosition(positionTo);
+        game.setTile(tileFrom);
 
         game.rebuildTilePositionAutoCompleteList();
-        ShowGame.simpleShowGame(game, event, DisplayType.map);
+        FowCommunicationThreadService.checkAllCommThreads(game);
+        MessageHelper.replyToMessage(event, "Swapped " + tileTo.getPosition() + " and " + tileFrom.getPosition());
+        RiftSetModeService.swappedSystems(game);
+    }
+
+    private Tile getRandomTile() {
+        Set<String> EXCLUDED_POSITIONS = Set.of("tl", "tr", "bl", "br");
+        List<Tile> availableTiles = getGame().getTileMap().values().stream()
+                .filter(tile -> !EXCLUDED_POSITIONS.contains(tile.getPosition()))
+                .filter(tile -> !tile.getTileModel().isHyperlane())
+                .collect(Collectors.toList());
+
+        if (availableTiles.isEmpty()) {
+            return null; 
+        }
+
+        return availableTiles.get(new Random().nextInt(availableTiles.size()));
     }
 }

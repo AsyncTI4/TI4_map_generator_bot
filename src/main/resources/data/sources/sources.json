@@ -1,0 +1,188 @@
+[
+    {
+        "source":"base",
+        "name":"Twilight Imperium 4th Edition (Base Game)",
+        "canal":"official",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Official_Rules",
+            "Book: https://images-cdn.fantasyflightgames.com/filer_public/da/df/dadf9f07-78f3-43ac-9cce-dd6b55b24ec2/ti4_living_rules_reference_v1_3_web.pdf",
+            "Errata: https://twilight-imperium.fandom.com/wiki/Errata",
+            "FAQ: https://twilight-imperium.fandom.com/wiki/FAQ",
+            "FAQ: https://docs.google.com/document/d/1_93kw7KkzvAXoQAxRioxo7iAt-Ar6BMIxdNf4Lv25rI/edit",
+            "FAQ: https://docs.google.com/document/d/1Bgl9OpP-162sifCcratI9RtbOSTNXtFGnKEU_-89rZI/edit",
+            "Rules: https://www.tirules.com/",
+            "Content: https://www.ti4ultimate.com/",
+            "Stats: https://lookerstudio.google.com/u/0/reporting/3b435bf2-2100-488c-a424-130f1d22ebb0/page/pE58B"
+        ]
+    },
+    {
+        "source":"pok",
+        "name":"Prophecy of Kings [Expansion]",
+        "canal":"official",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"new Factions, Leaders, Exploration, Relics, Mechs, new Techs, new Tiles, PN Alliance, new Objectives & ACs, modified Agendas, updated SC2 & SC4",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Prophecy_of_Kings"
+        ]
+    },
+    {
+        "source":"codex1",
+        "name":"Codex I",
+        "canal":"official",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"omega Techs & PNs, new ACs, updated Rules, new Map & Scenario",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Codex#Volume_I_(Ordinian)",
+            "Book: https://images-cdn.fantasyflightgames.com/filer_public/94/c5/94c59830-533e-47aa-a708-25634575161b/twilight_codex_v1-compressed.pdf",
+            "Assets: https://drive.google.com/drive/folders/1NIPQTtyrSREUObfLgg1QGFk3Q2UoF6kQ"
+        ]
+    },
+    {
+        "source":"codex2",
+        "name":"Codex II",
+        "canal":"official",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"Faction Ref Cards & Alliance Ref Cards, Alliance Game mode, new Relics, new Maps",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Codex#Volume_II_(Affinity)",
+            "Book: https://images-cdn.fantasyflightgames.com/filer_public/ff/fe/fffe5e9d-33fb-4149-a3a2-cd6dfadb4de3/ti_codex_ii_rules_web.pdf",
+            "Assets: https://images-cdn.fantasyflightgames.com/filer_public/ef/e2/efe2a571-f1dc-4547-97f6-93a5e55cd20e/ti_codex_2_cards_compressed.pdf",
+            "Assets: https://drive.google.com/file/d/1DChH7_coZNkV0m22VJYpGHL9MJRaBZAB/view"
+        ]
+    },
+    {
+        "source":"codex3",
+        "name":"Codex III",
+        "canal":"official",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"omega Leaders & Mech & Objectives (Naalu, Yin, Xxcha), new Faction (Keleres), new Frontier",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Codex#Volume_III_(Vigil)",
+            "Book: https://images-cdn.fantasyflightgames.com/filer_public/35/e1/35e10f37-4b6d-4479-a117-4e2c571ddfa7/ti_codex_volume_3_vigil_v2_1-compressed.pdf",
+            "Assets: https://images-cdn.fantasyflightgames.com/filer_public/d6/cf/d6cfc687-621a-4c83-9c83-bdf10e14bdf2/ti_codex_3_cards.pdf",
+            "Assets: https://drive.google.com/file/d/1nxpsU74PEzMMl-C8Fs-BBao3I1lYRp4O/view"
+        ]
+    },
+    {
+        "source":"ds",
+        "name":"Discordant Stars",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"andcat",
+        "description":"new Factions and all their components\nthe bot may contain some content of Uncharted Space or Blue Reverier expansions",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Discordant_Stars_Expansion_(UNOFFICIAL)",
+            "Reference: https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg",
+            "Book: https://drive.google.com/file/d/11stOJknvmhmPeNDuhEkkykQypUi8stVY/view",
+            "Assets: https://drive.google.com/drive/folders/1AipLLvGhyp2v--w2oeT7uQIovmH_HyVn",
+            "Assets: https://drive.google.com/drive/folders/1OV4zr3wcbXQROkv6cOvnO6H_8AvpIL8H",
+            "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=2544813038",
+            "Official channel: https://discord.com/channels/743629929484386395/1203133748342947910",
+            "Asynch channel: https://discord.com/channels/943410040369479690/1168522933283598437"
+        ]
+    },
+    {
+        "source":"uncharted_space",
+        "name":"Uncharted Space",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"andcat",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Uncharted_Space_Expansion_(UNOFFICIAL)",
+            "Reference: https://docs.google.com/document/d/10sYWiwVNvdOwDMpvHlbsx4athKwgeTc8usWFMV3Aaas",
+            "Assets: https://drive.google.com/drive/folders/1RGFGfT76cvT-bJASW3FUMV6kWbjvxqyD",
+            "Assets: https://drive.google.com/drive/folders/1OV4zr3wcbXQROkv6cOvnO6H_8AvpIL8H",
+            "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=3148127083",
+            "Official channel: https://discord.com/channels/743629929484386395/1205392661024866366",
+            "Asynch channel: https://discord.com/channels/943410040369479690/1168522933283598437"
+        ]
+    },
+    {
+        "source":"absol",
+        "name":"Absol",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"Absol197",
+        "data": [
+            "Assets: https://drive.google.com/drive/folders/1OV4zr3wcbXQROkv6cOvnO6H_8AvpIL8H",
+            "Official channel: https://discord.com/channels/743629929484386395/1215827226302349393"
+        ]
+    },
+    {
+        "source":"monuments",
+        "name":"Monuments+",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"Blarknob",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Monuments",
+            "Assets: https://drive.google.com/drive/folders/1kqtY943syNMRsM1ijmHfymCxVVWxYUJq",
+            "Official channel: https://discord.com/channels/743629929484386395/1205395696950321172"
+        ]
+    },
+    {
+        "source":"franken",
+        "name":"Franken",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"",
+        "data": [
+        ]
+    },
+    {
+        "source":"action_deck_2",
+        "name":"Action Card Deck 2",
+        "canal":"community",
+        "subcanal":"lil homebrew",
+        "credits":"private.static.void",
+        "data": [
+            "Assets: https://i.imgur.com/sTuGJWi.jpeg",
+            "Assets & FAQ: https://drive.google.com/drive/folders/1B-uCJxnW18i8zsoq0tQC6x0bpsPNv7Ny",
+            "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=3358036285",
+            "Official channel: https://discord.com/channels/743629929484386395/1214775467123544134"
+        ]
+    },
+    {
+        "source":"lost_star_charts_of_ixth",
+        "name":"Lost Star Charts of Ixth",
+        "canal":"community",
+        "subcanal":"lil homebrew",
+        "credits":"unfulvio",
+        "data": [
+            "Assets: https://drive.google.com/drive/u/0/folders/1HinrGQ1i8gugvjVTouipRisr7hYYM5n-?ths=true",
+            "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=2841087923",
+            "Official channel: https://discord.com/channels/743629929484386395/1353893473815756981"
+        ]
+    },
+    {
+        "source":"promises_promises",
+        "name":"Promises, Promises",
+        "canal":"community",
+        "subcanal":"lil homebrew",
+        "credits":"bradleysigma",
+        "data": [
+            "Official channel: https://discord.com/channels/743629929484386395/1208453502896967790"
+        ]
+    },
+    {
+        "source":"eronous",
+        "name":"Ascendent Sun",
+        "canal":"community",
+        "subcanal":"personal projs",
+        "credits":"eronous",
+        "data": [
+            "Official channel: https://discord.com/channels/743629929484386395/1305897691682967552"
+        ]
+    },
+    {
+        "source":"luminous",
+        "name":"Luminous",
+        "canal":"community",
+        "subcanal":"personal projs",
+        "credits":"Blarknob",
+        "data": [
+            "Official channel: https://discord.com/channels/743629929484386395/1205395696950321172"
+        ]
+    }
+]

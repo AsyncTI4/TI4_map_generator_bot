@@ -2,7 +2,8 @@
     "id": "marshengurn",
     "tileId": "s04",
     "name": "Marshen Gurn",
-    "shortName": null,
+    "shortNamePNAttach": "Marshen G.",
+    "shrinkName": true,
     "aliases": [
         "marshengurn",
         "marshen_gurn",

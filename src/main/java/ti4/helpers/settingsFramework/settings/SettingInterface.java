@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.Helper;
+import ti4.service.emoji.TI4Emoji;
 
 @Getter
 @Setter
@@ -77,5 +77,17 @@ public abstract class SettingInterface {
         else
             val = shortValue();
         return String.format("`%s`%s: %s", Helper.leftpad(name, pad), emote, val);
+    }
+
+    public void setEmoji(String emoji) {
+        this.emoji = emoji;
+    }
+
+    public void setEmoji(TI4Emoji emoji) {
+        if (emoji == null) {
+            this.emoji = null;
+        } else {
+            setEmoji(emoji.toString());
+        }
     }
 }

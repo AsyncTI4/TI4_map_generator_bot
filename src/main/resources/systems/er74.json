@@ -6,7 +6,6 @@
         "v3e"
     ],
     "imagePath": "er74_empty3e.png",
-    "planetIds": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [
         {
@@ -31,5 +30,11 @@
         }
     ],
     "wormholes": null,
-    "planets": []
+    "planets": [],
+    "isAsteroidField": false,
+    "isSupernova": false,
+    "isNebula": false,
+    "isGravityRift": false,
+    "source": "eronous",
+    "tileBack": "red"
 }

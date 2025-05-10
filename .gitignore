@@ -16,8 +16,12 @@ TI4_map_generator_bot.code-workspace
 docker_run.ps1
 TI4_map_generator_discord_bot.iml
 .project
+.prettierrc
 .settings
 /runbot.sh
 .DS_Store
-.classpath
 *.swp
+/src/test/java/ti4/image/static/tileLayout/temp
+.classpath
+runlocally clean.ps1
+runlocally.ps1

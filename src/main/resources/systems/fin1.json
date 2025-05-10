@@ -32,5 +32,6 @@
     "planets": [
         "nn"
     ],
-    "source": "other"
+    "source": "other",
+    "tileBack": "black"
 }

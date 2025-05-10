@@ -1,56 +1,36 @@
 package ti4.commands.user;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.Command;
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 
-public class UserCommand implements Command {
+public class UserCommand implements ParentCommand {
 
-    private final Collection<UserSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new ShowUserSettings(),
+                    new SetPreferredColourList(),
+                    new SetPersonalPingInterval(),
+                    new SetPingOnNextTurn(),
+                    new OfferAFKTimeOptions(),
+                    new SetFowFilter())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.USER;
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (UserSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                subcommand.postExecute(event);
-                break;
-            }
-        }
-    }
-
-    protected String getActionDescription() {
+    public String getDescription() {
         return "User";
     }
 
-    private Collection<UserSubcommandData> getSubcommands() {
-        Collection<UserSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new ShowUserSettings());
-        subcommands.add(new SetPreferredColourList());
-        subcommands.add(new SetPersonalPingInterval());
-        return subcommands;
-    }
-
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands()));
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
     }
 }

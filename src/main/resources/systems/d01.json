@@ -1,6 +1,6 @@
 {
     "id": "d01",
-    "name": "Rhune (Veldyr)",
+    "name": "Rhune - Veldyr",
     "aliases": [
         "d01",
         "rhune",
@@ -17,5 +17,7 @@
     "planets": [
         "rhune"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
+    
 }

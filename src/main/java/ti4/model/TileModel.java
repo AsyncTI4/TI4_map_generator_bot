@@ -1,37 +1,64 @@
 package ti4.model;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
-import ti4.generator.Mapper;
-import ti4.helpers.Emojis;
+import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TileEmojis;
 
 @Data
 public class TileModel implements ModelInterface, EmbeddableModel {
+
+    public enum TileBack {
+        GREEN, BLUE, RED, BLACK;
+
+        @JsonCreator
+        public static TileBack fromString(String value) {
+            return value == null ? TileBack.BLACK : TileBack.valueOf(value.toUpperCase());
+        }
+
+        @JsonValue
+        public String toValue() {
+            return this.name().toLowerCase();
+        }
+    }
+
     private String id;
     private String name;
     private List<String> aliases;
     private String imagePath;
     private List<String> planets;
+    @Nullable
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
-    private Boolean isAsteroidField;
-    private Boolean isSupernova;
-    private Boolean isNebula;
-    private Boolean isGravityRift;
+    private @JsonProperty("isHyperlane") boolean hyperlane = false;
+    private @JsonProperty("isAsteroidField") boolean asteroidField = false;
+    private @JsonProperty("isSupernova") boolean supernova = false;
+    private @JsonProperty("isNebula") boolean nebula = false;
+    private @JsonProperty("isGravityRift") boolean gravityRift = false;
     private String imageURL;
     private ComponentSource source;
-    private String tileBack;
+    private TileBack tileBack = TileBack.BLACK;
 
     @Override
     @JsonIgnore
@@ -46,36 +73,47 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(name).orElse("");
     }
 
-    public MessageEmbed getHelpMessageEmbed(boolean includeAliases) {
+    public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
         EmbedBuilder eb = new EmbedBuilder();
 
         //TITLE
-        StringBuilder sb = new StringBuilder();
-        sb.append("(").append(getId()).append(") __").append(getNameNullSafe()).append("__");
-        eb.setTitle(sb.toString());
+        eb.setTitle(getEmbedTitle());
 
-        sb = new StringBuilder();
-        if (isEmpty()) sb.append(Emojis.Frontier);
-        if (isAsteroidField()) sb.append(Emojis.Asteroid);
-        if (isSupernova()) sb.append(Emojis.Supernova);
-        if (isNebula()) sb.append(Emojis.Nebula);
-        if (isGravityRift()) sb.append(Emojis.GravityRift);
+        StringBuilder sb = new StringBuilder();
+        if (isEmpty()) sb.append(ExploreEmojis.Frontier);
+        if (isAsteroidField()) sb.append(MiscEmojis.Asteroids);
+        if (isSupernova()) sb.append(MiscEmojis.Supernova);
+        if (isNebula()) sb.append(MiscEmojis.Nebula);
+        if (isGravityRift()) sb.append(MiscEmojis.GravityRift);
         if (hasPlanets()) sb.append("\nPlanets: ").append(getPlanets().toString());
         eb.setDescription(sb.toString());
 
-        eb.setThumbnail("attachment://" + getImagePath());
+        // Image
+        TI4Emoji emoji = getEmoji();
+        if (emoji != null && emoji.asEmoji() instanceof CustomEmoji customEmoji) {
+            if (emoji.name().endsWith("Back") && !StringUtils.isEmpty(getImagePath())) {
+                eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/" + getImagePath() + "?raw=true");
+            } else {
+                eb.setThumbnail(customEmoji.getImageUrl());
+            }
+        }
+
         if (includeAliases) eb.setFooter("Aliases: " + getAliases());
         return eb.build();
+    }
+
+    public String getEmbedTitle() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(").append(getId()).append(") ");
+        if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
+        if (!getNameNullSafe().isEmpty()) sb.append("__").append(getNameNullSafe()).append("__");
+        return sb.toString();
     }
 
     @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(getId());
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
-        if (tilePath == null) {
-            //BotLogger.log("Could not find tile image: " + getId());
-        }
-        return tilePath;
+        return ResourceHelper.getInstance().getTileFile(tileName);
     }
 
     @JsonIgnore
@@ -89,28 +127,38 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
+    public int getNumPlanets() {
+        return getPlanets() == null ? 0 : getPlanets().size();
+    }
+
+    @JsonIgnore
     public boolean isEmpty() {
         return !hasPlanets();
     }
 
     @JsonIgnore
     public boolean isAsteroidField() {
-        return Optional.ofNullable(isAsteroidField).orElse(false);
+        return asteroidField;
     }
 
     @JsonIgnore
     public boolean isSupernova() {
-        return Optional.ofNullable(isSupernova).orElse(false);
+        return supernova;
     }
 
     @JsonIgnore
     public boolean isNebula() {
-        return Optional.ofNullable(isNebula).orElse(false);
+        return nebula;
     }
 
     @JsonIgnore
     public boolean isGravityRift() {
-        return Optional.ofNullable(isGravityRift).orElse(false);
+        return gravityRift;
+    }
+
+    @JsonIgnore
+    public boolean isAnomaly() {
+        return isAsteroidField() || isGravityRift() || isNebula() || isSupernova();
     }
 
     @JsonIgnore
@@ -130,7 +178,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public MessageEmbed getRepresentationEmbed() {
-        throw new UnsupportedOperationException("Unimplemented method 'getRepresentationEmbed'");
+        return getRepresentationEmbed(false);
     }
 
     @JsonIgnore
@@ -139,7 +187,8 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     }
 
     @JsonIgnore
-    public Optional<String> getTileBackOption() {
-        return Optional.ofNullable(tileBack);
+    @Nullable
+    public TI4Emoji getEmoji() {
+        return TileEmojis.getTileEmojiFromTileID(getId());
     }
 }

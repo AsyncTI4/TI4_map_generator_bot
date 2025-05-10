@@ -6,53 +6,54 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetupGameChannels extends GameSubcommandData {
+class SetupGameChannels extends GameStateSubcommand {
+
     public SetupGameChannels() {
-        super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non-standard games");
+        super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non-standard games", true, false);
         addOptions(new OptionData(OptionType.CHANNEL, Constants.MAIN_GAME_CHANNEL, "Main game channel").setRequired(true));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.TABLE_TALK_CHANNEL, "Table talk channel").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.TABLE_TALK_CHANNEL, "Table talk channel"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL1, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL1, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE2, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL2, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE2, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL2, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE3, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL3, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE3, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL3, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE4, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL4, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE4, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL4, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE5, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL5, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE5, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL5, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE6, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL6, "Private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Main player for Community/Fog mode"));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE6, "Community Mode role"));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL6, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Main player for Community/Fog mode").setRequired(false));
-        //addOptions(new OptionData(OptionType.ROLE, Constants.ROLE7, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Private channel for player/role").setRequired(false));
+        //7th and 8th are missing ROLE and subcommand doesn't have space for them
+        //addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Main player for Community/Fog mode"));
+        //addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Private channel for player/role"));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Main player for Community/Fog mode").setRequired(false));
-        //addOptions(new OptionData(OptionType.ROLE, Constants.ROLE8, "Community Mode role").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Private channel for player/role").setRequired(false));
+        //addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Main player for Community/Fog mode"));
+        //addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Private channel for player/role"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Game game = getActiveGame();
+        Game game = getGame();
 
         // Set main channel where SC's get played
         OptionMapping channel = event.getOption(Constants.MAIN_GAME_CHANNEL);
@@ -77,8 +78,8 @@ public class SetupGameChannels extends GameSubcommandData {
             setRoleAndChannel(event, game, Constants.PLAYER4, Constants.ROLE4, Constants.CHANNEL4);
             setRoleAndChannel(event, game, Constants.PLAYER5, Constants.ROLE5, Constants.CHANNEL5);
             setRoleAndChannel(event, game, Constants.PLAYER6, Constants.ROLE6, Constants.CHANNEL6);
-            setRoleAndChannel(event, game, Constants.PLAYER7, Constants.ROLE7, Constants.CHANNEL7);
-            setRoleAndChannel(event, game, Constants.PLAYER8, Constants.ROLE8, Constants.CHANNEL8);
+            //setRoleAndChannel(event, game, Constants.PLAYER7, Constants.ROLE7, Constants.CHANNEL7);
+            //setRoleAndChannel(event, game, Constants.PLAYER8, Constants.ROLE8, Constants.CHANNEL8);
         }
     }
 
@@ -100,10 +101,7 @@ public class SetupGameChannels extends GameSubcommandData {
 
             //set community mode data
             if (game.isCommunityMode()) {
-                if (role == null) {
-                    //MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify role for community mode: " + roleConstant + " is missing");
-                    //return;
-                } else {
+                if (role != null) {
                     player_.setRoleIDForCommunity(role.getAsRole().getId());
                 }
             }

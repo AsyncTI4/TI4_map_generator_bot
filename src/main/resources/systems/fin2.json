@@ -30,5 +30,6 @@
     "planets": [
         "ll"
     ],
-    "source": "other"
+    "source": "other",
+    "tileBack": "black"
 }

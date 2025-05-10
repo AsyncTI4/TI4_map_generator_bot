@@ -1,119 +1,46 @@
 package ti4.commands.cardsso;
 
-import java.util.List;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.AsyncTI4DiscordBot;
-import ti4.commands.Command;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import ti4.commands.ParentCommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.map.Game;
-import ti4.map.GameManager;
-import ti4.map.GameSaveLoadManager;
-import ti4.map.Player;
-import ti4.message.MessageHelper;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+public class SOCardsCommand implements ParentCommand {
 
-public class SOCardsCommand implements Command {
-
-    private final Collection<SOCardsSubcommandData> subcommandData = getSubcommands();
+    private final Map<String, Subcommand> subcommands = Stream.of(
+                    new DrawSO(),
+                    new ShuffleSecretDeck(),
+                    new DiscardSO(),
+                    new SOInfo(),
+                    new ShowSO(),
+                    new ShowSOToAll(),
+                    new ScoreSO(),
+                    new DealSO(),
+                    new UnscoreSO(),
+                    new ShowAllSO(),
+                    new ShowAllSOToAll(),
+                    new ShowRandomSO(),
+                    new DealSOToAll(),
+                    new DrawSpecificSO(),
+                    new ShowUnScoredSOs(),
+                    new ListAllScored())
+            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
-    public String getActionID() {
+    public String getName() {
         return Constants.CARDS_SO;
     }
 
     @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return acceptEvent(event, getActionID());
-    }
-
-    public static boolean acceptEvent(SlashCommandInteractionEvent event, String actionID) {
-        if (event.getName().equals(actionID)) {
-            String userID = event.getUser().getId();
-            GameManager gameManager = GameManager.getInstance();
-            if (!gameManager.isUserWithActiveGame(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
-                return false;
-            }
-            Member member = event.getMember();
-            if (member != null) {
-                List<Role> roles = member.getRoles();
-                for (Role role : AsyncTI4DiscordBot.adminRoles) {
-                    if (roles.contains(role)) {
-                        return true;
-                    }
-                }
-            }
-            Game userActiveGame = gameManager.getUserActiveGame(userID);
-            if (userActiveGame.isCommunityMode()) {
-                Player player = Helper.getGamePlayer(userActiveGame, null, event, userID);
-                if (player == null || !userActiveGame.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                    MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                    return false;
-                }
-            } else if (!userActiveGame.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(AsyncTI4DiscordBot.userID)) {
-                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
-                return false;
-            }
-            if (!event.getChannel().getName().startsWith(userActiveGame.getName() + "-")) {
-                MessageHelper.replyToMessage(event, "Commands may be executed only in game specific channels.");
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void execute(SlashCommandInteractionEvent event) {
-        String subcommandName = event.getInteraction().getSubcommandName();
-        for (SOCardsSubcommandData subcommand : subcommandData) {
-            if (Objects.equals(subcommand.getName(), subcommandName)) {
-                subcommand.preExecute(event);
-                subcommand.execute(event);
-                break;
-            }
-        }
-        String userID = event.getUser().getId();
-        Game game = GameManager.getInstance().getUserActiveGame(userID);
-        GameSaveLoadManager.saveMap(game, event);
-    }
-
-    protected String getActionDescription() {
+    public String getDescription() {
         return "Secret Objectives";
     }
 
-    private Collection<SOCardsSubcommandData> getSubcommands() {
-        Collection<SOCardsSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new DrawSO());
-        subcommands.add(new DiscardSO());
-        subcommands.add(new SOInfo());
-        subcommands.add(new ShowSO());
-        subcommands.add(new ShowSOToAll());
-        subcommands.add(new ScoreSO());
-        subcommands.add(new DealSO());
-        subcommands.add(new UnscoreSO());
-        subcommands.add(new ShowAllSO());
-        subcommands.add(new ShowAllSOToAll());
-        subcommands.add(new ShowRandomSO());
-        subcommands.add(new DealSOToAll());
-        subcommands.add(new DrawSpecificSO());
-        subcommands.add(new ShowUnScoredSOs());
-        subcommands.add(new ListAllScored());
-        return subcommands;
-    }
-
     @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-            Commands.slash(getActionID(), getActionDescription())
-                .addSubcommands(getSubcommands()));
+    public Map<String, Subcommand> getSubcommands() {
+        return subcommands;
     }
 }

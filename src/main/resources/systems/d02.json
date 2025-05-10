@@ -1,6 +1,6 @@
 {
     "id": "d02",
-    "name": "Kjalengard/Hulgade (Kjalengard)",
+    "name": "Kjalengard/Hulgade - Kjalengard",
     "aliases": [
         "d02",
         "kjalengard",
@@ -17,5 +17,6 @@
         "kjalengard",
         "hulgade"
     ],
-    "source": "ds"
+    "source": "ds",
+    "tileBack": "green"
 }

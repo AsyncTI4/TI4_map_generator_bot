@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
@@ -23,11 +21,12 @@ import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.draft.items.StartingFleetDraftItem;
 import ti4.draft.items.StartingTechDraftItem;
 import ti4.draft.items.TechDraftItem;
-import ti4.generator.Mapper;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.ModelInterface;
+import ti4.service.emoji.TI4Emoji;
 
 public abstract class DraftItem implements ModelInterface {
     @Override
@@ -51,10 +50,8 @@ public abstract class DraftItem implements ModelInterface {
 
     public DraftErrataModel Errata;
 
-    public static DraftItem Generate(Category category, String itemId) {
-        DraftItem item = null;
-        switch (category) {
-
+    public static DraftItem generate(Category category, String itemId) {
+        DraftItem item = switch (category) {
             case ABILITY -> item = new AbilityDraftItem(itemId);
             case TECH -> item = new TechDraftItem(itemId);
             case AGENT -> item = new AgentDraftItem(itemId);
@@ -70,14 +67,15 @@ public abstract class DraftItem implements ModelInterface {
             case BLUETILE -> item = new BlueTileDraftItem(itemId);
             case REDTILE -> item = new RedTileDraftItem(itemId);
             case DRAFTORDER -> item = new SpeakerOrderDraftItem(itemId);
-        }
+        };
+
         item.Errata = Mapper.getFrankenErrata().get(item.getAlias());
         return item;
     }
 
-    public static DraftItem GenerateFromAlias(String alias) {
+    public static DraftItem generateFromAlias(String alias) {
         String[] split = alias.split(":");
-        return Generate(Category.valueOf(split[0]), split[1]);
+        return generate(Category.valueOf(split[0]), split[1]);
     }
 
     public static List<DraftItem> generateAllDraftableCards() {
@@ -116,12 +114,12 @@ public abstract class DraftItem implements ModelInterface {
         return items;
     }
 
-    public static List<DraftItem> GetAlwaysIncludeItems(Category type) {
+    public static List<DraftItem> getAlwaysIncludeItems(Category type) {
         List<DraftItem> alwaysInclude = new ArrayList<>();
         var frankenErrata = Mapper.getFrankenErrata().values();
         for (DraftErrataModel errataItem : frankenErrata) {
             if (errataItem.ItemCategory == type && errataItem.AlwaysAddToPool) {
-                alwaysInclude.add(GenerateFromAlias(errataItem.getAlias()));
+                alwaysInclude.add(generateFromAlias(errataItem.getAlias()));
             }
         }
 
@@ -143,7 +141,7 @@ public abstract class DraftItem implements ModelInterface {
             if (Errata.AdditionalComponents != null) {
                 sb.append("\n>  - *Also adds: ");
                 for (DraftErrataModel i : Errata.AdditionalComponents) {
-                    DraftItem item = Generate(i.ItemCategory, i.ItemId);
+                    DraftItem item = generate(i.ItemCategory, i.ItemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }
@@ -152,7 +150,7 @@ public abstract class DraftItem implements ModelInterface {
             if (Errata.OptionalSwaps != null) {
                 sb.append("\n>  - *Includes optional swaps: ");
                 for (DraftErrataModel i : Errata.OptionalSwaps) {
-                    DraftItem item = Generate(i.ItemCategory, i.ItemId);
+                    DraftItem item = generate(i.ItemCategory, i.ItemId);
                     sb.append(item.getItemEmoji()).append(" ").append(item.getShortDescription());
                     sb.append(", ");
                 }
@@ -166,7 +164,7 @@ public abstract class DraftItem implements ModelInterface {
     protected abstract String getLongDescriptionImpl();
 
     @JsonIgnore
-    public abstract String getItemEmoji();
+    public abstract TI4Emoji getItemEmoji();
 
     public boolean isDraftable(Player player) {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
@@ -193,11 +191,11 @@ public abstract class DraftItem implements ModelInterface {
 
     @JsonIgnore
     public Button getAddButton() {
-        return Buttons.green("frankenItemAdd" + getAlias(), "Add " + getShortDescription()).withEmoji(Emoji.fromFormatted(getItemEmoji()));
+        return Buttons.green("frankenItemAdd" + getAlias(), "Add " + getShortDescription(), getItemEmoji());
     }
 
     @JsonIgnore
     public Button getRemoveButton() {
-        return Buttons.red("frankenItemRemove" + getAlias(), "Remove " + getShortDescription()).withEmoji(Emoji.fromFormatted(getItemEmoji()));
+        return Buttons.red("frankenItemRemove" + getAlias(), "Remove " + getShortDescription(), getItemEmoji());
     }
 }

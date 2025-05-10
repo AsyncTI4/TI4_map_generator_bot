@@ -2,12 +2,13 @@ package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.buttons.Buttons;
+import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
 
-public class CCsButton extends PlayerSubcommandData {
+class CCsButton extends Subcommand {
 
     public CCsButton() {
-        super("cc", "Adjust Command Counters");
+        super("cc", "Adjust Command Tokens");
     }
 
     @Override

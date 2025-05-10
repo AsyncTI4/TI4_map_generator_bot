@@ -19,7 +19,7 @@
     "alias": "intimidate_the_council_little_omega",
     "name": "Intimidate the Council ω",
     "phase": "Status",
-    "text": "Have ships in 2 systems that are adjacent to Mecatol Rex.",
+    "text": "Have ships in the Mecatol Rex system, or in 2 systems that are adjacent to the Mecatol Rex system.",
     "points": 1,
     "source": "little_omega"
   },

@@ -1,19 +1,28 @@
 package ti4.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.CombatRollType;
-import ti4.helpers.Emojis;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.Source.ComponentSource;
+import ti4.service.combat.CombatRollType;
+import ti4.service.emoji.ExploreEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.MiscEmojis;
+import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.TI4Emoji;
+import ti4.service.emoji.TechEmojis;
 
 @Data
 public class UnitModel implements ModelInterface, EmbeddableModel {
@@ -21,12 +30,15 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private String baseType;
     private String asyncId;
     private String name;
+    private String subtitle;
     private String upgradesFromUnitId;
     private String upgradesToUnitId;
     private String requiredTechId;
     private String faction;
+    private List<String> eligiblePlanetTypes;
     private int moveValue;
     private int productionValue;
+    private String basicProduction;
     private int capacityValue;
     private int fleetSupplyBonus;
     private int capacityUsed;
@@ -45,8 +57,11 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     private Boolean disablesPlanetaryShield;
     private Boolean canBeDirectHit;
     private Boolean isStructure;
+    private Boolean isMonument;
     private Boolean isGroundForce;
     private Boolean isShip;
+    private Boolean isSpaceOnly;
+    private Boolean isPlanetOnly;
     private String ability;
     private String unlock; // for Flagshipping homebrew
     private String homebrewReplacesID;
@@ -65,11 +80,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             && name != null
             && asyncId != null
             && source != null
-            && List.of("ca", "cv", "dd", "dn", "ff", "fs", "gf", "mf", "pd", "sd", "ws", "csd", "plenaryorbital", "tyrantslament", "lady", "cavalry").contains(getAsyncId())
-            // && (requiredTechId == null || Mapper.isValidTech(requiredTechId))
-            // && (upgradesFromUnitId == null || Mapper.isValidUnit(upgradesFromUnitId))
-            // && (upgradesToUnitId == null || Mapper.isValidUnit(upgradesToUnitId))
-            && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()));
+            && (getFaction().isEmpty() || Mapper.isValidFaction(getFaction().orElse("").toLowerCase()))
+            && new HashSet<>(List.of("CULTURAL", "HAZARDOUS", "INDUSTRIAL", "TECH_SPECIALTY", "LEGENDARY", "MECATOL_REX", "EMPTY_NONANOMALY")).containsAll(getEligiblePlanetTypes());
     }
 
     public String getAlias() {
@@ -86,13 +98,23 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return color + getImageFileSuffix();
     }
 
-    public String getUnitEmoji() {
-        return Emojis.getEmojiFromDiscord(getBaseType());
+    public TI4Emoji getFactionEmoji() {
+        return FactionEmojis.getFactionIcon(getFaction().orElse(""));
+    }
+
+    public UnitType getUnitType() {
+        return Units.findUnitType(getAsyncId());
+    }
+
+    public TI4Emoji getUnitEmoji() {
+        if (getUnitType() == null)
+            return TI4Emoji.getRandomGoodDog();
+        return getUnitType().getUnitTypeEmoji();
     }
 
     public String getUnitRepresentation() {
-        String factionEmoji = Emojis.getEmojiFromDiscord(getFaction().orElse(""));
-        String unitEmoji = Emojis.getEmojiFromDiscord(getBaseType());
+        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
+        TI4Emoji unitEmoji = getUnitEmoji();
 
         String unitString = unitEmoji + " " + getName() + factionEmoji;
         if (getAbility().isPresent()) {
@@ -106,19 +128,21 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
-        String factionEmoji = getFaction().isEmpty() ? "" : Emojis.getFactionIconFromDiscord(getFaction().orElse(""));
-        String unitEmoji = getBaseType() == null ? "" : Emojis.getEmojiFromDiscord(getBaseType());
+        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
+        TI4Emoji unitEmoji = getUnitEmoji();
 
         EmbedBuilder eb = new EmbedBuilder();
 
-        String name = getName() == null ? "" : getName();
+        String name = getName();
         eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__ " + getSourceEmoji(), null);
+        if (getSubtitle().isPresent()) eb.setDescription("-# " + getSubtitle().get() + " " + getEligiblePlanetEmojis());
 
         if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
         if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
         if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
         if (getAbility().isPresent()) eb.addField("Ability:", getAbility().get(), false);
         if (getUnlock().isPresent()) eb.addField("Unlock:", getUnlock().get(), false);
+        // if (getImageURL() != null) eb.setThumbnail(getImageURL());
 
         if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
@@ -126,8 +150,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        String factionEmoji = getFaction().isEmpty() ? "" : Emojis.getFactionIconFromDiscord(getFaction().orElse(""));
-        String unitEmoji = getBaseType() == null ? "" : Emojis.getEmojiFromDiscord(getBaseType());
+        String factionEmoji = getFaction().isEmpty() ? "" : getFactionEmoji().toString();
+        TI4Emoji unitEmoji = getUnitEmoji();
         String name = getName() == null ? "" : getName();
         return factionEmoji + unitEmoji + " " + name + " " + getSourceEmoji();
     }
@@ -179,13 +203,21 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     public int getSpaceCannonDieCount(Player player, Game game) {
-        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            return getSpaceCannonDieCount();
-        }
-        if (getBaseType().equalsIgnoreCase("spacedock")) {
-            return 3;
+        if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
+            if (getBaseType().equalsIgnoreCase("spacedock")) {
+                return 3;
+            }
         }
         return getSpaceCannonDieCount();
+    }
+
+    public int getSpaceCannonHitsOn(Player player, Game game) {
+        if (game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction()) || player.hasRelic("lightrailordnance")) {
+            if (getBaseType().equalsIgnoreCase("spacedock")) {
+                return 5;
+            }
+        }
+        return getSpaceCannonHitsOn();
     }
 
     public int getAfbHitsOn(Player player, Game game) {
@@ -202,21 +234,8 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return getAfbHitsOn();
     }
 
-    public int getSpaceCannonHitsOn(Player player, Game game) {
-        if (!game.getStoredValue("EBSFaction").equalsIgnoreCase(player.getFaction())) {
-            return getSpaceCannonHitsOn();
-        } else {
-            if (getBaseType().equalsIgnoreCase("spacedock")) {
-                return 5;
-            } else {
-                return getSpaceCannonHitsOn();
-            }
-        }
-    }
-
     public int getBombardDieCount(Player player, Game game) {
         if (!game.getStoredValue("BlitzFaction").equalsIgnoreCase(player.getFaction())) {
-
             if (game.getStoredValue("TnelisAgentFaction").equalsIgnoreCase(player.getFaction()) && getBombardDieCount() == 0 && getAfbDieCount() > 0) {
                 return getAfbDieCount();
             }
@@ -291,9 +310,9 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     private String getCostText() {
         if (getCost() >= 1) {
-            return "Cost: " + Emojis.getResourceEmoji(Math.round(getCost())) + "\n";
+            return "Cost: " + MiscEmojis.getResourceEmoji(Math.round(getCost())) + "\n";
         } else if (getCost() == 0.5) {
-            return "Cost: " + Emojis.Resources_1 + " (for 2 " + Emojis.getEmojiFromDiscord(getBaseType()) + ")\n";
+            return "Cost: " + MiscEmojis.Resources_1 + " per 2 " + getUnitEmoji() + "\n";
         }
         return "";
     }
@@ -306,8 +325,14 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
     }
 
     private String getProductionText() {
+        if ("res".equals(getBasicProduction())) {
+            return "PRODUCTION: " + MiscEmojis.resources + "+" + getProductionValue() + "\n";
+        }
+        if (getBasicProduction() != null) {
+            return "PRODUCTION: *️⃣+" + getProductionValue() + "\n";
+        }
         if (getProductionValue() > 0) {
-            return "Production: " + getProductionValue() + "\n";
+            return "PRODUCTION: " + getProductionValue() + "\n";
         }
         return "";
     }
@@ -324,43 +349,49 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             return "Combat: " + getCombatHitsOn() + "\n";
         } else if (getCombatDieCount() > 1) {
             return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
+        } else if ("winnu_flagship".equals(getId())) {
+            return "Combat: " + getCombatHitsOn() + " (x # of opponent's non-fighter ships)\n";
         }
         return "";
     }
 
     private String getAFBText() {
-        if (getAfbDieCount() > 0) {
-            return "Anti-Fighter Barrage " + getAfbHitsOn() + " (x" + getAfbDieCount() + ")\n";
+        if (getAfbDieCount() == 1) {
+            return "ANTI-FIGHTER BARRAGE " + getAfbHitsOn() + "\n";
+        } else if (getAfbDieCount() >= 2) {
+            return "ANTI-FIGHTER BARRAGE " + getAfbHitsOn() + " (x" + getAfbDieCount() + ")\n";
         }
         return "";
     }
 
     private String getBombardText() {
         if (getBombardDieCount() == 1) {
-            return "Bombardment: " + getBombardHitsOn() + "\n";
-        } else if (getBombardDieCount() > 0) {
-            return "Bombardment: " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
+            return "BOMBARDMENT: " + getBombardHitsOn() + "\n";
+        } else if (getBombardDieCount() >= 2) {
+            return "BOMBARDMENT: " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
         }
         return "";
     }
 
     private String getSpaceCannonText() {
-        if (getSpaceCannonDieCount() > 0) {
-            return ((getDeepSpaceCannon()) ? "Deep " : "") + "Space Cannon " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
+        if (getSpaceCannonDieCount() == 1) {
+            return "SPACE CANNON " + getSpaceCannonHitsOn() + "\n";
+        } else if (getSpaceCannonDieCount() >= 2) {
+            return "SPACE CANNON " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
         }
         return "";
     }
 
     private String getPlanetaryShieldText() {
         if (getPlanetaryShield()) {
-            return "Planetary Shield\n";
+            return "PLANETARY SHIELD\n";
         }
         return "";
     }
 
     private String getSustainDamageText() {
         if (getSustainDamage()) {
-            return "Sustain Damage\n";
+            return "SUSTAIN DAMAGE\n";
         }
         return "";
     }
@@ -370,6 +401,7 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
             || getFaction().orElse("").toLowerCase().contains(searchString)
             || getId().toLowerCase().contains(searchString)
             || getBaseType().toLowerCase().contains(searchString)
+            || getSubtitle().orElse("").toLowerCase().contains(searchString)
             || getSearchTags().contains(searchString);
     }
 
@@ -415,12 +447,24 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
         return Optional.ofNullable(isStructure).orElse(false);
     }
 
+    public boolean getIsMonument() {
+        return Optional.ofNullable(isMonument).orElse(false);
+    }
+
     public boolean getIsGroundForce() {
         return Optional.ofNullable(isGroundForce).orElse(false);
     }
 
     public boolean getIsShip() {
         return Optional.ofNullable(isShip).orElse(false);
+    }
+
+    public boolean getIsSpaceOnly() {
+        return Optional.ofNullable(isSpaceOnly).orElse(getIsShip());
+    }
+
+    public boolean getIsPlanetOnly() {
+        return Optional.ofNullable(isPlanetOnly).orElse(getIsStructure());
     }
 
     public Optional<String> getUpgradesFromUnitId() {
@@ -433,6 +477,10 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getRequiredTechId() {
         return Optional.ofNullable(requiredTechId);
+    }
+
+    public Optional<String> getSubtitle() {
+        return Optional.ofNullable(subtitle);
     }
 
     public Optional<String> getFaction() {
@@ -449,5 +497,28 @@ public class UnitModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getHomebrewReplacesID() {
         return Optional.ofNullable(homebrewReplacesID);
+    }
+
+    public List<String> getEligiblePlanetTypes() {
+        return Optional.ofNullable(eligiblePlanetTypes).orElse(Collections.emptyList());
+    }
+
+    public TI4Emoji getMonumentPlanetTypeEmoji(String planetType) {
+        return switch (planetType.toLowerCase()) {
+            case "cultural", "industrial", "hazardous" -> ExploreEmojis.getTraitEmoji(planetType);
+            case "legendary" -> MiscEmojis.LegendaryPlanet;
+            case "empty_nonanomaly" -> MiscEmojis.EmptySystem;
+            case "tech_specialty" -> TechEmojis.NonUnitTechSkip;
+            case "mecatol_rex" -> PlanetEmojis.Mecatol;
+            default -> TI4Emoji.getRandomGoodDog();
+        };
+    }
+
+    public String getEligiblePlanetEmojis() {
+        StringBuilder sb = new StringBuilder();
+        for (String type : getEligiblePlanetTypes()) {
+            sb.append(getMonumentPlanetTypeEmoji(type));
+        }
+        return sb.toString();
     }
 }

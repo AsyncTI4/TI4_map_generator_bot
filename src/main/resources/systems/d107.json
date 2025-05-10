@@ -5,7 +5,7 @@
         "etirv",
         "etir",
         "et",
-        "4242"
+        "4258"
     ],
     "imagePath": "d107.png",
     "shipPositionsType": "TYPE01",
@@ -31,5 +31,6 @@
     "planets": [
         "etirv"
     ],
-    "source": "uncharted_space"
+    "source": "uncharted_space",
+    "tileBack": "blue"
 }
