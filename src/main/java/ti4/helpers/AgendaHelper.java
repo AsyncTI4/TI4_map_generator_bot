@@ -444,7 +444,7 @@ public class AgendaHelper {
                         }
 
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                            "The game is currently waiting on " + num + " people to decide on \"whens\".");
+                            "The game is currently waiting on " + num + ((num > 1) ? " people" : " person") + " to decide on \"whens\".");
                     } else {
                         game.setStoredValue("queuedWhens",
                             game.getStoredValue("queuedWhens").replace(player.getFaction() + "_", ""));
@@ -509,7 +509,7 @@ public class AgendaHelper {
                             num++;
                         }
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                            "The game is currently waiting on " + num + " people to decide on \"afters\".");
+                            "The game is currently waiting on " + num + ((num > 1) ? " people" : " person") + " to decide on \"afters\".");
                         return; // The person up has not yet decided whether to queue or not queue an after
                     } else {
                         game.setStoredValue("queuedAfters",
