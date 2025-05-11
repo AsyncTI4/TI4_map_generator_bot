@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.map.Game;
@@ -109,6 +110,23 @@ public class MigrationHelper {
         BotLogger.info(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
+    }
+
+    public static boolean cleanupFactionEmojis(Game game) {
+        if (game.isFrankenGame()) return false;
+
+        boolean anyChanged = false;
+        for (Player p : game.getPlayers().values()) {
+            String rawEmoji = p.getFactionEmojiRaw();
+            if (rawEmoji == null || rawEmoji.equals("null")) continue;
+
+            Emoji e = Emoji.fromFormatted(rawEmoji);
+            if (e.getName().equalsIgnoreCase(p.getFaction())) {
+                p.setFactionEmoji(null);
+                anyChanged = true;
+            }
+        }
+        return anyChanged;
     }
 
     public static boolean removeWekkersAbsolsPoliticalSecrets(Game game) {

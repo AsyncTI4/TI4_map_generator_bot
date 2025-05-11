@@ -1222,8 +1222,9 @@ public class Player extends PlayerProperties {
         return getFactionEmoji();
     }
 
+    @JsonIgnore
     public String getFactionEmojiRaw() {
-        return getFactionEmoji();
+        return super.getFactionEmoji();
     }
 
     public boolean hasCustomFactionEmoji() {

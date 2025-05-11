@@ -32,7 +32,7 @@ public class SearchCommand implements ParentCommand {
         new SearchExploresSubcommand(),
         new SearchDecksSubcommand(),
         new SearchFactionsSubcommand(),
-        new SearchEmojisSubcommand(),
+        new SearchEmojis(),
         new SearchStrategyCardsSubcommand(),
         new SearchSources()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
