@@ -617,7 +617,16 @@ public class StartPhaseService {
             .addComponents(ActionRow.of(buttons)).build();
 
         game.getMainGameChannel().sendMessage(messageObject).queue(message -> GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
-
+        for (Player player : game.getRealPlayers()) {
+            if (!player.getAllianceMembers().isEmpty()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Note that now is the time that alliance members can exchange planets, and you may want to wait for everyone to confirm they are done doing that before moving on.");
+                break;
+            }
+            if (player.hasTech("dsrohdy") && custodiansTaken) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Note that now is the time that a player needs to resolve Contractual Obligations tech and you may want to wait until thats done before proceeding.");
+                break;
+            }
+        }
         GMService.createFOWStatusSummary(game);
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }

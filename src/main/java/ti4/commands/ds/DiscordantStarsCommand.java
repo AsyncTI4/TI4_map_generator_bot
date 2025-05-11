@@ -22,6 +22,7 @@ public class DiscordantStarsCommand implements ParentCommand {
         new AddOmenDie(),
         new KyroHero(),
         new ATS(),
+        new PathToken(),
         new SetPlanetTradeGoods())
         .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
