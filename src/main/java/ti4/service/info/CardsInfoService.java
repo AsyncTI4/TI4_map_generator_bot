@@ -137,6 +137,9 @@ public class CardsInfoService {
         if (player.getPathTokenCounter() > 0) {
             buttons.add(Buttons.gray("redistributePath", "Redistribute 1 CC With Path", FactionEmojis.uydai));
         }
+        if (player.hasAbility("prescience")) {
+            buttons.add(Buttons.gray("listPath", "List How Many Path Tokens You Have", FactionEmojis.uydai));
+        }
         if (player.hasUnexhaustedLeader("uydaiagent")) {
             buttons.add(Buttons.gray("getAgentSelection_uydaiagent", "Use Uydai Agent", FactionEmojis.uydai));
         }
