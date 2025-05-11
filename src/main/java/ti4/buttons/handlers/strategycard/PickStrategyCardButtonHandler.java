@@ -2,10 +2,8 @@ package ti4.buttons.handlers.strategycard;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -144,17 +142,6 @@ public class PickStrategyCardButtonHandler {
         event.getMessage().delete().queue();
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
         if (buttons.isEmpty()) {
-            Set<Integer> scPickedList = new HashSet<>();
-            for (Player player_ : game.getRealPlayers()) {
-                scPickedList.addAll(player_.getSCs());
-            }
-
-            //ADD A TG TO UNPICKED SC
-            game.incrementScTradeGoods();
-
-            for (int sc : scPickedList) {
-                game.setScTradeGood(sc, 0);
-            }
             StartPhaseService.startActionPhase(event, game);
             game.setStoredValue("willRevolution", "");
         } else {
