@@ -328,6 +328,9 @@ public class AsyncTI4DiscordBot {
         if (System.getenv("TESTING") != null) return false;
         if (guild.getId().equals(Constants.ASYNCTI4_HUB_SERVER_ID)) return false;
 
+        // Disable this for now
+        if (true) return false;
+
         try {
             CommandListUpdateAction commands = guild.updateCommands();
             CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
