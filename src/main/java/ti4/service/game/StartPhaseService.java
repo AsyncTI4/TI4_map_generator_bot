@@ -1,8 +1,10 @@
 package ti4.service.game;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import lombok.experimental.UtilityClass;
@@ -632,6 +634,10 @@ public class StartPhaseService {
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {
+        startActionPhase(event, game, true);
+    }
+
+    public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
@@ -660,8 +666,23 @@ public class StartPhaseService {
         if (game.isFowMode()) {
             FoWHelper.pingAllPlayersWithFullStats(game, event, nextPlayer, "started turn");
         }
-        ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
+        Set<Integer> scPickedList = new HashSet<>();
+        for (Player player_ : game.getRealPlayers()) {
+            scPickedList.addAll(player_.getSCs());
+        }
 
+        //ADD A TG TO UNPICKED SC
+        if (incrementTgs) {
+            game.incrementScTradeGoods();
+
+            for (int sc : scPickedList) {
+                game.setScTradeGood(sc, 0);
+            }
+        }
+        ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
+        if (nextPlayer.getInRoundTurnCount() == 0) {
+            nextPlayer.setInRoundTurnCount(1);
+        }
         if (isFowPrivateGame) {
             String msgExtra = "Start phase command run";
             String fail = "User for next faction not found. Report to ADMIN";
@@ -713,6 +734,20 @@ public class StartPhaseService {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_", buttons);
             }
+            if (!game.isFowMode()) {
+                String preDeclineMsg = p2.getRepresentation() + " in order to resolve SCs faster, you have the opportunity now to pre-decline various SCs if you know you will not follow them. Feel free to not do this. Trade is never available for this feature due to trade sometimes being mandatory.";
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), preDeclineMsg);
+                for (Integer sc : game.getSCList()) {
+                    if (p2.getSCs().contains(sc) || game.getStrategyCardModelByInitiative(sc).get().usesAutomationForSCID("pok5trade") || !scPickedList.contains(sc)) {
+                        continue;
+                    }
+                    List<Button> scButtons = new ArrayList<>();
+                    scButtons.add(Buttons.red("preDeclineSC_" + sc + "_yes", "Don't follow " + game.getStrategyCardModelByInitiative(sc).get().getName()));
+                    scButtons.add(Buttons.gray("preDeclineSC_" + sc + "_no", "Decide Later"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), "Use this to decide on " + game.getStrategyCardModelByInitiative(sc).get().getName(), scButtons);
+                }
+            }
+
         }
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
     }
