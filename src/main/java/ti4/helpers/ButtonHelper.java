@@ -6307,6 +6307,17 @@ public class ButtonHelper {
         MessageHelper.sendEphemeralMessageToEventChannel(event, "Set path to " + path);
     }
 
+    @ButtonHandler("listPath")
+    public static void listPath(ButtonInteractionEvent event, Game game, Player player) {
+        if (player.getPathTokenCounter() < 1) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not have any path tokens");
+            return;
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You have " + player.getPathTokenCounter() + " path tokens");
+        }
+
+    }
+
     @ButtonHandler("redistributePath")
     public static void redistributePath(ButtonInteractionEvent event, Game game, Player player) {
         if (player.getPathTokenCounter() < 1) {
@@ -6329,7 +6340,7 @@ public class ButtonHelper {
     @ButtonHandler("cashInPathTokens")
     public static void cashInPathTokens(ButtonInteractionEvent event, Game game, Player player) {
         deleteTheOneButton(event);
-        player.setPathTokenCounter(0);
+        player.setPathTokenCounter(player.getPathTokenCounter() - 6);
         String msg1 = player.getRepresentation()
             + " chose to turn in 6 path tokens in order to resolve any 1 secondary";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg1);
