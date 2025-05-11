@@ -634,6 +634,10 @@ public class StartPhaseService {
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {
+        startActionPhase(event, game, true);
+    }
+
+    public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
@@ -668,10 +672,12 @@ public class StartPhaseService {
         }
 
         //ADD A TG TO UNPICKED SC
-        game.incrementScTradeGoods();
+        if (incrementTgs) {
+            game.incrementScTradeGoods();
 
-        for (int sc : scPickedList) {
-            game.setScTradeGood(sc, 0);
+            for (int sc : scPickedList) {
+                game.setScTradeGood(sc, 0);
+            }
         }
         ButtonHelperFactionSpecific.resolveMilitarySupportCheck(nextPlayer, game);
         if (nextPlayer.getInRoundTurnCount() == 0) {
