@@ -1050,7 +1050,7 @@ public class ButtonHelperFactionSpecific {
             "> " + player1.getRepresentationNoPing() + CardEmojis.getSCFrontFromInteger(player1SC) + " :arrow_right: " + CardEmojis.getSCFrontFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);
         event.getMessage().delete().queue();
-        StartPhaseService.startActionPhase(event, game);
+        StartPhaseService.startActionPhase(event, game, false);
     }
 
     @ButtonHandler("raghsCallStepTwo_")
@@ -2404,7 +2404,7 @@ public class ButtonHelperFactionSpecific {
     public static void resolveCreussIFFStart(Game game, @NotNull Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         List<Button> buttons = getCreusIFFLocationOptions(game, player, type);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
         event.getMessage().delete().queue();
     }
@@ -2497,7 +2497,7 @@ public class ButtonHelperFactionSpecific {
         chooseTileButtons.add(Buttons.green("creussIFFResolve_" + type + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("blindIFFSelection_" + type + "~MDL", "Change Tile"));
 
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", chooseTileButtons);
         event.getMessageChannel().deleteMessageById(origMessageId).queue();
     }

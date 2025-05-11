@@ -141,6 +141,33 @@ public class ButtonHelperSCs {
         }
     }
 
+    @ButtonHandler("preDeclineSC_")
+    public static void preDeclineSC(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String sc = buttonID.split("_")[1];
+        String decision = buttonID.split("_")[2];
+        List<Button> scButtons = new ArrayList<>();
+        scButtons.add(Buttons.gray("getPreDeclineSCButtons_" + sc, "Undo Decision"));
+        String msg = "";
+        if (decision.equalsIgnoreCase("no")) {
+            msg = "Decided not to decide yet on " + game.getStrategyCardModelByInitiative(Integer.parseInt(sc)).get().getName();
+        } else {
+            msg = "Decided to pre-pass on following " + game.getStrategyCardModelByInitiative(Integer.parseInt(sc)).get().getName();
+            game.setStoredValue("prePassOnSC" + sc + "Round" + game.getRound() + player.getFaction(), "yes");
+        }
+        event.getMessage().editMessage(msg).setComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons)).queue();
+    }
+
+    @ButtonHandler("getPreDeclineSCButtons_")
+    public static void getPreDeclineSCButtons(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        int sc = Integer.parseInt(buttonID.split("_")[1]);
+        game.removeStoredValue("prePassOnSC" + sc + "Round" + game.getRound() + player.getFaction());
+        String msg = "Use these to decide again";
+        List<Button> scButtons = new ArrayList<>();
+        scButtons.add(Buttons.red("preDeclineSC_" + sc + "_yes", "Don't follow " + game.getStrategyCardModelByInitiative(sc).get().getName()));
+        scButtons.add(Buttons.gray("preDeclineSC_" + sc + "_no", "Decide Later"));
+        event.getMessage().editMessage(msg).setComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons)).queue();
+    }
+
     @ButtonHandler("score_imperial")
     public static void scoreImperial(Game game, Player player, ButtonInteractionEvent event) {
         if (player == null || game == null) return;
