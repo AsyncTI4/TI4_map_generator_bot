@@ -34,9 +34,21 @@ public interface ParentCommand extends Command {
         commands.addCommands(command);
     }
 
+    default void registerSearchCommands(CommandListUpdateAction commands) {
+        if (getSearchSubcommands().isEmpty()) return;
+        var command = Commands.slash(getName(), getDescription())
+            .addSubcommands(getSearchSubcommands().values())
+            .addOptions(getOptions());
+        commands.addCommands(command);
+    }
+
     String getDescription();
 
     default Map<String, Subcommand> getSubcommands() {
+        return Collections.emptyMap();
+    }
+
+    default Map<String, Subcommand> getSearchSubcommands() {
         return Collections.emptyMap();
     }
 

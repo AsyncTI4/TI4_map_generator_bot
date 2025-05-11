@@ -44,6 +44,7 @@ import ti4.cron.UploadStatsCron;
 import ti4.cron.InteractionLogCron;
 import ti4.executors.ExecutorManager;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.image.MapRenderPipeline;
@@ -61,7 +62,6 @@ import ti4.listeners.UserJoinServerListener;
 import ti4.listeners.UserLeaveServerListener;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
 import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -91,6 +91,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
+    public static final Set<Guild> searchOnlyGuilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new LinkedList<>();
 
@@ -144,60 +145,60 @@ public class AsyncTI4DiscordBot {
 
         // Primary HUB Server
         guildPrimary = jda.getGuildById(args[2]);
-        startBot(guildPrimary);
+        boolean success = startBot(guildPrimary);
 
         // Community Plays TI
         if (args.length >= 4) {
             guildCommunityPlays = jda.getGuildById(args[3]);
-            startBot(guildCommunityPlays);
+            success &= startBot(guildCommunityPlays);
         }
 
         // Async: FOW Chapter
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
-            startBot(guildFogOfWar);
+            success &= startBot(guildFogOfWar);
             fowServers.add(guildFogOfWar);
         }
 
         // Async: Stroter's Paradise
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
-            startBot(guildSecondary);
+            success &= startBot(guildSecondary);
             serversToCreateNewGamesOn.add(guildSecondary);
         }
 
         // Async: Dreadn't
         if (args.length >= 7) {
             guildTertiary = jda.getGuildById(args[6]);
-            startBot(guildTertiary);
+            success &= startBot(guildTertiary);
             serversToCreateNewGamesOn.add(guildTertiary);
         }
 
         // Async: War Sun Tzu
         if (args.length >= 8) {
             guildQuaternary = jda.getGuildById(args[7]);
-            startBot(guildQuaternary);
+            success &= startBot(guildQuaternary);
             serversToCreateNewGamesOn.add(guildQuaternary);
         }
 
         // Async: Fighter Club
         if (args.length >= 9) {
             guildQuinary = jda.getGuildById(args[8]);
-            startBot(guildQuinary);
+            success &= startBot(guildQuinary);
             serversToCreateNewGamesOn.add(guildQuinary);
         }
 
         // Async: Tommer Hawk
         if (args.length >= 10) {
             guildSenary = jda.getGuildById(args[9]);
-            startBot(guildSenary);
+            success &= startBot(guildSenary);
             serversToCreateNewGamesOn.add(guildSenary);
         }
 
         // Async: Duder's Domain
         if (args.length >= 11) {
             guildSeptenary = jda.getGuildById(args[10]);
-            startBot(guildSeptenary);
+            success &= startBot(guildSeptenary);
             serversToCreateNewGamesOn.add(guildSeptenary);
         }
 
@@ -207,6 +208,19 @@ public class AsyncTI4DiscordBot {
         //    startBot(guildFogOfWarSecondary);
         //    fowServers.add(guildFogOfWarSecondary);
         //}
+
+        if (!success) {
+            BotLogger.info("Failed to start the bot on one or more servers. Aborting.");
+            BotLogger.warning("Failed to start the bot on one or more servers. Aborting.");
+            BotLogger.error("Failed to start the bot on one or more servers. Aborting.");
+            return;
+        }
+
+        // Attempt to start a "Search Only" version of the bot on eligible servers
+        for (Guild searchGuild : jda.getGuilds()) {
+            if (guilds.stream().anyMatch(g -> g.getId().equals(searchGuild.getId()))) continue;
+            startBotSearchOnly(searchGuild);
+        }
 
         // LOAD DATA
         BotLogger.info("LOADING DATA");
@@ -254,7 +268,7 @@ public class AsyncTI4DiscordBot {
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
-        jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
+        updatePresence();
         BotLogger.info("FINISHED LOADING GAMES");
 
         // Register Shutdown Hook to run when SIGTERM is received from docker stop
@@ -292,15 +306,46 @@ public class AsyncTI4DiscordBot {
         }));
     }
 
-    private static void startBot(Guild guild) {
+    private static boolean startBot(Guild guild) {
         if (guild == null) {
-            return;
+            return false;
         }
-        CommandListUpdateAction commands = guild.updateCommands();
-        CommandManager.getCommands().forEach(command -> command.register(commands));
-        commands.queue();
-        BotLogger.info(new BotLogger.LogMessageOrigin(guild), "BOT STARTED UP: " + guild.getName());
-        guilds.add(guild);
+        try {
+            CommandListUpdateAction commands = guild.updateCommands();
+            CommandManager.getCommands().forEach(command -> command.register(commands));
+            commands.queue();
+            BotLogger.info(new BotLogger.LogMessageOrigin(guild), "BOT STARTED UP: " + guild.getName());
+            guilds.add(guild);
+        } catch (Exception e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(guild), "\n# FAILED TO START BOT ", e);
+        }
+        return true;
+    }
+
+    private static boolean startBotSearchOnly(Guild guild) {
+        // Do not set up search commands for test bots, and definitely never for the hub server, which several test bots are still in
+        if (guild == null) return false;
+        if (System.getenv("TESTING") != null) return false;
+        if (guild.getId().equals(Constants.ASYNCTI4_HUB_SERVER_ID)) return false;
+
+        // Disable this for now
+        if (true) return false;
+
+        try {
+            CommandListUpdateAction commands = guild.updateCommands();
+            CommandManager.getCommands().forEach(command -> command.registerSearchCommands(commands));
+            commands.queue();
+            BotLogger.info(new BotLogger.LogMessageOrigin(guild), "SEARCH-ONLY BOT STARTED UP: " + guild.getName());
+            guilds.add(guild);
+        } catch (Exception e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(guild), "\n# SEARCH-ONLY BOT FAILED TO START: " + guild.getName(), e);
+        }
+        return true;
+    }
+
+    public static void updatePresence() {
+        long activeGames = GameManager.getActiveGameCount();
+        AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(activeGames + " games of Async TI4"));
     }
 
     /**

@@ -588,7 +588,27 @@ public class Game extends GameProperties {
         return getRealPlayers().stream().anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
     }
 
+    public String gameJumpLinks() {
+        return String.format("%s %s %s", getName(), getTabletalkJumpLink(), getActionsJumpLink());
+    }
+
     @JsonIgnore
+    public String getTabletalkJumpLink() {
+        TextChannel tt = getTableTalkChannel();
+        if (tt == null) return "[no tt]";
+        return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
+
+    }
+
+    @JsonIgnore
+    public String getActionsJumpLink() {
+        TextChannel act = getActionsChannel();
+        if (act == null) return "[no actions]";
+        return String.format("[__[Actions](%s)__]", act.getJumpUrl());
+    }
+
+    @JsonIgnore
+    @Nullable
     public TextChannel getTableTalkChannel() {
         try {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getTableTalkChannelID());
