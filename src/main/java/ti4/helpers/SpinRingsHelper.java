@@ -205,7 +205,8 @@ public class SpinRingsHelper {
     }
 
     private static void spunMessage(StringBuffer sb, int ring, String direction, int steps, Game game) {
-        sb.append("\n-# Ring ").append(ring).append(" ");
+        sb.append("\n-# Ring ");
+        sb.append(game.isFowMode() ? "?" : ring).append(" ");
         sb.append(game.isFowMode() ? "?" : direction.toUpperCase()).append(" for ");
         sb.append(game.isFowMode() ? "?" : steps).append(" steps.");
     }

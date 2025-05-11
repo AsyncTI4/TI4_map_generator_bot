@@ -17,8 +17,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -26,7 +30,9 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
+import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -2398,7 +2404,8 @@ public class ButtonHelperFactionSpecific {
     public static void resolveCreussIFFStart(Game game, @NotNull Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         List<Button> buttons = getCreusIFFLocationOptions(game, player, type);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+            player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -2410,8 +2417,8 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getTileByPosition(pos);
         String msg;
         if (game.isFowMode() && !isTileCreussIFFSuitable(game, player, tile)) {
-            msg = "Tile was not suitable for the _Creuss IFF_.";
-            if (player.getTg() > 0) {
+            msg = pos + " was not suitable for the _Creuss IFF_.";
+            /*if (player.getTg() > 0) {
                 player.setTg(player.getTg() - 1);
                 msg += " You lost 1 trade good.";
             } else {
@@ -2424,7 +2431,7 @@ public class ButtonHelperFactionSpecific {
                         msg += " You lost 1 command token from your fleet pool.";
                     }
                 }
-            }
+            }*/
         } else {
             StringBuilder sb = new StringBuilder(player.getRepresentation());
             tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
@@ -2449,14 +2456,50 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getCreusIFFLocationOptions(Game game, @NotNull Player player, String type) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (isTileCreussIFFSuitable(game, player, tile) || (game.isFowMode()
-                && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition()))) {
+            if (isTileCreussIFFSuitable(game, player, tile) && (!game.isFowMode()
+                || FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition()))) {
                 buttons.add(Buttons.green("creussIFFResolve_" + type + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
             }
         }
         SortHelper.sortButtonsByTitle(buttons);
+        if (game.isFowMode()) {
+            buttons.add(Buttons.red("blindIFFSelection_" + type + "~MDL", "Blind Tile"));
+        }
         return buttons;
+    }
+
+    @ButtonHandler("blindIFFSelection_")
+    public static void offerBlindIFFSelection(ButtonInteractionEvent event, String buttonID) {
+        String type = StringUtils.substringBetween(buttonID, "blindIFFSelection_", "~MDL");
+        TextInput position = TextInput.create(Constants.POSITION, "Position for " + type, TextInputStyle.SHORT)
+            .setRequired(true).build();
+
+        Modal blindSelectionModal = Modal.create("blindIFFSelection_" + type + "_" + event.getMessageId(), "Select position")
+            .addActionRow(position).build();
+        event.replyModal(blindSelectionModal).queue();
+    }
+
+    @ModalHandler("blindIFFSelection_")
+    public static void doBlindIFF(ModalInteractionEvent event, Player player, Game game) {
+        String modalId[] = event.getModalId().split("_");
+        String type = modalId[1];
+        String origMessageId = modalId[2];
+        String position = event.getValue(Constants.POSITION).getAsString().trim();
+
+        if (!PositionMapper.isTilePositionValid(position)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Position " + position + " is invalid.");
+            return;
+        }
+
+        Tile tile = game.getTileByPosition(position);
+        List<Button> chooseTileButtons = new ArrayList<>();
+        chooseTileButtons.add(Buttons.green("creussIFFResolve_" + type + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+        chooseTileButtons.add(Buttons.red("blindIFFSelection_" + type + "~MDL", "Change Tile"));
+
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
+            player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", chooseTileButtons);
+        event.getMessageChannel().deleteMessageById(origMessageId).queue();
     }
 
     public static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
@@ -2733,7 +2776,6 @@ public class ButtonHelperFactionSpecific {
         String agendaid = game.getCurrentAgendaInfo().split("_")[2];
         if ("CL".equalsIgnoreCase(agendaid)) {
             String id2 = game.revealAgenda(false);
-            Map<String, Integer> discardAgendas = game.getDiscardAgendas();
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
             String agendaName = agendaDetails.getName();
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
