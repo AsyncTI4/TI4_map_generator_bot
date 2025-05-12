@@ -42,6 +42,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
       -> Will send ships into the Void
   * Other players stats areas are visible only by seeing their HS - PNs don't count
   * To remove a token from the board, you need to see it
+  * Prevents looking at explore/relic decks
  */
 public class FOWPlusService {
     public static final String VOID_TILEID = "-1";
