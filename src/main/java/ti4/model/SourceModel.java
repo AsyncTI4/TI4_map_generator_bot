@@ -34,6 +34,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(null);
     }
+
     public MessageEmbed getRepresentationEmbed(HashMap<String, Integer> occurrences) {
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -64,17 +65,27 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         return eb.build();
     }
 
+    /**
+     * Search in fields String 'name' and ComponentSource 'source'
+     */
     @Override
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString)
             || getSource().toString().toLowerCase().contains(searchString);
     }
 
+    /**
+     * Give the full name for the source
+     */
     @Override
     public String getAutoCompleteName() {
         return getName();
     }
 
+    /**
+     * List all items of the 'data' field
+     * @return StringBuilder
+     */
     public String getDataFormatted() {
         StringBuilder sb = new StringBuilder();
         for (String s : data) {
@@ -83,11 +94,20 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         return sb.toString();
     }
 
+    /**
+     * 
+     * @return true if field 'Canal' = "Official", false otherwise
+     */
     public boolean isCanalOfficial() {
         boolean official = (getCanal().equals("official")) ? true : false;
         return official;
     }
 
+    /**
+     * List the result of the SearchSources function getOccurrencesByCompType(ComponentSource x)
+     * @param occurrences HashMap with Key is Component Type and Value is occurrences for specific Source in Component Type json files
+     * @return StringBuilder
+     */
     private String compTypeOccurrences(HashMap<String, Integer> occurrences){
         StringBuilder implementation = new StringBuilder("");
         for (Map.Entry<String, Integer> entry : occurrences.entrySet()) {

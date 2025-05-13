@@ -33,7 +33,7 @@
     },
     {
         "id": "forgottentradestation",
-        "name": "Forgotten Trade Station",
+        "name": "Deserted Trade Station",
         "type": "Cultural",
         "resolution": "Instant",
         "text": "For each planet in this system, gain 1 trade good.",
