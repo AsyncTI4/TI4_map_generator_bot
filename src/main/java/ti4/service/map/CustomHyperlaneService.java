@@ -63,7 +63,7 @@ public class CustomHyperlaneService {
         }
        
         if (hyperlaneTileButtons.isEmpty()) {
-            sb.append("No custom HL tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
+            sb.append("No HL tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
         } else {
             SortHelper.sortButtonsByTitle(hyperlaneTileButtons);
             hyperlaneTileButtons.add(Buttons.gray("customHyperlaneRefresh", "Refresh"));
@@ -299,5 +299,12 @@ public class CustomHyperlaneService {
             }
         }
         return false;
+    }
+
+    public static String getHyperlaneDataForTile(Tile tile, Game game) {
+        if (isCustomHyperlaneTile(tile)) {
+            return game.getCustomHyperlaneData().get(tile.getPosition());
+        }
+        return null;
     }
 }
