@@ -33,10 +33,6 @@ public interface TI4Emoji {
         return emoji.getFormatted();
     }
 
-    default String filePath() {
-        return ApplicationEmojiService.getEmojiFilePath(this);
-    }
-
     String name();
 
     // -------------------------------------------------------------------------------------------------------------------------------

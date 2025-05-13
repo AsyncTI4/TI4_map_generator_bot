@@ -103,7 +103,7 @@ public class ApplicationEmojiService {
 
         List<CachedEmoji> cached = ApplicationEmojiCacheService.readCachedEmojis();
         if (cached.size() == 0) {
-            BotLogger.log("No cached emojis found. Initializing from Discord.");
+            BotLogger.info("No cached emojis found. Initializing from Discord.");
             resetCacheFromDiscord();
         } else {
             cached.forEach(c -> emojis.put(c.getName(), c));
@@ -225,12 +225,6 @@ public class ApplicationEmojiService {
         if (cached == null)
             return false;
         return cached.getFormatted().equals(emoji.getFormatted());
-    }
-
-    public static String getEmojiFilePath(TI4Emoji emoji) {
-        if (emojiFiles.containsKey(emoji.name()))
-            return emojiFiles.get(emoji.name()).getFile().getPath();
-        return null;
     }
 
     @Getter

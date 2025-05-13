@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import ti4.message.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 
@@ -71,7 +72,7 @@ public class ImageHelper {
 
     @Nullable
     public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
-        return ImageHelper.readScaled(emoji.filePath(), size, size);
+        return ImageHelper.readEmojiImageScaled(emoji.emojiString(), size);
     }
 
     @Nullable
