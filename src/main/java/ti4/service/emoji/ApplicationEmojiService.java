@@ -78,7 +78,7 @@ public class ApplicationEmojiService {
         Set<String> emojiFileNames = new HashSet<>(enumerateEmojiFilesRecursive().map(EmojiFileData::new).map(EmojiFileData::getName).toList());
         Set<String> missingEnums = SetUtils.difference(emojiFileNames, emojiEnumNames);
         if (!missingEnums.isEmpty()) {
-            BotLogger.error("Missing " + missingEnums.size() + " Emoji enums: " + missingEnums);
+            BotLogger.info("Missing " + missingEnums.size() + " Emoji enums: " + missingEnums);
         }
         Set<String> missingFiles = SetUtils.difference(emojiEnumNames, emojiFileNames);
         if (!missingFiles.isEmpty()) {
@@ -89,7 +89,7 @@ public class ApplicationEmojiService {
     public static void spoofEmojis() {
         List<TI4Emoji> ti4Emojis = new ArrayList<>(TI4Emoji.allEmojiEnums());
         for (TI4Emoji e : ti4Emojis) {
-            String formatted = "<normalEmoji>";
+            String formatted = "<" + e.name() + ">";
             if (MiscEmojis.goodDogs().contains(e)) formatted = "<goodDoggy>";
             emojis.put(e.name(), new CachedEmoji(e.name(), "1234", formatted, 0));
         }
@@ -128,9 +128,7 @@ public class ApplicationEmojiService {
             return AsyncTI4DiscordBot.jda.createApplicationEmoji(emoji.getName(), emoji.getIcon()).complete();
         } catch (Exception e) {
             // Check if we failed because it already exists...
-
             BotLogger.error("Failed to upload emoji file: " + emoji.getName(), e);
-
             return null;
         }
     }
@@ -187,7 +185,6 @@ public class ApplicationEmojiService {
                 .complete();
         } catch (Exception e) {
             BotLogger.error(Constants.jazzPing() + " Failed to upload emoji file: " + name, e);
-
             return null;
         }
     }
@@ -208,9 +205,7 @@ public class ApplicationEmojiService {
             }
             return success;
         } catch (Exception e) {
-
             BotLogger.error(Constants.jazzPing() + " Failed to upload emoji files: ", e);
-
             return false;
         }
     }
@@ -230,6 +225,12 @@ public class ApplicationEmojiService {
         if (cached == null)
             return false;
         return cached.getFormatted().equals(emoji.getFormatted());
+    }
+
+    public static String getEmojiFilePath(TI4Emoji emoji) {
+        if (emojiFiles.containsKey(emoji.name()))
+            return emojiFiles.get(emoji.name()).getFile().getPath();
+        return null;
     }
 
     @Getter
