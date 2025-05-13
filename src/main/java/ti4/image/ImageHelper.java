@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import ti4.message.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 
@@ -63,16 +64,15 @@ public class ImageHelper {
 
     @Nullable
     public static BufferedImage readEmojiImageScaled(String emoji, int size) {
-        if (Emoji.fromFormatted(emoji) instanceof CustomEmoji e)
+        Emoji em = Emoji.fromFormatted(emoji);
+        if (em != null && em instanceof CustomEmoji e)
             return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
         return null;
     }
 
     @Nullable
     public static BufferedImage readEmojiImageScaled(TI4Emoji emoji, int size) {
-        if (emoji.asEmoji() != null && emoji.asEmoji() instanceof CustomEmoji e)
-            return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
-        return null;
+        return ImageHelper.readEmojiImageScaled(emoji.emojiString(), size);
     }
 
     @Nullable
