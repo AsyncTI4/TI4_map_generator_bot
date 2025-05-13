@@ -268,6 +268,7 @@ public class AsyncTI4DiscordBot {
 
         // BOT IS READY
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, true);
+        AsyncTI4DiscordBot.jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing("Async TI4"));
         updatePresence();
         BotLogger.info("FINISHED LOADING GAMES");
 

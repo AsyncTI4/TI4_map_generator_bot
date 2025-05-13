@@ -234,7 +234,6 @@ public class MapGenerator implements AutoCloseable {
 
     FileUpload createFileUpload() {
         if (debug) debugDiscordTime = StopWatch.createStarted();
-        AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
         FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
         if (debug) debugDiscordTime.stop();
@@ -259,7 +258,7 @@ public class MapGenerator implements AutoCloseable {
         if (displayTypeBasic != DisplayType.all && displayTypeBasic != DisplayType.map) {
             return;
         }
-        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);  
+        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
@@ -1803,9 +1802,9 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static void drawFleetCCOfPlayer(
-                Graphics graphics, String ccID, int x, int y, Player player,
-                boolean rightAlign
-            ) {
+        Graphics graphics, String ccID, int x, int y, Player player,
+        boolean rightAlign
+    ) {
         String ccPath = Mapper.getCCPath(ccID);
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
@@ -2252,16 +2251,16 @@ public class MapGenerator implements AutoCloseable {
     }
 
     public static void addWebsiteOverlay(
-                List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y,
-                int width, int height
-            ) {
+        List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y,
+        int width, int height
+    ) {
         overlays.add(new WebsiteOverlay(dataModel, List.of(x, y, width, height)));
     }
 
     public static void addWebsiteOverlay(
-                List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w,
-                int h
-            ) {
+        List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w,
+        int h
+    ) {
         overlays.add(new WebsiteOverlay(title, text, List.of(x, y, w, h)));
     }
 
