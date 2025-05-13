@@ -72,6 +72,7 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -1367,12 +1368,7 @@ public class AgendaHelper {
         }
         String summary2 = getSummaryOfVotes(game, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
-        if (game.isFowMode()) {
-            Player gm = game.getPlayersWithGMRole().getFirst();
-            if (gm != null) {
-                MessageHelper.sendMessageToChannel(gm.getCardsInfoThread(), getSummaryOfVotes(game, true, true));
-            }
-        }
+        GMService.logPlayerActivity(game, null, getSummaryOfVotes(game, true, true));
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();

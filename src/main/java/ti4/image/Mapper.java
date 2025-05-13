@@ -324,6 +324,7 @@ public class Mapper {
         return TileHelper.getAllTileModels().stream()
             .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
             .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
+            .filter(tileModel -> !tileModel.isHyperlane())
             .filter(TileModel::isEmpty)
             .map(TileModel::getId)
             .toList();
