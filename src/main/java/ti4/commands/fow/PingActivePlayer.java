@@ -10,6 +10,8 @@ import ti4.model.metadata.AutoPingMetadataManager;
 
 class PingActivePlayer extends GameStateSubcommand {
 
+    private static final long PING_COOLDOWN = 28800000; // (1000 * 60 * 60 * 8); //eight hours
+
     public PingActivePlayer() {
         super(Constants.PING_ACTIVE_PLAYER, "Ping the active player in this game", true, true);
     }
@@ -40,8 +42,9 @@ class PingActivePlayer extends GameStateSubcommand {
         }
 
         long milliSinceLastPing = System.currentTimeMillis() - latestPingMilliseconds;
-        if (!game.getPlayersWithGMRole().contains(playerThatRanCommand) && milliSinceLastPing < (1000 * 60 * 60 * 8) && !samePlayer) { //eight hours
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
+        if (!game.getPlayersWithGMRole().contains(playerThatRanCommand) && milliSinceLastPing < PING_COOLDOWN && !samePlayer) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+                "Active player was pinged recently. Command on cooldown for " + formatMillis(PING_COOLDOWN - milliSinceLastPing));
         } else {
             String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
             if (game.isFowMode()) {
@@ -52,5 +55,12 @@ class PingActivePlayer extends GameStateSubcommand {
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
+    }
+
+    public static String formatMillis(long millis) {
+        long totalMinutes = (millis + 59999) / 60000; // adds 59.999s before division to round up
+        long hours = totalMinutes / 60;
+        long minutes = totalMinutes % 60;
+        return hours + "h " + minutes + "min";
     }
 }
