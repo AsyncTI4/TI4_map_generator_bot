@@ -23,9 +23,8 @@ public class StatisticsCommand implements ParentCommand {
         new GameWinsWithOtherFactions(),
         new StellarConverterStatistics(),
         new ListTitlesGiven(),
-        new ExportToCSV()
-    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
-
+        new ExportToCSV(),
+        new FactionGames()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

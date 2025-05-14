@@ -721,7 +721,7 @@ public class ButtonHelperFactionSpecific {
             return buttons;
         }
         for (String planet : hacan.getPlanetsAllianceMode()) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
+            if (planet.contains("custodia") || planet.contains("ghoti") || ButtonHelper.getUnitHolderFromPlanetName(planet, game) == null) {
                 continue;
             }
             if (ButtonHelper.getUnitHolderFromPlanetName(planet, game).getUnitCount(UnitType.Mech,

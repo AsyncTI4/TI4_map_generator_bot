@@ -22,6 +22,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.GameLaunchThreadHelper;
@@ -45,6 +46,7 @@ import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -526,6 +528,18 @@ public class StartPhaseService {
                     + " _Maw of Worlds_ is technically start of agenda, but can be done now for efficiency");
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()
                     + ", you may use these buttons to resolve _Maw Of Worlds_.", ButtonHelper.getMawButtons());
+            }
+            if (game.isCustodiansScored() && player.hasTech("dsrohdy")) {
+                TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged()
+                    + " you have " + dsrohdy.getRepresentation(false) + " and may choose a player.\n"
+                    + "They must produce 1 ship in a system that contains 1 or more of their space docks or war suns.");
+                for (String tech : player.getTechs()) {
+                    if (Mapper.getTech(tech).isUnitUpgrade()) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "",
+                            ButtonHelperModifyUnits.getContractualObligationsButtons(game, player));
+                    }
+                }
             }
             if (player.getRelics() != null && player.hasRelic("twilight_mirror") && game.isCustodiansScored()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + ", a reminder this is the window to purge _Twilight Mirror_.");
