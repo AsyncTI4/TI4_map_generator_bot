@@ -681,7 +681,7 @@ public class AgendaHelper {
 
     }
 
-    private static String pluralPerson(int num){
+    private static String pluralPerson(int num) {
         String result = num + ((num > 1) ? " people" : " person");
         return result;
     }
@@ -3631,13 +3631,12 @@ public class AgendaHelper {
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
                 String message = "";
-                if(!game.getStoredValue(politicsHolder).isEmpty()){
+                if (!game.getStoredValue(politicsHolder).isEmpty()) {
                     message = "## " + game.getStoredValue(politicsHolder) + " had Politics and placed the agendas in this order: "
-                    + game.getStoredValue(key).replace("_", ", ") + ".";
-                }
-                else {
+                        + game.getStoredValue(key).replace("_", ", ") + ".";
+                } else {
                     message = "## The Politics player placed the agendas in this order: "
-                    + game.getStoredValue(key).replace("_", ", ") + ".";
+                        + game.getStoredValue(key).replace("_", ", ") + ".";
                 }
                 MessageHelper.sendMessageToChannel(channel, message);
             }
@@ -3649,18 +3648,6 @@ public class AgendaHelper {
                     player.getRepresentationUnfogged()
                         + " you have Quaxdol Junitas, the Florzen commander, and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
-            }
-            if (!action && aCount == 1 && player.hasTech("dsrohdy")) {
-                TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-                    + " you have " + dsrohdy.getRepresentation(false) + " and may choose a player.\n"
-                    + "They must produce 1 ship in a system that contains 1 or more of their space docks or war suns.");
-                for (String tech : player.getTechs()) {
-                    if (Mapper.getTech(tech).isUnitUpgrade()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "",
-                            ButtonHelperModifyUnits.getContractualObligationsButtons(game, player));
-                    }
-                }
             }
         }
         if (!game.isFowMode() && !action) {

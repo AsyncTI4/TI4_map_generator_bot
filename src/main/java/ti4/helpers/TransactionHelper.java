@@ -126,6 +126,8 @@ public class TransactionHelper {
         if (!debtOnly) {
             ButtonHelperAbilities.pillageCheck(p1, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            CommanderUnlockCheckService.checkPlayer(p1, "hacan");
+            CommanderUnlockCheckService.checkPlayer(p2, "hacan");
         }
     }
 
@@ -984,7 +986,6 @@ public class TransactionHelper {
                 tgAmount = Math.min(p1.getTg(), tgAmount);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                CommanderUnlockCheckService.checkPlayer(p2, "hacan");
                 message2 = ident + " sent " + tgAmount + " trade good" + (tgAmount == 1 ? "" : "s") + " to " + ident2 + ".";
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
@@ -1008,8 +1009,6 @@ public class TransactionHelper {
                     }
                     p2.setCommodities(targetTG);
                 }
-
-                CommanderUnlockCheckService.checkPlayer(p2, "hacan");
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " commodit" + (tgAmount == 1 ? "y" : "ies") + " to " + ident2 + ".";
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
@@ -1038,8 +1037,6 @@ public class TransactionHelper {
                 p2.setCommodities(newP2Comms);
                 p1.setTg(p1.getTg() + (oldP1Comms - newP1Comms));
                 p2.setTg(p2.getTg() + (oldP2Comms - newP2Comms));
-                CommanderUnlockCheckService.checkPlayer(p2, "hacan");
-                CommanderUnlockCheckService.checkPlayer(p1, "hacan");
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
                 String id1 = p1.getFactionEmojiOrColor();
@@ -1424,6 +1421,8 @@ public class TransactionHelper {
         Player player2 = game.getPlayerFromColorOrFaction(player2Color);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAbilities.pillageCheck(player2, game);
+        CommanderUnlockCheckService.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player2, "hacan");
         ButtonHelper.deleteMessage(event);
     }
 
