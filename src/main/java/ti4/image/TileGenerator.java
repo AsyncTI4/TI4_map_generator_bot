@@ -53,6 +53,7 @@ import ti4.model.ShipPositionModel.ShipPosition;
 import ti4.model.UnitModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
+import ti4.service.map.CustomHyperlaneService;
 
 public class TileGenerator {
 
@@ -65,9 +66,10 @@ public class TileGenerator {
     private static final BasicStroke stroke8 = new BasicStroke(8.0f);
     private static final int TILE_EXTRA_WIDTH = 260;
     private static final int EXTRA_X = 100;
-    private static final int TILE_WIDTH = 345;
-    private static final int TILE_HEIGHT = 300;
     private static final int EXTRA_Y = 100;
+
+    public static final int TILE_WIDTH = 345;
+    public static final int TILE_HEIGHT = 300;
 
     private final Game game;
     private final GenericInteractionCreateEvent event;
@@ -218,7 +220,9 @@ public class TileGenerator {
             case Setup -> {
             } // do nothing
             case Tile -> {
-                BufferedImage image = ImageHelper.read(tile.getTilePath());
+                BufferedImage image = CustomHyperlaneService.isCustomHyperlaneTile(tile)
+                    ? HyperlaneTileGenerator.generateHyperlaneTile(tile, game)
+                    : ImageHelper.read(tile.getTilePath());
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
@@ -236,8 +240,9 @@ public class TileGenerator {
                 }
 
                 // ADD HEX BORDERS FOR CONTROL
+                // display type = unlocked forces border style = solid
                 Player controllingPlayer = game.getPlayerThatControlsTile(tile);
-                if (!game.getHexBorderStyle().equals("off") && controllingPlayer != null && !isSpiral) {
+                if ((!game.getHexBorderStyle().equals("off") || displayType == DisplayType.unlocked) && controllingPlayer != null && !isSpiral) {
                     int sideNum = 0;
                     List<Integer> openSides = new ArrayList<>();
                     for (String adj : PositionMapper.getAdjacentTilePositions(tile.getPosition())) {
@@ -247,12 +252,14 @@ public class TileGenerator {
                         sideNum++;
                     }
                     if (isFoWPrivate && this.fowPlayer == null) openSides.clear();
-                    BufferedImage border = DrawingUtil.hexBorder(game.getHexBorderStyle(), Mapper.getColor(controllingPlayer.getColor()), openSides);
+                    String hexBorderStyle = displayType == DisplayType.unlocked ? "solid" : game.getHexBorderStyle();
+                    BufferedImage border = DrawingUtil.hexBorder(hexBorderStyle, Mapper.getColor(controllingPlayer.getColor()), openSides);
                     tileGraphics.drawImage(border, TILE_PADDING, TILE_PADDING, null);
                 }
 
                 setTextSize(tileGraphics);
 
+                // FoW stuff
                 if (isFoWPrivate && tile.hasFog(fowPlayer)) {
                     BufferedImage frogOfWar = ImageHelper.read(tile.getFowTilePath(fowPlayer));
                     tileGraphics.drawImage(frogOfWar, TILE_PADDING, TILE_PADDING, null);
@@ -278,6 +285,7 @@ public class TileGenerator {
                     }
                 }
 
+                // Draft Stuff
                 if (TileHelper.isDraftTile(tile.getTileModel())) {
                     String tileID = tile.getTileID();
                     String draftNum = tileID.replaceAll("[a-z]", "");
@@ -301,8 +309,11 @@ public class TileGenerator {
                     DrawingUtil.superDrawString(tileGraphics, draftColor, numX, numY, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Bottom, stroke6, Color.BLACK);
                 }
 
-                // pa_unitimage.png
                 // add icons to wormholes for agendas
+                // Worhmole recon:  For: alpha||beta WH systems are adjacent to each other 
+                // Travel ban:      For: alpha/beta WH have no effect during movement
+                // Nexus:           For: alpha/beta WH **in Nexus** have no effect during movement
+                // Shared research: For: Units can move through nebulae
                 boolean reconstruction = (ButtonHelper.isLawInPlay(game, "wormhole_recon") || ButtonHelper.isLawInPlay(game, "absol_recon"));
                 if ((ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban"))
                     && (Mapper.getWormholes(tile.getTileID()).contains(Constants.ALPHA) || Mapper.getWormholes(tile.getTileID()).contains(Constants.BETA))) {
@@ -351,23 +362,28 @@ public class TileGenerator {
                 }
             }
             case Extras -> {
-                if (isFoWPrivate && tile.hasFog(fowPlayer))
-                    return tileOutput;
-
-                List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
-                int direction = 0;
-                for (String secondaryTile : adj) {
-                    if (secondaryTile != null) {
-                        addBorderDecoration(direction, secondaryTile, tileGraphics,
-                            BorderAnomalyModel.BorderAnomalyType.ARROW);
+                if (!isFoWPrivate || !tile.hasFog(fowPlayer)) {
+                    List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
+                    int direction = 0;
+                    for (String secondaryTile : adj) {
+                        if (secondaryTile != null) {
+                            addBorderDecoration(direction, secondaryTile, tileGraphics,
+                                BorderAnomalyModel.BorderAnomalyType.ARROW);
+                        }
+                        direction++;
                     }
-                    direction++;
                 }
-                game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
-                    if (borderAnomalyHolder.getTile().equals(tile.getPosition())) {
-                        addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
-                    }
-                });
+
+                if (!game.getBorderAnomalies().isEmpty()) {
+                    List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
+                    Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, fowPlayer);
+                    game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
+                        if (borderAnomalyHolder.getTile().equals(tile.getPosition()) 
+                            && (!isFoWPrivate || !tile.hasFog(fowPlayer) || visiblePositions.contains(orderedAdjacentPositions.get(borderAnomalyHolder.getDirection())))) {
+                            addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
+                        }
+                    });
+                }
             }
             case Units -> {
                 if (isFoWPrivate && tile.hasFog(fowPlayer))
@@ -1548,6 +1564,11 @@ public class TileGenerator {
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
             return false;
+        }
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasAbility("synthesis") && player.getReadiedPlanets().contains(unitHolder.getName())) {
+                return true;
+            }
         }
 
         Map<Units.UnitKey, Integer> units = unitHolder.getUnits();

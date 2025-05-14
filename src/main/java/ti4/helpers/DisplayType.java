@@ -17,7 +17,8 @@ public enum DisplayType {
     attachments("attachments"),
     shipless("shipless"),
     googly("googly"),
-    landscape("landscape");
+    landscape("landscape"),
+    unlocked("unlocked"); // Master Display Type = Map, force HexBorder = Solid, hide locked units (have a CC of their colour in their system)
 
     public final String value;
 

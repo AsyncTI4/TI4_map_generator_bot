@@ -351,6 +351,25 @@ public class PlayStrategyCardService {
                         }
                     }
                 }
+                if (!p2.hasFollowedSC(scToPlay) && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + player.getFaction()).isEmpty()) {
+                    game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + player.getFaction());
+                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                    if (reactionEmoji2 != null) {
+                        message.addReaction(reactionEmoji2).queue();
+                        p2.addFollowedSC(scToPlay, event);
+                        if (scToPlay == 8) {
+                            String key3 = "potentialBlockers";
+                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                            }
+
+                            String key = "factionsThatAreNotDiscardingSOs";
+                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                        }
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                            + stratCardName + "** because you told the bot earlier that you wished to pass on it.");
+                    }
+                }
             }
         }
         game.setStoredValue("scPlay" + scToPlay, message.getJumpUrl());

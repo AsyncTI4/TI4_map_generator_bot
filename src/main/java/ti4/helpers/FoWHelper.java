@@ -331,7 +331,7 @@ public class FoWHelper {
             return tiles;
         }
 
-        List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
+        List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection, game);
         if (hyperlaneData != null && hyperlaneData.isEmpty() && !naturalMapOnly) {
             // We could not load the hyperlane data correctly, quit
             return tiles;
@@ -358,10 +358,10 @@ public class FoWHelper {
             boolean borderBlocked = false;
             for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
                 if (b == null || b.getTile() == null) continue;
-                if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacency())
+                if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacencyOut()
+                    || b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacencyIn()) {
                     borderBlocked = true;
-                if (b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacency())
-                    borderBlocked = true;
+                }
             }
             if (borderBlocked && !naturalMapOnly)
                 continue;

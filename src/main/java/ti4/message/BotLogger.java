@@ -1,6 +1,5 @@
 package ti4.message;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -205,6 +204,17 @@ public class BotLogger {
 		logToChannel(origin, message, null, LogSeverity.Error);
 	}
 
+	public static void error(@Nonnull String message, @Nullable Game game, @Nullable GenericInteractionCreateEvent event) {
+		if (event != null && game != null)
+			error(new LogMessageOrigin(event, game), message);
+		else if (event != null)
+			error(new LogMessageOrigin(event), message);
+		else if (game != null)
+			error(new LogMessageOrigin(game), message);
+		else
+			error(message);
+	}
+
 	/**
 	 * Sends a log message via the specified bot log channel. Should be used through info(), warning(), or error() methods.
 	 * <p>
@@ -217,35 +227,37 @@ public class BotLogger {
 	 */
 	private static void logToChannel(@Nullable LogMessageOrigin origin, @Nonnull String message, @Nullable Throwable err, @Nonnull LogSeverity severity) {
 		TextChannel channel = null;
-		StringBuilder msg = new StringBuilder().append(severity.headerText);
+		StringBuilder msg = new StringBuilder();
+
+		// **__`2025-01-01 xx:xx:xx.xxx`__** user pressed button blahblahblah
+		// Game Info: [Tabletalk] [Actions]
+		// Message: jajfdkljakdsjflkajsdlkfjaksdjfklajskdflasd
+		boolean multiline = origin != null && (origin.getEventString() != null || origin.getGameInfo() != null);
 
 		if (origin != null) {
-			msg.append(origin.getOriginTime())
-				.append("\n");
-			origin.appendSourceString(msg);
-			origin.appendEventString(msg);
+			// Add header text iff the error spans multiple lines
+			if (multiline || err != null) msg.append(severity.headerText);
+			msg.append(origin.getOriginTimeFormatted());
+			if (origin.getEventString() != null)
+				msg.append(origin.getEventString());
+			if (origin.getGameInfo() != null)
+				msg.append(origin.getGameInfo());
 			channel = origin.getLogChannel(severity);
 		} else {
-			msg.append(DateTimeHelper.getCurrentTimestamp())
-				.append("\n")
-				.append("Source: Not provided\n");
+			origin = new LogMessageOrigin(AsyncTI4DiscordBot.guildPrimary);
+			msg.append(origin.getOriginTimeFormatted());
+			channel = origin.getLogChannel(severity);
 		}
 
-		msg.append("Message: ")
-			.append(message);
+		if (multiline) {
+			msg.append("Message: ");
+		}
+		msg.append(message);
+		if (multiline && err != null) msg.append("\n_ _"); // Append a blank line iff the error spans multiple lines and there's no stack trace
 
 		// Send off message
 		String compiledMessage = msg.toString();
 		int msgLength = compiledMessage.length();
-
-		if (channel == null && AsyncTI4DiscordBot.guildPrimary != null) {
-			List<TextChannel> logCandidates = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("bot-log", false);
-			if (logCandidates.isEmpty()) {
-				BotLogger.error("Primary log channel could not be found in main server, defaulting to webhook");
-			} else {
-				channel = logCandidates.getFirst();
-			}
-		}
 
 		// Handle message length overflow. Overflow length is derived from previous implementation
 		for (int i = 0; i <= msgLength; i += 2000) {
@@ -293,7 +305,7 @@ public class BotLogger {
 		if (timeToNextMessage <= 0) {
 			sendMessageToBotLogWebhook(message);
 		} else {
-            CronManager.scheduleOnce(BotLogger.class, () -> sendMessageToBotLogWebhook(message), timeToNextMessage, TimeUnit.MILLISECONDS);
+			CronManager.scheduleOnce(BotLogger.class, () -> sendMessageToBotLogWebhook(message), timeToNextMessage, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -303,8 +315,7 @@ public class BotLogger {
 				"https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v";
 			case "1059645656295292968" -> // PrisonerOne's Test Server
 				"https://discord.com/api/webhooks/1159478386998116412/NiyxcE-6TVkSH0ACNpEhwbbEdIBrvTWboZBTwuooVfz5n4KccGa_HRWTbCcOy7ivZuEp";
-			case null, default ->
-				null;
+			case null, default -> null;
 		};
 
 		if (botLogWebhookURL == null) {
@@ -538,14 +549,11 @@ public class BotLogger {
 	}
 
 	public static void catchRestError(Throwable e) {
-		// if it's ignored, it's not actionable. Simple
-		// if (ignoredError(e)) return;
-
-		// Otherwise... maybe actionable!
-
-		// If it gets too annoying, we can limit to testing mode/debug mode
+		// This has become too annoying, so we are limitting to testing mode/debug mode
 		boolean debugMode = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.DEBUG.toString(), Boolean.class, false);
 		if (System.getenv("TESTING") != null || debugMode) {
+			// if it's ignored, it's not actionable. Simple
+			if (ignoredError(e)) return;
 			BotLogger.error("Encountered REST error", e);
 		}
 	}
@@ -553,7 +561,7 @@ public class BotLogger {
 	private static boolean ignoredError(Throwable error) {
 		if (error instanceof ErrorResponseException restError) {
 			// This is an "unknown message" error. Typically caused by the bot trying to delete or edit
-			// a message that has already been deleted. We don't generally care about these
+			// a message that has already been deleted. We don't care about these
 			return restError.getErrorCode() == 10008;
 		}
 		return false;
@@ -683,8 +691,10 @@ public class BotLogger {
 				case ModalInteractionEvent mEvent -> {
 					if (mEvent.getMessage() != null) return mEvent.getMessage().getJumpUrl();
 				}
-				case null -> {}
-				default -> {} // This will default to the GuildChannel in which the event was sent.
+				case null -> {
+				}
+				default -> {
+				} // This will default to the GuildChannel in which the event was sent.
 			}
 
 			if (channel != null) return channel.getAsMention();
@@ -710,25 +720,18 @@ public class BotLogger {
 		}
 
 		/**
-		 * Append the "Source:" portion of a log message to a StringBuilder.
-		 * @param builder - The StringBuilder to which the source string is appended
+		 * Append the "Game:" portion of a log message to a StringBuilder.
+		 * @param builder - The StringBuilder to which the game string is appended
 		 * @return The StringBuilder passed into builder
 		 */
-		@Nonnull
-		public StringBuilder appendSourceString(@Nonnull StringBuilder builder) {
-			builder.append("Source: ");
-			if (player != null) builder.append("| Player \"")
-					.append(player.getDisplayName())
-					.append("\" ");
-			if (game != null) builder.append("| Game \"")
-					.append(game.getName())
-					.append("\" ");
-			builder.append(getStrictestName())
-					.append(" (")
-					.append(getStrictestMention())
-					.append(")\n");
-
-			return builder;
+		@Nullable
+		public StringBuilder getGameInfo() {
+			if (game != null) {
+				StringBuilder builder = new StringBuilder().append("\nGame info: ");
+				builder.append(game.gameJumpLinks());
+				return builder;
+			}
+			return null;
 		}
 
 		/**
@@ -736,27 +739,26 @@ public class BotLogger {
 		 * @param builder - The StringBuilder to which the event string is appended
 		 * @return The StringBuilder passed into builder
 		 */
-		@Nonnull
-		public StringBuilder appendEventString(@Nonnull StringBuilder builder) {
-			if (event == null) return builder;
+		@Nullable
+		public StringBuilder getEventString() {
+			if (event == null) return null;
 
-			builder.append(event.getUser().getEffectiveName())
-					.append(" ");
+			StringBuilder builder = new StringBuilder().append(event.getUser().getEffectiveName()).append(" ");
 
 			switch (event) {
 				case SlashCommandInteractionEvent sEvent -> builder.append("used command `")
-						.append(sEvent.getCommandString())
-						.append("`\n");
+					.append(sEvent.getCommandString())
+					.append("`\n");
 				case ButtonInteractionEvent bEvent -> builder.append("pressed button ")
-						.append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
-						.append("\n");
+					.append(ButtonHelper.getButtonRepresentation(bEvent.getButton()))
+					.append("\n");
 				case StringSelectInteractionEvent sEvent -> builder.append("selected ")
-						.append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
-						.append("\n");
+					.append(SelectionMenuProcessor.getSelectionMenuDebugText(sEvent))
+					.append("\n");
 				case ModalInteractionEvent mEvent -> builder.append("used modal ")
-						.append(ModalListener.getModalDebugText(mEvent))
-						.append("\n");
-				default -> builder.append("initiated an unexpected event\n");
+					.append(ModalListener.getModalDebugText(mEvent))
+					.append("\n");
+				default -> builder.append("initiated an unexpected event of type `").append(event.getType().toString()).append("`\n");
 			}
 
 			return builder;
@@ -770,15 +772,22 @@ public class BotLogger {
 		 */
 		@Nullable
 		public TextChannel getLogChannel(@Nonnull LogSeverity severity) {
+			Guild guild = AsyncTI4DiscordBot.guildPrimary;
+			if (guild == null) guild = this.guild;
 			if (guild == null) return null;
 
 			return guild.getTextChannelsByName(severity.channelName, false)
+				.stream()
+				.findFirst()
+				.orElse(guild.getTextChannelsByName("bot-log", false)
 					.stream()
-					.findAny()
-					.orElse(guild.getTextChannelsByName("bot-log", false)
-							.stream()
-							.findFirst()
-							.orElse(null));
+					.findFirst()
+					.orElse(null));
+		}
+
+		@Nonnull
+		public String getOriginTimeFormatted() {
+			return String.format("**__%s__** ", getOriginTime());
 		}
 	}
 
@@ -787,7 +796,7 @@ public class BotLogger {
 	 */
 	// Implementor's note: all subclasses of AbstractEventLog are automatically accounted for in InteractionLogCron as long as channelName and threadName are defined.
 	public sealed abstract static class AbstractEventLog { // Yes, this is basically trying to recreate a rust enum. No, I'm not sorry
-		protected LogMessageOrigin source;
+		protected final LogMessageOrigin source;
 
 		// Implementor's note: These fields must have getters, as this is how the subclasses override the statics without changing them for all subclasses
 		@Getter
@@ -804,15 +813,19 @@ public class BotLogger {
 		public String getLogString() {
 			StringBuilder message = new StringBuilder();
 
-			source.appendEventString(
-					source.appendSourceString(
-							message.append(source.getOriginTime())
-									.append("\n")));
+			message.append(source.getOriginTimeFormatted());
+			if (source.getEventString() != null) {
+				message.append(source.getEventString());
+			}
+			if (source.getGameInfo() != null) {
+				message.append(source.getGameInfo());
+			}
 
-			if (!this.message.isEmpty())
+			if (!this.message.isEmpty()) {
 				message.append(getMessagePrefix())
-						.append(this.message)
-						.append("\n");
+					.append(this.message)
+					.append("\n");
+			}
 
 			message.append("\n");
 			return message.toString();

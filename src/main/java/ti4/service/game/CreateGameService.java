@@ -44,6 +44,7 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
 import ti4.service.option.GameOptionService;
 import ti4.settings.GlobalSettings;
@@ -343,7 +344,7 @@ public class CreateGameService {
             for (Member member : missingMembers) {
                 sb.append("> ").append(member.getAsMention()).append("\n");
             }
-            sb.append("You will be automatically added to the game channels when you join the server.");
+            sb.append("You will be automatically added to the game channels when you join the server. \n\nNote that if for some reason you are not automatically added to the game after joining the server, you can fix this by having one of the other game members run /game ping in the actions channel. ");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
         }
         return missingMembers;
@@ -355,6 +356,8 @@ public class CreateGameService {
             return "pbd1";
         }
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
+        while (ReserveGameNumberService.isGameNumReserved("pbd" + nextPBDNumber))
+            nextPBDNumber++;
         return "pbd" + nextPBDNumber;
     }
 

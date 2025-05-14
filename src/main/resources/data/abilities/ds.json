@@ -847,7 +847,7 @@
         "name": "Dark Purpose",
         "faction": "pharadn",
         "window": "When you score an objective",
-        "windowEffect": "Capture 2 infantry from the supply",
+        "windowEffect": "When you score an objective, gain 1 command token.",
         "source": "ds"
     },
     {
@@ -868,7 +868,14 @@
         "id": "data_recovery",
         "name": "Data Recovery",
         "faction": "qhet",
-        "permanentEffect": "Game effects other than your command tokens cannot prevent you from activating, or moving ships into, your home system.",
+        "permanentEffect": "Once per action, after 1 or more of your units is destroyed, you may place 1 of the active player’s control tokens on your faction sheet.",
+        "source": "ds"
+    },
+    {
+        "id": "tempest_squads",
+        "name": "Data Recovery",
+        "faction": "qhet",
+        "permanentEffect": "While you are the active player, 2 infantry in the active system do not count against your ships’ capacity. [Note: think of this as sort of like a mild Sardakk hero]",
         "source": "ds"
     },
     {

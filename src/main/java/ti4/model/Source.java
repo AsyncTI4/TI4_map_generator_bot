@@ -7,6 +7,14 @@ import ti4.service.emoji.TI4Emoji;
 public class Source {
 
     public enum ComponentSource {
+        // IF YOU ADD A VALUE TO THE ENUM
+        //   please also add and complete the corresponding entry in the \resources\data\sources\sources.json file
+        // IF YOU CHANGE THE ENUM VALUE FOR A SOURCE
+        //   then you must change that value for all occurrences in .json files (including sources.json)
+        //   any oversight of an occurrence will make the bot unable to complete Mapper.loadData() at start up, and thus a bunch of Mapper Map objects will be empty
+        // IF YOU ARE LOOKING FOR ALL OCCURRENCES OF A SOURCE ACROSS THE .json FILES
+        //   then you can run the '/search sources' which also look for occurrences (for now it counts occurrences by folder)
+        //   (or you can use the search functionality of your IDE ofc)
 
         // official
         base, pok, codex1, codex2, codex3,
@@ -88,6 +96,10 @@ public class Source {
             return emoji == null ? "" : emoji.toString();
         }
 
+        /**
+         * Switch to Source Model and \data\sources\ once they are completed
+         * @return
+         */
         public String prettyName() {
             return switch (this) {
                 case base -> "Twilight Imperium 4th Edition (Base Game)";
@@ -97,10 +109,10 @@ public class Source {
                 case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
                 case ds -> "Discordant Stars [Homebrew]";
                 case absol -> "Absol's Mod [Homebrew]";
-                case flagshipping -> "Flagshipping";
-                case promises_promises -> "Promises Promises";
+                case flagshipping -> "Flagshipping [Homebrew]";
+                case promises_promises -> "Promises Promises [Homebrew]";
                 case franken -> "Franken Draft [Homebrew Game Mode]";
-                case monuments -> "Monuments+";
+                case monuments -> "Monuments+ [Homebrew]";
                 case omega_phase -> "Omega Phase [Homebrew]";
                 default -> toString();
             };

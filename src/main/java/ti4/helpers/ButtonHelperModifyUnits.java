@@ -314,7 +314,9 @@ public class ButtonHelperModifyUnits {
                         hits -= min;
                         var unit = new ParsedUnit(unitKey, min, planet);
                         RemoveUnitService.removeUnit(event, tile, game, unit);
-
+                        if (player.hasAbility("heroism") && unitKey.getUnitType() == UnitType.Infantry) {
+                            ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, min, unitName, event);
+                        }
                         handleCabalConsumption(cabal, player, tile, planet, min, unitName, event, game, cabalMech);
                         handleTechOrAbilityTriggers(player, unitName, min, game);
                     }
@@ -612,7 +614,7 @@ public class ButtonHelperModifyUnits {
 
             boolean isNraShenanigans = thingToHit.equalsIgnoreCase("nraShenanigans");
             boolean isRemainingSustains = thingToHit.equalsIgnoreCase("remainingSustains");
-
+            if (isRemainingSustains && numSustains < 1) continue;
             for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
                 UnitKey unitKey = unitEntry.getKey();
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
