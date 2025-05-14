@@ -82,7 +82,7 @@ public class GameProperties {
     private boolean stratPings = true;
     private boolean testBetaFeaturesMode;
     private boolean showOwnedPNsInPlayerArea = false;
-    private String hexBorderStyle = "off";
+    private String hexBorderStyle = "off"; // values are off/dash/solid
     private String textSize = "medium";
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private int autoPingSpacer;

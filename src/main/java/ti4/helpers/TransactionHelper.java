@@ -13,14 +13,20 @@ import org.apache.commons.lang3.StringUtils;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TransactionGenerator;
 import ti4.listeners.annotations.ButtonHandler;
+import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
@@ -231,6 +237,7 @@ public class TransactionHelper {
                     case "Frags" -> trans.append(ExploreEmojis.getFragEmoji(furtherDetail).toString().repeat(amountToTransact));
                     case "Planets", "AlliancePlanets", "dmz" -> trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
                     case "action" -> trans.append("An in-game ").append(furtherDetail).append(" action");
+                    case "details" -> trans.append(furtherDetail.replace("fin777", " "));
                     default -> trans.append(" some odd thing: `").append(item).append("`");
                 }
                 trans.append("\n");
@@ -632,9 +639,36 @@ public class TransactionHelper {
                     stuffToTransButtons.add(Buttons.gray(prefix + "_URF" + x, "Unknown Fragments (x" + x + ")", ExploreEmojis.UFrag));
                 }
             }
+            case "Details" -> {
+                String other = p1.getFaction();
+                if (player == p1) {
+                    other = p2.getFaction();
+                }
+                event.getMessage().delete().queue();
+                String modalId = "finishDealDetails_" + other;
+                String fieldID = "details";
+                TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
+                    .setPlaceholder("Edit your deals details here.")
+                    .setValue("I propose that")
+                    .build();
+                Modal modal = Modal.create(modalId, "Deal Details").addActionRow(summary).build();
+                event.replyModal(modal).queue();
+                return;
+            }
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
+    }
+
+    @ModalHandler("finishDealDetails_")
+    public static void finishDealDetails(ModalInteractionEvent event, Game game, Player player, String modalID) {
+        ModalMapping mapping = event.getValue("details");
+        String thoughts = mapping.getAsString();
+        Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
+        player.addTransactionItem("sending" + player.getFaction() + "_receiving" + modalID.split("_")[1] + "_details_" + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
+        String message = "Current transaction offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+            + "### Click something that you wish to __request from__ " + opposing.getRepresentation(false, false);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, player, opposing));
     }
 
     @ButtonHandler("offerToTransact_")
@@ -1260,6 +1294,9 @@ public class TransactionHelper {
         }
         if (!p1.getFragments().isEmpty()) {
             stuffToTransButtons.add(Buttons.green("newTransact_Frags_" + p1.getFaction() + "_" + p2.getFaction(), "Fragments"));
+        }
+        if (p1 == player) {
+            stuffToTransButtons.add(Buttons.blue("newTransact_Details_" + p1.getFaction() + "_" + p2.getFaction() + "_~MDL", "Specify Deal"));
         }
         if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             stuffToTransButtons.add(Buttons.green("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));

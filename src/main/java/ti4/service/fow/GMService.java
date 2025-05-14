@@ -107,12 +107,16 @@ public class GMService {
     }
 
     public static void logPlayerActivity(Game game, Player player, String eventLog, String jumpUrl, boolean ping) {
+        if (!game.isFowMode()) return;
+
         String timestamp = "`[" + LocalDateTime.now().format(formatter) + "]` ";
         final String log = timestamp + eventLog + (ping ? " - " + gmPing(game): "");
         ThreadGetter.getThreadInChannel(getGMChannel(game), game.getName() + ACTIVITY_LOG_THREAD, true, false,
             threadChannel -> {
                 if (jumpUrl != null) {
                     MessageHelper.sendMessageToChannel(threadChannel, log + " - " + jumpUrl);
+                } else if (player == null) {
+                    MessageHelper.sendMessageToChannel(threadChannel, log);
                 } else {
                     jumpToLatestMessage(player, latestJumpUrl -> {
                         MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl);
@@ -122,7 +126,7 @@ public class GMService {
     }
 
     private static void jumpToLatestMessage(Player player, Consumer<String> callback) {
-        MessageChannel privateChannel = player.getPrivateChannel();
+        MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
         if (privateChannel != null) {
             privateChannel.getHistory().retrievePast(1).queue(messages -> {
                 callback.accept( messages.get(0).getJumpUrl());

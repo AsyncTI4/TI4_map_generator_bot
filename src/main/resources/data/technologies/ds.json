@@ -554,7 +554,7 @@
         "faction": "mirveda",
         "baseUpgrade": "pds2",
         "source": "ds",
-        "text": "Move 2, Capacity 1\nSPACE CANNON 4, BOMBARDMENT 4\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed.",
+        "text": "Move 2, Capacity 1\nSPACE CANNON 4, BOMBARDMENT 4\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed.[Note: this unit cannot fire into adjacent systems by itself. Needs Mirveda commander. Also note that if it is alone and an enemy ship moves into its space, it will be blockaded and die before it can shoot PDS.]",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/gauss_cannon_2.jpg?raw=true"
     },
     {
@@ -919,7 +919,7 @@
         "faction": "qhet",
         "baseUpgrade": "inf2",
         "source": "ds",
-        "text": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the start of the status phase, place up to 2 units that are on this card on each planet that contains 1 or more of your structures.1(x2) 7; PLANETARY SHIELD"
+        "text": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the end of your turn, place up to 2 units that are on this card on 1 planet that contains your units..1(x2) 7; PLANETARY SHIELD"
     },
     {
         "alias": "dsqhetcr",

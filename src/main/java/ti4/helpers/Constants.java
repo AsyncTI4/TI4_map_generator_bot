@@ -34,10 +34,6 @@ public class Constants {
         return blt == null ? "" : blt.getAsMention();
     }
 
-    // Tourney Winners
-    public static final String cal1nos = "740848810749722646";
-    public static final List<String> tourneyWinners = List.of(cal1nos);
-
     // Other People IDs
     public static final String cagesId = "203608548440014848";
     public static final String bortId = "154000388121559040";
@@ -749,6 +745,7 @@ public class Constants {
     public static final String SCORED_PO = "scoredPublicObjectives";
     public static final String CUSTOM_ADJACENT_TILES = "customAdjacentTiles";
     public static final String ADJACENCY_OVERRIDES = "adjacencyOverrides";
+    public static final String CUSTOM_HYPERLANE_DATA = "customHyperlaneData";
     public static final String PRIMARY_TILE = "primary_tile";
     public static final String BORDER_TILE = "border_tile";
     public static final String SECONDARY_TILE = "secondary_tile";

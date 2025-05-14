@@ -70,7 +70,7 @@ public class ShowGameService {
 
     public static boolean includeButtons(DisplayType displayType) {
         return switch (displayType) {
-            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments, shipless -> false;
+            case wormholes, anomalies, legendaries, empties, aetherstream, spacecannon, traits, techskips, attachments, shipless, unlocked -> false;
             default -> true;
         };
     }

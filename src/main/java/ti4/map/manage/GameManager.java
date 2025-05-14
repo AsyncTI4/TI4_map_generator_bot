@@ -1,12 +1,15 @@
 package ti4.map.manage;
 
 import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import lombok.experimental.UtilityClass;
+import ti4.AsyncTI4DiscordBot;
 import ti4.map.Game;
 import ti4.map.Player;
 
@@ -61,10 +64,16 @@ public class GameManager {
     }
 
     public static boolean save(Game game, String reason) {
+        boolean wasActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName())).map(ManagedGame::isActive).orElse(false);
         if (!GameSaveService.save(game, reason)) {
             return false;
         }
         gameNameToManagedGame.put(game.getName(), new ManagedGame(game));
+
+        boolean isActive = Optional.ofNullable(gameNameToManagedGame.get(game.getName())).map(ManagedGame::isActive).orElse(false);
+        if (wasActive != isActive) {
+            AsyncTI4DiscordBot.updatePresence();
+        }
         return true;
     }
 
@@ -114,6 +123,10 @@ public class GameManager {
 
     public static int getGameCount() {
         return gameNameToManagedGame.size();
+    }
+
+    public static long getActiveGameCount() {
+        return getManagedGames().stream().filter(ManagedGame::isActive).count();
     }
 
     public static ManagedGame getManagedGame(String gameName) {
