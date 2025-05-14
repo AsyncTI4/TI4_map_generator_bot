@@ -320,6 +320,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         AddUnitService.addUnits(event, tile, game, player.getColor(), unit + " " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " placed a " + unit + " on " + Helper.getPlanetRepresentation(planet, game));
+        CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
     }
 
     @ButtonHandler("qhetMechProduce_")
@@ -509,7 +510,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                                 "Very impressive.",
                                 "If only all technology was this productive.",
                                 "Surely there can't be even more savings to come?",
-                                "Your faction's stockholders are ectatic.",
+                                "Your faction's stockholders are ecstatic.",
                                 "The Scanlink stans have been thoroughly shamed.");
                             msg += lameMessages.get(result);
                         } else {
@@ -1057,7 +1058,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void movedNExplored(
-        ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonInteractionEvent event, Player player, String buttonID, Game game
+    ) {
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = false;
         if (bID.startsWith("dsdihmy_")) {
@@ -2929,7 +2931,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         Button loseTactic = Buttons.red(finChecker + "decrease_tactic_cc", "Lose 1 Tactic Token");
         Button loseFleet = Buttons.red(finChecker + "decrease_fleet_cc", "Lose 1 Fleet Token");
         Button loseStrat = Buttons.red(finChecker + "decrease_strategy_cc", "Lose 1 Strategy Token");
-        Button doneGainingCC = Buttons.red(finChecker + "deleteButtons", "Done Redistributing Command Tokens");
+        Button doneGainingCC = Buttons.blue(finChecker + "deleteButtons", "Done Redistributing Command Tokens");
         Button resetCC = Buttons.gray(finChecker + "resetCCs", "Reset Command Tokens");
 
         List<Button> buttons = Arrays.asList(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat,

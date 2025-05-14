@@ -167,6 +167,9 @@ public class PlayStrategyCardService {
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
+            if (ButtonHelper.isLawInPlay(game, "sanctions") && !game.isAbsolMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Friendly reminder that executive sanctions is in play, so the AC limit is 3 instead of 7");
+            }
         }
 
         // Handle Kyro Hero
