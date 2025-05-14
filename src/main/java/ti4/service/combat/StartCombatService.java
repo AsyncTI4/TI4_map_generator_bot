@@ -551,13 +551,6 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
                     "you may use the button unlock the system or draw 1 AC (Qhet Hero Ability).", buttons);
             }
-            if (player.hasAbility("data_recovery") && player != game.getActivePlayer()) {
-                String finChecker = "FFCC_" + player.getFaction() + "_";
-                buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(finChecker + "dataRecovery_" + otherPlayer.getColor(), "Grab 1 Control Token", FactionEmojis.qhet));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you lose a unit in this combat, " +
-                    "you may use the button to grab one of the opponents control tokens using data recovery.", buttons);
-            }
             if (player.hasAbility("black_ops") && player == game.getActivePlayer()) {
                 int debt = player.getDebtTokenCount(otherPlayer.getColor());
                 if (debt > 1) {
@@ -825,7 +818,12 @@ public class StartCombatService {
                 buttons.add(Buttons.blue("assCannonNDihmohn_exo_" + tile.getPosition(), "Use Exotrireme II Ability", FactionEmojis.Sardakk));
             }
         }
-
+        if (p1.hasAbility("data_recovery") && p1 != game.getActivePlayer()) {
+            buttons.add(Buttons.gray(p1.getFinsFactionCheckerPrefix() + "dataRecovery_" + p2.getColor(), "Grab 1 Control Token (Upon Unit Death)", FactionEmojis.qhet));
+        }
+        if (p2.hasAbility("data_recovery") && p2 != game.getActivePlayer()) {
+            buttons.add(Buttons.gray(p2.getFinsFactionCheckerPrefix() + "dataRecovery_" + p1.getColor(), "Grab 1 Control Token (Upon Unit Death)", FactionEmojis.qhet));
+        }
         if ((p2.hasUnexhaustedLeader("kortaliagent")) && !game.isFowMode() && isGroundCombat
             && !p1.getFragments().isEmpty()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";

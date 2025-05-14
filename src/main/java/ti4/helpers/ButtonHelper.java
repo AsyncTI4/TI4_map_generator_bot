@@ -2777,6 +2777,7 @@ public class ButtonHelper {
             }
         }
         Helper.isCCCountCorrect(player);
+        ButtonHelper.checkACLimit(game, player);
         return highest;
     }
 
@@ -3659,6 +3660,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         player.getRepresentationUnfogged()
                             + " Due to the **Reclamation** ability, 1 PDS and 1 space dock have been added to Mecatol Rex. This is optional though.");
+                    CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
                 }
             }
         }
