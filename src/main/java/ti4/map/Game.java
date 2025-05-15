@@ -3452,6 +3452,7 @@ public class Game extends GameProperties {
                     removePlanet(unitHolder);
                 }
             }
+            customHyperlaneData.remove(position);
         }
 
         tileMap.remove(position);

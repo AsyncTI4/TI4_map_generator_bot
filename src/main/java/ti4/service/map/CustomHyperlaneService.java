@@ -307,4 +307,17 @@ public class CustomHyperlaneService {
         }
         return null;
     }
+
+    public static void moveCustomHyperlaneData(String from, String to, Game game) {
+        moveCustomHyperlaneData(from, to, game, false);
+    }
+
+    public static void moveCustomHyperlaneData(String from, String to, Game game, boolean twoWays) {
+        Map<String, String> data = game.getCustomHyperlaneData();
+        String dataFrom = data.remove(from);
+        String dataTo = data.remove(to);
+
+        if (dataFrom != null) data.put(to, dataFrom);
+        if (twoWays && dataTo != null) data.put(from, dataTo);
+    }
 }
