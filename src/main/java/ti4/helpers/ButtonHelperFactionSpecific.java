@@ -2505,7 +2505,7 @@ public class ButtonHelperFactionSpecific {
 
     public static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
         if (tile != null && tile.getTileModel() != null && tile.getTileModel().isHyperlane()
-            || FOWPlusService.isVoid(game, tile.getPosition())) {
+            || FOWPlusService.isVoid(tile)) {
             return false;
         }
 
