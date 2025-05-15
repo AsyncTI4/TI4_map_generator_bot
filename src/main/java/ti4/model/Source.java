@@ -111,6 +111,7 @@ public class Source {
                 case franken -> "Franken Draft [Homebrew Game Mode]";
                 case monuments -> "Monuments+ [Homebrew]";
                 case omega_phase -> "Omega Phase [Homebrew]";
+                case voices_of_the_council -> "Voices of the Council [Homebrew]";
                 default -> toString();
             };
         }
