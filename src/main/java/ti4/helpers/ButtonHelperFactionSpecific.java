@@ -54,6 +54,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -2503,6 +2504,11 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
+        if (tile != null && tile.getTileModel() != null && tile.getTileModel().isHyperlane()
+            || FOWPlusService.isVoid(tile)) {
+            return false;
+        }
+
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
@@ -2526,9 +2532,6 @@ public class ButtonHelperFactionSpecific {
                 hs = p2.getHomeSystemTile();
             }
             if (hs != null && hs.getPosition().equalsIgnoreCase(tile.getPosition())) {
-                return false;
-            }
-            if (tile == null || tile.getRepresentationForButtons(game, player).toLowerCase().contains("hyperlane")) {
                 return false;
             }
         }

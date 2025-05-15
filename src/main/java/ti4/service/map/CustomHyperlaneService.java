@@ -63,7 +63,7 @@ public class CustomHyperlaneService {
         }
        
         if (hyperlaneTileButtons.isEmpty()) {
-            sb.append("No custom HL tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
+            sb.append("No HL tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
         } else {
             SortHelper.sortButtonsByTitle(hyperlaneTileButtons);
             hyperlaneTileButtons.add(Buttons.gray("customHyperlaneRefresh", "Refresh"));
@@ -299,5 +299,25 @@ public class CustomHyperlaneService {
             }
         }
         return false;
+    }
+
+    public static String getHyperlaneDataForTile(Tile tile, Game game) {
+        if (isCustomHyperlaneTile(tile)) {
+            return game.getCustomHyperlaneData().get(tile.getPosition());
+        }
+        return null;
+    }
+
+    public static void moveCustomHyperlaneData(String from, String to, Game game) {
+        moveCustomHyperlaneData(from, to, game, false);
+    }
+
+    public static void moveCustomHyperlaneData(String from, String to, Game game, boolean twoWays) {
+        Map<String, String> data = game.getCustomHyperlaneData();
+        String dataFrom = data.remove(from);
+        String dataTo = data.remove(to);
+
+        if (dataFrom != null) data.put(to, dataFrom);
+        if (twoWays && dataTo != null) data.put(from, dataTo);
     }
 }
