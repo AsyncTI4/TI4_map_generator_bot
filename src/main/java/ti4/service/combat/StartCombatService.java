@@ -810,6 +810,9 @@ public class StartCombatService {
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("yinagent")) {
                 buttons.add(Buttons.gray(finChecker + "yinagent_" + pos, "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yin Agent", FactionEmojis.Yin));
             }
+            if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("mirveda_flagship", agentHolder,tile) && isSpaceCombat) {
+                buttons.add(Buttons.gray(finChecker + "mirvedaFS_" + pos, "Place Fighter (Mirveda FS)", FactionEmojis.mirveda));
+            }
         }
 
         // Exo 2s

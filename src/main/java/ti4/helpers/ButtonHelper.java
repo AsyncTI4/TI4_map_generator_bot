@@ -6396,11 +6396,30 @@ public class ButtonHelper {
         game.setStoredValue("endTurnWhenSCFinished", sc + player.getFaction());
         ButtonHelper.deleteTheOneButton(event);
         ButtonHelper.deleteTheOneButton(event, "fleetLogWhenAllReactedTo_" + sc, true);
+        for (Player p2 : game.getRealPlayers()) {
+            if (!p2.hasFollowedSC(Integer.parseInt(sc))) {
+                return;
+            }
+        }
+        game.setStoredValue("endTurnWhenSCFinished", "");
+        Player p2 = game.getActivePlayer();
+        EndTurnService.endTurnAndUpdateMap(event, game, p2);
+
     }
 
     @ButtonHandler("fleetLogWhenAllReactedTo_")
     public static void fleetLogWhenAllReacted(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String sc = buttonID.split("_")[1];
+        List<Player> players = new ArrayList<>();
+        for (Player p2 : game.getRealPlayers()) {
+            if (!p2.hasFollowedSC(Integer.parseInt(sc))) {
+                players.add(p2);
+            }
+        }
+        if (players.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " everyone has already reacted. ");
+            return;
+        }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
             game.getPing() + " the active player has elected to move the game along after everyone has resolved **"
                 + Helper.getSCName(Integer.parseInt(sc), game)
