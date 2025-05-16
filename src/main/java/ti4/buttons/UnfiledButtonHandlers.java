@@ -2849,18 +2849,21 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("proceed_to_strategy")
     public static void proceedToStrategy(ButtonInteractionEvent event, Game game) {
-        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
-            PriorityTrackHelper.PrintPriorityTrack(game);
-            return;
+        String readiedCardsString = "All planets have been readied at the end of the agenda phase.";
+        if (game.isOmegaPhaseMode()) {
+            readiedCardsString = "All cards have been readied at the end of the omega phase.";
+            if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
+                PriorityTrackHelper.PrintPriorityTrack(game);
+                return;
+            }
         }
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             for (Player player_ : players.values()) {
                 RefreshCardsService.refreshPlayerCards(game, player_, false);
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "All planets have been readied at the end of the agenda phase.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), readiedCardsString);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Did not automatically ready planets due to _Checks and Balances_ resolving \"against\"."
