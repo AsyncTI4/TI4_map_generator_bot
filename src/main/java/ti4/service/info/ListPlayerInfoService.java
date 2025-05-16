@@ -241,6 +241,9 @@ public class ListPlayerInfoService {
             }
             msg.append(representSecrets(game)).append("\n");
             msg.append(representSupports(game)).append("\n");
+            if (gameHasMutablePoints(game)) {
+                msg.append(representMutablePoints(game)).append("\n");
+            }
             msg.append(representTotalVPs(game)).append("\n");
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
@@ -315,6 +318,37 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ").append(player.getSupportForTheThroneVictoryPoints()).append("/1  ");
+            }
+        }
+        return representation.toString();
+    }
+
+    public static String getMutablePointRepresentation(String objectiveId) {
+        return switch (objectiveId) {
+            case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne" -> objectiveId;
+            default -> null;
+        };
+    }
+
+    public static boolean gameHasMutablePoints(Game game) {
+        return game.getScoredPublicObjectives().keySet().stream()
+            .anyMatch(obj -> getMutablePointRepresentation(obj) != null);
+    }
+
+    public static String representMutablePoints(Game game) {
+        //TODO: Better name than hot potato
+        StringBuilder representation = new StringBuilder("__**Hot Potato Points**__\n> ");
+        if (!game.isFowMode()) {
+            for (var objective : game.getScoredPublicObjectives().entrySet()) {
+                String mutablePointRepresentation = getMutablePointRepresentation(objective.getKey());
+                if (mutablePointRepresentation == null) continue;
+
+                representation.append(mutablePointRepresentation).append(": ");
+                representation.append(objective.getValue().stream()
+                    .map(game::getPlayerFromColorOrFaction)
+                    .map(Player::getRepresentationNoPing)
+                    .reduce((a, b) -> a + ", " + b).orElse("Not currently held"));
+                representation.append("\n");
             }
         }
         return representation.toString();
