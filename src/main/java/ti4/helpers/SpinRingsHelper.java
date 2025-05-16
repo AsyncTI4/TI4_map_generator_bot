@@ -2,7 +2,9 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import lombok.experimental.UtilityClass;
@@ -10,6 +12,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.FowCommunicationThreadService;
 
 @UtilityClass
@@ -80,7 +83,9 @@ public class SpinRingsHelper {
     public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
         String[] customSpins = customSpinString.toLowerCase().split(" ");
         StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## ⚙️ " + randomStatusMessage());
+        
         List<Tile> tilesToSet = new ArrayList<>();
+        List<String[]> customHyperlanesToMove = new ArrayList<>();
 
         for (String spinString : customSpins) {
             Random random = new Random();
@@ -104,7 +109,7 @@ public class SpinRingsHelper {
             if (steps > 0) {
                 for (int x = 1; x < (ring * 6 + 1); x++) {
                     Tile tile = game.getTileByPosition(ring + (x < 10 ? "0" : "") + x);
-                    if (tile == null) {
+                    if (tile == null || FOWPlusService.isVoid(tile)) {
                         continue;
                     }
 
@@ -122,7 +127,11 @@ public class SpinRingsHelper {
                             pos = x - steps;
                         }
                     }
+                    String fromPosition = tile.getPosition();
                     tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
+                    if (game.getCustomHyperlaneData().get(fromPosition) != null) {
+                        customHyperlanesToMove.add(new String[]{fromPosition, tile.getPosition()});
+                    }
                     tilesToSet.add(tile);
                     updateHomeSystem(game, tile);
                 }
@@ -132,6 +141,14 @@ public class SpinRingsHelper {
 
         for (Tile tile : tilesToSet) {
             game.setTile(tile);
+        }
+        if (!customHyperlanesToMove.isEmpty()) {
+            Map<String, String> currentData = game.getCustomHyperlaneData();
+            Map<String, String> previousData = new HashMap<>(currentData);
+            for (String[] pair : customHyperlanesToMove) {
+                currentData.remove(pair[0]);
+                currentData.put(pair[1], previousData.get(pair[0]));
+            }
         }
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
@@ -164,7 +181,7 @@ public class SpinRingsHelper {
                 } else {
                     tile = game.getTileByPosition(y + "" + x);
                 }
-                if (tile == null) {
+                if (tile == null || FOWPlusService.isVoid(tile)) {
                     continue;
                 } 
 

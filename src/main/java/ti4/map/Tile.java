@@ -37,6 +37,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.map.CustomHyperlaneService;
 
 public class Tile {
     private final String tileID;
@@ -242,7 +243,7 @@ public class Tile {
     public List<Boolean> getHyperlaneData(Integer sourceDirection, Game game) {
         String property = Mapper.getHyperlaneData(tileID);
         if (property == null) {
-            property = game.getCustomHyperlaneData().get(position);
+            property = CustomHyperlaneService.getHyperlaneDataForTile(this, game);
         }
 
         if (property == null) {

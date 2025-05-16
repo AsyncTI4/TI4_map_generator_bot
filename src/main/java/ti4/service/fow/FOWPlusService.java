@@ -65,6 +65,10 @@ public class FOWPlusService {
         return game.getTileByPosition(position).getTileID().equals(VOID_TILEID);
     }
 
+    public static boolean isVoid(Tile tile) {
+        return tile != null && VOID_TILEID.equals(tile.getTileID());
+    }
+
     //Only return a void tile if looking for a valid position without a tile
     public static Tile voidTile(String position) {
         return PositionMapper.isTilePositionValid(position) ? new Tile(VOID_TILEID, position) : null;
