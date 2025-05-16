@@ -1057,7 +1057,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     }
 
     public static void movedNExplored(
-        ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonInteractionEvent event, Player player, String buttonID, Game game
+    ) {
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = false;
         if (bID.startsWith("dsdihmy_")) {
@@ -1164,14 +1165,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {
                 var speakerPlayer = game.getSpeaker();
-                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
+                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1, true);
                 if (!game.isFowMode() && game.getTableTalkChannel() != null) {
                     MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
                     ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
                 }
-                String message = "The next Objective has been revealed to " + MiscEmojis.SpeakerToken + speakerPlayer.getRepresentationNoPing() + ". When ready, proceed to the Strategy Phase.";
+                String message = "When ready, proceed to the Strategy Phase.";
                 Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
                     "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "The next Objective has been revealed to " + MiscEmojis.SpeakerToken + speakerPlayer.getRepresentationNoPing() + ".");
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), message, proceedToStrategyPhase);
             }
         }
