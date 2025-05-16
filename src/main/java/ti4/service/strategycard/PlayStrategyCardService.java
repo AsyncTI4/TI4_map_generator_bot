@@ -354,8 +354,8 @@ public class PlayStrategyCardService {
                         }
                     }
                 }
-                if (!p2.hasFollowedSC(scToPlay) && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + player.getFaction()).isEmpty()) {
-                    game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + player.getFaction());
+                if (!p2.hasFollowedSC(scToPlay) && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction()).isEmpty()) {
+                    game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
                         message.addReaction(reactionEmoji2).queue();

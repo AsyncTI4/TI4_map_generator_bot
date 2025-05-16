@@ -125,6 +125,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("saaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_saaragent", "Use Saar Agent", FactionEmojis.Saar));
         }
+        if (player.hasUnexhaustedLeader("belkoseaagent")) {
+            buttons.add(Buttons.gray("getAgentSelection_belkoseaagent", "Use Belkosea Agent", FactionEmojis.belkosea));
+        }
         if (player.hasUnexhaustedLeader("qhetagent")) {
             buttons.add(Buttons.gray("getAgentSelection_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
         }

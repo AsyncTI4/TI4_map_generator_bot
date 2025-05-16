@@ -929,6 +929,72 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
+    public static List<Button> getSuperWeaponButtonsPart1(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        for (String planetName : player.getPlanetsAllianceMode()) {
+            if (planetName.contains("custodia") || planetName.contains("ghoti")) {
+                continue;
+            }
+            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            if (planet == null) {
+                continue;
+            }
+            Tile tile = game.getTileFromPlanet(planetName);
+            if (tile == null) {
+                continue;
+            }
+            boolean hasSuperweapon = false;
+            for (String token : planet.getTokenList()) {
+                if (token.contains("superweapon")) {
+                    hasSuperweapon = true;
+                }
+            }
+            if (!hasSuperweapon) {
+                buttons.add(Buttons.gray(player.finChecker() + "superWeaponPart2_" + planetName,
+                    Helper.getPlanetRepresentation(planetName, game)));
+            }
+        }
+        return buttons;
+    }
+
+    @ButtonHandler("superWeaponPart2_")
+    public static void superWeaponButtonsPart2(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planetName = buttonID.split("_")[1];
+        List<Button> buttons = new ArrayList<>();
+
+        buttons.add(Buttons.gray(player.finChecker() + "superWeaponPart3_availyn" + planetName,
+            "Availyn"));
+        buttons.add(Buttons.gray(player.finChecker() + "superWeaponPart3_caled" + planetName,
+            "Caled"));
+        buttons.add(Buttons.gray(player.finChecker() + "superWeaponPart3_glatison" + planetName,
+            "Glatison"));
+        buttons.add(Buttons.gray(player.finChecker() + "superWeaponPart3_grom" + planetName,
+            "Grom"));
+        buttons.add(Buttons.gray(player.finChecker() + "superWeaponPart3_mors" + planetName,
+            "Mors"));
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " Please pick what superweapon you would like on your planet. Note that you can only have one of each superweapon but can remove superweapons from unlocked systems if you want to rebuild them somewhere else.", buttons);
+
+    }
+
+    @ButtonHandler("superWeaponPart3_")
+    public static void superWeaponButtonsPart3(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String planetName = buttonID.split("_")[2];
+        String superweaponName = buttonID.split("_")[1];
+
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " put the superweapon " + StringUtils.capitalize(superweaponName) + " on the planet " + Helper.getPlanetName(planetName) + " for a cost of 5 resources or influence");
+        List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
+        Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
+        buttons.add(DoneExhausting);
+        player.addRelic("superweapon" + superweaponName);
+        CommanderUnlockCheckService.checkPlayer(player, "belkosea");
+        Tile tile = game.getTileFromPlanet(planetName);
+        tile.addToken("attachment_superweapon_" + superweaponName, planetName);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Use Buttons to Pay 5 influence or resources for the superweapon", buttons);
+    }
+
     @ButtonHandler("resolveShipOrder_")
     public static void resolveAxisOrderExhaust(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String order = buttonID.split("_")[1];

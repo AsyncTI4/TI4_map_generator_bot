@@ -50,7 +50,6 @@ import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
-import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
@@ -1084,6 +1083,39 @@ public class ButtonHelperHeroes {
 
         MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         game.setStoredValue("mentakHero", player.getFaction());
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("refreshBelkoseaHero")
+    public static void refreshBelkoseaHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Leader playerLeader = player.unsafeGetLeader("belkoseahero");
+        if (playerLeader == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getFactionEmoji() + "You don't have the Belkosea hero.");
+            return;
+        }
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" refreshed ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        playerLeader.setExhausted(false);
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+        ButtonHelper.deleteTheOneButton(event);
+
+    }
+
+    @ButtonHandler("exhaustBelkoseaHero")
+    public static void exhaustBelkoseaHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Leader playerLeader = player.unsafeGetLeader("belkoseahero");
+        if (playerLeader == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getFactionEmoji() + "You don't have the Belkosea hero.");
+            return;
+        }
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" exhausted ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        playerLeader.setExhausted(true);
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
         ButtonHelper.deleteTheOneButton(event);
     }
 

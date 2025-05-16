@@ -1690,7 +1690,7 @@ public class Helper {
         }
 
         if (!"arboCommander".equalsIgnoreCase(warfareNOtherstuff) && !"arboHeroBuild".equalsIgnoreCase(warfareNOtherstuff) && !"freelancers".equalsIgnoreCase(warfareNOtherstuff)
-            && !"sling".equalsIgnoreCase(warfareNOtherstuff) && !warfareNOtherstuff.contains("integrated")
+            && !"sling".equalsIgnoreCase(warfareNOtherstuff) && !"muaatagent".equalsIgnoreCase(warfareNOtherstuff) && !warfareNOtherstuff.contains("integrated")
             && !"chaosM".equalsIgnoreCase(warfareNOtherstuff)) {
 
             if (player.hasUnexhaustedLeader("argentagent")) {

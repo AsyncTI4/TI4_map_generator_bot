@@ -1924,6 +1924,13 @@ public class ButtonHelper {
                 || (p.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasAbility("byssus")))) {
                 count++;
             }
+            if (p != null) {
+                for (String token : p.getTokenList()) {
+                    if (player.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
+                        count++;
+                    }
+                }
+            }
         }
         return count;
     }
@@ -1939,6 +1946,14 @@ public class ButtonHelper {
                 || p.getUnitCount(UnitType.Pds, player.getColor()) > 0
                 || (p.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasAbility("byssus")))) {
                 planets.add(planet);
+                continue;
+            }
+            if (p != null) {
+                for (String token : p.getTokenList()) {
+                    if (player.getPlanets().contains(p.getName()) && token.contains("superweapon")) {
+                        planets.add(planet);
+                    }
+                }
             }
         }
         return planets;
@@ -3202,6 +3217,9 @@ public class ButtonHelper {
         if (player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")) {
             endButtons.add(Buttons.green(finChecker + "exhaustTech_bs", "Exhaust Bio-Stims"));
         }
+        if (player.getTechs().contains("dsbelky") && !player.getExhaustedTechs().contains("dsbelky")) {
+            endButtons.add(Buttons.green(finChecker + "exhaustTech_dsbelky", "Exhaust Synchrony Matrix", FactionEmojis.belkosea));
+        }
         // dsceldr
         if (player.getTechs().contains("dsceldr") && !player.getExhaustedTechs().contains("dsceldr")
             && player.getStrategicCC() > 0) {
@@ -4299,6 +4317,9 @@ public class ButtonHelper {
         if (player.hasUnexhaustedLeader("saaragent")) {
             buttons.add(Buttons.gray("exhaustAgent_saaragent", "Use Saar Agent", FactionEmojis.Saar));
         }
+        if (player.hasUnexhaustedLeader("belkoseaagent")) {
+            buttons.add(Buttons.gray("exhaustAgent_belkoseaagent", "Use Belkosea Agent", FactionEmojis.belkosea));
+        }
         Tile tile = game.getTileByPosition(game.getActiveSystem());
         if (player.hasUnexhaustedLeader("qhetagent") && !tile.isHomeSystem() && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             buttons.add(Buttons.gray("exhaustAgent_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
@@ -4552,7 +4573,7 @@ public class ButtonHelper {
                         buttons.add(validTile2);
                     }
                 }
-                if ((player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2"))
+                if ((player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2") || player.hasUnit("belkosea_fighter") || player.hasUnit("belkosea_fighter2"))
                     && tile.getUnitHolders().get("space").getUnits() != null
                     && tile.getUnitHolders().get("space").getUnitCount(fs, colorID) > 0
                     && tile.getUnitHolders().get("space").getUnitCount(ff, colorID) > 0) {
