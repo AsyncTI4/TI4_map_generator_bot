@@ -55,7 +55,7 @@ public class StatusHelper {
 
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
-        GMService.logPlayerActivity(game, null, "**StatusScoring** Phase for Round " + game.getRound() + " started.", null, true);
+        GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
         for (Player player : game.getRealPlayers()) {
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             List<String> relics = new ArrayList<>(player.getRelics());

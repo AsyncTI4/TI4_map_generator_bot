@@ -1373,7 +1373,7 @@ public class AgendaHelper {
         }
         String summary2 = getSummaryOfVotes(game, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
-        GMService.logPlayerActivity(game, null, getSummaryOfVotes(game, true, true));
+        GMService.logActivity(game, getSummaryOfVotes(game, true, true), false);
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
@@ -3468,7 +3468,7 @@ public class AgendaHelper {
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
             if (aCount == 1) {
-                GMService.logPlayerActivity(game, null, "**Agenda** Phase for Round " + game.getRound() + " started.", null, true);
+                GMService.logActivity(game, "**Agenda** Phase for Round " + game.getRound() + " started.", true);
                 FowCommunicationThreadService.checkAllCommThreads(game);
             }
         } else {
