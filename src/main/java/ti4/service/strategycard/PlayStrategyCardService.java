@@ -267,18 +267,7 @@ public class PlayStrategyCardService {
                     .findFirst()
                     .orElse(null);
                 if (raHolder != null && raHolder != raOwner) {
-                    List<Player> playersInOrder;
-                    if (!game.isOmegaPhaseMode()) {
-                        playersInOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
-                    } else {
-                        if (game.getPhaseOfGame().contains("agenda")) {
-                            playersInOrder = Helper.getSpeakerOrPriorityOrder(game);
-                        } else {
-                            playersInOrder = game.getActionPhaseTurnOrder();
-                        }
-                        Collections.rotate(playersInOrder, -playersInOrder.indexOf(player));
-                    }
-                    //index of raOwner
+                    List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
                     int raOwnerIndex = playersInOrder.indexOf(raOwner);
                     int raHolderIndex = playersInOrder.indexOf(raHolder);
                     if (raHolderIndex < raOwnerIndex) {
@@ -424,6 +413,23 @@ public class PlayStrategyCardService {
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
+                    //QUESTION: Do we want this actually all the time?
+                    if (game.isOmegaPhaseMode()) {
+                        List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
+                        StringBuilder playerOrder = new StringBuilder("__Order for performing the Secondary ability:__\n");
+                        for (int i = 0; i < playersInOrder.size(); i++) {
+                            playerOrder.append("`").append(i + 1).append(".` ");
+                            if (game.getPhaseOfGame() == "action") {
+                                playerOrder.append(CardEmojis.getSCFrontFromInteger(playersInOrder.get(i).getLowestSC()));
+                            }
+                            playerOrder.append(playersInOrder.get(i).getRepresentationNoPing());
+                            if (playersInOrder.get(i).isSpeaker()) {
+                                playerOrder.append(MiscEmojis.SpeakerToken);
+                            }
+                            playerOrder.append("\n");
+                        }
+                        MessageHelper.sendMessageToChannel(m5, playerOrder.toString());
+                    }
                 }
 
                 if (scModel.usesAutomationForSCID("pok5trade")) {
@@ -541,17 +547,7 @@ public class PlayStrategyCardService {
         game.setStoredValue(key, "");
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
-        List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
-            players = Helper.getSpeakerOrPriorityOrderFromPlayer(imperialHolder, game);
-        } else {
-            if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
-            } else {
-                players = game.getActionPhaseTurnOrder();
-            }
-            Collections.rotate(players, -players.indexOf(imperialHolder));
-        }
+        List<Player> players = getPlayersInFollowOrder(game, imperialHolder);
         if (game.isQueueSO()) {
             for (Player player : players) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
@@ -565,6 +561,21 @@ public class PlayStrategyCardService {
                 }
             }
         }
+    }
+
+    private static List<Player> getPlayersInFollowOrder(Game game, Player player) {
+        List<Player> players;
+        if (!game.isOmegaPhaseMode()) {
+            players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        } else {
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getSpeakerOrPriorityOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
+            Collections.rotate(players, -players.indexOf(player));
+        }
+        return players;
     }
 
     private static List<Button> getLeadershipButtons(int sc) {
