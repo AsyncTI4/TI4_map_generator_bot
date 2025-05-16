@@ -182,7 +182,7 @@ public class TransactionHelper {
                     case "starCharts" -> trans.append(Mapper.getRelic(furtherDetail).getName()).append(SourceEmojis.DiscordantStars);
                     case "ACs" -> {
                         switch (furtherDetail) {
-                            case "generic" -> trans.append(amountToTransact).append(" ").append(CardEmojis.ActionCard).append(" to be specified verbally");
+                            case "generic" -> trans.append(amountToTransact).append(" ").append(CardEmojis.ActionCard).append(" to be specified by player");
                             default -> {
                                 int acNum = Integer.parseInt(furtherDetail);
                                 String acID = null;
@@ -206,7 +206,7 @@ public class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
-                                    trans.append(amountToTransact).append(" ").append(CardEmojis.PN).append(" to be specified verbally");
+                                    trans.append(amountToTransact).append(" ").append(CardEmojis.PN).append(" to be specified by player");
                                 } else {
                                     trans.append(CardEmojis.PN);
                                 }
@@ -651,7 +651,7 @@ public class TransactionHelper {
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
                     .setPlaceholder("Edit your deals details here.")
-                    .setValue("I propose that")
+                    .setValue("The deal is that")
                     .build();
                 Modal modal = Modal.create(modalId, "Deal Details").addActionRow(summary).build();
                 event.replyModal(modal).queue();

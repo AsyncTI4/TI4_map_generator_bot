@@ -157,13 +157,16 @@ public class AddPlanetService {
                     Set<String> tokens = new HashSet<>();
                     tokens.addAll(unitHolder.getTokenList());
                     for (String token : tokens) {
-                        if (token.contains("facility")) {
+                        if (token.contains("facility") || token.contains("superweapon")) {
                             unitHolder.removeToken(token);
                             if (token.contains("embassy")) {
                                 ButtonHelperSCs.updateEmbassies(game, player_, tile);
                             }
                             if (token.contains("logistics")) {
                                 player_.setCommoditiesTotal(player_.getCommoditiesTotal() - 1);
+                            }
+                            if (token.contains("superweapon")) {
+                                player_.removeRelic(token.replace(".png", ""));
                             }
                         }
                     }

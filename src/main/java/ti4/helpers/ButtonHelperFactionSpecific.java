@@ -799,6 +799,32 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    public static void rollForBelkoseaPN(Player player) {
+        String result = player.getFactionEmojiOrColor() + " rolling for belkosea PN:\n";
+        // Actually roll for each unit
+        int totalHits = 0;
+        StringBuilder resultBuilder = new StringBuilder(result);
+
+        int toHit = 8;
+        int modifierToHit = 0;
+        int extraRollsForUnit = 0;
+        int numRollsPerUnit = 1;
+        int numRolls = 4;
+        List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+        player.setExpectedHitsTimes10(
+            player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+        int hitRolls = DiceHelper.countSuccesses(resultRolls);
+        totalHits += hitRolls;
+        String unitRoll = CombatMessageHelper.displayUnitRoll(player.getUnitByBaseType("fs"), toHit, modifierToHit, 1,
+            numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+        resultBuilder.append(unitRoll);
+
+        result = resultBuilder.toString();
+        result += CombatMessageHelper.displayHitResults(totalHits);
+        player.setActualHits(player.getActualHits() + totalHits);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result + "\nPlease assign any hits using the assign hits button in the combat thread. Remember these hits only apply against infantry or fighters.");
+    }
+
     public static void checkForNaaluPN(Game game) {
         game.setStoredValue("Play Naalu PN", "");
         for (Player player : game.getRealPlayers()) {
@@ -2293,13 +2319,12 @@ public class ButtonHelperFactionSpecific {
                 break;
             }
         }
-        boolean removed = false;
+        boolean damaged = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             int count = uH.getUnitCount(UnitType.Mech, player.getColor())
                 - uH.getDamagedUnitCount(UnitType.Mech, player.getColorID());
-
-            if (count > 0 && !removed) {
-                removed = true;
+            if (count > 0 && !damaged) {
+                damaged = true;
                 uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
                 sb.append("\n ").append(player.getFactionEmoji()).append(" damaged 1 mech on ")
                     .append(tile.getRepresentation()).append("(").append(uH.getName()).append(")");
@@ -2309,6 +2334,33 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "nivyn");
         event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("becomeDamaged_")
+    public static void becomeDamaged(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String tilePos = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(tilePos);
+        StringBuilder sb = new StringBuilder(player.getRepresentation());
+        UnitHolder uH = tile.getSpaceUnitHolder();
+        uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+        sb.append(" damaged their " + unit + " in ").append(tile.getRepresentation());
+        if (unit.equalsIgnoreCase("flagship")) {
+            if (player.ownsUnit("belkosea_flagship")) {
+                sb.append(" to produce 1 hit against the opponents non-fighter ships.");
+                ButtonHelperModifyUnits.resolveAssaultCannonNDihmohnCommander("id_belkosea_" + tilePos, event, player, game);
+            }
+            if (player.ownsUnit("kortali_flagship")) {
+                sb.append(" to gain 1 command counter.");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " can gain 1 command token due to self-damaging the Kortali Flagship");
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain 1 command token.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("creussMechStep2_")
