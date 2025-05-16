@@ -3468,6 +3468,7 @@ public class AgendaHelper {
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
             if (aCount == 1) {
+                GMService.logPlayerActivity(game, null, "**Agenda** Phase for Round " + game.getRound() + " started.", null, true);
                 FowCommunicationThreadService.checkAllCommThreads(game);
             }
         } else {
