@@ -32,7 +32,10 @@ public class FinishDraftService {
         List<String> valid = flavors.stream().filter(Predicate.not(manager::isFactionTaken)).toList();
         String preset = game.getStoredValue("keleresFlavorPreset");
         if (valid.contains(preset)) return Mapper.getFaction("keleres" + preset.charAt(0));
-        if (valid.size() == 1) return Mapper.getFaction(valid.getFirst());
+        if (valid.size() == 1) {
+            preset = valid.getFirst();
+            return Mapper.getFaction("keleres" + preset.charAt(0));
+        }
         return null;
     }
 
