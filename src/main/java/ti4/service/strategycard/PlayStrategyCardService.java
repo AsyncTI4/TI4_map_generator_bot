@@ -259,6 +259,36 @@ public class PlayStrategyCardService {
             }
         }
 
+        if (scModel.usesAutomationForSCID("pok7technology")) {
+            Player raOwner = game.getPNOwner("ra");
+            if (raOwner != null && playersToFollow.contains(raOwner)) {
+                Player raHolder = game.getRealPlayers().stream()
+                    .filter(p -> p.getPromissoryNotes().containsKey("ra"))
+                    .findFirst()
+                    .orElse(null);
+                if (raHolder != null && raHolder != raOwner) {
+                    List<Player> playersInOrder;
+                    if (!game.isOmegaPhaseMode()) {
+                        playersInOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+                    } else {
+                        if (game.getPhaseOfGame().contains("agenda")) {
+                            playersInOrder = Helper.getSpeakerOrPriorityOrder(game);
+                        } else {
+                            playersInOrder = game.getActionPhaseTurnOrder();
+                        }
+                        Collections.rotate(playersInOrder, -playersInOrder.indexOf(player));
+                    }
+                    //index of raOwner
+                    int raOwnerIndex = playersInOrder.indexOf(raOwner);
+                    int raHolderIndex = playersInOrder.indexOf(raHolder);
+                    if (raHolderIndex < raOwnerIndex) {
+                        MessageHelper.sendMessageToChannel(raHolder.getCardsInfoThread(),
+                            "If you get a chance to play Research Agreement from the " + scModel.getName() + " strategy card, reminder that you must choose any techs you research before you can gain theirs.");
+                    }
+                }
+            }
+        }
+
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         Button deleteButton = Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action");
