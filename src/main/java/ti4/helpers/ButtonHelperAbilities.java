@@ -55,6 +55,13 @@ public class ButtonHelperAbilities {
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("mirvedaFS_")
+    public static void mirvedaFS(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), "ff");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " placed 1 fighter in the active system after using the Mirveda flagship ability at the end of a round of space combat.");
+    }
+
     @ButtonHandler("blackOps_")
     public static void blackOps(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
