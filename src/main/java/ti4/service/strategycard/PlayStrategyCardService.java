@@ -38,6 +38,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.turn.StartTurnService;
@@ -419,8 +420,10 @@ public class PlayStrategyCardService {
                         StringBuilder playerOrder = new StringBuilder("__Order for performing the Secondary ability:__\n");
                         for (int i = 0; i < playersInOrder.size(); i++) {
                             playerOrder.append("`").append(i + 1).append(".` ");
-                            if (game.getPhaseOfGame() == "action") {
-                                playerOrder.append(CardEmojis.getSCFrontFromInteger(playersInOrder.get(i).getLowestSC()));
+                            if (game.getPhaseOfGame().equals("action")) {
+                                int lowestSC = playersInOrder.get(i).getLowestSC();
+                                TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
+                                playerOrder.append(scEmoji);
                             }
                             playerOrder.append(playersInOrder.get(i).getRepresentationNoPing());
                             if (playersInOrder.get(i).isSpeaker()) {
