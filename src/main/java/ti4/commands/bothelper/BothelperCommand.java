@@ -14,22 +14,23 @@ import ti4.helpers.Constants;
 public class BothelperCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new CreateGameChannels(),
-                    new CreateFOWGameChannels(),
-                    new ServerLimitStats(),
-                    new ArchiveOldThreads(),
-                    new FixGameChannelPermissions(),
-                    new ListCategoryChannelCounts(),
-                    new BeginVideoGeneration(),
-                    new JazzCommand(),
-                    new ListButtons(),
-                    new ReloadGame(),
-                    new ServerGameStats(),
-                    new ListDeadGames(),
-                    new RemoveTitle(),
-                    new CheckNextPingTime(),
-                    new ListSlashCommandsUsed())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new CreateGameChannels(),
+        new CreateFOWGameChannels(),
+        new ServerLimitStats(),
+        new ArchiveOldThreads(),
+        new FixGameChannelPermissions(),
+        new ListCategoryChannelCounts(),
+        new BeginVideoGeneration(),
+        new JazzCommand(),
+        new ListButtons(),
+        new ReloadGame(),
+        new ServerGameStats(),
+        new ListDeadGames(),
+        new RemoveTitle(),
+        new CheckNextPingTime(),
+        new ListSlashCommandsUsed(),
+        new ReserveGame() //
+    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {

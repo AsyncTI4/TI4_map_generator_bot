@@ -324,6 +324,7 @@ public class Mapper {
         return TileHelper.getAllTileModels().stream()
             .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
             .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
+            .filter(tileModel -> !tileModel.isHyperlane())
             .filter(TileModel::isEmpty)
             .map(TileModel::getId)
             .toList();
@@ -338,6 +339,13 @@ public class Mapper {
 
     public static String getHyperlaneData(String tileID) {
         return hyperlaneAdjacencies.getProperty(tileID);
+    }
+
+    public static String getHyperlaneTileId(String hyperlaneData) {
+        return hyperlaneAdjacencies.stringPropertyNames().stream()
+            .filter(key -> hyperlaneData.equals(hyperlaneAdjacencies.getProperty(key)))
+            .findFirst()
+            .orElse(null);
     }
 
     public static Set<String> getWormholes(String tileID) {

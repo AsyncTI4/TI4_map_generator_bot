@@ -391,7 +391,7 @@ public class ButtonHelperModifyUnits {
 
     private static boolean shouldProcessUnit(Player player, String unitType, UnitHolder units, int hits) {
         return switch (unitType) {
-            case "fighter" -> hits > 0 && (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2")) && units.getUnitCount(UnitType.Fighter, player.getColor()) > 0;
+            case "fighter" -> hits > 0 && (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2") || player.hasUnit("belkosea_fighter") || player.hasUnit("belkosea_fighter2")) && units.getUnitCount(UnitType.Fighter, player.getColor()) > 0;
             case "infantry" -> hits > 0;
             case "pds" -> hits > 0 && (player.hasUnit("titans_pds") || player.hasUnit("titans_pds2")) && units.getUnitCount(UnitType.Pds, player.getColor()) > 0;
             default -> false;
@@ -1100,7 +1100,7 @@ public class ButtonHelperModifyUnits {
             if (damaged) {
                 dmg = "damaged ";
             }
-            msg = player.getRepresentation() + " lost a " + dmg + unitModel.getBaseType() + " to your opponent's Exotrireme II ability.";
+            msg = player.getRepresentation() + " lost a " + dmg + unitModel.getBaseType() + " to your opponent's ability.";
             var parsedUnit = new ParsedUnit(key, 1, Constants.SPACE);
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             ButtonHelperFactionSpecific.cabalEatsUnitIfItShould(player, game, player, 1, unitName, event, tile, tile.getSpaceUnitHolder());
@@ -1790,6 +1790,13 @@ public class ButtonHelperModifyUnits {
             msg = player.getRepresentation() + " choose which opposing unit to destroy";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to choose 2 opposing ships to destroy. This occurs after any retreats. The dread has been removed.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+        } else if (cause.contains("caled")) {
+            buttons = getOpposingUnitsToHit(player, game, event, tile, true);
+            msg = player.getRepresentation() + " choose which opposing unit to destroy";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of opposing ships using the Superweapon Caled ability. Note that the bot did not check if a straight line unimpeded by anomalies existed between the Caled system and the active system.");
+        } else if (cause.contains("belkosea")) {
+            msg = opponent.getRepresentationUnfogged() + " your opponent used the Belkosea flagship to produce a hit against your non-fighter ships. Please assign it with buttons.";
+            buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "combat");
         } else {
             msg = opponent.getRepresentationUnfogged() + " your opponent used _Assault Cannon_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");

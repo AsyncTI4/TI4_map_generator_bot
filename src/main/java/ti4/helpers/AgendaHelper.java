@@ -72,6 +72,7 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -444,7 +445,7 @@ public class AgendaHelper {
                         }
 
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                            "The game is currently waiting on " + num + " people to decide on \"whens\".");
+                            "The game is currently waiting on " + pluralPerson(num) + " to decide on \"whens\".");
                     } else {
                         game.setStoredValue("queuedWhens",
                             game.getStoredValue("queuedWhens").replace(player.getFaction() + "_", ""));
@@ -509,7 +510,7 @@ public class AgendaHelper {
                             num++;
                         }
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                            "The game is currently waiting on " + num + " people to decide on \"afters\".");
+                            "The game is currently waiting on " + pluralPerson(num) + " to decide on \"afters\".");
                         return; // The person up has not yet decided whether to queue or not queue an after
                     } else {
                         game.setStoredValue("queuedAfters",
@@ -672,12 +673,17 @@ public class AgendaHelper {
             }
         }
         String msg = player.getRepresentation(true, false)
-            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ";
+            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + pluralPerson(num) + "). They have been pinged in their private thread. ";
         if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
-            msg += "The " + AgendaHelper.getPlayersWhoNeedToPreVoted(game).size() + " who still need to decide on voting were also reminded";
+            msg += "The " + pluralPerson(AgendaHelper.getPlayersWhoNeedToPreVoted(game).size()) + " who still need to decide on voting were also reminded";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
+    }
+
+    private static String pluralPerson(int num) {
+        String result = num + ((num > 1) ? " people" : " person");
+        return result;
     }
 
     @ButtonHandler("queueAWhen")
@@ -1144,7 +1150,7 @@ public class AgendaHelper {
                     if (getPlayersWhoNeedToPreVoted(game).isEmpty()) {
                         startTheVoting(game);
                     } else {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Game needs " + getPlayersWhoNeedToPreVoted(game).size() + " more people to pre-vote before voting will start");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Game needs " + pluralPerson(getPlayersWhoNeedToPreVoted(game).size()) + " to pre-vote before voting will start");
                     }
                 }
 
@@ -1369,12 +1375,7 @@ public class AgendaHelper {
         }
         String summary2 = getSummaryOfVotes(game, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
-        if (game.isFowMode()) {
-            Player gm = game.getPlayersWithGMRole().getFirst();
-            if (gm != null) {
-                MessageHelper.sendMessageToChannel(gm.getCardsInfoThread(), getSummaryOfVotes(game, true, true));
-            }
-        }
+        GMService.logActivity(game, getSummaryOfVotes(game, true, true), false);
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
@@ -3467,6 +3468,7 @@ public class AgendaHelper {
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
             if (aCount == 1) {
+                GMService.logActivity(game, "**Agenda** Phase for Round " + game.getRound() + " started.", true);
                 FowCommunicationThreadService.checkAllCommThreads(game);
             }
         } else {
@@ -3647,18 +3649,6 @@ public class AgendaHelper {
                     player.getRepresentationUnfogged()
                         + " you have Quaxdol Junitas, the Florzen commander, and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
-            }
-            if (!action && aCount == 1 && player.hasTech("dsrohdy")) {
-                TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-                    + " you have " + dsrohdy.getRepresentation(false) + " and may choose a player.\n"
-                    + "They must produce 1 ship in a system that contains 1 or more of their space docks or war suns.");
-                for (String tech : player.getTechs()) {
-                    if (Mapper.getTech(tech).isUnitUpgrade()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "",
-                            ButtonHelperModifyUnits.getContractualObligationsButtons(game, player));
-                    }
-                }
             }
         }
         if (!game.isFowMode() && !action) {
