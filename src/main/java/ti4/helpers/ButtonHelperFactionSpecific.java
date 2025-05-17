@@ -816,7 +816,7 @@ public class ButtonHelperFactionSpecific {
             player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
         int hitRolls = DiceHelper.countSuccesses(resultRolls);
         totalHits += hitRolls;
-        String unitRoll = CombatMessageHelper.displayUnitRoll(player.getUnitByBaseType("fs"), toHit, modifierToHit, 1,
+        String unitRoll = CombatMessageHelper.displayUnitRoll(player.getUnitByID("belkosea_flagship"), toHit, modifierToHit, 1,
             numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
         resultBuilder.append(unitRoll);
 
@@ -824,6 +824,7 @@ public class ButtonHelperFactionSpecific {
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result + "\nPlease assign any hits using the assign hits button in the combat thread. Remember these hits only apply against infantry or fighters.");
+
     }
 
     public static void checkForNaaluPN(Game game) {

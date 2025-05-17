@@ -124,6 +124,10 @@ public class PlayerTechService {
                 ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(game, event, player, false);
                 deleteTheOneButtonIfButtonEvent(event);
             }
+            case "dsbelky" -> {
+                ButtonHelper.sendAllAgentsAndAbilitiesToReady(game, event, player);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
             case "gls" -> { // Graviton
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
                     + " exhausted _Graviton Laser System_. The auto-assign hits button for SPACE CANNON OFFENSE fire will now kill fighters last.");

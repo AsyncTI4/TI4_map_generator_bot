@@ -905,7 +905,7 @@ public class StartCombatService {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));
         }
-        if (p1.hasAbility("superweaponcaled")) {
+        if (p1.hasRelicReady("superweaponcaled")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));
         }
@@ -913,7 +913,7 @@ public class StartCombatService {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_availyn_" + tile.getPosition(), "Move 3 Fighters With Availyn", FactionEmojis.belkosea));
         }
-        if (p1.hasAbility("superweaponavailyn")) {
+        if (p1.hasRelicReady("superweaponavailyn")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_availyn_" + tile.getPosition(), "Move 3 Fighters With Availyn", FactionEmojis.belkosea));
         }

@@ -134,7 +134,6 @@
         "name": "Superweapon Availyn",
         "imagePath": "attachment_superweapon_availyn.png",
         "isFakeAttachment": true,
-        "isNebula": true,
         "source": "ds"
     },
     {

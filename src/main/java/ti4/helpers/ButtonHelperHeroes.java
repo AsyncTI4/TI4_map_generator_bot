@@ -1098,7 +1098,7 @@ public class ButtonHelperHeroes {
             .append(Helper.getLeaderFullRepresentation(playerLeader));
         playerLeader.setExhausted(false);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         ButtonHelper.deleteTheOneButton(event);
 
     }
