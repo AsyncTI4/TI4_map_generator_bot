@@ -225,7 +225,9 @@ public class MessageListener extends ListenerAdapter {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.getGame().isHiddenAgendaMode() && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
             Player player = getPlayer(event, managedGame.getGame());
-            if (player == null || !player.isRealPlayer() || managedGame.isFowMode() && event.getChannel().equals(player.getPrivateChannel())) {
+            if (player == null || !player.isRealPlayer() 
+                || event.getChannel().getId().equals(player.getCardsInfoThreadID())
+                || managedGame.isFowMode() && event.getChannel().equals(player.getPrivateChannel())) {
                 return false;
             }
             if (!player.isSpeaker()) {

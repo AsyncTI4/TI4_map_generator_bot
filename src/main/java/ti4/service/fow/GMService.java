@@ -102,6 +102,10 @@ public class GMService {
         return "";
     }
 
+    public static void logActivity(Game game,String eventLog, boolean ping) {
+        logPlayerActivity(game, null, eventLog, null, ping);
+    }
+
     public static void logPlayerActivity(Game game, Player player, String eventLog) {
         logPlayerActivity(game, player, eventLog, null, false);
     }

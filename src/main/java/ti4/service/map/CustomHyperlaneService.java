@@ -149,7 +149,7 @@ public class CustomHyperlaneService {
     public static void editHyperlaneData(ButtonInteractionEvent event, String buttonID, Game game) {
         String position = StringUtils.substringBetween(buttonID, "customHyperlaneEdit_", "~MDL");
 
-        TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Matrix (empty to remove)", TextInputStyle.PARAGRAPH)
+        TextInput.Builder data = TextInput.create(Constants.SETTING_VALUE, "Hyperlane Matrix (clear to delete)", TextInputStyle.PARAGRAPH)
             .setPlaceholder("0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0")
             .setValue("0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0;\n0,0,0,0,0,0")
             .setRequired(false)
