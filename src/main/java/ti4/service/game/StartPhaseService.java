@@ -700,14 +700,10 @@ public class StartPhaseService {
             nextPlayer.setInRoundTurnCount(1);
         }
         if (isFowPrivateGame) {
-            String msgExtra = "Start phase command run";
-            String fail = "User for next faction not found. Report to ADMIN";
-            String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(nextPlayer, game, event, msgExtra, fail, success);
             if (game.isShowBanners()) {
                 BannerGenerator.drawFactionBanner(nextPlayer);
             }
-            msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
+            String msgExtra = nextPlayer.getRepresentationUnfogged() + ", it is now your turn (your "
                 + StringHelper.ordinal(nextPlayer.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             game.updateActivePlayer(nextPlayer);
 
