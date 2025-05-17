@@ -185,9 +185,8 @@ public class CreateFoWGameService {
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
         HomebrewService.offerGameHomebrewButtons(gmChannel);
-        GMService.logPlayerActivity(newGame, null,
-            "This thread will log player slash commands and other activities.",
-            "If you don't care to follow this, just remove yourself from the thread.", true);
+        GMService.logActivity(newGame, "This thread will log player slash commands and other activities.\n"
+            + " If you don't care to follow this, just remove yourself from the thread.", true);
 
         // Individual player channels
         String privateChannelIntro = getInfoTextFromFile("FoWPrivateChannelIntro.txt");

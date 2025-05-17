@@ -813,6 +813,11 @@ public class ExploreService {
                 message = "Card has been added to play area.\nAdded as a relic (not actually a relic)";
                 MessageHelper.sendMessageToEventChannel(event, message);
             }
+            case "suspiciouswreckage" -> {
+                Button button = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1", "Resolve Suspicious Wreckage");
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
+            }
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
