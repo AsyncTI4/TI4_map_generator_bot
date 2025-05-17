@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,7 +21,9 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
+import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -62,16 +65,18 @@ public class CustomHyperlaneService {
             }
         }
        
-        if (hyperlaneTileButtons.isEmpty()) {
-            sb.append("No HL tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
-        } else {
+        if (!hyperlaneTileButtons.isEmpty()) {
             SortHelper.sortButtonsByTitle(hyperlaneTileButtons);
-            hyperlaneTileButtons.add(Buttons.gray("customHyperlaneRefresh", "Refresh"));
             hyperlaneTileButtons.add(Buttons.gray("customHyperlaneImport~MDL", "Import"));
             hyperlaneTileButtons.add(Buttons.gray("customHyperlaneExport", "Export"));
-            hyperlaneTileButtons.add(Buttons.DONE_DELETE_BUTTONS);
+        } else {
+            sb.append("No HL tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
         }
-
+        
+        hyperlaneTileButtons.add(Buttons.gray("customHyperlaneRefresh", "Refresh"));
+        hyperlaneTileButtons.add(Buttons.gray("customHyperlaneTransform~MDL", "Transform"));
+        hyperlaneTileButtons.add(Buttons.DONE_DELETE_BUTTONS);
+        
         if (originalMessageId == null) {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), sb.toString(), hyperlaneTileButtons);
         } else {
@@ -190,6 +195,91 @@ public class CustomHyperlaneService {
         }
 
         offerManageHyperlaneButtons(game, event, origMessageId);
+    }
+
+    @ButtonHandler("customHyperlaneTransform~MDL")
+    public static void transformHyperlane(ButtonInteractionEvent event, Game game) {
+        TextInput.Builder data1 = TextInput.create("staticToCustom", "Static -> Custom", TextInputStyle.SHORT)
+            .setPlaceholder("Comma separated positions or ALL")
+            .setRequired(false);
+        TextInput.Builder data2 = TextInput.create("customToStatic", "Custom -> Static", TextInputStyle.SHORT)
+            .setPlaceholder("Comma separated positions or ALL")
+            .setRequired(false);
+
+        Modal modal = Modal.create("customHyperlaneTransformExecute", "Transform Hyperlanes")
+            .addActionRow(data1.build())
+            .addActionRow(data2.build())
+            .build();
+
+        event.replyModal(modal).queue();
+    }
+
+    @ModalHandler("customHyperlaneTransformExecute")
+    public static void transformHyperlaneExecute(ModalInteractionEvent event, Player player, Game game) {
+        String staticToCustom = event.getValue("staticToCustom").getAsString();
+        String customToStatic = event.getValue("customToStatic").getAsString();
+
+        StringBuilder success = new StringBuilder();
+        StringBuilder failed = new StringBuilder();
+
+        //From Static to Custom
+        if (!StringUtils.isBlank(staticToCustom)) {
+            List<String> targets = Constants.ALL.equals(staticToCustom) 
+                ? getStaticHyperlanePositions(game)
+                : Helper.getListFromCSV(staticToCustom);
+            
+            for (String position : targets) {
+                Tile tile = game.getTileByPosition(position);
+                if (isStaticHyperlane(tile)) {
+                    String data = Mapper.getHyperlaneData(tile.getTileID());
+                    if (!StringUtils.isBlank(data)) {
+                        AddTileService.addTile(game, new Tile(HYPERLANE_TILEID, position));
+                        game.getCustomHyperlaneData().put(position, data);
+                        success.append(position).append(" ");
+                    } else {
+                        failed.append(position).append(" ");
+                    }
+                } else {
+                    failed.append(position).append(" ");
+                }
+            }
+        } 
+
+        //From Custom to Static
+        if (!StringUtils.isBlank(customToStatic)) {
+            List<String> targets = Constants.ALL.equals(customToStatic) 
+                ? new ArrayList<>(game.getCustomHyperlaneData().keySet())
+                : Helper.getListFromCSV(customToStatic);
+            
+            for (String position : targets) {
+                String customData = game.getCustomHyperlaneData().get(position);
+                String staticHyperlaneTileId = customData != null ? Mapper.getHyperlaneTileId(customData) : null;
+                if (staticHyperlaneTileId != null) {
+                    game.getCustomHyperlaneData().remove(position);
+                    AddTileService.addTile(game, new Tile(staticHyperlaneTileId, position));
+                    success.append(position).append(" ");
+                } else {
+                    failed.append(position).append(" ");
+                }
+            }
+        }
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), 
+            "Transformed: `" + success.toString() + "`\nCould not transform: `" + failed.toString() + "`");
+    }
+
+    private static List<String> getStaticHyperlanePositions(Game game) {
+        return game.getTileMap().values().stream()
+            .filter(tile -> isStaticHyperlane(tile))
+            .map(Tile::getPosition)
+            .collect(Collectors.toList());
+    }
+
+    private boolean isStaticHyperlane(Tile tile) {
+        return tile != null 
+            && tile.getTileModel() != null 
+            && tile.getTileModel().isHyperlane() 
+            && !isCustomHyperlaneTile(tile);
     }
 
     public static String matrixToBinary(String matrix) {
