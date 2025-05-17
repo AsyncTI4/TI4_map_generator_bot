@@ -1374,6 +1374,33 @@ public class ButtonHelper {
             msg, buttons);
     }
 
+    public static void sendAllAgentsAndAbilitiesToReady(Game game, GenericInteractionCreateEvent event, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (String ability : player.getExhaustedPlanetsAbilities()) {
+            buttons.add(Buttons.green("belkoseaYellowTechReady_planet_", "Ready " + ability + " abiility"));
+        }
+        String msg = "Use buttons to select an agent or an ability to ready.";
+
+        for (String relic : player.getExhaustedRelics()) {
+            if (relic.contains("superweapon")) {
+                buttons.add(Buttons.green("belkoseaYellowTechReady_relic_" + relic,
+                    "Ready " + Mapper.getRelic(relic).getName()));
+            }
+            if (relic.contains("titanprototype") || relic.contains("absol_jr")) {
+                buttons.add(Buttons.green("belkoseaYellowTechReady_agent_" + relic,
+                    "Ready " + Mapper.getRelic(relic).getName()));
+            }
+        }
+        for (Leader leader : player.getLeaders()) {
+            if (leader.isExhausted() && leader.getId().contains("agent")) {
+                buttons.add(Buttons.green("belkoseaYellowTechReady_agent_" + leader.getId(),
+                    "Ready " + Mapper.getLeader(leader.getId()).getName() + " (Agent)"));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+
+    }
+
     public static void celdauriRedTech(Player player, Game game, GenericInteractionCreateEvent event) {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
         if (player.getStrategicCC() > 0) {
@@ -4576,9 +4603,8 @@ public class ButtonHelper {
                         buttons.add(validTile2);
                     }
                 }
-                if ((player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2") || player.hasUnit("belkosea_fighter") || player.hasUnit("belkosea_fighter2"))
+                if ((ButtonHelper.doesPlayerHaveFSHere("naalu_flagship", player, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_naalu_flagship_2", player, tile) || player.hasUnit("belkosea_fighter") || player.hasUnit("belkosea_fighter2"))
                     && tile.getUnitHolders().get("space").getUnits() != null
-                    && tile.getUnitHolders().get("space").getUnitCount(fs, colorID) > 0
                     && tile.getUnitHolders().get("space").getUnitCount(ff, colorID) > 0) {
                     limit = tile.getUnitHolders().get("space").getUnitCount(ff, colorID);
                     for (int x = 1; x < limit + 1; x++) {

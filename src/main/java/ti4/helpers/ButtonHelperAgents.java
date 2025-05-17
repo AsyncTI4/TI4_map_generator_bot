@@ -272,8 +272,10 @@ public class ButtonHelperAgents {
         } else {
             if (thing.equalsIgnoreCase("planet")) {
                 player.removeExhaustedAbility(detail);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             } else {
                 player.removeExhaustedRelic(detail);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
         ButtonHelper.deleteMessage(event);

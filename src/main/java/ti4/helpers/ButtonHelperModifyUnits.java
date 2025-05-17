@@ -1100,7 +1100,7 @@ public class ButtonHelperModifyUnits {
             if (damaged) {
                 dmg = "damaged ";
             }
-            msg = player.getRepresentation() + " lost a " + dmg + unitModel.getBaseType() + " to your opponent's Exotrireme II ability.";
+            msg = player.getRepresentation() + " lost a " + dmg + unitModel.getBaseType() + " to your opponent's ability.";
             var parsedUnit = new ParsedUnit(key, 1, Constants.SPACE);
             RemoveUnitService.removeUnit(event, tile, game, parsedUnit, damaged);
             ButtonHelperFactionSpecific.cabalEatsUnitIfItShould(player, game, player, 1, unitName, event, tile, tile.getSpaceUnitHolder());
@@ -1791,11 +1791,9 @@ public class ButtonHelperModifyUnits {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to choose 2 opposing ships to destroy. This occurs after any retreats. The dread has been removed.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         } else if (cause.contains("caled")) {
-            RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "1 dread");
-            ButtonHelperFactionSpecific.cabalEatsUnitIfItShould(player, game, player, 1, "dread", event, tile, tile.getSpaceUnitHolder());
             buttons = getOpposingUnitsToHit(player, game, event, tile, true);
             msg = player.getRepresentation() + " choose which opposing unit to destroy";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of opposing ships using the caled superweapon ability. Note that the bot did not check if a straight line unimpeded by anomalies existed between the caled system and the active system.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation(false, false) + " has chosen to destroy one of opposing ships using the Superweapon Caled ability. Note that the bot did not check if a straight line unimpeded by anomalies existed between the Caled system and the active system.");
         } else if (cause.contains("belkosea")) {
             msg = opponent.getRepresentationUnfogged() + " your opponent used the Belkosea flagship to produce a hit against your non-fighter ships. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "combat");
