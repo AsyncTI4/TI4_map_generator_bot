@@ -233,6 +233,10 @@ public class ComponentActionHelper {
             Button abilityButton = Buttons.green(finChecker + prefix + "ability_fabrication", "Purge 1 Fragment for 1 Token", FactionEmojis.Naaz);
             compButtons.add(abilityButton);
         }
+        if (p1.hasAbility("classified_developments")) {
+            Button abilityButton = Buttons.green(finChecker + prefix + "ability_classifieddevelopments", "Spend 5 For Superweapon", FactionEmojis.belkosea);
+            compButtons.add(abilityButton);
+        }
 
         // Other "abilities"
         if (p1.getUnitsOwned().contains("muaat_flagship") && p1.getStrategicCC() > 0
@@ -327,6 +331,10 @@ public class ComponentActionHelper {
                             tile.getRepresentationForButtons(game, p1));
                         buttons.add(starTile);
                     }
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                } else if ("classifiedDevelopments".equalsIgnoreCase(buttonID)) {
+                    List<Button> buttons = ButtonHelperAbilities.getSuperWeaponButtonsPart1(p1, game);
+                    String message = p1.getRepresentation() + " Select the planet you wish to put a superweapon on.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol

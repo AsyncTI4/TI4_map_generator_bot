@@ -60,6 +60,16 @@ public class ActionCardHelper {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
+        if (player.hasAbility("classified_developments")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Info on your superweapons are as follows:\n");
+            sb.append(Mapper.getRelic("superweaponavailyn").getSimpleRepresentation()).append("\n");
+            sb.append(Mapper.getRelic("superweaponcaled").getSimpleRepresentation()).append("\n");
+            sb.append(Mapper.getRelic("superweaponglatison").getSimpleRepresentation()).append("\n");
+            sb.append(Mapper.getRelic("superweapongrom").getSimpleRepresentation()).append("\n");
+            sb.append(Mapper.getRelic("superweaponmors").getSimpleRepresentation()).append("\n");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
+        }
     }
 
     private static String getTrapCardInfo(Player player) {

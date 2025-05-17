@@ -33,7 +33,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 /*
-  To activate Extra Dark mode use /fow fow_options
+  To activate FoW+ mode use /fow fow_options
 
   * 0b tiles are hidden
   * Adjacent hyperlanes that don't connect to the viewing tile are hidden
@@ -42,6 +42,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
       -> Will send ships into the Void
   * Other players stats areas are visible only by seeing their HS - PNs don't count
   * To remove a token from the board, you need to see it
+  * Prevents looking at explore/relic decks
  */
 public class FOWPlusService {
     public static final String VOID_TILEID = "-1";
@@ -52,7 +53,7 @@ public class FOWPlusService {
 
     //Only allow activating positions player can see
     public static boolean canActivatePosition(String position, Player player, Game game) {
-        return !isActive(game) || !isVoid(game, position) && FoWHelper.getTilePositionsToShow(game, player).contains(position);
+        return !isActive(game) || FoWHelper.getTilePositionsToShow(game, player).contains(position);
     }
 
     //Hide all 0b tiles from FoW map
@@ -61,12 +62,11 @@ public class FOWPlusService {
     }
 
     public static boolean isVoid(Game game, String position) {
-        return game.getTileByPosition(position).getTileID().equals(VOID_TILEID);
+        return isActive(game) && game.getTileByPosition(position) == null;
     }
 
-    //Only return a void tile if looking for a valid position without a tile
     public static Tile voidTile(String position) {
-        return PositionMapper.isTilePositionValid(position) ? new Tile(VOID_TILEID, position) : null;
+        return new Tile(VOID_TILEID, position);
     }
 
     @ButtonHandler("blindTileSelection~MDL")
@@ -95,6 +95,9 @@ public class FOWPlusService {
 
         String targetPosition = position;
         Tile tile = game.getTileByPosition(targetPosition);
+        if (tile == null) {
+            tile = voidTile(targetPosition);
+        }
 
         List<Button> chooseTileButtons = new ArrayList<>();
         chooseTileButtons.add(Buttons.green(finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));

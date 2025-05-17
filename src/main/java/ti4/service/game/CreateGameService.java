@@ -44,6 +44,7 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
 import ti4.service.option.GameOptionService;
 import ti4.settings.GlobalSettings;
@@ -355,6 +356,8 @@ public class CreateGameService {
             return "pbd1";
         }
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
+        while (ReserveGameNumberService.isGameNumReserved("pbd" + nextPBDNumber))
+            nextPBDNumber++;
         return "pbd" + nextPBDNumber;
     }
 

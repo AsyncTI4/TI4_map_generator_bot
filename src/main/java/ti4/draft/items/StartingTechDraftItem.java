@@ -40,6 +40,7 @@ public class StartingTechDraftItem extends DraftItem {
         Map.entry("celdauri", "Choose 2 of the following: :Propulsiontech: Antimass Deflectors, :Cybernetictech: Sarween Tools, :Warfaretech: Plasma Scoring"),
         Map.entry("cheiran", "Choose 1 of the following: :Warfaretech: Magen Defense Grid, :Warfaretech: Self-Assembly Routines"),
         Map.entry("edyn", "Choose any 3 technologies that have different colors and no prerequisites."),
+        Map.entry("belkosea", "Choose 1 yellow or red technology with no prerequisites."),
         Map.entry("ghoti", "Choose 1 of the following: :Propulsiontech: Gravity Drive, :Propulsiontech: Sling Relay."),
         Map.entry("gledge", "Choose 2 of the following: :Biotictech: Psychoarchaeology, :Cybernetictech: Scanlink Drone Network, :Warfaretech: AI Development Algorithm."),
         Map.entry("kjalengard", "Choose 1 non-faction unit upgrade."),

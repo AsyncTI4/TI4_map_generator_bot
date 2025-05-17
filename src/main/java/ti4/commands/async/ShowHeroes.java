@@ -1,4 +1,4 @@
-package ti4.commands.tigl;
+package ti4.commands.async;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
 
-class TIGLShowHeroes extends Subcommand {
+class ShowHeroes extends Subcommand {
 
-    public TIGLShowHeroes() {
+    public ShowHeroes() {
         super("show_heroes", "Display a list of the reigning Heroes");
     }
 

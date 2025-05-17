@@ -419,5 +419,14 @@
         "playArea": false,
         "source": "ds",
         "text": "At the start of invasion: Choose 1 unit you control in the active system; that unit gains PLANETARY SHIELD until the end of this action. Then, return this card to the Atokera player."
+    },
+    {
+        "alias": "dspnbelk",
+        "name": "Mercenary Sortie",
+        "faction": "belkosea",
+        "color": "",
+        "playArea": false,
+        "source": "ds",
+        "text": "At the start of combat: Roll 4 dice, for each result of 8 or greater, destroy up to 1 of your opponent’s fighters or infantry participating in that combat.Then, return this card to the Belkosea player."
     }
 ]
