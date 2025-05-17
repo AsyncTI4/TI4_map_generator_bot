@@ -28,7 +28,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.manage.GameManager;
-import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
 
 @UtilityClass
@@ -231,13 +230,11 @@ public class CommandHelper {
 
     public Tile getTile(SlashCommandInteractionEvent event, Game game) {
         String tileName = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase(), " ");
-        Tile tile = TileHelper.getTile(event, tileName, game);
-        return tile != null && !FOWPlusService.isVoid(tile) ? tile : null;
+        return TileHelper.getTile(event, tileName, game);
     }
 
     public Tile getTile(SlashCommandInteractionEvent event, Game game, String tileName) {
         tileName = StringUtils.substringBefore(tileName.toLowerCase(), " ");
-        Tile tile = TileHelper.getTile(event, tileName, game);
-        return tile != null && !FOWPlusService.isVoid(tile) ? tile : null;
+        return TileHelper.getTile(event, tileName, game);
     }
 }
