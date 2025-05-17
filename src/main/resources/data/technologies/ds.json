@@ -896,7 +896,7 @@
         "faction": "pharadn",
         "baseUpgrade": "inf2",
         "source": "ds",
-        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. At the start of your turn, place up to 1 of your captured infantry on a planet in a system that contains your structures, as if they were your own."
+        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. At the start of your turn, you may produce 1 infantry on a planet you control in a system that contains 1 of your structures. "
     },
     {
         "alias": "dspharb",
@@ -955,5 +955,28 @@
         "faction": "atokera",
         "source": "ds",
         "text": "Once during each of your actions, choose 1 of your units and 1 unit ability. That unit gains that unit ability with a value of 3, if applicable, until the end of that action. [Note: not currently automated by the bot]"
+    },
+    {
+        "alias": "dsbelky",
+        "name": "Synchrony Matrix",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "belkosea",
+        "source": "ds",
+        "text": "At the end of your turn, you may exhaust this card to ready 1 agent or ability card in your play area."
+    },
+    {
+        "alias": "dsbelkff",
+        "name": "Wyvern II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GB",
+        "faction": "belkosea",
+        "baseUpgrade": "ff2",
+        "source": "ds",
+        "text": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships’ capacity count against your fleet pool. 1(x2), 8, 2; ANTI-FIGHTER BARRAGE 9(x2)"
     }
 ]
