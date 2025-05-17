@@ -2888,6 +2888,9 @@ public class ButtonHelper {
                         fightersIgnored += 4;
                         fleetCap += 2;
                     }
+                    if (token.contains("glatison")) {
+                        fightersIgnored += 5;
+                    }
                 }
             }
 

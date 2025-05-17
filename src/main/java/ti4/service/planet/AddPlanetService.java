@@ -166,7 +166,7 @@ public class AddPlanetService {
                                 player_.setCommoditiesTotal(player_.getCommoditiesTotal() - 1);
                             }
                             if (token.contains("superweapon")) {
-                                player_.removeRelic(token.replace(".png", ""));
+                                player_.removeRelic(token.replace(".png", "").replace("attachment", "").replace("_", ""));
                             }
                         }
                     }

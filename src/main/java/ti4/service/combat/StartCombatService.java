@@ -901,6 +901,23 @@ public class StartCombatService {
             buttons.add(Buttons.gray(finChecker + "offerNecrophage", "Necrophage", FactionEmojis.mykomentori));
         }
 
+        if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));
+        }
+        if (p1.hasAbility("superweaponcaled")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));
+        }
+        if (p2.hasRelicReady("superweaponavailyn") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_availyn_" + tile.getPosition(), "Move 3 Fighters With Availyn", FactionEmojis.belkosea));
+        }
+        if (p1.hasAbility("superweaponavailyn")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_availyn_" + tile.getPosition(), "Move 3 Fighters With Availyn", FactionEmojis.belkosea));
+        }
+
         boolean hasDevotionShips = space != null && (space.getUnitCount(Units.UnitType.Destroyer, p2) > 0 || space.getUnitCount(Units.UnitType.Cruiser, p2) > 0);
         if (p2.hasAbility("devotion") && !game.isFowMode() && isSpaceCombat && hasDevotionShips) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
