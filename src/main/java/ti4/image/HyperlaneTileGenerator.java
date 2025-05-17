@@ -109,14 +109,14 @@ public class HyperlaneTileGenerator {
 
     private static final Shape SMALL_CURVE_TEMPLATE = new QuadCurve2D.Float(
         CENTER_X, 0,
-        218.7f, 69.98f, 
-        302, 75 //302.4038f, 75
+        197.25f, 106.78f,
+        302, 75
     );
 
     private static final Shape LARGE_CURVE_TEMPLATE = new QuadCurve2D.Float(
         CENTER_X, 0,
         181.2f, 144.98f,
-        302, 225 //302.4038f, 225.0f
+        302, 225
     );
 
     private static final Shape ROUNDABOUT = new Ellipse2D.Float(

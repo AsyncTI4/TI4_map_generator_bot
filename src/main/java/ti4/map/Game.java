@@ -90,7 +90,6 @@ import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
-import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -3285,8 +3284,7 @@ public class Game extends GameProperties {
 
     public Tile getTileByPosition(String position) {
         if (position == null) return null;
-        Tile tile = tileMap.get(position);
-        return tile == null && FOWPlusService.isActive(this) ? FOWPlusService.voidTile(position) : tile;
+        return tileMap.get(position);
     }
 
     public boolean isTileDuplicated(String tileID) {
@@ -3453,6 +3451,7 @@ public class Game extends GameProperties {
                     removePlanet(unitHolder);
                 }
             }
+            customHyperlaneData.remove(position);
         }
 
         tileMap.remove(position);

@@ -249,6 +249,38 @@ public class ButtonHelperAgents {
             + "_Hypermetabolism_ and spent a command token from their strategy pool to ready " + agent + ".");
     }
 
+    @ButtonHandler("belkoseaYellowTechReady_")
+    public static void belkoseaYellowTechReady(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("belkoseaYellowTechReady_", "");
+        String thing = buttonID.split("_")[0];
+        String detail = buttonID.replace(thing + "_", "");
+        String msg = player.getFactionEmoji() + " exhausted _Synchrony Matrix_ to ready " + detail + ".";
+        if (thing.equalsIgnoreCase("agent")) {
+            String agent = detail;
+            Leader playerLeader = player.getLeader(agent).orElse(null);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            if (playerLeader == null) {
+                if (agent.contains("titanprototype")) {
+                    player.removeExhaustedRelic("titanprototype");
+                }
+                if (agent.contains("absol")) {
+                    player.removeExhaustedRelic("absol_jr");
+                }
+                return;
+            }
+            RefreshLeaderService.refreshLeader(player, playerLeader, game);
+        } else {
+            if (thing.equalsIgnoreCase("planet")) {
+                player.removeExhaustedAbility(detail);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            } else {
+                player.removeExhaustedRelic(detail);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("umbatTile_")
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String pos = buttonID.replace("umbatTile_", "");
@@ -1194,6 +1226,11 @@ public class ButtonHelperAgents {
                 && uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
                 return true;
             }
+            for (String token : uH.getTokenList()) {
+                if (player.getPlanets().contains(uH.getName()) && token.contains("superweapon")) {
+                    return true;
+                }
+            }
         }
         return present;
     }
@@ -1962,9 +1999,10 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static List<Button> getL1Z1XAgentButtons(Game game, Player player) {
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
+    public static List<Button> getL1Z1XAgentButtons(Game game, Tile tile, Player player) {
         List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String planetId = planet.getName();
             if (player.getPlanetsAllianceMode().contains(planetId) && FoWHelper.playerHasInfantryOnPlanet(player, tile, planetId)) {

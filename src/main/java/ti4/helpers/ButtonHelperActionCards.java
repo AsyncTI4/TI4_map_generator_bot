@@ -1092,7 +1092,7 @@ public class ButtonHelperActionCards {
         String message = p2.getRepresentationUnfogged() + ", you have been forced to give a promissory note. Please select which promissory note you would like to send.";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", buttons for resolving _Diplomatic Pressure_ have been sent to " + p2.getFactionEmojiOrColor() + ".");
+            player.getRepresentationUnfogged() + ", buttons to send a promissory note have been given to " + p2.getFactionEmojiOrColor() + ".");
         ButtonHelper.deleteMessage(event);
     }
 

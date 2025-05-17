@@ -34,10 +34,6 @@ public class Constants {
         return blt == null ? "" : blt.getAsMention();
     }
 
-    // Tourney Winners
-    public static final String cal1nos = "740848810749722646";
-    public static final List<String> tourneyWinners = List.of(cal1nos);
-
     // Other People IDs
     public static final String cagesId = "203608548440014848";
     public static final String bortId = "154000388121559040";
@@ -217,6 +213,7 @@ public class Constants {
     public static final String SEARCH_EXPLORES = "explores";
     public static final String SEARCH_COMMANDS = "commands";
     public static final String SEARCH_MY_GAMES = "my_games";
+    public static final String STATISTICS_FACTION_GAMES = "faction_games";
     public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
     public static final String SEARCH_SOURCES = "sources";

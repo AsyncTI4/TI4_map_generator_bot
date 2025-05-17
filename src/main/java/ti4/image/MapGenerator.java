@@ -234,7 +234,6 @@ public class MapGenerator implements AutoCloseable {
 
     FileUpload createFileUpload() {
         if (debug) debugDiscordTime = StopWatch.createStarted();
-        AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
         FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
         if (debug) debugDiscordTime.stop();
