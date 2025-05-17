@@ -242,8 +242,8 @@ public class ListPlayerInfoService {
             }
             msg.append(representSecrets(game)).append("\n");
             msg.append(representSupports(game)).append("\n");
-            if (gameHasTransferrablePoints(game)) {
-                msg.append(representTransferrablePoints(game)).append("\n");
+            if (gameHasTransferablePoints(game)) {
+                msg.append(representTransferablePoints(game)).append("\n");
             }
             msg.append(representTotalVPs(game)).append("\n");
         } else {
@@ -324,7 +324,7 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String getTransferrablePointRepresentation(String objectiveId) {
+    public static String getTransferablePointRepresentation(String objectiveId) {
         return switch (objectiveId) {
             case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne", "Political Censure" -> objectiveId;
             case "Shard of the Throne (1)", "Shard of the Throne (2)", "Shard of the Throne (3)" -> objectiveId;
@@ -333,16 +333,16 @@ public class ListPlayerInfoService {
         };
     }
 
-    public static boolean gameHasTransferrablePoints(Game game) {
+    public static boolean gameHasTransferablePoints(Game game) {
         return game.getCustomPublicVP().keySet().stream()
-            .anyMatch(obj -> getTransferrablePointRepresentation(obj) != null);
+            .anyMatch(obj -> getTransferablePointRepresentation(obj) != null);
     }
 
-    public static String representTransferrablePoints(Game game) {
-        StringBuilder representation = new StringBuilder("__**Transferrable Points**__");
+    public static String representTransferablePoints(Game game) {
+        StringBuilder representation = new StringBuilder("__**Transferable Points**__");
         if (!game.isFowMode()) {
             for (var objective : game.getCustomPublicVP().entrySet()) {
-                String mutablePointRepresentation = getTransferrablePointRepresentation(objective.getKey());
+                String mutablePointRepresentation = getTransferablePointRepresentation(objective.getKey());
                 if (mutablePointRepresentation == null) continue;
 
                 List<String> scoringPlayers = game.getScoredPublicObjectives().get(objective.getKey());
