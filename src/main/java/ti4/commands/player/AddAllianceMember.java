@@ -38,12 +38,16 @@ class AddAllianceMember extends GameStateSubcommand {
         if (!player.getAllianceMembers().contains(otherPlayer.getFaction())) {
             player.addAllianceMember(otherPlayer.getFaction() + currentMembers);
         }
+        player.removeOwnedPromissoryNoteByID(player.getColor() + "_an");
+        player.removePromissoryNote(player.getColor() + "_an");
+        otherPlayer.removeOwnedPromissoryNoteByID(otherPlayer.getColor() + "_an");
+        otherPlayer.removePromissoryNote(otherPlayer.getColor() + "_an");
 
         for (String leaderID : otherPlayer.getLeaderIDs()) {
             if (leaderID.contains("commander") && !player.hasLeader(leaderID)) {
                 if (!leaderID.contains("mahact") && !player.hasAbility("edict")) {
                     player.addLeader(leaderID);
-                    if(!leaderID.contains("celdauri")){
+                    if (!leaderID.contains("celdauri")) {
                         game.addFakeCommander(leaderID);
                     }
                     player.getLeader(leaderID).ifPresent(leader -> leader.setLocked(false));

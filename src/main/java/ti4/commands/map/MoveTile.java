@@ -10,6 +10,7 @@ import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.service.map.CustomHyperlaneService;
 
 public class MoveTile extends GameStateSubcommand {
 
@@ -30,6 +31,7 @@ public class MoveTile extends GameStateSubcommand {
         }
 
         String tileToPosition = event.getOption(Constants.POSITION).getAsString();
+        String tileFromPosition = movingTile.getPosition();
 
         if (game.getTileMap().containsKey(tileToPosition)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Oops, a tile already exists here: " + tileToPosition);
@@ -39,12 +41,13 @@ public class MoveTile extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: " + tileToPosition);
             return;
         }
-
-        MessageHelper.sendMessageToEventChannel(event, "Moved tile " + movingTile.getRepresentation() + " from " + movingTile.getPosition() + " to " + tileToPosition);
-        
+       
         movingTile.setPosition(tileToPosition);
         game.setTile(movingTile);
 
+        CustomHyperlaneService.moveCustomHyperlaneData(tileFromPosition, tileToPosition, game);
+
+        MessageHelper.sendMessageToEventChannel(event, "Moved tile " + movingTile.getRepresentation() + " from " + tileFromPosition + " to " + tileToPosition);
 
         game.rebuildTilePositionAutoCompleteList();
     }

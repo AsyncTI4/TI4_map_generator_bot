@@ -54,6 +54,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -721,7 +722,7 @@ public class ButtonHelperFactionSpecific {
             return buttons;
         }
         for (String planet : hacan.getPlanetsAllianceMode()) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
+            if (planet.contains("custodia") || planet.contains("ghoti") || ButtonHelper.getUnitHolderFromPlanetName(planet, game) == null) {
                 continue;
             }
             if (ButtonHelper.getUnitHolderFromPlanetName(planet, game).getUnitCount(UnitType.Mech,
@@ -797,6 +798,33 @@ public class ButtonHelperFactionSpecific {
         player.setActualHits(player.getActualHits() + totalHits);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static void rollForBelkoseaPN(Player player) {
+        String result = player.getFactionEmojiOrColor() + " rolling for belkosea PN:\n";
+        // Actually roll for each unit
+        int totalHits = 0;
+        StringBuilder resultBuilder = new StringBuilder(result);
+
+        int toHit = 8;
+        int modifierToHit = 0;
+        int extraRollsForUnit = 0;
+        int numRollsPerUnit = 1;
+        int numRolls = 4;
+        List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+        player.setExpectedHitsTimes10(
+            player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+        int hitRolls = DiceHelper.countSuccesses(resultRolls);
+        totalHits += hitRolls;
+        String unitRoll = CombatMessageHelper.displayUnitRoll(player.getUnitByID("belkosea_flagship"), toHit, modifierToHit, 1,
+            numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+        resultBuilder.append(unitRoll);
+
+        result = resultBuilder.toString();
+        result += CombatMessageHelper.displayHitResults(totalHits);
+        player.setActualHits(player.getActualHits() + totalHits);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result + "\nPlease assign any hits using the assign hits button in the combat thread. Remember these hits only apply against infantry or fighters.");
+
     }
 
     public static void checkForNaaluPN(Game game) {
@@ -2293,13 +2321,12 @@ public class ButtonHelperFactionSpecific {
                 break;
             }
         }
-        boolean removed = false;
+        boolean damaged = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             int count = uH.getUnitCount(UnitType.Mech, player.getColor())
                 - uH.getDamagedUnitCount(UnitType.Mech, player.getColorID());
-
-            if (count > 0 && !removed) {
-                removed = true;
+            if (count > 0 && !damaged) {
+                damaged = true;
                 uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
                 sb.append("\n ").append(player.getFactionEmoji()).append(" damaged 1 mech on ")
                     .append(tile.getRepresentation()).append("(").append(uH.getName()).append(")");
@@ -2309,6 +2336,33 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "nivyn");
         event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("becomeDamaged_")
+    public static void becomeDamaged(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String tilePos = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(tilePos);
+        StringBuilder sb = new StringBuilder(player.getRepresentation());
+        UnitHolder uH = tile.getSpaceUnitHolder();
+        uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+        sb.append(" damaged their " + unit + " in ").append(tile.getRepresentation());
+        if (unit.equalsIgnoreCase("flagship")) {
+            if (player.ownsUnit("belkosea_flagship")) {
+                sb.append(" to produce 1 hit against the opponents non-fighter ships.");
+                ButtonHelperModifyUnits.resolveAssaultCannonNDihmohnCommander("id_belkosea_" + tilePos, event, player, game);
+            }
+            if (player.ownsUnit("kortali_flagship")) {
+                sb.append(" to gain 1 command counter.");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " can gain 1 command token due to self-damaging the Kortali Flagship");
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain 1 command token.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("creussMechStep2_")
@@ -2493,6 +2547,9 @@ public class ButtonHelperFactionSpecific {
         }
 
         Tile tile = game.getTileByPosition(position);
+        if (FOWPlusService.isVoid(game, position)) {
+            tile = FOWPlusService.voidTile(position);
+        }
         List<Button> chooseTileButtons = new ArrayList<>();
         chooseTileButtons.add(Buttons.green("creussIFFResolve_" + type + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("blindIFFSelection_" + type + "~MDL", "Change Tile"));
@@ -2503,6 +2560,10 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
+        if (tile == null || tile.getTileModel() != null && tile.getTileModel().isHyperlane()) {
+            return false;
+        }
+
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
@@ -2526,9 +2587,6 @@ public class ButtonHelperFactionSpecific {
                 hs = p2.getHomeSystemTile();
             }
             if (hs != null && hs.getPosition().equalsIgnoreCase(tile.getPosition())) {
-                return false;
-            }
-            if (tile == null || tile.getRepresentationForButtons(game, player).toLowerCase().contains("hyperlane")) {
                 return false;
             }
         }
@@ -2680,9 +2738,12 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getRohDhnaRecycleButtons(Game game, Player player) {
+    public static List<Button> getRohDhnaRecycleButtons(Game game, Tile tile, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
         List<UnitKey> availableUnits = new ArrayList<>();
-        Map<UnitKey, Integer> units = game.getTileByPosition(game.getActiveSystem()).getUnitHolders()
+        Map<UnitKey, Integer> units = tile.getUnitHolders()
             .get("space").getUnits();
         for (UnitKey unit : units.keySet()) {
             if (Objects.equals(unit.getColor(), player.getColor()) && (unit.getUnitType() == UnitType.Cruiser
@@ -2694,7 +2755,6 @@ public class ButtonHelperFactionSpecific {
             }
         }
 
-        List<Button> buttons = new ArrayList<>();
         for (UnitKey unit : availableUnits) {
             buttons.add(Buttons.green("FFCC_" + player.getFaction() + "_rohdhnaRecycle_" + unit.unitName(), unit.getUnitType().humanReadableName(), unit.unitEmoji()));
         }

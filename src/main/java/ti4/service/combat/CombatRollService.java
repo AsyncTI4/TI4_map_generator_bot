@@ -425,6 +425,7 @@ public class CombatRollService {
                     }
                 }
             }
+
             if (unitModel.getId().equalsIgnoreCase("sigma_jolnar_flagship_1") || unitModel.getId().equalsIgnoreCase("sigma_jolnar_flagship_2")) {
                 int additionalDice = hitRolls;
                 while (hitRolls < 100 && additionalDice > 0) {
@@ -454,6 +455,13 @@ public class CombatRollService {
                         break;
 
                     }
+                }
+            }
+            if (unitModel.getId().equalsIgnoreCase("belkosea_mech")) {
+                if (hitRolls > 0) {
+                    player.setCommodities(Math.min(player.getCommodities() + hitRolls, player.getCommoditiesTotal()));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                        + " gained " + hitRolls + " commodities due to the Belkosea Mech ability (gain comms when producing hits).");
                 }
             }
             int misses = numRolls - hitRolls;
