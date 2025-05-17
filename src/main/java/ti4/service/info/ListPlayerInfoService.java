@@ -2,6 +2,7 @@ package ti4.service.info;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -241,8 +242,8 @@ public class ListPlayerInfoService {
             }
             msg.append(representSecrets(game)).append("\n");
             msg.append(representSupports(game)).append("\n");
-            if (gameHasMutablePoints(game)) {
-                msg.append(representMutablePoints(game)).append("\n");
+            if (gameHasTransferrablePoints(game)) {
+                msg.append(representTransferrablePoints(game)).append("\n");
             }
             msg.append(representTotalVPs(game)).append("\n");
         } else {
@@ -323,32 +324,41 @@ public class ListPlayerInfoService {
         return representation.toString();
     }
 
-    public static String getMutablePointRepresentation(String objectiveId) {
+    public static String getTransferrablePointRepresentation(String objectiveId) {
         return switch (objectiveId) {
-            case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne" -> objectiveId;
+            case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne", "Political Censure" -> objectiveId;
+            case "Shard of the Throne (1)", "Shard of the Throne (2)", "Shard of the Throne (3)" -> objectiveId;
+            case "Ixthian Rex Point" -> objectiveId;
             default -> null;
         };
     }
 
-    public static boolean gameHasMutablePoints(Game game) {
-        return game.getScoredPublicObjectives().keySet().stream()
-            .anyMatch(obj -> getMutablePointRepresentation(obj) != null);
+    public static boolean gameHasTransferrablePoints(Game game) {
+        return game.getCustomPublicVP().keySet().stream()
+            .anyMatch(obj -> getTransferrablePointRepresentation(obj) != null);
     }
 
-    public static String representMutablePoints(Game game) {
-        //TODO: Better name than hot potato
-        StringBuilder representation = new StringBuilder("__**Hot Potato Points**__\n> ");
+    public static String representTransferrablePoints(Game game) {
+        StringBuilder representation = new StringBuilder("__**Transferrable Points**__");
         if (!game.isFowMode()) {
-            for (var objective : game.getScoredPublicObjectives().entrySet()) {
-                String mutablePointRepresentation = getMutablePointRepresentation(objective.getKey());
+            for (var objective : game.getCustomPublicVP().entrySet()) {
+                String mutablePointRepresentation = getTransferrablePointRepresentation(objective.getKey());
                 if (mutablePointRepresentation == null) continue;
 
-                representation.append(mutablePointRepresentation).append(": ");
-                representation.append(objective.getValue().stream()
-                    .map(game::getPlayerFromColorOrFaction)
-                    .map(Player::getRepresentationNoPing)
-                    .reduce((a, b) -> a + ", " + b).orElse("Not currently held"));
-                representation.append("\n");
+                List<String> scoringPlayers = game.getScoredPublicObjectives().get(objective.getKey());
+                if (scoringPlayers == null) {
+                    scoringPlayers = List.of();
+                }
+                representation
+                    .append("\n> ")
+                    .append(mutablePointRepresentation)
+                    .append(" (").append(objective.getValue()).append(" VP)")
+                    .append(": ")
+                    .append(scoringPlayers.stream()
+                        .map(game::getPlayer)
+                        .filter(Objects::nonNull)
+                        .map(Player::getRepresentationNoPing)
+                        .reduce((a, b) -> a + ", " + b).orElse("Not currently held"));
             }
         }
         return representation.toString();
