@@ -19,7 +19,7 @@ public class ObjectiveHelper {
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
         if (fullEmbed) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "**Stage 1 Public Objective at location " + loc1 + "**");
-            player.getCardsInfoThread().sendMessageEmbeds(po.getRepresentationEmbed());
+            player.getCardsInfoThread().sendMessageEmbeds(po.getRepresentationEmbed()).queue();
         } else {
             String sb = player.getRepresentationUnfogged() +
                 " **Stage 1 Public Objective at location " + loc1 + "**" + "\n" +
