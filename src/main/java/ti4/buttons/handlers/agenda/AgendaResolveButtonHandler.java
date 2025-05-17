@@ -1071,7 +1071,7 @@ class AgendaResolveButtonHandler {
             } else {
                 electVoiceText += " (optional)";
             }
-            if (aCount < 2) {
+            if (aCount < 3) {
                 electVoiceOfTheCouncil = Buttons.gray("elect_voice_of_the_council", electVoiceText);
                 proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to scoring objectives");
             } else {
@@ -1089,10 +1089,10 @@ class AgendaResolveButtonHandler {
                     proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to scoring objectives");
                 }
             }
-            if (aCount == 2) {
+            if (aCount == 3) {
                 voteMessage += " The bot believes this is the 3rd agenda, which in Omega Phase means you might vote on the Voice of the Council.";
-                voteMessage += "\n- If a player currently has the Voice of the Council, the Speaker chooses whether to vote on it again or proceed to scoring";
-                voteMessage += "\n- If no player currently has the Voice of the Council, it must be voted on once before proceeding to scoring";
+                voteMessage += "\n- If a player currently has the Voice of the Council, the Speaker chooses whether to vote on it this round or not.";
+                voteMessage += "\n- If no player currently has the Voice of the Council, it must be voted on once before proceeding to scoring.";
                 voteMessage += "\nIf this is not actually the third agenda yet, please remember this when that agenda is reached.";
             }
             buttons.add(electVoiceOfTheCouncil);
