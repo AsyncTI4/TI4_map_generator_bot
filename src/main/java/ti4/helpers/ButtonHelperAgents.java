@@ -1999,9 +1999,10 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static List<Button> getL1Z1XAgentButtons(Game game, Player player) {
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
+    public static List<Button> getL1Z1XAgentButtons(Game game, Tile tile, Player player) {
         List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String planetId = planet.getName();
             if (player.getPlanetsAllianceMode().contains(planetId) && FoWHelper.playerHasInfantryOnPlanet(player, tile, planetId)) {

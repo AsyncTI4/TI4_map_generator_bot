@@ -2547,6 +2547,9 @@ public class ButtonHelperFactionSpecific {
         }
 
         Tile tile = game.getTileByPosition(position);
+        if (FOWPlusService.isVoid(game, position)) {
+            tile = FOWPlusService.voidTile(position);
+        }
         List<Button> chooseTileButtons = new ArrayList<>();
         chooseTileButtons.add(Buttons.green("creussIFFResolve_" + type + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("blindIFFSelection_" + type + "~MDL", "Change Tile"));
@@ -2557,8 +2560,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
-        if (tile != null && tile.getTileModel() != null && tile.getTileModel().isHyperlane()
-            || FOWPlusService.isVoid(tile)) {
+        if (tile == null || tile.getTileModel() != null && tile.getTileModel().isHyperlane()) {
             return false;
         }
 
@@ -2736,9 +2738,12 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getRohDhnaRecycleButtons(Game game, Player player) {
+    public static List<Button> getRohDhnaRecycleButtons(Game game, Tile tile, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
         List<UnitKey> availableUnits = new ArrayList<>();
-        Map<UnitKey, Integer> units = game.getTileByPosition(game.getActiveSystem()).getUnitHolders()
+        Map<UnitKey, Integer> units = tile.getUnitHolders()
             .get("space").getUnits();
         for (UnitKey unit : units.keySet()) {
             if (Objects.equals(unit.getColor(), player.getColor()) && (unit.getUnitType() == UnitType.Cruiser
@@ -2750,7 +2755,6 @@ public class ButtonHelperFactionSpecific {
             }
         }
 
-        List<Button> buttons = new ArrayList<>();
         for (UnitKey unit : availableUnits) {
             buttons.add(Buttons.green("FFCC_" + player.getFaction() + "_rohdhnaRecycle_" + unit.unitName(), unit.getUnitType().humanReadableName(), unit.unitEmoji()));
         }
