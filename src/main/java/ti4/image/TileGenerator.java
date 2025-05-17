@@ -378,7 +378,7 @@ public class TileGenerator {
                     List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
                     Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, fowPlayer);
                     game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
-                        if (borderAnomalyHolder.getTile().equals(tile.getPosition()) 
+                        if (borderAnomalyHolder.getTile().equals(tile.getPosition())
                             && (!isFoWPrivate || !tile.hasFog(fowPlayer) || visiblePositions.contains(orderedAdjacentPositions.get(borderAnomalyHolder.getDirection())))) {
                             addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
                         }
@@ -1564,6 +1564,9 @@ public class TileGenerator {
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
             return false;
+        }
+        if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains("superweapon_mors"))) {
+            return true;
         }
         for (Player player : game.getRealPlayers()) {
             if (player.hasAbility("synthesis") && player.getReadiedPlanets().contains(unitHolder.getName())) {
