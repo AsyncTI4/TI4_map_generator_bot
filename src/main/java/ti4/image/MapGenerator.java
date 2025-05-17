@@ -259,7 +259,7 @@ public class MapGenerator implements AutoCloseable {
         if (displayTypeBasic != DisplayType.all && displayTypeBasic != DisplayType.map) {
             return;
         }
-        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);  
+        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
@@ -634,8 +634,7 @@ public class MapGenerator implements AutoCloseable {
             g2.drawRect(i * boxWidth + trackXShift, y, boxWidth, boxHeight);
         }
 
-        int colCount = priorityTrack.size() - 1;
-        int availableSpacePerColumn = (boxWidth - boxBuffer * 2) / colCount;
+        int availableSpacePerColumn = boxWidth - boxBuffer * 2;
         int availableSpacePerRow = boxHeight - boxBuffer * 2;
         float scale = 0.7f;
         for (Player player : priorityTrack) {
@@ -649,12 +648,14 @@ public class MapGenerator implements AutoCloseable {
                 int tokenWidth = controlTokenImage == null ? 51 : controlTokenImage.getWidth(); // 51
                 int tokenHeight = controlTokenImage == null ? 33 : controlTokenImage.getHeight(); // 33
                 int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);
-                int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) * 3 / 4);
+                int lowerVerticalQuarter = Math.max(0, (availableSpacePerRow - tokenHeight) * 3 / 4);
 
                 int spaceOnTrack = player.getPriorityPosition() - 1;
-                int firstX = Math.min(boxBuffer + /*(availableSpacePerColumn * col) +*/ centreHorizontally, boxWidth - tokenWidth - boxBuffer) + trackXShift;
+                int boxCenter = boxBuffer + centreHorizontally;
+                int boxFarRight = boxWidth - tokenWidth - boxBuffer;
+                int firstX = Math.min(boxCenter, boxFarRight) + trackXShift;
                 int tokenX = spaceOnTrack * boxWidth + firstX;
-                int tokenY = y + boxBuffer + centreVertically;
+                int tokenY = y + boxBuffer + lowerVerticalQuarter;
                 DrawingUtil.drawControlToken(graphics, controlTokenImage, player, tokenX, tokenY, false, scale);
             } catch (Exception e) {
                 // nothing
@@ -1803,9 +1804,9 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static void drawFleetCCOfPlayer(
-                Graphics graphics, String ccID, int x, int y, Player player,
-                boolean rightAlign
-            ) {
+        Graphics graphics, String ccID, int x, int y, Player player,
+        boolean rightAlign
+    ) {
         String ccPath = Mapper.getCCPath(ccID);
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
@@ -2252,16 +2253,16 @@ public class MapGenerator implements AutoCloseable {
     }
 
     public static void addWebsiteOverlay(
-                List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y,
-                int width, int height
-            ) {
+        List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y,
+        int width, int height
+    ) {
         overlays.add(new WebsiteOverlay(dataModel, List.of(x, y, width, height)));
     }
 
     public static void addWebsiteOverlay(
-                List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w,
-                int h
-            ) {
+        List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w,
+        int h
+    ) {
         overlays.add(new WebsiteOverlay(title, text, List.of(x, y, w, h)));
     }
 
