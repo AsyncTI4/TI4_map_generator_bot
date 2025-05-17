@@ -1200,6 +1200,7 @@
         "commodities": 2,
         "factionTech": ["dsbelky", "dsbelkff"],
         "startingTechAmount": 1,
+        "startingTechOptions": ["st", "ps", "sdn","aida"],
         "homePlanets": ["strang","reil"],
         "abilities": ["classified_developments", "superweapon_projects"],
         "leaders": ["belkoseaagent", "belkoseacommander", "belkoseahero"],
