@@ -341,6 +341,13 @@ public class Mapper {
         return hyperlaneAdjacencies.getProperty(tileID);
     }
 
+    public static String getHyperlaneTileId(String hyperlaneData) {
+        return hyperlaneAdjacencies.stringPropertyNames().stream()
+            .filter(key -> hyperlaneData.equals(hyperlaneAdjacencies.getProperty(key)))
+            .findFirst()
+            .orElse(null);
+    }
+
     public static Set<String> getWormholes(String tileID) {
         if (tileID == null || TileHelper.getTileById(tileID) == null || TileHelper.getTileById(tileID).getWormholes() == null) {
             return new HashSet<>();
