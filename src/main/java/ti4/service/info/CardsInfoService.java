@@ -174,6 +174,15 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("nekroagent")) {
             buttons.add(Buttons.gray("exhaustAgent_nekroagent", "Use Nekro Agent", FactionEmojis.Nekro));
         }
+        if (player.hasRelicReady("superweapongrom")) {
+            buttons.add(Buttons.gray("exhaustSuperweapon_grom", "Use Grom To Fire AFB Against Every Fighter", FactionEmojis.belkosea));
+        }
+        if (player.hasRelicReady("superweaponmors")) {
+            buttons.add(Buttons.gray("exhaustSuperweapon_mors", "Use Mors to Damage Every Unit In System", FactionEmojis.belkosea));
+        }
+        if (player.hasRelicReady("superweaponglatison")) {
+            buttons.add(Buttons.gray("exhaustSuperweapon_glatison", "Use Glatison To Repair Every Unit", FactionEmojis.belkosea));
+        }
         if (player.hasUnexhaustedLeader("vaylerianagent")) {
             buttons.add(Buttons.gray("exhaustAgent_vaylerianagent", "Use Vaylerian Agent", FactionEmojis.vaylerian));
         }

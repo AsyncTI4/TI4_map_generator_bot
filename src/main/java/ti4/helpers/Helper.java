@@ -1399,6 +1399,16 @@ public class Helper {
                     productionValueTotal++;
                 }
             }
+            if (token.contains("availyn")) {
+                productionValueTotal += 3;
+                if (player.hasRelic("boon_of_the_cerulean_god")) {
+                    productionValueTotal++;
+                }
+                if (player.hasAbility("synthesis")) {
+                    productionValueTotal++;
+                }
+            }
+
             if (token.contains("facilitycorefactory")) {
                 planetUnitVal += 1;
                 productionValueTotal += 1;

@@ -28,6 +28,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
+import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
@@ -957,6 +958,129 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
+    public static Tile getLocationOfSuperweapon(Game game, String name) {
+        Tile tile = null;
+        for (Tile loc : game.getTileMap().values()) {
+            for (UnitHolder uH : loc.getPlanetUnitHolders()) {
+                for (String token : uH.getTokenList()) {
+                    if (token.contains("superweapon_" + name)) {
+                        return loc;
+                    }
+                }
+            }
+        }
+        return tile;
+    }
+
+    @ButtonHandler("exhaustSuperweapon_")
+    public static void exhaustSuperweapon(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String name = buttonID.split("_")[1];
+        String superweapon = "superweapon" + buttonID.split("_")[1];
+        player.addExhaustedRelic(superweapon);
+        Tile tile = getLocationOfSuperweapon(game, name);
+        ButtonHelper.deleteTheOneButton(event);
+        List<Button> buttons = new ArrayList<>();
+        switch (name) {
+            case "grom" -> {
+                for (String adj : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true)) {
+                    buttons.add(Buttons.gray("gromPart2_" + adj, game.getTileByPosition(adj).getRepresentationForButtons()));
+                }
+            }
+            case "mors" -> {
+                Set<String> adjPos = FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true);
+                for (Tile loc : game.getTileMap().values()) {
+                    if (adjPos.contains(loc.getPosition()))
+                        buttons.add(Buttons.gray("morsPart2_" + loc.getPosition(), loc.getRepresentationForButtons()));
+                }
+            }
+            case "glatison" -> {
+                for (Tile loc : game.getTileMap().values()) {
+                    loc.removeAllUnitDamage(player.getColor());
+                }
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    player.getFactionEmoji() + " repaired all their damaged units everywhere by exhausting the Glatison superweapon ability.");
+                return;
+            }
+            case "caled" -> {
+                ButtonHelperModifyUnits.resolveAssaultCannonNDihmohnCommander("id_caled_" + buttonID.split("_")[2], event, player, game);
+                return;
+            }
+            case "availyn" -> {
+                availynStep1(game, player, event, "availyn_" + buttonID.split("_")[2]);
+                return;
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Choose the tile you wish to target.", buttons);
+    }
+
+    @ButtonHandler("morsPart2_")
+    public static void morsPart2(Player belk, Game game, String buttonID, ButtonInteractionEvent event) {
+        String location = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(location);
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            Map<UnitKey, Integer> units = unitHolder.getUnits();
+            for (Player player : game.getRealPlayers()) {
+                for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+                    if (!player.unitBelongsToPlayer(unitEntry.getKey()))
+                        continue;
+                    UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                    if (unitModel == null)
+                        continue;
+                    UnitKey unitKey = unitEntry.getKey();
+                    int damagedUnits = 0;
+                    if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(unitKey) != null) {
+                        damagedUnits = unitHolder.getUnitDamage().get(unitKey);
+                    }
+                    int totalUnits = unitEntry.getValue() - damagedUnits;
+                    if (totalUnits > 0 && unitModel.getSustainDamage()) {
+                        tile.addUnitDamage(unitHolder.getName(), unitKey, totalUnits);
+                    }
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannel(belk.getCorrectChannel(),
+            belk.getFactionEmoji() + " damaged all units in the tile " + tile.getRepresentation() + " by exhausting the Mors superweapon ability.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("gromPart2_")
+    public static void gromPart2(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String location = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(location);
+        List<Button> buttons = new ArrayList<>();
+
+        buttons.add(Buttons.red("getDamageButtons_" + location + "_spacecombat", "Assign Hits"));
+        for (Player victim : game.getRealPlayers()) {
+            UnitHolder uH = tile.getSpaceUnitHolder();
+            if (uH.getUnitCount(UnitType.Fighter, victim) > 0) {
+                String result = player.getFactionEmojiOrColor() + " rolling for belkosea PN against fighters owned by " + victim.getRepresentation() + ":\n";
+                int totalHits = 0;
+                StringBuilder resultBuilder = new StringBuilder(result);
+                int toHit = 4;
+                int modifierToHit = 0;
+                int extraRollsForUnit = 0;
+                int numRollsPerUnit = 1;
+                int numRolls = uH.getUnitCount(UnitType.Fighter, victim);
+                List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                player.setExpectedHitsTimes10(
+                    player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+                int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                totalHits += hitRolls;
+                String unitRoll = CombatMessageHelper.displayUnitRoll(player.getUnitByBaseType("fs"), toHit, modifierToHit, 1,
+                    numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+                resultBuilder.append(unitRoll);
+
+                result = resultBuilder.toString();
+                result += CombatMessageHelper.displayHitResults(totalHits);
+                player.setActualHits(player.getActualHits() + totalHits);
+                MessageHelper.sendMessageToChannelWithButtons(victim.getCorrectChannel(), result + "\n" + victim.getRepresentation() + " Please assign any hits using this assign hits button.", buttons);
+            }
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getFactionEmoji() + " fired AFB 4 against each fighter in the tile " + tile.getRepresentation() + " by exhausting the Grom superweapon ability.");
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("superWeaponPart2_")
     public static void superWeaponButtonsPart2(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planetName = buttonID.split("_")[1];
@@ -1690,5 +1814,55 @@ public class ButtonHelperAbilities {
         String msg = player.getRepresentationUnfogged()
             + " the bot doesn't know if the next objective is a stage 1 or a stage 2. Please help it out and click the right button.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+    }
+
+    public static void availynStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos2 = buttonID.split("_")[1];
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile2 : game.getTileMap().values()) {
+            UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
+            if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
+                buttons.add(Buttons.green("availynStep2_" + pos2 + "_" + tile2.getPosition(),
+                    tile2.getRepresentationForButtons(game, player)));
+            }
+        }
+        buttons.add(Buttons.red("deleteButtons", "Done Resolving"));
+        String msg = player.getRepresentation() + " choose the tile you wish to pull fighters from.";
+        ButtonHelper.deleteTheOneButton(event);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("availynStep2_")
+    public static void availynStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos2 = buttonID.split("_")[1];
+        String pos = buttonID.split("_")[2];
+        Tile tile2 = game.getTileByPosition(pos);
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("availynStep3_" + pos2 + "_" + pos + "_1", "1 fighter"));
+        if (tile2.getUnitHolders().get("space").getUnitCount(UnitType.Fighter, player.getColor()) > 1) {
+            buttons.add(Buttons.green("availynStep3_" + pos2 + "_" + pos + "_2", "2 fighters"));
+        }
+        if (tile2.getUnitHolders().get("space").getUnitCount(UnitType.Fighter, player.getColor()) > 2) {
+            buttons.add(Buttons.green("availynStep3_" + pos2 + "_" + pos + "_3", "3 fighters"));
+        }
+        String msg = player.getRepresentation() + " choose whether to pull 1 or 2 or 3 fighters.";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
+    }
+
+    @ButtonHandler("availynStep3_")
+    public static void availynStep3(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos2 = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(pos2);
+        String pos = buttonID.split("_")[2];
+        Tile tile2 = game.getTileByPosition(pos);
+        String fighters = buttonID.split("_")[3];
+
+        RemoveUnitService.removeUnits(event, tile2, game, player.getColor(), fighters + " fighters");
+        AddUnitService.addUnits(event, tile, game, player.getColor(), fighters + " fighters");
+        String msg = player.getRepresentation() + " used the superweapon Availyn ability and transferred " + fighters
+            + " fighter" + (fighters.equals("1") ? "" : "s") + " from " + tile2.getRepresentationForButtons(game, player) + " to "
+            + tile.getRepresentationForButtons(game, player);
+        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 }

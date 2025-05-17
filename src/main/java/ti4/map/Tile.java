@@ -469,7 +469,7 @@ public class Tile {
     @JsonIgnore
     public boolean isNebula() {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
-            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png")) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "attachment_superweapon_availyn.png")) {
                 return true;
             }
         }
