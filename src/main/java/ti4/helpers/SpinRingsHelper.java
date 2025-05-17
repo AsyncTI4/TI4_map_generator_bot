@@ -12,7 +12,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.FowCommunicationThreadService;
 
 @UtilityClass
@@ -109,7 +108,7 @@ public class SpinRingsHelper {
             if (steps > 0) {
                 for (int x = 1; x < (ring * 6 + 1); x++) {
                     Tile tile = game.getTileByPosition(ring + (x < 10 ? "0" : "") + x);
-                    if (tile == null || FOWPlusService.isVoid(tile)) {
+                    if (tile == null) {
                         continue;
                     }
 
@@ -181,7 +180,7 @@ public class SpinRingsHelper {
                 } else {
                     tile = game.getTileByPosition(y + "" + x);
                 }
-                if (tile == null || FOWPlusService.isVoid(tile)) {
+                if (tile == null) {
                     continue;
                 } 
 

@@ -949,6 +949,8 @@ public class ButtonHelper {
         Game game, Tile activeSystem, Player player,
         boolean justChecking, ButtonInteractionEvent event
     ) {
+        if (activeSystem == null) return 0;
+
         int numberOfAbilities = 0;
         if (game.getStoredValue("allianceModeSimultaneousAction").isEmpty() && !player.getAllianceMembers().isEmpty()) {
             for (Player p2 : game.getRealPlayers()) {
@@ -2062,6 +2064,8 @@ public class ButtonHelper {
 
     public static List<String> getPlanetsWithSpecificUnit(Player player, Tile tile, String unit) {
         List<String> planetsWithUnit = new ArrayList<>();
+        if (tile == null) return planetsWithUnit;
+
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             if (unitHolder instanceof Planet planet) {
                 if (planet.getUnits()
@@ -3732,7 +3736,7 @@ public class ButtonHelper {
 
         }
         if (doesPlayerHaveFSHere("lanefir_flagship", player, tile)) {
-            List<Button> button2 = scanlinkResolution(player, game);
+            List<Button> button2 = scanlinkResolution(player, tile, game);
             if (!button2.isEmpty()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                     + "Due to the Memory of Dusk (the Lanefir flagship), you may explore a planet you control in the system.");
@@ -4019,9 +4023,10 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static List<Button> getAbsolOrbitalButtons(Game game, Player player) {
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
+    public static List<Button> getAbsolOrbitalButtons(Game game, Tile tile, Player player) {
         List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
         for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
             if ("space".equalsIgnoreCase(planetUnit.getName())) {
                 continue;
@@ -4050,9 +4055,10 @@ public class ButtonHelper {
         deleteMessage(event);
     }
 
-    public static List<Button> scanlinkResolution(Player player, Game game) {
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
+    public static List<Button> scanlinkResolution(Player player, Tile tile, Game game) {
         List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
         for (UnitHolder planetUnit : tile.getUnitHolders().values()) {
             if ("space".equalsIgnoreCase(planetUnit.getName())) {
                 continue;
@@ -4408,7 +4414,7 @@ public class ButtonHelper {
             buttons.add(Buttons.blue(finChecker + "purgeVaylerianHero", "Use Vaylerian Hero", FactionEmojis.vaylerian));
         }
         Tile active = game.getTileByPosition(game.getActiveSystem());
-        if (!active.isHomeSystem() && player.hasLeaderUnlocked("uydaihero")) {
+        if (active != null && !active.isHomeSystem() && player.hasLeaderUnlocked("uydaihero")) {
             buttons.add(Buttons.blue(finChecker + "purgeUydaiHero", "Use Uydai Hero", FactionEmojis.vaylerian));
         }
 
@@ -4444,6 +4450,9 @@ public class ButtonHelper {
         Map<String, Integer> displacedUnits = game.getMovedUnitsFromCurrentActivation();
         Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = game.getTileByPosition(game.getActiveSystem());
+        if (FOWPlusService.isVoid(game, game.getActiveSystem())) {
+            tile = FOWPlusService.voidTile(game.getActiveSystem());
+        }
         if (!game.getMovedUnitsFromCurrentActivation().isEmpty()) {
             tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         }
