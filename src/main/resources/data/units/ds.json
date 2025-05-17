@@ -2265,7 +2265,7 @@
         "baseType": "fighter",
         "asyncId": "ff",
         "name": "Wyvern II",
-        "upgradesFromUnitId": "belkosea_cruiser",
+        "upgradesFromUnitId": "belkosea_fighter",
         "requiredTechId": "dsbelkff",
         "source": "ds",
         "faction": "belkosea",
