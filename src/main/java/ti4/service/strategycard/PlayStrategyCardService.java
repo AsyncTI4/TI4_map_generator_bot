@@ -260,25 +260,6 @@ public class PlayStrategyCardService {
             }
         }
 
-        if (scModel.usesAutomationForSCID("pok7technology")) {
-            Player raOwner = game.getPNOwner("ra");
-            if (raOwner != null && playersToFollow.contains(raOwner)) {
-                Player raHolder = game.getRealPlayers().stream()
-                    .filter(p -> p.getPromissoryNotes().containsKey("ra"))
-                    .findFirst()
-                    .orElse(null);
-                if (raHolder != null && raHolder != raOwner) {
-                    List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
-                    int raOwnerIndex = playersInOrder.indexOf(raOwner);
-                    int raHolderIndex = playersInOrder.indexOf(raHolder);
-                    if (raHolderIndex < raOwnerIndex) {
-                        MessageHelper.sendMessageToChannel(raHolder.getCardsInfoThread(),
-                            "If you get a chance to play Research Agreement from the " + scModel.getName() + " strategy card, reminder that you must choose any techs you research before you can gain theirs.");
-                    }
-                }
-            }
-        }
-
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Buttons.red(player.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         Button deleteButton = Buttons.red(player.getFinsFactionCheckerPrefix() + "doAnotherAction", "Do Another Action");
@@ -414,13 +395,12 @@ public class PlayStrategyCardService {
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
-                    //QUESTION: Do we want this actually all the time?
-                    if (game.isOmegaPhaseMode()) {
+                    if (ShouldPrintFollowOrder(game, scModel)) {
                         List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
                         StringBuilder playerOrder = new StringBuilder("__Order for performing the Secondary ability:__\n");
                         for (int i = 0; i < playersInOrder.size(); i++) {
                             playerOrder.append("`").append(i + 1).append(".` ");
-                            if (game.getPhaseOfGame().equals("action")) {
+                            if (game.isOmegaPhaseMode() && game.getPhaseOfGame().equals("action")) {
                                 int lowestSC = playersInOrder.get(i).getLowestSC();
                                 TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
                                 playerOrder.append(scEmoji);
@@ -579,6 +559,18 @@ public class PlayStrategyCardService {
             Collections.rotate(players, -players.indexOf(player));
         }
         return players;
+    }
+
+    private static boolean ShouldPrintFollowOrder(Game game, StrategyCardModel scModel) {
+        if (game.isOmegaPhaseMode()) return true;
+
+        if (scModel.usesAutomationForSCID("pok7technology")) {
+            Player raOwner = game.getPNOwner("ra");
+            if (raOwner == null) return false;
+            return true;
+        }
+
+        return false;
     }
 
     private static List<Button> getLeadershipButtons(int sc) {
