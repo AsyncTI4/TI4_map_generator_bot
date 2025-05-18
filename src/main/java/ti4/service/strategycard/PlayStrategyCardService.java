@@ -167,6 +167,9 @@ public class PlayStrategyCardService {
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
+            if (ButtonHelper.isLawInPlay(game, "sanctions") && !game.isAbsolMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Friendly reminder that executive sanctions is in play, so the AC limit is 3 instead of 7");
+            }
         }
 
         // Handle Kyro Hero
@@ -315,7 +318,63 @@ public class PlayStrategyCardService {
             message.addReaction(reactionEmoji).queue();
             player.addFollowedSC(scToPlay, event);
         }
+        if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1 && !game.getName().equalsIgnoreCase("pbd100two")) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player) {
+                    continue;
+                }
+                if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
+                    && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
+                    && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
+                    && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                    if (reactionEmoji2 != null) {
+                        message.addReaction(reactionEmoji2).queue();
+                        p2.addFollowedSC(scToPlay, event);
+                        if (scToPlay == 8) {
+                            String key3 = "potentialBlockers";
+                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                            }
 
+                            String key = "factionsThatAreNotDiscardingSOs";
+                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                        }
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                            + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
+                    }
+                } else {
+                    if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
+                        Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                        if (reactionEmoji2 != null) {
+                            message.addReaction(reactionEmoji2).queue();
+                            p2.addFollowedSC(scToPlay, event);
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                                + stratCardName + "** because the bot does not believe you have a space dock in your home system");
+                        }
+                    }
+                }
+                if (!p2.hasFollowedSC(scToPlay) && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction()).isEmpty()) {
+                    game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
+                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                    if (reactionEmoji2 != null) {
+                        message.addReaction(reactionEmoji2).queue();
+                        p2.addFollowedSC(scToPlay, event);
+                        if (scToPlay == 8) {
+                            String key3 = "potentialBlockers";
+                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                            }
+
+                            String key = "factionsThatAreNotDiscardingSOs";
+                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                        }
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                            + stratCardName + "** because you told the bot earlier that you wished to pass on it.");
+                    }
+                }
+            }
+        }
         game.setStoredValue("scPlay" + scToPlay, message.getJumpUrl());
         game.setStoredValue("scPlayMsgID" + scToPlay, message.getId());
         game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, System.currentTimeMillis() + "");

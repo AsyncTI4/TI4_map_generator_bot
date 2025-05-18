@@ -854,7 +854,7 @@
         "id": "mark_of_pharadn",
         "name": "Mark Of Pharadn",
         "faction": "pharadn",
-        "permanentEffect": "Abilities that would place infantry from your reinforcements on planets instead allow you to produce those units. When you produce infantry, you must return 1 of your captured infantry to produce each of those units, instead of spending resources.",
+        "permanentEffect": "Abilities that would allow you to place infantry on the game board instead allow you to produce those units. When you produce infantry, you must return 1 of your captured infantry to produce each of those units, instead of spending resources.",
         "source": "ds"
     },
     {
@@ -898,6 +898,20 @@
         "name": "Living Metals",
         "faction": "atokera",
         "permanentEffect": "Agenda outcomes and action cards that have component actions cannot remove or destroy your units, or place other player’s units on planets you control. [Note: protects against ixthian] ",
+        "source": "ds"
+    },
+    {
+        "id": "classified_developments",
+        "name": "Classified Developments",
+        "faction": "belkosea",
+        "permanentEffect": "ACTION: Spend a combined total of 5 resources or influence to place 1 superweapon ability card in your play area, and the corresponding superweapon token on a planet you control.",
+        "source": "ds"
+    },
+    {
+        "id": "superweapon_projects",
+        "name": "Superweapon Projects",
+        "faction": "belkosea",
+        "permanentEffect": "Superweapons you control are structures and cannot be destroyed by abilities. Each planet can contain a maximum of 1 superweapon. ",
         "source": "ds"
     }
 ]

@@ -90,7 +90,6 @@ import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
-import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -588,7 +587,27 @@ public class Game extends GameProperties {
         return getRealPlayers().stream().anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
     }
 
+    public String gameJumpLinks() {
+        return String.format("%s %s %s", getName(), getTabletalkJumpLink(), getActionsJumpLink());
+    }
+
     @JsonIgnore
+    public String getTabletalkJumpLink() {
+        TextChannel tt = getTableTalkChannel();
+        if (tt == null) return "[no tt]";
+        return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
+
+    }
+
+    @JsonIgnore
+    public String getActionsJumpLink() {
+        TextChannel act = getActionsChannel();
+        if (act == null) return "[no actions]";
+        return String.format("[__[Actions](%s)__]", act.getJumpUrl());
+    }
+
+    @JsonIgnore
+    @Nullable
     public TextChannel getTableTalkChannel() {
         try {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getTableTalkChannelID());
@@ -3264,8 +3283,7 @@ public class Game extends GameProperties {
 
     public Tile getTileByPosition(String position) {
         if (position == null) return null;
-        Tile tile = tileMap.get(position);
-        return tile == null && FOWPlusService.isActive(this) ? FOWPlusService.voidTile(position) : tile;
+        return tileMap.get(position);
     }
 
     public boolean isTileDuplicated(String tileID) {
@@ -3432,6 +3450,7 @@ public class Game extends GameProperties {
                     removePlanet(unitHolder);
                 }
             }
+            customHyperlaneData.remove(position);
         }
 
         tileMap.remove(position);

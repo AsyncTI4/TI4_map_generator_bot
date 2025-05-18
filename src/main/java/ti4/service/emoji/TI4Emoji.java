@@ -58,6 +58,31 @@ public interface TI4Emoji {
         return values;
     }
 
+    static <T extends TI4Emoji> T getEmojiFromName(Class<T> clazz, String name) {
+        if (!clazz.isEnum()) return null;
+        List<T> consts = Arrays.asList(clazz.getEnumConstants());
+        return consts.stream().filter(c -> c.name().equalsIgnoreCase(name)).findFirst().orElse(null);
+    }
+
+    static TI4Emoji findEmoji(String category, String name) {
+        return switch (category.toLowerCase()) {
+            case "card", "cards", "cardemojis" -> getEmojiFromName(CardEmojis.class, name);
+            case "color", "colors", "coloremojis" -> getEmojiFromName(ColorEmojis.class, name);
+            case "dice", "diceemojis" -> getEmojiFromName(DiceEmojis.class, name);
+            case "explore", "explores", "exploreemojis" -> getEmojiFromName(ExploreEmojis.class, name);
+            case "faction", "factions", "factionemojis" -> getEmojiFromName(FactionEmojis.class, name);
+            case "leader", "leaders", "leaderemojis" -> getEmojiFromName(LeaderEmojis.class, name);
+            case "milty", "miltydraft", "draft", "miltyemojis" -> getEmojiFromName(MiltyDraftEmojis.class, name);
+            case "planet", "planets", "planetemojis" -> getEmojiFromName(PlanetEmojis.class, name);
+            case "source", "sources", "sourceemojis" -> getEmojiFromName(SourceEmojis.class, name);
+            case "tech", "techs", "techemojis" -> getEmojiFromName(TechEmojis.class, name);
+            case "unit", "units", "unitemojis" -> getEmojiFromName(UnitEmojis.class, name);
+            case "tile", "tiles", "tileemojis" -> getEmojiFromName(TileEmojis.class, name);
+            case "misc", "miscemojis" -> getEmojiFromName(MiscEmojis.class, name);
+            default -> null;
+        };
+    }
+
     static TI4Emoji getRandomGoodDog() {
         List<TI4Emoji> goodDogs = new ArrayList<>(MiscEmojis.goodDogs());
         Random seed = ThreadLocalRandom.current();

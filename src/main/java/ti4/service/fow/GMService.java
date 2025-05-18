@@ -102,6 +102,10 @@ public class GMService {
         return "";
     }
 
+    public static void logActivity(Game game,String eventLog, boolean ping) {
+        logPlayerActivity(game, null, eventLog, null, ping);
+    }
+
     public static void logPlayerActivity(Game game, Player player, String eventLog) {
         logPlayerActivity(game, player, eventLog, null, false);
     }
@@ -115,6 +119,8 @@ public class GMService {
             threadChannel -> {
                 if (jumpUrl != null) {
                     MessageHelper.sendMessageToChannel(threadChannel, log + " - " + jumpUrl);
+                } else if (player == null) {
+                    MessageHelper.sendMessageToChannel(threadChannel, log);
                 } else {
                     jumpToLatestMessage(player, latestJumpUrl -> {
                         MessageHelper.sendMessageToChannel(threadChannel, log + " - " + latestJumpUrl);
@@ -124,7 +130,7 @@ public class GMService {
     }
 
     private static void jumpToLatestMessage(Player player, Consumer<String> callback) {
-        MessageChannel privateChannel = player.getPrivateChannel();
+        MessageChannel privateChannel = player != null ? player.getPrivateChannel() : null;
         if (privateChannel != null) {
             privateChannel.getHistory().retrievePast(1).queue(messages -> {
                 callback.accept( messages.get(0).getJumpUrl());

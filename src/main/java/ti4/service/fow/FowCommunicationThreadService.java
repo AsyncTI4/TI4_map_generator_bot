@@ -170,7 +170,7 @@ public class FowCommunicationThreadService {
             .queue(t -> MessageHelper.sendMessageToChannel(t, "## Private communications thread opened\n"
                 + "Players: " + inviteePlayer.getRepresentation(true, true, false, true)
                 + " " + player.getRepresentation(true, true, false, true) + "\n"
-                + "GM ping: " + game.getPlayersWithGMRole().stream().map(Player::getPing).collect(Collectors.joining(" "))));
+                + "GM ping: " + GMService.gmPing(game)));
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() 
                 + "(You) accepted private communications invitation from " + inviteePlayer.getRepresentationNoPing());

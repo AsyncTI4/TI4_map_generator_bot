@@ -358,10 +358,10 @@ public class FoWHelper {
             boolean borderBlocked = false;
             for (BorderAnomalyHolder b : game.getBorderAnomalies()) {
                 if (b == null || b.getTile() == null) continue;
-                if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacency())
+                if (b.getTile().equals(position) && b.getDirection() == i && b.blocksAdjacencyOut()
+                    || b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacencyIn()) {
                     borderBlocked = true;
-                if (b.getTile().equals(position_) && b.getDirection() == dirFrom && b.blocksAdjacency())
-                    borderBlocked = true;
+                }
             }
             if (borderBlocked && !naturalMapOnly)
                 continue;
@@ -636,6 +636,9 @@ public class FoWHelper {
      */
     public static List<Player> getAdjacentPlayers(Game game, String position, boolean includeSweep) {
         List<Player> players = new ArrayList<>();
+        if (FOWPlusService.isVoid(game, position))
+            return players;
+
         Set<String> tilesToCheck = getAdjacentTiles(game, position, null, false);
         Tile startingTile = game.getTileByPosition(position);
 
@@ -667,6 +670,8 @@ public class FoWHelper {
 
     /** Check if the specified player should have vision on the system */
     public static boolean playerIsInSystem(Game game, Tile tile, Player player, boolean forNeighbors) {
+        if (tile == null) return false;
+
         Set<String> unitHolderNames = tile.getUnitHolders().keySet();
         List<String> playerPlanets = player.getPlanetsAllianceMode();
         if (forNeighbors) {
@@ -699,13 +704,12 @@ public class FoWHelper {
 
     /** Check if the player has units in the system */
     public static boolean playerHasUnitsInSystem(Player player, Tile tile) {
-        return tile.containsPlayersUnits(player);
+        return tile != null && tile.containsPlayersUnits(player);
     }
 
     public static boolean playerHasPlanetsInSystem(Player player, Tile tile) {
-        if (tile == null || player == null) {
-            return false;
-        }
+        if (tile == null || player == null) return false;
+
         for (UnitHolder uH : tile.getPlanetUnitHolders()) {
             if (player.getPlanetsAllianceMode().contains(uH.getName())) {
                 return true;
@@ -717,8 +721,7 @@ public class FoWHelper {
 
     public static boolean playerHasShipsInSystem(Player player, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
-        if (colorID == null)
-            return false; // player doesn't have a color
+        if (tile == null || colorID == null) return false;
 
         UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
@@ -733,8 +736,7 @@ public class FoWHelper {
 
     public static boolean playerHasActualShipsInSystem(Player player, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
-        if (colorID == null)
-            return false; // player doesn't have a color
+        if (tile == null || colorID == null) return false;
 
         UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
@@ -773,8 +775,7 @@ public class FoWHelper {
 
     public static boolean playerHasFightersInSystem(Player player, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
-        if (colorID == null)
-            return false; // player doesn't have a color
+        if (tile == null || colorID == null) return false; 
 
         UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
@@ -789,8 +790,8 @@ public class FoWHelper {
 
     public static boolean playerHasFightersInAdjacentSystems(Player player, Tile tile, Game game) {
         String colorID = Mapper.getColorID(player.getColor());
-        if (colorID == null)
-            return false; // player doesn't have a color
+        if (tile == null || colorID == null) return false;
+
         for (String pos : getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
             Tile tile2 = game.getTileByPosition(pos);
             UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
@@ -807,8 +808,7 @@ public class FoWHelper {
 
     public static boolean playerHasUnitsOnPlanet(Player player, UnitHolder unitHolder) {
         String colorID = Mapper.getColorID(player.getColor());
-        if (colorID == null)
-            return false; // player doesn't have a color
+        if (colorID == null) return false;
 
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
 
@@ -822,8 +822,7 @@ public class FoWHelper {
 
     public static boolean playerHasInfantryOnPlanet(Player player, Tile tile, String planet) {
         String colorID = Mapper.getColorID(player.getColor());
-        if (colorID == null)
-            return false; // player doesn't have a color
+        if (tile == null || colorID == null) return false;
 
         UnitHolder unitHolder = tile.getUnitHolders().get(planet);
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());

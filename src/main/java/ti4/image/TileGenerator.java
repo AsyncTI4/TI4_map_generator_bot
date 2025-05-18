@@ -362,23 +362,28 @@ public class TileGenerator {
                 }
             }
             case Extras -> {
-                if (isFoWPrivate && tile.hasFog(fowPlayer))
-                    return tileOutput;
-
-                List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
-                int direction = 0;
-                for (String secondaryTile : adj) {
-                    if (secondaryTile != null) {
-                        addBorderDecoration(direction, secondaryTile, tileGraphics,
-                            BorderAnomalyModel.BorderAnomalyType.ARROW);
+                if (!isFoWPrivate || !tile.hasFog(fowPlayer)) {
+                    List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
+                    int direction = 0;
+                    for (String secondaryTile : adj) {
+                        if (secondaryTile != null) {
+                            addBorderDecoration(direction, secondaryTile, tileGraphics,
+                                BorderAnomalyModel.BorderAnomalyType.ARROW);
+                        }
+                        direction++;
                     }
-                    direction++;
                 }
-                game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
-                    if (borderAnomalyHolder.getTile().equals(tile.getPosition())) {
-                        addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
-                    }
-                });
+
+                if (!game.getBorderAnomalies().isEmpty()) {
+                    List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
+                    Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, fowPlayer);
+                    game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
+                        if (borderAnomalyHolder.getTile().equals(tile.getPosition())
+                            && (!isFoWPrivate || !tile.hasFog(fowPlayer) || visiblePositions.contains(orderedAdjacentPositions.get(borderAnomalyHolder.getDirection())))) {
+                            addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
+                        }
+                    });
+                }
             }
             case Units -> {
                 if (isFoWPrivate && tile.hasFog(fowPlayer))
@@ -1559,6 +1564,9 @@ public class TileGenerator {
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
             return false;
+        }
+        if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains("superweapon_mors"))) {
+            return true;
         }
         for (Player player : game.getRealPlayers()) {
             if (player.hasAbility("synthesis") && player.getReadiedPlanets().contains(unitHolder.getName())) {

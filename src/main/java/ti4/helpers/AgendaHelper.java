@@ -72,6 +72,7 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -1372,12 +1373,7 @@ public class AgendaHelper {
         }
         String summary2 = getSummaryOfVotes(game, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
-        if (game.isFowMode()) {
-            Player gm = game.getPlayersWithGMRole().getFirst();
-            if (gm != null) {
-                MessageHelper.sendMessageToChannel(gm.getCardsInfoThread(), getSummaryOfVotes(game, true, true));
-            }
-        }
+        GMService.logActivity(game, getSummaryOfVotes(game, true, true), false);
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
@@ -3472,6 +3468,7 @@ public class AgendaHelper {
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
             if (aCount == 1) {
+                GMService.logActivity(game, "**Agenda** Phase for Round " + game.getRound() + " started.", true);
                 FowCommunicationThreadService.checkAllCommThreads(game);
             }
         } else {
@@ -3635,13 +3632,12 @@ public class AgendaHelper {
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
                 String message = "";
-                if(!game.getStoredValue(politicsHolder).isEmpty()){
+                if (!game.getStoredValue(politicsHolder).isEmpty()) {
                     message = "## " + game.getStoredValue(politicsHolder) + " had Politics and placed the agendas in this order: "
-                    + game.getStoredValue(key).replace("_", ", ") + ".";
-                }
-                else {
+                        + game.getStoredValue(key).replace("_", ", ") + ".";
+                } else {
                     message = "## The Politics player placed the agendas in this order: "
-                    + game.getStoredValue(key).replace("_", ", ") + ".";
+                        + game.getStoredValue(key).replace("_", ", ") + ".";
                 }
                 MessageHelper.sendMessageToChannel(channel, message);
             }
@@ -3653,18 +3649,6 @@ public class AgendaHelper {
                     player.getRepresentationUnfogged()
                         + " you have Quaxdol Junitas, the Florzen commander, and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
-            }
-            if (!action && aCount == 1 && player.hasTech("dsrohdy")) {
-                TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-                    + " you have " + dsrohdy.getRepresentation(false) + " and may choose a player.\n"
-                    + "They must produce 1 ship in a system that contains 1 or more of their space docks or war suns.");
-                for (String tech : player.getTechs()) {
-                    if (Mapper.getTech(tech).isUnitUpgrade()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "",
-                            ButtonHelperModifyUnits.getContractualObligationsButtons(game, player));
-                    }
-                }
             }
         }
         if (!game.isFowMode() && !action) {

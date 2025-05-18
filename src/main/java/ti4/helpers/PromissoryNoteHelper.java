@@ -427,8 +427,11 @@ public class PromissoryNoteHelper {
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please use buttons to explore a planet you control.", buttons);
         }
+        if ("dspnbelk".equalsIgnoreCase(id)) {
+            ButtonHelperFactionSpecific.rollForBelkoseaPN(player);
+        }
         if ("gift".equalsIgnoreCase(id)) {
-            StartPhaseService.startActionPhase(event, game);
+            StartPhaseService.startActionPhase(event, game, false);
             //in case Naalu gets eliminated and the PN goes away
             game.setStoredValue("naaluPNUser", player.getFaction());
         }

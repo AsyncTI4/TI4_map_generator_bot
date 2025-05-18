@@ -31,6 +31,7 @@ import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
+import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.turn.StartTurnService;
@@ -54,6 +55,7 @@ public class StatusHelper {
 
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
+        GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);
         for (Player player : game.getRealPlayers()) {
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
             List<String> relics = new ArrayList<>(player.getRelics());

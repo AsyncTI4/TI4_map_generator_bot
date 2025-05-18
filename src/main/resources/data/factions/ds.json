@@ -1191,5 +1191,33 @@
         ],
         "complexity": "High",
         "source": "ds"
+    },
+    {
+        "alias": "belkosea",
+        "factionName": "Belkosea Allied States",
+        "homeSystem": "br5",
+        "startingFleet": "1 cv,5 ff,1 inf s, 1 sd s, 1 pds r,1 inf r, 1 dn, 1 cr",
+        "commodities": 2,
+        "factionTech": ["dsbelky", "dsbelkff"],
+        "startingTechAmount": 1,
+        "startingTechOptions": ["st", "ps", "sdn","aida"],
+        "homePlanets": ["strang","reil"],
+        "abilities": ["classified_developments", "superweapon_projects"],
+        "leaders": ["belkoseaagent", "belkoseacommander", "belkoseahero"],
+        "promissoryNotes": ["dspnbelk"],
+        "units": [
+            "belkosea_fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "belkosea_flagship",
+            "infantry",
+            "belkosea_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
     }
 ]
