@@ -314,7 +314,6 @@ public class PlayStrategyCardService {
         Message message = mainGameChannel.sendMessage(toSend).complete();
         Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
         String stratCardName = Helper.getSCName(scToPlay, game);
-        String threadMessage = "";
 
         if (reactionEmoji != null) {
             message.addReaction(reactionEmoji).queue();
@@ -341,10 +340,6 @@ public class PlayStrategyCardService {
                         }
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
                             + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
-                        
-                        threadMessage = p2.getRepresentation(false, false) + " was automatically marked as not following **"
-                                        + stratCardName + "** because of a lack of command tokens in their strategy pool";
-                        
                     }
                 } else if (playerCantFollowNoDocks(game, player, p2, scToPlay)){
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
@@ -353,8 +348,6 @@ public class PlayStrategyCardService {
                         p2.addFollowedSC(scToPlay, event);
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
                             + stratCardName + "** because the bot does not believe you have a space dock in your home system");
-                        threadMessage = p2.getRepresentation(false, false) + " was automatically marked as not following **"
-                                        + stratCardName + "** because the bot does not believe they have a space dock in their home system";
                     }
                 }
 
@@ -450,9 +443,26 @@ public class PlayStrategyCardService {
                         }
                     }
                 } 
+                else {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2 == player) {
+                            continue;
+                        }
+                        if (playerCantFollowNoTokens(game, player, p2, scToPlay)) {
+                            MessageHelper.sendMessageToChannel(m5, p2.getRepresentation(false, false) + " was automatically marked as not following **"
+                                + stratCardName + "** because of a lack of command tokens in their strategy pool");
+                        } else if (playerCantFollowNoDocks(game, player, p2, scToPlay)){
+                            MessageHelper.sendMessageToChannel(m5, p2.getRepresentation(false, false) + " was automatically marked as not following **"
+                                + stratCardName + "** because the bot does not believe they have a space dock in their home system");
+                        }
+                        else if (!p2.hasFollowedSC(scToPlay) && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction()).isEmpty()) {
+                            MessageHelper.sendMessageToChannel(m5, p2.getRepresentation(false, true) + " is not following " + stratCardName + ".");
+                            
+                        }
+                    }
+                }
             });
-        }
-        
+        }     
     }
 
     private static boolean playerCantFollowNoTokens(Game game, Player player,  Player p2, int scToPlay) {
