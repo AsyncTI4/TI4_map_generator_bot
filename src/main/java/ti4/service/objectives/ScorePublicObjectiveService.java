@@ -22,7 +22,6 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.leader.HeroUnlockCheckService;
-import ti4.service.unit.AddUnitService;
 
 @UtilityClass
 public class ScorePublicObjectiveService {
@@ -114,8 +113,11 @@ public class ScorePublicObjectiveService {
         }
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         if (player.hasAbility("dark_purpose")) {
-            AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "2 infantry");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " captured 2 infantry due to scoring an objective while having the Dark Purpose ability");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " can gain 1 command token due to their dark purpose ability");
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+                + ". Use buttons to gain 1 command token.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         if (game.isOmegaPhaseMode()) {
             //Omega Phase objectives require you to have, not spend. Skip all the spending checks.
@@ -165,18 +167,22 @@ public class ScorePublicObjectiveService {
         }
         if (poName.contains("Lead From the Front")) {
             int currentStrat = player.getStrategicCC();
+            int requiredSpend = 3;
+            if (player.hasRelicReady("emelpar")) {
+                requiredSpend--;
+            }
             int currentTact = player.getTacticalCC();
-            if (currentStrat + currentTact >= 3) {
-                if (currentStrat >= 3) {
-                    for (int x = 0; x < 3; x++) {
+            if (currentStrat + currentTact >= requiredSpend) {
+                if (currentStrat >= requiredSpend) {
+                    for (int x = 0; x < requiredSpend; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " _Lead from the Front_.");
                     }
-                    player.setStrategicCC(currentStrat - 3);
+                    player.setStrategicCC(currentStrat - requiredSpend);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                         + ", 3 command tokens have automatically been deducted from your strategy pool (" + currentStrat + "->" + player.getStrategicCC() + ").");
                 } else {
                     String currentCC = player.getCCRepresentation();
-                    int subtract = 3 - currentStrat;
+                    int subtract = requiredSpend - currentStrat;
                     for (int x = 0; x < currentStrat; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public1 + " _Lead from the Front_.");
                     }
@@ -200,17 +206,21 @@ public class ScorePublicObjectiveService {
         if (poName.contains("Galvanize the People")) {
             int currentStrat = player.getStrategicCC();
             int currentTact = player.getTacticalCC();
-            if (currentStrat + currentTact >= 6) {
-                if (currentStrat >= 6) {
-                    for (int x = 0; x < 6; x++) {
+            int requiredSpend = 6;
+            if (player.hasRelicReady("emelpar")) {
+                requiredSpend--;
+            }
+            if (currentStrat + currentTact >= requiredSpend) {
+                if (currentStrat >= requiredSpend) {
+                    for (int x = 0; x < requiredSpend; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " _Galvanize the People_.");
                     }
-                    player.setStrategicCC(currentStrat - 6);
+                    player.setStrategicCC(currentStrat - requiredSpend);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                         + ", 6 command tokens have automatically been deducted from your strategy pool (" + currentStrat + "->" + player.getStrategicCC() + ")");
                 } else {
                     String currentCC = player.getCCRepresentation();
-                    int subtract = 6 - currentStrat;
+                    int subtract = requiredSpend - currentStrat;
                     for (int x = 0; x < currentStrat; x++) {
                         ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Scored " + CardEmojis.Public2 + " _Galvanize the People_.");
                     }

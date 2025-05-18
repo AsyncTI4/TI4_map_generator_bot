@@ -129,8 +129,11 @@ public class SecretObjectiveHelper {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         if (player.hasAbility("dark_purpose")) {
-            AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "2 infantry");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " captured 2 infantry due to scoring an objective while having the Dark Purpose ability");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " can gain 1 command token due to their dark purpose ability");
+            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+                + ". Use buttons to gain 1 command token.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         CommanderUnlockCheckService.checkPlayer(player, "nomad");
         Helper.checkEndGame(game, player);
