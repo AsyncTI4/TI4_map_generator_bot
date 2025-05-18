@@ -315,44 +315,7 @@ public class PlayStrategyCardService {
             message.addReaction(reactionEmoji).queue();
             player.addFollowedSC(scToPlay, event);
         }
-        if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1 && !game.getName().equalsIgnoreCase("pbd100two")) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) {
-                    continue;
-                }
-                if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
-                    && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
-                    && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
-                    && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
-                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
-                    if (reactionEmoji2 != null) {
-                        message.addReaction(reactionEmoji2).queue();
-                        p2.addFollowedSC(scToPlay, event);
-                        if (scToPlay == 8) {
-                            String key3 = "potentialBlockers";
-                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
-                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
-                            }
 
-                            String key = "factionsThatAreNotDiscardingSOs";
-                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
-                        }
-                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
-                            + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
-                    }
-                } else {
-                    if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
-                        Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
-                        if (reactionEmoji2 != null) {
-                            message.addReaction(reactionEmoji2).queue();
-                            p2.addFollowedSC(scToPlay, event);
-                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
-                                + stratCardName + "** because the bot does not believe you have a space dock in your home system");
-                        }
-                    }
-                }
-            }
-        }
         game.setStoredValue("scPlay" + scToPlay, message.getJumpUrl());
         game.setStoredValue("scPlayMsgID" + scToPlay, message.getId());
         game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, System.currentTimeMillis() + "");
@@ -389,6 +352,7 @@ public class PlayStrategyCardService {
                 }
                 MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread.", scButtons);
 
+                MessageHelper.sendMessageToChannel(m5, stratCardName);
                 // Trade Neighbour Message
                 if (scModel.usesAutomationForSCID("pok5trade")) {
                     if (player.hasAbility("guild_ships")) {
@@ -421,9 +385,62 @@ public class PlayStrategyCardService {
                             MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
                         }
                     }
+                } 
+                if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1 && !game.getName().equalsIgnoreCase("pbd100two")) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2 == player) {
+                            continue;
+                        }
+                        if(playerCantFollow(game, player, p2, scToPlay)){
+                            // send the player the message saying they were autonofollowed
+                            Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                            if (reactionEmoji2 != null) {
+                                message.addReaction(reactionEmoji2).queue();
+                                p2.addFollowedSC(scToPlay, event);
+                                if (scToPlay == 8) {
+                                    String key3 = "potentialBlockers";
+                                    if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                        game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                                    }
+
+                                    String key = "factionsThatAreNotDiscardingSOs";
+                                    game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                                }
+                                if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())){
+                                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                                        + stratCardName + "** because the bot does not believe you have a space dock in your home system");
+                                        
+                                    MessageHelper.sendMessageToChannel(m5, p2.getRepresentation(false, false) + " was automatically marked as not following **"
+                                        + stratCardName + "** because the bot does not believe they have a space dock in their home system");
+                                }
+                                else {
+                                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                                    + stratCardName + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
+
+                                    MessageHelper.sendMessageToChannel(m5, p2.getRepresentation(false, false) + " was automatically marked as not following **"
+                                        + stratCardName + "** because of a lack of command tokens in their strategy pool");
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
+        
+    }
+
+    private static boolean playerCantFollow(Game game, Player player,  Player p2, int scToPlay) {
+        if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
+            && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
+            && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
+            && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+            return true;
+        } else {
+            if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship") && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero, Player player) {
