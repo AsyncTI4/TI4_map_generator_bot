@@ -164,7 +164,7 @@ public class StatusHelper {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
             if (scorables.isEmpty() || !Helper.canPlayerScorePOs(game, player)) {
                 String message = player.getRepresentation()
-                    + " cannot score any public objectives according to the bot, but should still confirm this by hitting No PO Scoring.";
+                    + " cannot score any public objectives according to the bot, and has been marked as not scoring POs.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "None");
                 key2 = "queueToScorePOs";
