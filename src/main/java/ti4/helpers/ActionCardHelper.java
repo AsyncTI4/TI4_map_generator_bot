@@ -340,6 +340,16 @@ public class ActionCardHelper {
                 + " The bot thinks you are over the limit and thus will not allow you to play action cards at this time."
                 + " You may discard the action cards and manually resolve if you need to.";
         }
+        if (actionCard.getPhase().equalsIgnoreCase("agenda") && game.getPhaseOfGame() != null && game.getPhaseOfGame().equalsIgnoreCase("action")) {
+            if (!player.getFaction().equalsIgnoreCase("edyn") && !player.getFaction().contains("franken")) {
+                return player.getRepresentationUnfogged()
+                    + " The bot thinks it is the action phase and this is an agenda card. If this is a mistake, ping bothelper in the actions channel";
+            }
+        }
+        if (actionCard.getPhase().equalsIgnoreCase("action") && game.getPhaseOfGame() != null && game.getPhaseOfGame().contains("agenda")) {
+            return player.getRepresentationUnfogged()
+                + " The bot thinks it is the agenda phase and this is an action phase card. If this is a mistake, ping bothelper in the actions channel";
+        }
 
         if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);
