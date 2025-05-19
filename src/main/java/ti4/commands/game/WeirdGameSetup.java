@@ -100,6 +100,9 @@ class WeirdGameSetup extends GameStateSubcommand {
             TIGLHelper.initializeTIGLGame(game);
             return true;
         }
+        if (!isTIGLGame) {
+            game.setCompetitiveTIGLGame(false);
+        }
 
         if (miltyModMode && !baseGameMode) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Milty Mod Mode can only be combined with No Expansion Mode. Please set the game to No Expansion Mode first.");
