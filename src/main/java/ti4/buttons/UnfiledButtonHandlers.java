@@ -1581,6 +1581,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 + ", please play _Sabotage_ by clicking the Sabo button on the action card you wish to Sabo.");
             return;
         }
+
         if (acID.contains("reverse_")) {
             String actionCardTitle = acID.split("_")[2];
             acID = acID.split("_")[0];
@@ -2326,6 +2327,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + raiders, buttons);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        }
+        if (Helper.getCCCount(game, player.getColor()) > 15) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that you are at the CC limit right now, so may need to pull a command counter off your sheet in order to retreat (unless you retreat to a system that has one)");
         }
     }
 
