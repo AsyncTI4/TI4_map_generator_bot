@@ -1180,6 +1180,7 @@ public class ButtonHelperModifyUnits {
                 + " did not place a command token in system they retreated to due to Kado S'mah-Qar, the Kollecc commander.");
         } else {
             CommandCounterHelper.addCC(event, player, tile2, true);
+            Helper.isCCCountCorrect(player);
         }
 
         for (Map.Entry<String, UnitHolder> entry : tile1.getUnitHolders().entrySet()) {

@@ -231,7 +231,7 @@ public class ListPlayerInfoService {
         if (onlyThisGameObj) {
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
-                    msg.append(representScoring(game, id, x)).append("\n");
+                    msg.append(representScoring(game, id, x)).append("\n\n");
                     x++;
                 }
             }
