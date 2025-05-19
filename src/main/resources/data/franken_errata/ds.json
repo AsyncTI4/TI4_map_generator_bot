@@ -453,6 +453,12 @@
     },
     {
         "ItemCategory": "ABILITY",
+        "ItemId": "lithoids",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
         "ItemId": "privileged_citizenry",
         "Undraftable": true,
         "source": "ds"
@@ -525,10 +531,17 @@
         "ItemId": "nivyn_mech",
         "AdditionalComponents": [
             "ABILITY:singularity_point"
+            "HERO:nivynhero",
         ],
         "OptionalSwaps": [
             "TECH:dsnivymf"
         ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "nivynhero",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -545,6 +558,12 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "desperados",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "nokarcommander",
         "Undraftable": true,
         "source": "ds"
     },
