@@ -11,6 +11,8 @@ import ti4.helpers.Constants;
 public class StatisticsCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
+        new OptIn(),
+        new OptOut(),
         new GameStatistics(),
         new PlayerStatistics(),
         new AverageTurnTime(),
