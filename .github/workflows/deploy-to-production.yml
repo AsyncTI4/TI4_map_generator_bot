@@ -21,6 +21,7 @@ jobs:
             DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
             DISCORD_BOT_USERID: ${{ secrets.DISCORD_BOT_USERID }}
             REPO_DISPATCH_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
+            TI4_ULTIMATE_STATISTICS_API_KEY: ${{ secrets.TI4_ULTIMATE_STATISTICS_API_KEY }}
         with:
             host: ${{ secrets.HOSTINGER_SSH_HOST }}
             username: ${{ secrets.HOSTINGER_SSH_USER }}
