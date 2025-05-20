@@ -15,12 +15,13 @@ jobs:
         DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         DISCORD_BOT_USERID: ${{ secrets.DISCORD_BOT_USERID }}
         REPO_DISPATCH_TOKEN: ${{ secrets.REPOSITORY_DISPATCH_TOKEN }}
+        TI4_ULTIMATE_STATISTICS_API_KEY: ${{ secrets.TI4_ULTIMATE_STATISTICS_API_KEY }}
       with:
         host: ${{ secrets.HOSTINGER_SSH_HOST }}
         username: ${{ secrets.HOSTINGER_SSH_USER }}
         password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
         port: ${{ secrets.HOSTINGER_SSH_PORT }}
-        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN
+        envs: AWS_KEY, AWS_SECRET, DISCORD_BOT_TOKEN, DISCORD_BOT_USERID, REPO_DISPATCH_TOKEN, TI4_ULTIMATE_STATISTICS_API_KEY
         script: |
           cd /app
           ./scheduled_upload.sh
@@ -31,7 +32,7 @@ jobs:
           echo "Restarting TIBot... giving 600 seconds to shutdown"
           docker stop $(docker ps -q) --time 600
           echo "Starting Container..."
-          docker run -v ${{ vars.HOST_TI4_SAVES_DIR }}:/opt/STORAGE -d --restart unless-stopped -m 7g -e REPO_DISPATCH_TOKEN=$REPO_DISPATCH_TOKEN tibot $DISCORD_BOT_TOKEN $DISCORD_BOT_USERID 943410040369479690 847560709730730064 1062139934745559160 1090910555327434774 1145823841227112598 1176104225932058694 1209956332380229672 1250131684393881610 1312882116597518416
+          docker run -v ${{ vars.HOST_TI4_SAVES_DIR }}:/opt/STORAGE -d --restart unless-stopped -m 7g -e TI4_ULTIMATE_STATISTICS_API_KEY=$TI4_ULTIMATE_STATISTICS_API_KEY REPO_DISPATCH_TOKEN=$REPO_DISPATCH_TOKEN tibot $DISCORD_BOT_TOKEN $DISCORD_BOT_USERID 943410040369479690 847560709730730064 1062139934745559160 1090910555327434774 1145823841227112598 1176104225932058694 1209956332380229672 1250131684393881610 1312882116597518416
           echo "Cleaning up docker stuff..."
           docker rm $(docker ps --filter status=exited -q) || true
           docker rmi -f $(docker images --filter "dangling=true" -q) || true
