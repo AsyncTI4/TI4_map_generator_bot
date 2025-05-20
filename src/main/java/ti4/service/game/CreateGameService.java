@@ -11,9 +11,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,6 +27,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -423,54 +422,6 @@ public class CreateGameService {
     }
 
     @Nullable
-    private static Guild getNextAvailableServerOrdinal() {
-        List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn;
-
-        // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
-        Guild guild = AsyncTI4DiscordBot.jda
-            .getGuildById(GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
-                AsyncTI4DiscordBot.guildPrimary.getId()));
-
-        int index = guilds.indexOf(guild);
-        if (index == -1) { // NOT FOUND
-            BotLogger.warning("`CreateGameService.getNextAvailableServer` WARNING: Current guild is not in the list of available overflow servers: ***" + guild.getName() + "***");
-        }
-
-        // CHECK IF CURRENT GUILD HAS ROOM (INDEX = X)
-        if (serverHasRoomForNewFullCategory(guild)) {
-            return guild;
-        }
-
-        // CHECK NEXT GUILDS IN LINE STARTING AT CURRENT (INDEX = X+1 to ♾)
-        for (int i = index + 1; i < guilds.size(); i++) {
-            guild = guilds.get(i);
-            if (serverHasRoomForNewFullCategory(guild)) {
-                GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-                return guild;
-            }
-        }
-
-        // CHECK STARTING FROM BEGINNING UP TO INDEX (INDEX = 0 to X-1)
-        for (int i = 0; i < index; i++) {
-            guild = guilds.get(i);
-            if (serverHasRoomForNewFullCategory(guild)) {
-                GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-                return guild;
-            }
-        }
-
-        // ALL OVERFLOWS FULL, CHECK PRIMARY
-        if (serverHasRoomForNewFullCategory(AsyncTI4DiscordBot.guildPrimary)) {
-            // Don't set GlobalSetting to check for new overflow each time
-            return AsyncTI4DiscordBot.guildPrimary;
-        }
-
-        BotLogger.warning("`CreateGameService.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
-        return null;
-    }
-
-    @Nullable
     private static Guild getServerWithMostCapacity() {
         List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn.stream()
             .filter(CreateGameService::serverHasRoomForNewFullCategory)
@@ -580,7 +531,7 @@ public class CreateGameService {
                     return category.getName();
                 }
             } catch (Exception e) {
-                BotLogger.error("Could not parse integers within category name: " + category.getName(), e);
+                BotLogger.warning("Could not parse integers within category name: " + category.getName(), e);
             }
         }
 
