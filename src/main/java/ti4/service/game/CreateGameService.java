@@ -422,54 +422,6 @@ public class CreateGameService {
     }
 
     @Nullable
-    private static Guild getNextAvailableServerOrdinal() {
-        List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn;
-
-        // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
-        Guild guild = AsyncTI4DiscordBot.jda
-            .getGuildById(GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
-                AsyncTI4DiscordBot.guildPrimary.getId()));
-
-        int index = guilds.indexOf(guild);
-        if (index == -1) { // NOT FOUND
-            BotLogger.warning("`CreateGameService.getNextAvailableServer` WARNING: Current guild is not in the list of available overflow servers: ***" + guild.getName() + "***");
-        }
-
-        // CHECK IF CURRENT GUILD HAS ROOM (INDEX = X)
-        if (serverHasRoomForNewFullCategory(guild)) {
-            return guild;
-        }
-
-        // CHECK NEXT GUILDS IN LINE STARTING AT CURRENT (INDEX = X+1 to ♾)
-        for (int i = index + 1; i < guilds.size(); i++) {
-            guild = guilds.get(i);
-            if (serverHasRoomForNewFullCategory(guild)) {
-                GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-                return guild;
-            }
-        }
-
-        // CHECK STARTING FROM BEGINNING UP TO INDEX (INDEX = 0 to X-1)
-        for (int i = 0; i < index; i++) {
-            guild = guilds.get(i);
-            if (serverHasRoomForNewFullCategory(guild)) {
-                GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-                return guild;
-            }
-        }
-
-        // ALL OVERFLOWS FULL, CHECK PRIMARY
-        if (serverHasRoomForNewFullCategory(AsyncTI4DiscordBot.guildPrimary)) {
-            // Don't set GlobalSetting to check for new overflow each time
-            return AsyncTI4DiscordBot.guildPrimary;
-        }
-
-        BotLogger.warning("`CreateGameService.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
-        return null;
-    }
-
-    @Nullable
     private static Guild getServerWithMostCapacity() {
         List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn.stream()
             .filter(CreateGameService::serverHasRoomForNewFullCategory)
