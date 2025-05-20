@@ -123,6 +123,26 @@ public class StatusHelper {
                     player.getRepresentationUnfogged() + " reminder this is the window to use the Uydai promissory note");
             }
         }
+        String key2 = "queueToScorePOs";
+        String key3 = "potentialScorePOBlockers";
+        String key2b = "queueToScoreSOs";
+        String key3b = "potentialScoreSOBlockers";
+
+        game.setStoredValue(key2, "");
+        game.setStoredValue(key3, "");
+        game.setStoredValue(key2b, "");
+        game.setStoredValue(key3b, "");
+        if (game.getHighestScore() + 4 > game.getVp()) {
+            game.setStoredValue("forcedScoringOrder", "true");
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
+                "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
+            for (Player player : GetPlayersInScoringOrder(game)) {
+                game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
+                game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
+            }
+        }
 
         for (Player player : game.getRealPlayers()) {
             List<String> scorables = new ArrayList<>();
@@ -147,6 +167,21 @@ public class StatusHelper {
                 }
             }
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), messageText);
+            if (scorables.isEmpty() || !Helper.canPlayerScorePOs(game, player)) {
+                String message = player.getRepresentation()
+                    + " cannot score any public objectives according to the bot, and has been marked as not scoring POs.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                game.setStoredValue(player.getFaction() + "round" + game.getRound() + "PO", "None");
+                key2 = "queueToScorePOs";
+                key3 = "potentialScorePOBlockers";
+                if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+                    game.setStoredValue(key2,
+                        game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                }
+                if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
+                    game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                }
+            }
 
             int count = 0;
             StringBuilder message3a = new StringBuilder(player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:");
@@ -161,28 +196,24 @@ public class StatusHelper {
             if (count > 0 && player.isRealPlayer()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a.toString());
             }
-        }
-
-        String key2 = "queueToScorePOs";
-        String key3 = "potentialScorePOBlockers";
-        String key2b = "queueToScoreSOs";
-        String key3b = "potentialScoreSOBlockers";
-
-        game.setStoredValue(key2, "");
-        game.setStoredValue(key3, "");
-        game.setStoredValue(key2b, "");
-        game.setStoredValue(key3b, "");
-        if (game.getHighestScore() + 4 > game.getVp()) {
-            game.setStoredValue("forcedScoringOrder", "true");
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
-                "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
-            for (Player player : GetPlayersInScoringOrder(game)) {
-                game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
-                game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");
+            if (player.getSo() == 0) {
+                String message = player.getRepresentation()
+                    + " has no SOs to score at this time.";
+                game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "None");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                key2 = "queueToScoreSOs";
+                key3 = "potentialScoreSOBlockers";
+                if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
+                    game.setStoredValue(key2,
+                        game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+                }
+                if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
+                    game.setStoredValue(key3,
+                        game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
+                }
             }
         }
+
     }
 
     public static List<Player> GetPlayersInScoringOrder(Game game) {
