@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -598,7 +599,7 @@ public class FoWHelper {
         }
 
         boolean ghostAgent = player != null && player.isActivePlayer() 
-            && game.getStoredValue("ghostagent_active") != null && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
+            && !StringUtils.isEmpty(game.getStoredValue("ghostagent_active")) && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
         for (Tile tile_ : allTiles) {
             String position_ = tile_.getPosition();
 
