@@ -2655,7 +2655,9 @@ public class AgendaHelper {
         List<Button> proceedButtons = new ArrayList<>();
         String msg = "Buttons for various things";
 
-        listVoteCount(game, game.getMainGameChannel());
+        if (!game.isFowMode()) {
+            listVoteCount(game, game.getMainGameChannel());
+        }
 
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
