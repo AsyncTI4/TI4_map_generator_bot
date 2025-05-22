@@ -60,7 +60,6 @@ import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
-import ti4.model.TechnologyModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.async.DrumrollService;
 import ti4.service.button.ReactionService;
@@ -2206,8 +2205,10 @@ public class AgendaHelper {
                 if (voter != null) {
                     if (!specificVote.contains("Rider")
                         && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity") && !specificVote.contains("Ability")) {
-                        try {
-                            int vote = Integer.parseInt(specificVote.split("_")[1]);
+                        String voteS = specificVote.split("_")[1];
+                        if (NumberUtils.isDigits(voteS)) {
+                            int vote = Integer.parseInt(voteS);
+
                             if (vote == highestVote) {
                                 highestVoter = null;
                             } else {
@@ -2216,8 +2217,6 @@ public class AgendaHelper {
                                     highestVoter = voter;
                                 }
                             }
-                        } catch (Exception e) {
-                            //Not concerned about it not being an integer
                         }
                     }
 
