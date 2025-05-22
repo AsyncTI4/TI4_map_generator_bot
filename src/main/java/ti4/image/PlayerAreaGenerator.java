@@ -62,6 +62,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
 import ti4.website.WebsiteOverlay;
 
@@ -1256,6 +1257,7 @@ public class PlayerAreaGenerator {
                     String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
                     List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warningMessage, removeButtons);
+                    GMService.logPlayerActivity(game, player, warningMessage);
                 }
 
                 if (numInReinforcements > -10) {
