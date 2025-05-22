@@ -3027,12 +3027,13 @@ public class ButtonHelper {
             if (numInf > ((numOfCapitalShips
                 + tile.getUnitHolders().get("space").getUnitCount(UnitType.Destroyer, player.getColor())) / 2)) {
                 if (issuePing) {
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        player.getRepresentation()
-                            + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
-                            + "You seem to be violating this in "
-                            + tile.getRepresentationForButtons(game, player)
-                            + ".");
+                    String msg = player.getRepresentation()
+                        + ", reminder that your **Flotilla** ability says you can't have more infantry than non-fighter ships in the space area of a system. "
+                        + "You seem to be violating this in "
+                        + tile.getRepresentationForButtons(game, player)
+                        + ".";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+                    GMService.logPlayerActivity(game, player, msg);
                 }
             }
         }
@@ -3085,6 +3086,7 @@ public class ButtonHelper {
                     MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext, message,
                         buttons);
                     game.setStoredValue("violatedSystems", game.getStoredValue("violatedSystems") + tile.getPosition() + "_");
+                    GMService.logPlayerActivity(game, player, message);
                 }
             }
         }
@@ -3476,9 +3478,10 @@ public class ButtonHelper {
     @ButtonHandler("confirmSecondAction")
     public static void confirmSecondAction(ButtonInteractionEvent event, Game game, Player player) {
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-            " is using an ability to take another action.",
+        String msg = player.getRepresentation() + " is using an ability to take another action.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg,
             StartTurnService.getStartOfTurnButtons(player, game, true, event, true));
+        GMService.logPlayerActivity(game, player, msg);
     }
 
     @ButtonHandler("addToken_")
@@ -4991,7 +4994,6 @@ public class ButtonHelper {
                             } else {
                                 messageBuilder.append(" (distance exceeds move value (").append(distance).append(" > ")
                                     .append(moveValue).append("), __does not have _Gravity Drive___)");
-                                GMService.logPlayerActivity(game, player, messageBuilder.toString());
                             }
                             if (player.getTechs().contains("dsgledb")) {
                                 messageBuilder.append(" (has _Lightning Drives_ for +1 movement if not transporting)");
@@ -5021,6 +5023,9 @@ public class ButtonHelper {
         message = messageBuilder.toString();
         if ("".equalsIgnoreCase(message)) {
             message = "Nothing moved.";
+        }
+        if (message.contains("does not have") || "yes".equals(game.getStoredValue("possiblyUsedRift"))) {
+            GMService.logPlayerActivity(game, player, message);
         }
         return message;
     }
