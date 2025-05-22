@@ -1408,7 +1408,7 @@ public class TileGenerator {
                 && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;
             }
-            if (unitHolder.getName().equalsIgnoreCase("elysium")) {
+            if (unitHolder.getName().equalsIgnoreCase("elysium") || unitHolder.getName().equalsIgnoreCase("magna")) {
                 scale = 1.65f;
             }
             if (Constants.MECATOLS.contains(unitHolder.getName())) {
