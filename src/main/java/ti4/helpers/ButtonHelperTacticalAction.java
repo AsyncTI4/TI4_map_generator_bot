@@ -547,6 +547,10 @@ public class ButtonHelperTacticalAction {
 
     @ButtonHandler("tacticalAction")
     public static void selectRingThatActiveSystemIsIn(Player player, Game game, ButtonInteractionEvent event) {
+        if (!player.isActivePlayer()) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## " + player.getFactionEmoji() + " is not the active player.");
+            return;
+        }
         if (player.getTacticalCC() < 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " does not have any command tokens in their tactic pool.");
             return;
