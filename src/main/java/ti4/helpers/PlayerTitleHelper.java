@@ -10,6 +10,8 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.statistics.StatisticOptIn;
+import ti4.settings.users.UserSettingsManager;
 
 public class PlayerTitleHelper {
 
@@ -51,7 +53,134 @@ public class PlayerTitleHelper {
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here (if you dont see them, try exiting discord and reopening it)", buttons);
+            var userSettings = UserSettingsManager.get(player.getUserID());
+            if (!userSettings.isHasIndicatedStatPreferences()) {
+                buttons = getOptInButtons(game, player);
+                msg = player.getRepresentation() + " congratz on finishing a game of async! Async has a website that collects and displays games and player stats, but we don't want to display your game stats without your permission."
+                    + " You can indicate what you're comfortable with displaying below with the buttons, and once you submit an answer you will not be asked again. However, you can always change"
+                    + " your preferences with the /statisticis opt_in and /statistics opt_out commands.\nIf you want to see what a fully displayed profile looks like, check out this profile: https://www.ti4ultimate.com/community/async/player-profile?playerId=406";
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Submit decision with these buttons", buttons);
+            } else {
+                msg = "If you have any interest in general or specific player stats in async, feel free to check out this website: https://www.ti4ultimate.com/community/async/";
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
+            }
+
         }
+    }
+
+    public static List<Button> getOptInButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        String key = player.getFaction() + "optin" + "winrate";
+        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+            buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Win Rate"));
+        } else {
+            buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Win Rate"));
+        }
+
+        key = player.getFaction() + "optin" + "vps";
+        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+            buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Victory Points"));
+        } else {
+            buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Victory Points"));
+        }
+
+        key = player.getFaction() + "optin" + "turns";
+        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+            buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Turn Time Stats"));
+        } else {
+            buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Turn Time Stats"));
+        }
+
+        key = player.getFaction() + "optin" + "combats";
+        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+            buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Combat Data"));
+        } else {
+            buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Combat Data"));
+        }
+
+        key = player.getFaction() + "optin" + "opponents";
+        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+            buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Opponents"));
+        } else {
+            buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Opponents"));
+        }
+
+        key = player.getFaction() + "optin" + "factions";
+        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+            buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Factions Played"));
+        } else {
+            buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Factions Played"));
+        }
+
+        key = player.getFaction() + "optin" + "games";
+        if (game.getStoredValue(key).isEmpty() || game.getStoredValue(key).equalsIgnoreCase("no")) {
+            buttons.add(Buttons.green("setOptInSinglePreference_" + key + "_yes", "Click To Display Games"));
+        } else {
+            buttons.add(Buttons.red("setOptInSinglePreference_" + key + "_no", "Click To Not Display Games"));
+        }
+
+        buttons.add(Buttons.blue("setOptInStats_acceptAll", "Click To Display All Stats"));
+        buttons.add(Buttons.red("setOptInStats_declineAll", "Click To Display No Stats"));
+        buttons.add(Buttons.gray("setOptInStats_some", "Click To Submit Decisions"));
+        return buttons;
+    }
+
+    @ButtonHandler(value = "setOptInSinglePreference_")
+    public static void setOptInSinglePreference(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        game.setStoredValue(buttonID.split("_")[1], buttonID.split("_")[2]);
+        String msg = "Altered a value";
+        event.getMessage().editMessage(msg).setComponents(ButtonHelper.turnButtonListIntoActionRowList(getOptInButtons(game, player))).queue();
+    }
+
+    @ButtonHandler(value = "setOptInStats_")
+    public static void setOptInStats(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        var userSettings = UserSettingsManager.get(player.getUserID());
+        userSettings.setHasIndicatedStatPreferences(true);
+        UserSettingsManager.save(userSettings);
+        String decision = buttonID.split("_")[1];
+        var statisticsOpIn = new StatisticOptIn();
+        statisticsOpIn.setPlayerDiscordId(event.getUser().getId());
+        if (decision.equalsIgnoreCase("acceptAll")) {
+            statisticsOpIn.setShowWinRates(true);
+            statisticsOpIn.setShowTurnStats(true);
+            statisticsOpIn.setShowCombatStats(true);
+            statisticsOpIn.setShowVpStats(true);
+            statisticsOpIn.setShowFactionStats(true);
+            statisticsOpIn.setShowOpponents(true);
+            statisticsOpIn.setShowGames(true);
+
+        }
+        if (decision.equalsIgnoreCase("declineAll")) {
+            statisticsOpIn.setShowWinRates(false);
+            statisticsOpIn.setShowTurnStats(false);
+            statisticsOpIn.setShowCombatStats(false);
+            statisticsOpIn.setShowVpStats(false);
+            statisticsOpIn.setShowFactionStats(false);
+            statisticsOpIn.setShowOpponents(false);
+            statisticsOpIn.setShowGames(false);
+        }
+        if (decision.equalsIgnoreCase("some")) {
+            String key = player.getFaction() + "optin" + "winrate";
+            statisticsOpIn.setShowWinRates(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            key = player.getFaction() + "optin" + "turns";
+            statisticsOpIn.setShowTurnStats(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            key = player.getFaction() + "optin" + "combats";
+            statisticsOpIn.setShowCombatStats(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            key = player.getFaction() + "optin" + "vps";
+            statisticsOpIn.setShowVpStats(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            key = player.getFaction() + "optin" + "factions";
+            statisticsOpIn.setShowFactionStats(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            key = player.getFaction() + "optin" + "opponents";
+            statisticsOpIn.setShowOpponents(game.getStoredValue(key).equalsIgnoreCase("yes"));
+            key = player.getFaction() + "optin" + "games";
+            statisticsOpIn.setShowGames(game.getStoredValue(key).equalsIgnoreCase("yes"));
+        }
+        WebHelper.sendStatisticsOptIn(statisticsOpIn);
+        String msg = "Successfully logged your decision. Feel free to check out stats at https://www.ti4ultimate.com/community/async/";
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
+        ButtonHelper.deleteMessage(event);
+
     }
 
     @ButtonHandler(value = "bestowTitleStep1_", save = false)
