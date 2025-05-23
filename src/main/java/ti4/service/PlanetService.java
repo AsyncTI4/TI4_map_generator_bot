@@ -24,4 +24,10 @@ public class PlanetService {
             .filter(unitHolderID -> unitHolderID.startsWith(planetName))
             .findFirst().orElse(planetName);
     }
+
+    public static void refreshAllPlanets(Player player) {
+        for (String planet : player.getPlanets()) {
+            player.refreshPlanet(planet);
+        }
+    }
 }

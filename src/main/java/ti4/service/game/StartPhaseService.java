@@ -47,6 +47,7 @@ import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
+import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
@@ -310,9 +311,16 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             game.setStoredValue("agendaChecksNBalancesAgainst", "");
             for (Player player2 : game.getRealPlayers()) {
-                String message = player2.getRepresentation() + ", please choose up to 3 planets you wish to ready because of _Checks and Balances_ resolving \"Against\".";
+                String message = player2.getRepresentation();  
                 List<Button> buttons = Helper.getPlanetRefreshButtons(player2, game);
-                buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
+                if (buttons.size() <= 3) {
+                    message += ", you had no more than 3 planets exhausted. Planets readied because of _Checks and Balances_ resolving \"Against\".";
+                    PlanetService.refreshAllPlanets(player2);
+                    buttons = new ArrayList<>();
+                } else {
+                    message += ", please choose up to 3 planets you wish to ready because of _Checks and Balances_ resolving \"Against\".";
+                    buttons.add(Buttons.red("deleteButtons_spitItOut", "Done Readying Planets")); // spitItOut
+                }
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), message, buttons);
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
