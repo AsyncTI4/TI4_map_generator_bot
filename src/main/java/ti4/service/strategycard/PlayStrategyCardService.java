@@ -38,6 +38,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.turn.StartTurnService;
@@ -397,6 +398,24 @@ public class PlayStrategyCardService {
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
+                    if (ShouldPrintFollowOrder(game, scModel)) {
+                        List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
+                        StringBuilder playerOrder = new StringBuilder("__Order for performing the Secondary ability:__\n");
+                        for (int i = 0; i < playersInOrder.size(); i++) {
+                            playerOrder.append("`").append(i + 1).append(".` ");
+                            if (game.isOmegaPhaseMode() && game.getPhaseOfGame().equals("action")) {
+                                int lowestSC = playersInOrder.get(i).getLowestSC();
+                                TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
+                                playerOrder.append(scEmoji);
+                            }
+                            playerOrder.append(playersInOrder.get(i).getRepresentationNoPing());
+                            if (playersInOrder.get(i).isSpeaker()) {
+                                playerOrder.append(MiscEmojis.SpeakerToken);
+                            }
+                            playerOrder.append("\n");
+                        }
+                        MessageHelper.sendMessageToChannel(m5, playerOrder.toString());
+                    }
                 }
 
                 if (scModel.usesAutomationForSCID("pok5trade")) {
@@ -514,17 +533,7 @@ public class PlayStrategyCardService {
         game.setStoredValue(key, "");
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
-        List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
-            players = Helper.getSpeakerOrPriorityOrderFromPlayer(imperialHolder, game);
-        } else {
-            if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
-            } else {
-                players = game.getActionPhaseTurnOrder();
-            }
-            Collections.rotate(players, -players.indexOf(imperialHolder));
-        }
+        List<Player> players = getPlayersInFollowOrder(game, imperialHolder);
         if (game.isQueueSO()) {
             for (Player player : players) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
@@ -538,6 +547,33 @@ public class PlayStrategyCardService {
                 }
             }
         }
+    }
+
+    private static List<Player> getPlayersInFollowOrder(Game game, Player player) {
+        List<Player> players;
+        if (!game.isOmegaPhaseMode()) {
+            players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        } else {
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getSpeakerOrPriorityOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
+            Collections.rotate(players, -players.indexOf(player));
+        }
+        return players;
+    }
+
+    private static boolean ShouldPrintFollowOrder(Game game, StrategyCardModel scModel) {
+        if (game.isOmegaPhaseMode()) return true;
+
+        if (scModel.usesAutomationForSCID("pok7technology")) {
+            Player raOwner = game.getPNOwner("ra");
+            if (raOwner == null) return false;
+            return true;
+        }
+
+        return false;
     }
 
     private static List<Button> getLeadershipButtons(int sc) {
