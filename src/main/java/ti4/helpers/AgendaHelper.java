@@ -2660,7 +2660,8 @@ public class AgendaHelper {
 
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-        proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+        if (!game.isHiddenAgendaMode())
+            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
         proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
         proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
         proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
@@ -2690,7 +2691,7 @@ public class AgendaHelper {
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_" + votes,
-            "Vote " + votes + " vote" + (votes.equals("1") ? "" : "s")));
+            "Confirm " + votes + " vote" + (votes.equals("1") ? "" : "s")));
         buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "distinguished_" + votes, "Modify Votes"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
@@ -3607,7 +3608,8 @@ public class AgendaHelper {
             msg = "These buttons can help with bugs/issues that occur during the agenda phase";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+            if (!game.isHiddenAgendaMode())
+                proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
             proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
             proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
             proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));

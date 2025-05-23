@@ -547,7 +547,7 @@ public class ButtonHelperTacticalAction {
 
     @ButtonHandler("tacticalAction")
     public static void selectRingThatActiveSystemIsIn(Player player, Game game, ButtonInteractionEvent event) {
-        if (!player.isActivePlayer()) {
+        if (!player.isActivePlayer() && game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "## " + player.getFactionEmoji() + " is not the active player.");
             return;
         }
