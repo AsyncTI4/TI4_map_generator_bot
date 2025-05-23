@@ -53,6 +53,11 @@ public class StatusHelper {
             messageText += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
         }
 
+        if (game.isOmegaPhaseMode()) {
+            // Show the effects of the Agendas while scoring
+            ButtonHelper.updateMap(game, event, "After Agendas, Round " + game.getRound() + ".");
+        }
+
         game.setPhaseOfGame("statusScoring");
         game.setStoredValue("startTimeOfRound" + game.getRound() + "StatusScoring", System.currentTimeMillis() + "");
         GMService.logActivity(game, "**StatusScoring** Phase for Round " + game.getRound() + " started.", true);

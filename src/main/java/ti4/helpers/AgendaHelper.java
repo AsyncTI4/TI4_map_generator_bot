@@ -1126,8 +1126,10 @@ public class AgendaHelper {
         String votes = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         MessageChannel channel;
 
-        boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty() && player != game.getActivePlayer();
-        if (prevoting) {
+        boolean playerPrevotesIsEmpty = game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
+        boolean playerIsNotActivePlayer = player != game.getActivePlayer();
+        boolean playerIsPrevoting = !playerPrevotesIsEmpty && playerIsNotActivePlayer;
+        if (playerIsPrevoting) {
             if (votes.equalsIgnoreCase("0")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You cannot pre-vote 0 votes. Pre-abstain if you wish to pre-abstain");
                 return;
@@ -2295,9 +2297,7 @@ public class AgendaHelper {
     }
 
     public static List<Player> getVotingOrder(Game game) {
-        List<Player> orderList = new ArrayList<>(game.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .toList());
+        List<Player> orderList = Helper.getSpeakerOrPriorityOrder(game);
         String speakerName = game.getSpeakerUserID();
         Optional<Player> optSpeaker = orderList.stream()
             .filter(player -> player.getUserID().equals(speakerName))

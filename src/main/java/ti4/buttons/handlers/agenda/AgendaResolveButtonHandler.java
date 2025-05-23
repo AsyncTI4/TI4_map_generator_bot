@@ -1061,13 +1061,47 @@ class AgendaResolveButtonHandler {
         if (!game.isOmegaPhaseMode()) {
             buttons.add(Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)"));
         } else {
-            Button electVoiceOfTheCouncil = Buttons.green("elect_voice_of_the_council", "Elect Voice of the Council");
+            Button proceedToScoring;
+            Button electVoiceOfTheCouncil;
+            String currentVotC = game.getLawsInfo().get(Constants.VOICE_OF_THE_COUNCIL_ID);
+            boolean mustElectVoice = currentVotC == null || currentVotC.isEmpty();
+            String electVoiceText = "Elect Voice of the Council";
+            if (mustElectVoice) {
+                electVoiceText += " (required before scoring)";
+            } else {
+                electVoiceText += " (optional)";
+            }
+            if (aCount < 3) {
+                electVoiceOfTheCouncil = Buttons.gray("elect_voice_of_the_council", electVoiceText);
+                proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to scoring objectives");
+            } else {
+                electVoiceOfTheCouncil = Buttons.green("elect_voice_of_the_council", electVoiceText);
+                if (mustElectVoice) {
+                    proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to scoring objectives");
+                } else {
+                    String speakerUserID = game.getSpeakerUserID();
+                    Player speaker = game.getPlayer(speakerUserID);
+                    if (speaker != null) {
+                        MessageChannel speakerCardsInfoThread = speaker.getCardsInfoThread();
+                        MessageHelper.sendMessageToChannel(speakerCardsInfoThread, "These are the current votes available for the Voice of the Council vote.");
+                        AgendaHelper.listVoteCount(game, speakerCardsInfoThread);
+                    }
+                    proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to scoring objectives");
+                }
+            }
+            if (aCount == 3) {
+                voteMessage += " The bot believes this is the 3rd agenda, which in Omega Phase means you might vote on the Voice of the Council.";
+                voteMessage += "\n- If a player currently has the Voice of the Council, the Speaker chooses whether to vote on it this round or not.";
+                voteMessage += "\n- If no player currently has the Voice of the Council, it must be voted on once before proceeding to scoring.";
+                voteMessage += "\nIf this is not actually the third agenda yet, please remember this when that agenda is reached.";
+            }
             buttons.add(electVoiceOfTheCouncil);
-            Button proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to scoring objectives");
             buttons.add(proceedToScoring);
         }
 
-        if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
+        if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID))
+
+        {
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);

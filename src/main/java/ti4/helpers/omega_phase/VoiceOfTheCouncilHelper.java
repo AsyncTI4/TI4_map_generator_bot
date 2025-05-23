@@ -18,8 +18,8 @@ public class VoiceOfTheCouncilHelper {
 
         game.addLaw(Constants.VOICE_OF_THE_COUNCIL_ID, null);
 
-        if (game.getCustomPublicVP().containsKey(Constants.VOICE_OF_THE_COUNCIL_ID)) {
-            game.removeCustomPO(Constants.VOICE_OF_THE_COUNCIL_ID);
+        if (game.getCustomPublicVP().containsKey(Constants.VOICE_OF_THE_COUNCIL_PO)) {
+            game.removeCustomPO(Constants.VOICE_OF_THE_COUNCIL_PO);
         }
 
         game.addCustomPO(Constants.VOICE_OF_THE_COUNCIL_PO, 1);
