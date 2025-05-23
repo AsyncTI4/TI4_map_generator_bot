@@ -5024,7 +5024,7 @@ public class ButtonHelper {
         if ("".equalsIgnoreCase(message)) {
             message = "Nothing moved.";
         }
-        if (message.contains("does not have") || "yes".equals(game.getStoredValue("possiblyUsedRift"))) {
+        if (message.contains("distance exceeds") && (message.contains("does not") || message.contains("could add"))) {
             GMService.logPlayerActivity(game, player, message);
         }
         return message;
