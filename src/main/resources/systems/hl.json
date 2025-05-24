@@ -2,9 +2,7 @@
   "id": "hl",
   "name": "Custom Hyperlane",
   "isHyperlane": true,
-  "aliases": [
-      "hl_empty"
-  ],
+  "aliases": [],
   "imagePath": "hl_bg/hl_empty_0.png",
   "shipPositionsType": null,
   "spaceTokenLocations": [
