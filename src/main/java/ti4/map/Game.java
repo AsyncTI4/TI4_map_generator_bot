@@ -1,5 +1,8 @@
 package ti4.map;
 
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
+
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
@@ -19,10 +22,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import static java.util.function.Predicate.not;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,6 +55,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -2386,6 +2388,10 @@ public class Game extends GameProperties {
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
             Player player = getPlayer(userID);
+            if (player.hasAbility("deceive")) {
+                ButtonHelperFactionSpecific.resolveDeceive(player, this);
+                return null;
+            }
             if (player != null) {
                 getActionCards().remove(id);
                 player.setActionCard(id);

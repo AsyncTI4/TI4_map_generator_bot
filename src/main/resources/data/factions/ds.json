@@ -1219,5 +1219,33 @@
         ],
         "complexity": "High",
         "source": "ds"
+    },
+    {
+        "alias": "toldar",
+        "factionName": "Toldar Concordat",
+        "homeSystem": "br6",
+        "startingFleet": "1 cv,1 ff,1 inf k, 1 sd k, 2 inf d, 1 dn",
+        "commodities": 3,
+        "factionTech": ["dstoldb", "dstoldr"],
+        "startingTechAmount": 1,
+        "startingTechOptions": ["det","am","nm","pa"],
+        "homePlanets": ["khodd","dryun"],
+        "abilities": ["honor_bound","pride","the_code"],
+        "leaders": ["toldaragent", "toldarcommander", "toldarhero"],
+        "promissoryNotes": ["dspntold"],
+        "units": [
+            "fighter",
+            "destroyer",
+            "cruiser",
+            "carrier",
+            "dreadnought",
+            "toldar_flagship",
+            "infantry",
+            "toldar_mech",
+            "pds",
+            "spacedock"
+        ],
+        "complexity": "High",
+        "source": "ds"
     }
 ]

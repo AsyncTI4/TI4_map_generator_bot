@@ -1,7 +1,9 @@
 package ti4.service.objectives;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -118,6 +120,22 @@ public class ScorePublicObjectiveService {
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
                 + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        }
+
+        if (player.hasAbility("reflect")) {
+
+            String idC = "";
+            for (Entry<String, Integer> po : game.getRevealedPublicObjectives().entrySet()) {
+                if (po.getValue().equals(0)) {
+                    idC = po.getKey();
+                    break;
+                }
+            }
+            List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
+            if (scoredPlayerList.size() > 1 && Mapper.getPublicObjective(idC) != null) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " draws 1 AC due to scoring an objective someone else already scored.");
+                game.drawActionCard(player.getUserID());
+            }
         }
         if (game.isOmegaPhaseMode()) {
             //Omega Phase objectives require you to have, not spend. Skip all the spending checks.

@@ -753,6 +753,22 @@
         ],
         "forCombatAbility": "combatround"
     },
+    
+    {
+        "alias": "plus_x_code_always_mech",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "code",
+        "persistenceType": "ALWAYS",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "toldar_mech"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
     {
         "alias": "plus_x_law_always_flagship",
         "type": "mods",
