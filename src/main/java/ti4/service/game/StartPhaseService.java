@@ -32,6 +32,7 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.BannerGenerator;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
@@ -59,6 +60,7 @@ import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
 import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.ListTurnOrderService;
+import ti4.service.strategycard.PickStrategyCardService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.settings.users.UserSettingsManager;
@@ -145,7 +147,7 @@ public class StartPhaseService {
     }
 
     public static String getQueueSCMessage(Game game, Player player) {
-        int number = Helper.getPlayerSpeakerOrPriorityNumber(player, game);
+        int number = PickStrategyCardService.getSCPickOrderNumber(game, player);
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
         int numQueued = alreadyQueued.split("_").length;
         if (alreadyQueued.isEmpty()) {
@@ -374,7 +376,7 @@ public class StartPhaseService {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Pinged speaker to pick a strategy card.");
         }
         Player firstSCPicker;
-        if (!game.isOmegaPhaseMode()) {
+        if (!game.hasAnyPriorityTrackMode()) {
             if (game.getPlayer(game.getSpeakerUserID()) != null) {
                 firstSCPicker = game.getPlayers().get(game.getSpeakerUserID());
             } else {
@@ -386,8 +388,9 @@ public class StartPhaseService {
             }
         } else {
             PriorityTrackHelper.PrintPriorityTrack(game);
-            var priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
-            var firstInPriorityOrder = priorityTrack.stream()
+            //Use this helper to get the Priority Track, because it also respects Speaker-first SC pick setting
+            List<Player> scPickOrder = PickStrategyCardService.getSCPickOrder(game);
+            var firstInPriorityOrder = scPickOrder.stream()
                 .filter(Objects::nonNull)
                 .filter(p -> p.getSCs().size() < game.getStrategyCardsPerPlayer())
                 .findFirst();
@@ -408,7 +411,7 @@ public class StartPhaseService {
         } else {
             if (game.getRealPlayers().size() < 9 && game.getStrategyCardsPerPlayer() == 1 && !game.isHomebrewSCMode()) {
                 for (Player player2 : game.getRealPlayers()) {
-                    int number = Helper.getPlayerSpeakerOrPriorityNumber(player2, game);
+                    int number = PickStrategyCardService.getSCPickOrderNumber(game, player2);
                     if (number == 1 || (number == 8 && !game.isFowMode()) || !player2.getSCs().isEmpty()) {
                         continue;
                     }
@@ -678,8 +681,11 @@ public class StartPhaseService {
             }
         }
 
-        if (game.isOmegaPhaseMode()) {
+        if (game.hasAnyPriorityTrackMode()) {
             PriorityTrackHelper.ClearPriorityTrack(game);
+            if (game.getPriorityTrackMode() == PriorityTrackMode.THIS_ROUND_ONLY) {
+                game.setPriorityTrackMode(PriorityTrackMode.NONE);
+            }
         }
 
         Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();

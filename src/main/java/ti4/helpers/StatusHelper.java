@@ -217,7 +217,7 @@ public class StatusHelper {
     }
 
     public static List<Player> GetPlayersInScoringOrder(Game game) {
-        if (game.isOmegaPhaseMode()) {
+        if (game.hasFullPriorityTrackMode()) {
             return PriorityTrackHelper.GetPriorityTrack(game)
                 .stream().filter(Objects::nonNull).toList();
         } else {

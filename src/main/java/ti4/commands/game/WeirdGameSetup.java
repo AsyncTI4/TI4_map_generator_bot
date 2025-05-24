@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -36,6 +37,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(new OptionData(OptionType.BOOLEAN, FOWOption.RIFTSET_MODE.toString(), "True to enable Eronous RiftSet mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Catc Facilities"));
+        addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game").setAutoComplete(true));
     }
 
     @Override
@@ -72,6 +74,20 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
         if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");
+
+        String priorityTrackModeString = event.getOption(Constants.PRIORITY_TRACK, null, OptionMapping::getAsString);
+        if (priorityTrackModeString != null) {
+            PriorityTrackMode priorityTrackMode = PriorityTrackMode.parse(priorityTrackModeString);
+            if (game.isCompetitiveTIGLGame()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
+            } else if (game.isOmegaPhaseMode() && priorityTrackMode != PriorityTrackMode.FULL) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Omega Phase requires the FULL Priority Track. Priority Track is unchanged.");
+            } else if (game.getPhaseOfGame().equals("strategy")) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot add or remove the Priority Track during the Strategy Phase. Either UNDO out of it or wait for after it. Priority Track is unchanged.");
+            } else {
+                game.setPriorityTrackMode(priorityTrackMode);
+            }
+        }
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {

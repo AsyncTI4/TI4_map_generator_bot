@@ -41,6 +41,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.json.ObjectMapperFactory;
@@ -752,6 +753,7 @@ class GameLoadService {
                     TIGLHelper.TIGLRank rank = TIGLHelper.TIGLRank.fromString(info);
                     game.setMinimumTIGLRankAtGameStart(rank);
                 }
+                case Constants.PRIORITY_TRACK_MODE -> game.setPriorityTrackMode(PriorityTrackMode.parse(info));
             }
         }
     }

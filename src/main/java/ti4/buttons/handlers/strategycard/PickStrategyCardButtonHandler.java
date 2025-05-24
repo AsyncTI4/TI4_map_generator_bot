@@ -38,7 +38,7 @@ public class PickStrategyCardButtonHandler {
         String num = buttonID.split("_")[1];
         game.setStoredValue(player.getFaction() + "scpickqueue", game.getStoredValue(player.getFaction() + "scpickqueue") + num + "_");
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
-        int number = Helper.getPlayerSpeakerOrPriorityNumber(player, game);
+        int number = PickStrategyCardService.getSCPickOrderNumber(game, player);
         if (game.isFowMode()) {
             number = 8;
         }
