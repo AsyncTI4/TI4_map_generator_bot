@@ -1166,14 +1166,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 EndGameService.secondHalfOfGameEnd(event, game, true, true, false);
             } else {
                 var speakerPlayer = game.getSpeaker();
-                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1);
+                ObjectiveHelper.secondHalfOfPeakStage1(game, speakerPlayer, 1, true);
                 if (!game.isFowMode() && game.getTableTalkChannel() != null) {
                     MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "## End of Round #" + game.getRound() + " Scoring Info");
                     ListPlayerInfoService.displayerScoringProgression(game, true, game.getTableTalkChannel(), "both");
                 }
-                String message = "The next Objective has been revealed to " + MiscEmojis.SpeakerToken + speakerPlayer.getRepresentationNoPing() + ". When ready, proceed to the Strategy Phase.";
+                String message = "When ready, proceed to the Strategy Phase.";
                 Button proceedToStrategyPhase = Buttons.green("proceed_to_strategy",
                     "Proceed to Strategy Phase (will refresh all cards and ping the priority player)");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "The next Objective has been revealed to " + MiscEmojis.SpeakerToken + speakerPlayer.getRepresentationNoPing() + ".");
                 MessageHelper.sendMessageToChannelWithButton(event.getChannel(), message, proceedToStrategyPhase);
             }
         }
@@ -2853,18 +2854,21 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("proceed_to_strategy")
     public static void proceedToStrategy(ButtonInteractionEvent event, Game game) {
-        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
-            PriorityTrackHelper.PrintPriorityTrack(game);
-            return;
+        String readiedCardsString = "All planets have been readied at the end of the agenda phase.";
+        if (game.isOmegaPhaseMode()) {
+            readiedCardsString = "All cards have been readied at the end of the omega phase.";
+            if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
+                PriorityTrackHelper.PrintPriorityTrack(game);
+                return;
+            }
         }
         Map<String, Player> players = game.getPlayers();
         if (game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             for (Player player_ : players.values()) {
                 RefreshCardsService.refreshPlayerCards(game, player_, false);
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "All planets have been readied at the end of the agenda phase.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), readiedCardsString);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Did not automatically ready planets due to _Checks and Balances_ resolving \"against\"."

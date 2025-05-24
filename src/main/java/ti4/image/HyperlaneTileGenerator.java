@@ -33,8 +33,23 @@ public class HyperlaneTileGenerator {
     private static final float CENTER_Y = TILE_HEIGHT / 2.0f;
 
     private static final List<String> RANDOM_BACKGROUNDS = List.of(
-      "hl_empty.png"
-        //need more different backgrounds
+      "hl_bg/hl_empty_0.png",
+      "hl_bg/hl_empty_1.png",
+      "hl_bg/hl_empty_2.png",
+      "hl_bg/hl_empty_3.png",
+      "hl_bg/hl_empty_4.png",
+      "hl_bg/hl_empty_5.png",
+      "hl_bg/hl_empty_6.png",
+      "hl_bg/hl_empty_7.png",
+      "hl_bg/hl_empty_8.png",
+      "hl_bg/hl_empty_9.png",
+      "hl_bg/hl_empty_10.png",
+      "hl_bg/hl_empty_11.png",
+      "hl_bg/hl_empty_12.png",
+      "hl_bg/hl_empty_13.png",
+      "hl_bg/hl_empty_14.png",
+      "hl_bg/hl_empty_15.png",
+      "hl_bg/hl_empty_16.png"
     );
 
     public enum HLColor {

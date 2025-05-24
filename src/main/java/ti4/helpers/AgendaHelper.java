@@ -1126,8 +1126,10 @@ public class AgendaHelper {
         String votes = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         MessageChannel channel;
 
-        boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty() && player != game.getActivePlayer();
-        if (prevoting) {
+        boolean playerPrevotesIsEmpty = game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
+        boolean playerIsNotActivePlayer = player != game.getActivePlayer();
+        boolean playerIsPrevoting = !playerPrevotesIsEmpty && playerIsNotActivePlayer;
+        if (playerIsPrevoting) {
             if (votes.equalsIgnoreCase("0")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You cannot pre-vote 0 votes. Pre-abstain if you wish to pre-abstain");
                 return;
@@ -2295,9 +2297,7 @@ public class AgendaHelper {
     }
 
     public static List<Player> getVotingOrder(Game game) {
-        List<Player> orderList = new ArrayList<>(game.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .toList());
+        List<Player> orderList = Helper.getSpeakerOrPriorityOrder(game);
         String speakerName = game.getSpeakerUserID();
         Optional<Player> optSpeaker = orderList.stream()
             .filter(player -> player.getUserID().equals(speakerName))
@@ -2654,11 +2654,14 @@ public class AgendaHelper {
         List<Button> proceedButtons = new ArrayList<>();
         String msg = "Buttons for various things";
 
-        listVoteCount(game, game.getMainGameChannel());
+        if (!game.isFowMode()) {
+            listVoteCount(game, game.getMainGameChannel());
+        }
 
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-        proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+        if (!game.isHiddenAgendaMode())
+            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
         proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
         proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
         proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
@@ -2688,7 +2691,7 @@ public class AgendaHelper {
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_" + votes,
-            "Vote " + votes + " vote" + (votes.equals("1") ? "" : "s")));
+            "Confirm " + votes + " vote" + (votes.equals("1") ? "" : "s")));
         buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "distinguished_" + votes, "Modify Votes"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
@@ -3605,7 +3608,8 @@ public class AgendaHelper {
             msg = "These buttons can help with bugs/issues that occur during the agenda phase";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+            if (!game.isHiddenAgendaMode())
+                proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
             proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
             proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
             proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
