@@ -319,7 +319,7 @@ public class PlayStrategyCardService {
             message.addReaction(reactionEmoji).queue();
             player.addFollowedSC(scToPlay, event);
         }
-        if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1 && !game.getName().equalsIgnoreCase("pbd100two")) {
+        if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && !game.getName().equalsIgnoreCase("pbd100two")) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
@@ -327,7 +327,7 @@ public class PlayStrategyCardService {
                 if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
                     && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
                     && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
-                    && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                    && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent") && scToPlay != 1) {
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
                         message.addReaction(reactionEmoji2).queue();

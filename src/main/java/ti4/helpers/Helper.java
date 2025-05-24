@@ -1988,6 +1988,7 @@ public class Helper {
 
             String msg = player.getRepresentationUnfogged() + " is over the command token limit of " + limit + ". Command tokens used: " + ccCount;
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            GMService.logPlayerActivity(game, player, msg);
         }
     }
 

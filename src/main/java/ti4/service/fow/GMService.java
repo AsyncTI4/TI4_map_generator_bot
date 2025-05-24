@@ -56,7 +56,8 @@ public class GMService {
         Buttons.EDIT_NOTEPAD,
         Buttons.POST_NOTEPAD,
         Buttons.green("gmSystemLore", "Edit System Lore"),
-        Buttons.EDIT_SUMMARIES);
+        Buttons.EDIT_SUMMARIES,
+        Buttons.gray("gmRefresh", "Refresh"));
 
     private static final List<Button> HAND_CHECK_BUTTONS = Arrays.asList(
         Buttons.gray("gmCheckPlayerHands_sabotage", "Sabotages", CardEmojis.ActionCard),
@@ -140,6 +141,12 @@ public class GMService {
         } else {
             callback.accept("No private channel.");
         }
+    }
+
+    @ButtonHandler("gmRefresh")
+    public static void refreshGMButtons(ButtonInteractionEvent event, Game game) {
+        showGMButtons(game);
+        event.getMessage().delete().queue();
     }
 
     @ButtonHandler("gmShowGameAs_")

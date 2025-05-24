@@ -347,8 +347,10 @@ public class ActionCardHelper {
             }
         }
         if (actionCard.getPhase().equalsIgnoreCase("action") && game.getPhaseOfGame() != null && game.getPhaseOfGame().contains("agenda")) {
-            return player.getRepresentationUnfogged()
-                + " The bot thinks it is the agenda phase and this is an action phase card. If this is a mistake, ping bothelper in the actions channel";
+            if (!actionCard.getName().toLowerCase().contains("war machine")) {
+                return player.getRepresentationUnfogged()
+                    + " The bot thinks it is the agenda phase and this is an action phase card. If this is a mistake, ping bothelper in the actions channel";
+            }
         }
 
         if (player.hasAbility("cybernetic_madness")) {

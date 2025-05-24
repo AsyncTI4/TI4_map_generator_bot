@@ -360,7 +360,7 @@
         "name": "Wormhole Reconstruction",
         "type": "Law",
         "target": "For/Against",
-        "text1": "For: All systems that contain either an alpha or beta wormhole are adjacent to each other. [Note that this will essentially overrule any effect of the Enforced Trave Ban agenda]",
+        "text1": "For: All systems that contain either an alpha or beta wormhole are adjacent to each other. [Note that this will essentially overrule any effect of the Enforced Travel Ban agenda]",
         "text2": "Against: Each player places a command token from their reinforcements in each system that contains a wormhole and 1 or more of their ships.",
         "forEmoji": "MixedWormhole",
         "againstEmoji": "🔒",
