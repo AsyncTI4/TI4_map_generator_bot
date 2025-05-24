@@ -633,8 +633,7 @@ public class MapGenerator implements AutoCloseable {
             g2.drawRect(i * boxWidth + trackXShift, y, boxWidth, boxHeight);
         }
 
-        int colCount = priorityTrack.size() - 1;
-        int availableSpacePerColumn = (boxWidth - boxBuffer * 2) / colCount;
+        int availableSpacePerColumn = boxWidth - boxBuffer * 2;
         int availableSpacePerRow = boxHeight - boxBuffer * 2;
         float scale = 0.7f;
         for (Player player : priorityTrack) {
@@ -648,12 +647,14 @@ public class MapGenerator implements AutoCloseable {
                 int tokenWidth = controlTokenImage == null ? 51 : controlTokenImage.getWidth(); // 51
                 int tokenHeight = controlTokenImage == null ? 33 : controlTokenImage.getHeight(); // 33
                 int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);
-                int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) * 3 / 4);
+                int lowerVerticalQuarter = Math.max(0, (availableSpacePerRow - tokenHeight) * 3 / 4);
 
                 int spaceOnTrack = player.getPriorityPosition() - 1;
-                int firstX = Math.min(boxBuffer + /*(availableSpacePerColumn * col) +*/ centreHorizontally, boxWidth - tokenWidth - boxBuffer) + trackXShift;
+                int boxCenter = boxBuffer + centreHorizontally;
+                int boxFarRight = boxWidth - tokenWidth - boxBuffer;
+                int firstX = Math.min(boxCenter, boxFarRight) + trackXShift;
                 int tokenX = spaceOnTrack * boxWidth + firstX;
-                int tokenY = y + boxBuffer + centreVertically;
+                int tokenY = y + boxBuffer + lowerVerticalQuarter;
                 DrawingUtil.drawControlToken(graphics, controlTokenImage, player, tokenX, tokenY, false, scale);
             } catch (Exception e) {
                 // nothing

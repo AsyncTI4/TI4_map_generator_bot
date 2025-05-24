@@ -571,6 +571,7 @@ public class Game extends GameProperties {
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("Little Omega", isLittleOmega());
         gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
+        gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Homebrew", !isNormalGame);
 
         for (String tag : getTags()) {
