@@ -265,7 +265,7 @@ public class CustomHyperlaneService {
         }
 
         MessageHelper.sendMessageToChannel(event.getChannel(), 
-            "Transformed: `" + success.toString() + "`\nCould not transform: `" + failed.toString() + "`");
+            "Transformed: " + success.toString() + "\nCould not transform: " + failed.toString());
     }
 
     private static List<String> getStaticHyperlanePositions(Game game) {

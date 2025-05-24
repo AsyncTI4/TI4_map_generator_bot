@@ -895,6 +895,7 @@ public class ExploreService {
         if (!FOWPlusService.deckInfoAvailable(player, game) || !RiftSetModeService.deckInfoAvailable(player, game)) {
             return;
         }
+        boolean isGM = player != null && game.getPlayersWithGMRole().contains(player);
         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             List<String> deck = game.getExploreDeck(currentType);
@@ -919,11 +920,11 @@ public class ExploreService {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
             }
 
-            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode()) {
+            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode() || isGM) {
                 MessageHelper.sendMessageToChannel(channel, info.toString());
             }
         }
-        if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && game.isFowMode() && !overRide) {
+        if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && game.isFowMode() && !overRide && !isGM) {
             MessageHelper.sendMessageToChannel(channel, "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         }
     }
