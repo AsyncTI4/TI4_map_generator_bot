@@ -40,6 +40,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.strategycard.PlayStrategyCardService;
 
 public class ButtonHelperSCs {
 
@@ -248,17 +249,7 @@ public class ButtonHelperSCs {
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
-        List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
-            players = Helper.getSpeakerOrPriorityOrderFromPlayer(imperialHolder, game);
-        } else {
-            if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
-            } else {
-                players = game.getActionPhaseTurnOrder();
-            }
-            Collections.rotate(players, -players.indexOf(imperialHolder));
-        }
+        List<Player> players = PlayStrategyCardService.getPlayersInFollowOrder(game, imperialHolder);
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         String message = " drew a secret objective.";

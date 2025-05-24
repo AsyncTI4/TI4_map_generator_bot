@@ -403,7 +403,7 @@ public class PlayStrategyCardService {
                         StringBuilder playerOrder = new StringBuilder("__Order for performing the Secondary ability:__\n");
                         for (int i = 0; i < playersInOrder.size(); i++) {
                             playerOrder.append("`").append(i + 1).append(".` ");
-                            if (game.isOmegaPhaseMode() && game.getPhaseOfGame().equals("action")) {
+                            if (game.hasFullPriorityTrackMode() && game.getPhaseOfGame().equals("action")) {
                                 int lowestSC = playersInOrder.get(i).getLowestSC();
                                 TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
                                 playerOrder.append(scEmoji);
@@ -549,9 +549,9 @@ public class PlayStrategyCardService {
         }
     }
 
-    private static List<Player> getPlayersInFollowOrder(Game game, Player player) {
+    public static List<Player> getPlayersInFollowOrder(Game game, Player player) {
         List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
+        if (!game.hasFullPriorityTrackMode()) {
             players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
         } else {
             if (game.getPhaseOfGame().contains("agenda")) {
@@ -565,7 +565,7 @@ public class PlayStrategyCardService {
     }
 
     private static boolean ShouldPrintFollowOrder(Game game, StrategyCardModel scModel) {
-        if (game.isOmegaPhaseMode()) return true;
+        if (game.hasFullPriorityTrackMode()) return true;
 
         if (scModel.usesAutomationForSCID("pok7technology")) {
             Player raOwner = game.getPNOwner("ra");
