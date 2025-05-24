@@ -28,6 +28,9 @@ public class MapRenderPipeline {
     private MapRenderPipeline() {
         worker = new Thread(() -> {
             while (running || !gameRenderQueue.isEmpty()) {
+                if (gameRenderQueue.size() >= 10) {
+                    BotLogger.warning("Large number of games (" + gameRenderQueue.size() + ") in the game render queue...");
+                }
                 try {
                     RenderEvent renderEvent = gameRenderQueue.poll(2, TimeUnit.SECONDS);
                     if (renderEvent != null) {
