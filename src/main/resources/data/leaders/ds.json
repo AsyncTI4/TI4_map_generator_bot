@@ -409,7 +409,17 @@
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
-    
+    {
+        "id": "toldaragent",
+        "faction": "toldar",
+        "type": "agent",
+        "name": "Zhroth Khuvad",
+        "title": "Esteemed Philanthropist",
+        "abilityWindow": "When another player gains any number of commodities",
+        "abilityText": "You may exhaust this card to gain an equal number of commodities and convert that player's commodities to trade goods.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
     {
         "id": "belkoseaagent",
         "faction": "belkosea",
@@ -838,6 +848,18 @@
         "abilityWindow": "After you perform an action:",
         "abilityText": "If you won a combat during that action, you may perform an additional action. ",
         "unlockCondition": "Win 2 combats in 1 turn",
+        "source": "ds"
+    },
+    
+    {
+        "id": "toldarcommander",
+        "faction": "toldar",
+        "type": "commander",
+        "name": "Baird Feraux",
+        "title": "Reserved Strategist",
+        "abilityWindow": "During each round of combat:",
+        "abilityText": "If your opponent controls more units participating in that combat than you, one of your units may roll 1 additional combat die",
+        "unlockCondition": "Gain a second Code card",
         "source": "ds"
     },
     {

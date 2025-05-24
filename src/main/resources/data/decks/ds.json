@@ -458,7 +458,9 @@
             "dsatokcr",
             "dsatoky",
             "dsbelkff",
-            "dsbelky"
+            "dsbelky",
+            "dstoldb",
+            "dstoldr"
         ],
         "source": "ds"
     }

@@ -162,6 +162,107 @@ public class ButtonHelperFactionSpecific {
         player.removeDebtTokens(game.getPlayerFromColorOrFaction(opposingFaction).getColor(), 1);
     }
 
+    public static void resolveDeceive(Player player, Game game) {
+        String msg = player.getRepresentation() + " choose the neighbor who you want to steal a random action card from. Please ensure that everyone's AC amounts are correct before resolving this (async often floats AC draws)";
+        List<Button> buttons = new ArrayList<>();
+        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+            String rep = neighbor.getFaction();
+            if (game.isFowMode()) {
+                rep = neighbor.getColor();
+            }
+            buttons.add(Buttons.green("spyStep2_" + neighbor.getFaction(), rep));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+
+    }
+
+    @ButtonHandler("resolvePride_")
+    public static void resolvePride(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        ButtonHelper.deleteTheOneButton(event);
+        if (p2.getTotalVictoryPoints() == player.getTotalVictoryPoints()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you do not gain or lose honor when beating someone with the same amount of VPs as yourself.");
+        }
+        if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {
+            player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1 honor by beating someone with more VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+        }
+        if (p2.getTotalVictoryPoints() < player.getTotalVictoryPoints()) {
+            player.setHonorCounter(Math.max(-8, player.getHonorCounter() - 1));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost 1 honor by beating someone with less VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+        }
+        if (player.getHonorCounter() > 1) {
+            if (!player.hasAbility("bestow")) {
+                player.addAbility("bestow");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the bestow honor card\n" + Mapper.getAbility("bestow").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("bestow")) {
+                player.removeAbility("bestow");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the bestow honor card");
+            }
+        }
+        if (player.getHonorCounter() > 4) {
+            if (!player.hasAbility("reflect")) {
+                player.addAbility("reflect");
+                CommanderUnlockCheckService.checkPlayer(player, "toldar");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the reflect honor card\n" + Mapper.getAbility("reflect").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("reflect")) {
+                player.removeAbility("reflect");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the reflect honor card");
+            }
+        }
+        if (player.getHonorCounter() > 7) {
+            if (!player.hasAbility("ascend")) {
+                player.addAbility("ascend");
+                Integer poIndex = game.addCustomPO("Ascend", 1);
+                game.scorePublicObjective(player.getUserID(), poIndex);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the ascend honor card and 1 VP.\n" + Mapper.getAbility("ascend").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("ascend")) {
+                player.removeAbility("ascend");
+                int ascendPublicObjectiveID = game.getRevealedPublicObjectives().get("Ascend");
+                game.unscorePublicObjective(player.getUserID(), ascendPublicObjectiveID);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the ascend honor card and 1 VP");
+            }
+        }
+
+        if (player.getHonorCounter() < -1) {
+            if (!player.hasAbility("thwart")) {
+                player.addAbility("thwart");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the thwart honor card\n" + Mapper.getAbility("thwart").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("thwart")) {
+                player.removeAbility("thwart");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the thwart honor card");
+            }
+        }
+        if (player.getHonorCounter() < -4) {
+            if (!player.hasAbility("deceive")) {
+                player.addAbility("deceive");
+                CommanderUnlockCheckService.checkPlayer(player, "toldar");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the deceive honor card\n" + Mapper.getAbility("deceive").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("deceive")) {
+                player.removeAbility("deceive");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the deceive honor card");
+            }
+        }
+        if (player.getHonorCounter() < -7) {
+            if (!player.hasAbility("scourge")) {
+                player.addAbility("scourge");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the scourge honor card\n" + Mapper.getAbility("scourge").getRepresentation());
+            }
+        }
+
+    }
+
     @ButtonHandler("collateralizedLoans_")
     public static void collateralizedLoans(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];

@@ -877,6 +877,14 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(finChecker + "gloryTech", "Research Unit Upgrade (Upon Win)", FactionEmojis.kjalengard));
             }
         }
+        if ((p2 == game.getActivePlayer() && p2.hasAbility("pride")) && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "resolvePride_" + p1.getFaction(), "Resolve Pride (Upon Win)", FactionEmojis.toldar));
+        }
+        if ((p1 == game.getActivePlayer() && p1.hasAbility("pride"))) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "resolvePride_" + p2.getFaction(), "Resolve Pride (Upon Win)", FactionEmojis.toldar));
+        }
 
         if ((p2.hasAbility("collateralized_loans")) && !game.isFowMode()
             && p2.getDebtTokenCount(p1.getColor()) > 0 && groundOrSpace.equalsIgnoreCase("space")) {

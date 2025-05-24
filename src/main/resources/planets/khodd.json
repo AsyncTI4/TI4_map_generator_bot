@@ -1,0 +1,111 @@
+{
+    "id": "khodd",
+    "tileId": "br6",
+    "name": "Khodd",
+    "aliases": [
+        "khodd"
+    ],
+    "positionInTile": {
+        "x": 134.0,
+        "y": 86.0
+    },
+    "resources": 3,
+    "influence": 2,
+    "factionHomeworld": "toldar",
+    "planetType": "FACTION",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "khodd",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 94.0,
+                    "y": 72.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 65.0,
+                    "y": 107.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 99.0,
+                    "y": 99.0
+                },
+                {
+                    "x": 116.0,
+                    "y": 99.0
+                },
+                {
+                    "x": 133.0,
+                    "y": 99.0
+                },
+                {
+                    "x": 108.0,
+                    "y": 110.0
+                },
+                {
+                    "x": 126.0,
+                    "y": 110.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 101.0,
+                    "y": 28.0
+                },
+                {
+                    "x": 119.0,
+                    "y": 28.0
+                },
+                {
+                    "x": 94.0,
+                    "y": 41.0
+                },
+                {
+                    "x": 112.0,
+                    "y": 41.0
+                },
+                {
+                    "x": 130.0,
+                    "y": 41.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 113.0,
+                    "y": 69.0
+                },
+                {
+                    "x": 80.0,
+                    "y": 69.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 32.0,
+                    "y": 76.0
+                },
+                {
+                    "x": 156.0,
+                    "y": 30.0
+                },
+                {
+                    "x": 164.0,
+                    "y": 61.0
+                },
+                {
+                    "x": 156.0,
+                    "y": 92.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "source": "ds"
+}

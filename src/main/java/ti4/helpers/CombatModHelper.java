@@ -427,6 +427,28 @@ public class CombatModHelper {
                         scalingCount += 1;
                     }
                 }
+                case "code" -> {
+                    if (player.getHonorCounter() > 1) {
+                        scalingCount += 1;
+                        if (player.getHonorCounter() > 4) {
+                            scalingCount += 1;
+                            if (player.getHonorCounter() > 7) {
+                                scalingCount += 1;
+                            }
+                        }
+                    } else {
+                        if (player.getHonorCounter() < -1) {
+                            scalingCount += 1;
+                            if (player.getHonorCounter() < -4) {
+                                scalingCount += 1;
+                                if (player.getHonorCounter() < -7) {
+                                    scalingCount += 1;
+                                }
+                            }
+
+                        }
+                    }
+                }
                 case Constants.LAW -> scalingCount = game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {
                     if (opponent != null) {

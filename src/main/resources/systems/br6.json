@@ -1,0 +1,19 @@
+{
+    "id": "br6",
+    "name": "Khodd/Dryun - Toldar",
+    "aliases": [
+        "br6",
+        "khodd",
+        "dryun",
+        "toldar"
+    ],
+    "imagePath": "BR6_Toldar.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "khodd",
+        "dryun"
+    ],
+    "source": "ds",
+    "tileBack": "green"
+}
