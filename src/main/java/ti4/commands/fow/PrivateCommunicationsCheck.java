@@ -1,11 +1,7 @@
 package ti4.commands.fow;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -36,9 +32,7 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
             return;
         }
 
-        List<Button> buttons = new ArrayList<>();
-        FowCommunicationThreadService.checkNewNeighbors(game, player, buttons);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Communication threads with neighbors checked."
-            + (buttons.isEmpty() ? " No new neighbors found." : ""), buttons);
+        FowCommunicationThreadService.checkNewNeighbors(game, player);
+        MessageHelper.replyToMessage(event, "Communication threads with neighbors checked.");
     }
 }

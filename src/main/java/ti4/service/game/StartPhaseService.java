@@ -717,6 +717,7 @@ public class StartPhaseService {
 
             StartTurnService.reviveInfantryII(nextPlayer);
             MessageHelper.sendMessageToChannelWithButtons(nextPlayer.getPrivateChannel(), msgExtra + "\n Use buttons to do turn.", StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
+            FowCommunicationThreadService.checkNewNeighbors(game, nextPlayer);
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.\n"
                 + nextPlayer.getRepresentation() + " is first in initiative order.");

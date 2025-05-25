@@ -14,6 +14,7 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -67,6 +68,7 @@ public class EndTurnService {
         game.setActiveSystem("");
         game.setStoredValue("possiblyUsedRift", "");
         if (game.isFowMode()) {
+            FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
                 + "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + mainPlayer.getRepresentation());
         } else {
