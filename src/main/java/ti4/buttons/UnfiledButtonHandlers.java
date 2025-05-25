@@ -1132,6 +1132,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                 }
             }
         }
+        if (!game.getStoredValue("revealedPOInRound" + game.getRound()).isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "The bot thinks that a PO was already revealed this round. Try doing /status reveal if this was a mistake");
+            return;
+        } else {
+            game.setStoredValue("revealedPOInRound" + game.getRound(), "Yes");
+        }
         String revealedObjective = null;
         if (!game.isRedTapeMode()) {
             if ("2".equalsIgnoreCase(stage)) {
@@ -3371,6 +3377,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up the Priority Track in the default seating order.");
             PriorityTrackHelper.PrintPriorityTrack(game);
+        }
+        if (!game.getStoredValue("revealedFlop" + game.getRound()).isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "The bot thinks that POs were already revealed. Try doing /status reveal if this was a mistake");
+            return;
+        } else {
+            game.setStoredValue("revealedFlop" + game.getRound(), "Yes");
         }
         RevealPublicObjectiveService.revealTwoStage1(game);
         StartPhaseService.startStrategyPhase(event, game);
