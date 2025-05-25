@@ -1002,6 +1002,15 @@ public class ButtonHelper {
                 }
             }
         }
+        if (FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
+            for (Player empy : player.getNeighbouringPlayers(false)) {
+                if (empy.hasTech("as") && empy != player) {
+                    List<Button> aetherButtons = new ArrayList<>();
+                    aetherButtons.add(Buttons.gray("declareUse_Aetherstream", "Declare Aetherstream", FactionEmojis.Empyrean));
+                    MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(), "You can use aetherstream on this movement by " + player.getRepresentationNoPing() + " to " + game.getActiveSystem(), aetherButtons);
+                }
+            }
+        }
         if (doesPlayerHaveFSHere("arborec_flagship", player, activeSystem)) {
             Button arboCommander = Buttons.green(
                 player.getFinsFactionCheckerPrefix() + "umbatTile_" + activeSystem.getPosition(),
@@ -2265,6 +2274,20 @@ public class ButtonHelper {
                 player.getRepresentation()
                     + ", you may redistribute command tokens with these buttons after picking up a command token from the game board.",
                 redistributeButton);
+        }
+        for (Player toldar : game.getRealPlayers()) {
+            if (ButtonHelper.doesPlayerHaveFSHere("toldar_flagship", toldar, tile)) {
+                if (player == toldar) {
+                    continue;
+                }
+                String msg2 = player.getRepresentation() + " in order to remove your CC from tile " + tile.getRepresentationForButtons() +
+                    " you need to first pay 1 CC from your sheet (due to toldar flagship ability). If you don't want to pay this CC," +
+                    " then your CC will stay in the system. Use buttons to decide.";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't pay"));
+                buttons.add(Buttons.red("lose1CC", "Pay 1 CC"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
+            }
         }
     }
 
@@ -4379,6 +4402,10 @@ public class ButtonHelper {
 
         if (player.hasTech("as") && FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             buttons.add(Buttons.gray("declareUse_Aetherstream", "Declare Aetherstream", FactionEmojis.Empyrean));
+        }
+
+        if (player.hasTech("dstoldb")) {
+            buttons.add(Buttons.gray("declareUse_Emergency Modifications", "Emergency Modifications", FactionEmojis.toldar));
         }
         if (player.hasTech("dspharb")) {
             buttons.add(Buttons.gray("declareUse_Reality Field Impactor", "Declare Reality Field Impactor",

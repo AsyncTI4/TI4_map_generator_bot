@@ -1706,6 +1706,13 @@ public class ButtonHelperAbilities {
         game.setStoredValue("munitionsReserves", player.getFaction());
     }
 
+    @ButtonHandler("virTraining")
+    public static void virTraining(ButtonInteractionEvent event, Game game, Player player) {
+        String msg = player.getFactionEmoji() + " is using their tech V.I.R. training to cancel one hit they produced in order to cancel up to 1 hit their opponent produced. " +
+            "They can do this once per round of combat. Both sides should just manually assign one less hit.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+    }
+
     @ButtonHandler("contagion_")
     public static void lastStepOfContagion(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];

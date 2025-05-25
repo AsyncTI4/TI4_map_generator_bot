@@ -955,6 +955,15 @@ public class StartCombatService {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "munitionsReserves", "Use Munitions Reserves", FactionEmojis.Letnev));
         }
+
+        if (p2.hasTech("dstoldr") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
+        }
+        if (p1.hasTech("dstoldr")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
+        }
         if (p2.hasTech("dsvadey") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "vadenYellowTechUse_" + p1.getColor(), "Pay 1 TG For Additional Hit", FactionEmojis.vaden));
