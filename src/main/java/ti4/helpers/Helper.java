@@ -430,7 +430,7 @@ public class Helper {
         return null;
     }
 
-    public static List<Player> getSpeakerOrPriorityOrder(Game game) {
+    public static List<Player> getSpeakerOrFullPriorityOrder(Game game) {
         if (!game.hasFullPriorityTrackMode()) {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
@@ -440,21 +440,21 @@ public class Helper {
         return arrayPlayers;
     }
 
-    public static List<Player> getSpeakerOrPriorityOrderFromPlayer(Player player, Game game) {
-        var players = getSpeakerOrPriorityOrder(game);
+    public static List<Player> getSpeakerOrFullPriorityOrderFromPlayer(Player player, Game game) {
+        var players = getSpeakerOrFullPriorityOrder(game);
         if (player != null && players.indexOf(player) != -1) {
             Collections.rotate(players, -players.indexOf(player));
         }
         return players;
     }
 
-    public static int getPlayerSpeakerOrPriorityNumber(Player player, Game game) {
+    public static int getPlayerSpeakerOrFullPriorityNumber(Player player, Game game) {
         if (!game.hasFullPriorityTrackMode() && game.getSpeaker() == null) {
             return 1;
         } else if (game.hasFullPriorityTrackMode() && player.getPriorityPosition() < 1) {
             return 1;
         }
-        var players = getSpeakerOrPriorityOrder(game);
+        var players = getSpeakerOrFullPriorityOrder(game);
         return players.indexOf(player) + 1;
     }
 

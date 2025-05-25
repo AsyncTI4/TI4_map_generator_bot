@@ -19,14 +19,14 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         game.getPlayerFromColorOrFaction("letnev").setPriorityPosition(-1);
         game.getPlayerFromColorOrFaction("sol").setPriorityPosition(-1);
         var player = game.getPlayerFromColorOrFaction("sol");
-        var players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        var players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         assertEquals("argent", players.get(0).getFaction());
         assertEquals("nomad", players.get(1).getFaction());
         assertEquals("nekro", players.get(2).getFaction());
         assertEquals("xxcha", players.get(3).getFaction());
         assertEquals(4, players.size());
         player = game.getPlayerFromColorOrFaction("xxcha");
-        players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         assertEquals("xxcha", players.get(0).getFaction());
         assertEquals("argent", players.get(1).getFaction());
         assertEquals("nomad", players.get(2).getFaction());
@@ -39,7 +39,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         var game = createTestGame(PriorityTrackMode.NONE);
         game.setSpeakerUserID(null);
         var player = game.getPlayerFromColorOrFaction("sol");
-        var players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        var players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         assertEquals(0, players.size());
     }
 
@@ -48,7 +48,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         var game = createTestGame(PriorityTrackMode.FULL);
         game.setSpeakerUserID(null);
         var player = game.getPlayerFromColorOrFaction("sol");
-        var players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        var players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         assertEquals("sol", players.get(0).getFaction());
         assertEquals("nekro", players.get(1).getFaction());
         assertEquals("xxcha", players.get(2).getFaction());
@@ -61,7 +61,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
     void GetNonInitiativeOrderFromPlayer() {
         var game = createTestGame(PriorityTrackMode.NONE);
         var player = game.getPlayerFromColorOrFaction("nekro");
-        var players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        var players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         assertEquals("nekro", players.get(0).getFaction());
         assertEquals("argent", players.get(1).getFaction());
         assertEquals("xxcha", players.get(2).getFaction());
@@ -74,7 +74,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
     void GetNonInitiativeOrderFromPlayer_OmegaPhase() {
         var game = createTestGame(PriorityTrackMode.FULL);
         var player = game.getPlayerFromColorOrFaction("sol");
-        var players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        var players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         assertEquals("sol", players.get(0).getFaction());
         assertEquals("nekro", players.get(1).getFaction());
         assertEquals("xxcha", players.get(2).getFaction());
@@ -89,9 +89,9 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         game.getPlayerFromColorOrFaction("letnev").setPriorityPosition(-1);
         game.getPlayerFromColorOrFaction("sol").setPriorityPosition(-1);
         var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(1, Helper.getPlayerSpeakerOrPriorityNumber(player, game));
+        assertEquals(1, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
         player = game.getPlayerFromColorOrFaction("xxcha");
-        assertEquals(4, Helper.getPlayerSpeakerOrPriorityNumber(player, game));
+        assertEquals(4, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         var game = createTestGame(PriorityTrackMode.NONE);
         game.setSpeakerUserID(null);
         var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(1, Helper.getPlayerSpeakerOrPriorityNumber(player, game));
+        assertEquals(1, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
     }
 
     @Test
@@ -107,21 +107,21 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         var game = createTestGame(PriorityTrackMode.FULL);
         game.setSpeakerUserID(null);
         var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(3, Helper.getPlayerSpeakerOrPriorityNumber(player, game));
+        assertEquals(3, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
     }
 
     @Test
     void GetPlayerNonInitiativeNumber() {
         var game = createTestGame(PriorityTrackMode.NONE);
         var player = game.getPlayerFromColorOrFaction("nekro");
-        assertEquals(4, Helper.getPlayerSpeakerOrPriorityNumber(player, game));
+        assertEquals(4, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
     }
 
     @Test
     void GetPlayerNonInitiativeNumber_OmegaPhase() {
         var game = createTestGame(PriorityTrackMode.FULL);
         var player = game.getPlayerFromColorOrFaction("sol");
-        assertEquals(3, Helper.getPlayerSpeakerOrPriorityNumber(player, game));
+        assertEquals(3, Helper.getPlayerSpeakerOrFullPriorityNumber(player, game));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
         var game = createTestGame(PriorityTrackMode.FULL);
         game.getPlayerFromColorOrFaction("letnev").setPriorityPosition(-1);
         game.getPlayerFromColorOrFaction("sol").setPriorityPosition(-1);
-        var players = Helper.getSpeakerOrPriorityOrder(game);
+        var players = Helper.getSpeakerOrFullPriorityOrder(game);
         assertEquals("argent", players.get(0).getFaction());
         assertEquals("nomad", players.get(1).getFaction());
         assertEquals("nekro", players.get(2).getFaction());
@@ -141,7 +141,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
     void GetNonInitiativeTurnOrder_NoSpeaker() {
         var game = createTestGame(PriorityTrackMode.NONE);
         game.setSpeakerUserID(null);
-        var players = Helper.getSpeakerOrPriorityOrder(game);
+        var players = Helper.getSpeakerOrFullPriorityOrder(game);
         assertEquals(0, players.size());
     }
 
@@ -149,7 +149,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
     void GetNonInitiativeTurnOrder_NoSpeaker_OmegaPhase() {
         var game = createTestGame(PriorityTrackMode.FULL);
         game.setSpeakerUserID(null);
-        var players = Helper.getSpeakerOrPriorityOrder(game);
+        var players = Helper.getSpeakerOrFullPriorityOrder(game);
         assertEquals("argent", players.get(0).getFaction());
         assertEquals("nomad", players.get(1).getFaction());
         assertEquals("sol", players.get(2).getFaction());
@@ -161,7 +161,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
     @Test
     void GetNonInitiativeTurnOrder() {
         var game = createTestGame(PriorityTrackMode.NONE);
-        var players = Helper.getSpeakerOrPriorityOrder(game);
+        var players = Helper.getSpeakerOrFullPriorityOrder(game);
         assertEquals("nomad", players.get(0).getFaction());
         assertEquals("letnev", players.get(1).getFaction());
         assertEquals("sol", players.get(2).getFaction());
@@ -173,7 +173,7 @@ public class TurnOrderHelperTest extends BaseTi4Test {
     @Test
     void GetNonInitiativeTurnOrder_OmegaPhase() {
         var game = createTestGame(PriorityTrackMode.FULL);
-        var players = Helper.getSpeakerOrPriorityOrder(game);
+        var players = Helper.getSpeakerOrFullPriorityOrder(game);
         assertEquals("argent", players.get(0).getFaction());
         assertEquals("nomad", players.get(1).getFaction());
         assertEquals("sol", players.get(2).getFaction());
