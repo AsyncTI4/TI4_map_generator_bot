@@ -1174,6 +1174,13 @@ public class Mapper {
         return hyperlaneAdjacencies.getProperty(tileID);
     }
 
+    public static String getHyperlaneTileId(String hyperlaneData) {
+        return hyperlaneAdjacencies.stringPropertyNames().stream()
+            .filter(key -> hyperlaneData.equals(hyperlaneAdjacencies.getProperty(key)))
+            .findFirst()
+            .orElse(null);
+    }
+
     // ####################
     // Special cases from .properties
 
