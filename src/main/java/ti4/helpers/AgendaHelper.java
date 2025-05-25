@@ -422,10 +422,10 @@ public class AgendaHelper {
         String alreadyResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty()) {
             String lastPlayerToPlayAWhen = game.getStoredValue("lastPlayerToPlayAWhen");
-            List<Player> agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrder(game);
+            List<Player> agendaAbilityResolutionOrder = Helper.getSpeakerOrFullPriorityOrder(game);
             if (!lastPlayerToPlayAWhen.isEmpty()) {
-                agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAWhen), game);
-                agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
+                agendaAbilityResolutionOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAWhen), game);
+                agendaAbilityResolutionOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
             }
             for (Player player : agendaAbilityResolutionOrder) {
                 String factionsThatHavePassedOnWhens = game.getStoredValue("declinedWhens");
@@ -488,10 +488,10 @@ public class AgendaHelper {
         String whensResolved = game.getStoredValue("whensResolved");
         if (alreadyResolved.isEmpty() && !whensResolved.isEmpty()) {
             String lastPlayerToPlayAnAfter = game.getStoredValue("lastPlayerToPlayAnAfter");
-            List<Player> agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrder(game);
+            List<Player> agendaAbilityResolutionOrder = Helper.getSpeakerOrFullPriorityOrder(game);
             if (!lastPlayerToPlayAnAfter.isEmpty()) {
-                agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAnAfter), game);
-                agendaAbilityResolutionOrder = Helper.getSpeakerOrPriorityOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
+                agendaAbilityResolutionOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(game.getPlayerFromColorOrFaction(lastPlayerToPlayAnAfter), game);
+                agendaAbilityResolutionOrder = Helper.getSpeakerOrFullPriorityOrderFromPlayer(agendaAbilityResolutionOrder.get(1), game);
             }
             for (Player player : agendaAbilityResolutionOrder) {
                 String factionsThatHavePassedOnAfters = game.getStoredValue("declinedAfters");
@@ -2297,7 +2297,7 @@ public class AgendaHelper {
     }
 
     public static List<Player> getVotingOrder(Game game) {
-        List<Player> orderList = Helper.getSpeakerOrPriorityOrder(game);
+        List<Player> orderList = Helper.getSpeakerOrFullPriorityOrder(game);
         String speakerName = game.getSpeakerUserID();
         Optional<Player> optSpeaker = orderList.stream()
             .filter(player -> player.getUserID().equals(speakerName))

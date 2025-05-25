@@ -552,10 +552,10 @@ public class PlayStrategyCardService {
     public static List<Player> getPlayersInFollowOrder(Game game, Player player) {
         List<Player> players;
         if (!game.hasFullPriorityTrackMode()) {
-            players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+            players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         } else {
             if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
+                players = Helper.getSpeakerOrFullPriorityOrder(game);
             } else {
                 players = game.getActionPhaseTurnOrder();
             }
