@@ -112,6 +112,7 @@ public class StartTurnService {
             MessageHelper.sendPrivateMessageToPlayer(player, game, event, text, fail, success);
             if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
+                FowCommunicationThreadService.checkNewNeighbors(game, player);
             }
             if (getMissedSCFollowsText(game, player) != null
                 && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
@@ -389,8 +390,6 @@ public class StartTurnService {
             .remove(game.getName(), GameMessageType.TURN)
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
-            FowCommunicationThreadService.checkAllCommThreads(game);
-            FowCommunicationThreadService.checkNewNeighbors(game, player, startButtons);
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
         } else {
             startButtons.add(Buttons.gray("showMap", "Show Map"));
