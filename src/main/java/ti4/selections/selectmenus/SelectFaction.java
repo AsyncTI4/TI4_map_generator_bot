@@ -44,7 +44,7 @@ public class SelectFaction implements Selection {
     }
 
     public static void offerFactionSelectionMenu(GenericInteractionCreateEvent event) {
-        List<FactionModel> factions = Mapper.getFactions().stream().sorted(Comparator.comparing(FactionModel::getFactionName)).sorted(Comparator.comparing(FactionModel::getSource)).toList();
+        List<FactionModel> factions = Mapper.getFactionsValues().stream().sorted(Comparator.comparing(FactionModel::getFactionName)).sorted(Comparator.comparing(FactionModel::getSource)).toList();
         List<List<FactionModel>> factionPages = ListUtils.partition(factions, 25);
         List<StringSelectMenu> menus = new ArrayList<>();
 
