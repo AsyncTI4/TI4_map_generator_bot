@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SpinRingsHelper;
 import ti4.image.Mapper;
@@ -26,12 +30,31 @@ public class StatusCleanupService {
         game.removeStoredValue("pharadnPNUsed");
         Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
+            for (Player toldar : game.getRealPlayers()) {
+                if (ButtonHelper.doesPlayerHaveFSHere("toldar_flagship", toldar, tile)) {
+                    for (Player player : game.getRealPlayers()) {
+                        if (player == toldar) {
+                            continue;
+                        }
+                        if (CommandCounterHelper.hasCC(player, tile)) {
+                            String msg = player.getRepresentation() + " in order to remove your CC from tile " + tile.getRepresentationForButtons() +
+                                " you need to first pay 1 CC from your sheet (due to toldar flagship ability). If you don't want to pay this CC," +
+                                " then your CC will stay in the system. Use buttons to decide.";
+                            List<Button> buttons = new ArrayList<>();
+                            buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't pay"));
+                            buttons.add(Buttons.red("lose1CC", "Pay 1 CC"));
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        }
+                    }
+                }
+            }
             tile.removeAllCC();
             Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 unitHolder.removeAllCC();
                 unitHolder.removeAllUnitDamage();
             }
+
         }
         game.removeStoredValue("galacticThreatUsed");
         game.removeStoredValue("conspiratorsUsed");

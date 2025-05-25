@@ -1096,6 +1096,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("toldarPN")
+    public static void toldarPN(ButtonInteractionEvent event, Player player, Game game) {
+        player.setCommodities(Math.min(player.getCommoditiesTotal(), player.getCommodities() + 3));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " used the toldar promissory note to gain " +
+            "3 commodities after winning a combat against someone with more VP than them. They can do this once per action. Their currently hold "
+            + player.getCommodities() + " commodities");
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     @ButtonHandler("exhaustRelic_")
     public static void exhaustRelic(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String relic = buttonID.replace("exhaustRelic_", "");
@@ -1131,6 +1140,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                     return;
                 }
             }
+        }
+        if (!game.getStoredValue("revealedPOInRound" + game.getRound()).isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "The bot thinks that a PO was already revealed this round. Try doing /status reveal if this was a mistake");
+            return;
+        } else {
+            game.setStoredValue("revealedPOInRound" + game.getRound(), "Yes");
         }
         String revealedObjective = null;
         if (!game.isRedTapeMode()) {
@@ -2926,6 +2941,35 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
     }
 
+    @ButtonHandler("placeCCBack_")
+    public static void placeCCBack(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String position = buttonID.split("_")[1];
+        String message = player.getRepresentationUnfogged() + " has chosen to not pay the 1 CC required to remove a CC from the toldar flagship system, and so their CC has been placed back in tile " + position;
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ButtonHelper.deleteMessage(event);
+        CommandCounterHelper.addCC(event, player, game.getTileByPosition(position));
+    }
+
+    @ButtonHandler("lose1CC")
+    public static void lose1CC(ButtonInteractionEvent event, Player player, Game game) {
+        String message = player.getRepresentationUnfogged() + "! Your current command tokens are "
+            + player.getCCRepresentation() + ".";
+        game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+
+        String finChecker = player.finChecker();
+        Button loseTactic = Buttons.red(finChecker + "decrease_tactic_cc", "Lose 1 Tactic Token");
+        Button loseFleet = Buttons.red(finChecker + "decrease_fleet_cc", "Lose 1 Fleet Token");
+        Button loseStrat = Buttons.red(finChecker + "decrease_strategy_cc", "Lose 1 Strategy Token");
+        Button doneGainingCC = Buttons.blue(finChecker + "deleteButtons_spitItOut", "Done Losing 1 CC Tokens");
+        Button resetCC = Buttons.gray(finChecker + "resetCCs", "Reset Command Tokens");
+
+        List<Button> buttons = Arrays.asList(loseTactic, loseFleet, loseStrat,
+            doneGainingCC, resetCC);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has chosen to lose 1 CC");
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("redistributeCCButtons") // Buttons.REDISTRIBUTE_CCs
     public static void redistributeCCButtons(ButtonInteractionEvent event, Player player, Game game) {
         String message = player.getRepresentationUnfogged() + "! Your current command tokens are "
@@ -3342,6 +3386,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             }
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set up the Priority Track in the default seating order.");
             PriorityTrackHelper.PrintPriorityTrack(game);
+        }
+        if (!game.getStoredValue("revealedFlop" + game.getRound()).isEmpty()) {
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "The bot thinks that POs were already revealed. Try doing /status reveal if this was a mistake");
+            return;
+        } else {
+            game.setStoredValue("revealedFlop" + game.getRound(), "Yes");
         }
         RevealPublicObjectiveService.revealTwoStage1(game);
         StartPhaseService.startStrategyPhase(event, game);

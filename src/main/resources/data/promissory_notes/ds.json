@@ -428,5 +428,15 @@
         "playArea": false,
         "source": "ds",
         "text": "At the start of combat: Roll 4 dice, for each result of 8 or greater, destroy up to 1 of your opponent’s fighters or infantry participating in that combat.Then, return this card to the Belkosea player."
+    },
+    {
+        "alias": "dspntold",
+        "name": "Concordat Allegiant",
+        "faction": "toldar",
+        "color": "",
+        "playArea": true,
+        "playImmediately": false,
+        "source": "ds",
+        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. If you activate a system that contains the Toldar player's units, purge 1 of your command tokens and return this card to that player."
     }
 ]

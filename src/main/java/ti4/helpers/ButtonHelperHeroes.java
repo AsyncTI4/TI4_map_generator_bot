@@ -2017,6 +2017,27 @@ public class ButtonHelperHeroes {
         }
     }
 
+    public static void resolveToldarHero(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        String message = player.getRepresentation() + " choose the objective that you want to get 2 CC whenever another player scores it, and which players with the least VP will not need to meet the conditions of in order to score";
+        for (String obj : game.getRevealedPublicObjectives().keySet()) {
+            if (Mapper.getPublicObjective(obj) != null) {
+                buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "toldarHero_" + Mapper.getPublicObjective(obj).getName(), Mapper.getPublicObjective(obj).getName()));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            message, buttons);
+    }
+
+    @ButtonHandler("toldarHero_")
+    public static void toldarHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String obj = buttonID.replace("toldarHero_", "");
+        game.setStoredValue("toldarHeroObj", obj);
+        game.setStoredValue("toldarHeroPlayer", player.getFaction());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentation() + " successfully attached hero to " + obj);
+    }
+
     public static List<Button> getWinnuHeroSCButtons(Game game) {
         List<Button> scButtons = new ArrayList<>();
         for (Integer sc : game.getSCList()) {

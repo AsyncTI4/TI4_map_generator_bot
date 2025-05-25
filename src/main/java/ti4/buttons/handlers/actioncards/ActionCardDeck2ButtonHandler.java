@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
@@ -178,6 +179,7 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveAncientTradeRoutes(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         player.setCommodities(player.getCommodities() + 2);
+        ButtonHelperAgents.toldarAgentInitiation(game, player, 2);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " gained 2 commodities");
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
@@ -247,6 +249,7 @@ class ActionCardDeck2ButtonHandler {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
         p2.setCommodities(p2.getCommodities() + 2);
+        ButtonHelperAgents.toldarAgentInitiation(game, p2, 2);
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getFactionEmoji()
             + " gained 2 commodities due to _Ancient Trade Routes_ and is neighbors with " + player.getFactionEmojiOrColor() + " for this turn.");
         event.getMessage().delete().queue();
@@ -299,8 +302,10 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("strandedShipStep2_")
-    public static void resolveStrandedShipStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveStrandedShipStep2(
+        Player player, Game game, ButtonInteractionEvent event,
+        String buttonID
+    ) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
@@ -338,8 +343,10 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("spatialCollapseStep2_")
-    public static void resolveSpatialCollapseStep2(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveSpatialCollapseStep2(
+        Game game, Player player, ButtonInteractionEvent event,
+        String buttonID
+    ) {
         String pos1 = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         Tile tile1 = game.getTileByPosition(pos1);
@@ -361,8 +368,10 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("spatialCollapseStep3_")
-    public static void resolveSpatialCollapseStep3(Game game, Player player, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveSpatialCollapseStep3(
+        Game game, Player player, ButtonInteractionEvent event,
+        String buttonID
+    ) {
         String position = buttonID.split("_")[1];
         String position2 = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(position);
@@ -432,8 +441,10 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("brutalOccupationStep2_")
-    public static void resolveBrutalOccupationStep2(Player player, Game game, ButtonInteractionEvent event,
-        String buttonID) {
+    public static void resolveBrutalOccupationStep2(
+        Player player, Game game, ButtonInteractionEvent event,
+        String buttonID
+    ) {
         String planet = buttonID.split("_")[1];
         player.refreshPlanet(planet);
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);

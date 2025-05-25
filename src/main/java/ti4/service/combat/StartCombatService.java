@@ -877,6 +877,14 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(finChecker + "gloryTech", "Research Unit Upgrade (Upon Win)", FactionEmojis.kjalengard));
             }
         }
+        if ((p2 == game.getActivePlayer() && p2.hasAbility("pride")) && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "resolvePride_" + p1.getFaction(), "Resolve Pride (Upon Win)", FactionEmojis.toldar));
+        }
+        if ((p1 == game.getActivePlayer() && p1.hasAbility("pride"))) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "resolvePride_" + p2.getFaction(), "Resolve Pride (Upon Win)", FactionEmojis.toldar));
+        }
 
         if ((p2.hasAbility("collateralized_loans")) && !game.isFowMode()
             && p2.getDebtTokenCount(p1.getColor()) > 0 && groundOrSpace.equalsIgnoreCase("space")) {
@@ -899,6 +907,15 @@ public class StartCombatService {
         if (p1.hasAbility("necrophage")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "offerNecrophage", "Necrophage", FactionEmojis.mykomentori));
+        }
+
+        if (p2.getPromissoryNotesInPlayArea().contains("dspntold") && !game.isFowMode() && p2.getTotalVictoryPoints() < p1.getTotalVictoryPoints()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Comms (Upon Win)", FactionEmojis.toldar));
+        }
+        if (p1.getPromissoryNotesInPlayArea().contains("dspntold") && p1.getTotalVictoryPoints() < p2.getTotalVictoryPoints()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Comms (Upon Win)", FactionEmojis.toldar));
         }
 
         if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
@@ -946,6 +963,15 @@ public class StartCombatService {
         if (isSpaceCombat && p1.hasAbility("munitions")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "munitionsReserves", "Use Munitions Reserves", FactionEmojis.Letnev));
+        }
+
+        if (p2.hasTech("dstoldr") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
+        }
+        if (p1.hasTech("dstoldr")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
         }
         if (p2.hasTech("dsvadey") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
