@@ -864,9 +864,14 @@ public class ButtonHelperAbilities {
         String planet = buttonID.split("_")[1];
         String message = player.getFactionEmoji() + " added a tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".";
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        if (unitHolder.getTokenList().contains("token_tomb.png")) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getFactionEmoji() + " had already added a tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".");
+
+            return;
+        }
         unitHolder.addToken("token_tomb.png");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
     }
 
     @ButtonHandler("startAncientEmpire")
@@ -874,9 +879,6 @@ public class ButtonHelperAbilities {
         String message = player.getRepresentation() + " chose a planet to add a tomb token to.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : game.getPlanets()) {
-            if (player.getPlanets().contains(planet)) {
-                continue;
-            }
             UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (unitHolder != null) {
                 if (unitHolder.getTokenList().contains("token_tomb.png")) {
