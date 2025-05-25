@@ -3460,7 +3460,7 @@ public class ButtonHelper {
         List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
         for (String pos2 : directlyAdjacentTiles) {
             Tile tile = game.getTileByPosition(pos2);
-            if (tile != null && tile.isEdgeOfBoard(game)) {
+            if (tile != null && tile.isEdgeOfBoard(game) && !pos2.equalsIgnoreCase(pos)) {
                 buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_"
                     + tile.getPosition() + "_" + pos, tile.getRepresentationForButtons(game, player)));
             }

@@ -168,6 +168,21 @@ public class ButtonHelperAbilities {
             getTilesToRallyToTheCause(game, player));
     }
 
+    @ButtonHandler("deployFreesystemsMech_")
+    public static void deployFreesystemsMech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        if (player.getTg() < 1) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "You dont have 1tg to pay for the mech");
+            return;
+        }
+        player.setTg(player.getTg() - 1);
+        List<Button> buttons = new ArrayList<>();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " paid 1 tg to DEPLOY a mech to a planet adjacent the system they are rallying to the cause in");
+        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to deploy a mech to a system adjacent to the rallied system.", buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("rallyToTheCauseStep2_")
     public static void rallyToTheCauseStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
@@ -179,6 +194,24 @@ public class ButtonHelperAbilities {
             + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+        if (player.ownsUnit("freesystems_mech") && !ButtonHelper.isLawInPlay(game, "articles_war")
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+            buttons = new ArrayList<>();
+            boolean adj = false;
+            for (String pos2 : FoWHelper.getAdjacentTilesAndNotThisTile(game, pos, player, false)) {
+                Tile tile = game.getTileByPosition(pos2);
+                for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                    if (player.getPlanetsAllianceMode().contains(planet.getName())) {
+                        adj = true;
+                    }
+                }
+            }
+            if (adj) {
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deployFreesystemsMech_" + pos, "Pay 1 tg to deploy mech"));
+                message = player.getRepresentation() + " you can pay 1 tg to deploy a mech to a planet adjacent to the system you're rallying to the cause. ";
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            }
+        }
         event.getMessage().delete().queue();
     }
 
@@ -186,7 +219,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game) || tile.isHomeSystem()
-                || ButtonHelper.isTileLegendary(tile) || tile.isMecatol()) {
+                || ButtonHelper.isTileLegendary(tile) || tile.isMecatol() || tile.getPlanetUnitHolders().isEmpty()) {
                 continue;
             }
             buttons.add(Buttons.green("rallyToTheCauseStep2_" + tile.getPosition(),

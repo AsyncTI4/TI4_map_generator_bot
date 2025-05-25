@@ -712,7 +712,10 @@ public class TransactionHelper {
                 player.addTransactionItem("sending" + p2.getFaction() + "_receiving" + p1.getFaction() + "_TGs_" + tgP2Sent);
             }
         } else {
-            player.addTransactionItem("sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail);
+            String itemS = "sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail;
+            if (!player.getTransactionItems().contains(itemS) || !itemS.contains("dmz")) {
+                player.addTransactionItem(itemS);
+            }
         }
 
         if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("binding_debts") && !p2.hasAbility("data_recovery")) {
