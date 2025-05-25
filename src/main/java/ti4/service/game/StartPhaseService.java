@@ -54,6 +54,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
@@ -313,7 +314,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaChecksNBalancesAgainst").isEmpty()) {
             game.setStoredValue("agendaChecksNBalancesAgainst", "");
             for (Player player2 : game.getRealPlayers()) {
-                String message = player2.getRepresentationUnfogged();  
+                String message = player2.getRepresentationUnfogged();
                 List<Button> buttons = Helper.getPlanetRefreshButtons(player2, game);
                 if (buttons.size() <= 3) {
                     message += ", you had no more than 3 planets exhausted. Planets readied because of _Checks and Balances_ resolving \"Against\".";
@@ -387,7 +388,29 @@ public class StartPhaseService {
                 firstSCPicker = Helper.getSpeakerOrderFromThisPlayer(firstSCPicker, game).get(1);
             }
         } else {
-            PriorityTrackHelper.PrintPriorityTrack(game);
+            if (game.getPriorityTrackMode() != PriorityTrackMode.AFTER_SPEAKER) {
+                PriorityTrackHelper.PrintPriorityTrack(game);
+            } else {
+                Player speaker = game.getSpeaker();
+                List<Player> priorityTrack = PriorityTrackHelper.GetPriorityTrack(game);
+                StringBuilder sb = new StringBuilder("**Priority Track (Speaker first)**\n");
+                if (speaker != null) {
+                    sb.append(MiscEmojis.SpeakerToken).append(" ").append(speaker.getRepresentation()).append("\n");
+                }
+                for (var i = 0; i < priorityTrack.size(); i++) {
+                    int priority = i + 1;
+                    if (priorityTrack.get(i) == null) {
+                        sb.append(String.format("%d.\n", priority));
+                    } else if (priorityTrack.get(i).equals(speaker)) {
+                        Player player = priorityTrack.get(i);
+                        sb.append(String.format("%d. ~~%s~~\n", priority, player.getRepresentationNoPing()));
+                    } else {
+                        Player player = priorityTrack.get(i);
+                        sb.append(String.format("%d. %s\n", priority, player.getRepresentation()));
+                    }
+                }
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+            }
             //Use this helper to get the Priority Track, because it also respects Speaker-first SC pick setting
             List<Player> scPickOrder = PickStrategyCardService.getSCPickOrder(game);
             var firstInPriorityOrder = scPickOrder.stream()
