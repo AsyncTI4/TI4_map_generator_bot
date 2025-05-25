@@ -151,7 +151,13 @@ public class StatusHelper {
                 if (player.isRealPlayer() && !scoredPlayerList.contains(player.getUserID()) && Mapper.getPublicObjective(obbie) != null) {
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(obbie, game);
                     int playerProgress = ListPlayerInfoService.getPlayerProgressOnObjective(obbie, game, player);
-                    if (playerProgress >= threshold && threshold > 0) {
+                    boolean toldarHero = false;
+                    if (Mapper.getPublicObjective(obbie).getName().equalsIgnoreCase(game.getStoredValue("toldarHeroObj"))) {
+                        if (!game.getStoredValue("toldarHeroPlayer").equalsIgnoreCase(player.getFaction()) && AgendaHelper.getPlayersWithLeastPoints(game).contains(player)) {
+                            toldarHero = true;
+                        }
+                    }
+                    if ((playerProgress >= threshold && threshold > 0) || toldarHero) {
                         scorables.add(Mapper.getPublicObjective(obbie).getRepresentation(false));
                     }
                 }

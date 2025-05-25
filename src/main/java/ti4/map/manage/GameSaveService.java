@@ -616,6 +616,9 @@ class GameSaveService {
             writer.write(Constants.PATH_TOKEN_COUNT + " " + player.getPathTokenCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.HONOR_COUNT + " " + player.getHonorCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 

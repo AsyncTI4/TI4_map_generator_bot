@@ -357,6 +357,22 @@
         ]
     },
     {
+        "alias": "toldar_commander",
+        "type": "extrarolls",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "toldar_commander_particular",
+        "scope": "_best_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": "> Toldar Commander Grants an Extra Die\n"
+            }
+        ]
+    },
+    {
         "alias": "plus1_vaylerian_hero",
         "type": "mods",
         "value": "+1",
@@ -749,6 +765,22 @@
             {
                 "type": "unit",
                 "alias": "bentor_flagship"
+            }
+        ],
+        "forCombatAbility": "combatround"
+    },
+    
+    {
+        "alias": "plus_x_code_always_mech",
+        "type": "mods",
+        "value": "+1",
+        "valueScalingType": "code",
+        "persistenceType": "ALWAYS",
+        "scope": "mf",
+        "related": [
+            {
+                "type": "unit",
+                "alias": "toldar_mech"
             }
         ],
         "forCombatAbility": "combatround"

@@ -913,5 +913,68 @@
         "faction": "belkosea",
         "permanentEffect": "Superweapons you control are structures and cannot be destroyed by abilities. Each planet can contain a maximum of 1 superweapon. ",
         "source": "ds"
+    },
+    {
+        "id": "honor_bound",
+        "name": "Honor-Bound",
+        "faction": "toldar",
+        "permanentEffect": "When you gain honor, place or flip 1 code token on your faction sheet face up, if able. When you gain dishonor, instead place or flip 1 code token face down, if able.",
+        "source": "ds"
+    },
+    {
+        "id": "pride",
+        "name": "Pride",
+        "faction": "toldar",
+        "permanentEffect": "When you win a combat as the attacker against a player who has more victory points than you, gain 1 honor; if that player has fewer victory points than you, gain 1 dishonor.",
+        "source": "ds"
+    },
+    {
+        "id": "the_code",
+        "name": "The Code",
+        "faction": "toldar",
+        "permanentEffect": "When you gain—or lose—honor or dishonor, gain or lose the Code cards corresponding with your current honor and dishonor. This faction has the abilities on those Code cards.",
+        "source": "ds"
+    },
+    {
+        "id": "bestow",
+        "name": "Bestow (2 Honor)",
+        "faction": "toldar",
+        "permanentEffect": "When you pass, you may allow all of your neighbors to each gain 2 commodities, for each neighbor that does, gain 1 commodity.",
+        "source": "ds"
+    },
+    {
+        "id": "reflect",
+        "name": "Reflect (5 Honor)",
+        "faction": "toldar",
+        "permanentEffect": "When you score an objective, if another player has already scored that objective, draw 1 action card.",
+        "source": "ds"
+    },
+    {
+        "id": "ascend",
+        "name": "Ascend (8 Honor)",
+        "faction": "toldar",
+        "permanentEffect": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point.",
+        "source": "ds"
+    },
+    {
+        "id": "thwart",
+        "name": "Thwart (2 Dishonor)",
+        "faction": "toldar",
+        "permanentEffect": "When you would gain 1 or more commodities or trade goods, instead take them from any combination of your neighbors, if able. [Note: not automated, have your neighbors subtract with /player stats]",
+        "source": "ds"
+    },
+    {
+        "id": "deceive",
+        "name": "Deceive (5 Dishonor)",
+        "faction": "toldar",
+        "permanentEffect": "When you would draw 1 or more action cards, instead take 1 at random from 1 of your neighbors. ",
+        "source": "ds"
+    },
+    {
+        "id": "scourge",
+        "name": "Scourge (8 Dishonor)",
+        "faction": "toldar",
+        "permanentEffect": "Purge your promissory notes [Note: even ones in other players hands/play areas]; you cannot gain honor. You treat scored secret objectives as public objectives, instead of public objectives.",
+        "source": "ds"
     }
 ]

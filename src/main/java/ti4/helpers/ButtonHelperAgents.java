@@ -83,7 +83,52 @@ public class ButtonHelperAgents {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
+            if (cabal.hasUnexhaustedLeader("toldaragent")) {
+                List<Button> buttons = new ArrayList<>();
+                String msg = cabal.getRepresentationUnfogged() + " you have the ability to use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + " the Toldar" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
+                    + p2.getFactionEmojiOrColor() + " who has "
+                    + p2.getCommoditiesTotal() + " commodities";
+                buttons.add(Buttons.green("toldarAgent_" + p2.getFaction() + "_" + p2.getCommoditiesTotal(),
+                    "Use Toldar Agent"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
+            }
         }
+    }
+
+    public static void toldarAgentInitiation(Game game, Player p2, int amount) {
+        for (Player toldar : game.getRealPlayers()) {
+            if (toldar == p2) {
+                continue;
+            }
+            if (toldar.hasUnexhaustedLeader("toldaragent")) {
+                List<Button> buttons = new ArrayList<>();
+                String msg = toldar.getRepresentationUnfogged() + " you have the ability to use " + (toldar.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + " the Toldar" + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
+                    + p2.getFactionEmojiOrColor() + " for " + amount + " commodities";
+                buttons.add(Buttons.green("toldarAgent_" + p2.getFaction() + "_" + amount,
+                    "Use Toldar Agent"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(toldar.getCardsInfoThread(), msg, buttons);
+            }
+        }
+    }
+
+    @ButtonHandler("toldarAgent_")
+    public static void toldarAgent(Player toldar, Game game, String buttonID, GenericInteractionCreateEvent event) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String am = buttonID.split("_")[2];
+        int amount = Integer.parseInt(am);
+        ButtonHelperAgents.exhaustAgent("exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
+        int commodities = p2.getCommodities();
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+            p2.getRepresentationUnfogged() + " your " + commodities + " commodities have been washed by the Toldar agent.");
+        p2.setTg(p2.getTg() + commodities);
+        p2.setCommodities(0);
+        toldar.setCommodities(Math.min(toldar.getCommoditiesTotal(), toldar.getCommodities() + amount));
+        MessageHelper.sendMessageToChannel(toldar.getCorrectChannel(), toldar.getRepresentation() + " you now have " + toldar.getCommodities() + " commodities after using your agent");
+        toldarAgentInitiation(game, toldar, amount);
     }
 
     @ButtonHandler("startCabalAgent_")
@@ -537,6 +582,10 @@ public class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "The Stillness of Stars, the Vuil'Raith" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             startCabalAgent(player, game, rest.replace("cabalagent_", ""), event);
+        }
+        if ("toldaragent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Toldar agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Doctor Sucaban, the Jol-Nar" + ssruuSlash + " agent.";

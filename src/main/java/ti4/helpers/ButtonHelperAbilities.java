@@ -168,6 +168,47 @@ public class ButtonHelperAbilities {
             getTilesToRallyToTheCause(game, player));
     }
 
+    @ButtonHandler("startBestow")
+    public static void startBestow(Game game, Player player, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("bestowPart2_" + player.getFaction(), "Gain 2 Comms"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        for (Player p2 : player.getNeighbouringPlayers(true)) {
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + " your neighbor " + player.getRepresentationNoPing() +
+                " has chosen to allow you to gain 2 commodities (they would gain 1). Use buttons to decide if you want to accept this offer.",
+                buttons);
+        }
+    }
+
+    @ButtonHandler("bestowPart2_")
+    public static void bestowPart2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        event.getMessage().delete().queue();
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+
+        p2.setCommodities(p2.getCommodities() + 1);
+        player.setCommodities(player.getCommodities() + 2);
+        ButtonHelperAgents.toldarAgentInitiation(game, player, 2);
+        ButtonHelperAgents.toldarAgentInitiation(game, p2, 1);
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " you gained 1 commodity from " + player.getRepresentationNoPing() + " accepting your bestow ability");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 2 commodities from " + p2.getRepresentationNoPing() + "'s bestow ability");
+    }
+
+    @ButtonHandler("deployFreesystemsMech_")
+    public static void deployFreesystemsMech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        if (player.getTg() < 1) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "You dont have 1tg to pay for the mech");
+            return;
+        }
+        player.setTg(player.getTg() - 1);
+        List<Button> buttons = new ArrayList<>();
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " paid 1 tg to DEPLOY a mech to a planet adjacent the system they are rallying to the cause in");
+        buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to deploy a mech to a system adjacent to the rallied system.", buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("rallyToTheCauseStep2_")
     public static void rallyToTheCauseStep2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
@@ -179,6 +220,24 @@ public class ButtonHelperAbilities {
             + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+        if (player.ownsUnit("freesystems_mech") && !ButtonHelper.isLawInPlay(game, "articles_war")
+            && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+            buttons = new ArrayList<>();
+            boolean adj = false;
+            for (String pos2 : FoWHelper.getAdjacentTilesAndNotThisTile(game, pos, player, false)) {
+                Tile tile = game.getTileByPosition(pos2);
+                for (UnitHolder planet : tile.getPlanetUnitHolders()) {
+                    if (player.getPlanetsAllianceMode().contains(planet.getName())) {
+                        adj = true;
+                    }
+                }
+            }
+            if (adj) {
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deployFreesystemsMech_" + pos, "Pay 1 tg to deploy mech"));
+                message = player.getRepresentation() + " you can pay 1 tg to deploy a mech to a planet adjacent to the system you're rallying to the cause. ";
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            }
+        }
         event.getMessage().delete().queue();
     }
 
@@ -186,7 +245,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game) || tile.isHomeSystem()
-                || ButtonHelper.isTileLegendary(tile) || tile.isMecatol()) {
+                || ButtonHelper.isTileLegendary(tile) || tile.isMecatol() || tile.getPlanetUnitHolders().isEmpty()) {
                 continue;
             }
             buttons.add(Buttons.green("rallyToTheCauseStep2_" + tile.getPosition(),
@@ -805,9 +864,14 @@ public class ButtonHelperAbilities {
         String planet = buttonID.split("_")[1];
         String message = player.getFactionEmoji() + " added a tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".";
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+        if (unitHolder.getTokenList().contains("token_tomb.png")) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getFactionEmoji() + " had already added a tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".");
+
+            return;
+        }
         unitHolder.addToken("token_tomb.png");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        event.getMessage().delete().queue();
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
     }
 
     @ButtonHandler("startAncientEmpire")
@@ -815,9 +879,6 @@ public class ButtonHelperAbilities {
         String message = player.getRepresentation() + " chose a planet to add a tomb token to.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : game.getPlanets()) {
-            if (player.getPlanets().contains(planet)) {
-                continue;
-            }
             UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (unitHolder != null) {
                 if (unitHolder.getTokenList().contains("token_tomb.png")) {
@@ -1704,6 +1765,13 @@ public class ButtonHelperAbilities {
             + "\nTheir next roll will automatically reroll misses. If they wish to instead reroll hits as a part of a deal, they should just ignore the rerolls.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         game.setStoredValue("munitionsReserves", player.getFaction());
+    }
+
+    @ButtonHandler("virTraining")
+    public static void virTraining(ButtonInteractionEvent event, Game game, Player player) {
+        String msg = player.getFactionEmoji() + " is using their tech V.I.R. training to cancel one hit they produced in order to cancel up to 1 hit their opponent produced. " +
+            "They can do this once per round of combat. Both sides should just manually assign one less hit.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @ButtonHandler("contagion_")

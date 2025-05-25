@@ -978,5 +978,25 @@
         "baseUpgrade": "ff2",
         "source": "ds",
         "text": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships’ capacity count against your fleet pool. 1(x2), 8, 2; ANTI-FIGHTER BARRAGE 9(x2)"
+    },{
+        "alias": "dstoldb",
+        "name": "Emergency Modifications",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "toldar",
+        "source": "ds",
+        "text": "After a player activates a system, choose 1 unit on the game board; apply +2 to that unit's Capacity value, if it has one, until the end of this tactical action. "
+    },{
+        "alias": "dstoldr",
+        "name": "V.I.R. Training",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "toldar",
+        "source": "ds",
+        "text": "During each round of combat, you may cancel 1 hit your units produced to cancel up to 1 hit your opponent’s units produced."
     }
 ]

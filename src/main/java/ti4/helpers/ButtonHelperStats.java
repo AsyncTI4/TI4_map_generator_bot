@@ -87,7 +87,7 @@ public class ButtonHelperStats {
 
         if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, fogMessage);
-
+        ButtonHelperAgents.toldarAgentInitiation(game, player, amt);
         if (deleteMsg) ButtonHelper.deleteMessage(event);
         afterGainCommsChecks(game, player, finalComm - initComm);
     }
