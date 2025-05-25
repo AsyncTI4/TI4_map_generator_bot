@@ -171,7 +171,7 @@ class CustomizationOptions extends GameStateSubcommand {
             game.setOutputVerbosity(verbosity);
 
         String unitSource = event.getOption(Constants.UNIT_SOURCE, null, OptionMapping::getAsString);
-        if (unitSource != null && Mapper.getUnitSources().contains(unitSource))
+        if (unitSource != null && Mapper.getUnitSourcesDistinct().contains(unitSource))
             game.swapInVariantUnits(unitSource);
     }
 }

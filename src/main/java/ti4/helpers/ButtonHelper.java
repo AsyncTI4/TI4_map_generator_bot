@@ -5583,11 +5583,11 @@ public class ButtonHelper {
     public static List<Button> getFactionSetupButtons(Game game, String buttonID) {
         String userId = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
-        List<FactionModel> factionsOnMap = Mapper.getFactions().stream()
+        List<FactionModel> factionsOnMap = Mapper.getFactionsValues().stream()
             .filter(f -> game.getTile(f.getHomeSystem()) != null)
             .filter(f -> game.getPlayerFromColorOrFaction(f.getAlias()) == null)
             .toList();
-        List<FactionModel> allFactions = Mapper.getFactions().stream()
+        List<FactionModel> allFactions = Mapper.getFactionsValues().stream()
             .filter(f -> game.isDiscordantStarsMode() ? f.getSource().isDs() : f.getSource().isOfficial())
             .filter(f -> game.getPlayerFromColorOrFaction(f.getAlias()) == null)
             .sorted((f1, f2) -> factionsOnMap.contains(f1) ? (factionsOnMap.contains(f2) ? 0 : -1)
@@ -5759,7 +5759,7 @@ public class ButtonHelper {
         List<Button> buttons = getFactionSetupButtons(game, buttonID);
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = -1;
-        long numberOfHomes = Mapper.getFactions().stream()
+        long numberOfHomes = Mapper.getFactionsValues().stream()
             .filter(f -> game.getTile(f.getHomeSystem()) != null)
             .filter(f -> game.getPlayerFromColorOrFaction(f.getAlias()) == null)
             .count();

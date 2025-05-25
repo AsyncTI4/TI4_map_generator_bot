@@ -71,7 +71,7 @@ public class FrankenDraft extends BagDraft {
     }
 
     public static List<FactionModel> getAllFrankenLegalFactions() {
-        List<FactionModel> factionSet = Mapper.getFactions();
+        List<FactionModel> factionSet = Mapper.getFactionsValues();
         factionSet.removeIf((FactionModel model) -> {
             if (model.getSource().isPok() || model.getSource().isDs()) {
                 for (String excludedFaction : excludedFactions) {
