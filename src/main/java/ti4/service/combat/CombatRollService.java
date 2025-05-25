@@ -137,10 +137,10 @@ public class CombatRollService {
 
         TileModel tileModel = TileHelper.getTileById(tile.getTileID());
         List<NamedCombatModifierModel> modifiers = CombatModHelper.getModifiers(player, opponent,
-            playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_MODIFIERS);
+            playerUnitsByQuantity, opponentUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_MODIFIERS);
 
         List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(player, opponent,
-            playerUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_EXTRA_ROLLS);
+            playerUnitsByQuantity, opponentUnitsByQuantity, tileModel, game, rollType, Constants.COMBAT_EXTRA_ROLLS);
 
         // Check for temp mods
         CombatTempModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
@@ -460,6 +460,7 @@ public class CombatRollService {
             if (unitModel.getId().equalsIgnoreCase("belkosea_mech")) {
                 if (hitRolls > 0) {
                     player.setCommodities(Math.min(player.getCommodities() + hitRolls, player.getCommoditiesTotal()));
+                    ButtonHelperAgents.toldarAgentInitiation(game, player, hitRolls);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
                         + " gained " + hitRolls + " commodities due to the Belkosea Mech ability (gain comms when producing hits).");
                 }

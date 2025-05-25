@@ -168,6 +168,32 @@ public class ButtonHelperAbilities {
             getTilesToRallyToTheCause(game, player));
     }
 
+    @ButtonHandler("startBestow")
+    public static void startBestow(Game game, Player player, ButtonInteractionEvent event) {
+        event.getMessage().delete().queue();
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Buttons.green("bestowPart2_" + player.getFaction(), "Gain 2 Comms"));
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
+        for (Player p2 : player.getNeighbouringPlayers(true)) {
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + " your neighbor " + player.getRepresentationNoPing() +
+                " has chosen to allow you to gain 2 commodities (they would gain 1). Use buttons to decide if you want to accept this offer.",
+                buttons);
+        }
+    }
+
+    @ButtonHandler("bestowPart2_")
+    public static void bestowPart2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        event.getMessage().delete().queue();
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+
+        p2.setCommodities(p2.getCommodities() + 1);
+        player.setCommodities(player.getCommodities() + 2);
+        ButtonHelperAgents.toldarAgentInitiation(game, player, 2);
+        ButtonHelperAgents.toldarAgentInitiation(game, p2, 1);
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " you gained 1 commodity from " + player.getRepresentationNoPing() + " accepting your bestow ability");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 2 commodities from " + p2.getRepresentationNoPing() + "'s bestow ability");
+    }
+
     @ButtonHandler("deployFreesystemsMech_")
     public static void deployFreesystemsMech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];

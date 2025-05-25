@@ -1710,6 +1710,7 @@ public class Helper {
                 unitButtons.add(Buttons.green("sarMechStep1_" + tile.getPosition() + "_" + warfareNOtherstuff, "Use Self-Assembly Routines", TechEmojis.WarfareTech));
             }
             if (playerHasWarMachine(player)) {
+                ActionCardHelper.sendActionCardInfo(game, player, event);
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Reminder that you have _War Machine_ and this is the window for it.");
             }
         }
@@ -1978,6 +1979,9 @@ public class Helper {
         int limit = 16;
         if (!game.getStoredValue("ccLimit").isEmpty()) {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
+        }
+        if (!game.getStoredValue("ccLimit" + color).isEmpty()) {
+            limit = Integer.parseInt(game.getStoredValue("ccLimit" + color));
         }
         boolean ccCountIsOver = ccCount > limit;
         if (ccCountIsOver && game.isCcNPlasticLimit()) {

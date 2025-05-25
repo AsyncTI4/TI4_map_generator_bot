@@ -1,6 +1,15 @@
 package ti4.image;
 
-import java.awt.*;
+import static org.apache.commons.lang3.StringUtils.*;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -19,11 +28,12 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -65,8 +75,6 @@ import ti4.model.UnitModel;
 import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
 import ti4.website.WebsiteOverlay;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class PlayerAreaGenerator {
 
@@ -397,6 +405,7 @@ public class PlayerAreaGenerator {
         xDeltaTop = speakerToken(player, xDeltaTop, yPlayArea);
 
         // SECOND ROW RIGHT SIDE (faction tokens)
+        xDeltaBottom = honorOrPathTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = sleeperTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = creussWormholeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
 
@@ -553,6 +562,18 @@ public class PlayerAreaGenerator {
 
         int numToDisplay = 5 - game.getSleeperTokensPlacedCount();
         return displayRemainingFactionTokens(points, bufferedImage, numToDisplay, xDeltaFromRightSide, yDelta);
+    }
+
+    private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (player.getHonorCounter() < 1 && player.getPathTokenCounter() < 1) {
+            return xDeltaFromRightSide;
+        }
+        if (player.getHonorCounter() > 0) {
+            DrawingUtil.superDrawStringCenteredDefault(graphics, "Honor Count: " + player.getHonorCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
+        } else {
+            DrawingUtil.superDrawStringCenteredDefault(graphics, "Path Token Count: " + player.getPathTokenCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
+        }
+        return xDeltaFromRightSide + 200;
     }
 
     private int creussWormholeTokens(Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
@@ -1273,6 +1294,9 @@ public class PlayerAreaGenerator {
             int positionCount = reinforcementsPosition.getPositionCount(CC_TAG);
             if (!game.getStoredValue("ccLimit").isEmpty()) {
                 positionCount = Integer.parseInt(game.getStoredValue("ccLimit"));
+            }
+            if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
+                positionCount = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
             }
             int remainingReinforcements = positionCount - ccCount;
             if (remainingReinforcements > 0) {

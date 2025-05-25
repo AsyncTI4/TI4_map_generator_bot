@@ -1,5 +1,6 @@
 package ti4.service.turn;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,6 +50,15 @@ public class PassService {
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = player.getRepresentationUnfogged() + "! Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain a command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+        }
+        if (player.hasAbility("bestow")) {
+            String msg = player.getRepresentation() + ", since you have the Bestow Honor card,"
+                + " you can allow your neighbors to each gain 2 commodities with the below button. If you do, for each one that does you will gain 1 commodity.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.green("startBestow", "Allow Neighbors To Gain 2 Comms"));
+            buttons.add(Buttons.red("deleteButtons", "Decline"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to resolve", buttons);
         }
         if (player.hasTech("dskolug")) {
             int oldComm = player.getCommodities();

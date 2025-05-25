@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,6 +43,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
@@ -257,7 +259,18 @@ public class ButtonHelperFactionSpecific {
         if (player.getHonorCounter() < -7) {
             if (!player.hasAbility("scourge")) {
                 player.addAbility("scourge");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the scourge honor card\n" + Mapper.getAbility("scourge").getRepresentation());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the scourge honor card. Every one of their PNs has been purged. In order to score SOs as POs, use /status po_add_custom and /status po_score\n" + Mapper.getAbility("scourge").getRepresentation());
+                for (Player p3 : game.getRealPlayers()) {
+                    Set<String> pns = new HashSet<>(p3.getPromissoryNotes().keySet());
+                    Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
+                    for (String pnID : pns) {
+                        PromissoryNoteModel pn = promissoryNotes.get(pnID);
+                        if (pn != null && (pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction()))) {
+                            p3.removePromissoryNote(pnID);
+                            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p3, false);
+                        }
+                    }
+                }
             }
         }
 

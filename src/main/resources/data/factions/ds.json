@@ -1228,7 +1228,7 @@
         "commodities": 3,
         "factionTech": ["dstoldb", "dstoldr"],
         "startingTechAmount": 1,
-        "startingTechOptions": ["det","am","nm","pa"],
+        "startingTechOptions": ["det","amd","nm","pa"],
         "homePlanets": ["khodd","dryun"],
         "abilities": ["honor_bound","pride","the_code"],
         "leaders": ["toldaragent", "toldarcommander", "toldarhero"],
