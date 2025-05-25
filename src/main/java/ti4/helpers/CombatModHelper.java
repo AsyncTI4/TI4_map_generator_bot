@@ -51,6 +51,7 @@ public class CombatModHelper {
         Player player,
         Player opponent,
         Map<UnitModel, Integer> unitsByQuantity,
+        Map<UnitModel, Integer> opponentUnitsByQuantity,
         TileModel tile,
         Game game,
         CombatRollType rollType,
@@ -72,7 +73,7 @@ public class CombatModHelper {
                 .findFirst();
 
             if (relevantMod.isPresent()
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity,
                     game)) {
                 AbilityModel abilityModel = Mapper.getAbility(ability);
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), abilityModel.getRepresentation()));
@@ -85,7 +86,7 @@ public class CombatModHelper {
                 .findFirst();
 
             if (relevantMod.isPresent()
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity,
                     game)) {
                 TechnologyModel technologyModel = Mapper.getTech(tech);
                 modifiers
@@ -102,7 +103,7 @@ public class CombatModHelper {
                     .findFirst();
 
                 if (relevantMod.isPresent()
-                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                    && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity,
                         game)) {
                     TechnologyModel technologyModel = Mapper.getTech(tech);
                     modifiers.add(
@@ -116,7 +117,7 @@ public class CombatModHelper {
                 .filter(modifier -> modifier.isRelevantTo(Constants.RELIC, relic))
                 .findFirst();
 
-            if (relevantMod.isPresent() && checkModPassesCondition(relevantMod.get(), tile, player, opponent,
+            if (relevantMod.isPresent() && checkModPassesCondition(relevantMod.get(), tile, player, opponent, opponentUnitsByQuantity,
                 unitsByQuantity, game)) {
                 RelicModel relicModel = Mapper.getRelic(relic);
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), relicModel.getSimpleRepresentation()));
@@ -133,7 +134,7 @@ public class CombatModHelper {
                 .findFirst();
 
             if (relevantMod.isPresent()
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity,
                     game)) {
                 modifiers
                     .add(new NamedCombatModifierModel(relevantMod.get(), CardEmojis.Agenda + " " + agenda.getName()));
@@ -147,7 +148,7 @@ public class CombatModHelper {
                 .findFirst();
 
             if (relevantMod.isPresent()
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity,
                     game)) {
                 modifiers.add(new NamedCombatModifierModel(relevantMod.get(), unit.getUnitEmoji() + " " + unit.getName() + " " + unit.getAbility()));
             }
@@ -162,7 +163,7 @@ public class CombatModHelper {
                 .findFirst();
 
             if (relevantMod.isPresent()
-                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity,
+                && checkModPassesCondition(relevantMod.get(), tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity,
                     game)) {
                 modifiers.add(
                     new NamedCombatModifierModel(relevantMod.get(), Helper.getLeaderFullRepresentation(leader)));
@@ -173,7 +174,7 @@ public class CombatModHelper {
             .filter(modifier -> modifier.isRelevantTo(Constants.CUSTOM, Constants.CUSTOM))
             .toList();
         for (CombatModifierModel relevantMod : customAlwaysRelveantMods) {
-            if (checkModPassesCondition(relevantMod, tile, player, opponent, unitsByQuantity,
+            if (checkModPassesCondition(relevantMod, tile, player, opponent, unitsByQuantity, opponentUnitsByQuantity,
                 game)) {
                 modifiers.add(
                     new NamedCombatModifierModel(relevantMod, relevantMod.getRelated().getFirst().getMessage()));
@@ -216,6 +217,7 @@ public class CombatModHelper {
         Player player,
         Player opponent,
         Map<UnitModel, Integer> unitsByQuantity,
+        Map<UnitModel, Integer> opponentUnitsByQuantity,
         Game game
     ) {
         boolean meetsCondition = false;
@@ -352,6 +354,18 @@ public class CombatModHelper {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "nivyncommander")) {
                     meetsCondition = true;
                 }
+            }
+            case "toldar_commander_particular" -> {
+                int ownUnits = 0;
+                int opponentUnits = 0;
+                for (UnitModel unitM : unitsByQuantity.keySet()) {
+                    ownUnits += unitsByQuantity.get(unitM);
+                }
+                for (UnitModel unitM : opponentUnitsByQuantity.keySet()) {
+                    opponentUnits += opponentUnitsByQuantity.get(unitM);
+                }
+                return ownUnits < opponentUnits;
+
             }
             case "lizho_commander_particular" -> {
                 if (game.playerHasLeaderUnlockedOrAlliance(player, "lizhocommander")) {

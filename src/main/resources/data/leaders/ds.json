@@ -1364,5 +1364,17 @@
         "abilityText": "You may purge this card to commit any of your ships in the active system to planets as if they were ground forces; those units participate in combat. At the end of this tactical action, return those ships to the space area of the active system.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
+    },
+    {
+        "id": "toldarhero",
+        "faction": "toldar",
+        "type": "hero",
+        "name": "Acamont",
+        "title": " Concordat Marshall",
+        "abilityName": "Concord Renewed - Galactic Outreach",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Attach this card to a revealed public objective. Other players with the fewest victory points may score this objective without fulfilling its requirements; after another player scores this objective, the Toldar player gains 2 command tokens.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
     }
 ]

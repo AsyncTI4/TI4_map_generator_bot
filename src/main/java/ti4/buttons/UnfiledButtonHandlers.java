@@ -1096,6 +1096,15 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteTheOneButton(event);
     }
 
+    @ButtonHandler("toldarPN")
+    public static void toldarPN(ButtonInteractionEvent event, Player player, Game game) {
+        player.setCommodities(Math.min(player.getCommoditiesTotal(), player.getCommodities() + 3));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " used the toldar promissory note to gain " +
+            "3 commodities after winning a combat against someone with more VP than them. They can do this once per action. Their currently hold "
+            + player.getCommodities() + " commodities");
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     @ButtonHandler("exhaustRelic_")
     public static void exhaustRelic(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String relic = buttonID.replace("exhaustRelic_", "");

@@ -378,6 +378,10 @@ public class AgendaHelper {
             buttons.add(Buttons.red("queueAfter_planet_" + planet, "Tarrock Ability"));
         }
 
+        if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
+            buttons.add(Buttons.red("queueAfter_leader_Atokera Commander", "Atokera Commander Ability"));
+        }
+
         if (player.hasLeaderUnlocked("keleresheroodlynn")) {
             buttons.add(Buttons.red("queueAfter_leader_Keleres Xxcha Hero", "Keleres Hero"));
         }
@@ -558,16 +562,21 @@ public class AgendaHelper {
                                     riderButtons);
                             }
                             case "leader" -> {
-                                Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
-                                if (playerLeader != null) {
-                                    String message = player.getRepresentation() + " played " +
-                                        Helper.getLeaderFullRepresentation(playerLeader);
-                                    player.removeLeader(playerLeader);
-                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                                        message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
+                                if (after.toLowerCase().contains("keleres")) {
+                                    Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                                    if (playerLeader != null) {
+                                        String message = player.getRepresentation() + " played " +
+                                            Helper.getLeaderFullRepresentation(playerLeader);
+                                        player.removeLeader(playerLeader);
+                                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                                            message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
+                                    }
+                                    riderButtons = getAgendaButtons("Keleres Xxcha Hero", game,
+                                        player.getFinsFactionCheckerPrefix());
+                                } else {
+                                    riderButtons = getAgendaButtons("Atokera Commander Ability", game,
+                                        player.getFinsFactionCheckerPrefix());
                                 }
-                                riderButtons = getAgendaButtons("Keleres Xxcha Hero", game,
-                                    player.getFinsFactionCheckerPrefix());
                                 MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),
                                     player.getRepresentation() + ", please select your target.", game, player,
                                     riderButtons);

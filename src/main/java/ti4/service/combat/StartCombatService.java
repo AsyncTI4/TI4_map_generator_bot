@@ -909,6 +909,15 @@ public class StartCombatService {
             buttons.add(Buttons.gray(finChecker + "offerNecrophage", "Necrophage", FactionEmojis.mykomentori));
         }
 
+        if (p2.getPromissoryNotesInPlayArea().contains("dspntold") && !game.isFowMode() && p2.getTotalVictoryPoints() < p1.getTotalVictoryPoints()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Comms (Upon Win)", FactionEmojis.toldar));
+        }
+        if (p1.getPromissoryNotesInPlayArea().contains("dspntold") && p1.getTotalVictoryPoints() < p2.getTotalVictoryPoints()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Comms (Upon Win)", FactionEmojis.toldar));
+        }
+
         if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));

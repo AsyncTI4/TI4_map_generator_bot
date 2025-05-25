@@ -10,6 +10,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -84,6 +85,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 int comms = player.getHarvestCounter();
                 player.setHarvestCounter(0);
                 player.setCommodities(Math.min(player.getCommoditiesTotal(), player.getCommodities() + comms));
+                ButtonHelperAgents.toldarAgentInitiation(game, player, comms);
                 MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " + player.getCommodities() + " commodities (from the " + comms + " that were on the card)");
             }
             case "mirage" -> {

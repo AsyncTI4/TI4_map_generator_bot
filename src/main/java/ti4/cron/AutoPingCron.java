@@ -314,7 +314,11 @@ public class AutoPingCron {
             }
             if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
                 if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).contains(p2)) {
-                    MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to decide on voting.");
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("preVote", "Pre-Vote"));
+                    buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
+                    buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to decide on voting.", buttons);
                 }
             }
         }
