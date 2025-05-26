@@ -356,15 +356,17 @@ public class CombatModHelper {
                 }
             }
             case "toldar_commander_particular" -> {
-                int ownUnits = 0;
-                int opponentUnits = 0;
-                for (UnitModel unitM : unitsByQuantity.keySet()) {
-                    ownUnits += unitsByQuantity.get(unitM);
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "toldarcommander")) {
+                    int ownUnits = 0;
+                    int opponentUnits = 0;
+                    for (UnitModel unitM : unitsByQuantity.keySet()) {
+                        ownUnits += unitsByQuantity.get(unitM);
+                    }
+                    for (UnitModel unitM : opponentUnitsByQuantity.keySet()) {
+                        opponentUnits += opponentUnitsByQuantity.get(unitM);
+                    }
+                    meetsCondition = ownUnits < opponentUnits;
                 }
-                for (UnitModel unitM : opponentUnitsByQuantity.keySet()) {
-                    opponentUnits += opponentUnitsByQuantity.get(unitM);
-                }
-                return ownUnits < opponentUnits;
 
             }
             case "lizho_commander_particular" -> {
