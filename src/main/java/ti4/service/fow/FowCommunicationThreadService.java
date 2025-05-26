@@ -82,7 +82,7 @@ public class FowCommunicationThreadService {
         return player.getNeighbouringPlayers(true);
     }
 
-    public static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {
+    private static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {
         CompletableFuture<List<ThreadChannel>> future = new CompletableFuture<>();
 
         List<ThreadChannel> result = new ArrayList<>(game.getMainGameChannel().getThreadChannels());
@@ -114,7 +114,6 @@ public class FowCommunicationThreadService {
 
     private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<Set<Player>> checkedPairs, Game game) {
         boolean areAllowedToTalkInAgenda = areAllowedToTalkInAgenda(game);
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
             ThreadChannel threadChannel = thread.getKey();
             String threadName = thread.getKey().getName();
@@ -132,10 +131,12 @@ public class FowCommunicationThreadService {
             String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
             if (!threadLocked && isHiddenAgenda(game)) {
                 //Reminder of Hidden Agenda mode
+                ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
                 threadChannel.getManager().setArchived(false).queue(success -> 
                     threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda **only** speaker is allowed to speak.").queue());
             } else if (areNeighbors && threadLocked) {
                 //Allow talking
+                ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
                 threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
                     .queue(nameUpdated -> threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda
                         ? " **may** communicate in Agenda phase."
@@ -143,6 +144,7 @@ public class FowCommunicationThreadService {
 
             } else if (!areNeighbors && !threadLocked) {
                 //Deny talking
+                ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
                 threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR))
                     .queue(nameUpdated -> threadChannel.sendMessage(notice + " are no longer neighbors and should **not** communicate.").queue()));
             }
