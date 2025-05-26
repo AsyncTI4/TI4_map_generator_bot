@@ -39,7 +39,7 @@ public class RegexHelper {
 
     private static Set<String> legalFactions(Game game) {
         Set<String> factionAliases = new HashSet<>();
-        Mapper.getFactions().forEach(faction -> {
+        Mapper.getFactionsValues().forEach(faction -> {
             if (game == null || game.getPlayerFromColorOrFaction(faction.getAlias()) != null) {
                 factionAliases.add(faction.getAlias());
             }
@@ -232,7 +232,7 @@ public class RegexHelper {
 
     /** @return group "token" */
     public static String tokenRegex() {
-        Set<String> tokens = new HashSet<>(Mapper.getTokensFromproperties());
+        Set<String> tokens = new HashSet<>(Mapper.getTokensFromProperties());
         return regexBuilder("token", tokens);
     }
 }

@@ -47,7 +47,7 @@ public class StandardBagDraft extends BagDraft {
     }
 
     public static List<FactionModel> getAllLegalFactions() {
-        List<FactionModel> factionSet = Mapper.getFactions();
+        List<FactionModel> factionSet = Mapper.getFactionsValues();
         factionSet.removeIf((FactionModel model) -> {
             if (model.getSource().isPok() || model.getSource().isDs()) {
                 for (String excludedFaction : excludedFactions) {
