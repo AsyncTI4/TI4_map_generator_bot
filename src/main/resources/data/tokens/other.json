@@ -87,7 +87,10 @@
         "imagePath": "token_ds_customtnelis.png",
         "source": "other"
     },
-    { "id": "customwinnu", "imagePath": "token_winnu.png", "source": "other" },
+    {
+        "id": "customwinnu",
+        "imagePath": "token_winnu.png",
+        "source": "other" },
     {
         "id": "speaker",
         "imagePath": "token_speaker.png",
