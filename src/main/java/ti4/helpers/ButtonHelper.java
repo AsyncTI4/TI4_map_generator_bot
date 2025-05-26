@@ -5062,6 +5062,12 @@ public class ButtonHelper {
                             } else {
                                 messageBuilder.append(" (distance exceeds move value (").append(distance).append(" > ")
                                     .append(moveValue).append("), __does not have _Gravity Drive___)");
+
+                                if (game.isFowMode()) {
+                                    int lastNewline = messageBuilder.lastIndexOf("\n");
+                                    GMService.logPlayerActivity(game, player,
+                                        (lastNewline == -1) ? messageBuilder.toString() : messageBuilder.substring(lastNewline + 1));
+                                }
                             }
                             if (player.getTechs().contains("dsgledb")) {
                                 messageBuilder.append(" (has _Lightning Drives_ for +1 movement if not transporting)");
@@ -5091,9 +5097,6 @@ public class ButtonHelper {
         message = messageBuilder.toString();
         if ("".equalsIgnoreCase(message)) {
             message = "Nothing moved.";
-        }
-        if (message.contains("distance exceeds") && (message.contains("does not") || message.contains("could add"))) {
-            GMService.logPlayerActivity(game, player, message);
         }
         return message;
     }
