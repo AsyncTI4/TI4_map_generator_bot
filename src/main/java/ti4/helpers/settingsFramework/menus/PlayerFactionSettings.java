@@ -103,7 +103,7 @@ public class PlayerFactionSettings extends SettingsMenu {
     protected void updateTransientSettings() {
         if (parent instanceof MiltySettings m) {
             List<ComponentSource> sources = m.getSourceSettings().getFactionSources();
-            Map<String, FactionModel> allFactions = Mapper.getFactions().stream()
+            Map<String, FactionModel> allFactions = Mapper.getFactionsValues().stream()
                 .filter(model -> sources.contains(model.getSource()))
                 .filter(model -> !model.getAlias().contains("keleres") || model.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor
                 .collect(Collectors.toMap(FactionModel::getAlias, f -> f));

@@ -719,7 +719,7 @@
         "id": "collateralized_loans",
         "name": "Collateralized Loans",
         "faction": "vaden",
-        "window": "After 1 of your opponent's ships is destroyed during a round of space combat",
+        "window": "After 1 of your opponent's ships is destroyed during a round of space combat:",
         "windowEffect": "You may remove 1 of that player's control tokens from your faction sheet to place 1 ship of that type from your reinforcements in the active system.",
         "source": "ds",
         "shortName": "Collateral\n-ized Loans"
