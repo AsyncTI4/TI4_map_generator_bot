@@ -47,7 +47,7 @@ public class GameWinsWithOtherFactionsService {
         StringBuilder sb = new StringBuilder();
         sb.append("Faction Win Percent:").append("\n");
 
-        Mapper.getFactions().stream()
+        Mapper.getFactionsValues().stream()
             .map(faction -> {
                 double winCount = factionWinCount.getOrDefault(faction.getAlias(), 0);
                 double gameCount = factionGameCount.getOrDefault(faction.getAlias(), 0);

@@ -146,7 +146,7 @@ public class MiltyService {
         initDraftOrder(draftManager, players, staticOrder);
 
         // initialize factions
-        List<String> unbannedFactions = new ArrayList<>(Mapper.getFactions().stream()
+        List<String> unbannedFactions = new ArrayList<>(Mapper.getFactionsValues().stream()
             .filter(f -> specs.factionSources.contains(f.getSource()))
             .filter(f -> !specs.bannedFactions.contains(f.getAlias()))
             .filter(f -> !f.getAlias().contains("keleres") || f.getAlias().equals("keleresm")) // Limit the pool to only 1 keleres flavor

@@ -119,7 +119,7 @@ public class GameStatisticsFilterer {
 
     private static boolean isDiscordantStarsGame(Game game) {
         return game.isDiscordantStarsMode() ||
-            Mapper.getFactions().stream()
+            Mapper.getFactionsValues().stream()
                 .filter(faction -> "ds".equals(faction.getSource().name()))
                 .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
