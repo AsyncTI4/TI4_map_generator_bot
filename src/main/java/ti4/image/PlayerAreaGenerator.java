@@ -1755,6 +1755,10 @@ public class PlayerAreaGenerator {
 
         try {
             Planet planet = planetsInfo.get(planetName);
+            if (planet == null) {
+                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Planet " + planetName + " not found in game " + game.getName());
+                return deltaX;
+            }
             PlanetModel planetModel = planet.getPlanetModel();
             if (planetModel == null) return deltaX;
 

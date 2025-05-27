@@ -27,6 +27,7 @@ import ti4.listeners.context.SelectionMenuContext;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.message.BotLogger.LogMessageOrigin;
 
 public class AnnotationHandler {
 
@@ -150,19 +151,25 @@ public class AnnotationHandler {
                 context.setShouldSave(save);
                 method.invoke(null, args.toArray());
             } catch (InvocationTargetException e) {
-                BotLogger.error("Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
+                LogMessageOrigin origin = null;
                 for (Object arg : args) {
                     if (arg instanceof ButtonInteractionEvent buttonInteractionEvent) {
+                        origin = new LogMessageOrigin((GenericInteractionCreateEvent) arg);
                         buttonInteractionEvent.getInteraction().getMessage()
                             .reply("The button failed. An exception has been logged for the developers.")
                             .queue();
                     }
                     if (arg instanceof StringSelectInteractionEvent selectInteractionEvent) {
+                        origin = new LogMessageOrigin((GenericInteractionCreateEvent) arg);
                         selectInteractionEvent.getInteraction().getMessage()
                             .reply("The selection failed. An exception has been logged for the developers.")
                             .queue();
                     }
                 }
+                //help track down issues like this one by adding context to the error
+                //ex: https://discord.com/channels/943410040369479690/1341438476528123904/1376507434323148830
+                //ex: https://discord.com/channels/943410040369479690/1341438476528123904/1376239752226799661
+                BotLogger.error(origin, "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.stream(method.getParameters()).map(param -> param.getType().getSimpleName()).toList();
                 List<String> argTypes = args.stream().map(obj -> obj.getClass().getSimpleName()).toList();
@@ -226,11 +233,15 @@ public class AnnotationHandler {
                     if (argGetter == null) {
                         continue;
                     }
-                    
+
                     for (H handler : handlers) {
                         String val = null;
                         Boolean save = true;
-                        if (handler instanceof ButtonHandler bh) { val = bh.value(); save = bh.save(); };
+                        if (handler instanceof ButtonHandler bh) {
+                            val = bh.value();
+                            save = bh.save();
+                        }
+                        ;
                         if (handler instanceof SelectionHandler sh) val = sh.value();
                         if (handler instanceof ModalHandler mh) val = mh.value();
                         if (val == null) continue;

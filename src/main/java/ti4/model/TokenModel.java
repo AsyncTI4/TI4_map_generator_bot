@@ -40,7 +40,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     public boolean allowedOnPlanet() {
         return spaceOrPlanet == null || "planet".equals(spaceOrPlanet) || "both".equals(spaceOrPlanet);
     }
-    
+
     public boolean searchSource(ComponentSource searchSource) {
         return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
     }
@@ -61,16 +61,16 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if(getSpaceOrPlanet() != null) sb.append("Location: ").append(getSpaceOrPlanet().toString()).append("\n");
-        if(getTokenPlanetName() != null) sb.append("Planet: ").append(getTokenPlanetName().toString()).append("\n");
-        if(getAttachmentID() != null) sb.append("Attachment: ").append(getAttachmentID().toString()).append("\n");
-        if(getWormholes() != null) sb.append("Wormhole: ").append(getWormholes().toString()).append("\n");
-        if(getIsAnomaly() != null) sb.append("Anomaly");
+        if (getSpaceOrPlanet() != null) sb.append("Location: ").append(getSpaceOrPlanet().toString()).append("\n");
+        if (getTokenPlanetName() != null) sb.append("Planet: ").append(getTokenPlanetName().toString()).append("\n");
+        if (getAttachmentID() != null) sb.append("Attachment: ").append(getAttachmentID().toString()).append("\n");
+        if (getWormholes() != null) sb.append("Wormhole: ").append(getWormholes().toString()).append("\n");
+        if (getIsAnomaly() != null) sb.append("Anomaly");
         eb.setDescription(sb.toString());
 
         sb = new StringBuilder();
         sb.append("ID: ").append(getId());
-        if(getSource() != null) sb.append(" Source: ").append(getSource());
+        if (getSource() != null) sb.append(" Source: ").append(getSource());
         eb.setFooter(sb.toString());
 
         eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/" + getImagePath() + "?raw=true");
@@ -80,8 +80,9 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
+        //ex: https://discord.com/channels/943410040369479690/1341438476528123904/1376380617411002483
         return getId().contains(searchString)
-            || getAliasList().toString().contains(searchString)
+            || (getAliasList() != null && getAliasList().toString().contains(searchString))
             || getSource().toString().contains(searchString)
             || getAutoCompleteName().contains(searchString);
     }
