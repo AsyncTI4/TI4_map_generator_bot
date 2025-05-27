@@ -196,6 +196,12 @@ public class TileHelper {
     }
 
     public static Tile getTile(GenericInteractionCreateEvent event, String tileNameOrPos, Game game) {
+//help https://discord.com/channels/943410040369479690/1341438476528123904/1376710456168681565
+        if (tileNameOrPos.matches("^\\s*\\d{3} \\(\\w+\\)\\s*$")) {
+            // If the tileNameOrPos is in the format "123 (XYZ)", we extract the position only
+            tileNameOrPos = tileNameOrPos.trim().substring(0, tileNameOrPos.indexOf(' ')).trim();
+        }
+
         String tileAlias = AliasHandler.resolveTile(tileNameOrPos);
         if (game.isTileDuplicated(tileAlias)) {
             if (event != null)

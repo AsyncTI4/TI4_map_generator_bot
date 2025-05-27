@@ -22,6 +22,11 @@ public class LookAgendaService {
 
     private static List<MessageEmbed> getAgendaEmbeds(int count, boolean fromBottom, Game game) {
         List<MessageEmbed> agendaEmbeds = new ArrayList<>();
+        //A few random attempts to peek at a lot of agendas here:
+        //exs start from here: https://discord.com/channels/943410040369479690/1341438476528123904/1376470594593357948
+        if (count > game.getAgendas().size()) {
+            count = game.getAgendas().size();
+        }
         for (int i = 0; i < count; i++) {
             String agendaID = fromBottom ? game.lookAtBottomAgenda(i) : game.lookAtTopAgenda(i);
             if (agendaID != null) {
