@@ -1136,17 +1136,18 @@ public class StartCombatService {
             if (unitH instanceof Planet) {
                 nameOfHolder = Helper.getPlanetRepresentation(unitH.getName(), game);
                 for (Player p : List.of(p1, p2)) {
-                    // Sol Commander
                     Player otherP = p1;
                     if (p == p1) {
                         otherP = p2;
                     }
+                    // Sol Commander
                     if (p != game.getActivePlayer() && game.playerHasLeaderUnlockedOrAlliance(p, "solcommander") && isGroundCombat) {
                         String id = p.finChecker() + "utilizeSolCommander_" + unitH.getName();
                         String label = "Use Sol Commander on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Sol));
                     }
-                    if (p.hasUnit("atokera") && isGroundCombat && p.getReadiedPlanets().contains(unitH.getName()) && unitH.getUnitCount(UnitType.Mech, p) > 0) {
+                    // atokera
+                    if (p.hasUnit("atokera_mech") && isGroundCombat && p.getReadiedPlanets().contains(unitH.getName()) && unitH.getUnitCount(UnitType.Mech, p) > 0) {
                         String id = p.finChecker() + "utilizeAtokeraMech_" + unitH.getName();
                         String label = "Use Atokera Mech Ability on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.atokera));
@@ -1174,9 +1175,8 @@ public class StartCombatService {
                         String label = "Deploy Dunlain Reaper on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Letnev));
                     }
-                    // Assimilate
-
                 }
+                // Assimilate
                 if (p1.hasAbility("assimilate") && isGroundCombat
                     && (unitH.getUnitCount(Units.UnitType.Spacedock, p2.getColor()) > 0
                         || unitH.getUnitCount(Units.UnitType.Pds, p2.getColor()) > 0)) {
@@ -1232,7 +1232,7 @@ public class StartCombatService {
 
     private static String getSpaceCombatIntroMessage() {
         return """
-            ## Steps for Space Combat:
+            ## Steps for End of Movement & Space Combat:
             > 1. End of movement abilities (**Foresight**, _Stymie_, etc.)
             > 2. Space Cannon Offense
             > 3. Start of Combat (_Skilled Retreat_, _Morale Boost_, etc.)

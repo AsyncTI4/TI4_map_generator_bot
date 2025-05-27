@@ -40,10 +40,11 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.tactical.TacticalActionService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
-import ti4.service.unit.ParsedUnit;
+import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperAbilities {
@@ -1358,8 +1359,11 @@ public class ButtonHelperAbilities {
         String planet1 = buttonID.split("_")[1];
         String planet2 = buttonID.split("_")[2];
         player.setHasUsedPeopleConnectAbility(true);
-        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet1), game, player.getColor(), "inf " + planet1);
-        AddUnitService.addUnits(event, game.getTileFromPlanet(planet2), game, player.getColor(), "inf " + planet2);
+
+        Tile source = game.getTileFromPlanet(planet1);
+        Tile dest = game.getTileFromPlanet(planet2);
+        MoveUnitService.moveUnits(event, source, game, player.getColor(), "inf " + planet1, dest, planet2);
+
         MessageHelper.sendMessageToChannel(event.getChannel(),
             player.getFactionEmoji() + " moved 1 infantry from "
                 + Helper.getPlanetRepresentation(planet1, game) + " to "
@@ -1484,7 +1488,7 @@ public class ButtonHelperAbilities {
         game.setStoredValue("hiredGunsInPlay", player.getFaction() + "_" + game.getActivePlayer().getFaction());
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is using their hired guns ability to send up to three ships to the active system to fight under the command of " + game.getActivePlayer().getRepresentation() +
             ".\nWhen the tactical action concludes, any of the sold ships in the active system will be converted into the active players ships.");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to select up to three ships", ButtonHelper.getTilesToMoveFrom(player, game, event));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to select up to three ships", TacticalActionService.getTilesToMoveFrom(player, game, event));
     }
 
     @ButtonHandler("startSimultaneousTacticalAction")
@@ -1498,7 +1502,7 @@ public class ButtonHelperAbilities {
         ButtonHelperTacticalAction.selectActiveSystem(player, game, event, "ringTile_" + game.getActiveSystem());
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is doing a simultaenous tactical action with " + game.getActivePlayer().getRepresentation());
-        //MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to move ships", ButtonHelper.getTilesToMoveFrom(player, game, event));
+        //MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to move ships", TacticalActionService.getTilesToMoveFrom(player, game, event));
     }
 
     public static void pillageCheck(Player player, Game game) {
@@ -1677,10 +1681,8 @@ public class ButtonHelperAbilities {
             successMessage = player.getFactionEmojiOrColor() + " replaced 1 infantry with 1 mech on "
                 + Helper.getPlanetRepresentation(uH, game) + " with " + reason + ".";
         }
-        UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), player.getColor());
-        AddUnitService.addUnits(event, tile, game, player.getColor(), "mech " + uH.replace("space", ""));
-        var parsedUnit = new ParsedUnit(key, 1, uH);
-        RemoveUnitService.removeUnit(event, tile, game, parsedUnit);
+        UnitHolder holder = tile.getUnitHolders().get(uH);
+        MoveUnitService.replaceUnit(event, game, player, tile, holder, UnitType.Infantry, UnitType.Mech);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), successMessage);
         event.getMessage().delete().queue();
@@ -1838,9 +1840,7 @@ public class ButtonHelperAbilities {
             }
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet) && !player.getAllianceMembers().contains(p2.getFaction())) {
                 RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
-                if (p2.getUnitsOwned().contains("pharadn_infantry") || p2.getUnitsOwned().contains("pharadn_infantry2")) {
-                    ButtonHelper.resolveInfantryDeath(p2, 1);
-                }
+                ButtonHelper.resolveInfantryRemoval(p2, 1);
                 opponent = p2.getRepresentationNoPing();
                 break;
             }
@@ -1870,11 +1870,9 @@ public class ButtonHelperAbilities {
         if ("decline".equalsIgnoreCase(info[0])) {
             message = player.getFactionEmoji() + " declined to use their **Distant Suns** ability.";
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
-            ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
-                player, true, game, 1, false);
+            ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, true, game, 1, false);
         } else {
-            ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2],
-                player, true, game, 2, false);
+            ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, true, game, 2, false);
         }
 
         event.getMessage().delete().queue();

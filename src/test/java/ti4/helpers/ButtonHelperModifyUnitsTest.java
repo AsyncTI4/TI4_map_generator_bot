@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -23,10 +24,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
@@ -41,10 +42,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, true, false);
@@ -59,13 +60,13 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
@@ -79,10 +80,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
@@ -97,10 +98,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
@@ -115,10 +116,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
@@ -134,15 +135,15 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
@@ -158,15 +159,15 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
@@ -181,10 +182,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
@@ -199,13 +200,13 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
@@ -219,10 +220,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
@@ -237,10 +238,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
@@ -255,10 +256,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
@@ -274,15 +275,15 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
@@ -297,15 +298,15 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
@@ -324,7 +325,7 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
@@ -342,7 +343,7 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
@@ -358,7 +359,7 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         Player player = createPlayerWithDuraniumArmor(game, "red");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 4);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 

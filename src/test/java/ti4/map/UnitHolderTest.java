@@ -1,6 +1,8 @@
 package ti4.map;
 
 import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units;
@@ -9,6 +11,10 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class UnitHolderTest {
 
+    public int sum(List<Integer> vals) {
+        return vals.stream().collect(Collectors.summingInt(i -> i));
+    }
+
     @Test
     public void testRemovingUnitsInExcess() {
         Units.UnitKey unitKey = new Units.UnitKey(Units.UnitType.Destroyer, "red");
@@ -16,9 +22,9 @@ class UnitHolderTest {
         UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
         unitHolder.addUnit(unitKey, 2);
 
-        int actuallyRemoved = unitHolder.removeUnit(unitKey, 5);
+        List<Integer> actuallyRemoved = unitHolder.removeUnit(unitKey, 5);
 
-        assertThat(actuallyRemoved).isEqualTo(2);
+        assertThat(sum(actuallyRemoved)).isEqualTo(2);
     }
 
     @Test
@@ -28,9 +34,9 @@ class UnitHolderTest {
         UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
         unitHolder.addUnit(unitKey, 2);
 
-        int actuallyRemoved = unitHolder.removeUnit(unitKey, 2);
+        List<Integer> actuallyRemoved = unitHolder.removeUnit(unitKey, 2);
 
-        assertThat(actuallyRemoved).isEqualTo(2);
+        assertThat(sum(actuallyRemoved)).isEqualTo(2);
     }
 
     @Test
@@ -40,9 +46,9 @@ class UnitHolderTest {
         UnitHolder unitHolder = new Space("whatever", new Point(0, 0));
         unitHolder.addUnit(unitKey, 5);
 
-        int actuallyRemoved = unitHolder.removeUnit(unitKey, 2);
+        List<Integer> actuallyRemoved = unitHolder.removeUnit(unitKey, 2);
 
-        assertThat(actuallyRemoved).isEqualTo(2);
+        assertThat(sum(actuallyRemoved)).isEqualTo(2);
     }
 
 }

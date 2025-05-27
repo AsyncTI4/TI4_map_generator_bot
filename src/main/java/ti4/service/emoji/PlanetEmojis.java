@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public enum PlanetEmojis implements TI4Emoji {
 
@@ -89,6 +90,13 @@ public enum PlanetEmojis implements TI4Emoji {
 
     @NotNull
     public static TI4Emoji getPlanetEmoji(String planet) {
+        TI4Emoji emoji = getPlanetEmojiOrNull(planet);
+        if (emoji == null) return SemLore;
+        return emoji;
+    }
+
+    @Nullable
+    public static TI4Emoji getPlanetEmojiOrNull(String planet) {
         return switch (planet.toLowerCase()) {
             case "0.0.0" -> Planet000;
             case "abaddon" -> Abaddon;
@@ -336,7 +344,7 @@ public enum PlanetEmojis implements TI4Emoji {
 
             case "space" -> TileEmojis.randomVoid();
 
-            default -> SemLore; // SemLore default is vaguely important
+            case null, default -> null;
         };
     }
 

@@ -10,6 +10,8 @@ public interface EmbeddableModel {
 
     boolean search(String searchString);
 
+    String getAutoCompleteName();
+
     default boolean search(String searchString, ComponentSource searchSource) {
         return (searchSource == null || (getSource() != null && getSource().equals(searchSource)))
             && (searchString == null || search(searchString));
@@ -19,6 +21,4 @@ public interface EmbeddableModel {
     default boolean searchSource(ComponentSource searchSource) {
         return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
     }
-
-    String getAutoCompleteName();
 }

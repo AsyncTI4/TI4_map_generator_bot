@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.dv8tion.jda.api.entities.Guild;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
@@ -60,6 +59,10 @@ import ti4.service.game.GameUndoNameService;
 
 public class MessageHelper {
 
+    private static MessageFunction pin(MessageChannel channel) {
+        return msg -> msg.pin().queue(null, error -> BotLogger.error(getRestActionFailureMessage(channel, "Failed to pin message", null, error), error));
+    }
+
     public interface MessageFunction {
         void run(Message msg);
     }
@@ -72,6 +75,10 @@ public class MessageHelper {
         sendMessageToChannel(event.getMessageChannel(), messageText);
     }
 
+    public static void sendMessageToEventChannelWithButtons(GenericInteractionCreateEvent event, String messageText, List<Button> buttons) {
+        sendMessageToChannelWithButtons(event.getMessageChannel(), messageText, buttons);
+    }
+
     public static void sendMessageToEventServerBotLogChannel(GenericInteractionCreateEvent event, String messageText) {
         splitAndSent(messageText, BotLogger.getBotLogChannel(event));
     }
@@ -82,6 +89,10 @@ public class MessageHelper {
 
     public static void sendMessageToChannelWithEmbeds(MessageChannel channel, String messageText, List<MessageEmbed> embeds) {
         splitAndSent(messageText, channel, embeds, null);
+    }
+
+    public static void sendMessageToChannelWithEmbedsAndPin(MessageChannel channel, String messageText, List<MessageEmbed> embeds) {
+        splitAndSentWithAction(messageText, channel, pin(channel), embeds, null);
     }
 
     public static void sendMessageToChannelWithButton(MessageChannel channel, String messageText, Button button) {
@@ -224,9 +235,7 @@ public class MessageHelper {
     }
 
     public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
-        MessageFunction pin = (msg) -> msg.pin().queue(null,
-            error -> BotLogger.error(getRestActionFailureMessage(channel, "Failed to pin message", null, error), error));
-        splitAndSentWithAction(messageText, channel, pin);
+        splitAndSentWithAction(messageText, channel, pin(channel));
     }
 
     public static void sendFileToChannel(MessageChannel channel, File file) {
@@ -381,11 +390,8 @@ public class MessageHelper {
         String gameName = GameNameService.getGameNameFromChannel(channel);
         if (GameManager.isValid(gameName)) {
             ManagedGame managedGame = GameManager.getManagedGame(gameName);
-            if (!managedGame.isFowMode()) {
-                Game game = managedGame.getGame();
-                if (game.isInjectRulesLinks()) {
-                    messageText = injectRules(messageText);
-                }
+            if (!managedGame.isInjectRules()) {
+                messageText = injectRules(messageText);
             }
         }
 
@@ -402,7 +408,8 @@ public class MessageHelper {
                     ManagedGame managedGame = GameManager.getManagedGame(gameName);
                     if (finalMessageText != null && managedGame != null && !managedGame.isFowMode()) {
                         if (finalMessageText.contains("Use buttons to do your turn") || finalMessageText.contains("Use buttons to end turn")) {
-                            GameMessageManager.replace(gameName, message.getId(), GameMessageType.TURN, managedGame.getLastModifiedDate());
+                            String old = GameMessageManager.replace(gameName, message.getId(), GameMessageType.TURN, managedGame.getLastModifiedDate());
+                            if (old != null) channel.deleteMessageById(old).queue(Consumers.nop(), BotLogger::catchRestError);
                         }
                     }
 
@@ -699,7 +706,24 @@ public class MessageHelper {
             return new ArrayList<>();
         }
         embeds = embeds.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        return ListUtils.partition(embeds, 8); //max is 10, but we've had issues with 6k char limit in embeds in single message
+
+        int characterLimit = 6000;
+        int currentChars = 0;
+        List<MessageEmbed> currentList = new ArrayList<>();
+        List<List<MessageEmbed>> partition = new ArrayList<>();
+        for (MessageEmbed embed : embeds) {
+            int len = embed.getLength();
+            if (currentChars + len > characterLimit || currentList.size() == 8) {
+                partition.add(currentList);
+                currentList = new ArrayList<>();
+                currentChars = 0;
+            }
+            currentChars += len;
+            currentList.add(embed);
+        }
+        if (!currentList.isEmpty())
+            partition.add(currentList);
+        return partition;
     }
 
     public static void sendMessageToThread(MessageChannel channel, String threadName, String messageToSend) {
@@ -759,7 +783,9 @@ public class MessageHelper {
         webhook.setContent(message);
         try {
             webhook.execute();
-        } catch (Exception ignored) { System.out.println("[BOT-LOG-WEBHOOK] " + message + ignored.getMessage()); }
+        } catch (Exception ignored) {
+            System.out.println("[BOT-LOG-WEBHOOK] " + message + ignored.getMessage());
+        }
     }
 
     /**
