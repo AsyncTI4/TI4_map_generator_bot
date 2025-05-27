@@ -2523,12 +2523,8 @@ public class ButtonHelper {
     }
 
     public static void deleteAllButtons(ButtonInteractionEvent event) {
-        if (event == null) {
-            return;
-        } else {
-            event.getMessage();
-        }
-        event.editComponents(Collections.emptyList()).queue(Consumers.nop(), BotLogger::catchRestError);
+        if (event == null) return;
+        event.getMessage().editMessageComponents(List.of()).queue();
     }
 
     public static void deleteTheOneButton(GenericInteractionCreateEvent event) {
@@ -3230,6 +3226,7 @@ public class ButtonHelper {
         if (player.getStasisInfantry() > 0 && player.hasTech("dsqhetinf")) {
             endButtons.add(Buttons.red(player.finChecker() + "startQhetInfRevival", "Revive Up To 2 Infantry"));
         }
+        endButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
         return endButtons;
     }
 
