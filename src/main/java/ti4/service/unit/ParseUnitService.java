@@ -12,13 +12,24 @@ import org.apache.commons.lang3.math.NumberUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
 
 @UtilityClass
 public class ParseUnitService {
+
+    public ParsedUnit simpleParsedUnit(Player player, UnitType type, String holder, Integer amt) {
+        return new ParsedUnit(Units.getUnitKey(type, player.getColorID()), amt, holder);
+    }
+
+    public ParsedUnit simpleParsedUnit(Player player, UnitType type, UnitHolder holder, Integer amt) {
+        return new ParsedUnit(Units.getUnitKey(type, player.getColorID()), amt, holder.getName());
+    }
 
     public List<ParsedUnit> getParsedUnits(GenericInteractionCreateEvent event, String color, Tile tile, String unitList) {
         if (!Mapper.isValidColor(color)) {
@@ -54,7 +65,7 @@ public class ParseUnitService {
         if (NumberUtils.isDigits(firstToken)) {
             count = Math.max(Integer.parseInt(firstToken), 1);
             originalUnit = unitInfoTokenizer.nextToken();
-        }  else {
+        } else {
             originalUnit = firstToken;
         }
 
@@ -64,7 +75,7 @@ public class ParseUnitService {
 
         String planetName = parsePlanetName(unitInfoTokenizer, tile);
 
-        var parsedUnit =  new ParsedUnit(unitKey, count, planetName);
+        var parsedUnit = new ParsedUnit(unitKey, count, planetName);
         if (event instanceof SlashCommandInteractionEvent && !validateParsedUnit(parsedUnit, tile, unitListToken, event)) {
             return null;
         }
@@ -94,8 +105,10 @@ public class ParseUnitService {
         return false;
     }
 
-    private void sendValidationError(GenericInteractionCreateEvent event, String token, ParsedUnit parsedUnit, boolean isValidUnit,
-                                        boolean isValidUnitHolder, Tile tile) {
+    private void sendValidationError(
+        GenericInteractionCreateEvent event, String token, ParsedUnit parsedUnit, boolean isValidUnit,
+        boolean isValidUnitHolder, Tile tile
+    ) {
         String message = "Could not parse this section of the command: `" + token + "`\n"
             + formatValidationMessage("Unit", isValidUnit, parsedUnit.getUnitKey(), "UnitID or Alias not found. Try: `inf, mech, dn, etc.`")
             + formatValidationMessage("Planet", isValidUnitHolder, parsedUnit.getLocation(), "Planets in this system are: " + String.join(", ", tile.getUnitHolders().keySet()));

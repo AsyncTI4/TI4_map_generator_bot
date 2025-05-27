@@ -21,6 +21,10 @@ import ti4.service.emoji.TechEmojis;
 
 public class Buttons {
 
+    public enum ButtonColor {
+        green, red, gray, blue;
+    }
+
     public static final Button GET_A_TECH = green("acquireATech", "Get a Technology");
     public static final Button GET_A_UNIT_TECH_WITH_INF = green("acquireAUnitTechWithInf", "Get a Unit Upgrade Technology");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");

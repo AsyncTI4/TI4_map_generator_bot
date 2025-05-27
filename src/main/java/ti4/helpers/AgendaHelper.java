@@ -77,6 +77,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 
 public class AgendaHelper {
 
@@ -3782,8 +3783,13 @@ public class AgendaHelper {
             }
             if (FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition())) {
                 UnitHolder uH = tile.getUnitHolders().get(Constants.SPACE);
-                for (Player player : game.getRealPlayers()) {
-                    uH.removeAllShips(player);
+                for (UnitKey key : uH.getUnitKeys()) {
+                    game.getPlayerByUnitKey(key).ifPresent(p -> {
+                        if (p.getUnitFromUnitKey(key).getIsShip()) {
+                            int amt = uH.getUnitCount(key);
+                            DestroyUnitService.destroyUnit(event, tile, game, key, amt, uH, false);
+                        }
+                    });
                 }
             }
         }
@@ -3814,14 +3820,8 @@ public class AgendaHelper {
         for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())) {
-                    int numInf = 0;
-                    String colorID = Mapper.getColorID(player.getColor());
-                    UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-                    if (unitHolder.getUnits() != null) {
-                        if (unitHolder.getUnits().get(infKey) != null) {
-                            numInf = unitHolder.getUnits().get(infKey);
-                        }
-                    }
+                    int numInf = unitHolder.getUnitCount(UnitType.Infantry, player);
+                    UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
                     if (numInf > 0) {
                         int numTG = (numInf + 1) / 2;
                         int cTG = player.getTg();
@@ -3831,28 +3831,10 @@ public class AgendaHelper {
                             .append(Helper.getPlanetRepresentation(unitHolder.getName(), game))
                             .append(" and gained ").append(numTG).append(" trade goods (").append(cTG).append("->")
                             .append(fTG).append("). \n");
-                        tile.removeUnit(unitHolder.getName(), infKey, numTG);
-                        if (player.hasInf2Tech()) {
-                            ButtonHelper.resolveInfantryDeath(player, numTG);
-                        }
-                        boolean cabalMech = player.hasAbility("amalgamation")
-                            && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
-                            && player.hasUnit("cabal_mech") && !game.getLaws().containsKey("articles_war");
-                        if (player.hasAbility("amalgamation")
-                            && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", player, tile)
-                                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", player, tile)
-                                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", player, tile)
-                                || cabalMech)
-                            && FoWHelper.playerHasUnitsOnPlanet(player, tile, unitHolder.getName())) {
-                            ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, numTG, "infantry", event);
-                        }
-
+                        DestroyUnitService.destroyUnit(event, tile, game, infKey, numTG, unitHolder, false);
                     }
                 }
             }
-        }
-        if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))) {
-            ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
         }
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());

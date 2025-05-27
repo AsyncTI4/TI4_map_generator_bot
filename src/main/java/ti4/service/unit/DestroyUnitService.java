@@ -1,0 +1,155 @@
+package ti4.service.unit;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.function.Consumers;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
+import ti4.helpers.Units.UnitType;
+import ti4.map.Game;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
+import ti4.service.unit.RemoveUnitService.RemovedUnit;
+
+public class DestroyUnitService {
+
+    public static void destroyAllUnitsInSystem(GenericInteractionCreateEvent event, Tile tile, Game game, boolean combat) {
+        List<RemovedUnit> units = new ArrayList<>();
+        for (UnitHolder uh : tile.getUnitHolders().values())
+            units.addAll(RemoveUnitService.removeAllUnits(event, tile, game, uh));
+        handleDestroyedUnits(event, game, units, combat);
+    }
+
+    public static void destroyAllUnits(GenericInteractionCreateEvent event, Tile tile, Game game, UnitHolder unitHolder, boolean combat) {
+        List<RemovedUnit> units = RemoveUnitService.removeAllUnits(event, tile, game, unitHolder);
+        handleDestroyedUnits(event, game, units, combat);
+    }
+
+    public static void destroyAllPlayerUnitsInSystem(GenericInteractionCreateEvent event, Game game, Player player, Tile tile, boolean combat) {
+        List<RemovedUnit> units = new ArrayList<>();
+        for (UnitHolder uh : tile.getUnitHolders().values())
+            units.addAll(RemoveUnitService.removeAllPlayerUnits(event, game, player, tile, uh));
+        handleDestroyedUnits(event, game, units, combat);
+    }
+
+    public static void destroyAllPlayerUnits(GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder, boolean combat) {
+        List<RemovedUnit> units = RemoveUnitService.removeAllPlayerUnits(event, game, player, tile, unitHolder);
+        handleDestroyedUnits(event, game, units, combat);
+    }
+
+    public static void destroyUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList, boolean combat) {
+        destroyUnits(event, tile, game, color, unitList, combat, true);
+    }
+
+    public static void destroyUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList, boolean combat, boolean prioritizeDamagedUnits) {
+        List<RemovedUnit> destroyedMap = RemoveUnitService.removeUnits(event, tile, game, color, unitList, prioritizeDamagedUnits);
+        handleDestroyedUnits(event, game, destroyedMap, combat);
+    }
+
+    public static void destroyUnit(GenericInteractionCreateEvent event, Tile tile, Game game, UnitKey key, int amt, UnitHolder unitHolder, boolean combat) {
+        ParsedUnit unit = new ParsedUnit(key, amt, unitHolder.getName());
+        destroyUnit(event, tile, game, unit, combat);
+    }
+
+    public static void destroyUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit, boolean combat) {
+        destroyUnit(event, tile, game, parsedUnit, combat, true);
+    }
+
+    public static void destroyUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit, boolean combat, boolean prioritizeDamagedUnits) {
+        var destroyedUnit = RemoveUnitService.removeUnit(event, tile, game, parsedUnit, prioritizeDamagedUnits);
+        handleDestroyedUnits(event, game, destroyedUnit, combat);
+    }
+
+    public static void destroyUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit, boolean combat, UnitState preferredState) {
+        var destroyedUnit = RemoveUnitService.removeUnit(event, tile, game, parsedUnit, preferredState);
+        handleDestroyedUnits(event, game, destroyedUnit, combat);
+    }
+
+    private static void handleDestroyedUnits(GenericInteractionCreateEvent event, Game game, List<RemovedUnit> units, boolean combat) {
+        // batch up infantry for INF2-ish effects
+        for (Player player : game.getRealPlayers()) {
+            int numInfantry = 0;
+            for (RemovedUnit u : units) {
+                if (player.unitBelongsToPlayer(u.unitKey()) && u.unitKey().getUnitType() == UnitType.Infantry) {
+                    numInfantry += u.getTotalRemoved();
+                }
+            }
+
+            if (numInfantry > 0) {
+                ButtonHelper.resolveInfantryDestroy(player, numInfantry);
+            }
+        }
+
+        // Handle other destroyed units individually
+        for (RemovedUnit u : units)
+            handleDestroyedUnit(event, game, units, u);
+    }
+
+    // TODO: Jazz add the rest of the destroy code here
+    private static void handleDestroyedUnit(GenericInteractionCreateEvent event, Game game, List<RemovedUnit> allUnits, RemovedUnit unit) {
+        int totalAmount = unit.getTotalRemoved();
+        Player player = game.getPlayerFromColorOrFaction(unit.unitKey().getColorID());
+
+        List<Player> capturing = CaptureUnitService.listCapturingFlagshipPlayers(game, allUnits, unit);
+        List<Player> devours = CaptureUnitService.listCapturingCombatPlayers(game, unit);
+        capturing.addAll(devours);
+
+        switch (unit.unitKey().getUnitType()) {
+            case Infantry -> {
+                capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
+            }
+            case Mech -> {
+                handleSelfAssemblyRoutines(player, totalAmount, game);
+                if (player != null && player.hasUnit("mykomentori_mech")) {
+                    for (int x = 0; x < totalAmount; x++) {
+                        ButtonHelper.rollMykoMechRevival(game, player);
+                    }
+                }
+                if (player != null && player.hasUnit("cheiran_mech")) {
+                    AddUnitService.addUnits(event, unit.tile(), game, player.getColor(), totalAmount + " infantry " + unit.uh().getName());
+                    String message = "> Added " + totalAmount + " infantry to the planet following " + totalAmount + " Nauplius (Cheiran mech) being destroyed.\n";
+                    MessageHelper.sendMessageToEventChannel(event, message);
+                }
+            }
+            default -> Consumers.nop();
+        }
+
+        Set<String> counted = new HashSet<>();
+        for (Player cabal : capturing) {
+            if (!counted.add(cabal.getColorID())) continue;
+            CaptureUnitService.executeCapture(event, game, cabal, unit);
+        }
+        if (player != null && player.hasAbility("heroism")) {
+            ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, totalAmount, unit.unitKey().unitName(), event);
+        }
+        Player mentakHero = game.getPlayerFromColorOrFaction(game.getStoredValue("mentakHero"));
+        if (mentakHero != null) {
+            ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, game, mentakHero, totalAmount, unit.unitKey().unitName(), event, unit.tile());
+        }
+    }
+
+    public static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
+        if (player.hasTech("sar")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
+                + " you gained " + min + " trade good (" + player.getTg() + "->" + (player.getTg() + min)
+                + ") from _Self-Assembly Routines_ because of " + min + " of your mechs dying."
+                + " This is not an optional gain" + (min > 1 ? ", and happens 1 trade good at a time" : "") + ".");
+            for (int x = 0; x < min; x++) {
+                player.setTg(player.getTg() + 1);
+                ButtonHelperAbilities.pillageCheck(player, game);
+            }
+            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+        }
+    }
+}

@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CommandCounterHelper;
@@ -65,6 +69,7 @@ public class StatusCleanupService {
         }
 
         returnEndStatusPNs(game); // return any PNs with "end of status phase" return timing
+        closeRoundThreads(game);
 
         Map<String, Player> players = game.getPlayers();
 
@@ -154,5 +159,17 @@ public class StatusCleanupService {
                 }
             }
         }
+    }
+
+    private static void closeRoundThreads(Game game) {
+        String threadName = "-round-" + game.getRound();
+        try {
+            TextChannel main = game.getMainGameChannel();
+            for (ThreadChannel thread : main.getThreadChannels()) {
+                if (thread.getName().contains(threadName)) {
+                    thread.getManager().setArchived(true).queueAfter(10, TimeUnit.SECONDS);
+                }
+            }
+        } catch (Exception e) {}
     }
 }
