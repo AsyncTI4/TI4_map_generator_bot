@@ -256,6 +256,7 @@ public class Game extends GameProperties {
         FactionModel setupInfo = neutral.getFactionSetupInfo();
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
+        neutral.addTech("ff2");
         return neutral;
     }
 
