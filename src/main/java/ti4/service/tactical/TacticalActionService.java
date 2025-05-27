@@ -273,7 +273,7 @@ public class TacticalActionService {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(game, player, playersWithPds2, tile);
         }
         StartCombatService.combatCheck(game, event, tile);
-        ButtonHelper.deleteMessage(event);
+        ButtonHelper.deleteAllButtons(event);
     }
 
     public List<Button> getLandingTroopsButtons(Game game, Player player, Tile tile) {
