@@ -47,7 +47,12 @@ class ListDeadGames extends Subcommand {
             }
             if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
                 if (game.getActionsChannel() != null) {
-                    channelCount += sendMessageToChannel(game, sb, delete);
+
+                    if (delete) {
+                        channelCount += sendMessageToChannel(game, sb, delete);
+                    } else {
+                        channelCount += 1;
+                    }
                 }
                 Guild guild = game.getGuild();
                 if (guild == null) {
@@ -82,7 +87,7 @@ class ListDeadGames extends Subcommand {
         int channelCount = 0;
 
         if (AsyncTI4DiscordBot.getAvailablePBDCategories().contains(actionsChannel.getParentCategory()) &&
-                actionsChannel.getParentCategory() != null && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            actionsChannel.getParentCategory() != null && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             sb.append(actionsChannel.getJumpUrl()).append("\n");
             channelCount++;
             if (delete) {
@@ -95,7 +100,7 @@ class ListDeadGames extends Subcommand {
 
         var tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory()) &&
-                tableTalkChannel.getParentCategory() != null && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            tableTalkChannel.getParentCategory() != null && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             if (tableTalkChannel.getName().contains(game.getName() + "-")) {
                 sb.append(tableTalkChannel.getJumpUrl()).append("\n");
                 channelCount++;
