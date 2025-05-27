@@ -67,7 +67,11 @@ public class MessageListener extends ListenerAdapter {
                 TextChannel deletionLogChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
                     .findFirst().orElse(null);
                 if (deletionLogChannel == null) return;
-                MessageHelper.sendMessageToChannel(deletionLogChannel, "Message from dicecord: " + message.getContentRaw() + "\nHere: " + message.getJumpUrl());
+                if (!message.getEmbeds().isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithEmbeds(deletionLogChannel, "Message from dicecord: " + message.getContentRaw() + "\nHere: " + message.getJumpUrl(), message.getEmbeds());
+                } else {
+                    MessageHelper.sendMessageToChannel(deletionLogChannel, "Message from dicecord: " + message.getContentRaw() + "\nHere: " + message.getJumpUrl());
+                }
                 return;
             }
             handleFogOfWarCombatThreadMirroring(event);

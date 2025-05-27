@@ -48,9 +48,7 @@ public class DeletionListener extends ListenerAdapter {
                     if (relevantLog != null) {
                         String deleter = relevantLog.getUser().getName();
                         String deletedMessageAuthor = event.getJDA().getUserById(relevantLog.getChanges().get(0).getOldValue()).getName();
-                        MessageHelper.sendMessageToChannel(deletionLogChannel, "Message " + messageId + " deleted in channel " + channelId + " by " + deleter + " message was authored by " + deletedMessageAuthor);
-                    } else {
-                        MessageHelper.sendMessageToChannel(deletionLogChannel, "Message " + messageId + " deleted in channel " + channelId + ", but the deleter could not be determined.");
+                        MessageHelper.sendMessageToChannel(deletionLogChannel, "Message " + messageId + " deleted in channel " + channelId + " by " + deleter + " message was authored by " + deletedMessageAuthor + "\nHere: " + event.getJumpUrl());
                     }
                 });
         } catch (Exception e) {
