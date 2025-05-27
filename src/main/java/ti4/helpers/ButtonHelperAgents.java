@@ -44,6 +44,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -360,9 +361,7 @@ public class ButtonHelperAgents {
         String message = player.getRepresentation() + " chose to destroy all infantry on " + Helper.getPlanetRepresentation(planet, game);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int amountToKill = uH.getUnitCount(UnitType.Infantry, player.getColor());
-        if (player.hasInf2Tech()) {
-            ButtonHelper.resolveInfantryDeath(player, amountToKill);
-        }
+        ButtonHelper.resolveInfantryDestroy(player, amountToKill);
         message += ". " + amountToKill + " infantry were destroyed. " + Math.min(player.getCommoditiesTotal(), amountToKill) + " comms were gained and then converted to tgs";
         player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), amountToKill));
         player.setCommodities(Math.max(0, player.getCommodities() - Math.min(player.getCommoditiesTotal(), amountToKill)));
@@ -1774,7 +1773,7 @@ public class ButtonHelperAgents {
 
         if (event instanceof ButtonInteractionEvent event2) {
             if (event2.getButton().getLabel().contains("Yourself")) {
-                List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event2);
+                List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
                 event2.getMessage().editMessage(event2.getMessage().getContentRaw())
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
             }

@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.gwt.thirdparty.guava.common.base.Joiner;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -32,14 +30,13 @@ class SearchSources extends Subcommand {
 
     private static final String CHECK_SOURCES = "sources_check";
     private static final String CANAL = "canal_official";
-    
+
     public SearchSources() {
         super(Constants.SEARCH_SOURCES, "List all sources the bot has");
         addOptions(
             new OptionData(OptionType.STRING, Constants.SOURCE, "Limit results to a specific source.").setAutoComplete(true),
             new OptionData(OptionType.BOOLEAN, CANAL, "unspecified for all sources, True for 'official' only, False for 'community' only"),
-            new OptionData(OptionType.BOOLEAN, CHECK_SOURCES, "True: Cancel search, counts elements in json files per source, and compare to sources file")
-        );
+            new OptionData(OptionType.BOOLEAN, CHECK_SOURCES, "True: Cancel search, counts elements in json files per source, and compare to sources file"));
     }
 
     /*
@@ -52,7 +49,7 @@ class SearchSources extends Subcommand {
     */
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        
+
         String sourceString = event.getOption(Constants.SOURCE, null, OptionMapping::getAsString);
         ComponentSource source = ComponentSource.fromString(sourceString);
         boolean sourcesCheck = event.getOption(CHECK_SOURCES, false, OptionMapping::getAsBoolean);
@@ -73,13 +70,14 @@ class SearchSources extends Subcommand {
             .filter(model -> model.search(sourceString, source))
             .filter(model -> canalBool == null || canalBool == model.isCanalOfficial())
             .sorted((r1, r2) -> { // should sort by canal ('official' before 'community') then subcanal (null values before non-null values, but all 'official' should have null subcanal and all 'community' should have non null subcanal) then source
-                if(r1.getCanal().equals(r2.getCanal()))
+                if (r1.getCanal().equals(r2.getCanal())) {
                     if (r1.getSubcanal() == null && r2.getSubcanal() == null) return r1.getSource().compareTo(r2.getSource());
-                    else if (r1.getSubcanal() == null) return -1;
-                    else if (r2.getSubcanal() == null) return 1;
-                    else if (r1.getSubcanal().equals(r2.getSubcanal())) return r1.getSource().compareTo(r2.getSource());
-                    else return r1.getSubcanal().compareTo(r2.getSubcanal());
-                else return -r1.getCanal().compareTo(r2.getName());
+                    if (r1.getSubcanal() == null) return -1;
+                    if (r2.getSubcanal() == null) return 1;
+                    if (r1.getSubcanal().equals(r2.getSubcanal())) return r1.getSource().compareTo(r2.getSource());
+                    return r1.getSubcanal().compareTo(r2.getSubcanal());
+                }
+                return -r1.getCanal().compareTo(r2.getName());
             })
             //.sorted((r1, r2) -> (r1.getCanal()+r1.getSubcanal()).compareTo((r2.getCanal()+r2.getSubcanal()))) // raise a bug for null values
             .map(model -> model.getRepresentationEmbed(getOccurrencesByCompType(model.getSource())))
@@ -161,12 +159,12 @@ class SearchSources extends Subcommand {
         List<String> planetSources = Mapper.getPlanetsSources(null);
         List<String> tileSources = Mapper.getTilesSources(null);
 
-        List<String> componentSources = Stream.of(abilitySources, actioncardSources, agendaSources, attachmentSources,
-                deckSources, eventSources, exploreSources, factionSources, drafterrataSources, genericcardSources,
-                leaderSources, promissorynoteSources, publicobjectiveSources, relicSources, secretobjectiveSources,
-                strategycardsetSources, strategycardSources, technologySources, tokenSources, unitSources,
-                planetSources, tileSources)
-            .flatMap(i -> i.stream()).toList();
+        List<String> componentSources = Stream.of(
+            abilitySources, actioncardSources, agendaSources, attachmentSources, deckSources, eventSources,
+            exploreSources, factionSources, drafterrataSources, genericcardSources, leaderSources, promissorynoteSources,
+            publicobjectiveSources, relicSources, secretobjectiveSources, strategycardsetSources, strategycardSources,
+            technologySources, tokenSources, unitSources, planetSources, tileSources //
+        ).flatMap(i -> i.stream()).toList();
 
         Map<String, Long> uniqueComponentSources = componentSources.stream().collect(Collectors.groupingBy(e -> e, Collectors.counting())) // Groups by distinct value and counts initial occurrences
             .entrySet().stream().sorted(Map.Entry.comparingByKey()).sorted(Collections.reverseOrder(Map.Entry.comparingByValue())) // Sorts by values DESC then untie with key ASC
@@ -183,10 +181,12 @@ class SearchSources extends Subcommand {
         StringBuilder uniqueComponentSourcesTextList = new StringBuilder();
 
         uniqueComponentSourcesTextList.append("**All \\resources\\ JSON content:**\n");
-        uniqueComponentSourcesTextList.append(uniqueComponentSources.size()).append(" sources: ").append(uniqueComponentSources.values().stream().mapToLong(d -> d).sum()).append(" elements\r\n");
-        uniqueComponentSourcesTextList.append("- ").append(Joiner.on("\r\n- ").withKeyValueSeparator(": ").join(uniqueComponentSources)); // added guava class for "Joiner"
-        // TO DO: find a way to add emoji to list given by previous instruction, might need to remove the joiner and so the dependency
-        
+        uniqueComponentSourcesTextList.append(uniqueComponentSources.size()).append(" sources: ").append(uniqueComponentSources.values().stream().mapToLong(d -> d).sum()).append(" elements");
+        for (var component : uniqueComponentSources.entrySet()) {
+            uniqueComponentSourcesTextList.append("\n> - ").append(component.getKey()).append(": ").append(component.getValue());
+        }
+        // TO DO: find a way to add emoji to list given by previous instruction
+
         uniqueComponentSourcesTextList.append("\n\n");
 
         uniqueComponentSourcesTextList.append("**Implementation missing in \\resources\\ JSON content:**\n");

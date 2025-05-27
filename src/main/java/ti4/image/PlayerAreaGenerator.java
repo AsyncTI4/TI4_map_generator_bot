@@ -1,7 +1,5 @@
 package ti4.image;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -34,6 +32,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -287,13 +286,14 @@ public class PlayerAreaGenerator {
             graphics.setFont(Storage.getFont20());
             int drawX = x + 9;
             int drawY = y + 125;
-            if (player.getNeighbouringPlayers(true).isEmpty()) {
+            Set<Player> neighbors = player.getNeighbouringPlayers(true);
+            if (neighbors.isEmpty()) {
                 DrawingUtil.superDrawString(g2, "No Neighbors", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
                 xSpacer += 115;
             } else {
                 DrawingUtil.superDrawString(g2, "Neighbors: ", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
                 xSpacer += 115;
-                for (Player p2 : player.getNeighbouringPlayers(true)) {
+                for (Player p2 : neighbors) {
                     String faction2 = p2.getFaction();
                     if (faction2 != null) {
                         DrawingUtil.drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 - 20, 26, 26);
@@ -1318,16 +1318,14 @@ public class PlayerAreaGenerator {
     }
 
     private static void fillUnits(Map<UnitKey, Integer> unitCount, UnitHolder unitHolder, boolean ignoreInfantryFighters) {
-        Map<UnitKey, Integer> units = unitHolder.getUnits();
-        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-            UnitKey uk = unitEntry.getKey();
+        for (UnitKey uk : unitHolder.getUnitKeys()) {
             int count = unitCount.getOrDefault(uk, 0);
 
             if (uk.getUnitType() == UnitType.Infantry || uk.getUnitType() == UnitType.Fighter) {
                 if (ignoreInfantryFighters) continue;
                 count++;
             } else {
-                count += unitEntry.getValue();
+                count += unitHolder.getUnitCount(uk);
             }
             unitCount.put(uk, count);
         }
@@ -1387,8 +1385,8 @@ public class PlayerAreaGenerator {
     private int nombox(Player player, int xDeltaFromRightSide, int y) {
         int widthOfNombox = 450;
         int x = mapWidth - widthOfNombox - xDeltaFromRightSide;
-        UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
-        if (unitHolder == null || unitHolder.getUnits().isEmpty()) {
+        UnitHolder unitHolder = player.getNomboxTile().getSpaceUnitHolder();
+        if (unitHolder == null || unitHolder.getUnitKeys().isEmpty()) {
             return xDeltaFromRightSide;
         }
 
@@ -1412,20 +1410,18 @@ public class PlayerAreaGenerator {
 
         drawPAImage(x, y, "pa_nombox.png");
 
-        Map<UnitKey, Integer> tempUnits = new HashMap<>(unitHolder.getUnits());
-        Map<UnitKey, Integer> units = new LinkedHashMap<>();
+        Set<UnitKey> tempUnits = unitHolder.getUnitKeys();
+        Set<UnitKey> units = new HashSet<>();
 
-        for (Map.Entry<UnitKey, Integer> entry : tempUnits.entrySet()) {
-            UnitKey id = entry.getKey();
+        for (UnitKey id : tempUnits) {
             if (id.getUnitType() == UnitType.Mech) {
-                units.put(id, entry.getValue());
+                units.add(id);
             }
         }
-
-        for (UnitKey key : units.keySet()) {
+        for (UnitKey key : units) {
             tempUnits.remove(key);
         }
-        units.putAll(tempUnits);
+        units.addAll(tempUnits);
 
         BufferedImage image = null;
 
@@ -1440,22 +1436,21 @@ public class PlayerAreaGenerator {
             UnitType.Fighter,
             UnitType.Infantry);
 
-        Map<UnitType, List<Map.Entry<UnitKey, Integer>>> collect = units.entrySet().stream()
-            .collect(Collectors.groupingBy(key -> key.getKey().getUnitType()));
+        Map<UnitType, List<UnitKey>> collect = units.stream()
+            .collect(Collectors.groupingBy(key -> key.getUnitType()));
         for (UnitType orderKey : order) {
-            List<Map.Entry<UnitKey, Integer>> entry = collect.get(orderKey);
-            if (entry == null) {
+            List<UnitKey> keys = collect.get(orderKey);
+            if (keys == null) {
                 continue;
             }
 
             int countOfUnits = 0;
-            for (Map.Entry<UnitKey, Integer> entrySet : entry) {
-                countOfUnits += entrySet.getValue();
+            for (UnitKey k : keys) {
+                countOfUnits += unitHolder.getUnitCount(k);
             }
             int deltaY = 0;
-            for (Map.Entry<UnitKey, Integer> unitEntry : entry) {
-                UnitKey unitKey = unitEntry.getKey();
-                Integer unitCount = unitEntry.getValue();
+            for (UnitKey unitKey : keys) {
+                int unitCount = unitHolder.getUnitCount(unitKey);
                 Integer bulkUnitCount = null;
                 Player p = game.getPlayerFromColorOrFaction(unitKey.getColor());
 
@@ -1480,10 +1475,6 @@ public class PlayerAreaGenerator {
                 if (image == null) {
                     BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not find unit image for: " + unitKey);
                     continue;
-                }
-
-                if (unitCount == null) {
-                    unitCount = 0;
                 }
 
                 Point position = new Point(x, y);
@@ -1834,7 +1825,7 @@ public class PlayerAreaGenerator {
             }
 
             String originalTechSpeciality = planet.getOriginalTechSpeciality();
-            if (isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
+            if (StringUtils.isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
                 String planetTechSkip = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
                 drawPlanetCardDetail(x + deltaX + 26, y + 82, planetTechSkip);
             } else if (!hasBentorEncryptionKey) {
@@ -2345,8 +2336,7 @@ public class PlayerAreaGenerator {
         }
 
         // Add the blank warsun if player has no warsun
-        List<UnitModel> playerUnitModels = new ArrayList<>();
-        playerUnitModels.addAll(player.getUnitModels());
+        List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
         if (player.getUnitsByAsyncID("ws").isEmpty()) {
             playerUnitModels.add(Mapper.getUnit("nowarsun"));
         }

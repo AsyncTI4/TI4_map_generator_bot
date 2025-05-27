@@ -131,15 +131,17 @@ public class StartPhaseService {
     public static List<Button> getQueueSCPickButtons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
+        boolean hasQueue = false;
         for (int x = 1; x < 9; x++) {
             String num = x + "";
             if (alreadyQueued.contains(num)) {
+                hasQueue = true;
                 continue;
             }
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(x);
             buttons.add(Buttons.green("queueScPick_" + num, Helper.getSCName(x, game), scEmoji));
         }
-        buttons.add(Buttons.red("deleteButtons", "Decline to Queue"));
+        if (!hasQueue) buttons.add(Buttons.red("deleteButtons", "Decline to Queue"));
         buttons.add(Buttons.gray("restartSCQueue", "Restart Queue"));
         return buttons;
     }

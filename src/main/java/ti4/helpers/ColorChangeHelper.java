@@ -1,7 +1,6 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
+import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -119,25 +119,11 @@ public class ColorChangeHelper {
         String oldColorSuffix = "_" + oldColorID + ".";
         String newColorSuffix = "_" + newColorID + ".";
 
-        Map<Units.UnitKey, Integer> unitDamage = new HashMap<>(unitHolder.getUnitDamage());
-        for (Map.Entry<Units.UnitKey, Integer> unitDmg : unitDamage.entrySet()) {
-            Units.UnitKey unitKey = unitDmg.getKey();
+        for (UnitKey unitKey : unitHolder.getUnitKeys()) {
             if (unitKey.getColorID().equals(oldColorID)) {
-                Integer value = unitDmg.getValue();
-                Units.UnitKey replacedKey = Mapper.getUnitKey(unitKey.asyncID(), newColorID);
-                unitHolder.removeDamagedUnit(unitKey, value);
-                unitHolder.addDamagedUnit(replacedKey, value);
-            }
-        }
-
-        Map<Units.UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
-        for (Map.Entry<Units.UnitKey, Integer> unit : units.entrySet()) {
-            Units.UnitKey unitKey = unit.getKey();
-            if (unitKey.getColorID().equals(oldColorID)) {
-                Integer value = unit.getValue();
-                Units.UnitKey replacedKey = Mapper.getUnitKey(unitKey.asyncID(), newColorID);
-                unitHolder.removeUnit(unitKey, value);
-                unitHolder.addUnit(replacedKey, value);
+                UnitKey replacedKey = Units.getUnitKey(unitKey.getUnitType(), newColorID);
+                List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));
+                unitHolder.addUnitsWithStates(replacedKey, states);
             }
         }
 
@@ -149,7 +135,7 @@ public class ColorChangeHelper {
             unitHolder.addControl(control);
         }
 
-        Set<String> ccList = new HashSet<>(unitHolder.getCCList());
+        Set<String> ccList = new HashSet<>(unitHolder.getCcList());
         for (String cc : ccList) {
             if (!cc.contains(oldColorSuffix)) continue;
             unitHolder.removeCC(cc);

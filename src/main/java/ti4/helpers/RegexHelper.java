@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import lombok.experimental.UtilityClass;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -65,12 +66,29 @@ public class RegexHelper {
     }
 
     /**
+     * @param game if provided, only match colors present in this game
+     * @return group "color" matching any color in the bot
+     */
+    public static String colorRegex(Game game, String group) {
+        Set<String> colorNames = legalColors(game);
+        return regexBuilder(group, colorNames);
+    }
+
+    /**
      * @param game if provided, only match factions present in this game
      * @return group "faction" matching any faction in the bot
      */
     public static String factionRegex(Game game) {
+        return factionRegex(game, "faction");
+    }
+
+    /**
+     * @param game if provided, only match factions present in this game
+     * @return group "faction" matching any faction in the bot
+     */
+    public static String factionRegex(Game game, String group) {
         Set<String> factionAliases = legalFactions(game);
-        return regexBuilder("faction", factionAliases);
+        return regexBuilder(group, factionAliases);
     }
 
     /**
@@ -94,6 +112,18 @@ public class RegexHelper {
     /** @return group "unittype" */
     public static String unitTypeRegex() {
         return unitTypeRegex("unittype");
+    }
+
+    /** @return group "state" */
+    public static String unitStateRegex() {
+        return unitStateRegex("state");
+    }
+
+    /** @return group "state" */
+    public static String unitStateRegex(String group) {
+        Set<String> states = new HashSet<>();
+        Arrays.asList(UnitState.values()).forEach(x -> states.add(x.name()));
+        return regexBuilder("state", states);
     }
 
     /** @return group "genericcard" */
@@ -129,9 +159,22 @@ public class RegexHelper {
         return posRegex("pos");
     }
 
+    /** @return group "ring" matching "ring<#>" or "ringcorners", and returns "<#>" or "corners" respectively */
+    public static String ringRegex() {
+        return ringRegex("ring");
+    }
+
+    public static String ringRegex(String group) {
+        return "ring" + regexBuilder(group, List.of("[\\+\\-]?[0-9]+", "corners"));
+    }
+
     /** @return group "tileID" matching any legal tile ID in the bot */
     public static String tileIDRegex() {
-        return regexBuilder("tileID", TileHelper.getAllTileIds());
+        return tileIDRegex("tileID");
+    }
+
+    public static String tileIDRegex(String group) {
+        return regexBuilder(group, TileHelper.getAllTileIds());
     }
 
     /** @return group matching any planet name in the game */
@@ -223,6 +266,30 @@ public class RegexHelper {
         }
         allACs.addAll(player.getActionCards().values().stream().map(Object::toString).toList());
         return regexBuilder("ac", allACs);
+    }
+
+    /** @return group "pn" */
+    public static String pnRegex(Game game) {
+        Set<String> allPNs = new HashSet<>();
+        if (game != null) {
+            for (Player p : game.getRealPlayers())
+                allPNs.addAll(p.getPromissoryNotesOwned());
+        } else {
+            allPNs.addAll(Mapper.getPromissoryNotes().keySet());
+        }
+        return regexBuilder("pn", allPNs);
+    }
+
+    /** @return group "pn" */
+    public static String pnRegex(Game game, Player player) {
+        Set<String> allPNs = new HashSet<>();
+        if (player != null) {
+            allPNs.addAll(player.getPromissoryNotes().keySet());
+            allPNs.removeAll(player.getPromissoryNotesInPlayArea());
+        } else {
+            return pnRegex(game);
+        }
+        return regexBuilder("pn", allPNs);
     }
 
     /** @return group "page" matching an integer */

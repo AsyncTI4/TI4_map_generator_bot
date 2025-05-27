@@ -12,16 +12,19 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
@@ -108,23 +111,24 @@ public class OtherHeroButtonHandler {
     @ButtonHandler("pharadnHeroDestroy_")
     public static void pharadnHeroDestroy(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " you chose to use the Pharadn Hero on " + Mapper.getPlanet(planet).getAutoCompleteName() + " to destroy all infantry. ");
-        ButtonHelper.deleteMessage(event);
-        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        Planet unitHolder = game.getUnitHolderFromPlanet(planet);
         Tile tile = game.getTileFromPlanet(planet);
+        if (unitHolder == null || tile == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not locate planet");
+            return;
+        }
+
         for (Player p2 : game.getRealPlayers()) {
-            String name = unitHolder.getName().replace("space", "");
             if (tile.containsPlayersUnits(p2)) {
                 int amountInf = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
-                if (p2.hasInf2Tech()) {
-                    ButtonHelper.resolveInfantryDeath(p2, amountInf);
-                }
-                if (amountInf > 0) {
-                    RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
-                }
+                UnitKey infKey = Units.getUnitKey(UnitType.Infantry, p2.getColorID());
+                DestroyUnitService.destroyUnit(event, tile, game, infKey, amountInf, unitHolder, false);
             }
         }
+
+        String msg = player.getFactionEmoji() + " you chose to use the Pharadn Hero on " + unitHolder.getRepresentation(game) + " to destroy all infantry.";
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("pharadnHeroCommit_")
@@ -177,7 +181,8 @@ public class OtherHeroButtonHandler {
             CommandCounterHelper.addCC(event, player, game.getTileByPosition(game.getActiveSystem()));
             game.setStoredValue("vaylerianHeroActive", "true");
         }
-        for (Tile tile : ButtonHelperAgents.getGloryTokenTiles(game)) {
+        List<Tile> gloryTiles = ButtonHelperAgents.getGloryTokenTiles(game);
+        for (int i = 0; i < gloryTiles.size(); i++) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
             if (!buttons.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
