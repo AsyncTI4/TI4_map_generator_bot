@@ -48,6 +48,11 @@ public class DrumrollService {
                 sleepForTwoSeconds();
                 if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) break; // if the bot needs to shut down, cancel all drumrolls
             }
+            msg.delete().queue(null, null);
+            for (Message bonus : bonusMessages) {
+                bonus.delete().queue(null, null);
+            }
+
             Game reloadedGame = GameManager.getManagedGame(gameName).getGame();
             if (resolve.test(reloadedGame))
                 GameManager.save(reloadedGame, "Post-Drumroll");

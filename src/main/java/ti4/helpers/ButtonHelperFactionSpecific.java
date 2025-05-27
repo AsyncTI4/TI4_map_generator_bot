@@ -456,13 +456,8 @@ public class ButtonHelperFactionSpecific {
                 for (Tile tile : game.getTileMap().values()) {
                     UnitHolder unitHolder = tile.getUnitHolders().get("space");
                     if (unitHolder.getUnitCount(UnitType.Cavalry, player.getColor()) > 0) {
-                        if (unitHolder.getUnitDamage() != null
-                            && unitHolder.getUnitDamage()
-                                .get(Mapper.getUnitKey("cavalry", player.getColorID())) != null
-                            && unitHolder.getUnitDamage()
-                                .get(Mapper.getUnitKey("cavalry", player.getColorID())) > 0) {
-                            unitHolder.addDamagedUnit(
-                                Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+                        if (unitHolder.getDamagedUnitCount(UnitType.Cavalry, player.getColorID()) > 0) {
+                            unitHolder.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
                             unitHolder.removeDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
                         }
                         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "cavalry");

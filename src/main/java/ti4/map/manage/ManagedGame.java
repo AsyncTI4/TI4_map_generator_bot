@@ -27,6 +27,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final boolean vpGoalReached;
     private final boolean fowMode;
     private final boolean factionReactMode;
+    private final boolean injectRules;
     private final String creationDate;
     private final long lastModifiedDate;
     private final String activePlayerId;
@@ -49,6 +50,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         vpGoalReached = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
         factionReactMode = game.isBotFactionReacts();
+        injectRules = game.isInjectRulesLinks();
         creationDate = game.getCreationDate();
         lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());

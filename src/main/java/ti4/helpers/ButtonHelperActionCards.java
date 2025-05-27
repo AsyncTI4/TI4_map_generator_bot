@@ -37,6 +37,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -1705,27 +1706,7 @@ public class ButtonHelperActionCards {
                 ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
             }
         }
-        if (p2.hasInf2Tech()) {
-            ButtonHelper.resolveInfantryDeath(p2, amountToKill);
-            boolean cabalMech = false;
-            Tile tile = game.getTileFromPlanet(planet);
-            if (p2.hasAbility("amalgamation")
-                && game.getTileFromPlanet(planet).getUnitHolders().get(planet).getUnitCount(UnitType.Mech,
-                    p2.getColor()) > 0
-                && p2.hasUnit("cabal_mech")
-                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-                cabalMech = true;
-            }
-            if (p2.hasAbility("amalgamation")
-                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile) || cabalMech)
-                && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
-                ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, amountToKill, "infantry", event);
-            }
-        }
-        if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
-            ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
-        }
-        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, p2.getColor(), amountToKill + " inf " + planet);
+        DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, Units.getUnitKey(UnitType.Infantry, p2.getColor()), amountToKill, uH, false);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " you exhausted " + planetRep
@@ -1805,28 +1786,9 @@ public class ButtonHelperActionCards {
                 }
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
-            UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), p2.getColor());
-            var parsedUnit = new ParsedUnit(key, hits, planet);
-            RemoveUnitService.removeUnit(event, game.getTileFromPlanet(planet), game, parsedUnit);
+            UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
+            DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, amount, uH, false);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
-            ButtonHelper.resolveInfantryDeath(p2, hits);
-            if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
-                ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
-            }
-            boolean cabalMech = false;
-            Tile tile = game.getTileFromPlanet(planet);
-            if (p2.hasAbility("amalgamation")
-                && game.getTileFromPlanet(planet).getUnitHolders().get(planet).getUnitCount(UnitType.Mech,
-                    p2.getColor()) > 0
-                && p2.hasUnit("cabal_mech")
-                && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-                cabalMech = true;
-            }
-            if (p2.hasAbility("amalgamation")
-                && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile) || cabalMech)
-                && FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)) {
-                ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, hits, "infantry", event);
-            }
             if (hits > 0) {
                 if (p2.hasAbility("data_recovery")) {
                     ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());

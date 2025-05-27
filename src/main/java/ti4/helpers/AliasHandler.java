@@ -213,7 +213,6 @@ public class AliasHandler {
 
     public static String resolveUnit(String name) {
         String aliasID = unitAliasList.get(name.toLowerCase());
-        //System.out.println("Could not find an alias for Unit: " + name);
         return Objects.requireNonNullElse(aliasID, name);
     }
 

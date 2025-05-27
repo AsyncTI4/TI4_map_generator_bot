@@ -1,5 +1,9 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import ti4.AsyncTI4DiscordBot;
+import ti4.image.Mapper;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 
@@ -17,12 +22,10 @@ public class Units {
 
     private static final String EMDASH = "—";
     private static final Pattern UNIT_PATTERN = Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
+    private static final Map<UnitType, Map<String, UnitKey>> keys = new HashMap<>();
 
     /**
-     * <H3>
-     * DO NOT ADD NEW VALUES TO THIS OBJECT.
-     * </H3>
-     * 
+     * <H3> DO NOT ADD NEW VALUES TO THIS OBJECT. </H3>
      * <p>
      * It is being used as a key in some major hashmaps which causes issues when we attempt to
      * save/restore from JSON as JSON map keys have to be strings, not JSON objects. This forces
@@ -32,8 +35,8 @@ public class Units {
     @Data
     public static class UnitKey {
 
-        private UnitType unitType;
-        private String colorID;
+        private final UnitType unitType;
+        private final String colorID;
 
         @JsonIgnore
         public String getColor() {
@@ -180,8 +183,59 @@ public class Units {
         }
     }
 
+    public enum UnitState {
+        none, //. . 0000
+        dmg, // . . 0001
+        ;
+
+        public static final int DMG = 0b0000001;
+
+        public boolean isDamaged() {
+            return (ordinal() & DMG) > 0;
+        }
+
+        public static List<UnitState> defaultAddOrder() {
+            return List.of(none, dmg);
+        }
+
+        public static List<UnitState> defaultRemoveOrder() {
+            return List.of(dmg, none);
+        }
+
+        public static List<UnitState> defaultAddStatusOrder() {
+            return List.of(none, dmg);
+        }
+
+        public static List<UnitState> defaultRemoveStatusOrder() {
+            return List.of(dmg, none);
+        }
+
+        public static List<Integer> emptyList() {
+            List<Integer> ls = new ArrayList<>();
+            for (int i = 0; i < values().length; i++)
+                ls.add(0);
+            return ls;
+        }
+
+        public String humanDescr() {
+            return switch (this) {
+                case none -> "";
+                case dmg -> "damaged";
+            };
+        }
+    }
+
+    public static UnitState findUnitState(String state) {
+        if (state == null) return null;
+        return switch (state.toLowerCase()) {
+            case "none" -> UnitState.none;
+            case "dmg", "damaged", "damage" -> UnitState.dmg;
+            default -> null;
+        };
+    }
+
     public static UnitType findUnitType(String unitType) {
-        return switch (unitType) {
+        return switch (AliasHandler.resolveUnit(unitType)) {
             case "gf" -> UnitType.Infantry;
             case "mf" -> UnitType.Mech;
             case "pd", "pds" -> UnitType.Pds;
@@ -203,20 +257,27 @@ public class Units {
         };
     }
 
-    public static UnitKey getUnitKey(String unitType, String colorID) {
+    public static UnitKey getUnitKey(String unitType, String color) {
         UnitType u = findUnitType(unitType);
-        if (colorID == null || u == null) return null;
-        return new UnitKey(u, colorID);
+        if (color == null || u == null) return null;
+        return lookupKey(u, color);
     }
 
-    public static UnitKey getUnitKey(UnitType unitType, String colorID) {
-        return new UnitKey(unitType, colorID);
+    public static UnitKey getUnitKey(UnitType unitType, String color) {
+        return lookupKey(unitType, color);
+    }
+
+    private static UnitKey lookupKey(UnitType type, String color) {
+        String colorID = Mapper.getColorID(color); // trust, but verify
+        keys.putIfAbsent(type, new HashMap<>());
+        keys.get(type).putIfAbsent(colorID, new UnitKey(type, colorID));
+        return keys.get(type).get(colorID);
     }
 
     @Nullable
     public static UnitKey parseID(String id) {
         if (id.contains(".png")) {
-            id = id.replace(".png", "").replace("_", EMDASH);
+            id = id.replace(".png", "").replace("_", EMDASH).replace("-", EMDASH);
         }
 
         Matcher unitParser = UNIT_PATTERN.matcher(id);
