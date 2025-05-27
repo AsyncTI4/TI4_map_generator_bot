@@ -1,5 +1,7 @@
 package ti4.listeners;
 
+import java.util.concurrent.TimeUnit;
+
 import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.audit.ActionType;
@@ -39,7 +41,7 @@ public class DeletionListener extends ListenerAdapter {
             Guild guild = event.getGuild();
 
             guild.retrieveAuditLogs().type(ActionType.MESSAGE_DELETE).limit(10)
-                .queue(auditLogs -> {
+                .queueAfter(10, TimeUnit.SECONDS, auditLogs -> {
                     AuditLogEntry relevantLog = auditLogs.stream()
                         .filter(log -> log.getTargetIdLong() == messageId)
                         .findFirst()
