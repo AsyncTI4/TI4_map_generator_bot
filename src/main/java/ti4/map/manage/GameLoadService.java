@@ -566,24 +566,8 @@ class GameLoadService {
                         JavaType reference = factory.constructMapLikeType(HashMap.class, factory.constructType(String.class), unitholder);
                         Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, reference);
                         game.setTacticalActionDisplacement(displacedUnits);
-
-                        // copy values into the existing map, so that we don't erase old data
-                        // Map<String, Map<UnitKey, List<Integer>>> displaceMap = game.getTacticalActionDisplacement();
-                        // for (String uh : displacedUnits.keySet()) {
-                        //     Map<UnitKey, List<Integer>> holder = displacedUnits.get(uh);
-                        //     if (holder == null || holder.isEmpty()) continue;
-                        //     Map<UnitKey, List<Integer>> holderCopy = displacedUnits.get(uh);
-                        //     for (UnitKey uk : holder.keySet()) {
-                        //         List<Integer> stateCopy = new ArrayList<>();
-                        //         if (holder.get(uk) != null && !holder.get(uk).isEmpty()) {
-                        //             stateCopy.addAll(holder.get(uk));
-                        //             holderCopy.put(uk, stateCopy);
-                        //         }
-                        //     }
-                        //     if (!holderCopy.isEmpty()) displaceMap.put(uh, holderCopy);
-                        // }
                     } catch (Exception e) {
-                        BotLogger.error("AHHHHHHH " + Constants.jazzPing(), e);
+                        BotLogger.error("Failed to load unit displace map from game save data " + Constants.jazzPing(), e);
                     }
                 }
                 // TODO: DEPRECATED: Remove after September 1st
