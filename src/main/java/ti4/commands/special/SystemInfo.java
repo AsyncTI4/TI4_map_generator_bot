@@ -93,7 +93,7 @@ class SystemInfo extends GameStateSubcommand {
                 }
                 sb.append("\n");
                 boolean hasCC = false;
-                for (String cc : unitHolder.getCCList()) {
+                for (String cc : unitHolder.getCcList()) {
                     if (!hasCC) {
                         sb.append("Command Tokens: ");
                         hasCC = true;

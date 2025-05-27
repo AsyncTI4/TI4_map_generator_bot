@@ -6,12 +6,13 @@ import java.util.Set;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
-import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 
 @UtilityClass
 public class AddPlanetToPlayAreaService {
@@ -20,15 +21,15 @@ public class AddPlanetToPlayAreaService {
         if (Constants.SPACE.equals(planetName)) {
             return;
         }
-        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-        if (unitHolder == null) {
-            return;
-        }
-        Set<Units.UnitKey> allUnitsOnPlanet = unitHolder.getUnits().keySet();
+
+        Planet planet = tile.getUnitHolderFromPlanet(planetName);
+        if (planet == null) return;
+
+        Set<UnitKey> allUnitsOnPlanet = planet.getUnitKeys();
         Set<String> unitColors = new HashSet<>();
-        for (Units.UnitKey unit_ : allUnitsOnPlanet) {
+        for (UnitKey unit_ : allUnitsOnPlanet) {
             String unitColor = unit_.getColorID();
-            if (unit_.getUnitType() != Units.UnitType.Fighter) {
+            if (unit_.getUnitType() != UnitType.Fighter) {
                 unitColors.add(unitColor);
             }
         }

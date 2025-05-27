@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.ListUtils;
 import ti4.AsyncTI4DiscordBot;
@@ -19,6 +20,7 @@ import ti4.model.MapTemplateModel;
 import ti4.service.milty.MiltyService.DraftSpec;
 import ti4.settings.GlobalSettings;
 
+@UtilityClass
 public class GenerateSlicesService {
 
     public static boolean generateSlices(GenericInteractionCreateEvent event, MiltyDraftManager draftManager, DraftSpec specs) {
@@ -26,18 +28,9 @@ public class GenerateSlicesService {
         boolean anomaliesCanTouch = specs.anomaliesCanTouch;
 
         MapTemplateModel mapTemplate = specs.template;
+        List<List<Boolean>> adjMatrix = getAdjMatrix(mapTemplate);
         int bluePerPlayer = mapTemplate.bluePerPlayer();
         int redPerPlayer = mapTemplate.redPerPlayer();
-
-        List<List<Boolean>> adjMatrix = new ArrayList<>();
-        List<String> tilePositions = mapTemplate.emulatedTiles();
-        for (String pos1 : tilePositions) {
-            List<Boolean> row = new ArrayList<>();
-            List<String> adj = PositionMapper.getAdjacentTilePositions(pos1);
-            for (String pos2 : tilePositions)
-                row.add(adj.contains(pos2));
-            adjMatrix.add(row);
-        }
 
         boolean slicesCreated = false;
         int i = 0;
@@ -66,6 +59,7 @@ public class GenerateSlicesService {
         int redPerPartition = Math.ceilDiv(red.size(), redPerPlayer);
         partitionedTiles.addAll(ListUtils.partition(red, redPerPartition));
 
+        // how long do we sit here generating slices?
         long quitDiff = 60L * 1000L * 1000L * 1000L;
         long minAttempts = 1000000L;
         long startTime = System.nanoTime();
@@ -90,13 +84,13 @@ public class GenerateSlicesService {
             for (int sliceIndex = 0; sliceIndex < possibleSlices; sliceIndex++) {
                 MiltyDraftSlice slice = assembleOneSlice(adjMatrix, partitionedTiles, sliceIndex, nextSliceName, anomaliesCanTouch);
                 if (!checkIfSliceIsGood(specs, slice, reasons)) {
-                    if (draftManager.getSlices().size() == sliceCount)
-                        break;
-                    if ((draftManager.getSlices().size() + possibleSlices - sliceIndex) <= sliceCount)
-                        break;
+                    if ((draftManager.getSlices().size() + possibleSlices - sliceIndex) <= sliceCount) break;
                     continue;
                 }
+
+                // Slice is valid. Add it, then check if we are done
                 draftManager.addSlice(slice);
+                if (draftManager.getSlices().size() == sliceCount) break;
                 nextSliceName = Character.toString('A' + draftManager.getSlices().size());
             }
 
@@ -136,7 +130,6 @@ public class GenerateSlicesService {
     }
 
     private static MiltyDraftSlice assembleOneSlice(List<List<Boolean>> adjMatrix, List<List<MiltyDraftTile>> partition, int sliceNum, String sliceName, boolean anomaliesCanTouch) {
-
         List<MiltyDraftTile> tiles = new ArrayList<>();
         for (List<MiltyDraftTile> tier : partition)
             tiles.add(tier.get(sliceNum));
@@ -182,11 +175,10 @@ public class GenerateSlicesService {
         int totalOptimal = slice.getOptimalTotalValue();
         if (optInf < spec.getMinInf() || optRes < spec.getMinRes() || totalOptimal < spec.getMinTot() || totalOptimal > spec.getMaxTot()) {
             addReason.apply("value");
-            System.out.println(slice.ttsString() + " = " + optInf + "/" + optRes + " (" + totalOptimal + ")");
             return false;
         }
 
-        // if the slice has 2 alphas, or 2 betas, throw it out
+        // if the slice has 2 alphas or 2 betas, throw it out
         if (slice.getTiles().stream().filter(MiltyDraftTile::isHasAlphaWH).count() > 1) {
             addReason.apply("alpha");
             return false;
@@ -195,7 +187,7 @@ public class GenerateSlicesService {
             addReason.apply("beta");
             return false;
         }
-        // if the spec says to load it up, don't fail here lol
+        // if the spec says to load it up, don't fail here
         if (slice.getTiles().stream().filter(MiltyDraftTile::isLegendary).count() > 1 && spec.getMaxLegend() < spec.getNumSlices()) {
             addReason.apply("legend");
             return false;
@@ -203,4 +195,18 @@ public class GenerateSlicesService {
 
         return true;
     }
+
+    private List<List<Boolean>> getAdjMatrix(MapTemplateModel template) {
+        List<List<Boolean>> adjMatrix = new ArrayList<>();
+        List<String> tilePositions = template.emulatedTiles();
+        for (String pos1 : tilePositions) {
+            List<Boolean> row = new ArrayList<>();
+            List<String> adj = PositionMapper.getAdjacentTilePositions(pos1);
+            for (String pos2 : tilePositions)
+                row.add(adj.contains(pos2));
+            adjMatrix.add(row);
+        }
+        return adjMatrix;
+    }
+
 }
