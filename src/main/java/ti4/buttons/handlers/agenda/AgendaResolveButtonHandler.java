@@ -58,6 +58,11 @@ class AgendaResolveButtonHandler {
         MessageChannel actionsChannel = game.getMainGameChannel();
         String winner = buttonID.substring(buttonID.indexOf("_") + 1);
         String agendaid = game.getCurrentAgendaInfo().split("_")[2];
+        if (game.getStoredValue("agendaRes" + game.getRound() + game.getDiscardAgendas().size()).equalsIgnoreCase(winner + agendaid)) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Double press suspected, stopping resolution here.");
+            return;
+        }
+        game.setStoredValue("agendaRes" + game.getRound() + game.getDiscardAgendas().size(), winner + agendaid);
         int aID;
         if ("CL".equalsIgnoreCase(agendaid)) {
             String id2 = game.revealAgenda(false);
