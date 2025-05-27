@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import ti4.buttons.handlers.unitPickers.TacticalActionButtonHandlers;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -51,8 +50,6 @@ class GameSaveService {
 
     private static boolean save(Game game) {
         TransientGameInfoUpdater.update(game);
-        // TODO: DELETE THIS AFTER SEPTEMBER 1
-        TacticalActionButtonHandlers.warnGameWithOldDisplaceMaps(game, game.getActivePlayer());
 
         //Ugly fix to update seen tiles data for fog since doing it in 
         //MapGenerator/TileGenerator won't save changes anymore

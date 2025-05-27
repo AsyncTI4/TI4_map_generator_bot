@@ -1,18 +1,14 @@
 package ti4.buttons.handlers.unitPickers;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
+
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
-import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -52,8 +48,12 @@ public class TacticalActionButtonHandlers {
             String planetName = matcher.group("planet");
             boolean reverse = StringUtils.isNotBlank(matcher.group("reverse"));
 
-            if (!reverse) TacticalActionService.moveSingleUnit(event, game, player, tile, planetName, typeToMove, amt, state, moveOrRemove);
-            if (reverse) TacticalActionService.reverseSingleUnit(event, game, player, tile, planetName, typeToMove, amt, state, moveOrRemove);
+            if (!reverse)
+                TacticalActionService.moveSingleUnit(event, game, player, tile, planetName, typeToMove, amt, state,
+                    moveOrRemove);
+            if (reverse)
+                TacticalActionService.reverseSingleUnit(event, game, player, tile, planetName, typeToMove, amt, state,
+                    moveOrRemove);
         }, x -> {})) {
             return;
         }
@@ -83,7 +83,10 @@ public class TacticalActionButtonHandlers {
     }
 
     @ButtonHandler("doneWithOneSystem_")
-    public static void finishMovingFromOneTile(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void finishMovingFromOneTile(
+        Player player, Game game, ButtonInteractionEvent event,
+        String buttonID
+    ) {
         TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(event, game, player);
     }
 
@@ -124,7 +127,8 @@ public class TacticalActionButtonHandlers {
         Tile tile = game.getTileByPosition(pos);
 
         String message = TacticalActionOutputService.buildMessageForSingleSystem(game, player, tile);
-        List<Button> systemButtons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, "Move");
+        List<Button> systemButtons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile,
+            "Move");
         MessageHelper.sendMessageToEventChannelWithButtons(event, message, systemButtons);
         ButtonHelper.deleteMessage(event);
     }
@@ -140,7 +144,8 @@ public class TacticalActionButtonHandlers {
 
     @ButtonHandler("spaceUnits_")
     public static void spaceLandedUnits(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
-        String regex = "spaceUnits_" + RegexHelper.posRegex(game) + "_" + RegexHelper.intRegex("num") + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh");
+        String regex = "spaceUnits_" + RegexHelper.posRegex(game) + "_" + RegexHelper.intRegex("num")
+            + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String pos = matcher.group("pos");
             int amount = Integer.parseInt(matcher.group("num"));
@@ -153,19 +158,23 @@ public class TacticalActionButtonHandlers {
             UnitHolder addToHolder = tile.getSpaceUnitHolder();
             game.setActiveSystem(pos);
 
-            List<RemovedUnit> removed = RemoveUnitService.removeUnit(event, tile, game, player, removeFromHolder, type, amount, damaged);
+            List<RemovedUnit> removed = RemoveUnitService.removeUnit(event, tile, game, player, removeFromHolder, type,
+                amount, damaged);
             List<RemovedUnit> toAdd = removed.stream().map(r -> r.onUnitHolder(addToHolder)).toList();
             AddUnitService.addUnits(event, game, toAdd);
 
             List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
 
             String planetName = Mapper.getPlanet(planet).getNameNullSafe();
-            String undidMsg = player.getFactionEmojiOrColor() + " undid landing of " + amount + " " + type.humanReadableName() + " on " + planetName + ".";
+            String undidMsg = player.getFactionEmojiOrColor() + " undid landing of " + amount + " "
+                + type.humanReadableName() + " on " + planetName + ".";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), undidMsg);
-            event.getMessage().editMessage(event.getMessage().getContentRaw()).setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+            event.getMessage().editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         }, fail -> {
             // Regen buttons
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Failed to un-land units, regenerating buttons.\nIf the problem persists please yell at Jazzxhands");
+            MessageHelper.sendEphemeralMessageToEventChannel(event,
+                "Failed to un-land units, regenerating buttons.\nIf the problem persists please yell at Jazzxhands");
             Tile active = game.getTileByPosition(game.getActiveSystem());
             MessageHelper.editMessageButtons(event, TacticalActionService.getLandingUnitsButtons(game, player, active));
         });
@@ -173,7 +182,8 @@ public class TacticalActionButtonHandlers {
 
     @ButtonHandler("landUnits_")
     public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String regex = "landUnits_" + RegexHelper.posRegex(game) + "_" + RegexHelper.intRegex("num") + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh");
+        String regex = "landUnits_" + RegexHelper.posRegex(game) + "_" + RegexHelper.intRegex("num")
+            + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh");
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String pos = matcher.group("pos");
             int amount = Integer.parseInt(matcher.group("num"));
@@ -186,64 +196,30 @@ public class TacticalActionButtonHandlers {
             UnitHolder addToHolder = tile.getUnitHolderFromPlanet(planet);
             game.setActiveSystem(pos);
 
-            List<RemovedUnit> removed = RemoveUnitService.removeUnit(event, tile, game, player, removeFromHolder, type, amount, damaged);
+            List<RemovedUnit> removed = RemoveUnitService.removeUnit(event, tile, game, player, removeFromHolder, type,
+                amount, damaged);
             List<RemovedUnit> toAdd = removed.stream().map(r -> r.onUnitHolder(addToHolder)).toList();
             AddUnitService.addUnits(event, game, toAdd);
 
             List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
 
             String planetName = Mapper.getPlanet(planet).getNameNullSafe();
-            String landingMsg = player.fogSafeEmoji() + " landed " + amount + " " + type.humanReadableName() + " on " + planetName + ".";
+            String landingMsg = player.fogSafeEmoji() + " landed " + amount + " " + type.humanReadableName() + " on "
+                + planetName + ".";
             if (!removed.isEmpty()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Landing failed for an unknown reason. Regenerated buttons, please ping bothelper if the problem persists.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Landing failed for an unknown reason. Regenerated buttons, please ping bothelper if the problem persists.");
             }
-            event.getMessage().editMessage(event.getMessage().getContentRaw()).setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+            event.getMessage().editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         }, fail -> {
             // Regen buttons
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "Failed to land units, regenerating buttons.\nIf the problem persists please yell at Jazzxhands");
+            MessageHelper.sendEphemeralMessageToEventChannel(event,
+                "Failed to land units, regenerating buttons.\nIf the problem persists please yell at Jazzxhands");
             Tile active = game.getTileByPosition(game.getActiveSystem());
             MessageHelper.editMessageButtons(event, TacticalActionService.getLandingUnitsButtons(game, player, active));
         });
-    }
-
-    @Deprecated // TODO: DELETE THIS AFTER SEPTEMBER 1ST
-    public static void warnGameWithOldDisplaceMaps(Game game, Player player) {
-        if (game.getMovedUnitsFromCurrentActivation().isEmpty()) return;
-        if (player == null) return;
-
-        Map<String, Integer> moved = game.getMovedUnitsFromCurrentActivation();
-        for (String unit : moved.keySet()) {
-            Integer amt = moved.get(unit);
-
-            // Get the state
-            UnitState st = UnitState.none;
-            if (unit.contains("damaged")) {
-                unit = unit.replace("damaged", "");
-                st = UnitState.dmg;
-            }
-
-            UnitKey key = Units.getUnitKey(unit, player.getColorID());
-            if (key != null) {
-                // Add the unit to "unk"
-                if (!game.getTacticalActionDisplacement().containsKey("unk"))
-                    game.getTacticalActionDisplacement().put("unk", new HashMap<>());
-                Map<UnitKey, List<Integer>> uh = game.getTacticalActionDisplacement().get("unk");
-                if (!uh.containsKey(key)) uh.put(key, UnitState.emptyList());
-                int mv = uh.get(key).get(st.ordinal());
-                uh.get(key).set(st.ordinal(), mv + amt);
-            }
-        }
-        game.resetCurrentMovedUnitsFrom1System();
-        game.resetCurrentMovedUnitsFrom1TacticalAction();
-
-        String msg = "Hey " + player.getRepresentationUnfogged() + ", I redid a lot of the tactical action buttons, and because of this a little bit of information has been lost. ";
-        msg += "**__All your units are still accounted for__**, but any units that you moved won't be able to be put back unless you use `undo`. ";
-        msg += "Apologies for the inconvenience. Let me know if anything breaks during this tactical action and you need help fixing it.\n\n";
-        msg += "Good news though, future tactical actions you'll be able to freely edit your unit movement from each system as much as you like!\n";
-        msg += "\\- Jazzxhands";
-        if (game.getTableTalkChannel() != null)
-            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), msg);
     }
 }
