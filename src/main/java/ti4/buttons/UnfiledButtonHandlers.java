@@ -1948,11 +1948,12 @@ public class UnfiledButtonHandlers {
         if (matchingFactionReactions >= numberOfPlayers) {
             respondAllPlayersReacted(event, game);
             GameMessageManager.remove(game.getName(), messageId);
-        } else if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring"))) {
+        } else if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand"))) {
             boolean allReacted = true;
             for (Player player : game.getRealPlayers()) {
                 String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
-                if (po.isEmpty()) {
+                String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+                if (po.isEmpty() || so.isEmpty() || game.getPhaseOfGame().contains("action")) {
                     allReacted = false;
                 }
             }
@@ -1967,7 +1968,7 @@ public class UnfiledButtonHandlers {
         if (game == null || buttonID == null) {
             return;
         }
-        if (buttonID.startsWith(Constants.PO_SCORING)) {
+        if (buttonID.startsWith(Constants.PO_SCORING) || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand")) {
             buttonID = Constants.PO_SCORING;
         } else if ((buttonID.startsWith(Constants.SC_FOLLOW) || buttonID.startsWith("sc_no_follow"))) {
             buttonID = Constants.SC_FOLLOW;
@@ -1989,7 +1990,7 @@ public class UnfiledButtonHandlers {
             case "no_after", "no_after_persistent" -> ReactionService.handleAllPlayersReactingNoAfters(event.getInteraction().getMessage(), game);
             case "no_sabotage" -> ReactionService.handleAllPlayersReactingNoSabotage(event.getInteraction().getMessage(), game);
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
-                String message2 = "All players have indicated public scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
+                String message2 = "All players have indicated scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
                 Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
                 Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
                 Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
@@ -2023,7 +2024,7 @@ public class UnfiledButtonHandlers {
                         buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
                     }
                 }
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
             }
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
