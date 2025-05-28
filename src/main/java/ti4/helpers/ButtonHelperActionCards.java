@@ -1787,7 +1787,7 @@ public class ButtonHelperActionCards {
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
             UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
-            DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, amount, uH, false);
+            DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, hits, uH, false);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             if (hits > 0) {
                 if (p2.hasAbility("data_recovery")) {
