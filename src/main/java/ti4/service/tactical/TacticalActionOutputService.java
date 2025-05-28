@@ -192,7 +192,6 @@ public class TacticalActionOutputService {
     public String validateMoveValue(Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, int distance, int riftDistance) {
         int moveValue = getUnitMoveValue(game, player, tile, unit, false);
         if (moveValue == 0) return "";
-        if (player.getUnitFromUnitKey(unit).getCapacityUsed() > 0) return "";
 
         String output = "";
         if (distance > moveValue && distance < 90) {
