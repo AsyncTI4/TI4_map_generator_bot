@@ -165,6 +165,8 @@ public class ButtonHelper {
     public static void resolveInfantryDestroy(Player player, int totalAmount) {
         resolveInfantryRemoval(player, totalAmount);
         if (totalAmount <= 0 || !player.hasInf2Tech()) return;
+        if (player.getUnitsOwned().contains("pharadn_infantry") || player.getUnitsOwned().contains("pharadn_infantry2"))
+            return;
 
         if (player.hasTech("cl2")) {
             ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
