@@ -1120,8 +1120,8 @@ public class ButtonHelperActionCards {
         p2.setCommodities(0);
         player.setTg(player.getTg() + comm);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " stole " + comm + "commodit " + (comm == 1 ? "y" : "ies")
-                + " from " + player.getFactionEmojiOrColor());
+            player.getRepresentationUnfogged() + " stole " + comm + " commodit" + (comm == 1 ? "y" : "ies")
+                + " from " + p2.getFactionEmojiOrColor());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + " your commodities were somehow stolen with _Salvage_.");
         ButtonHelper.deleteMessage(event);
