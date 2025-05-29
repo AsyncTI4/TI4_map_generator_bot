@@ -374,7 +374,7 @@ public class ButtonHelperFactionSpecific {
             // System.out.println(unitKey.asyncID());
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
-            if ("fighter".equalsIgnoreCase(unitName)) {
+            if ("fighter".equalsIgnoreCase(unitName) || "sd".equals(unitKey.asyncID())) {
                 continue;
             }
 
