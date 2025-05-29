@@ -42,6 +42,7 @@ public class WebPlayerArea {
 
     // Strategy cards and promissory notes
     private Set<Integer> followedSCs;
+    private List<Integer> unfollowedSCs;
     private List<String> promissoryNotesInPlayArea;
 
     // Technologies
@@ -68,6 +69,18 @@ public class WebPlayerArea {
     // Additional properties
     private String flexibleDisplayName;
     private Set<Integer> scs;
+    private Boolean isSpeaker;
+    private List<String> neighbors;
+
+    // army values
+    private float spaceArmyRes;
+    private float groundArmyRes;
+    private float spaceArmyHealth;
+    private float groundArmyHealth;
+    private float spaceArmyCombat;
+    private float groundArmyCombat;
+
+
 
     public static WebPlayerArea fromPlayer(Player player) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -104,6 +117,7 @@ public class WebPlayerArea {
 
         // Strategy cards and promissory notes
         webPlayerArea.setFollowedSCs(player.getFollowedSCs());
+        webPlayerArea.setUnfollowedSCs(player.getUnfollowedSCs());
         webPlayerArea.setPromissoryNotesInPlayArea(player.getPromissoryNotesInPlayArea());
 
         // Technologies
@@ -130,6 +144,16 @@ public class WebPlayerArea {
         // Additional properties
         webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());
         webPlayerArea.setScs(player.getSCs());
+        webPlayerArea.setIsSpeaker(player.isSpeaker());
+        webPlayerArea.setNeighbors(player.getNeighbouringPlayers(false).stream().map(Player::getColor).toList());
+
+        // Army values
+        webPlayerArea.setSpaceArmyRes(player.getTotalResourceValueOfUnits("space"));
+        webPlayerArea.setGroundArmyRes(player.getTotalResourceValueOfUnits("ground"));
+        webPlayerArea.setSpaceArmyHealth(player.getTotalHPValueOfUnits("space"));
+        webPlayerArea.setGroundArmyHealth(player.getTotalHPValueOfUnits("ground"));
+        webPlayerArea.setSpaceArmyCombat(player.getTotalCombatValueOfUnits("space"));
+        webPlayerArea.setGroundArmyCombat(player.getTotalCombatValueOfUnits("ground"));
 
         return webPlayerArea;
     }
