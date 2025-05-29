@@ -21,6 +21,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.message.BotLogger.LogMessageOrigin;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
 import ti4.model.TechnologyModel.TechnologyType;
@@ -185,6 +186,15 @@ public class ListPlayerInfoService {
         String current = planets.get(index);
 
         Planet planet = game.getPlanetsInfo().get(current);
+        if (planet == null) {
+            BotLogger.warning(new LogMessageOrigin(player), "ListPlayerInfoService: Planet \"" + current + "\" not found for game " + game.getName());
+            return backtrack(planets,
+                currentResources,
+                currentInfluence,
+                index + 1,
+                usedPlanets,
+                remainingTradeGoods, goal, player, game, closestScore);
+        }
         int resources = planet.getResources();
         int influence = planet.getInfluence();
         if (player.hasLeaderUnlocked("xxchahero")) {
