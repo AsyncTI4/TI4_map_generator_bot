@@ -42,6 +42,7 @@ public class WebPlayerArea {
 
     // Strategy cards and promissory notes
     private Set<Integer> followedSCs;
+    private List<Integer> unfollowedSCs;
     private List<String> promissoryNotesInPlayArea;
 
     // Technologies
@@ -79,7 +80,7 @@ public class WebPlayerArea {
     private float spaceArmyCombat;
     private float groundArmyCombat;
 
-    private List<Integer> unfollowedSCs;
+
 
     public static WebPlayerArea fromPlayer(Player player) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -116,6 +117,7 @@ public class WebPlayerArea {
 
         // Strategy cards and promissory notes
         webPlayerArea.setFollowedSCs(player.getFollowedSCs());
+        webPlayerArea.setUnfollowedSCs(player.getUnfollowedSCs());
         webPlayerArea.setPromissoryNotesInPlayArea(player.getPromissoryNotesInPlayArea());
 
         // Technologies
@@ -152,8 +154,6 @@ public class WebPlayerArea {
         webPlayerArea.setGroundArmyHealth(player.getTotalHPValueOfUnits("ground"));
         webPlayerArea.setSpaceArmyCombat(player.getTotalCombatValueOfUnits("space"));
         webPlayerArea.setGroundArmyCombat(player.getTotalCombatValueOfUnits("ground"));
-
-        webPlayerArea.setUnfollowedSCs(player.getUnfollowedSCs());
 
         return webPlayerArea;
     }
