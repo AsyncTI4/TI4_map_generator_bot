@@ -64,8 +64,6 @@ public class ParseUnitService {
         String originalUnit;
         if (NumberUtils.isDigits(firstToken)) {
             count = Math.max(Integer.parseInt(firstToken), 1);
-            //address badly formed commands where a number without a unit is given
-            //ex: https://discord.com/channels/943410040369479690/1341438476528123904/1376549368751980656
             if (!unitInfoTokenizer.hasMoreTokens()) return null;
             originalUnit = unitInfoTokenizer.nextToken();
         } else {
