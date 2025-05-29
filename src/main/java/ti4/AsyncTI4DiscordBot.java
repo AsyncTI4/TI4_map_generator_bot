@@ -1,5 +1,7 @@
 package ti4;
 
+import static org.reflections.scanners.Scanners.*;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.reflections.Reflections;
-import static org.reflections.scanners.Scanners.SubTypes;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
@@ -34,6 +35,7 @@ import ti4.cron.CloseLaunchThreadsCron;
 import ti4.cron.CronManager;
 import ti4.cron.EndOldGamesCron;
 import ti4.cron.FastScFollowCron;
+import ti4.cron.InteractionLogCron;
 import ti4.cron.LogButtonRuntimeStatisticsCron;
 import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
@@ -41,7 +43,6 @@ import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
-import ti4.cron.InteractionLogCron;
 import ti4.executors.ExecutorManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -54,6 +55,7 @@ import ti4.image.TileHelper;
 import ti4.listeners.AutoCompleteListener;
 import ti4.listeners.ButtonListener;
 import ti4.listeners.ChannelCreationListener;
+import ti4.listeners.DeletionListener;
 import ti4.listeners.MessageListener;
 import ti4.listeners.ModalListener;
 import ti4.listeners.SelectionMenuListener;
@@ -124,6 +126,7 @@ public class AsyncTI4DiscordBot {
 
         jda.addEventListener(
             new MessageListener(),
+            new DeletionListener(),
             new ChannelCreationListener(),
             new SlashCommandListener(),
             ButtonListener.getInstance(),

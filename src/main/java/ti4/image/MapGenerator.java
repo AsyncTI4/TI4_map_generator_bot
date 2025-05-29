@@ -400,6 +400,7 @@ public class MapGenerator implements AutoCloseable {
             WebHelper.putMap(game.getName(), mainImageBytes, false, null);
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game.getID(), websiteOverlays);
+            WebHelper.putPlayerData(game.getID(), game);
         } else if (isFoWPrivate) {
             Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
             WebHelper.putMap(game.getName(), mainImageBytes, true, player);
@@ -1335,13 +1336,11 @@ public class MapGenerator implements AutoCloseable {
                 }
             } else if (displayType == DisplayType.anomalies && player.ownsUnitSubstring("cabal_spacedock")) {
                 UnitKey unitKey = Mapper.getUnitKey("sd", player.getColor());
-                UnitKey unitKeyCabal = Mapper.getUnitKey("csd", player.getColor());
                 int unitNum = player.getUnitCap("sd") + player.getUnitCap("csd");
                 unitNum = (unitNum == 0 ? PositionMapper.getReinforcementsPosition("sd").getPositionCount("sd") : unitNum);
                 for (Tile tile2 : game.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile2.getUnitHolders().values()) {
-                        unitNum -= unitHolder.getUnits().getOrDefault(unitKey, 0);
-                        unitNum -= unitHolder.getUnits().getOrDefault(unitKeyCabal, 0);
+                        unitNum -= unitHolder.getUnitCount(unitKey);
                     }
                 }
                 if (unitNum > 0) {
@@ -1589,15 +1588,11 @@ public class MapGenerator implements AutoCloseable {
             if (player.isPassed()) {
                 point = PositionMapper.getPlayerStats("newpassed");
                 point.translate(miscTile.x, miscTile.y);
-                DrawingUtil.superDrawString(
-                    graphics, "PASSED", point.x, point.y, ColorUtil.PassedColor, center, null, stroke4,
-                    Color.BLACK);
+                DrawingUtil.superDrawString(graphics, "PASSED", point.x, point.y, ColorUtil.PassedColor, center, null, stroke4, Color.BLACK);
             } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
                 point = PositionMapper.getPlayerStats("newpassed");
                 point.translate(miscTile.x, miscTile.y);
-                DrawingUtil.superDrawString(
-                    graphics, "ACTIVE", point.x, point.y, ColorUtil.ActiveColor, center, null, stroke4,
-                    Color.BLACK);
+                DrawingUtil.superDrawString(graphics, "ACTIVE", point.x, point.y, ColorUtil.ActiveColor, center, null, stroke4, Color.BLACK);
             }
             if (player.isAFK()) {
                 point = PositionMapper.getPlayerStats("newafk");

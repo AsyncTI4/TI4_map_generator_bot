@@ -111,12 +111,15 @@ public class Game extends GameProperties {
     // TODO (Jazz): These should be easily added to GameProperties
     private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
     private Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
-    private Map<String, Integer> displacedUnitsFrom1System = new HashMap<>();
     private Map<String, Integer> thalnosUnits = new HashMap<>();
     private Map<String, Integer> slashCommandsUsed = new HashMap<>();
     private Map<String, Integer> actionCardsSabotaged = new HashMap<>();
-    private Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     private Map<String, String> currentAgendaVotes = new HashMap<>();
+    @Setter
+    @Getter
+    private Map<String, Map<UnitKey, List<Integer>>> tacticalActionDisplacement = new HashMap<>();
+    private @Deprecated Map<String, Integer> displacedUnitsFrom1System = new HashMap<>();
+    private @Deprecated Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
 
     @Setter
     @Getter
@@ -253,6 +256,7 @@ public class Game extends GameProperties {
         FactionModel setupInfo = neutral.getFactionSetupInfo();
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
+        neutral.addTech("ff2");
         return neutral;
     }
 

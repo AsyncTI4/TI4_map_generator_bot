@@ -11,6 +11,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -27,8 +30,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
@@ -146,7 +147,16 @@ public class CreateGameService {
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-
+        Role bothelperRole = getRole("Bothelper", guild);
+        long threadPermission = Permission.MANAGE_THREADS.getRawValue();
+        List<Member> nonGameBothelpers = new ArrayList<>();
+        if (bothelperRole != null) {
+            for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
+                if (!members.contains(botHelper)) {
+                    nonGameBothelpers.add(botHelper);
+                }
+            }
+        }
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
             .syncPermissionOverrides()
@@ -161,6 +171,10 @@ public class CreateGameService {
             .complete();
         newGame.setMainChannelID(actionsChannel.getId());
 
+        for (Member botHelper : nonGameBothelpers) {
+            chatChannel.getManager().putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).queue();
+            actionsChannel.getManager().putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).queue();
+        }
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)

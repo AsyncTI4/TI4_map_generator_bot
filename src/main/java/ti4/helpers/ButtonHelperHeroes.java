@@ -51,6 +51,7 @@ import ti4.service.planet.FlipTileService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -934,18 +935,12 @@ public class ButtonHelperHeroes {
                 String name = unitHolder.getName().replace("space", "");
                 if (tile.containsPlayersUnits(p2)) {
                     int amountInf = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
-                    if (p2.hasInf2Tech()) {
-                        ButtonHelper.resolveInfantryDeath(p2, amountInf);
-                    }
-                    if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
-                        ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
-                    }
                     if (amountInf > 0) {
-                        RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
+                        DestroyUnitService.destroyUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name, false);
                     }
                     int amountFF = unitHolder.getUnitCount(UnitType.Fighter, p2.getColor());
                     if (amountFF > 0) {
-                        RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountFF + " ff");
+                        DestroyUnitService.destroyUnits(event, tile, game, p2.getColor(), amountFF + " ff", false);
                     }
                     if (amountFF + amountInf > 0) {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),

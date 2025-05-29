@@ -21,7 +21,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.buttons.Buttons;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -34,6 +33,7 @@ import ti4.helpers.DiceHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
@@ -49,7 +49,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
-import ti4.service.unit.RemoveUnitService;
+import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
 public class CombatRollService {
@@ -477,28 +477,7 @@ public class CombatRollService {
                     String unitName = unitModel.getBaseType();
                     thalnosUnit = thalnosUnit.split("_")[2].replace("damaged", "");
                     if (thalnosUnit.equals(unitName)) {
-                        RemoveUnitService.removeUnits(event, tile, game, player.getColor(), misses + " " + unitName + " " + unitHolderName);
-                        if (unitName.equalsIgnoreCase("infantry")) {
-                            ButtonHelper.resolveInfantryDeath(player, misses);
-                        }
-                        if (unitName.equalsIgnoreCase("mech")) {
-                            if (player.hasUnit("mykomentori_mech")) {
-                                for (int x = 0; x < misses; x++) {
-                                    ButtonHelper.rollMykoMechRevival(game, player);
-                                }
-                            }
-                            if (player.hasTech("sar")) {
-                                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                                    + " you gained " + misses + " trade good (" + player.getTg() + "->" + (player.getTg() + misses)
-                                    + ") from _Self-Assembly Routines_ because of " + misses + " of your mechs dying."
-                                    + " This is not an optional gain" + (misses > 1 ? ", and happens 1 trade good at a time" : "") + ".");
-                                for (int x = 0; x < misses; x++) {
-                                    player.setTg(player.getTg() + 1);
-                                    ButtonHelperAbilities.pillageCheck(player, game);
-                                }
-                                ButtonHelperAgents.resolveArtunoCheck(player, 1);
-                            }
-                        }
+                        DestroyUnitService.destroyUnits(event, tile, game, player.getColor(), misses + " " + unitName + " " + unitHolderName, true);
                         break;
                     }
                 }
@@ -535,7 +514,7 @@ public class CombatRollService {
                         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)) {
                             for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, tile, "pds")) {
                                 Planet planetUnit = game.getUnitHolderFromPlanet(planet);
-                                if ("space".equalsIgnoreCase(planetUnit.getName())) {
+                                if (planetUnit == null) {
                                     continue;
                                 }
                                 planet = planetUnit.getName();
@@ -559,7 +538,7 @@ public class CombatRollService {
                         List<Button> buttons = new ArrayList<>();
                         for (String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, activeSystem, "pds")) {
                             Planet planetUnit = game.getUnitHolderFromPlanet(planet);
-                            if ("space".equalsIgnoreCase(planetUnit.getName())) {
+                            if (planetUnit == null) {
                                 continue;
                             }
                             planet = planetUnit.getName();
@@ -602,8 +581,8 @@ public class CombatRollService {
             if (argentInfKills > 0) {
                 String kills = "\nDue to the Strike Wing Alpha II destroyer ability, " + argentInfKills + " of " + opponent.getRepresentation(false, true) + " infantry were destroyed\n";
                 resultBuilder.append(kills);
-                space.removeUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("infantry"), opponent.getColorID()), argentInfKills);
-                ButtonHelper.resolveInfantryDeath(opponent, argentInfKills);
+                UnitKey inf = Units.getUnitKey(UnitType.Infantry, opponent.getColorID());
+                DestroyUnitService.destroyUnit(event, activeSystem, game, inf, argentInfKills, space, true);
             }
         }
         result = resultBuilder.toString();

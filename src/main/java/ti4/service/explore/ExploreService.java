@@ -82,9 +82,9 @@ public class ExploreService {
             if (player.hasAbility("distant_suns")) {
                 String reportMessage = """
                     Garbozia exploration with **Distant Suns** is not implemented.\
-                    
+
                     Please use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration.\
-                    
+
                     -# (NB: Player chooses a trait, reveals two of that trait and one of each other; reveal four cards total.)""";
                 if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);

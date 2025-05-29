@@ -13,7 +13,6 @@ import ti4.helpers.Helper;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
-import ti4.service.game.ManagedGameService;
 
 class ListDeadGames extends Subcommand {
 
@@ -47,7 +46,9 @@ class ListDeadGames extends Subcommand {
             }
             if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
                 if (game.getActionsChannel() != null) {
+
                     channelCount += sendMessageToChannel(game, sb, delete);
+
                 }
                 Guild guild = game.getGuild();
                 if (guild == null) {
@@ -82,27 +83,27 @@ class ListDeadGames extends Subcommand {
         int channelCount = 0;
 
         if (AsyncTI4DiscordBot.getAvailablePBDCategories().contains(actionsChannel.getParentCategory()) &&
-                actionsChannel.getParentCategory() != null && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            actionsChannel.getParentCategory() != null && !actionsChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             sb.append(actionsChannel.getJumpUrl()).append("\n");
             channelCount++;
             if (delete) {
                 actionsChannel.delete().queue();
             } else {
                 warned = true;
-                MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
+                //MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
             }
         }
 
         var tableTalkChannel = game.getTableTalkChannel();
         if (tableTalkChannel != null && AsyncTI4DiscordBot.getAvailablePBDCategories().contains(tableTalkChannel.getParentCategory()) &&
-                tableTalkChannel.getParentCategory() != null && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
+            tableTalkChannel.getParentCategory() != null && !tableTalkChannel.getParentCategory().getName().toLowerCase().contains("limbo")) {
             if (tableTalkChannel.getName().contains(game.getName() + "-")) {
                 sb.append(tableTalkChannel.getJumpUrl()).append("\n");
                 channelCount++;
                 if (delete) {
                     tableTalkChannel.delete().queue();
                 } else if (!warned) {
-                    MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
+                    //MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
                 }
             }
         }

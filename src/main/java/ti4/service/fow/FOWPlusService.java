@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +20,7 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.image.Mapper;
+import ti4.helpers.Units.UnitKey;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -120,7 +120,7 @@ public class FOWPlusService {
         for (Button button : new ArrayList<>(ringButtons)) {
             if (button.getLabel().startsWith("Ring #")) {
                 String ring = button.getLabel().replace("Ring #", "");
-                int availableTiles = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left").size() 
+                int availableTiles = ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_left").size()
                     + ButtonHelper.getTileInARing(player, game, "ring_" + ring + "_right").size() - 2;
                 if (availableTiles == 0) {
                     ringButtons.remove(button);
@@ -130,22 +130,28 @@ public class FOWPlusService {
     }
 
     public static void resolveVoidActivation(Player player, Game game) {
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## Your ships continued their journey into The Void " 
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## Your ships continued their journey into The Void "
             + MiscEmojis.GravityRift + " never to be seen again...");
-        
-        Map<String, Integer> unitsGoingToVoid = game.getMovedUnitsFromCurrentActivation();
+
+        Map<String, Map<UnitKey, List<Integer>>> unitsGoingToVoid = game.getTacticalActionDisplacement();
         float valueOfUnitsLost = 0f;
         String unitEmojis = "";
-        for (Entry<String, Integer> unit : unitsGoingToVoid.entrySet()) {
-            UnitModel model = Mapper.getUnit(unit.getKey());
-            if (model != null) {
-                valueOfUnitsLost += model.getCost() * unit.getValue();
-                unitEmojis += StringUtils.repeat("" + model.getUnitEmoji(), unit.getValue());
+        for (var unitHolder : unitsGoingToVoid.values()) {
+            for (var unit : unitHolder.entrySet()) {
+                int total = unit.getValue().stream().collect(Collectors.summingInt(x -> x));
+                UnitModel model = player.getUnitFromUnitKey(unit.getKey());
+                if (model != null) {
+                    valueOfUnitsLost += model.getCost() * total;
+                    unitEmojis += StringUtils.repeat("" + model.getUnitEmoji(), total);
+                }
             }
         }
-        GMService.logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() 
-            + " lost " + unitEmojis + " (" + valueOfUnitsLost + " res) to The Void round " + game.getRound() + " turn " + player.getInRoundTurnCount(), null, true);
-        game.resetCurrentMovedUnitsFrom1TacticalAction();
+
+        String message = player.getRepresentationUnfoggedNoPing() + " lost " + valueOfUnitsLost + " resources ";
+        message += "to The Void round " + game.getRound() + " turn " + player.getInRoundTurnCount();
+        message += "\n> " + unitEmojis;
+        GMService.logPlayerActivity(game, player, message, null, true);
+        game.getTacticalActionDisplacement().clear();
     }
 
     //If the target position is void or hyperlane that does not connect to tile we are checking from

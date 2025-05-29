@@ -178,22 +178,7 @@ public class ButtonHelperFactionSpecific {
 
     }
 
-    @ButtonHandler("resolvePride_")
-    public static void resolvePride(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
-        String faction = buttonID.split("_")[1];
-        Player p2 = game.getPlayerFromColorOrFaction(faction);
-        ButtonHelper.deleteTheOneButton(event);
-        if (p2.getTotalVictoryPoints() == player.getTotalVictoryPoints()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you do not gain or lose honor when beating someone with the same amount of VPs as yourself.");
-        }
-        if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {
-            player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1 honor by beating someone with more VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
-        }
-        if (p2.getTotalVictoryPoints() < player.getTotalVictoryPoints()) {
-            player.setHonorCounter(Math.max(-8, player.getHonorCounter() - 1));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost 1 honor by beating someone with less VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
-        }
+    public static void correctHonorAbilities(Player player, Game game) {
         if (player.getHonorCounter() > 1) {
             if (!player.hasAbility("bestow")) {
                 player.addAbility("bestow");
@@ -273,6 +258,25 @@ public class ButtonHelperFactionSpecific {
                 }
             }
         }
+    }
+
+    @ButtonHandler("resolvePride_")
+    public static void resolvePride(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        ButtonHelper.deleteTheOneButton(event);
+        if (p2.getTotalVictoryPoints() == player.getTotalVictoryPoints()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you do not gain or lose honor when beating someone with the same amount of VPs as yourself.");
+        }
+        if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {
+            player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1 honor by beating someone with more VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+        }
+        if (p2.getTotalVictoryPoints() < player.getTotalVictoryPoints()) {
+            player.setHonorCounter(Math.max(-8, player.getHonorCounter() - 1));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost 1 honor by beating someone with less VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+        }
+        correctHonorAbilities(player, game);
 
     }
 
@@ -452,13 +456,8 @@ public class ButtonHelperFactionSpecific {
                 for (Tile tile : game.getTileMap().values()) {
                     UnitHolder unitHolder = tile.getUnitHolders().get("space");
                     if (unitHolder.getUnitCount(UnitType.Cavalry, player.getColor()) > 0) {
-                        if (unitHolder.getUnitDamage() != null
-                            && unitHolder.getUnitDamage()
-                                .get(Mapper.getUnitKey("cavalry", player.getColorID())) != null
-                            && unitHolder.getUnitDamage()
-                                .get(Mapper.getUnitKey("cavalry", player.getColorID())) > 0) {
-                            unitHolder.addDamagedUnit(
-                                Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+                        if (unitHolder.getDamagedUnitCount(UnitType.Cavalry, player.getColorID()) > 0) {
+                            unitHolder.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
                             unitHolder.removeDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
                         }
                         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "cavalry");

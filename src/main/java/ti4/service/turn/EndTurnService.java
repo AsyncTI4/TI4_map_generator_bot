@@ -48,10 +48,18 @@ public class EndTurnService {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
-    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+    public static void resetStoredValuesEndOfTurn(Game game, Player player) {
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");
+        game.removeStoredValue("mahactHeroTarget");
+        game.removeStoredValue("possiblyUsedRift");
+        game.setActiveSystem("");
+    }
+
+    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+        resetStoredValuesEndOfTurn(game, mainPlayer);
+
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -64,9 +72,6 @@ public class EndTurnService {
                 }
             }
         }
-        game.setStoredValue("mahactHeroTarget", "");
-        game.setActiveSystem("");
-        game.setStoredValue("possiblyUsedRift", "");
         if (game.isFowMode()) {
             FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"

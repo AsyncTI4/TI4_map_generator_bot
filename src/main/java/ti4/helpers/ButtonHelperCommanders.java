@@ -41,8 +41,10 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
+import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
 
 public class ButtonHelperCommanders {
@@ -438,7 +440,7 @@ public class ButtonHelperCommanders {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " placed 1 infantry in " + tile.getRepresentation()
                 + " using Hkot Tokal, the Khrask Commander.");
-        List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
+        List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -615,16 +617,6 @@ public class ButtonHelperCommanders {
                 }
             }
         }
-        if (player.hasUnit("kolume_mech")) {
-            for (Tile tile : game.getTileMap().values()) {
-                for (UnitHolder uH : tile.getUnitHolders().values()) {
-                    if (uH.getDamagedUnitCount(UnitType.Mech, player.getColor()) > 0) {
-                        uH.removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getDamagedUnitCount(UnitType.Mech, player.getColorID()));
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
-                    }
-                }
-            }
-        }
     }
 
     public static void resolveNekroCommanderCheck(Player player, String tech, Game game) {
@@ -688,10 +680,7 @@ public class ButtonHelperCommanders {
         String message = player.getRepresentation() + " chose to destroy 2 infantry on " + Helper.getPlanetRepresentation(planet, game) + " as part of the Pharadn Commander unlock";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         int amountToKill = 2;
-        if (player.hasInf2Tech()) {
-            ButtonHelper.resolveInfantryDeath(player, amountToKill);
-        }
-        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
+        DestroyUnitService.destroyUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet, false);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -715,16 +704,11 @@ public class ButtonHelperCommanders {
                 continue; // fix indoctrinate vs neutral
             }
             if (FoWHelper.playerHasInfantryOnPlanet(p2, tile, planet) && !player.getAllianceMembers().contains(p2.getFaction())) {
-                RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
-                if (player.hasInf2Tech()) {
-                    ButtonHelper.resolveInfantryDeath(p2, 1);
-                }
+                DestroyUnitService.destroyUnits(event, tile, game, p2.getColor(), "1 infantry " + planet, true);
                 break;
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " destroyed 1 opposing infantry on "
-                + Helper.getPlanetRepresentation(planet, game) + " using the Pharadn Commander.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " destroyed 1 opposing infantry on " + Helper.getPlanetRepresentation(planet, game) + " using the Pharadn Commander.");
     }
 
     @ButtonHandler("yssarilcommander_")

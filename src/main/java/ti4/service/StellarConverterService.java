@@ -4,17 +4,16 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.RandomHelper;
-import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.service.unit.DestroyUnitService;
 
 @UtilityClass
 public class StellarConverterService {
@@ -44,19 +43,7 @@ public class StellarConverterService {
             if (p2.getPlanets().contains(planetName)) {
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + " we regret to inform you but " + Mapper.getPlanet(planetName).getName() + " has been _Stellar Converter_'d.");
-                int amountToKill;
-                amountToKill = unitHolder.getUnitCount(Units.UnitType.Infantry, p2.getColor());
-                if (p2.hasInf2Tech()) {
-                    ButtonHelper.resolveInfantryDeath(p2, amountToKill);
-                    boolean cabalMech = unitHolder.getUnitCount(Units.UnitType.Mech,
-                        p2.getColor()) > 0
-                        && p2.hasUnit("cabal_mech")
-                        && !ButtonHelper.isLawInPlay(game, "articles_war");
-                    if (p2.hasAbility("amalgamation")
-                        && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) || cabalMech)) {
-                        ButtonHelperFactionSpecific.cabalEatsUnit(p2, game, p2, amountToKill, "infantry", event);
-                    }
-                }
+                DestroyUnitService.destroyAllUnits(event, tile, game, unitHolder, false);
             }
         }
         game.removePlanet(unitHolder);
