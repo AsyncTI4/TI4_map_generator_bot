@@ -79,6 +79,36 @@ public class WebHelper {
         }
     }
 
+    public static void putPlayerData(String gameId, Game game) {
+        if (!sendingToWeb())  return;
+
+        try {
+            List<WebPlayerArea> playerDataList = new ArrayList<>();
+            for (Player player : game.getPlayers().values()) {
+                playerDataList.add(WebPlayerArea.fromPlayer(player));
+            }
+            String json = objectMapper.writeValueAsString(playerDataList);
+
+
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format("webdata/%s/%s.json", gameId, gameId))
+                    .contentType("application/json")
+                    .cacheControl("no-cache, no-store, must-revalidate")
+                    .build();
+
+            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
+                    .exceptionally(e -> {
+                        BotLogger.error(
+                                "An exception occurred while performing an async send of overlay data to the website.",
+                                e);
+                        return null;
+                    });
+        } catch (IOException e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
+        }
+    }
+
     public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
         if (!sendingToWeb()) return;
 
