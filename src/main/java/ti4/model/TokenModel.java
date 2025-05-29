@@ -80,7 +80,6 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        //ex: https://discord.com/channels/943410040369479690/1341438476528123904/1376380617411002483
         return getId().contains(searchString)
             || (getAliasList() != null && getAliasList().toString().contains(searchString))
             || getSource().toString().contains(searchString)
