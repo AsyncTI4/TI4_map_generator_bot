@@ -739,6 +739,9 @@ public class Constants {
     public static final String PRIORITY_TRACK = "priority_track";
     public static final String OMEGA_PHASE_MODE = "omega_phase_mode";
 
+    //Other Priority Track implementations
+    public static final String PRIORITY_TRACK_MODE = "priority_track_mode";
+
     public static final String ADD_CUSTOM = "po_add_custom";
     public static final String MAKE_SO_INTO_PO = "so_into_po";
     public static final String SO_TO_PO = "so_to_po";

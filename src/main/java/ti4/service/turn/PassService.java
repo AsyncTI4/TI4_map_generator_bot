@@ -78,7 +78,7 @@ public class PassService {
             }
         }
 
-        if (game.isOmegaPhaseMode()) {
+        if (game.hasAnyPriorityTrackMode()) {
             PriorityTrackHelper.AssignPlayerToPriority(game, player, null);
         }
 

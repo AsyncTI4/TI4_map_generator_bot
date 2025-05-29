@@ -28,6 +28,7 @@ import ti4.commands.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
@@ -742,6 +743,15 @@ public class AutoCompleteProvider {
             case Constants.RANDOM_TYPE -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Arrays.asList(RandomOption.values()).stream()
+                    .filter(value -> value.search(enteredValue))
+                    .limit(25)
+                    .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.PRIORITY_TRACK -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Arrays.asList(PriorityTrackMode.values()).stream()
                     .filter(value -> value.search(enteredValue))
                     .limit(25)
                     .map(value -> new Command.Choice(value.getAutoCompleteName(), value.toString()))

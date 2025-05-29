@@ -2834,6 +2834,8 @@ public class UnfiledButtonHandlers {
         String readiedCardsString = "All planets have been readied at the end of the agenda phase.";
         if (game.isOmegaPhaseMode()) {
             readiedCardsString = "All cards have been readied at the end of the omega phase.";
+        }
+        if (game.hasAnyPriorityTrackMode()) {
             if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
                 PriorityTrackHelper.PrintPriorityTrack(game);
@@ -3010,7 +3012,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("startStrategyPhase")
     public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
-        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+        if (game.hasAnyPriorityTrackMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
             PriorityTrackHelper.PrintPriorityTrack(game);
             return;
@@ -3339,7 +3341,7 @@ public class UnfiledButtonHandlers {
             ButtonHelper.offerSpeakerButtons(game, player);
             return;
         }
-        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+        if (game.hasAnyPriorityTrackMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             PriorityTrackHelper.CreateDefaultPriorityTrack(game);
             if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to fill the Priority Track with the default seating order. Use `/omegaphase assign_player_priority` to fill the track before proceeding.");

@@ -1,6 +1,7 @@
 package ti4.helpers.omega_phase;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import ti4.helpers.Helper;
@@ -150,6 +151,37 @@ public class PriorityTrackHelper {
                     break;
                 }
             }
+        }
+    }
+
+    public enum PriorityTrackMode {
+        NONE("Priority Track not used"), BASIC("Use to select Strategy Cards"), AFTER_SPEAKER("Use to select remaining Strategy Cards after the Speaker"), THIS_ROUND_ONLY("Use to select Strategy Cards for a single round"), FULL("Replace Speaker order fully, and score in Priority order");
+
+        private final String description;
+
+        PriorityTrackMode(String description) {
+            this.description = description;
+        }
+
+        public String getAutoCompleteName() {
+            return this + ": " + description;
+        }
+
+        public boolean search(String searchString) {
+            return toString().toLowerCase().contains(searchString) || description.toLowerCase().contains(searchString);
+        }
+
+        public static boolean isValid(String value) {
+            return EnumSet.allOf(PriorityTrackMode.class).stream().anyMatch(r -> value.equals(r.name()));
+        }
+
+        public static PriorityTrackMode parse(String value) {
+            for (PriorityTrackMode mode : PriorityTrackMode.values()) {
+                if (mode.name().equalsIgnoreCase(value) || mode.description.equalsIgnoreCase(value)) {
+                    return mode;
+                }
+            }
+            throw new IllegalArgumentException("Invalid PriorityTrackMode: " + value);
         }
     }
 }

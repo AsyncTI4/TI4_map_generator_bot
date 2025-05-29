@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.map.Game;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
@@ -48,7 +49,19 @@ public class DataMigrationManager {
         migrations.put("removeWekkersAbsolsPoliticalSecret_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecrets);
         migrations.put("removeWekkersAbsolsPoliticalSecretAgain_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
         migrations.put("warnGamesWithOldDisplaceMap_270525", MigrationHelper::warnGamesWithOldDisplaceMap);
+        migrations.put("splitPriorityTrackIntoSeparateMode_240525", DataMigrationManager::splitPriorityTrackIntoSeparateMode_240525);
         //migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
+    }
+
+    public static boolean splitPriorityTrackIntoSeparateMode_240525(Game game) {
+        if (game.isOmegaPhaseMode()) {
+            game.setPriorityTrackMode(PriorityTrackMode.FULL);
+            return true;
+        } else if (game.getPriorityTrackMode() == null) {
+            game.setPriorityTrackMode(PriorityTrackMode.NONE);
+            return true;
+        }
+        return false;
     }
 
     public static boolean runMigrations() {
