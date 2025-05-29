@@ -79,7 +79,7 @@ public class WebPlayerArea {
     private float spaceArmyCombat;
     private float groundArmyCombat;
 
-    private List<Integer> unfollowedScs;
+    private List<Integer> unfollowedSCs;
 
     public static WebPlayerArea fromPlayer(Player player) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -153,7 +153,7 @@ public class WebPlayerArea {
         webPlayerArea.setSpaceArmyCombat(player.getTotalCombatValueOfUnits("space"));
         webPlayerArea.setGroundArmyCombat(player.getTotalCombatValueOfUnits("ground"));
 
-        webPlayerArea.setUnfollowedScs(player.getUnfollowedSCs());
+        webPlayerArea.setUnfollowedSCs(player.getUnfollowedSCs());
 
         return webPlayerArea;
     }
