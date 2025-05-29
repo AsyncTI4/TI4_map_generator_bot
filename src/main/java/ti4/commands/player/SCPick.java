@@ -93,12 +93,7 @@ class SCPick extends GameStateSubcommand {
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
-        List<Player> activePlayers = game.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .collect(Collectors.toList());
-        if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
-            Collections.reverse(activePlayers);
-        }
+        List<Player> activePlayers = PickStrategyCardService.getSCPickOrder(game);
         int maxSCsPerPlayer = game.getStrategyCardsPerPlayer();
         if (maxSCsPerPlayer < 1) {
             maxSCsPerPlayer = 1;
