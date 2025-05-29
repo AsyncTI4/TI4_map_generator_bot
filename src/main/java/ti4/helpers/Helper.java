@@ -889,17 +889,15 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanetsAllianceMode());
         player.resetProducedUnits();
         for (String planet : planets) {
-            if (planet.contains("ghoti") || planet.contains("custodia")) {
-                continue;
-            }
-            UnitHolder uH = game.getUnitHolderFromPlanet(planet);
-            boolean containsDMZ = uH.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
+            UnitHolder uh = game.getUnitHolderFromPlanet(planet);
+            if (uh == null) continue; // custodia, ghoti, etc.
+
+            boolean containsDMZ = uh.getTokenList().stream().anyMatch(token -> token.contains("dmz"));
             if (containsDMZ) {
                 continue;
             }
             if (unit.equalsIgnoreCase("spacedock")) {
-
-                if (uH == null || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
+                if (uh == null || uh.getUnitCount(UnitType.Spacedock, player) > 0) {
                     continue;
                 }
             }
@@ -924,9 +922,8 @@ public class Helper {
             if (game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
                 continue;
             }
-            Button button = Buttons.red("FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + planet,
-                getPlanetRepresentation(planet, game), unitKey.unitEmoji());
-            planetButtons.add(button);
+            String id = player.finChecker() + prefix + "_" + unit + "_" + planet;
+            planetButtons.add(Buttons.red(id, getPlanetRepresentation(planet, game), unitKey.unitEmoji()));
         }
         return planetButtons;
     }
@@ -935,10 +932,8 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
-            Button button = Buttons.red(
-                "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
-                tile.getRepresentationForButtons(game, player));
-            planetButtons.add(button);
+            String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+            planetButtons.add(Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
         }
         return planetButtons;
     }
@@ -948,10 +943,8 @@ public class Helper {
         List<Tile> tiles = ButtonHelper.getTilesWithTrapsInTheSystem(game);
         for (Tile tile : tiles) {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                Button button = Buttons.red(
-                    "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player));
-                planetButtons.add(button);
+                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                planetButtons.add(Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
         }
         return planetButtons;
@@ -962,10 +955,8 @@ public class Helper {
         List<Tile> tiles = ButtonHelper.getTilesForCheiranHero(player, game);
         for (Tile tile : tiles) {
             if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
-                Button button = Buttons.red(
-                    "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player));
-                planetButtons.add(button);
+                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                planetButtons.add(Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
         }
         return planetButtons;
@@ -976,10 +967,8 @@ public class Helper {
         List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, game);
         for (Tile tile : tiles) {
             if (CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
-                Button button = Buttons.red(
-                    "FFCC_" + player.getFaction() + "_" + prefix + "_" + unit + "_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player));
-                planetButtons.add(button);
+                String id = player.finChecker() + prefix + "_" + unit + "_" + tile.getPosition();
+                planetButtons.add(Buttons.red(id, tile.getRepresentationForButtons(game, player), UnitEmojis.getUnitEmoji(unit)));
             }
         }
         return planetButtons;
@@ -1106,7 +1095,6 @@ public class Helper {
         }
         int tg = player.getSpentTgsThisWindow();
         boolean xxchaHero = player.hasLeaderUnlocked("xxchahero");
-
         int bestRes = 0;
         int keleresAgent = 0;
         for (String thing : spentThings) {
@@ -1486,7 +1474,6 @@ public class Helper {
         }
 
         return productionValueTotal;
-
     }
 
     public static int getProductionValue(Player player, Game game, Tile tile, boolean singleDock) {
@@ -2332,10 +2319,10 @@ public class Helper {
             if (tile == null) {
                 tile = player.getHomeSystemTile();
             }
-            boolean ghosty = player.getPlayerStatsAnchorPosition() != null
+            boolean ghostish = player.getPlayerStatsAnchorPosition() != null
                 && game.getTileByPosition(player.getPlayerStatsAnchorPosition()) != null
                 && "17".equals(game.getTileByPosition(player.getPlayerStatsAnchorPosition()).getTileID());
-            if ((player.getFaction().contains("ghost") && game.getTile("17") != null) || ghosty) {
+            if ((player.getFaction().contains("ghost") && game.getTile("17") != null) && ghostish) {
                 tile = game.getTile("17");
             }
             if (tile != null) {

@@ -13,7 +13,6 @@ import ti4.helpers.Helper;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.MessageHelper;
-import ti4.service.game.ManagedGameService;
 
 class ListDeadGames extends Subcommand {
 
@@ -48,11 +47,8 @@ class ListDeadGames extends Subcommand {
             if (game.isHasEnded() || milliSinceLastTurnChange > 5259600000L) {
                 if (game.getActionsChannel() != null) {
 
-                    if (delete) {
-                        channelCount += sendMessageToChannel(game, sb, delete);
-                    } else {
-                        channelCount += 1;
-                    }
+                    channelCount += sendMessageToChannel(game, sb, delete);
+
                 }
                 Guild guild = game.getGuild();
                 if (guild == null) {
@@ -94,7 +90,7 @@ class ListDeadGames extends Subcommand {
                 actionsChannel.delete().queue();
             } else {
                 warned = true;
-                MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
+                //MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
             }
         }
 
@@ -107,7 +103,7 @@ class ListDeadGames extends Subcommand {
                 if (delete) {
                     tableTalkChannel.delete().queue();
                 } else if (!warned) {
-                    MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
+                    //MessageHelper.sendMessageToChannel(actionsChannel, ManagedGameService.getPingAllPlayers(game) + WARNING_MESSAGE);
                 }
             }
         }

@@ -346,7 +346,7 @@ public class StatusHelper {
             UnitKey infKey = Mapper.getUnitKey("gf", colorID);
             for (Tile tile : game.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder.getUnits() == null) continue;
+                    if (!unitHolder.hasUnits()) continue;
                     if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                         unitHolder.addUnit(infKey, 1);
                         String genesisMessage = player.getRepresentationUnfogged() + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";

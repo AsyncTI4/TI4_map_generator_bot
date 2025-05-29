@@ -54,7 +54,7 @@ public class PlanetLayoutModel {
         double theta = switch (resourcesLocation) {
             case BottomRight -> 225.0;
             case BottomLeft -> 325.0;
-            case TopLeft -> 135.0;
+            case TopLeft -> 25.0;
             case TopRight -> 45.0;
         };
         double deltaTheta = switch (resourcesLocation) {

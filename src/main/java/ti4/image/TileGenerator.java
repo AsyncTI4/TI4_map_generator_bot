@@ -293,7 +293,7 @@ public class TileGenerator {
                     Point draftNumPosition = new Point(85, 140);
 
                     if (tileID.endsWith("blank")) {
-                        //tiny tile
+                        // tiny tile
                         String greenPath = ResourceHelper.getInstance().getTileFile("00_green.png");
                         BufferedImage green = ImageHelper.readScaled(greenPath, 73, 63);
                         tileGraphics.drawImage(green, TILE_PADDING + 49, TILE_PADDING + 119, null);
@@ -520,8 +520,7 @@ public class TileGenerator {
                     if (unitHolder != spaceUnitHolder) {
                         addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
                     }
-                    new UnitRenderGenerator(
-                        game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer).render();
+                    new UnitRenderGenerator(game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer).render();
                 }
             }
             case Distance -> {
@@ -1283,7 +1282,7 @@ public class TileGenerator {
     private void addCC(Tile tile, Graphics tileGraphics, UnitHolder unitHolder) {
         int deltaX = 0;
         int deltaY = 0;
-        for (String ccID : unitHolder.getCCList()) {
+        for (String ccID : unitHolder.getCcList()) {
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
                 continue;

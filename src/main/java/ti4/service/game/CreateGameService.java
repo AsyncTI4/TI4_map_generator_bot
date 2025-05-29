@@ -172,8 +172,8 @@ public class CreateGameService {
         newGame.setMainChannelID(actionsChannel.getId());
 
         for (Member botHelper : nonGameBothelpers) {
-            chatChannel.getManager().putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
-            actionsChannel.getManager().putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
+            chatChannel.getManager().putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).queue();
+            actionsChannel.getManager().putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).queue();
         }
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)

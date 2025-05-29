@@ -18,6 +18,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.combat.StartCombatService;
+import ti4.service.tactical.TacticalActionService;
 import ti4.service.unit.AddUnitService;
 
 public class AddUnits extends GameStateCommand {
@@ -39,18 +40,12 @@ public class AddUnits extends GameStateCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri")
-                .setRequired(true),
-            new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Eg. 2 infantry primor, carrier, 2 fighter, mech pri").setRequired(true),
+            new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements").setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true),
             new OptionData(OptionType.BOOLEAN, Constants.SLING_RELAY, "Declare use of and exhaust Sling Relay technology"),
-            new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command")
-        );
+            new OptionData(OptionType.BOOLEAN, Constants.NO_MAPGEN, "'True' to not generate a map update with this command"));
     }
 
     @Override
@@ -64,17 +59,17 @@ public class AddUnits extends GameStateCommand {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString();
         UnitHolder space = tile.getUnitHolders().get("space");
         boolean doesTileHaveFloatingGF = false;
-        if(space != null && getPlayer().getColor() != null){
+        if (space != null && getPlayer().getColor() != null) {
             doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0 || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
         }
         AddUnitService.addUnits(event, tile, game, color, unitList);
-        if(space != null && getPlayer().getColor() != null && !doesTileHaveFloatingGF && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tile).isEmpty()){
+        if (space != null && getPlayer().getColor() != null && !doesTileHaveFloatingGF && ButtonHelper.getOtherPlayersWithShipsInTheSystem(getPlayer(), game, tile).isEmpty()) {
             doesTileHaveFloatingGF = space.getUnitCount(UnitType.Mech, getPlayer()) > 0 || space.getUnitCount(UnitType.Infantry, getPlayer()) > 0;
-            if(doesTileHaveFloatingGF){
-                List<Button> buttons = ButtonHelper.getLandingTroopsButtons(getPlayer(), game, event, tile);
+            if (doesTileHaveFloatingGF) {
+                List<Button> buttons = TacticalActionService.getLandingTroopsButtons(game, getPlayer(), tile);
                 Button concludeMove = Buttons.red(getPlayer().getFinsFactionCheckerPrefix() + "deleteButtons", "Done Landing Troops");
                 buttons.add(concludeMove);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), getPlayer().getRepresentation()+" you can use these buttons to land troops if necessary",buttons);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), getPlayer().getRepresentation() + " you can use these buttons to land troops if necessary", buttons);
             }
         }
         StartCombatService.combatCheck(game, event, tile);
