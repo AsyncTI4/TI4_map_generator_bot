@@ -27,7 +27,7 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
         }
 
         Player commandUser = game.getPlayer(event.getUser().getId());
-        if (player != commandUser && !game.getPlayersWithGMRole().contains(commandUser)) {
+        if (player.getFaction() != commandUser.getFaction() && !game.getPlayersWithGMRole().contains(commandUser)) {
             MessageHelper.replyToMessage(event, "Only GM can use this for another player.");
             return;
         }
