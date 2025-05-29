@@ -166,9 +166,6 @@ public class AnnotationHandler {
                             .queue();
                     }
                 }
-                //help track down issues like this one by adding context to the error
-                //ex: https://discord.com/channels/943410040369479690/1341438476528123904/1376507434323148830
-                //ex: https://discord.com/channels/943410040369479690/1341438476528123904/1376239752226799661
                 BotLogger.error(origin, "Error within handler \"" + method.getDeclaringClass().getSimpleName() + "#" + method.getName() + "\":", e.getCause());
             } catch (Exception e) {
                 List<String> paramTypes = Arrays.stream(method.getParameters()).map(param -> param.getType().getSimpleName()).toList();
@@ -241,7 +238,6 @@ public class AnnotationHandler {
                             val = bh.value();
                             save = bh.save();
                         }
-                        ;
                         if (handler instanceof SelectionHandler sh) val = sh.value();
                         if (handler instanceof ModalHandler mh) val = mh.value();
                         if (val == null) continue;

@@ -142,10 +142,6 @@ public class PromissoryNoteHelper {
                 BotLogger.warning(new LogMessageOrigin(player), pnShortHand + " has no owner in game " + game.getName() + ".");
                 continue;
             }
-            //weird situations where PN exists in player's hand, but the owner can't be found.
-            //ex: https://discord.com/channels/943410040369479690/1341438476528123904/1376627814006132906
-            //ex2: https://discord.com/channels/943410040369479690/1341438476528123904/1376262769535483989
-            //ex3: https://discord.com/channels/943410040369479690/1341438476528123904/1376748910273364080
 
             Button transact;
             if (game.isFowMode()) {
