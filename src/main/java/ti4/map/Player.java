@@ -142,6 +142,10 @@ public class Player extends PlayerProperties {
         return nomboxTile;
     }
 
+    public UnitHolder getNombox() {
+        return nomboxTile.getSpaceUnitHolder();
+    }
+
     public void resetProducedUnits() {
         currentProducedUnits = new HashMap<>();
     }
@@ -2168,11 +2172,8 @@ public class Player extends PlayerProperties {
 
     public boolean hasMechInSystem(Tile tile) {
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        String colorID = Mapper.getColorID(getColor());
         for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty())
-                continue;
-            if (unitHolder.getUnitCount(UnitType.Mech, colorID) > 0) {
+            if (unitHolder.getUnitCount(UnitType.Mech, getColorID()) > 0) {
                 return true;
             }
         }

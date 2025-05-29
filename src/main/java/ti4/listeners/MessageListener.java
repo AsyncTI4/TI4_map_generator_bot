@@ -67,10 +67,14 @@ public class MessageListener extends ListenerAdapter {
                 TextChannel deletionLogChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
                     .findFirst().orElse(null);
                 if (deletionLogChannel == null) return;
+                String msg = "Message from dicecord: " + message.getContentRaw() + " " + message.getContentStripped() + " " + message.getContentDisplay() + " \nHere: " + message.getJumpUrl();
+                if (!message.getComponents().isEmpty()) {
+                    msg += "\n" + message.getComponents().getFirst().getType().name();
+                }
                 if (!message.getEmbeds().isEmpty()) {
-                    MessageHelper.sendMessageToChannelWithEmbeds(deletionLogChannel, "Message from dicecord: " + message.getContentRaw() + "\nHere: " + message.getJumpUrl(), message.getEmbeds());
+                    MessageHelper.sendMessageToChannelWithEmbeds(deletionLogChannel, msg, message.getEmbeds());
                 } else {
-                    MessageHelper.sendMessageToChannel(deletionLogChannel, "Message from dicecord: " + message.getContentRaw() + "\nHere: " + message.getJumpUrl());
+                    MessageHelper.sendMessageToChannel(deletionLogChannel, msg + "\n No embeds");
                 }
                 return;
             }

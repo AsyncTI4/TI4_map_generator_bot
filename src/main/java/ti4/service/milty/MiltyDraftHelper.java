@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +31,7 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
+import ti4.model.TileModel.TileBack;
 import ti4.model.TileModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.MiscEmojis;
@@ -40,6 +42,8 @@ import ti4.service.milty.MiltyDraftManager.PlayerDraft;
 
 @UtilityClass
 public class MiltyDraftHelper {
+
+    private static final Map<String, MiltyDraftTile> tiles = new HashMap<>();
 
     public static void generateAndPostSlices(Game game) {
         MessageChannel mainGameChannel = game.getMainGameChannel();
@@ -260,56 +264,52 @@ public class MiltyDraftHelper {
         initDraftTiles(manager, sources);
     }
 
+    private static MiltyDraftTile getDraftTileFromModel(TileModel tileModel) {
+        String tileID = tileModel.getId();
+        if (tiles.containsKey(tileID)) return tiles.get(tileID);
+
+        Set<WormholeModel.Wormhole> wormholes = tileModel.getWormholes();
+        MiltyDraftTile draftTile = new MiltyDraftTile();
+        if (wormholes != null) {
+            for (WormholeModel.Wormhole wormhole : wormholes) {
+                if (WormholeModel.Wormhole.ALPHA == wormhole) {
+                    draftTile.setHasAlphaWH(true);
+                } else if (WormholeModel.Wormhole.BETA == wormhole) {
+                    draftTile.setHasBetaWH(true);
+                } else {
+                    draftTile.setHasOtherWH(true);
+                }
+            }
+        }
+
+        Tile tile = new Tile(tileID, "none");
+        draftTile.setTile(tile);
+
+        for (Planet planet : tile.getPlanetUnitHolders()) {
+            draftTile.addPlanet(planet);
+        }
+
+        if (tile.isAnomaly()) {
+            draftTile.setTierList(TierList.anomaly);
+        } else if (tile.getPlanetUnitHolders().isEmpty()) {
+            draftTile.setTierList(TierList.red);
+        } else {
+            draftTile.setTierList(TierList.high);
+        }
+
+        tiles.put(tileID, draftTile);
+        return draftTile;
+    }
+
     public static void initDraftTiles(MiltyDraftManager draftManager, List<ComponentSource> sources) {
         List<TileModel> allTiles = new ArrayList<>(TileHelper.getAllTileModels());
         for (TileModel tileModel : allTiles) {
-            String tileID = tileModel.getId();
-            if (isInvalid(tileModel)) {
-                continue;
-            }
-            Set<WormholeModel.Wormhole> wormholes = tileModel.getWormholes();
-            MiltyDraftTile draftTile = new MiltyDraftTile();
-            if (wormholes != null) {
-                for (WormholeModel.Wormhole wormhole : wormholes) {
-                    if (WormholeModel.Wormhole.ALPHA == wormhole) {
-                        draftTile.setHasAlphaWH(true);
-                    } else if (WormholeModel.Wormhole.BETA == wormhole) {
-                        draftTile.setHasBetaWH(true);
-                    } else {
-                        draftTile.setHasOtherWH(true);
-                    }
-                }
-            }
+            if (isInvalid(tileModel)) continue;
 
-            boolean sourceAllowed = sources.contains(tileModel.getSource());
+            if (!sources.contains(tileModel.getSource())) continue;
+            if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 
-            // leaving these as a stop-gap for now until I can verify all sources are setup
-            if (tileID.length() <= 2) sourceAllowed = true;
-            if (tileID.matches("d\\d{1,3}") && sources.contains(ComponentSource.ds)) sourceAllowed = true;
-
-            if (!sourceAllowed) continue;
-
-            Tile tile = new Tile(tileID, "none");
-            if (tile.isHomeSystem() || tile.getTileModel().isHyperlane()) {
-                continue;
-            }
-
-            draftTile.setTile(tile);
-            Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-            for (UnitHolder unitHolder : unitHolders.values()) {
-                if (unitHolder instanceof Planet planet) {
-                    draftTile.addPlanet(planet);
-                }
-            }
-
-            if (tile.isAnomaly()) {
-                draftTile.setTierList(TierList.anomaly);
-            } else if (tile.getPlanetUnitHolders().isEmpty()) {
-                draftTile.setTierList(TierList.red);
-            } else {
-                draftTile.setTierList(TierList.high);
-            }
-
+            MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
             draftManager.addDraftTile(draftTile);
         }
     }

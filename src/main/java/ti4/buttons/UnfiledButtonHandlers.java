@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
@@ -47,7 +47,6 @@ import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.ObjectiveHelper;
 import ti4.helpers.PlayerPreferenceHelper;
@@ -56,10 +55,10 @@ import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.Units.UnitKey;
-import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
+import ti4.listeners.ButtonListener;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -74,6 +73,7 @@ import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
+import ti4.model.UnitModel;
 import ti4.service.PlanetService;
 import ti4.service.StatusCleanupService;
 import ti4.service.button.ReactionService;
@@ -96,15 +96,18 @@ import ti4.service.objectives.ScorePublicObjectiveService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.player.RefreshCardsService;
 import ti4.service.strategycard.PlayStrategyCardService;
+import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 
-/*
+/**
+ * TODO: move all of these methods to a better location, closer to the original button call and/or other related code
  * Buttons methods which were factored out of {@link ButtonListener} which need to be filed away somewhere more appropriate
  */
-public class UnfiledButtonHandlers { // TODO: move all of these methods to a better location, closer to the original
-                                     // button call and/or other related code
+@UtilityClass
+public class UnfiledButtonHandlers {
 
     @ButtonHandler("declareUse_")
     public static void declareUse(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
@@ -180,15 +183,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("genericRemove_")
     public static void genericRemove(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("genericRemove_", "");
-        game.resetCurrentMovedUnitsFrom1System();
-        game.resetCurrentMovedUnitsFrom1TacticalAction();
-        List<Button> systemButtons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game,
-            game.getTileByPosition(pos), "Remove");
-        game.resetCurrentMovedUnitsFrom1System();
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Chose to remove units from " + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            "Use buttons to select the units you wish to remove.", systemButtons);
+
+        game.getTacticalActionDisplacement().clear();
+        List<Button> systemButtons = ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, game.getTileByPosition(pos), "Remove");
+
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Chose to remove units from " + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the units you wish to remove.", systemButtons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -454,11 +454,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String planet = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(event.getChannel(),
             player.getFaction() + " used _X-89 Bacterial Weapon_ to remove all ground forces on " + planet + ".");
+
+        Tile tile = game.getTileFromPlanet(planet);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-        Map<UnitKey, Integer> units = new HashMap<>(uH.getUnits());
-        for (UnitKey unit : units.keySet()) {
-            if (unit.getUnitType() == UnitType.Mech || unit.getUnitType() == UnitType.Infantry) {
-                uH.removeUnit(unit, units.get(unit));
+        Set<UnitKey> units = new HashSet<>(uH.getUnitsByState().keySet());
+        for (UnitKey unit : units) {
+            if (game.getPlayerByUnitKey(unit).map(p -> p.getUnitFromUnitKey(unit)).map(UnitModel::getIsGroundForce).orElse(false)) {
+                int amt = uH.getUnitCount(unit);
+                DestroyUnitService.destroyUnit(event, tile, game, unit, amt, uH, true);
             }
         }
     }
@@ -819,27 +822,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
     @ButtonHandler("getRepairButtons_")
     public static void getRepairButtons(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.replace("getRepairButtons_", "");
-        List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game,
-            game.getTileByPosition(pos));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentationUnfogged() + " Use buttons to resolve", buttons);
-    }
-
-    @ButtonHandler("getDamageButtons_")
-    public static void getDamageButtons(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        if (buttonID.contains("deleteThis")) {
-            buttonID = buttonID.replace("deleteThis", "");
-            ButtonHelper.deleteMessage(event);
-        }
-        String pos = buttonID.split("_")[1];
-        String assignType = "combat";
-        if (buttonID.split("_").length > 2) {
-            assignType = buttonID.split("_")[2];
-        }
-        List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game,
-            game.getTileByPosition(pos), assignType);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentationUnfogged() + " Use buttons to resolve", buttons);
+        List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, game.getTileByPosition(pos));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentationUnfogged() + " Use buttons to resolve", buttons);
     }
 
     @ButtonHandler("refreshViewOfSystem_")
@@ -1583,13 +1567,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         }
     }
 
+    // TODO: bake this into /ac play
     @ButtonHandler(Constants.AC_PLAY_FROM_HAND)
-    public static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) { // TODO:
-                                                                                                                 // bake
-                                                                                                                 // this
-                                                                                                                 // into
-                                                                                                                 // /ac
-                                                                                                                 // play
+    public static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
         MessageChannel channel = game.getMainGameChannel();
         if (acID.contains("sabo")) {
@@ -1901,9 +1881,8 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
                 if (game.isNaaluAgent()) {
                     player = game.getPlayer(game.getActivePlayerID());
-                    game.setNaaluAgent(false);
                 }
-                game.setStoredValue("tnelisCommanderTracker", "");
+                ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
 
                 String message = player.getRepresentationUnfogged()
                     + " Use buttons to end turn or do another action.";
@@ -1969,11 +1948,12 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (matchingFactionReactions >= numberOfPlayers) {
             respondAllPlayersReacted(event, game);
             GameMessageManager.remove(game.getName(), messageId);
-        } else if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring"))) {
+        } else if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand"))) {
             boolean allReacted = true;
             for (Player player : game.getRealPlayers()) {
                 String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
-                if (po.isEmpty()) {
+                String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
+                if (po.isEmpty() || so.isEmpty() || game.getPhaseOfGame().contains("action")) {
                     allReacted = false;
                 }
             }
@@ -1988,7 +1968,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         if (game == null || buttonID == null) {
             return;
         }
-        if (buttonID.startsWith(Constants.PO_SCORING)) {
+        if (buttonID.startsWith(Constants.PO_SCORING) || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand")) {
             buttonID = Constants.PO_SCORING;
         } else if ((buttonID.startsWith(Constants.SC_FOLLOW) || buttonID.startsWith("sc_no_follow"))) {
             buttonID = Constants.SC_FOLLOW;
@@ -2010,7 +1990,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             case "no_after", "no_after_persistent" -> ReactionService.handleAllPlayersReactingNoAfters(event.getInteraction().getMessage(), game);
             case "no_sabotage" -> ReactionService.handleAllPlayersReactingNoSabotage(event.getInteraction().getMessage(), game);
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
-                String message2 = "All players have indicated public scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
+                String message2 = "All players have indicated scoring. Flip the relevant public objective using the buttons. This will automatically run status clean-up if it has not been run already.";
                 Button draw2Stage2 = Buttons.green("reveal_stage_2x2", "Reveal 2 Stage 2");
                 Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
                 Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
@@ -2044,7 +2024,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
                         buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
                     }
                 }
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), message2, buttons);
             }
             case "pass_on_abilities" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
@@ -2172,18 +2152,14 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteMessage(event);
     }
 
+    // TODO: support yin spinner into space
     @ButtonHandler("startYinSpinner")
     public static void startYinSpinner(ButtonInteractionEvent event, Player player, Game game) {
         MessageHelper.sendMessageToChannel(event.getChannel(),
             player.getRepresentationNoPing() + " is using _Yin Spinner_.");
         List<Button> buttons = new ArrayList<>(
             Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
-        String message = "Use buttons to drop 2 infantry on a planet. Technically you may also drop 2 infantry with your ships, but this ain't supported yet via button."; // TODO:
-                                                                                                                                                                           // support
-                                                                                                                                                                           // yin
-                                                                                                                                                                           // spinner
-                                                                                                                                                                           // into
-                                                                                                                                                                           // space
+        String message = "Use buttons to drop 2 infantry on a planet. Technically you may also drop 2 infantry with your ships, but this ain't supported yet via button.";
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
@@ -2193,9 +2169,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String message = "Please choose what kind of component action you wish to do.";
         List<Button> systemButtons = ComponentActionHelper.getAllPossibleCompButtons(game, player, event);
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, systemButtons);
-        // if (!game.isFowMode()) {
-        // ButtonHelper.deleteMessage(event);
-        // }
     }
 
     @ButtonHandler("corefactoryAction")
@@ -2411,7 +2384,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
             purgeOrExhaust + ExploreEmojis.Relic + " relic: " + relicName);
         ButtonHelper.deleteMessage(event);
         String message = "Choose a system to move from.";
-        List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
+        List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
     }
 
@@ -2513,17 +2486,6 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         ButtonHelper.deleteTheOneButton(event);
         ReactionService.addReaction(event, game, player, false, true, "Running Status Cleanup. ",
             "Status Cleanup Run!");
-    }
-
-    @ButtonHandler("ChooseDifferentDestination")
-    public static void chooseDifferentDestination(ButtonInteractionEvent event, Player player, Game game) {
-        String message = "Choosing a different system to activate. Please select the ring of the map that the system you wish to activate is located in.";
-        if (!game.isFowMode()) {
-            message += " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
-        }
-        List<Button> ringButtons = ButtonHelper.getPossibleRings(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("willRevolution")
@@ -2711,7 +2673,7 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
         String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1);
         boolean failed = false;
         if (labelP.contains("inf") && labelP.contains("mech")) {
-            message += ExploreHelper.checkForMechOrRemoveInf(planetName, game, player);
+            message += "Please resolve removing infantry manually, if applicable.";
             failed = message.contains("Please try again.");
         }
         if (!failed) {
@@ -3270,9 +3232,9 @@ public class UnfiledButtonHandlers { // TODO: move all of these methods to a bet
 
     @ButtonHandler("refreshLandingButtons")
     public static void refreshLandingButtons(ButtonInteractionEvent event, Player player, Game game) {
-        List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event);
-        event.getMessage().editMessage(event.getMessage().getContentRaw())
-            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+        Tile tile = game.getTileByPosition(game.getActiveSystem());
+        List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
+        event.getMessage().editMessage(event.getMessage().getContentRaw()).setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
 
     @ButtonHandler("useTA_")

@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.User;
-import ti4.AsyncTI4DiscordBot;
-
 public class Constants {
     // Staff Pings
     public static final String chassitId = "183213554445320192";
@@ -25,13 +22,11 @@ public class Constants {
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
 
     public static String jazzPing() {
-        User jazz = AsyncTI4DiscordBot.jda.getUserById(jazzId);
-        return jazz == null ? "" : jazz.getAsMention();
+        return "<@" + jazzId + ">";
     }
 
     public static String bltPing() {
-        User blt = AsyncTI4DiscordBot.jda.getUserById(bltId);
-        return blt == null ? "" : blt.getAsMention();
+        return "<@" + bltId + ">";
     }
 
     // Other People IDs
@@ -462,9 +457,10 @@ public class Constants {
     public static final String CURRENT_ACDRAWSTATUS_INFO = "current_acdrawstatus_info";
     public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
     public static final String CHECK_REACTS_INFO = "check_reacts_info";
-    public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
     public static final String THALNOS_UNITS = "thalnos_units";
+    public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
     public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";
+    public static final String DISPLACED_UNITS_ACTIVATION_NEW = "displaced_units_activation_new";
     public static final String AC_ID = "ac_id";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
