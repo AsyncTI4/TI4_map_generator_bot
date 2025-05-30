@@ -253,7 +253,7 @@
         "name": "Derelict Station",
         "phase": "Action",
         "window": "After your ships move out of, into, or through a system that does not contain planets",
-        "text": "Explore a frontier token that is in that system or gain 2 trade goods.",
+        "text": "Explore a frontier token that is in that system or gain 2 commodities.",
         "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
         "source": "action_deck_2"
     },
