@@ -2,6 +2,7 @@ package ti4.service.info;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -231,7 +232,7 @@ public class ListPlayerInfoService {
         if (onlyThisGameObj) {
             for (String id : game.getRevealedPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id) != null) {
-                    msg.append(representScoring(game, id, x)).append("\n");
+                    msg.append(representScoring(game, id, x)).append("\n\n");
                     x++;
                 }
             }
@@ -241,6 +242,9 @@ public class ListPlayerInfoService {
             }
             msg.append(representSecrets(game)).append("\n");
             msg.append(representSupports(game)).append("\n");
+            if (gameHasTransferablePoints(game)) {
+                msg.append(representTransferablePoints(game)).append("\n");
+            }
             msg.append(representTotalVPs(game)).append("\n");
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
@@ -315,6 +319,46 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation.append(player.getFactionEmoji()).append(": ").append(player.getSupportForTheThroneVictoryPoints()).append("/1  ");
+            }
+        }
+        return representation.toString();
+    }
+
+    public static String getTransferablePointRepresentation(String objectiveId) {
+        return switch (objectiveId) {
+            case Constants.VOICE_OF_THE_COUNCIL_PO, "Shard of the Throne", "Political Censure" -> objectiveId;
+            case "Shard of the Throne (1)", "Shard of the Throne (2)", "Shard of the Throne (3)" -> objectiveId;
+            case "Ixthian Rex Point" -> objectiveId;
+            default -> null;
+        };
+    }
+
+    public static boolean gameHasTransferablePoints(Game game) {
+        return game.getCustomPublicVP().keySet().stream()
+            .anyMatch(obj -> getTransferablePointRepresentation(obj) != null);
+    }
+
+    public static String representTransferablePoints(Game game) {
+        StringBuilder representation = new StringBuilder("__**Transferable Points**__");
+        if (!game.isFowMode()) {
+            for (var objective : game.getCustomPublicVP().entrySet()) {
+                String mutablePointRepresentation = getTransferablePointRepresentation(objective.getKey());
+                if (mutablePointRepresentation == null) continue;
+
+                List<String> scoringPlayers = game.getScoredPublicObjectives().get(objective.getKey());
+                if (scoringPlayers == null) {
+                    scoringPlayers = List.of();
+                }
+                representation
+                    .append("\n> ")
+                    .append(mutablePointRepresentation)
+                    .append(" (").append(objective.getValue()).append(" VP)")
+                    .append(": ")
+                    .append(scoringPlayers.stream()
+                        .map(game::getPlayer)
+                        .filter(Objects::nonNull)
+                        .map(Player::getRepresentationNoPing)
+                        .reduce((a, b) -> a + ", " + b).orElse("Not currently held"));
             }
         }
         return representation.toString();

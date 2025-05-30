@@ -33,8 +33,23 @@ public class HyperlaneTileGenerator {
     private static final float CENTER_Y = TILE_HEIGHT / 2.0f;
 
     private static final List<String> RANDOM_BACKGROUNDS = List.of(
-      "hl_empty.png"
-        //need more different backgrounds
+      "hl_bg/hl_empty_0.png",
+      "hl_bg/hl_empty_1.png",
+      "hl_bg/hl_empty_2.png",
+      "hl_bg/hl_empty_3.png",
+      "hl_bg/hl_empty_4.png",
+      "hl_bg/hl_empty_5.png",
+      "hl_bg/hl_empty_6.png",
+      "hl_bg/hl_empty_7.png",
+      "hl_bg/hl_empty_8.png",
+      "hl_bg/hl_empty_9.png",
+      "hl_bg/hl_empty_10.png",
+      "hl_bg/hl_empty_11.png",
+      "hl_bg/hl_empty_12.png",
+      "hl_bg/hl_empty_13.png",
+      "hl_bg/hl_empty_14.png",
+      "hl_bg/hl_empty_15.png",
+      "hl_bg/hl_empty_16.png"
     );
 
     public enum HLColor {
@@ -53,7 +68,7 @@ public class HyperlaneTileGenerator {
     }
 
     //Line format
-    private enum HLStroke {
+    private static enum HLStroke {
         GLOW(20, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f)),
         GAP(10, AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f)),
         CORE(4, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
@@ -109,14 +124,14 @@ public class HyperlaneTileGenerator {
 
     private static final Shape SMALL_CURVE_TEMPLATE = new QuadCurve2D.Float(
         CENTER_X, 0,
-        218.7f, 69.98f, 
-        302, 75 //302.4038f, 75
+        197.25f, 106.78f,
+        302, 75
     );
 
     private static final Shape LARGE_CURVE_TEMPLATE = new QuadCurve2D.Float(
         CENTER_X, 0,
         181.2f, 144.98f,
-        302, 225 //302.4038f, 225.0f
+        302, 225
     );
 
     private static final Shape ROUNDABOUT = new Ellipse2D.Float(
@@ -137,6 +152,10 @@ public class HyperlaneTileGenerator {
         new ConnectionRule(ROUNDABOUT_CONNECTIONS, ROUNDABOUT_CONNECTOR_TEMPLATE)
     );
 
+    //Cache for overlays to avoid re-generating the same overlay multiple times
+    //Key as canonical matrix to save only once for each unique matrix and rotate as needed
+    private static final Map<String, BufferedImage> HYPERLANE_CACHE = new HashMap<>();
+
     /*
      * Connection matrix format: 0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0 
      * Generates the hyperlane as roundabout if any connections connect to itself
@@ -145,33 +164,56 @@ public class HyperlaneTileGenerator {
         String matrix = game.getCustomHyperlaneData().get(tile.getPosition());
         boolean asRoundabout = CustomHyperlaneService.hasSelfConnection(matrix);
 
-        BufferedImage hyperlane = getRandomTransformedBackground(tile, matrix);
-        Graphics2D g = hyperlane.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        BufferedImage hyperlaneBackground = getRandomTransformedBackground(tile, matrix);
 
-        Set<Shape> shapes = new LinkedHashSet<>();
-   
-        //If no connection matrix, generate just the circle
-        if (asRoundabout || matrix == null) {
-            shapes.add(ROUNDABOUT);
-        }
+        // Find canonical matrix and rotation offset
+        MatrixRotationResult canonical = getCanonicalMatrix(matrix);
 
-        for (List<Integer> connection : getConnectionsFromMatrix(matrix, asRoundabout)) {
-            for (ConnectionRule rule : CONNECTION_RULES) {
-                if (rule.matches(connection)) {
-                    shapes.add(rule.getShape(connection));
-                    break;
+        // Use canonical matrix as cache key
+        String cacheKey = canonical.matrix == null ? "null" : canonical.matrix;
+
+        BufferedImage overlay = HYPERLANE_CACHE.computeIfAbsent(cacheKey, k -> {
+            BufferedImage img = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = img.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+
+            Set<Shape> shapes = new LinkedHashSet<>();
+            if (asRoundabout || matrix == null) {
+                shapes.add(ROUNDABOUT);
+            }
+            for (List<Integer> connection : getConnectionsFromMatrix(canonical.matrix, asRoundabout)) {
+                for (ConnectionRule rule : CONNECTION_RULES) {
+                    if (rule.matches(connection)) {
+                        shapes.add(rule.getShape(connection));
+                        break;
+                    }
                 }
             }
+            drawShapes(g, shapes, HLStroke.GLOW, HLColor.BLUE.glow);
+            drawShapes(g, shapes, HLStroke.GAP, null);
+            drawShapes(g, shapes, HLStroke.CORE, HLColor.BLUE.core);
+
+            g.dispose();
+            return img;
+        });
+
+        // Rotate overlay if needed
+        BufferedImage rotatedOverlay = overlay;
+        if (canonical.rotation != 0) {
+            rotatedOverlay = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = rotatedOverlay.createGraphics();
+            g2.rotate(Math.toRadians(-canonical.rotation), CENTER_X, CENTER_Y);
+            g2.drawImage(overlay, 0, 0, null);
+            g2.dispose();
         }
 
-        drawShapes(g, shapes, HLStroke.GLOW, HLColor.BLUE.glow);
-        drawShapes(g, shapes, HLStroke.GAP, null);
-        drawShapes(g, shapes, HLStroke.CORE, HLColor.BLUE.core);
-
+        // Draw overlay on top of background
+        Graphics2D g = hyperlaneBackground.createGraphics();
+        g.drawImage(rotatedOverlay, 0, 0, null);
         g.dispose();
-        return hyperlane;
+
+        return hyperlaneBackground;
     }
 
     private static void drawShapes(Graphics2D g, Set<Shape> shapes, HLStroke hlStroke, Color color) {
@@ -203,32 +245,85 @@ public class HyperlaneTileGenerator {
     //Randomize hyperlane tile background based on matrix, or use default if no matrix present
     private static BufferedImage getRandomTransformedBackground(Tile tile, String matrix) {
         String tilePath = tile.getTilePath();
+        int transform = -1;
         if (matrix != null) {
-            String randomTile = RANDOM_BACKGROUNDS.get(new Random(matrix.hashCode()).nextInt(RANDOM_BACKGROUNDS.size()));
+            Random rand = new Random(matrix.hashCode());
+            String randomTile = RANDOM_BACKGROUNDS.get(rand.nextInt(RANDOM_BACKGROUNDS.size()));
             tilePath = ResourceHelper.getInstance().getTileFile(randomTile);
             if (tilePath == null) {
                 tilePath = tile.getTilePath();
             }
+            transform = rand.nextInt(4); // 0, 1, 2, or 3
         }
 
         BufferedImage original = ImageHelper.read(tilePath);
         BufferedImage transformed = new BufferedImage(TILE_WIDTH, TILE_HEIGHT, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = transformed.createGraphics();
-    
-        int transform = matrix != null ? Math.abs(matrix.hashCode()) % 4 : -1;
+
         switch (transform) {
             case 1 -> g.drawImage(original, 0, 0, TILE_WIDTH, TILE_HEIGHT, TILE_WIDTH, 0, 0, TILE_HEIGHT, null); // Horizontal flip
             case 2 -> g.drawImage(original, 0, 0, TILE_WIDTH, TILE_HEIGHT, 0, TILE_HEIGHT, TILE_WIDTH, 0, null); // Vertical flip
             case 3 -> g.drawImage(original, 0, 0, TILE_WIDTH, TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, 0, null); // Both flips (180° rotate)
             default -> g.drawImage(original, 0, 0, null);  // No transformation
         }
-    
+
         g.dispose();
         return transformed;
     }
 
+    // Returns the canonical matrix and the rotation needed to match the input
+    private static MatrixRotationResult getCanonicalMatrix(String matrix) {
+        if (matrix == null) return new MatrixRotationResult(null, 0);
+        String minMatrix = matrix;
+        int minRotation = 0;
+        String current = matrix;
+        for (int rot = 1; rot < 6; rot++) {
+            current = rotateMatrix60(current);
+            if (current.compareTo(minMatrix) < 0) {
+                minMatrix = current;
+                minRotation = rot * 60;
+            }
+        }
+        return new MatrixRotationResult(minMatrix, minRotation);
+    }
+
+    // Rotates a 6x6 matrix string by 60 degrees
+    private static String rotateMatrix60(String matrix) {
+        if (matrix == null) return null;
+        String[] rows = matrix.split(";");
+        int size = 6;
+        int[][] mat = new int[size][size];
+
+        // Parse matrix string to int array
+        for (int i = 0; i < size; i++) {
+            String[] cols = rows[i].split(",");
+            for (int j = 0; j < size; j++) {
+                mat[i][j] = Integer.parseInt(cols[j].trim());
+            }
+        }
+
+        // Rotate: [i][j] -> [(i+1)%6][(j+1)%6]
+        int[][] rotated = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                rotated[(i + 1) % size][(j + 1) % size] = mat[i][j];
+            }
+        }
+
+        // Convert back to string
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            if (i > 0) sb.append(";");
+            for (int j = 0; j < size; j++) {
+                if (j > 0) sb.append(",");
+                sb.append(rotated[i][j]);
+            }
+        }
+        return sb.toString();
+    }
+
     //Connection rules to angles with shape cache
-    public static class ConnectionRule {
+    private static class ConnectionRule {
         private final Map<List<Integer>, Shape> rotatedCache = new HashMap<>();      
         private final Map<List<Integer>, Integer> angleMap;
         private final Shape template;
@@ -248,6 +343,16 @@ public class HyperlaneTileGenerator {
                 AffineTransform transform = AffineTransform.getRotateInstance(angleRad, CENTER_X, CENTER_Y);
                 return transform.createTransformedShape(template);
             });
+        }
+    }
+
+    // Helper class to hold canonical matrix and rotation
+    private static class MatrixRotationResult {
+        String matrix;
+        int rotation; // in degrees, 0, 60, ..., 300
+        MatrixRotationResult(String matrix, int rotation) {
+            this.matrix = matrix;
+            this.rotation = rotation;
         }
     }
 }

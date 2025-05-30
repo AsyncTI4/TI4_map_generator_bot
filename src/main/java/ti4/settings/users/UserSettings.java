@@ -21,6 +21,7 @@ public class UserSettings {
     private int personalPingInterval;
     private boolean prefersDistanceBasedTacticalActions;
     private String afkHours;
+    private boolean hasIndicatedStatPreferences;
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;

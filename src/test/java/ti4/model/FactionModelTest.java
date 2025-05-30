@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FactionModelTest extends BaseTi4Test {
     @Test
     void testFactions() {
-        for (FactionModel faction : Mapper.getFactions()) {
+        for (FactionModel faction : Mapper.getFactionsValues()) {
             assertTrue(faction.isValid(), faction.getAlias() + ": invalid");
             assertTrue(validateAbilities(faction), faction.getAlias() + ": invalid Abilities");
             assertTrue(validateFactionTech(faction), faction.getAlias() + ": invalid FactionTech: " + faction.getFactionTech());

@@ -31,6 +31,7 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.async.ReserveGameNumberService;
 import ti4.service.game.CreateGameService;
 import ti4.service.game.HomebrewService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -60,7 +61,7 @@ public class CreateFoWGameService {
         String gameName = getNextFOWGameName();
         String lastGame = getLastFOWGameName();
         Game game;
-        if(!lastGame.equalsIgnoreCase("fow1")) {
+        if (!lastGame.equalsIgnoreCase("fow1")) {
             if (!GameManager.isValid(lastGame)) {
                 BotLogger.warning(new BotLogger.LogMessageOrigin(event), "**Unable to create new games because the last game cannot be found. Was it deleted but the roles still exist?**");
                 return;
@@ -78,7 +79,7 @@ public class CreateFoWGameService {
         String gmLine = StringUtils.substringBetween(buttonMsg, "GM: ", "\n");
         String gmId = StringUtils.substringBefore(gmLine, ".");
         Member gm = event.getGuild().getMemberById(gmId);
-        
+
         //Get Members
         List<Member> members = new ArrayList<>();
         String[] lines = buttonMsg.split("\n");
@@ -116,7 +117,6 @@ public class CreateFoWGameService {
         event.editButton(null).queue();
         executeCreateFoWGame(guild, gameName, gameSillyName, gm, members, event.getChannel());
     }
-
 
     public static void executeCreateFoWGame(Guild guild, String gameName, String gameFunName, Member gameOwner, List<Member> members, MessageChannel eventChannel) {
         //CREATE ROLES
@@ -180,14 +180,13 @@ public class CreateFoWGameService {
         sb.append(getInfoTextFromFile("FoWMainChannelIntro.txt"));
         MessageHelper.sendMessageToChannel(actionsChannel, sb.toString());
         newGame.setMainChannelID(actionsChannel.getId());
-        
+
         sb = new StringBuilder(roleGM.getAsMention() + " - gm room\n");
         sb.append(getInfoTextFromFile("FoWGMIntro.txt"));
         MessageHelper.sendMessageToChannel(gmChannel, sb.toString());
         HomebrewService.offerGameHomebrewButtons(gmChannel);
-        GMService.logPlayerActivity(newGame, null, 
-            "This thread will log player slash commands and other activities.",
-            "If you don't care to follow this, just remove yourself from the thread.", true);
+        GMService.logActivity(newGame, "This thread will log player slash commands and other activities.\n"
+            + " If you don't care to follow this, just remove yourself from the thread.", true);
 
         // Individual player channels
         String privateChannelIntro = getInfoTextFromFile("FoWPrivateChannelIntro.txt");
@@ -238,6 +237,9 @@ public class CreateFoWGameService {
     }
 
     public static String getNextFOWGameName() {
+        int nextFowNum = getLastFOWGameNumber() + 1;
+        while (ReserveGameNumberService.isGameNumReserved("fow" + nextFowNum))
+            nextFowNum++;
         return "fow" + (getLastFOWGameNumber() + 1);
     }
 
@@ -285,7 +287,7 @@ public class CreateFoWGameService {
     public static Member getGM(SlashCommandInteractionEvent event) {
         if (Objects.nonNull(event.getOption(Constants.FOWGM))) {
             return event.getOption(Constants.FOWGM).getAsMember();
-        } 
+        }
         return event.getMember();
     }
 

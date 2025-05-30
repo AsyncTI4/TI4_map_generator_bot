@@ -97,7 +97,7 @@ public abstract class DraftItem implements ModelInterface {
     }
 
     public static List<DraftItem> generateAllCards() {
-        List<FactionModel> factions = Mapper.getFactions();
+        List<FactionModel> factions = Mapper.getFactionsValues();
         List<DraftItem> items = new ArrayList<>();
         items.addAll(AbilityDraftItem.buildAllItems(factions));
         items.addAll(TechDraftItem.buildAllItems(factions));

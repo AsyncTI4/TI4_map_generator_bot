@@ -27,6 +27,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final boolean vpGoalReached;
     private final boolean fowMode;
     private final boolean factionReactMode;
+    private final boolean injectRules;
     private final String creationDate;
     private final long lastModifiedDate;
     private final String activePlayerId;
@@ -40,6 +41,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final ThreadChannel launchPostThread;
     private final Set<ManagedPlayer> players;
     private final Map<ManagedPlayer, Boolean> playerToIsReal;
+    private final boolean stale;
 
     public ManagedGame(Game game) {
         name = game.getName();
@@ -48,6 +50,7 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         vpGoalReached = game.getPlayers().values().stream().anyMatch(player -> player.getTotalVictoryPoints() >= game.getVp());
         fowMode = game.isFowMode();
         factionReactMode = game.isBotFactionReacts();
+        injectRules = game.isInjectRulesLinks();
         creationDate = game.getCreationDate();
         lastModifiedDate = game.getLastModifiedDate();
         activePlayerId = sanitizeToNull(game.getActivePlayerID());
@@ -62,6 +65,9 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
 
         players = game.getPlayers().values().stream().map(p -> GameManager.addOrMergePlayer(this, p)).collect(toUnmodifiableSet());
         playerToIsReal = game.getPlayers().values().stream().collect(Collectors.toUnmodifiableMap(p -> getPlayer(p.getUserID()), Player::isRealPlayer));
+
+        final long sixtyDays = 1000 * 60 * 60 * 24 * 60;
+        stale = (System.currentTimeMillis() - game.getLastModifiedDate()) > sixtyDays;
     }
 
     private static String sanitizeToNull(String str) {
@@ -78,6 +84,10 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
 
     public boolean hasPlayer(String playerId) {
         return players.stream().anyMatch(p -> p.getId().equals(playerId));
+    }
+
+    public boolean isActive() {
+        return !hasEnded && !hasWinner && !vpGoalReached && !stale;
     }
 
     public List<String> getPlayerIds() {

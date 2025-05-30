@@ -28,6 +28,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -37,6 +38,7 @@ import ti4.model.TileModel;
 import ti4.model.UnitModel;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.TI4Emoji;
+import ti4.service.map.CustomHyperlaneService;
 
 public class Tile {
     private final String tileID;
@@ -117,14 +119,6 @@ public class Tile {
         if (unitHolder == null || count == null) {
             return;
         }
-        Map<UnitKey, Integer> units = unitHolder.getUnits();
-        Integer unitCount = units.get(unitID);
-        if (unitCount == null) {
-            return;
-        }
-        if (unitCount < count) {
-            count = unitCount;
-        }
         unitHolder.addDamagedUnit(unitID, count);
     }
 
@@ -193,11 +187,12 @@ public class Tile {
         }
     }
 
-    public void removeUnit(String spaceHolder, UnitKey unitID, Integer count) {
+    public List<Integer> removeUnit(String spaceHolder, UnitKey unitID, Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            unitHolder.removeUnit(unitID, count);
+            return unitHolder.removeUnit(unitID, count);
         }
+        return UnitState.emptyList();
     }
 
     public void removeUnitDamage(String spaceHolder, UnitKey unitID, @Nullable Integer count) {
@@ -210,7 +205,6 @@ public class Tile {
     public void removeAllUnits(String color) {
         for (UnitHolder unitHolder : unitHolders.values()) {
             unitHolder.removeAllUnits(color);
-            unitHolder.removeAllUnitDamage(color);
         }
     }
 
@@ -242,7 +236,7 @@ public class Tile {
     public List<Boolean> getHyperlaneData(Integer sourceDirection, Game game) {
         String property = Mapper.getHyperlaneData(tileID);
         if (property == null) {
-            property = game.getCustomHyperlaneData().get(position);
+            property = CustomHyperlaneService.getHyperlaneDataForTile(this, game);
         }
 
         if (property == null) {
@@ -468,7 +462,7 @@ public class Tile {
     @JsonIgnore
     public boolean isNebula() {
         for (UnitHolder unitHolder : getUnitHolders().values()) {
-            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png")) {
+            if (CollectionUtils.containsAny(unitHolder.getTokenList(), "token_ds_wound.png", "attachment_superweapon_availyn.png")) {
                 return true;
             }
         }
@@ -520,7 +514,7 @@ public class Tile {
             if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_vortex.png")) {
                 return true;
             }
-            for (UnitKey unit : unitHolder.getUnits().keySet()) {
+            for (UnitKey unit : unitHolder.getUnitKeys()) {
                 if (unit.getUnitType() == UnitType.Spacedock && game != null) {
                     Player player = game.getPlayerFromColorOrFaction(unit.getColor());
                     if (player != null && player.getUnitFromUnitKey(unit).getId().contains("cabal_spacedock")) {
@@ -587,22 +581,25 @@ public class Tile {
     @JsonIgnore
     public boolean containsPlayersUnits(Player p) {
         return getUnitHolders().values().stream()
-            .flatMap(uh -> uh.getUnits().entrySet().stream())
-            .anyMatch(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()));
+            .flatMap(uh -> uh.getUnitKeys().stream())
+            .anyMatch(p::unitBelongsToPlayer);
     }
 
     @JsonIgnore
     public boolean containsPlayersUnitsWithModelCondition(Player p, Predicate<? super UnitModel> condition) {
-        return getUnitHolders().values().stream().anyMatch(uh -> uh.countPlayersUnitsWithModelCondition(p, condition) > 0);
+        return getUnitHolders().values().stream()
+            .flatMap(uh -> uh.getUnitKeys().stream())
+            .filter(p::unitBelongsToPlayer)
+            .map(p::getUnitFromUnitKey)
+            .filter(Objects::nonNull)
+            .anyMatch(condition);
     }
 
     @JsonIgnore
     public boolean containsPlayersUnitsWithKeyCondition(Player p, Predicate<? super UnitKey> condition) {
         return getUnitHolders().values().stream()
-            .flatMap(uh -> uh.getUnits().entrySet().stream())
-            .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
-            .map(Map.Entry::getKey)
-            .filter(Objects::nonNull)
+            .flatMap(uh -> uh.getUnitKeys().stream())
+            .filter(p::unitBelongsToPlayer)
             .anyMatch(condition);
     }
 
@@ -645,9 +642,8 @@ public class Tile {
     @JsonIgnore
     public int getFleetSupplyBonusForPlayer(final Player player) {
         return getUnitHolders().values().stream()
-            .flatMap(unitHolder -> unitHolder.getUnits().entrySet().stream())
-            .filter(entry -> entry.getValue() > 0 && player.unitBelongsToPlayer(entry.getKey()))
-            .map(Map.Entry::getKey)
+            .flatMap(unitHolder -> unitHolder.getUnitKeys().stream())
+            .filter(player::unitBelongsToPlayer)
             .map(player::getUnitFromUnitKey)
             .filter(Objects::nonNull)
             .mapToInt(UnitModel::getFleetSupplyBonus)
@@ -662,6 +658,14 @@ public class Tile {
         return tile -> tile.containsPlayersUnits(player);
     }
 
+    public static Predicate<Tile> tileHasPlayerPlanet(Player player) {
+        return tile -> CollectionUtils.containsAny(player.getPlanets(), tile.getPlanetUnitHolders().stream().map(Planet::getName).toList());
+    }
+
+    public static Predicate<Tile> playerCanRetreatHere(Player player) {
+        return tileHasPlayerShips(player).or(tileHasPlayerPlanet(player));
+    }
+
     public String getHexTileSummary() {
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ;
         return getTileID() + AliasHandler.resolveTTPGPosition(getPosition());
@@ -674,6 +678,5 @@ public class Tile {
         } else {
             return getTileModel().getEmoji();
         }
-
     }
 }

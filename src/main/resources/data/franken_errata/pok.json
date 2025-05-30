@@ -81,6 +81,12 @@
         "source": "pok"
     },
     {
+        "ItemCategory": "ABILITY",
+        "ItemId": "dark_whispers",
+        "alternateText": "[Franken only] During setup, take the Dark Pact promissory note as an additional component, and you may choose Blood Pact as an optional component in place of your drafted promissory notes; you have 2 faction promissory notes.",
+        "source": "pok"
+    },
+    {
         "ItemCategory": "PN",
         "ItemId": "dark_pact",
         "Undraftable": true,
@@ -149,7 +155,7 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "imperia",
-        "alternateText": "When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens.\nWhile another player's command token is on your command sheet, you can use the ability of that player's commander, if it is unlocked.",
+        "alternateText": "[Franken only] When you win a combat, place 1 command token from your opponent's reinforcements in your fleet pool if it does not already contain 1 of that player's tokens; other players' tokens in your fleet pool do not increase your fleet limit and cannot be redistributed. While another player's command token is on your command sheet, you can use the ability of that player's commander, if it is unlocked.",
         "source": "pok"
     },
     {

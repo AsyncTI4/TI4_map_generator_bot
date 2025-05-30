@@ -12,4 +12,8 @@ public class Space extends UnitHolder {
     public Space(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         super(name, holderCenterPosition);
     }
+
+    public String getRepresentation(Game game) {
+        return "Space";
+    }
 }

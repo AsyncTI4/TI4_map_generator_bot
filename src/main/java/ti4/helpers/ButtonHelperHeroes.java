@@ -50,8 +50,8 @@ import ti4.service.planet.AddPlanetService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.tech.ListTechService;
-import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -935,18 +935,12 @@ public class ButtonHelperHeroes {
                 String name = unitHolder.getName().replace("space", "");
                 if (tile.containsPlayersUnits(p2)) {
                     int amountInf = unitHolder.getUnitCount(UnitType.Infantry, p2.getColor());
-                    if (p2.hasInf2Tech()) {
-                        ButtonHelper.resolveInfantryDeath(p2, amountInf);
-                    }
-                    if ((p2.getUnitsOwned().contains("mahact_infantry") || p2.hasTech("cl2"))) {
-                        ButtonHelperFactionSpecific.offerMahactInfButtons(p2, game);
-                    }
                     if (amountInf > 0) {
-                        RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name);
+                        DestroyUnitService.destroyUnits(event, tile, game, p2.getColor(), amountInf + " inf " + name, false);
                     }
                     int amountFF = unitHolder.getUnitCount(UnitType.Fighter, p2.getColor());
                     if (amountFF > 0) {
-                        RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), amountFF + " ff");
+                        DestroyUnitService.destroyUnits(event, tile, game, p2.getColor(), amountFF + " ff", false);
                     }
                     if (amountFF + amountInf > 0) {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
@@ -1084,6 +1078,39 @@ public class ButtonHelperHeroes {
 
         MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         game.setStoredValue("mentakHero", player.getFaction());
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("refreshBelkoseaHero")
+    public static void refreshBelkoseaHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Leader playerLeader = player.unsafeGetLeader("belkoseahero");
+        if (playerLeader == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getFactionEmoji() + "You don't have the Belkosea hero.");
+            return;
+        }
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" refreshed ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        playerLeader.setExhausted(false);
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
+        ButtonHelper.deleteTheOneButton(event);
+
+    }
+
+    @ButtonHandler("exhaustBelkoseaHero")
+    public static void exhaustBelkoseaHero(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Leader playerLeader = player.unsafeGetLeader("belkoseahero");
+        if (playerLeader == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getFactionEmoji() + "You don't have the Belkosea hero.");
+            return;
+        }
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" exhausted ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        playerLeader.setExhausted(true);
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1983,6 +2010,27 @@ public class ButtonHelperHeroes {
                     message, buttons);
             }
         }
+    }
+
+    public static void resolveToldarHero(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        String message = player.getRepresentation() + " choose the objective that you want to get 2 CC whenever another player scores it, and which players with the least VP will not need to meet the conditions of in order to score";
+        for (String obj : game.getRevealedPublicObjectives().keySet()) {
+            if (Mapper.getPublicObjective(obj) != null) {
+                buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "toldarHero_" + Mapper.getPublicObjective(obj).getName(), Mapper.getPublicObjective(obj).getName()));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            message, buttons);
+    }
+
+    @ButtonHandler("toldarHero_")
+    public static void toldarHero(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String obj = buttonID.replace("toldarHero_", "");
+        game.setStoredValue("toldarHeroObj", obj);
+        game.setStoredValue("toldarHeroPlayer", player.getFaction());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentation() + " successfully attached hero to " + obj);
     }
 
     public static List<Button> getWinnuHeroSCButtons(Game game) {

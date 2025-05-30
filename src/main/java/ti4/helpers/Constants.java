@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.User;
-import ti4.AsyncTI4DiscordBot;
-
 public class Constants {
     // Staff Pings
     public static final String chassitId = "183213554445320192";
@@ -25,18 +22,12 @@ public class Constants {
     public static final String ASYNCTI4_HUB_SERVER_ID = "943410040369479690";
 
     public static String jazzPing() {
-        User jazz = AsyncTI4DiscordBot.jda.getUserById(jazzId);
-        return jazz == null ? "" : jazz.getAsMention();
+        return "<@" + jazzId + ">";
     }
 
     public static String bltPing() {
-        User blt = AsyncTI4DiscordBot.jda.getUserById(bltId);
-        return blt == null ? "" : blt.getAsMention();
+        return "<@" + bltId + ">";
     }
-
-    // Tourney Winners
-    public static final String cal1nos = "740848810749722646";
-    public static final List<String> tourneyWinners = List.of(cal1nos);
 
     // Other People IDs
     public static final String cagesId = "203608548440014848";
@@ -201,25 +192,42 @@ public class Constants {
     public static final String SAVE_GAMES = "save_games";
     public static final String SAVE_GAME = "save_game";
 
+    /* From \data\ */
+    public static final String SEARCH_ABILITIES = "abilities";
+    public static final String SEARCH_ACTION_CARDS = "action_cards";
+    public static final String SEARCH_AGENDAS = "agendas";
+    public static final String SEARCH_ATTACHMENTS = "attachments";
+    // no /search colors yet, but there is /help sample_colors
+    // no /search combat_modifiers yet
+    public static final String SEARCH_DECKS = "decks";
+    public static final String SEARCH_EVENTS = "events";
+    public static final String SEARCH_EXPLORES = "explores";
+    public static final String SEARCH_FACTIONS = "factions";
+    // no /search franken_errata yet
+    // no /search generic_cards yet
+    public static final String SEARCH_LEADERS = "leaders";
+    // no /search map_templates yet
+    public static final String SEARCH_PROMISSORY_NOTES = "promissory_notes";
+    public static final String SEARCH_PUBLIC_OBJECTIVES = "public_objectives";
+    public static final String SEARCH_RELICS = "relics";
+    public static final String SEARCH_SECRET_OBJECTIVES = "secret_objectives";
+    public static final String SEARCH_SOURCES = "sources";
+    // no /search strategy_card_sets yet
+    public static final String SEARCH_STRATEGY_CARDS = "strategy_cards";
+    public static final String SEARCH_TECHS = "techs";
+    public static final String SEARCH_TOKENS = "tokens";
+    public static final String SEARCH_UNITS = "units";
+    /* From \resources\ */
+    public static final String SEARCH_EMOJIS = "emojis";
     public static final String SEARCH_TILES = "tiles";
     public static final String SEARCH_PLANETS = "planets";
-    public static final String SEARCH_UNITS = "units";
-    public static final String SEARCH_GAMES = "games";
-    public static final String SEARCH_ABILITIES = "abilities";
-    public static final String SEARCH_AGENDAS = "agendas";
-    public static final String SEARCH_SECRET_OBJECTIVES = "secret_objectives";
-    public static final String SEARCH_PUBLIC_OBJECTIVES = "public_objectives";
-    public static final String SEARCH_ACTION_CARDS = "action_cards";
-    public static final String SEARCH_RELICS = "relics";
-    public static final String SEARCH_TECHS = "techs";
-    public static final String SEARCH_LEADERS = "leaders";
-    public static final String SEARCH_PROMISSORY_NOTES = "promissory_notes";
-    public static final String SEARCH_EXPLORES = "explores";
+    /* From others */
     public static final String SEARCH_COMMANDS = "commands";
+    public static final String SEARCH_GAMES = "games";
     public static final String SEARCH_MY_GAMES = "my_games";
+    public static final String STATISTICS_FACTION_GAMES = "faction_games";
     public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
-    public static final String SEARCH_SOURCES = "sources";
 
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
     public static final String RELOAD_GAME = "reload_game";
@@ -449,9 +457,10 @@ public class Constants {
     public static final String CURRENT_ACDRAWSTATUS_INFO = "current_acdrawstatus_info";
     public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
     public static final String CHECK_REACTS_INFO = "check_reacts_info";
-    public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
     public static final String THALNOS_UNITS = "thalnos_units";
+    public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
     public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";
+    public static final String DISPLACED_UNITS_ACTIVATION_NEW = "displaced_units_activation_new";
     public static final String AC_ID = "ac_id";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
@@ -1042,6 +1051,7 @@ public class Constants {
     public static final String PILLAGE_COUNT = "pillage_count";
     public static final String SARWEEN_COUNT = "sarween_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";
+    public static final String HONOR_COUNT = "honor_count";
     public static final String HARVEST_COUNT = "harvest_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
@@ -1178,7 +1188,6 @@ public class Constants {
     public static final String FACTION_TECH = "faction_tech";
     public static final String FACTION_TECH_ADD = "faction_tech_add";
     public static final String FACTION_TECH_REMOVE = "faction_tech_remove";
-    public static final String SEARCH_DECKS = "decks";
     public static final Object MOD_TEMP_ONE_ROUND = "ONE_ROUND";
     public static final String MOD_TEMP_ONE_TACTICAL_ACTION = "ONE_TACTICAL_ACTION";
     public static final String MOD_TEMP_ONE_COMBAT = "ONE_COMBAT";
@@ -1186,10 +1195,7 @@ public class Constants {
     public static final String PLAYER_NEW_TEMP_MODS = "PLAYER_NEW_TEMP_MODS";
     public static final String ARCHIVE_CHANNELS = "archive_channels";
     public static final String MILTYMOD_MODE = "miltymod_mode";
-    public static final String SEARCH_FACTIONS = "factions";
-    public static final String SEARCH_EVENTS = "events";
     public static final String EVENT_PLAY = "play";
-    public static final String SEARCH_EMOJIS = "emojis";
     public static final String INCLUDE_RAW_STRING = "include_raw_string";
     public static final String RESTORE_GAME = "restore_game";
     public static final String SAVE_FILE = "save_file";
@@ -1215,7 +1221,6 @@ public class Constants {
     public static final String SOURCE = "source";
     public static final String INJECT_RULES_LINKS = "inject_rules_links";
     public static final String FACTION_DISPLAY_NAME = "faction_display_name";
-    public static final String SEARCH_STRATEGY_CARDS = "strategy_cards";
     public static final String USER = "user";
     public static final String SHOW_MAP_SETUP = "show_map_setup";
     public static final String SHOW_HAND = "show_hand";

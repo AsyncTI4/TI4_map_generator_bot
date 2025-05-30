@@ -36,7 +36,7 @@ public class StandardBagDraft extends BagDraft {
         return "standard_bag_draft";
     }
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "qhet", "atokera" };
+    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "qhet", "toldar", "atokera", "belkosea" };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllLegalFactions();
@@ -47,7 +47,7 @@ public class StandardBagDraft extends BagDraft {
     }
 
     public static List<FactionModel> getAllLegalFactions() {
-        List<FactionModel> factionSet = Mapper.getFactions();
+        List<FactionModel> factionSet = Mapper.getFactionsValues();
         factionSet.removeIf((FactionModel model) -> {
             if (model.getSource().isPok() || model.getSource().isDs()) {
                 for (String excludedFaction : excludedFactions) {

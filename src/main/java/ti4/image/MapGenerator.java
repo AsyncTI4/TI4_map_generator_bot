@@ -234,7 +234,6 @@ public class MapGenerator implements AutoCloseable {
 
     FileUpload createFileUpload() {
         if (debug) debugDiscordTime = StopWatch.createStarted();
-        AsyncTI4DiscordBot.jda.getPresence().setActivity(Activity.playing(game.getName()));
         game.incrementMapImageGenerationCount();
         FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
         if (debug) debugDiscordTime.stop();
@@ -259,7 +258,7 @@ public class MapGenerator implements AutoCloseable {
         if (displayTypeBasic != DisplayType.all && displayTypeBasic != DisplayType.map) {
             return;
         }
-        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);  
+        Map<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
         // Show Grey Setup Tiles
         if (game.isShowMapSetup() || tilesToDisplay.isEmpty()) {
             int ringCount = game.getRingCount();
@@ -401,6 +400,7 @@ public class MapGenerator implements AutoCloseable {
             WebHelper.putMap(game.getName(), mainImageBytes, false, null);
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game.getID(), websiteOverlays);
+            WebHelper.putPlayerData(game.getID(), game);
         } else if (isFoWPrivate) {
             Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
             WebHelper.putMap(game.getName(), mainImageBytes, true, player);
@@ -634,8 +634,7 @@ public class MapGenerator implements AutoCloseable {
             g2.drawRect(i * boxWidth + trackXShift, y, boxWidth, boxHeight);
         }
 
-        int colCount = priorityTrack.size() - 1;
-        int availableSpacePerColumn = (boxWidth - boxBuffer * 2) / colCount;
+        int availableSpacePerColumn = boxWidth - boxBuffer * 2;
         int availableSpacePerRow = boxHeight - boxBuffer * 2;
         float scale = 0.7f;
         for (Player player : priorityTrack) {
@@ -649,12 +648,14 @@ public class MapGenerator implements AutoCloseable {
                 int tokenWidth = controlTokenImage == null ? 51 : controlTokenImage.getWidth(); // 51
                 int tokenHeight = controlTokenImage == null ? 33 : controlTokenImage.getHeight(); // 33
                 int centreHorizontally = Math.max(0, (availableSpacePerColumn - tokenWidth) / 2);
-                int centreVertically = Math.max(0, (availableSpacePerRow - tokenHeight) * 3 / 4);
+                int lowerVerticalQuarter = Math.max(0, (availableSpacePerRow - tokenHeight) * 3 / 4);
 
                 int spaceOnTrack = player.getPriorityPosition() - 1;
-                int firstX = Math.min(boxBuffer + /*(availableSpacePerColumn * col) +*/ centreHorizontally, boxWidth - tokenWidth - boxBuffer) + trackXShift;
+                int boxCenter = boxBuffer + centreHorizontally;
+                int boxFarRight = boxWidth - tokenWidth - boxBuffer;
+                int firstX = Math.min(boxCenter, boxFarRight) + trackXShift;
                 int tokenX = spaceOnTrack * boxWidth + firstX;
-                int tokenY = y + boxBuffer + centreVertically;
+                int tokenY = y + boxBuffer + lowerVerticalQuarter;
                 DrawingUtil.drawControlToken(graphics, controlTokenImage, player, tokenX, tokenY, false, scale);
             } catch (Exception e) {
                 // nothing
@@ -1335,13 +1336,11 @@ public class MapGenerator implements AutoCloseable {
                 }
             } else if (displayType == DisplayType.anomalies && player.ownsUnitSubstring("cabal_spacedock")) {
                 UnitKey unitKey = Mapper.getUnitKey("sd", player.getColor());
-                UnitKey unitKeyCabal = Mapper.getUnitKey("csd", player.getColor());
                 int unitNum = player.getUnitCap("sd") + player.getUnitCap("csd");
                 unitNum = (unitNum == 0 ? PositionMapper.getReinforcementsPosition("sd").getPositionCount("sd") : unitNum);
                 for (Tile tile2 : game.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile2.getUnitHolders().values()) {
-                        unitNum -= unitHolder.getUnits().getOrDefault(unitKey, 0);
-                        unitNum -= unitHolder.getUnits().getOrDefault(unitKeyCabal, 0);
+                        unitNum -= unitHolder.getUnitCount(unitKey);
                     }
                 }
                 if (unitNum > 0) {
@@ -1589,15 +1588,11 @@ public class MapGenerator implements AutoCloseable {
             if (player.isPassed()) {
                 point = PositionMapper.getPlayerStats("newpassed");
                 point.translate(miscTile.x, miscTile.y);
-                DrawingUtil.superDrawString(
-                    graphics, "PASSED", point.x, point.y, ColorUtil.PassedColor, center, null, stroke4,
-                    Color.BLACK);
+                DrawingUtil.superDrawString(graphics, "PASSED", point.x, point.y, ColorUtil.PassedColor, center, null, stroke4, Color.BLACK);
             } else if (player.getUserID().equals(activePlayerID) && "action".equals(phase)) {
                 point = PositionMapper.getPlayerStats("newpassed");
                 point.translate(miscTile.x, miscTile.y);
-                DrawingUtil.superDrawString(
-                    graphics, "ACTIVE", point.x, point.y, ColorUtil.ActiveColor, center, null, stroke4,
-                    Color.BLACK);
+                DrawingUtil.superDrawString(graphics, "ACTIVE", point.x, point.y, ColorUtil.ActiveColor, center, null, stroke4, Color.BLACK);
             }
             if (player.isAFK()) {
                 point = PositionMapper.getPlayerStats("newafk");
@@ -1803,9 +1798,9 @@ public class MapGenerator implements AutoCloseable {
     }
 
     private static void drawFleetCCOfPlayer(
-                Graphics graphics, String ccID, int x, int y, Player player,
-                boolean rightAlign
-            ) {
+        Graphics graphics, String ccID, int x, int y, Player player,
+        boolean rightAlign
+    ) {
         String ccPath = Mapper.getCCPath(ccID);
         int ccCount = player.getFleetCC();
         boolean hasArmada = player.hasAbility("armada");
@@ -2252,16 +2247,16 @@ public class MapGenerator implements AutoCloseable {
     }
 
     public static void addWebsiteOverlay(
-                List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y,
-                int width, int height
-            ) {
+        List<WebsiteOverlay> overlays, ModelInterface dataModel, int x, int y,
+        int width, int height
+    ) {
         overlays.add(new WebsiteOverlay(dataModel, List.of(x, y, width, height)));
     }
 
     public static void addWebsiteOverlay(
-                List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w,
-                int h
-            ) {
+        List<WebsiteOverlay> overlays, String title, String text, int x, int y, int w,
+        int h
+    ) {
         overlays.add(new WebsiteOverlay(title, text, List.of(x, y, w, h)));
     }
 

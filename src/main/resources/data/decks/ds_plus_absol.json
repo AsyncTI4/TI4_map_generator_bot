@@ -272,7 +272,11 @@
             "dsqhetinf",
             "dsqhetcr",
             "dsatokcr",
-            "dsatoky"
+            "dsatoky",
+            "dsbelkff",
+            "dsbelky",
+            "dstoldb",
+            "dstoldr"
         ],
         "source": "other"
     }

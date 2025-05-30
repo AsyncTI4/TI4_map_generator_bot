@@ -10,6 +10,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,6 +39,8 @@ import ti4.service.option.FOWOptionService.FOWOption;
 @UtilityClass
 class GameSaveService {
 
+    private static final ObjectMapper mapper = ObjectMapperFactory.build();
+
     public static boolean save(Game game, String reason) {
         return GameFileLockManager.wrapWithWriteLock(game.getName(), () -> {
             game.setLatestCommand(Objects.requireNonNullElse(reason, "Command Unknown"));
@@ -47,6 +50,7 @@ class GameSaveService {
 
     private static boolean save(Game game) {
         TransientGameInfoUpdater.update(game);
+
         //Ugly fix to update seen tiles data for fog since doing it in 
         //MapGenerator/TileGenerator won't save changes anymore
         if (game.isFowMode()) {
@@ -161,14 +165,6 @@ class GameSaveService {
         writer.write(Constants.CHECK_REACTS_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> displaced1System = game.getCurrentMovedUnitsFrom1System();
-        StringBuilder sb3 = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : displaced1System.entrySet()) {
-            sb3.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
-        }
-        writer.write(Constants.DISPLACED_UNITS_SYSTEM + " " + sb3);
-        writer.write(System.lineSeparator());
-
         Map<String, Integer> thalnosUnits = game.getThalnosUnits();
         StringBuilder sb16 = new StringBuilder();
         for (Map.Entry<String, Integer> entry : thalnosUnits.entrySet()) {
@@ -193,12 +189,8 @@ class GameSaveService {
         writer.write(Constants.ACS_SABOD + " " + sb11);
         writer.write(System.lineSeparator());
 
-        Map<String, Integer> displacedActivation = game.getMovedUnitsFromCurrentActivation();
-        StringBuilder sb4 = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : displacedActivation.entrySet()) {
-            sb4.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
-        }
-        writer.write(Constants.DISPLACED_UNITS_ACTIVATION + " " + sb4);
+        String displacedUnits = mapper.writeValueAsString(game.getTacticalActionDisplacement());
+        writer.write(Constants.DISPLACED_UNITS_ACTIVATION_NEW + " " + displacedUnits);
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AGENDAS + " " + String.join(",", game.getAgendas()));
@@ -495,7 +487,6 @@ class GameSaveService {
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
         writer.write(System.lineSeparator());
 
-        ObjectMapper mapper = ObjectMapperFactory.build();
         String anomaliesJson = mapper.writeValueAsString(game.getBorderAnomalies()); // much easier than manually (de)serialising
         writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
         writer.write(System.lineSeparator());
@@ -616,6 +607,9 @@ class GameSaveService {
             writer.write(Constants.PATH_TOKEN_COUNT + " " + player.getPathTokenCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.HONOR_COUNT + " " + player.getHonorCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 
@@ -722,10 +716,10 @@ class GameSaveService {
             UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
             StringBuilder units = new StringBuilder();
             if (unitHolder != null) {
-                for (Map.Entry<UnitKey, Integer> entry : unitHolder.getUnits().entrySet()) {
-                    if (Mapper.isValidColor(entry.getKey().getColor())) {
-                        units.append(entry.getKey().outputForSave()).append(",").append(entry.getValue()).append(";");
-                    }
+                for (UnitKey unit : unitHolder.getUnitKeys()) {
+                    int amt = unitHolder.getUnitCount(unit);
+                    if (!Mapper.isValidColor(unit.getColor()) || amt <= 0) continue;
+                    units.append(unit.outputForSave()).append(",").append(amt).append(";");
                 }
             }
             writer.write(Constants.CAPTURE + " " + units);
@@ -736,8 +730,7 @@ class GameSaveService {
 
             writer.write(Constants.SO + " " + getStringRepresentationOfMap(player.getSecrets()));
             writer.write(System.lineSeparator());
-            writer.write(
-                Constants.PRODUCED_UNITS + " " + getStringRepresentationOfMap(player.getCurrentProducedUnits()));
+            writer.write(Constants.PRODUCED_UNITS + " " + getStringRepresentationOfMap(player.getCurrentProducedUnits()));
             writer.write(System.lineSeparator());
             writer.write(Constants.SO_SCORED + " " + getStringRepresentationOfMap(player.getSecretsScored()));
             writer.write(System.lineSeparator());
@@ -872,29 +865,19 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(unitHolder.getName());
             writer.write(System.lineSeparator());
-            Map<UnitKey, Integer> units = unitHolder.getUnits();
-            for (Map.Entry<UnitKey, Integer> entry : units.entrySet()) {
+            for (Entry<UnitKey, List<Integer>> entry : unitHolder.getUnitsByState().entrySet()) {
                 if (entry.getKey() != null) {
-                    writer.write(entry.getKey().outputForSave() + " " + entry.getValue());
+                    String amtString = String.join(",", entry.getValue().stream().map(i -> i.toString()).toList());
+                    writer.write(entry.getKey().outputForSave() + " " + amtString);
                     writer.write(System.lineSeparator());
                 }
             }
             writer.write(ENDUNITS);
             writer.write(System.lineSeparator());
 
-            writer.write(UNITDAMAGE);
-            writer.write(System.lineSeparator());
-            Map<UnitKey, Integer> unitDamage = unitHolder.getUnitDamage();
-            for (Map.Entry<UnitKey, Integer> entry : unitDamage.entrySet()) {
-                writer.write(entry.getKey().outputForSave() + " " + entry.getValue());
-                writer.write(System.lineSeparator());
-            }
-            writer.write(ENDUNITDAMAGE);
-            writer.write(System.lineSeparator());
-
             writer.write(PLANET_TOKENS);
             writer.write(System.lineSeparator());
-            for (String ccID : unitHolder.getCCList()) {
+            for (String ccID : unitHolder.getCcList()) {
                 writer.write(ccID);
                 writer.write(System.lineSeparator());
             }

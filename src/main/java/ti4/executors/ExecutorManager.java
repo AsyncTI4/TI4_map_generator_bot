@@ -20,36 +20,44 @@ import ti4.message.MessageHelper;
 public class ExecutorManager {
 
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
-    private static final Set<String> gameExecutions = ConcurrentHashMap.newKeySet();
+    private static final Set<String> executionLocks = ConcurrentHashMap.newKeySet();
 
     public static void runAsync(String name, String gameName, MessageChannel messageChannel, Runnable runnable) {
         if (canExecuteGameCommand(gameName, messageChannel)) {
             Runnable onCancel = () -> {
                 MessageHelper.sendMessageToChannel(messageChannel, "The last command timed out and was cancelled. Double check the map state " +
                     "and use undo if the command partially completed.");
-                gameExecutions.remove(gameName);
+                executionLocks.remove(gameName);
             };
-            runAsync(name, wrapWithGameRelease(gameName, runnable), onCancel);
+            runAsync(name, wrapWithLockRelease(gameName, runnable), onCancel);
         }
     }
 
     private static boolean canExecuteGameCommand(String gameName, MessageChannel messageChannel) {
-        if (GameManager.isValid(gameName) && !gameExecutions.add(gameName)) {
+        if (GameManager.isValid(gameName) && !executionLocks.add(gameName)) {
             MessageHelper.sendMessageToChannel(messageChannel, "The bot hasn't finished processing the last command for this game. Please wait.");
             return false;
         }
         return true;
     }
 
-    private static Runnable wrapWithGameRelease(String gameName, Runnable runnable) {
+    private static Runnable wrapWithLockRelease(String gameName, Runnable runnable) {
         return () -> {
             try {
                 runnable.run();
             } finally {
-                gameExecutions.remove(gameName);
+                executionLocks.remove(gameName);
             }
         };
     }
+
+    public static void runAsyncIfNotRunning(String name, Runnable runnable) {
+        if (!executionLocks.add(name)) {
+            return;
+        }
+        runAsync(name, wrapWithLockRelease(name, runnable));
+    }
+
 
     public static void runAsync(String name, Runnable runnable) {
         var timedRunnable = new TimedRunnable(name, runnable);

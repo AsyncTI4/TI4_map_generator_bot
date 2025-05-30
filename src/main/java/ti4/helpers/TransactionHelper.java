@@ -126,6 +126,8 @@ public class TransactionHelper {
         if (!debtOnly) {
             ButtonHelperAbilities.pillageCheck(p1, game);
             ButtonHelperAbilities.pillageCheck(p2, game);
+            CommanderUnlockCheckService.checkPlayer(p1, "hacan");
+            CommanderUnlockCheckService.checkPlayer(p2, "hacan");
         }
     }
 
@@ -180,7 +182,7 @@ public class TransactionHelper {
                     case "starCharts" -> trans.append(Mapper.getRelic(furtherDetail).getName()).append(SourceEmojis.DiscordantStars);
                     case "ACs" -> {
                         switch (furtherDetail) {
-                            case "generic" -> trans.append(amountToTransact).append(" ").append(CardEmojis.ActionCard).append(" to be specified verbally");
+                            case "generic" -> trans.append(amountToTransact).append(" ").append(CardEmojis.ActionCard).append(" to be specified by player");
                             default -> {
                                 int acNum = Integer.parseInt(furtherDetail);
                                 String acID = null;
@@ -204,7 +206,7 @@ public class TransactionHelper {
                         switch (furtherDetail) {
                             case "generic" -> {
                                 if (!hidePrivateCardText) {
-                                    trans.append(amountToTransact).append(" ").append(CardEmojis.PN).append(" to be specified verbally");
+                                    trans.append(amountToTransact).append(" ").append(CardEmojis.PN).append(" to be specified by player");
                                 } else {
                                     trans.append(CardEmojis.PN);
                                 }
@@ -649,7 +651,7 @@ public class TransactionHelper {
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
                     .setPlaceholder("Edit your deals details here.")
-                    .setValue("I propose that")
+                    .setValue("The deal is that")
                     .build();
                 Modal modal = Modal.create(modalId, "Deal Details").addActionRow(summary).build();
                 event.replyModal(modal).queue();
@@ -710,7 +712,10 @@ public class TransactionHelper {
                 player.addTransactionItem("sending" + p2.getFaction() + "_receiving" + p1.getFaction() + "_TGs_" + tgP2Sent);
             }
         } else {
-            player.addTransactionItem("sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail);
+            String itemS = "sending" + sender + "_receiving" + receiver + "_" + item + "_" + extraDetail;
+            if (!player.getTransactionItems().contains(itemS) || !itemS.contains("dmz")) {
+                player.addTransactionItem(itemS);
+            }
         }
 
         if ((item.equalsIgnoreCase("tgs") || item.equalsIgnoreCase("Comms")) && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("binding_debts") && !p2.hasAbility("data_recovery")) {
@@ -984,7 +989,6 @@ public class TransactionHelper {
                 tgAmount = Math.min(p1.getTg(), tgAmount);
                 p1.setTg(p1.getTg() - tgAmount);
                 p2.setTg(p2.getTg() + tgAmount);
-                CommanderUnlockCheckService.checkPlayer(p2, "hacan");
                 message2 = ident + " sent " + tgAmount + " trade good" + (tgAmount == 1 ? "" : "s") + " to " + ident2 + ".";
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
                     int amount = Math.min(tgAmount, p2.getDebtTokenCount(p1.getColor()));
@@ -1008,8 +1012,6 @@ public class TransactionHelper {
                     }
                     p2.setCommodities(targetTG);
                 }
-
-                CommanderUnlockCheckService.checkPlayer(p2, "hacan");
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
                 message2 = ident + " sent " + tgAmount + " commodit" + (tgAmount == 1 ? "y" : "ies") + " to " + ident2 + ".";
                 if (!p2.hasAbility("binding_debts") && p2.getDebtTokenCount(p1.getColor()) > 0 && !p2.hasAbility("data_recovery") && oldWay) {
@@ -1038,8 +1040,6 @@ public class TransactionHelper {
                 p2.setCommodities(newP2Comms);
                 p1.setTg(p1.getTg() + (oldP1Comms - newP1Comms));
                 p2.setTg(p2.getTg() + (oldP2Comms - newP2Comms));
-                CommanderUnlockCheckService.checkPlayer(p2, "hacan");
-                CommanderUnlockCheckService.checkPlayer(p1, "hacan");
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, oldP1Comms);
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p2, p1, oldP2Comms);
                 String id1 = p1.getFactionEmojiOrColor();
@@ -1424,6 +1424,8 @@ public class TransactionHelper {
         Player player2 = game.getPlayerFromColorOrFaction(player2Color);
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAbilities.pillageCheck(player2, game);
+        CommanderUnlockCheckService.checkPlayer(player, "hacan");
+        CommanderUnlockCheckService.checkPlayer(player2, "hacan");
         ButtonHelper.deleteMessage(event);
     }
 

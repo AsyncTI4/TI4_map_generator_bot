@@ -27,7 +27,7 @@ class SearchFactionsSubcommand extends SearchComponentModelSubcommand {
             return;
         }
         
-        List<MessageEmbed> messageEmbeds = Mapper.getFactions().stream()
+        List<MessageEmbed> messageEmbeds = Mapper.getFactionsValues().stream()
             .filter(model -> model.search(searchString, source))
             .sorted(Comparator.comparing(FactionModel::getAlias))
             .map(model -> model.getRepresentationEmbed(true, false))

@@ -1,0 +1,19 @@
+{
+    "id": "br5",
+    "name": "Reil/Strang - Belkosea",
+    "aliases": [
+        "br5",
+        "strang",
+        "reil",
+        "belkosea"
+    ],
+    "imagePath": "BR5_Belkosea.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "strang",
+        "reil"
+    ],
+    "source": "ds",
+    "tileBack": "green"
+}

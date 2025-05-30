@@ -11,12 +11,21 @@ import ti4.model.PublicObjectiveModel;
 public class ObjectiveHelper {
 
     public void secondHalfOfPeakStage1(Game game, Player player, int loc1) {
+        secondHalfOfPeakStage1(game, player, loc1, false);
+    }
+
+    public void secondHalfOfPeakStage1(Game game, Player player, int loc1, boolean fullEmbed) {
         String obj = game.peekAtStage1(loc1, player);
         PublicObjectiveModel po = Mapper.getPublicObjective(obj);
-        String sb = player.getRepresentationUnfogged() +
-            " **Stage 1 Public Objective at location " + loc1 + "**" + "\n" +
-            po.getRepresentation(!po.getAlias().equalsIgnoreCase(Constants.IMPERIUM_REX_ID)) + "\n";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
+        if (fullEmbed) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "**Stage 1 Public Objective at location " + loc1 + "**");
+            player.getCardsInfoThread().sendMessageEmbeds(po.getRepresentationEmbed()).queue();
+        } else {
+            String sb = player.getRepresentationUnfogged() +
+                " **Stage 1 Public Objective at location " + loc1 + "**" + "\n" +
+                po.getRepresentation(!po.getAlias().equalsIgnoreCase(Constants.IMPERIUM_REX_ID)) + "\n";
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb);
+        }
     }
 
     public void secondHalfOfPeakStage2(Game game, Player player, int loc1) {

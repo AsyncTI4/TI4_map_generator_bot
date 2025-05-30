@@ -2,9 +2,9 @@ package ti4.helpers;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -24,10 +24,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
@@ -42,10 +42,10 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, true, false);
@@ -60,13 +60,13 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
@@ -80,16 +80,16 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, true, false);
 
-        assertTrue(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Would repair 1 <dreadnought> due to _Duranium Armor_"));
     }
 
     @Test
@@ -98,16 +98,16 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, true, false);
 
-        assertTrue(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Would repair 1 <dreadnought> due to _Duranium Armor_"));
     }
 
     @Test
@@ -116,16 +116,16 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
 
-        assertFalse(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
+        assertFalse(actualMessage.contains("Would repair 1 <dreadnought> due to _Duranium Armor_"));
     }
 
     @Test
@@ -135,24 +135,23 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
 
-        assertTrue(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Would repair 1 <warsun> due to _Duranium Armor_"));
     }
 
-    @Disabled("Need a way to mock emoji's to prove actual message string")
     @Test
     void testAutoAssignSpaceCombatHits_Summarizing_DuraniumArmor_UnitDamage_DuraniumPreference() {
         Player player = createPlayerWithDuraniumArmor(game, "red");
@@ -160,21 +159,21 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
 
-        assertTrue(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Would repair 1 <warsun> due to _Duranium Armor_"));
     }
 
     @Test
@@ -183,15 +182,15 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
 
-        assertFalse(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
+        assertFalse(actualMessage.contains("Would repair 1 <dreadnought> due to _Duranium Armor_"));
     }
 
     @Test
@@ -201,18 +200,18 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
-        assertFalse(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertFalse(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
     }
 
     @Test
@@ -221,16 +220,16 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, false, false);
 
-        assertTrue(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
     }
 
     @Test
@@ -239,16 +238,16 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
 
-        assertTrue(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
     }
 
     @Test
@@ -257,16 +256,16 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("fighter");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey fighterUnitKey = new UnitKey(Units.UnitType.Fighter, "red");
+        UnitKey fighterUnitKey = Units.getUnitKey(UnitType.Fighter, "red");
         tile.addUnit(Constants.SPACE, fighterUnitKey, 1);
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
-        assertFalse(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertFalse(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
     }
 
     @Test
@@ -276,20 +275,20 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
-        assertTrue(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Repaired 1 <warsun> due to _Duranium Armor_"));
     }
 
     @Test
@@ -299,21 +298,21 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        UnitKey warsunUnitKey = new UnitKey(Units.UnitType.Warsun, "red");
+        UnitKey warsunUnitKey = Units.getUnitKey(UnitType.Warsun, "red");
         tile.addUnit(Constants.SPACE, warsunUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, warsunUnitKey, 1);
 
-        UnitKey flagshipUnitKey = new UnitKey(Units.UnitType.Flagship, "red");
+        UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
-        assertTrue(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Repaired 1 <warsun> due to _Duranium Armor_"));
         assertEquals(1, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(warsunUnitKey));
         assertEquals(2, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
         assertEquals(2, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(flagshipUnitKey));
@@ -326,13 +325,13 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
 
-        assertTrue(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
         assertEquals(1, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));
         assertEquals(0, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
     }
@@ -344,13 +343,13 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         player.addOwnedUnitByID("flagship");
         player.addOwnedUnitByID("warsun");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
-        assertFalse(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertFalse(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
         assertEquals(0, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));
         assertEquals(0, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
     }
@@ -360,13 +359,13 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         Player player = createPlayerWithDuraniumArmor(game, "red");
         player.addOwnedUnitByID("dreadnought");
 
-        UnitKey dreadnoughtUnitKey = new UnitKey(Units.UnitType.Dreadnought, "red");
+        UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 4);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
         String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 4, null, false, false);
 
-        assertTrue(actualMessage.contains("Repaired 1 <normalEmoji> due to _Duranium Armor_"));
+        assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
         assertEquals(3, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));
         assertEquals(2, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(dreadnoughtUnitKey));
     }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,28 +35,32 @@ public class FowCommunicationThreadService {
     }
 
     public static void checkAllCommThreads(Game game) {
-        if (!isActive(game)) return;
-
-        Set<Set<Player>> checkedPairs = new HashSet<>();
-        for (Player player : game.getRealPlayers()) {
-            Set<Player> neighbors = getNeighbors(game, player);
-            Map<ThreadChannel, Player> commThreadsWithPlayer = findCommThreads(game, player);
-            validateNeighbors(player, neighbors, commThreadsWithPlayer, checkedPairs, game);
-        }
+        checkNewNeighbors(game, null);
     }
 
-    public static void checkNewNeighbors(Game game, Player player, List<Button> buttons) {
+    public static void checkNewNeighbors(Game game, Player player) {
         if (!isActive(game)) return;
 
-        Set<Player> neighbors = getNeighbors(game, player);
-        Map<ThreadChannel, Player> commThreadsWithPlayer = findCommThreads(game, player);
+        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
+        Set<Set<Player>> checkedPairs = new HashSet<>();
+        getGameThreadChannels(game).thenAccept(threads -> {
+            for (Player p : game.getRealPlayers()) {
+                Set<Player> neighbors = getNeighbors(game, p);
+                Map<ThreadChannel, Player> commThreadsWithPlayer = findPlayersCommThreads(game, threads, p);
+                validateNeighbors(p, neighbors, commThreadsWithPlayer, checkedPairs, game);
 
-        //Check if can find neighbors without a comm thread
-        Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreadsWithPlayer);
-        
-        if (!newNeighbors.isEmpty()) {
-            buttons.add(Buttons.blue("fowComms_" + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), "Open Comms"));
-        }
+                //If checking from a specific player perspective, check for new neighbors
+                if (player != null && player == p) {
+                    Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreadsWithPlayer);
+                    if (!newNeighbors.isEmpty()) {
+                        MessageHelper.sendMessageToChannelWithButton(player.getPrivateChannel(), "New neighbors found", 
+                            Buttons.blue("fowComms_" 
+                                + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), 
+                                "Open Comms"));
+                    }
+                }
+            }
+        });
     }
 
     private static boolean areAllowedToTalkInAgenda(Game game) {
@@ -78,29 +83,38 @@ public class FowCommunicationThreadService {
         return player.getNeighbouringPlayers(true);
     }
 
-    private static Map<ThreadChannel, Player> findCommThreads(Game game, Player player) {
-        Map<ThreadChannel, Player> threadMap = new HashMap<>();
-        game.getMainGameChannel().getThreadChannels().forEach(thread -> checkThread(threadMap, thread, game, player));
+    private static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {
+        CompletableFuture<List<ThreadChannel>> future = new CompletableFuture<>();
 
-        game.getMainGameChannel().retrieveArchivedPrivateThreadChannels().forEach(thread -> checkThread(threadMap, thread, game, player));
+        List<ThreadChannel> result = new ArrayList<>(game.getMainGameChannel().getThreadChannels());
 
-        return threadMap;
+        game.getMainGameChannel()
+            .retrieveArchivedPrivateThreadChannels()
+            .queue(pagination -> {
+                pagination.forEach(result::add);
+                future.complete(result);
+            }, future::completeExceptionally);
+
+        return future;
     }
 
-    private static void checkThread(Map<ThreadChannel, Player> threadMap, ThreadChannel thread, Game game, Player player) {
-        Matcher matcher = THREAD_NAME_PATTERN.matcher(thread.getName());
-        if (matcher.find()) {
-            Player p1 = game.getPlayerFromColorOrFaction(matcher.group(1));
-            Player p2 = game.getPlayerFromColorOrFaction(matcher.group(2));
-            if (p1 != null && p2 != null && (player.equals(p1) || player.equals(p2))) {
-                threadMap.put(thread, player.equals(p1) ? p2 : p1);
+    private static Map<ThreadChannel, Player> findPlayersCommThreads(Game game, List<ThreadChannel> threads, Player player) {
+        Map<ThreadChannel, Player> threadMap = new HashMap<>();
+        for (ThreadChannel thread : threads) {
+            Matcher matcher = THREAD_NAME_PATTERN.matcher(thread.getName());
+            if (matcher.find()) {
+                Player p1 = game.getPlayerFromColorOrFaction(matcher.group(1));
+                Player p2 = game.getPlayerFromColorOrFaction(matcher.group(2));
+                if (p1 != null && p2 != null && (player.equals(p1) || player.equals(p2))) {
+                    threadMap.put(thread, player.equals(p1) ? p2 : p1);
+                }
             }
         }
+        return threadMap;
     }
 
     private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<Set<Player>> checkedPairs, Game game) {
         boolean areAllowedToTalkInAgenda = areAllowedToTalkInAgenda(game);
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
             ThreadChannel threadChannel = thread.getKey();
             String threadName = thread.getKey().getName();
@@ -170,7 +184,7 @@ public class FowCommunicationThreadService {
             .queue(t -> MessageHelper.sendMessageToChannel(t, "## Private communications thread opened\n"
                 + "Players: " + inviteePlayer.getRepresentation(true, true, false, true)
                 + " " + player.getRepresentation(true, true, false, true) + "\n"
-                + "GM ping: " + game.getPlayersWithGMRole().stream().map(Player::getPing).collect(Collectors.joining(" "))));
+                + "GM ping: " + GMService.gmPing(game)));
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() 
                 + "(You) accepted private communications invitation from " + inviteePlayer.getRepresentationNoPing());

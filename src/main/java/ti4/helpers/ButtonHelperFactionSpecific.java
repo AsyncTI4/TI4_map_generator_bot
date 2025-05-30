@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,8 +18,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -26,7 +31,9 @@ import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
+import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -36,6 +43,7 @@ import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.ExploreModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.StrategyCardModel;
 import ti4.model.UnitModel;
 import ti4.service.button.ReactionService;
@@ -48,6 +56,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -155,6 +164,122 @@ public class ButtonHelperFactionSpecific {
         player.removeDebtTokens(game.getPlayerFromColorOrFaction(opposingFaction).getColor(), 1);
     }
 
+    public static void resolveDeceive(Player player, Game game) {
+        String msg = player.getRepresentation() + " choose the neighbor who you want to steal a random action card from. Please ensure that everyone's AC amounts are correct before resolving this (async often floats AC draws)";
+        List<Button> buttons = new ArrayList<>();
+        for (Player neighbor : player.getNeighbouringPlayers(true)) {
+            String rep = neighbor.getFaction();
+            if (game.isFowMode()) {
+                rep = neighbor.getColor();
+            }
+            buttons.add(Buttons.green("spyStep2_" + neighbor.getFaction(), rep));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+
+    }
+
+    public static void correctHonorAbilities(Player player, Game game) {
+        if (player.getHonorCounter() > 1) {
+            if (!player.hasAbility("bestow")) {
+                player.addAbility("bestow");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the bestow honor card\n" + Mapper.getAbility("bestow").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("bestow")) {
+                player.removeAbility("bestow");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the bestow honor card");
+            }
+        }
+        if (player.getHonorCounter() > 4) {
+            if (!player.hasAbility("reflect")) {
+                player.addAbility("reflect");
+                CommanderUnlockCheckService.checkPlayer(player, "toldar");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the reflect honor card\n" + Mapper.getAbility("reflect").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("reflect")) {
+                player.removeAbility("reflect");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the reflect honor card");
+            }
+        }
+        if (player.getHonorCounter() > 7) {
+            if (!player.hasAbility("ascend")) {
+                player.addAbility("ascend");
+                Integer poIndex = game.addCustomPO("Ascend", 1);
+                game.scorePublicObjective(player.getUserID(), poIndex);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the ascend honor card and 1 VP.\n" + Mapper.getAbility("ascend").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("ascend")) {
+                player.removeAbility("ascend");
+                int ascendPublicObjectiveID = game.getRevealedPublicObjectives().get("Ascend");
+                game.unscorePublicObjective(player.getUserID(), ascendPublicObjectiveID);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the ascend honor card and 1 VP");
+            }
+        }
+
+        if (player.getHonorCounter() < -1) {
+            if (!player.hasAbility("thwart")) {
+                player.addAbility("thwart");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the thwart honor card\n" + Mapper.getAbility("thwart").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("thwart")) {
+                player.removeAbility("thwart");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the thwart honor card");
+            }
+        }
+        if (player.getHonorCounter() < -4) {
+            if (!player.hasAbility("deceive")) {
+                player.addAbility("deceive");
+                CommanderUnlockCheckService.checkPlayer(player, "toldar");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the deceive honor card\n" + Mapper.getAbility("deceive").getRepresentation());
+            }
+        } else {
+            if (player.hasAbility("deceive")) {
+                player.removeAbility("deceive");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the deceive honor card");
+            }
+        }
+        if (player.getHonorCounter() < -7) {
+            if (!player.hasAbility("scourge")) {
+                player.addAbility("scourge");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the scourge honor card. Every one of their PNs has been purged. In order to score SOs as POs, use /status po_add_custom and /status po_score\n" + Mapper.getAbility("scourge").getRepresentation());
+                for (Player p3 : game.getRealPlayers()) {
+                    Set<String> pns = new HashSet<>(p3.getPromissoryNotes().keySet());
+                    Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
+                    for (String pnID : pns) {
+                        PromissoryNoteModel pn = promissoryNotes.get(pnID);
+                        if (pn != null && (pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction()))) {
+                            p3.removePromissoryNote(pnID);
+                            PromissoryNoteHelper.sendPromissoryNoteInfo(game, p3, false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @ButtonHandler("resolvePride_")
+    public static void resolvePride(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
+        String faction = buttonID.split("_")[1];
+        Player p2 = game.getPlayerFromColorOrFaction(faction);
+        ButtonHelper.deleteTheOneButton(event);
+        if (p2.getTotalVictoryPoints() == player.getTotalVictoryPoints()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you do not gain or lose honor when beating someone with the same amount of VPs as yourself.");
+        }
+        if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {
+            player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1 honor by beating someone with more VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+        }
+        if (p2.getTotalVictoryPoints() < player.getTotalVictoryPoints()) {
+            player.setHonorCounter(Math.max(-8, player.getHonorCounter() - 1));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost 1 honor by beating someone with less VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+        }
+        correctHonorAbilities(player, game);
+
+    }
+
     @ButtonHandler("collateralizedLoans_")
     public static void collateralizedLoans(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String pos = buttonID.split("_")[1];
@@ -253,7 +378,7 @@ public class ButtonHelperFactionSpecific {
             // System.out.println(unitKey.asyncID());
             int totalUnits = unitEntry.getValue();
             int damagedUnits = 0;
-            if ("fighter".equalsIgnoreCase(unitName)) {
+            if ("fighter".equalsIgnoreCase(unitName) || "spacedock".equalsIgnoreCase(unitName)) {
                 continue;
             }
 
@@ -331,13 +456,8 @@ public class ButtonHelperFactionSpecific {
                 for (Tile tile : game.getTileMap().values()) {
                     UnitHolder unitHolder = tile.getUnitHolders().get("space");
                     if (unitHolder.getUnitCount(UnitType.Cavalry, player.getColor()) > 0) {
-                        if (unitHolder.getUnitDamage() != null
-                            && unitHolder.getUnitDamage()
-                                .get(Mapper.getUnitKey("cavalry", player.getColorID())) != null
-                            && unitHolder.getUnitDamage()
-                                .get(Mapper.getUnitKey("cavalry", player.getColorID())) > 0) {
-                            unitHolder.addDamagedUnit(
-                                Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+                        if (unitHolder.getDamagedUnitCount(UnitType.Cavalry, player.getColorID()) > 0) {
+                            unitHolder.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
                             unitHolder.removeDamagedUnit(Mapper.getUnitKey("cavalry", player.getColorID()), 1);
                         }
                         RemoveUnitService.removeUnits(event, tile, game, player.getColor(), "cavalry");
@@ -715,7 +835,7 @@ public class ButtonHelperFactionSpecific {
             return buttons;
         }
         for (String planet : hacan.getPlanetsAllianceMode()) {
-            if (planet.contains("custodia") || planet.contains("ghoti")) {
+            if (planet.contains("custodia") || planet.contains("ghoti") || ButtonHelper.getUnitHolderFromPlanetName(planet, game) == null) {
                 continue;
             }
             if (ButtonHelper.getUnitHolderFromPlanetName(planet, game).getUnitCount(UnitType.Mech,
@@ -791,6 +911,33 @@ public class ButtonHelperFactionSpecific {
         player.setActualHits(player.getActualHits() + totalHits);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    public static void rollForBelkoseaPN(Player player) {
+        String result = player.getFactionEmojiOrColor() + " rolling for belkosea PN:\n";
+        // Actually roll for each unit
+        int totalHits = 0;
+        StringBuilder resultBuilder = new StringBuilder(result);
+
+        int toHit = 8;
+        int modifierToHit = 0;
+        int extraRollsForUnit = 0;
+        int numRollsPerUnit = 1;
+        int numRolls = 4;
+        List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+        player.setExpectedHitsTimes10(
+            player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+        int hitRolls = DiceHelper.countSuccesses(resultRolls);
+        totalHits += hitRolls;
+        String unitRoll = CombatMessageHelper.displayUnitRoll(player.getUnitByID("belkosea_flagship"), toHit, modifierToHit, 1,
+            numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+        resultBuilder.append(unitRoll);
+
+        result = resultBuilder.toString();
+        result += CombatMessageHelper.displayHitResults(totalHits);
+        player.setActualHits(player.getActualHits() + totalHits);
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result + "\nPlease assign any hits using the assign hits button in the combat thread. Remember these hits only apply against infantry or fighters.");
+
     }
 
     public static void checkForNaaluPN(Game game) {
@@ -1044,7 +1191,7 @@ public class ButtonHelperFactionSpecific {
             "> " + player1.getRepresentationNoPing() + CardEmojis.getSCFrontFromInteger(player1SC) + " :arrow_right: " + CardEmojis.getSCFrontFromInteger(player2SC) + "\n";
         MessageHelper.sendMessageToChannel(player2.getCorrectChannel(), sb);
         event.getMessage().delete().queue();
-        StartPhaseService.startActionPhase(event, game);
+        StartPhaseService.startActionPhase(event, game, false);
     }
 
     @ButtonHandler("raghsCallStepTwo_")
@@ -2287,13 +2434,12 @@ public class ButtonHelperFactionSpecific {
                 break;
             }
         }
-        boolean removed = false;
+        boolean damaged = false;
         for (UnitHolder uH : tile.getUnitHolders().values()) {
             int count = uH.getUnitCount(UnitType.Mech, player.getColor())
                 - uH.getDamagedUnitCount(UnitType.Mech, player.getColorID());
-
-            if (count > 0 && !removed) {
-                removed = true;
+            if (count > 0 && !damaged) {
+                damaged = true;
                 uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), 1);
                 sb.append("\n ").append(player.getFactionEmoji()).append(" damaged 1 mech on ")
                     .append(tile.getRepresentation()).append("(").append(uH.getName()).append(")");
@@ -2303,6 +2449,33 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "nivyn");
         event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("becomeDamaged_")
+    public static void becomeDamaged(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
+        String tilePos = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        Tile tile = game.getTileByPosition(tilePos);
+        StringBuilder sb = new StringBuilder(player.getRepresentation());
+        UnitHolder uH = tile.getSpaceUnitHolder();
+        uH.addDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID()), 1);
+        sb.append(" damaged their " + unit + " in ").append(tile.getRepresentation());
+        if (unit.equalsIgnoreCase("flagship")) {
+            if (player.ownsUnit("belkosea_flagship")) {
+                sb.append(" to produce 1 hit against the opponents non-fighter ships.");
+                ButtonHelperModifyUnits.resolveAssaultCannonNDihmohnCommander("id_belkosea_" + tilePos, event, player, game);
+            }
+            if (player.ownsUnit("kortali_flagship")) {
+                sb.append(" to gain 1 command counter.");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " can gain 1 command token due to self-damaging the Kortali Flagship");
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain 1 command token.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+            }
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("creussMechStep2_")
@@ -2398,7 +2571,8 @@ public class ButtonHelperFactionSpecific {
     public static void resolveCreussIFFStart(Game game, @NotNull Player player, String buttonID, ButtonInteractionEvent event) {
         String type = buttonID.split("_")[1];
         List<Button> buttons = getCreusIFFLocationOptions(game, player, type);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", buttons);
         event.getMessage().delete().queue();
     }
 
@@ -2410,8 +2584,8 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getTileByPosition(pos);
         String msg;
         if (game.isFowMode() && !isTileCreussIFFSuitable(game, player, tile)) {
-            msg = "Tile was not suitable for the _Creuss IFF_.";
-            if (player.getTg() > 0) {
+            msg = pos + " was not suitable for the _Creuss IFF_.";
+            /*if (player.getTg() > 0) {
                 player.setTg(player.getTg() - 1);
                 msg += " You lost 1 trade good.";
             } else {
@@ -2424,7 +2598,7 @@ public class ButtonHelperFactionSpecific {
                         msg += " You lost 1 command token from your fleet pool.";
                     }
                 }
-            }
+            }*/
         } else {
             StringBuilder sb = new StringBuilder(player.getRepresentation());
             tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
@@ -2449,17 +2623,60 @@ public class ButtonHelperFactionSpecific {
     public static List<Button> getCreusIFFLocationOptions(Game game, @NotNull Player player, String type) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
-            if (isTileCreussIFFSuitable(game, player, tile) || (game.isFowMode()
-                && !FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition()))) {
+            if (isTileCreussIFFSuitable(game, player, tile) && (!game.isFowMode()
+                || FoWHelper.getTilePositionsToShow(game, player).contains(tile.getPosition()))) {
                 buttons.add(Buttons.green("creussIFFResolve_" + type + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
             }
         }
         SortHelper.sortButtonsByTitle(buttons);
+        if (game.isFowMode()) {
+            buttons.add(Buttons.red("blindIFFSelection_" + type + "~MDL", "Blind Tile"));
+        }
         return buttons;
     }
 
+    @ButtonHandler("blindIFFSelection_")
+    public static void offerBlindIFFSelection(ButtonInteractionEvent event, String buttonID) {
+        String type = StringUtils.substringBetween(buttonID, "blindIFFSelection_", "~MDL");
+        TextInput position = TextInput.create(Constants.POSITION, "Position for " + type, TextInputStyle.SHORT)
+            .setRequired(true).build();
+
+        Modal blindSelectionModal = Modal.create("blindIFFSelection_" + type + "_" + event.getMessageId(), "Select position")
+            .addActionRow(position).build();
+        event.replyModal(blindSelectionModal).queue();
+    }
+
+    @ModalHandler("blindIFFSelection_")
+    public static void doBlindIFF(ModalInteractionEvent event, Player player, Game game) {
+        String modalId[] = event.getModalId().split("_");
+        String type = modalId[1];
+        String origMessageId = modalId[2];
+        String position = event.getValue(Constants.POSITION).getAsString().trim();
+
+        if (!PositionMapper.isTilePositionValid(position)) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Position " + position + " is invalid.");
+            return;
+        }
+
+        Tile tile = game.getTileByPosition(position);
+        if (FOWPlusService.isVoid(game, position)) {
+            tile = FOWPlusService.voidTile(position);
+        }
+        List<Button> chooseTileButtons = new ArrayList<>();
+        chooseTileButtons.add(Buttons.green("creussIFFResolve_" + type + "_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+        chooseTileButtons.add(Buttons.red("blindIFFSelection_" + type + "~MDL", "Change Tile"));
+
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            player.getFactionEmojiOrColor() + " please select the tile you would like to place the " + type + " wormhole in.", chooseTileButtons);
+        event.getMessageChannel().deleteMessageById(origMessageId).queue();
+    }
+
     public static boolean isTileCreussIFFSuitable(Game game, Player player, Tile tile) {
+        if (tile == null || tile.getTileModel() != null && tile.getTileModel().isHyperlane()) {
+            return false;
+        }
+
         for (String planet : player.getPlanetsAllianceMode()) {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
@@ -2483,9 +2700,6 @@ public class ButtonHelperFactionSpecific {
                 hs = p2.getHomeSystemTile();
             }
             if (hs != null && hs.getPosition().equalsIgnoreCase(tile.getPosition())) {
-                return false;
-            }
-            if (tile == null || tile.getRepresentationForButtons(game, player).toLowerCase().contains("hyperlane")) {
                 return false;
             }
         }
@@ -2637,9 +2851,12 @@ public class ButtonHelperFactionSpecific {
         event.getMessage().delete().queue();
     }
 
-    public static List<Button> getRohDhnaRecycleButtons(Game game, Player player) {
+    public static List<Button> getRohDhnaRecycleButtons(Game game, Tile tile, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
         List<UnitKey> availableUnits = new ArrayList<>();
-        Map<UnitKey, Integer> units = game.getTileByPosition(game.getActiveSystem()).getUnitHolders()
+        Map<UnitKey, Integer> units = tile.getUnitHolders()
             .get("space").getUnits();
         for (UnitKey unit : units.keySet()) {
             if (Objects.equals(unit.getColor(), player.getColor()) && (unit.getUnitType() == UnitType.Cruiser
@@ -2651,7 +2868,6 @@ public class ButtonHelperFactionSpecific {
             }
         }
 
-        List<Button> buttons = new ArrayList<>();
         for (UnitKey unit : availableUnits) {
             buttons.add(Buttons.green("FFCC_" + player.getFaction() + "_rohdhnaRecycle_" + unit.unitName(), unit.getUnitType().humanReadableName(), unit.unitEmoji()));
         }
@@ -2733,7 +2949,6 @@ public class ButtonHelperFactionSpecific {
         String agendaid = game.getCurrentAgendaInfo().split("_")[2];
         if ("CL".equalsIgnoreCase(agendaid)) {
             String id2 = game.revealAgenda(false);
-            Map<String, Integer> discardAgendas = game.getDiscardAgendas();
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
             String agendaName = agendaDetails.getName();
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),

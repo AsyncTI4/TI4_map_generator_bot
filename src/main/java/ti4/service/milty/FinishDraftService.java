@@ -32,7 +32,10 @@ public class FinishDraftService {
         List<String> valid = flavors.stream().filter(Predicate.not(manager::isFactionTaken)).toList();
         String preset = game.getStoredValue("keleresFlavorPreset");
         if (valid.contains(preset)) return Mapper.getFaction("keleres" + preset.charAt(0));
-        if (valid.size() == 1) return Mapper.getFaction(valid.getFirst());
+        if (valid.size() == 1) {
+            preset = valid.getFirst();
+            return Mapper.getFaction("keleres" + preset.charAt(0));
+        }
         return null;
     }
 
@@ -65,6 +68,10 @@ public class FinishDraftService {
                         }
                         List<Button> buttons = new ArrayList<>();
                         String message = player.getPing() + " choose a flavor of keleres:";
+                        if (allowed.isEmpty()) {
+                            MessageHelper.sendMessageToPlayerCardsInfoThread(player, "*Hrrnnggh*\nThis is awkward, all of the keleres flavors got drafted. I'll let you pick any of them, but don't do that again!");
+                            allowed.addAll(Set.of("mentak", "xxcha", "argent"));
+                        }
                         for (String flavor : allowed) {
                             String emoji = Mapper.getFaction(flavor).getFactionEmoji();
                             String keleres = "keleres" + flavor.charAt(0);

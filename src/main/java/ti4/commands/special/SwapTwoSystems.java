@@ -16,6 +16,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.RiftSetModeService;
+import ti4.service.map.CustomHyperlaneService;
 
 class SwapTwoSystems extends GameStateSubcommand {
 
@@ -52,6 +53,8 @@ class SwapTwoSystems extends GameStateSubcommand {
 
         tileFrom.setPosition(positionTo);
         game.setTile(tileFrom);
+
+        CustomHyperlaneService.moveCustomHyperlaneData(positionFrom, positionTo, game, true);
 
         game.rebuildTilePositionAutoCompleteList();
         FowCommunicationThreadService.checkAllCommThreads(game);

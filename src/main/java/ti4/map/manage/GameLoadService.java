@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
@@ -41,6 +42,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.json.ObjectMapperFactory;
@@ -49,36 +52,19 @@ import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import static ti4.map.manage.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.manage.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.ENDTILE;
-import static ti4.map.manage.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.manage.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.manage.GamePersistenceKeys.MAPINFO;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.PLAYER;
-import static ti4.map.manage.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.manage.GamePersistenceKeys.TILE;
-import static ti4.map.manage.GamePersistenceKeys.TOKENS;
-import static ti4.map.manage.GamePersistenceKeys.UNITDAMAGE;
-import static ti4.map.manage.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.manage.GamePersistenceKeys.UNITS;
 import ti4.message.BotLogger;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
+import static ti4.map.manage.GamePersistenceKeys.*;
+
 @UtilityClass
 class GameLoadService {
 
     private static final Pattern PEEKED_OBJECTIVE_PATTERN = Pattern.compile("(?>([a-z_]+):((?>\\d+,)+);)");
+    private static final ObjectMapper mapper = ObjectMapperFactory.build();
 
     public static List<ManagedGame> loadManagedGames() {
         try (Stream<Path> pathStream = Files.list(Storage.getGamesDirectory().toPath())) {
@@ -241,19 +227,26 @@ class GameLoadService {
                         readUnit(tile, data, unitHolderName);
                     }
 
-                    while (gameFileLines.hasNext()) {
-                        String data = gameFileLines.next();
-                        if (UNITDAMAGE.equals(data)) {
-                            continue;
+                    // DEPRECATED. Delete this after September 1st
+                    boolean skipNext = true;
+                    String nextCategory = gameFileLines.next();
+                    if (UNITDAMAGE.equals(nextCategory)) {
+                        while (gameFileLines.hasNext()) {
+                            String data = skipNext ? nextCategory : gameFileLines.next();
+                            if (UNITDAMAGE.equals(data)) {
+                                skipNext = false;
+                                continue;
+                            }
+                            if (ENDUNITDAMAGE.equals(data)) {
+                                break;
+                            }
+                            readUnitDamage(tile, data, unitHolderName);
                         }
-                        if (ENDUNITDAMAGE.equals(data)) {
-                            break;
-                        }
-                        readUnitDamage(tile, data, unitHolderName);
                     }
 
                     while (gameFileLines.hasNext()) {
-                        String data = gameFileLines.next();
+                        String data = skipNext ? nextCategory : gameFileLines.next();
+                        skipNext = false;
                         if (PLANET_TOKENS.equals(data)) {
                             continue;
                         }
@@ -347,7 +340,6 @@ class GameLoadService {
                 case Constants.BORDER_ANOMALIES -> {
                     if ("[]".equals(info))
                         break;
-                    ObjectMapper mapper = ObjectMapperFactory.build();
                     try {
                         JavaType reference = mapper.getTypeFactory().constructParametricType(List.class, BorderAnomalyHolder.class);
                         game.setBorderAnomalies(mapper.readValue(info, reference));
@@ -521,21 +513,6 @@ class GameLoadService {
                         }
                     }
                 }
-                case Constants.DISPLACED_UNITS_SYSTEM -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ":");
-                    while (vote_info.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
-                        String outcome = null;
-                        String voteInfo;
-                        if (dataInfo.hasMoreTokens()) {
-                            outcome = dataInfo.nextToken();
-                        }
-                        if (dataInfo.hasMoreTokens()) {
-                            voteInfo = dataInfo.nextToken();
-                            game.setSpecificCurrentMovedUnitsFrom1System(outcome, Integer.parseInt(voteInfo));
-                        }
-                    }
-                }
                 case Constants.THALNOS_UNITS -> {
                     StringTokenizer vote_info = new StringTokenizer(info, ":");
                     while (vote_info.hasMoreTokens()) {
@@ -581,19 +558,27 @@ class GameLoadService {
                         }
                     }
                 }
+                case Constants.DISPLACED_UNITS_ACTIVATION_NEW -> {
+                    try {
+                        TypeFactory factory = mapper.getTypeFactory();
+                        JavaType states = factory.constructParametricType(List.class, Integer.class);
+                        JavaType unitholder = factory.constructMapLikeType(HashMap.class, factory.constructType(UnitKey.class), states);
+                        JavaType reference = factory.constructMapLikeType(HashMap.class, factory.constructType(String.class), unitholder);
+                        Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, reference);
+                        game.setTacticalActionDisplacement(displacedUnits);
+                    } catch (Exception e) {
+                        BotLogger.error("Failed to load unit displace map from game save data " + Constants.jazzPing(), e);
+                    }
+                }
+                // TODO: DEPRECATED: Remove after September 1st
                 case Constants.DISPLACED_UNITS_ACTIVATION -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ":");
-                    while (vote_info.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
-                        String outcome = null;
-                        String voteInfo;
-                        if (dataInfo.hasMoreTokens()) {
-                            outcome = dataInfo.nextToken();
-                        }
-                        if (dataInfo.hasMoreTokens()) {
-                            voteInfo = dataInfo.nextToken();
-                            game.setSpecificCurrentMovedUnitsFrom1TacticalAction(outcome,
-                                Integer.parseInt(voteInfo));
+                    StringTokenizer displacedInfo = new StringTokenizer(info, ":");
+                    while (displacedInfo.hasMoreTokens()) {
+                        String token = displacedInfo.nextToken();
+                        String unitOrig = token.split(",")[0];
+                        Integer amt = Integer.parseInt(token.split(",")[1]);
+                        if (unitOrig != null && amt != null) {
+                            game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitOrig, amt);
                         }
                     }
                 }
@@ -1050,6 +1035,7 @@ class GameLoadService {
                 case Constants.SARWEEN_COUNT -> player.setSarweenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.HONOR_COUNT -> player.setHonorCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HARVEST_COUNT -> player.setHarvestCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());
@@ -1094,7 +1080,21 @@ class GameLoadService {
         if (tile == null)
             return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
-        tile.addUnit(spaceHolder, Units.parseID(tokenizer.nextToken()), tokenizer.nextToken());
+        UnitKey uk = Units.parseID(tokenizer.nextToken());
+        List<String> nums = new ArrayList<>(Arrays.asList(tokenizer.nextToken().split(",")));
+        List<Integer> counts = new ArrayList<>();
+        for (String val : nums) {
+            try {
+                counts.add(Integer.parseInt(val));
+            } catch (Exception e) {
+                counts.add(0);
+            }
+        }
+        for (int x = counts.size(); x < UnitState.values().length; x++)
+            counts.add(0);
+        if (!tile.getUnitHolders().containsKey(spaceHolder))
+            BotLogger.error("Invalid unitHolder detected during load: " + tile.getTileID() + " / " + spaceHolder);
+        tile.getUnitHolders().get(spaceHolder).getUnitsByState().put(uk, counts);
     }
 
     private static void readUnitDamage(Tile tile, String data, String spaceHolder) {

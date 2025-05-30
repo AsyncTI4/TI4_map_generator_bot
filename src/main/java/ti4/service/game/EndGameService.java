@@ -82,12 +82,12 @@ public class EndGameService {
             }
         }
 
-        
         // MOVE CHANNELS TO IN-LIMBO
         List<Category> limbos = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true);
         Category inLimboCategory = limbos.isEmpty() ? null : limbos.getFirst();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
+        Category og = tableTalkChannel.getParentCategory();
         if (inLimboCategory != null && archiveChannels && !rematch) {
             if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
                 cleanUpInLimboCategory(event.getGuild(), 3);
@@ -102,6 +102,9 @@ public class EndGameService {
             if (actionsChannel != null) { // MOVE ACTIONS CHANNEL
                 actionsChannel.getManager().setParent(inLimboCategory).queueAfter(15, TimeUnit.SECONDS);
                 MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
+            }
+            if (og != null && og.getTextChannels().size() < 3) {
+                og.delete().queueAfter(20, TimeUnit.SECONDS);
             }
         }
 
@@ -376,7 +379,7 @@ public class EndGameService {
         Category inLimboCategory = guild.getCategoriesByName("The in-limbo PBD Archive", true).getFirst();
         if (inLimboCategory == null) {
             BotLogger.warning(new BotLogger.LogMessageOrigin(guild),
-                    "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
+                "`GameEnd.cleanUpInLimboCategory`\nA clean up of in-limbo was attempted but could not find the **The in-limbo PBD Archive** category on server: "
                     + guild.getName());
             return;
         }

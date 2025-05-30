@@ -82,9 +82,9 @@ public class ExploreService {
             if (player.hasAbility("distant_suns")) {
                 String reportMessage = """
                     Garbozia exploration with **Distant Suns** is not implemented.\
-                    
+
                     Please use `/explore draw_and_discard trait` then `/explore use explore_card_id` to manually resolve this exploration.\
-                    
+
                     -# (NB: Player chooses a trait, reveals two of that trait and one of each other; reveal four cards total.)""";
                 if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), reportMessage);
@@ -813,6 +813,11 @@ public class ExploreService {
                 message = "Card has been added to play area.\nAdded as a relic (not actually a relic)";
                 MessageHelper.sendMessageToEventChannel(event, message);
             }
+            case "suspiciouswreckage" -> {
+                Button button = Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1", "Resolve Suspicious Wreckage");
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
+                MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
+            }
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
@@ -890,6 +895,7 @@ public class ExploreService {
         if (!FOWPlusService.deckInfoAvailable(player, game) || !RiftSetModeService.deckInfoAvailable(player, game)) {
             return;
         }
+        boolean isGM = player != null && game.getPlayersWithGMRole().contains(player);
         for (String currentType : types) {
             StringBuilder info = new StringBuilder();
             List<String> deck = game.getExploreDeck(currentType);
@@ -914,11 +920,11 @@ public class ExploreService {
                 info.append("​"); // add a zero width space at the end to cement newlines between sets of explores
             }
 
-            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode()) {
+            if (player == null || player.getSCs().isEmpty() || overRide || !game.isFowMode() || isGM) {
                 MessageHelper.sendMessageToChannel(channel, info.toString());
             }
         }
-        if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && game.isFowMode() && !overRide) {
+        if (player != null && "action".equalsIgnoreCase(game.getPhaseOfGame()) && game.isFowMode() && !overRide && !isGM) {
             MessageHelper.sendMessageToChannel(channel, "It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         }
     }

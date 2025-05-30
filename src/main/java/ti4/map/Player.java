@@ -142,6 +142,10 @@ public class Player extends PlayerProperties {
         return nomboxTile;
     }
 
+    public UnitHolder getNombox() {
+        return nomboxTile.getSpaceUnitHolder();
+    }
+
     public void resetProducedUnits() {
         currentProducedUnits = new HashMap<>();
     }
@@ -335,7 +339,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2") || getTechs().contains("hcf2") || getTechs().contains("dsflorff")
-            || getTechs().contains("dslizhff") || getTechs().contains("absol_ff2") || getTechs().contains("absol_hcf2") || ownsUnit("florzen_fighter");
+            || getTechs().contains("dslizhff") || getTechs().contains("dsbelkff") || getTechs().contains("absol_ff2") || getTechs().contains("absol_hcf2") || ownsUnit("florzen_fighter");
     }
 
     @JsonIgnore
@@ -1222,8 +1226,9 @@ public class Player extends PlayerProperties {
         return getFactionEmoji();
     }
 
+    @JsonIgnore
     public String getFactionEmojiRaw() {
-        return getFactionEmoji();
+        return super.getFactionEmoji();
     }
 
     public boolean hasCustomFactionEmoji() {
@@ -2167,11 +2172,8 @@ public class Player extends PlayerProperties {
 
     public boolean hasMechInSystem(Tile tile) {
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        String colorID = Mapper.getColorID(getColor());
         for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty())
-                continue;
-            if (unitHolder.getUnitCount(UnitType.Mech, colorID) > 0) {
+            if (unitHolder.getUnitCount(UnitType.Mech, getColorID()) > 0) {
                 return true;
             }
         }

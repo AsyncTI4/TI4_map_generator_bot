@@ -63,6 +63,21 @@ public class MessageListener extends ListenerAdapter {
                     if (addFactionEmojiReactionsToMessages(event, gameName)) return;
                 }
             }
+            if (event.getAuthor().getId().equalsIgnoreCase("572698679618568193")) {
+                TextChannel deletionLogChannel = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("deletion-log", true).stream()
+                    .findFirst().orElse(null);
+                if (deletionLogChannel == null) return;
+                String msg = "Message from dicecord: " + message.getContentRaw() + " " + message.getContentStripped() + " " + message.getContentDisplay() + " \nHere: " + message.getJumpUrl();
+                if (!message.getComponents().isEmpty()) {
+                    msg += "\n" + message.getComponents().getFirst().getType().name();
+                }
+                if (!message.getEmbeds().isEmpty()) {
+                    MessageHelper.sendMessageToChannelWithEmbeds(deletionLogChannel, msg, message.getEmbeds());
+                } else {
+                    MessageHelper.sendMessageToChannel(deletionLogChannel, msg + "\n No embeds");
+                }
+                return;
+            }
             handleFogOfWarCombatThreadMirroring(event);
         } catch (Exception e) {
             BotLogger.error("`MessageListener.onMessageReceived`   Error trying to handle a received message:\n> " +
@@ -225,7 +240,9 @@ public class MessageListener extends ListenerAdapter {
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame.getGame().isHiddenAgendaMode() && managedGame.getGame().getPhaseOfGame().toLowerCase().contains("agenda")) {
             Player player = getPlayer(event, managedGame.getGame());
-            if (player == null || !player.isRealPlayer() || managedGame.isFowMode() && event.getChannel().equals(player.getPrivateChannel())) {
+            if (player == null || !player.isRealPlayer()
+                || event.getChannel().getId().equals(player.getCardsInfoThreadID())
+                || managedGame.isFowMode() && event.getChannel().equals(player.getPrivateChannel())) {
                 return false;
             }
             if (!player.isSpeaker()) {

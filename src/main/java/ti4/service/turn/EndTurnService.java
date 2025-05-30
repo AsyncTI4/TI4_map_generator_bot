@@ -14,6 +14,7 @@ import ti4.map.Player;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.game.EndPhaseService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
@@ -47,10 +48,18 @@ public class EndTurnService {
         pingNextPlayer(event, game, mainPlayer, false);
     }
 
-    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+    public static void resetStoredValuesEndOfTurn(Game game, Player player) {
         game.setStoredValue("lawsDisabled", "no");
         game.removeStoredValue("endTurnWhenSCFinished");
         game.removeStoredValue("fleetLogWhenSCFinished");
+        game.removeStoredValue("mahactHeroTarget");
+        game.removeStoredValue("possiblyUsedRift");
+        game.setActiveSystem("");
+    }
+
+    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+        resetStoredValuesEndOfTurn(game, mainPlayer);
+
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
         for (Player player : game.getRealPlayers()) {
             for (Player player_ : game.getRealPlayers()) {
@@ -63,12 +72,10 @@ public class EndTurnService {
                 }
             }
         }
-        game.setStoredValue("mahactHeroTarget", "");
-        game.setActiveSystem("");
-        game.setStoredValue("possiblyUsedRift", "");
         if (game.isFowMode()) {
+            FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _\n"
-                + "**End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for** " + mainPlayer.getRepresentation());
+                + "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + mainPlayer.getRepresentation());
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
         }
