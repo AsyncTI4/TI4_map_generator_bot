@@ -1,15 +1,22 @@
 package ti4.helpers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
-import ti4.map.Leader;
-import ti4.map.Player;
+import ti4.image.Mapper;
+import ti4.map.*;
 
 @Data
 public class WebPlayerArea {
+    @Data
+    public static class UnitCountInfo {
+        private final int unitCap;
+        private final int deployedCount;
+    }
+
     // Basic properties
     private String userName;
     private String faction;
@@ -80,9 +87,15 @@ public class WebPlayerArea {
     private float spaceArmyCombat;
     private float groundArmyCombat;
 
+    // card counts
+    private Integer soCount;
+    private Integer acCount;
+    private Integer pnCount;
 
+    // Unit information map
+    private Map<String, UnitCountInfo> unitCounts;
 
-    public static WebPlayerArea fromPlayer(Player player) {
+    public static WebPlayerArea fromPlayer(Player player, Map<String, Tile> tileMap) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
 
         // Basic properties
@@ -155,6 +168,45 @@ public class WebPlayerArea {
         webPlayerArea.setSpaceArmyCombat(player.getTotalCombatValueOfUnits("space"));
         webPlayerArea.setGroundArmyCombat(player.getTotalCombatValueOfUnits("ground"));
 
+        // card counts
+        webPlayerArea.setSoCount(player.getSo());
+        webPlayerArea.setAcCount(player.getAc());
+        webPlayerArea.setPnCount(player.getPnCount());
+
+        // get reinforcement count
+        Map<Units.UnitKey, Integer> unitMapCount = new HashMap<>();
+        for (Tile tile : tileMap.values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                fillUnits(unitMapCount, unitHolder);
+            }
+        }
+
+        // Get counts of units on map to show how many are in reinforcements
+        Map<String, UnitCountInfo> unitInfoMap = new HashMap<>();
+        String playerColor = player.getColor();
+        for (String unitID : Mapper.getUnitIDList()) {
+            Units.UnitKey unitKey = Mapper.getUnitKey(unitID, playerColor);
+            int unitCap = player.getUnitCap(unitID);
+            int count = unitMapCount.getOrDefault(unitKey, 0);
+            UnitCountInfo unitCountInfo = new UnitCountInfo(unitCap, count);
+            unitInfoMap.put(unitID, unitCountInfo);
+        }
+
+        webPlayerArea.setUnitCounts(unitInfoMap);
+
         return webPlayerArea;
     }
+
+    private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder) {
+        for (Units.UnitKey uk : unitHolder.getUnitKeys()) {
+            if (uk.getUnitType() == Units.UnitType.Infantry || uk.getUnitType() == Units.UnitType.Fighter) {
+                continue;
+            }
+
+            int count = unitCount.getOrDefault(uk, 0);
+            count += unitHolder.getUnitCount(uk);
+            unitCount.put(uk, count);
+        }
+    }
+
 }

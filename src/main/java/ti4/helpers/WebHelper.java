@@ -28,6 +28,7 @@ import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
@@ -84,11 +85,11 @@ public class WebHelper {
 
         try {
             List<WebPlayerArea> playerDataList = new ArrayList<>();
+            Map<String, Tile> tileMap = game.getTileMap();
             for (Player player : game.getPlayers().values()) {
-                playerDataList.add(WebPlayerArea.fromPlayer(player));
+                playerDataList.add(WebPlayerArea.fromPlayer(player, tileMap));
             }
             String json = objectMapper.writeValueAsString(playerDataList);
-
 
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))
