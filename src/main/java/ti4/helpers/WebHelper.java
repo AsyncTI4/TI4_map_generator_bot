@@ -28,6 +28,7 @@ import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
@@ -74,6 +75,36 @@ public class WebHelper {
                     BotLogger.error(new BotLogger.LogMessageOrigin(game), "An exception occurred while performing an async send of game data to the website.", e);
                     return null;
                 });
+        } catch (IOException e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
+        }
+    }
+
+    public static void putPlayerData(String gameId, Game game) {
+        if (!sendingToWeb())  return;
+
+        try {
+            List<WebPlayerArea> playerDataList = new ArrayList<>();
+            Map<String, Tile> tileMap = game.getTileMap();
+            for (Player player : game.getPlayers().values()) {
+                playerDataList.add(WebPlayerArea.fromPlayer(player, tileMap));
+            }
+            String json = objectMapper.writeValueAsString(playerDataList);
+
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format("webdata/%s/%s.json", gameId, gameId))
+                    .contentType("application/json")
+                    .cacheControl("no-cache, no-store, must-revalidate")
+                    .build();
+
+            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
+                    .exceptionally(e -> {
+                        BotLogger.error(
+                                "An exception occurred while performing an async send of overlay data to the website.",
+                                e);
+                        return null;
+                    });
         } catch (IOException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
