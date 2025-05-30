@@ -1467,6 +1467,7 @@ public class UnfiledButtonHandlers {
             event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
         }
         ButtonHelper.deleteMessage(event);
+        checkForAllReactions(event, game);
     }
 
     public static void acDiscardFromHand(
@@ -1953,7 +1954,7 @@ public class UnfiledButtonHandlers {
             for (Player player : game.getRealPlayers()) {
                 String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
                 String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
-                if (po.isEmpty() || so.isEmpty() || game.getPhaseOfGame().contains("action")) {
+                if (po.isEmpty() || so.isEmpty() || game.getPhaseOfGame().contains("action") || game.getPhaseOfGame().contains("agenda")) {
                     allReacted = false;
                 }
             }
@@ -3113,6 +3114,7 @@ public class UnfiledButtonHandlers {
             msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
+        checkForAllReactions(event, game);
     }
 
     @ButtonHandler(value = "refreshStatusSummary", save = false)
