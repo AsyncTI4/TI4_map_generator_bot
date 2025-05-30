@@ -273,5 +273,29 @@
         "abilityText": "You may exhaust this card and choose another player; that player may also resolve that action card as if they had played it.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
+    },
+    {
+        "id": "votc_xxchahero",
+        "faction": "xxcha",
+        "type": "hero",
+        "name": "Xxekir Grom",
+        "title": "The Council's Heart",
+        "abilityName": "Political Data Nexus: Voice of the Council",
+        "abilityWindow": "ACTION:",
+        "abilityText": "You may discard 1 law from play. Gain the speaker token, then look at the top 5 cards of the agenda deck. Choose up to 2 to resolve as if you had cast up to 5 votes for an outcome of your choice; discard the rest. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "id": "votc_keleresheroxxcha",
+        "faction": "keleres",
+        "type": "hero",
+        "name": "Odlynn Myrr",
+        "title": "Keleres Tribunii",
+        "abilityName": "Operation Archon: Witching Hour",
+        "abilityWindow": "After an agenda is revealed:",
+        "abilityText": "You may cast up to 6 additional votes on this agenda. Predict aloud an outcome of this agenda. For each player that abstains or votes for another outcome, gain 1 trade goods and 1 command token. Then, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "voices_of_the_council"
     }
 ]
