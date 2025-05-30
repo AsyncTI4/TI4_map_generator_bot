@@ -14,6 +14,7 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -51,18 +52,11 @@ public class StartTurnService {
                 game.removeStoredValue(id);
             }
         }
+
+        ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
-        game.setNaaluAgent(false);
-        game.setL1Hero(false);
         game.setStoredValue("lawsDisabled", "no");
         game.checkSOLimit(player);
-        game.removeStoredValue("hiredGunsInPlay");
-        game.removeStoredValue("allianceModeSimultaneousAction");
-        game.setStoredValue("vaylerianHeroActive", "");
-        game.setStoredValue("tnelisCommanderTracker", "");
-        game.setStoredValue("planetsTakenThisRound", "");
-        game.setStoredValue("absolLux", "");
-        game.setStoredValue("mentakHero", "");
         CardsInfoService.sendVariousAdditionalButtons(game, player);
         boolean goingToPass = false;
         if (game.getStoredValue("Pre Pass " + player.getFaction()) != null
@@ -112,6 +106,7 @@ public class StartTurnService {
             MessageHelper.sendPrivateMessageToPlayer(player, game, event, text, fail, success);
             if (!goingToPass) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
+                FowCommunicationThreadService.checkNewNeighbors(game, player);
             }
             if (getMissedSCFollowsText(game, player) != null
                 && !"".equalsIgnoreCase(getMissedSCFollowsText(game, player))) {
@@ -389,8 +384,6 @@ public class StartTurnService {
             .remove(game.getName(), GameMessageType.TURN)
             .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
         if (game.isFowMode()) {
-            FowCommunicationThreadService.checkAllCommThreads(game);
-            FowCommunicationThreadService.checkNewNeighbors(game, player, startButtons);
             startButtons.add(Buttons.gray("showGameAgain", "Refresh Map"));
         } else {
             startButtons.add(Buttons.gray("showMap", "Show Map"));

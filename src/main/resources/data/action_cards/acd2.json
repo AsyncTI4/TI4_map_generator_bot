@@ -432,7 +432,7 @@
         "name": "Heist",
         "phase": "Action",
         "window": "After you gain control of a planet that was controlled by another player",
-        "text": "Take or discard up to 2 of that player's relic fragments. For each relic fragment discarded, gain 2 trade goods.",
+        "text": "Take up to 2 of that player's relic fragments. If you did not take any relic fragments, gain 2 trade goods.",
         "flavorText": "Mot awoke in a pool of his own blood. S'ula had the courtesy to let him live—just barely—but he was too weak to stand. So, he lay in front of the empty vault and wept.",
         "source": "action_deck_2"
     },

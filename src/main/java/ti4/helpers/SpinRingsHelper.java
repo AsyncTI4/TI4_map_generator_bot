@@ -2,7 +2,9 @@ package ti4.helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import lombok.experimental.UtilityClass;
@@ -80,7 +82,9 @@ public class SpinRingsHelper {
     public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
         String[] customSpins = customSpinString.toLowerCase().split(" ");
         StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## ⚙️ " + randomStatusMessage());
+        
         List<Tile> tilesToSet = new ArrayList<>();
+        List<String[]> customHyperlanesToMove = new ArrayList<>();
 
         for (String spinString : customSpins) {
             Random random = new Random();
@@ -122,7 +126,11 @@ public class SpinRingsHelper {
                             pos = x - steps;
                         }
                     }
+                    String fromPosition = tile.getPosition();
                     tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
+                    if (game.getCustomHyperlaneData().get(fromPosition) != null) {
+                        customHyperlanesToMove.add(new String[]{fromPosition, tile.getPosition()});
+                    }
                     tilesToSet.add(tile);
                     updateHomeSystem(game, tile);
                 }
@@ -132,6 +140,14 @@ public class SpinRingsHelper {
 
         for (Tile tile : tilesToSet) {
             game.setTile(tile);
+        }
+        if (!customHyperlanesToMove.isEmpty()) {
+            Map<String, String> currentData = game.getCustomHyperlaneData();
+            Map<String, String> previousData = new HashMap<>(currentData);
+            for (String[] pair : customHyperlanesToMove) {
+                currentData.remove(pair[0]);
+                currentData.put(pair[1], previousData.get(pair[0]));
+            }
         }
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), sb.toString());
@@ -205,7 +221,8 @@ public class SpinRingsHelper {
     }
 
     private static void spunMessage(StringBuffer sb, int ring, String direction, int steps, Game game) {
-        sb.append("\n-# Ring ").append(ring).append(" ");
+        sb.append("\n-# Ring ");
+        sb.append(game.isFowMode() ? "?" : ring).append(" ");
         sb.append(game.isFowMode() ? "?" : direction.toUpperCase()).append(" for ");
         sb.append(game.isFowMode() ? "?" : steps).append(" steps.");
     }

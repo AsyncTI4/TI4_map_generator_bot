@@ -121,8 +121,10 @@ public class CommanderUnlockCheckService {
             case "uydai" -> shouldBeUnlocked = true;
             case "pharadn" -> shouldBeUnlocked = true;
             case "qhet" -> shouldBeUnlocked = true;
+            case "toldar" -> shouldBeUnlocked = true;
             case "nokar" -> shouldBeUnlocked = true;
             case "atokera" -> shouldBeUnlocked = true;
+            case "belkosea" -> shouldBeUnlocked = true;
             case "veldyr" -> {
                 if (ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player).size() > 1) {
                     shouldBeUnlocked = true;

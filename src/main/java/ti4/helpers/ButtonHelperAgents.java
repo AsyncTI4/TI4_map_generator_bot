@@ -44,6 +44,7 @@ import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.RefreshLeaderService;
+import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.ParsedUnit;
@@ -83,7 +84,52 @@ public class ButtonHelperAgents {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
             }
+            if (cabal.hasUnexhaustedLeader("toldaragent")) {
+                List<Button> buttons = new ArrayList<>();
+                String msg = cabal.getRepresentationUnfogged() + " you have the ability to use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + " the Toldar" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
+                    + p2.getFactionEmojiOrColor() + " who has "
+                    + p2.getCommoditiesTotal() + " commodities";
+                buttons.add(Buttons.green("toldarAgent_" + p2.getFaction() + "_" + p2.getCommoditiesTotal(),
+                    "Use Toldar Agent"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
+            }
         }
+    }
+
+    public static void toldarAgentInitiation(Game game, Player p2, int amount) {
+        for (Player toldar : game.getRealPlayers()) {
+            if (toldar == p2) {
+                continue;
+            }
+            if (toldar.hasUnexhaustedLeader("toldaragent")) {
+                List<Button> buttons = new ArrayList<>();
+                String msg = toldar.getRepresentationUnfogged() + " you have the ability to use " + (toldar.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + " the Toldar" + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
+                    + p2.getFactionEmojiOrColor() + " for " + amount + " commodities";
+                buttons.add(Buttons.green("toldarAgent_" + p2.getFaction() + "_" + amount,
+                    "Use Toldar Agent"));
+                buttons.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(toldar.getCardsInfoThread(), msg, buttons);
+            }
+        }
+    }
+
+    @ButtonHandler("toldarAgent_")
+    public static void toldarAgent(Player toldar, Game game, String buttonID, GenericInteractionCreateEvent event) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String am = buttonID.split("_")[2];
+        int amount = Integer.parseInt(am);
+        ButtonHelperAgents.exhaustAgent("exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
+        int commodities = p2.getCommodities();
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+            p2.getRepresentationUnfogged() + " your " + commodities + " commodities have been washed by the Toldar agent.");
+        p2.setTg(p2.getTg() + commodities);
+        p2.setCommodities(0);
+        toldar.setCommodities(Math.min(toldar.getCommoditiesTotal(), toldar.getCommodities() + amount));
+        MessageHelper.sendMessageToChannel(toldar.getCorrectChannel(), toldar.getRepresentation() + " you now have " + toldar.getCommodities() + " commodities after using your agent");
+        toldarAgentInitiation(game, toldar, amount);
     }
 
     @ButtonHandler("startCabalAgent_")
@@ -249,6 +295,38 @@ public class ButtonHelperAgents {
             + "_Hypermetabolism_ and spent a command token from their strategy pool to ready " + agent + ".");
     }
 
+    @ButtonHandler("belkoseaYellowTechReady_")
+    public static void belkoseaYellowTechReady(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        buttonID = buttonID.replace("belkoseaYellowTechReady_", "");
+        String thing = buttonID.split("_")[0];
+        String detail = buttonID.replace(thing + "_", "");
+        String msg = player.getFactionEmoji() + " exhausted _Synchrony Matrix_ to ready " + detail + ".";
+        if (thing.equalsIgnoreCase("agent")) {
+            String agent = detail;
+            Leader playerLeader = player.getLeader(agent).orElse(null);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            if (playerLeader == null) {
+                if (agent.contains("titanprototype")) {
+                    player.removeExhaustedRelic("titanprototype");
+                }
+                if (agent.contains("absol")) {
+                    player.removeExhaustedRelic("absol_jr");
+                }
+                return;
+            }
+            RefreshLeaderService.refreshLeader(player, playerLeader, game);
+        } else {
+            if (thing.equalsIgnoreCase("planet")) {
+                player.removeExhaustedAbility(detail);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            } else {
+                player.removeExhaustedRelic(detail);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
     @ButtonHandler("umbatTile_")
     public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String pos = buttonID.replace("umbatTile_", "");
@@ -283,9 +361,7 @@ public class ButtonHelperAgents {
         String message = player.getRepresentation() + " chose to destroy all infantry on " + Helper.getPlanetRepresentation(planet, game);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int amountToKill = uH.getUnitCount(UnitType.Infantry, player.getColor());
-        if (player.hasInf2Tech()) {
-            ButtonHelper.resolveInfantryDeath(player, amountToKill);
-        }
+        ButtonHelper.resolveInfantryDestroy(player, amountToKill);
         message += ". " + amountToKill + " infantry were destroyed. " + Math.min(player.getCommoditiesTotal(), amountToKill) + " comms were gained and then converted to tgs";
         player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), amountToKill));
         player.setCommodities(Math.max(0, player.getCommodities() - Math.min(player.getCommoditiesTotal(), amountToKill)));
@@ -505,6 +581,10 @@ public class ButtonHelperAgents {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "The Stillness of Stars, the Vuil'Raith" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             startCabalAgent(player, game, rest.replace("cabalagent_", ""), event);
+        }
+        if ("toldaragent".equalsIgnoreCase(agent)) {
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Toldar agent.";
+            MessageHelper.sendMessageToChannel(channel, exhaustText);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Doctor Sucaban, the Jol-Nar" + ssruuSlash + " agent.";
@@ -1194,6 +1274,11 @@ public class ButtonHelperAgents {
                 && uH.getUnitCount(UnitType.Mech, player.getColor()) > 0) {
                 return true;
             }
+            for (String token : uH.getTokenList()) {
+                if (player.getPlanets().contains(uH.getName()) && token.contains("superweapon")) {
+                    return true;
+                }
+            }
         }
         return present;
     }
@@ -1688,7 +1773,7 @@ public class ButtonHelperAgents {
 
         if (event instanceof ButtonInteractionEvent event2) {
             if (event2.getButton().getLabel().contains("Yourself")) {
-                List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, game, event2);
+                List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
                 event2.getMessage().editMessage(event2.getMessage().getContentRaw())
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
             }
@@ -1962,9 +2047,10 @@ public class ButtonHelperAgents {
         return buttons;
     }
 
-    public static List<Button> getL1Z1XAgentButtons(Game game, Player player) {
-        Tile tile = game.getTileByPosition(game.getActiveSystem());
+    public static List<Button> getL1Z1XAgentButtons(Game game, Tile tile, Player player) {
         List<Button> buttons = new ArrayList<>();
+        if (tile == null) return buttons;
+
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String planetId = planet.getName();
             if (player.getPlanetsAllianceMode().contains(planetId) && FoWHelper.playerHasInfantryOnPlanet(player, tile, planetId)) {

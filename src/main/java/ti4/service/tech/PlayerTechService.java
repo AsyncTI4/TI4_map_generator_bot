@@ -45,6 +45,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
@@ -122,6 +123,10 @@ public class PlayerTechService {
         switch (tech) {
             case "bs" -> { // Bio-stims
                 ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(game, event, player, false);
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "dsbelky" -> {
+                ButtonHelper.sendAllAgentsAndAbilitiesToReady(game, event, player);
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "gls" -> { // Graviton
@@ -262,7 +267,7 @@ public class PlayerTechService {
                 game.setDominusOrb(true);
                 ButtonHelper.deleteMessage(event);
                 String message = "Choose a system to move from.";
-                List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, game, event);
+                List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
             }
             case "dsaxisy" -> {

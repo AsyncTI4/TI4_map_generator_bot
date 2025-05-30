@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
+import ti4.commands.async.AsyncCommand;
 import ti4.commands.bothelper.BothelperCommand;
 import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.cardsac.ACCardsCommand;
@@ -36,7 +37,6 @@ import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tech.TechCommand;
-import ti4.commands.tigl.TIGLCommand;
 import ti4.commands.tokens.AddCCCommand;
 import ti4.commands.tokens.AddFrontierTokensCommand;
 import ti4.commands.tokens.AddTokenCommand;
@@ -119,7 +119,7 @@ public class CommandManager {
         new PlanetCommand(),
         new SelectionBoxDemoCommand(),
         new UserCommand(),
-        new TIGLCommand(),
+        new AsyncCommand(),
         new OmegaPhaseCommand()).collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
     public static ParentCommand getCommand(String name) {

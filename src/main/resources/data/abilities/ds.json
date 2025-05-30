@@ -719,7 +719,7 @@
         "id": "collateralized_loans",
         "name": "Collateralized Loans",
         "faction": "vaden",
-        "window": "After 1 of your opponent's ships is destroyed during a round of space combat",
+        "window": "After 1 of your opponent's ships is destroyed during a round of space combat:",
         "windowEffect": "You may remove 1 of that player's control tokens from your faction sheet to place 1 ship of that type from your reinforcements in the active system.",
         "source": "ds",
         "shortName": "Collateral\n-ized Loans"
@@ -854,7 +854,7 @@
         "id": "mark_of_pharadn",
         "name": "Mark Of Pharadn",
         "faction": "pharadn",
-        "permanentEffect": "Abilities that would place infantry from your reinforcements on planets instead allow you to produce those units. When you produce infantry, you must return 1 of your captured infantry to produce each of those units, instead of spending resources.",
+        "permanentEffect": "Abilities that would allow you to place infantry on the game board instead allow you to produce those units. When you produce infantry, you must return 1 of your captured infantry to produce each of those units, instead of spending resources.",
         "source": "ds"
     },
     {
@@ -873,7 +873,7 @@
     },
     {
         "id": "tempest_squads",
-        "name": "Data Recovery",
+        "name": "Tempest Squads",
         "faction": "qhet",
         "permanentEffect": "While you are the active player, 2 infantry in the active system do not count against your ships’ capacity. [Note: think of this as sort of like a mild Sardakk hero]",
         "source": "ds"
@@ -898,6 +898,83 @@
         "name": "Living Metals",
         "faction": "atokera",
         "permanentEffect": "Agenda outcomes and action cards that have component actions cannot remove or destroy your units, or place other player’s units on planets you control. [Note: protects against ixthian] ",
+        "source": "ds"
+    },
+    {
+        "id": "classified_developments",
+        "name": "Classified Developments",
+        "faction": "belkosea",
+        "permanentEffect": "ACTION: Spend a combined total of 5 resources or influence to place 1 superweapon ability card in your play area, and the corresponding superweapon token on a planet you control.",
+        "source": "ds"
+    },
+    {
+        "id": "superweapon_projects",
+        "name": "Superweapon Projects",
+        "faction": "belkosea",
+        "permanentEffect": "Superweapons you control are structures and cannot be destroyed by abilities. Each planet can contain a maximum of 1 superweapon. ",
+        "source": "ds"
+    },
+    {
+        "id": "honor_bound",
+        "name": "Honor-Bound",
+        "faction": "toldar",
+        "permanentEffect": "When you gain honor, place or flip 1 code token on your faction sheet face up, if able. When you gain dishonor, instead place or flip 1 code token face down, if able.",
+        "source": "ds"
+    },
+    {
+        "id": "pride",
+        "name": "Pride",
+        "faction": "toldar",
+        "permanentEffect": "When you win a combat as the attacker against a player who has more victory points than you, gain 1 honor; if that player has fewer victory points than you, gain 1 dishonor.",
+        "source": "ds"
+    },
+    {
+        "id": "the_code",
+        "name": "The Code",
+        "faction": "toldar",
+        "permanentEffect": "When you gain—or lose—honor or dishonor, gain or lose the Code cards corresponding with your current honor and dishonor. This faction has the abilities on those Code cards.",
+        "source": "ds"
+    },
+    {
+        "id": "bestow",
+        "name": "Bestow (2 Honor)",
+        "faction": "toldar",
+        "permanentEffect": "When you pass, you may allow all of your neighbors to each gain 2 commodities, for each neighbor that does, gain 1 commodity.",
+        "source": "ds"
+    },
+    {
+        "id": "reflect",
+        "name": "Reflect (5 Honor)",
+        "faction": "toldar",
+        "permanentEffect": "When you score an objective, if another player has already scored that objective, draw 1 action card.",
+        "source": "ds"
+    },
+    {
+        "id": "ascend",
+        "name": "Ascend (8 Honor)",
+        "faction": "toldar",
+        "permanentEffect": "When you gain this card, gain 1 victory point. When you lose this card, lose 1 victory point.",
+        "source": "ds"
+    },
+    {
+        "id": "thwart",
+        "name": "Thwart (2 Dishonor)",
+        "faction": "toldar",
+        "permanentEffect": "When you would gain 1 or more commodities or trade goods, instead take them from any combination of your neighbors, if able. [Note: not automated, have your neighbors subtract with /player stats]",
+        "source": "ds"
+    },
+    {
+        "id": "deceive",
+        "name": "Deceive (5 Dishonor)",
+        "faction": "toldar",
+        "permanentEffect": "When you would draw 1 or more action cards, instead take 1 at random from 1 of your neighbors. ",
+        "source": "ds"
+    },
+    {
+        "id": "scourge",
+        "name": "Scourge (8 Dishonor)",
+        "faction": "toldar",
+        "permanentEffect": "Purge your promissory notes [Note: even ones in other players hands/play areas]; you cannot gain honor. You treat scored secret objectives as public objectives, instead of public objectives.",
         "source": "ds"
     }
 ]

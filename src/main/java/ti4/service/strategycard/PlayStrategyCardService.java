@@ -38,6 +38,7 @@ import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
+import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.turn.StartTurnService;
@@ -167,6 +168,9 @@ public class PlayStrategyCardService {
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
+            if (ButtonHelper.isLawInPlay(game, "sanctions") && !game.isAbsolMode()) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Friendly reminder that executive sanctions is in play, so the AC limit is 3 instead of 7");
+            }
         }
 
         // Handle Kyro Hero
@@ -315,7 +319,7 @@ public class PlayStrategyCardService {
             message.addReaction(reactionEmoji).queue();
             player.addFollowedSC(scToPlay, event);
         }
-        if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && scToPlay != 1 && !game.getName().equalsIgnoreCase("pbd100two")) {
+        if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode() && scToPlay != 5 && !game.getName().equalsIgnoreCase("pbd100two")) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
@@ -323,7 +327,7 @@ public class PlayStrategyCardService {
                 if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
                     && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
                     && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
-                    && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")) {
+                    && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent") && scToPlay != 1) {
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
                         message.addReaction(reactionEmoji2).queue();
@@ -351,6 +355,25 @@ public class PlayStrategyCardService {
                         }
                     }
                 }
+                if (!p2.hasFollowedSC(scToPlay) && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction()).isEmpty()) {
+                    game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
+                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                    if (reactionEmoji2 != null) {
+                        message.addReaction(reactionEmoji2).queue();
+                        p2.addFollowedSC(scToPlay, event);
+                        if (scToPlay == 8) {
+                            String key3 = "potentialBlockers";
+                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                            }
+
+                            String key = "factionsThatAreNotDiscardingSOs";
+                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                        }
+                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                            + stratCardName + "** because you told the bot earlier that you wished to pass on it.");
+                    }
+                }
             }
         }
         game.setStoredValue("scPlay" + scToPlay, message.getJumpUrl());
@@ -375,6 +398,24 @@ public class PlayStrategyCardService {
             threadChannel.queue(m5 -> {
                 if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
                     MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
+                    if (ShouldPrintFollowOrder(game, scModel)) {
+                        List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
+                        StringBuilder playerOrder = new StringBuilder("__Order for performing the Secondary ability:__\n");
+                        for (int i = 0; i < playersInOrder.size(); i++) {
+                            playerOrder.append("`").append(i + 1).append(".` ");
+                            if (game.isOmegaPhaseMode() && game.getPhaseOfGame().equals("action")) {
+                                int lowestSC = playersInOrder.get(i).getLowestSC();
+                                TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
+                                playerOrder.append(scEmoji);
+                            }
+                            playerOrder.append(playersInOrder.get(i).getRepresentationNoPing());
+                            if (playersInOrder.get(i).isSpeaker()) {
+                                playerOrder.append(MiscEmojis.SpeakerToken);
+                            }
+                            playerOrder.append("\n");
+                        }
+                        MessageHelper.sendMessageToChannel(m5, playerOrder.toString());
+                    }
                 }
 
                 if (scModel.usesAutomationForSCID("pok5trade")) {
@@ -492,17 +533,7 @@ public class PlayStrategyCardService {
         game.setStoredValue(key, "");
         game.setStoredValue(key2, "");
         game.setStoredValue(key3, "");
-        List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
-            players = Helper.getSpeakerOrPriorityOrderFromPlayer(imperialHolder, game);
-        } else {
-            if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
-            } else {
-                players = game.getActionPhaseTurnOrder();
-            }
-            Collections.rotate(players, -players.indexOf(imperialHolder));
-        }
+        List<Player> players = getPlayersInFollowOrder(game, imperialHolder);
         if (game.isQueueSO()) {
             for (Player player : players) {
                 if (player.getSoScored() + player.getSo() < player.getMaxSOCount()
@@ -516,6 +547,33 @@ public class PlayStrategyCardService {
                 }
             }
         }
+    }
+
+    private static List<Player> getPlayersInFollowOrder(Game game, Player player) {
+        List<Player> players;
+        if (!game.isOmegaPhaseMode()) {
+            players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        } else {
+            if (game.getPhaseOfGame().contains("agenda")) {
+                players = Helper.getSpeakerOrPriorityOrder(game);
+            } else {
+                players = game.getActionPhaseTurnOrder();
+            }
+            Collections.rotate(players, -players.indexOf(player));
+        }
+        return players;
+    }
+
+    private static boolean ShouldPrintFollowOrder(Game game, StrategyCardModel scModel) {
+        if (game.isOmegaPhaseMode()) return true;
+
+        if (scModel.usesAutomationForSCID("pok7technology")) {
+            Player raOwner = game.getPNOwner("ra");
+            if (raOwner == null) return false;
+            return true;
+        }
+
+        return false;
     }
 
     private static List<Button> getLeadershipButtons(int sc) {

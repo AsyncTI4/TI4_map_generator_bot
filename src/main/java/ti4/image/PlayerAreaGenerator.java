@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -19,11 +26,13 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
+
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -62,10 +71,9 @@ import ti4.model.Source.ComponentSource;
 import ti4.model.StrategyCardModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
 import ti4.website.WebsiteOverlay;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class PlayerAreaGenerator {
 
@@ -278,13 +286,14 @@ public class PlayerAreaGenerator {
             graphics.setFont(Storage.getFont20());
             int drawX = x + 9;
             int drawY = y + 125;
-            if (player.getNeighbouringPlayers(true).isEmpty()) {
+            Set<Player> neighbors = player.getNeighbouringPlayers(true);
+            if (neighbors.isEmpty()) {
                 DrawingUtil.superDrawString(g2, "No Neighbors", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
                 xSpacer += 115;
             } else {
                 DrawingUtil.superDrawString(g2, "Neighbors: ", drawX + xSpacer, drawY, Color.red, null, null, stroke2, Color.black);
                 xSpacer += 115;
-                for (Player p2 : player.getNeighbouringPlayers(true)) {
+                for (Player p2 : neighbors) {
                     String faction2 = p2.getFaction();
                     if (faction2 != null) {
                         DrawingUtil.drawPlayerFactionIconImage(graphics, p2, x + xSpacer, y + 125 - 20, 26, 26);
@@ -396,6 +405,7 @@ public class PlayerAreaGenerator {
         xDeltaTop = speakerToken(player, xDeltaTop, yPlayArea);
 
         // SECOND ROW RIGHT SIDE (faction tokens)
+        xDeltaBottom = honorOrPathTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = sleeperTokens(player, xDeltaBottom, yPlayAreaSecondRow);
         xDeltaBottom = creussWormholeTokens(player, xDeltaBottom, yPlayAreaSecondRow);
 
@@ -552,6 +562,18 @@ public class PlayerAreaGenerator {
 
         int numToDisplay = 5 - game.getSleeperTokensPlacedCount();
         return displayRemainingFactionTokens(points, bufferedImage, numToDisplay, xDeltaFromRightSide, yDelta);
+    }
+
+    private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
+        if (player.getHonorCounter() < 1 && player.getPathTokenCounter() < 1) {
+            return xDeltaFromRightSide;
+        }
+        if (player.getHonorCounter() > 0) {
+            DrawingUtil.superDrawStringCenteredDefault(graphics, "Honor Count: " + player.getHonorCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
+        } else {
+            DrawingUtil.superDrawStringCenteredDefault(graphics, "Path Token Count: " + player.getPathTokenCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
+        }
+        return xDeltaFromRightSide + 200;
     }
 
     private int creussWormholeTokens(Player player, int xDeltaSecondRowFromRightSide, int yPlayAreaSecondRow) {
@@ -1256,6 +1278,7 @@ public class PlayerAreaGenerator {
                     String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
                     List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warningMessage, removeButtons);
+                    GMService.logPlayerActivity(game, player, warningMessage);
                 }
 
                 if (numInReinforcements > -10) {
@@ -1271,6 +1294,9 @@ public class PlayerAreaGenerator {
             int positionCount = reinforcementsPosition.getPositionCount(CC_TAG);
             if (!game.getStoredValue("ccLimit").isEmpty()) {
                 positionCount = Integer.parseInt(game.getStoredValue("ccLimit"));
+            }
+            if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
+                positionCount = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
             }
             int remainingReinforcements = positionCount - ccCount;
             if (remainingReinforcements > 0) {
@@ -1292,16 +1318,14 @@ public class PlayerAreaGenerator {
     }
 
     private static void fillUnits(Map<UnitKey, Integer> unitCount, UnitHolder unitHolder, boolean ignoreInfantryFighters) {
-        Map<UnitKey, Integer> units = unitHolder.getUnits();
-        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-            UnitKey uk = unitEntry.getKey();
+        for (UnitKey uk : unitHolder.getUnitKeys()) {
             int count = unitCount.getOrDefault(uk, 0);
 
             if (uk.getUnitType() == UnitType.Infantry || uk.getUnitType() == UnitType.Fighter) {
                 if (ignoreInfantryFighters) continue;
                 count++;
             } else {
-                count += unitEntry.getValue();
+                count += unitHolder.getUnitCount(uk);
             }
             unitCount.put(uk, count);
         }
@@ -1361,8 +1385,8 @@ public class PlayerAreaGenerator {
     private int nombox(Player player, int xDeltaFromRightSide, int y) {
         int widthOfNombox = 450;
         int x = mapWidth - widthOfNombox - xDeltaFromRightSide;
-        UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
-        if (unitHolder == null || unitHolder.getUnits().isEmpty()) {
+        UnitHolder unitHolder = player.getNomboxTile().getSpaceUnitHolder();
+        if (unitHolder == null || unitHolder.getUnitKeys().isEmpty()) {
             return xDeltaFromRightSide;
         }
 
@@ -1386,20 +1410,18 @@ public class PlayerAreaGenerator {
 
         drawPAImage(x, y, "pa_nombox.png");
 
-        Map<UnitKey, Integer> tempUnits = new HashMap<>(unitHolder.getUnits());
-        Map<UnitKey, Integer> units = new LinkedHashMap<>();
+        Set<UnitKey> tempUnits = unitHolder.getUnitKeys();
+        Set<UnitKey> units = new HashSet<>();
 
-        for (Map.Entry<UnitKey, Integer> entry : tempUnits.entrySet()) {
-            UnitKey id = entry.getKey();
+        for (UnitKey id : tempUnits) {
             if (id.getUnitType() == UnitType.Mech) {
-                units.put(id, entry.getValue());
+                units.add(id);
             }
         }
-
-        for (UnitKey key : units.keySet()) {
+        for (UnitKey key : units) {
             tempUnits.remove(key);
         }
-        units.putAll(tempUnits);
+        units.addAll(tempUnits);
 
         BufferedImage image = null;
 
@@ -1414,22 +1436,21 @@ public class PlayerAreaGenerator {
             UnitType.Fighter,
             UnitType.Infantry);
 
-        Map<UnitType, List<Map.Entry<UnitKey, Integer>>> collect = units.entrySet().stream()
-            .collect(Collectors.groupingBy(key -> key.getKey().getUnitType()));
+        Map<UnitType, List<UnitKey>> collect = units.stream()
+            .collect(Collectors.groupingBy(key -> key.getUnitType()));
         for (UnitType orderKey : order) {
-            List<Map.Entry<UnitKey, Integer>> entry = collect.get(orderKey);
-            if (entry == null) {
+            List<UnitKey> keys = collect.get(orderKey);
+            if (keys == null) {
                 continue;
             }
 
             int countOfUnits = 0;
-            for (Map.Entry<UnitKey, Integer> entrySet : entry) {
-                countOfUnits += entrySet.getValue();
+            for (UnitKey k : keys) {
+                countOfUnits += unitHolder.getUnitCount(k);
             }
             int deltaY = 0;
-            for (Map.Entry<UnitKey, Integer> unitEntry : entry) {
-                UnitKey unitKey = unitEntry.getKey();
-                Integer unitCount = unitEntry.getValue();
+            for (UnitKey unitKey : keys) {
+                int unitCount = unitHolder.getUnitCount(unitKey);
                 Integer bulkUnitCount = null;
                 Player p = game.getPlayerFromColorOrFaction(unitKey.getColor());
 
@@ -1454,10 +1475,6 @@ public class PlayerAreaGenerator {
                 if (image == null) {
                     BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not find unit image for: " + unitKey);
                     continue;
-                }
-
-                if (unitCount == null) {
-                    unitCount = 0;
                 }
 
                 Point position = new Point(x, y);
@@ -1808,7 +1825,7 @@ public class PlayerAreaGenerator {
             }
 
             String originalTechSpeciality = planet.getOriginalTechSpeciality();
-            if (isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
+            if (StringUtils.isNotBlank(originalTechSpeciality) && !hasBentorEncryptionKey) {
                 String planetTechSkip = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
                 drawPlanetCardDetail(x + deltaX + 26, y + 82, planetTechSkip);
             } else if (!hasBentorEncryptionKey) {
@@ -2319,8 +2336,7 @@ public class PlayerAreaGenerator {
         }
 
         // Add the blank warsun if player has no warsun
-        List<UnitModel> playerUnitModels = new ArrayList<>();
-        playerUnitModels.addAll(player.getUnitModels());
+        List<UnitModel> playerUnitModels = new ArrayList<>(player.getUnitModels());
         if (player.getUnitsByAsyncID("ws").isEmpty()) {
             playerUnitModels.add(Mapper.getUnit("nowarsun"));
         }

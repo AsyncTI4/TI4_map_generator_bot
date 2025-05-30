@@ -17,7 +17,7 @@
     },
     {
         "alias": "nanoforge",
-        "name": "Nanoforge",
+        "name": "Nano-Forge",
         "text": "ACTION: Attach this card to a non-legendary, non-home planet you control, its resource and influence values are increased by 2 and it is a legendary planet. This action cannot be performed once attached.",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/relics/pok/nanoforge.jpg?raw=true",
         "source": "codex2",

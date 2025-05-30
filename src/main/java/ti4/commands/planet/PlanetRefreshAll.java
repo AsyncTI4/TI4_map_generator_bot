@@ -7,6 +7,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.PlanetService;
 
 public class PlanetRefreshAll extends GameStateSubcommand {
 
@@ -19,9 +20,7 @@ public class PlanetRefreshAll extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Player player = getPlayer();
-        for (String planet : player.getPlanets()) {
-            player.refreshPlanet(planet);
-        }
+        PlanetService.refreshAllPlanets(player);
         MessageHelper.sendMessageToEventChannel(event, player.getRepresentation() + " readied all planets.");
     }
 }

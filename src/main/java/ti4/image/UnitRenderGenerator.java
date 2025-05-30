@@ -10,7 +10,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,9 +104,8 @@ public class UnitRenderGenerator {
         if (isSpace && displayType == DisplayType.shipless) return;
 
         BufferedImage unitImage;
-        Map<UnitKey, Integer> tempUnits = new HashMap<>(unitHolder.getUnits());
-        Map<UnitKey, Integer> units = sortUnits(tempUnits);
-        Map<UnitKey, Integer> unitDamage = unitHolder.getUnitDamage();
+        List<UnitKey> tempUnits = new ArrayList<>(unitHolder.getUnitKeys());
+        List<UnitKey> unitOrder = sortUnits(tempUnits);
 
         // Contains pre-computed values used in unit rendering.
         ctx = buildSystemContext(tile, unitHolder, frogPlayer);
@@ -116,15 +114,14 @@ public class UnitRenderGenerator {
 
         Map<UnitType, Integer> unitTypeCounts = new HashMap<>();
 
-        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-            UnitKey unitKey = unitEntry.getKey();
+        for (UnitKey unitKey : unitOrder) {
             if (shouldSkipInvalidUnit(unitKey)) continue;
             if (shouldHideJailUnit(frogPlayer, unitKey)) continue;
-            
-            if (displayType == DisplayType.unlocked){ // diplay type = unlocked hides locked units (could be written in a single line, but left as is for now in case of debugging), also is highly dependable on CC file name, TO DO : create a function to get colorIDs from tileCCs
-                String unitEntryColorID = unitEntry.getKey().getColorID();
-                Set<String> tileCCs = tile.getSpaceUnitHolder().getCCList();
-                List<String> tileCCsColorIDs = tileCCs.stream().flatMap(str -> Stream.of(str.replace(".png","").replace("command_",""))).toList();
+
+            if (displayType == DisplayType.unlocked) { // diplay type = unlocked hides locked units (could be written in a single line, but left as is for now in case of debugging), also is highly dependable on CC file name, TO DO : create a function to get colorIDs from tileCCs
+                String unitEntryColorID = unitKey.getColorID();
+                Set<String> tileCCs = tile.getSpaceUnitHolder().getCcList();
+                List<String> tileCCsColorIDs = tileCCs.stream().flatMap(str -> Stream.of(str.replace(".png", "").replace("command_", ""))).toList();
                 if (tileCCsColorIDs.contains(unitEntryColorID)) continue;
             }
 
@@ -133,7 +130,7 @@ public class UnitRenderGenerator {
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation());
                 continue;
             }
-            Integer unitCount = unitEntry.getValue();
+            Integer unitCount = unitHolder.getUnitCount(unitKey);
             Integer bulkUnitCount = getBulkUnitCount(unitKey, unitCount);
             String unitPath = getUnitPath(unitKey);
 
@@ -150,7 +147,7 @@ public class UnitRenderGenerator {
             if (unitImage == null) continue;
             if (bulkUnitCount != null && bulkUnitCount > 0) unitCount = 1;
 
-            Integer unitDamageCount = unitDamage.get(unitKey);
+            Integer unitDamageCount = unitHolder.getDamagedUnitCount(unitKey);
             BufferedImage decal = getUnitDecal(player, unitKey);
             BufferedImage spoopy = getSpoopyImage(unitKey, player);
             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
@@ -465,8 +462,8 @@ public class UnitRenderGenerator {
         return Set.of(UnitType.Fighter, UnitType.Infantry).contains(unitKey.getUnitType()) ? unitCount : null;
     }
 
-    private Map<UnitKey, Integer> sortUnits(Map<UnitKey, Integer> tempUnits) {
-        Map<UnitKey, Integer> sortedUnits = new LinkedHashMap<>();
+    private List<UnitKey> sortUnits(List<UnitKey> tempUnits) {
+        List<UnitKey> sortedUnits = new ArrayList<>();
 
         List<UnitType> typeOrder = new ArrayList<>();
         // Token units are drawn first, always
@@ -498,19 +495,18 @@ public class UnitRenderGenerator {
         // Add all units in order
         for (UnitType type : typeOrder) {
             for (String colorID : playerOrder) {
-                for (Map.Entry<UnitKey, Integer> entry : tempUnits.entrySet()) {
-                    UnitKey id = entry.getKey();
+                for (UnitKey id : tempUnits) {
                     if (id != null && id.getUnitType() == type && id.getColorID().equals(colorID)) {
-                        sortedUnits.put(id, entry.getValue());
+                        sortedUnits.add(id);
                     }
                 }
             }
         }
 
         // Add remaining units
-        for (UnitKey key : sortedUnits.keySet())
+        for (UnitKey key : sortedUnits)
             tempUnits.remove(key);
-        sortedUnits.putAll(tempUnits);
+        sortedUnits.addAll(tempUnits);
         return sortedUnits;
     }
 

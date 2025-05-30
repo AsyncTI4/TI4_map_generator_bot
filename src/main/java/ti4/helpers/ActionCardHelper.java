@@ -60,6 +60,16 @@ public class ActionCardHelper {
         if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { // Lih-zo trap abilities
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
+        if (player.hasAbility("classified_developments")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Info on your superweapons are as follows:\n");
+            sb.append(Mapper.getRelic("superweaponavailyn").getSimpleRepresentation()).append("\n");
+            sb.append(Mapper.getRelic("superweaponcaled").getSimpleRepresentation()).append("\n");
+            sb.append(Mapper.getRelic("superweaponglatison").getSimpleRepresentation()).append("\n");
+            sb.append(Mapper.getRelic("superweapongrom").getSimpleRepresentation()).append("\n");
+            sb.append(Mapper.getRelic("superweaponmors").getSimpleRepresentation()).append("\n");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
+        }
     }
 
     private static String getTrapCardInfo(Player player) {
@@ -329,6 +339,18 @@ public class ActionCardHelper {
             return player.getRepresentationUnfogged()
                 + " The bot thinks you are over the limit and thus will not allow you to play action cards at this time."
                 + " You may discard the action cards and manually resolve if you need to.";
+        }
+        if (actionCard.getPhase().equalsIgnoreCase("agenda") && game.getPhaseOfGame() != null && game.getPhaseOfGame().equalsIgnoreCase("action")) {
+            if (!player.getFaction().equalsIgnoreCase("edyn") && !player.getFaction().contains("franken")) {
+                return player.getRepresentationUnfogged()
+                    + " The bot thinks it is the action phase and this is an agenda card. If this is a mistake, ping bothelper in the actions channel";
+            }
+        }
+        if (actionCard.getPhase().equalsIgnoreCase("action") && game.getPhaseOfGame() != null && game.getPhaseOfGame().contains("agenda")) {
+            if (!actionCard.getName().toLowerCase().contains("war machine")) {
+                return player.getRepresentationUnfogged()
+                    + " The bot thinks it is the agenda phase and this is an action phase card. If this is a mistake, ping bothelper in the actions channel";
+            }
         }
 
         if (player.hasAbility("cybernetic_madness")) {

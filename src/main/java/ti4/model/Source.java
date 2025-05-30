@@ -7,11 +7,14 @@ import ti4.service.emoji.TI4Emoji;
 public class Source {
 
     public enum ComponentSource {
+        // IF YOU ADD A VALUE TO THE ENUM
+        //   please also add and complete the corresponding entry in the \resources\data\sources\sources.json file
         // IF YOU CHANGE THE ENUM VALUE FOR A SOURCE
         //   then you must change that value for all occurrences in .json files (including sources.json)
         //   any oversight of an occurrence will make the bot unable to complete Mapper.loadData() at start up, and thus a bunch of Mapper Map objects will be empty
         // IF YOU ARE LOOKING FOR ALL OCCURRENCES OF A SOURCE ACROSS THE .json FILES
         //   then you can run the '/search sources' which also look for occurrences (for now it counts occurrences by folder)
+        //   (or you can use the search functionality of your IDE ofc)
 
         // official
         base, pok, codex1, codex2, codex3,

@@ -60,7 +60,6 @@ import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.PlanetModel;
 import ti4.model.SecretObjectiveModel;
-import ti4.model.TechnologyModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.async.DrumrollService;
 import ti4.service.button.ReactionService;
@@ -72,11 +71,13 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
+import ti4.service.fow.GMService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 
 public class AgendaHelper {
 
@@ -378,6 +379,10 @@ public class AgendaHelper {
             buttons.add(Buttons.red("queueAfter_planet_" + planet, "Tarrock Ability"));
         }
 
+        if (player.getGame().playerHasLeaderUnlockedOrAlliance(player, "atokeracommander")) {
+            buttons.add(Buttons.red("queueAfter_leader_Atokera Commander", "Atokera Commander Ability"));
+        }
+
         if (player.hasLeaderUnlocked("keleresheroodlynn")) {
             buttons.add(Buttons.red("queueAfter_leader_Keleres Xxcha Hero", "Keleres Hero"));
         }
@@ -444,7 +449,7 @@ public class AgendaHelper {
                         }
 
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                            "The game is currently waiting on " + num + " people to decide on \"whens\".");
+                            "The game is currently waiting on " + pluralPerson(num) + " to decide on \"whens\".");
                     } else {
                         game.setStoredValue("queuedWhens",
                             game.getStoredValue("queuedWhens").replace(player.getFaction() + "_", ""));
@@ -509,7 +514,7 @@ public class AgendaHelper {
                             num++;
                         }
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                            "The game is currently waiting on " + num + " people to decide on \"afters\".");
+                            "The game is currently waiting on " + pluralPerson(num) + " to decide on \"afters\".");
                         return; // The person up has not yet decided whether to queue or not queue an after
                     } else {
                         game.setStoredValue("queuedAfters",
@@ -558,16 +563,21 @@ public class AgendaHelper {
                                     riderButtons);
                             }
                             case "leader" -> {
-                                Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
-                                if (playerLeader != null) {
-                                    String message = player.getRepresentation() + " played " +
-                                        Helper.getLeaderFullRepresentation(playerLeader);
-                                    player.removeLeader(playerLeader);
-                                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                                        message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
+                                if (after.toLowerCase().contains("keleres")) {
+                                    Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                                    if (playerLeader != null) {
+                                        String message = player.getRepresentation() + " played " +
+                                            Helper.getLeaderFullRepresentation(playerLeader);
+                                        player.removeLeader(playerLeader);
+                                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                                            message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
+                                    }
+                                    riderButtons = getAgendaButtons("Keleres Xxcha Hero", game,
+                                        player.getFinsFactionCheckerPrefix());
+                                } else {
+                                    riderButtons = getAgendaButtons("Atokera Commander Ability", game,
+                                        player.getFinsFactionCheckerPrefix());
                                 }
-                                riderButtons = getAgendaButtons("Keleres Xxcha Hero", game,
-                                    player.getFinsFactionCheckerPrefix());
                                 MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),
                                     player.getRepresentation() + ", please select your target.", game, player,
                                     riderButtons);
@@ -672,12 +682,17 @@ public class AgendaHelper {
             }
         }
         String msg = player.getRepresentation(true, false)
-            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + num + " people). They have been pinged in their private thread. ";
+            + " has chosen to issue a reminder ping to those who have not yet responded to whens/afters (a total of " + pluralPerson(num) + "). They have been pinged in their private thread. ";
         if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
-            msg += "The " + AgendaHelper.getPlayersWhoNeedToPreVoted(game).size() + " who still need to decide on voting were also reminded";
+            msg += "The " + pluralPerson(AgendaHelper.getPlayersWhoNeedToPreVoted(game).size()) + " who still need to decide on voting were also reminded";
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
+    }
+
+    private static String pluralPerson(int num) {
+        String result = num + ((num > 1) ? " people" : " person");
+        return result;
     }
 
     @ButtonHandler("queueAWhen")
@@ -1121,8 +1136,10 @@ public class AgendaHelper {
         String votes = buttonID.substring(buttonID.lastIndexOf("_") + 1);
         MessageChannel channel;
 
-        boolean prevoting = !game.getStoredValue("preVoting" + player.getFaction()).isEmpty() && player != game.getActivePlayer();
-        if (prevoting) {
+        boolean playerPrevotesIsEmpty = game.getStoredValue("preVoting" + player.getFaction()).isEmpty();
+        boolean playerIsNotActivePlayer = player != game.getActivePlayer();
+        boolean playerIsPrevoting = !playerPrevotesIsEmpty && playerIsNotActivePlayer;
+        if (playerIsPrevoting) {
             if (votes.equalsIgnoreCase("0")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You cannot pre-vote 0 votes. Pre-abstain if you wish to pre-abstain");
                 return;
@@ -1142,7 +1159,7 @@ public class AgendaHelper {
                     if (getPlayersWhoNeedToPreVoted(game).isEmpty()) {
                         startTheVoting(game);
                     } else {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Game needs " + getPlayersWhoNeedToPreVoted(game).size() + " more people to pre-vote before voting will start");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Game needs " + pluralPerson(getPlayersWhoNeedToPreVoted(game).size()) + " to pre-vote before voting will start");
                     }
                 }
 
@@ -1367,12 +1384,7 @@ public class AgendaHelper {
         }
         String summary2 = getSummaryOfVotes(game, true);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
-        if (game.isFowMode()) {
-            Player gm = game.getPlayersWithGMRole().getFirst();
-            if (gm != null) {
-                MessageHelper.sendMessageToChannel(gm.getCardsInfoThread(), getSummaryOfVotes(game, true, true));
-            }
-        }
+        GMService.logActivity(game, getSummaryOfVotes(game, true, true), false);
         game.setPhaseOfGame("agendaEnd");
         game.setActivePlayerID(null);
         StringBuilder message = new StringBuilder();
@@ -2205,8 +2217,10 @@ public class AgendaHelper {
                 if (voter != null) {
                     if (!specificVote.contains("Rider")
                         && !specificVote.contains("Sanction") && !specificVote.contains("Radiance") && !specificVote.contains("Unity") && !specificVote.contains("Ability")) {
-                        try {
-                            int vote = Integer.parseInt(specificVote.split("_")[1]);
+                        String voteS = specificVote.split("_")[1];
+                        if (NumberUtils.isDigits(voteS)) {
+                            int vote = Integer.parseInt(voteS);
+
                             if (vote == highestVote) {
                                 highestVoter = null;
                             } else {
@@ -2215,8 +2229,6 @@ public class AgendaHelper {
                                     highestVoter = voter;
                                 }
                             }
-                        } catch (Exception e) {
-                            //Not concerned about it not being an integer
                         }
                     }
 
@@ -2295,9 +2307,7 @@ public class AgendaHelper {
     }
 
     public static List<Player> getVotingOrder(Game game) {
-        List<Player> orderList = new ArrayList<>(game.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .toList());
+        List<Player> orderList = Helper.getSpeakerOrPriorityOrder(game);
         String speakerName = game.getSpeakerUserID();
         Optional<Player> optSpeaker = orderList.stream()
             .filter(player -> player.getUserID().equals(speakerName))
@@ -2654,11 +2664,14 @@ public class AgendaHelper {
         List<Button> proceedButtons = new ArrayList<>();
         String msg = "Buttons for various things";
 
-        listVoteCount(game, game.getMainGameChannel());
+        if (!game.isFowMode()) {
+            listVoteCount(game, game.getMainGameChannel());
+        }
 
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-        proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+        if (!game.isHiddenAgendaMode())
+            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
         proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
         proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
         proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
@@ -2688,7 +2701,7 @@ public class AgendaHelper {
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_" + votes,
-            "Vote " + votes + " vote" + (votes.equals("1") ? "" : "s")));
+            "Confirm " + votes + " vote" + (votes.equals("1") ? "" : "s")));
         buttons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "distinguished_" + votes, "Modify Votes"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
     }
@@ -3467,6 +3480,7 @@ public class AgendaHelper {
         if (!"action".equalsIgnoreCase(game.getPhaseOfGame())) {
             game.setPhaseOfGame("agendawaiting");
             if (aCount == 1) {
+                GMService.logActivity(game, "**Agenda** Phase for Round " + game.getRound() + " started.", true);
                 FowCommunicationThreadService.checkAllCommThreads(game);
             }
         } else {
@@ -3604,7 +3618,8 @@ public class AgendaHelper {
             msg = "These buttons can help with bugs/issues that occur during the agenda phase";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));
-            proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
+            if (!game.isHiddenAgendaMode())
+                proceedButtons.add(Buttons.red("eraseMyVote", "Erase my vote & have me vote again"));
             proceedButtons.add(Buttons.red("eraseMyRiders", "Erase my riders"));
             proceedButtons.add(Buttons.gray("refreshAgenda", "Refresh Agenda"));
             proceedButtons.add(Buttons.blue("pingNonresponders", "Ping Non-Responders"));
@@ -3630,13 +3645,12 @@ public class AgendaHelper {
             String key = "round" + game.getRound() + "AgendaPlacement";
             if (!game.getStoredValue(key).isEmpty() && !game.isFowMode()) {
                 String message = "";
-                if(!game.getStoredValue(politicsHolder).isEmpty()){
+                if (!game.getStoredValue(politicsHolder).isEmpty()) {
                     message = "## " + game.getStoredValue(politicsHolder) + " had Politics and placed the agendas in this order: "
-                    + game.getStoredValue(key).replace("_", ", ") + ".";
-                }
-                else {
+                        + game.getStoredValue(key).replace("_", ", ") + ".";
+                } else {
                     message = "## The Politics player placed the agendas in this order: "
-                    + game.getStoredValue(key).replace("_", ", ") + ".";
+                        + game.getStoredValue(key).replace("_", ", ") + ".";
                 }
                 MessageHelper.sendMessageToChannel(channel, message);
             }
@@ -3648,18 +3662,6 @@ public class AgendaHelper {
                     player.getRepresentationUnfogged()
                         + " you have Quaxdol Junitas, the Florzen commander, and may thus explore and ready a planet.",
                     ButtonHelperCommanders.resolveFlorzenCommander(player, game));
-            }
-            if (!action && aCount == 1 && player.hasTech("dsrohdy")) {
-                TechnologyModel dsrohdy = Mapper.getTech("dsrohdy");
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-                    + " you have " + dsrohdy.getRepresentation(false) + " and may choose a player.\n"
-                    + "They must produce 1 ship in a system that contains 1 or more of their space docks or war suns.");
-                for (String tech : player.getTechs()) {
-                    if (Mapper.getTech(tech).isUnitUpgrade()) {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "",
-                            ButtonHelperModifyUnits.getContractualObligationsButtons(game, player));
-                    }
-                }
             }
         }
         if (!game.isFowMode() && !action) {
@@ -3781,8 +3783,13 @@ public class AgendaHelper {
             }
             if (FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition())) {
                 UnitHolder uH = tile.getUnitHolders().get(Constants.SPACE);
-                for (Player player : game.getRealPlayers()) {
-                    uH.removeAllShips(player);
+                for (UnitKey key : uH.getUnitKeys()) {
+                    game.getPlayerByUnitKey(key).ifPresent(p -> {
+                        if (p.getUnitFromUnitKey(key).getIsShip()) {
+                            int amt = uH.getUnitCount(key);
+                            DestroyUnitService.destroyUnit(event, tile, game, key, amt, uH, false);
+                        }
+                    });
                 }
             }
         }
@@ -3813,14 +3820,8 @@ public class AgendaHelper {
         for (Tile tile : game.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (planets.contains(unitHolder.getName())) {
-                    int numInf = 0;
-                    String colorID = Mapper.getColorID(player.getColor());
-                    UnitKey infKey = Mapper.getUnitKey("gf", colorID);
-                    if (unitHolder.getUnits() != null) {
-                        if (unitHolder.getUnits().get(infKey) != null) {
-                            numInf = unitHolder.getUnits().get(infKey);
-                        }
-                    }
+                    int numInf = unitHolder.getUnitCount(UnitType.Infantry, player);
+                    UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
                     if (numInf > 0) {
                         int numTG = (numInf + 1) / 2;
                         int cTG = player.getTg();
@@ -3830,28 +3831,10 @@ public class AgendaHelper {
                             .append(Helper.getPlanetRepresentation(unitHolder.getName(), game))
                             .append(" and gained ").append(numTG).append(" trade goods (").append(cTG).append("->")
                             .append(fTG).append("). \n");
-                        tile.removeUnit(unitHolder.getName(), infKey, numTG);
-                        if (player.hasInf2Tech()) {
-                            ButtonHelper.resolveInfantryDeath(player, numTG);
-                        }
-                        boolean cabalMech = player.hasAbility("amalgamation")
-                            && unitHolder.getUnitCount(UnitType.Mech, player.getColor()) > 0
-                            && player.hasUnit("cabal_mech") && !game.getLaws().containsKey("articles_war");
-                        if (player.hasAbility("amalgamation")
-                            && (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", player, tile)
-                                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", player, tile)
-                                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", player, tile)
-                                || cabalMech)
-                            && FoWHelper.playerHasUnitsOnPlanet(player, tile, unitHolder.getName())) {
-                            ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, numTG, "infantry", event);
-                        }
-
+                        DestroyUnitService.destroyUnit(event, tile, game, infKey, numTG, unitHolder, false);
                     }
                 }
             }
-        }
-        if ((player.getUnitsOwned().contains("mahact_infantry") || player.hasTech("cl2"))) {
-            ButtonHelperFactionSpecific.offerMahactInfButtons(player, game);
         }
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());

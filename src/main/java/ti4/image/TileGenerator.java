@@ -293,7 +293,7 @@ public class TileGenerator {
                     Point draftNumPosition = new Point(85, 140);
 
                     if (tileID.endsWith("blank")) {
-                        //tiny tile
+                        // tiny tile
                         String greenPath = ResourceHelper.getInstance().getTileFile("00_green.png");
                         BufferedImage green = ImageHelper.readScaled(greenPath, 73, 63);
                         tileGraphics.drawImage(green, TILE_PADDING + 49, TILE_PADDING + 119, null);
@@ -362,23 +362,28 @@ public class TileGenerator {
                 }
             }
             case Extras -> {
-                if (isFoWPrivate && tile.hasFog(fowPlayer))
-                    return tileOutput;
-
-                List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
-                int direction = 0;
-                for (String secondaryTile : adj) {
-                    if (secondaryTile != null) {
-                        addBorderDecoration(direction, secondaryTile, tileGraphics,
-                            BorderAnomalyModel.BorderAnomalyType.ARROW);
+                if (!isFoWPrivate || !tile.hasFog(fowPlayer)) {
+                    List<String> adj = game.getAdjacentTileOverrides(tile.getPosition());
+                    int direction = 0;
+                    for (String secondaryTile : adj) {
+                        if (secondaryTile != null) {
+                            addBorderDecoration(direction, secondaryTile, tileGraphics,
+                                BorderAnomalyModel.BorderAnomalyType.ARROW);
+                        }
+                        direction++;
                     }
-                    direction++;
                 }
-                game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
-                    if (borderAnomalyHolder.getTile().equals(tile.getPosition())) {
-                        addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
-                    }
-                });
+
+                if (!game.getBorderAnomalies().isEmpty()) {
+                    List<String> orderedAdjacentPositions = PositionMapper.getAdjacentTilePositions(tile.getPosition());
+                    Set<String> visiblePositions = FoWHelper.getTilePositionsToShow(game, fowPlayer);
+                    game.getBorderAnomalies().forEach(borderAnomalyHolder -> {
+                        if (borderAnomalyHolder.getTile().equals(tile.getPosition())
+                            && (!isFoWPrivate || !tile.hasFog(fowPlayer) || visiblePositions.contains(orderedAdjacentPositions.get(borderAnomalyHolder.getDirection())))) {
+                            addBorderDecoration(borderAnomalyHolder.getDirection(), null, tileGraphics, borderAnomalyHolder.getType());
+                        }
+                    });
+                }
             }
             case Units -> {
                 if (isFoWPrivate && tile.hasFog(fowPlayer))
@@ -515,8 +520,7 @@ public class TileGenerator {
                     if (unitHolder != spaceUnitHolder) {
                         addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
                     }
-                    new UnitRenderGenerator(
-                        game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer).render();
+                    new UnitRenderGenerator(game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer).render();
                 }
             }
             case Distance -> {
@@ -1278,7 +1282,7 @@ public class TileGenerator {
     private void addCC(Tile tile, Graphics tileGraphics, UnitHolder unitHolder) {
         int deltaX = 0;
         int deltaY = 0;
-        for (String ccID : unitHolder.getCCList()) {
+        for (String ccID : unitHolder.getCcList()) {
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
                 continue;
@@ -1403,7 +1407,7 @@ public class TileGenerator {
                 && !smallLegendaries.contains(unitHolder.getName().toLowerCase())) {
                 scale = 1.65f;
             }
-            if (unitHolder.getName().equalsIgnoreCase("elysium")) {
+            if (unitHolder.getName().equalsIgnoreCase("elysium") || unitHolder.getName().equalsIgnoreCase("magna")) {
                 scale = 1.65f;
             }
             if (Constants.MECATOLS.contains(unitHolder.getName())) {
@@ -1559,6 +1563,9 @@ public class TileGenerator {
     private static boolean shouldPlanetHaveShield(UnitHolder unitHolder, Game game) {
         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(Constants.WORLD_DESTROYED))) {
             return false;
+        }
+        if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains("superweapon_mors"))) {
+            return true;
         }
         for (Player player : game.getRealPlayers()) {
             if (player.hasAbility("synthesis") && player.getReadiedPlanets().contains(unitHolder.getName())) {

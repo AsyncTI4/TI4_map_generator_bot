@@ -28,14 +28,17 @@ import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
+import ti4.service.statistics.StatisticOptIn;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
 
 public class WebHelper {
 
+    private static final String TI4_ULTIMATE_STATISTICS_API_KEY = System.getenv("TI4_ULTIMATE_STATISTICS_API_KEY");
     private static final int INITIAL_STAT_BUFFER_SIZE = 1024 * 1024 * 100; // 100 MB
     private static final int STAT_BATCH_SIZE = 200;
     private static final HttpClient httpClient = HttpClient.newHttpClient();
@@ -72,6 +75,36 @@ public class WebHelper {
                     BotLogger.error(new BotLogger.LogMessageOrigin(game), "An exception occurred while performing an async send of game data to the website.", e);
                     return null;
                 });
+        } catch (IOException e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
+        }
+    }
+
+    public static void putPlayerData(String gameId, Game game) {
+        if (!sendingToWeb())  return;
+
+        try {
+            List<WebPlayerArea> playerDataList = new ArrayList<>();
+            Map<String, Tile> tileMap = game.getTileMap();
+            for (Player player : game.getPlayers().values()) {
+                playerDataList.add(WebPlayerArea.fromPlayer(player, tileMap));
+            }
+            String json = objectMapper.writeValueAsString(playerDataList);
+
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(webProperties.getProperty("bucket"))
+                    .key(String.format("webdata/%s/%s.json", gameId, gameId))
+                    .contentType("application/json")
+                    .cacheControl("no-cache, no-store, must-revalidate")
+                    .build();
+
+            s3AsyncClient.putObject(request, AsyncRequestBody.fromString(json))
+                    .exceptionally(e -> {
+                        BotLogger.error(
+                                "An exception occurred while performing an async send of overlay data to the website.",
+                                e);
+                        return null;
+                    });
         } catch (IOException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
@@ -201,6 +234,27 @@ public class WebHelper {
             BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not add image for game `" + gameName + "` to web server", e);
+        }
+    }
+
+    public static void sendStatisticsOptIn(StatisticOptIn statisticsOptIn) {
+        try {
+            String statisticsOptInRequest = objectMapper.writeValueAsString(statisticsOptIn);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.ti4ultimate.com/api/Async/player-settings"))
+                .header("Content-Type", "application/json")
+                .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
+                .POST(HttpRequest.BodyPublishers.ofString(statisticsOptInRequest))
+                .build();
+
+            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .exceptionally(e -> {
+                    BotLogger.error(String.format("An exception occurred while sending a stats opt in: %s", statisticsOptInRequest), e);
+                    return null;
+                });
+        } catch (IOException e) {
+            BotLogger.error("An IOException occurred while sending a stats opt in.", e);
         }
     }
 }

@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -44,6 +45,7 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.async.ReserveGameNumberService;
 import ti4.service.image.FileUploadService;
 import ti4.service.option.GameOptionService;
 import ti4.settings.GlobalSettings;
@@ -146,7 +148,16 @@ public class CreateGameService {
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-
+        Role bothelperRole = getRole("Bothelper", guild);
+        long threadPermission = Permission.MANAGE_THREADS.getRawValue();
+        List<Member> nonGameBothelpers = new ArrayList<>();
+        if (bothelperRole != null) {
+            for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
+                if (!members.contains(botHelper)) {
+                    nonGameBothelpers.add(botHelper);
+                }
+            }
+        }
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
             .syncPermissionOverrides()
@@ -160,7 +171,12 @@ public class CreateGameService {
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-
+        TextChannelManager chat = chatChannel.getManager();
+        TextChannelManager actions = actionsChannel.getManager();
+        for (Member botHelper : nonGameBothelpers) {
+            chat.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).complete();
+            actions.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).complete();
+        }
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
@@ -355,6 +371,8 @@ public class CreateGameService {
             return "pbd1";
         }
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
+        while (ReserveGameNumberService.isGameNumReserved("pbd" + nextPBDNumber))
+            nextPBDNumber++;
         return "pbd" + nextPBDNumber;
     }
 
@@ -417,54 +435,6 @@ public class CreateGameService {
         }
 
         return pbdNumbers;
-    }
-
-    @Nullable
-    private static Guild getNextAvailableServerOrdinal() {
-        List<Guild> guilds = AsyncTI4DiscordBot.serversToCreateNewGamesOn;
-
-        // GET CURRENTLY SET GUILD, OR DEFAULT TO PRIMARY
-        Guild guild = AsyncTI4DiscordBot.jda
-            .getGuildById(GlobalSettings.getSetting(
-                GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES.toString(), String.class,
-                AsyncTI4DiscordBot.guildPrimary.getId()));
-
-        int index = guilds.indexOf(guild);
-        if (index == -1) { // NOT FOUND
-            BotLogger.warning("`CreateGameService.getNextAvailableServer` WARNING: Current guild is not in the list of available overflow servers: ***" + guild.getName() + "***");
-        }
-
-        // CHECK IF CURRENT GUILD HAS ROOM (INDEX = X)
-        if (serverHasRoomForNewFullCategory(guild)) {
-            return guild;
-        }
-
-        // CHECK NEXT GUILDS IN LINE STARTING AT CURRENT (INDEX = X+1 to ♾)
-        for (int i = index + 1; i < guilds.size(); i++) {
-            guild = guilds.get(i);
-            if (serverHasRoomForNewFullCategory(guild)) {
-                GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-                return guild;
-            }
-        }
-
-        // CHECK STARTING FROM BEGINNING UP TO INDEX (INDEX = 0 to X-1)
-        for (int i = 0; i < index; i++) {
-            guild = guilds.get(i);
-            if (serverHasRoomForNewFullCategory(guild)) {
-                GlobalSettings.setSetting(GlobalSettings.ImplementedSettings.GUILD_ID_FOR_NEW_GAME_CATEGORIES, guild.getId());
-                return guild;
-            }
-        }
-
-        // ALL OVERFLOWS FULL, CHECK PRIMARY
-        if (serverHasRoomForNewFullCategory(AsyncTI4DiscordBot.guildPrimary)) {
-            // Don't set GlobalSetting to check for new overflow each time
-            return AsyncTI4DiscordBot.guildPrimary;
-        }
-
-        BotLogger.warning("`CreateGameService.getNextAvailableServer`\n# WARNING: No available servers on which to create a new game category.");
-        return null;
     }
 
     @Nullable
@@ -577,7 +547,7 @@ public class CreateGameService {
                     return category.getName();
                 }
             } catch (Exception e) {
-                BotLogger.error("Could not parse integers within category name: " + category.getName(), e);
+                BotLogger.warning("Could not parse integers within category name: " + category.getName(), e);
             }
         }
 

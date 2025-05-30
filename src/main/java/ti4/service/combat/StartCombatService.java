@@ -551,13 +551,6 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
                     "you may use the button unlock the system or draw 1 AC (Qhet Hero Ability).", buttons);
             }
-            if (player.hasAbility("data_recovery") && player != game.getActivePlayer()) {
-                String finChecker = "FFCC_" + player.getFaction() + "_";
-                buttons = new ArrayList<>();
-                buttons.add(Buttons.gray(finChecker + "dataRecovery_" + otherPlayer.getColor(), "Grab 1 Control Token", FactionEmojis.qhet));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you lose a unit in this combat, " +
-                    "you may use the button to grab one of the opponents control tokens using data recovery.", buttons);
-            }
             if (player.hasAbility("black_ops") && player == game.getActivePlayer()) {
                 int debt = player.getDebtTokenCount(otherPlayer.getColor());
                 if (debt > 1) {
@@ -621,6 +614,14 @@ public class StartCombatService {
                 buttons.add(Buttons.green("unlockCommander_qhet", "Unlock Qhet Commander", FactionEmojis.qhet));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
                     + " this is a reminder that if you win two combats this turn, you may use the button to unlock the Qhet commander.",
+                    buttons);
+            }
+            if (player.getLeaderIDs().contains("belkoseahero")
+                && player.hasLeaderUnlocked("belkoseahero") && !player.hasUnexhaustedLeader("belkoseahero")) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.green("refreshBelkoseaHero", "Refresh Belkosea Hero", FactionEmojis.belkosea));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
+                    + " this is a reminder that if you lose this combat, you can refresh the Belkosea Hero.",
                     buttons);
             }
             if (player.getLeaderIDs().contains("kortalicommander")
@@ -716,6 +717,10 @@ public class StartCombatService {
 
         if ((p1.hasLeaderUnlocked("mentakhero")) || p2.hasLeaderUnlocked("mentakhero")) {
             buttons.add(Buttons.gray("purgeMentakHero_" + tile.getPosition(), "Purge Mentak Hero", FactionEmojis.Mentak));
+        }
+
+        if ((p1.hasLeaderUnlocked("belkoseahero") && p1.hasUnexhaustedLeader("belkoseahero")) || (p2.hasLeaderUnlocked("belkoseahero") && p2.hasUnexhaustedLeader("belkoseahero"))) {
+            buttons.add(Buttons.gray("exhaustBelkoseaHero", "Exhaust Belkosea Hero", FactionEmojis.belkosea));
         }
 
         if ((p1.hasAbility("facsimile") && p1 != game.getActivePlayer())
@@ -817,6 +822,15 @@ public class StartCombatService {
             if ((!game.isFowMode() || agentHolder == p1) && agentHolder.hasUnexhaustedLeader("yinagent")) {
                 buttons.add(Buttons.gray(finChecker + "yinagent_" + pos, "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yin Agent", FactionEmojis.Yin));
             }
+            if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("mirveda_flagship", agentHolder, tile) && isSpaceCombat) {
+                buttons.add(Buttons.gray(finChecker + "mirvedaFS_" + pos, "Place Fighter (Mirveda FS)", FactionEmojis.mirveda));
+            }
+            if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("belkosea_flagship", agentHolder, tile) && isSpaceCombat) {
+                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged To Produce Hit (Belkosea FS)", FactionEmojis.belkosea));
+            }
+            if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("kortali_flagship", agentHolder, tile) && isSpaceCombat) {
+                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged Upon Win To Gain CC (Kortali FS)", FactionEmojis.kortali));
+            }
         }
 
         // Exo 2s
@@ -825,7 +839,12 @@ public class StartCombatService {
                 buttons.add(Buttons.blue("assCannonNDihmohn_exo_" + tile.getPosition(), "Use Exotrireme II Ability", FactionEmojis.Sardakk));
             }
         }
-
+        if (p1.hasAbility("data_recovery") && p1 != game.getActivePlayer()) {
+            buttons.add(Buttons.gray(p1.getFinsFactionCheckerPrefix() + "dataRecovery_" + p2.getColor(), "Grab 1 Control Token (Upon Unit Death)", FactionEmojis.qhet));
+        }
+        if (p2.hasAbility("data_recovery") && p2 != game.getActivePlayer()) {
+            buttons.add(Buttons.gray(p2.getFinsFactionCheckerPrefix() + "dataRecovery_" + p1.getColor(), "Grab 1 Control Token (Upon Unit Death)", FactionEmojis.qhet));
+        }
         if ((p2.hasUnexhaustedLeader("kortaliagent")) && !game.isFowMode() && isGroundCombat
             && !p1.getFragments().isEmpty()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
@@ -858,6 +877,14 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(finChecker + "gloryTech", "Research Unit Upgrade (Upon Win)", FactionEmojis.kjalengard));
             }
         }
+        if ((p2 == game.getActivePlayer() && p2.hasAbility("pride")) && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "resolvePride_" + p1.getFaction(), "Resolve Pride (Upon Win)", FactionEmojis.toldar));
+        }
+        if ((p1 == game.getActivePlayer() && p1.hasAbility("pride"))) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "resolvePride_" + p2.getFaction(), "Resolve Pride (Upon Win)", FactionEmojis.toldar));
+        }
 
         if ((p2.hasAbility("collateralized_loans")) && !game.isFowMode()
             && p2.getDebtTokenCount(p1.getColor()) > 0 && groundOrSpace.equalsIgnoreCase("space")) {
@@ -870,6 +897,9 @@ public class StartCombatService {
             buttons.add(Buttons.gray(finChecker + "collateralizedLoans_" + pos + "_" + p2.getFaction(), "Collateralized Loans", FactionEmojis.vaden));
         }
 
+        if ((game.playerHasLeaderUnlockedOrAlliance(p1, "belkoseacommander") || game.playerHasLeaderUnlockedOrAlliance(p2, "belkoseacommander")) && isSpaceCombat) {
+            buttons.add(Buttons.gray("combatRoll_" + tile.getPosition() + "_space_afb", "Roll " + CombatRollType.AFB.getValue(), FactionEmojis.belkosea));
+        }
         if (p2.hasAbility("necrophage") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "offerNecrophage", "Necrophage", FactionEmojis.mykomentori));
@@ -877,6 +907,32 @@ public class StartCombatService {
         if (p1.hasAbility("necrophage")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "offerNecrophage", "Necrophage", FactionEmojis.mykomentori));
+        }
+
+        if (p2.getPromissoryNotesInPlayArea().contains("dspntold") && !game.isFowMode() && p2.getTotalVictoryPoints() < p1.getTotalVictoryPoints()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Comms (Upon Win)", FactionEmojis.toldar));
+        }
+        if (p1.getPromissoryNotesInPlayArea().contains("dspntold") && p1.getTotalVictoryPoints() < p2.getTotalVictoryPoints()) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Comms (Upon Win)", FactionEmojis.toldar));
+        }
+
+        if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));
+        }
+        if (p1.hasRelicReady("superweaponcaled")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));
+        }
+        if (p2.hasRelicReady("superweaponavailyn") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_availyn_" + tile.getPosition(), "Move 3 Fighters With Availyn", FactionEmojis.belkosea));
+        }
+        if (p1.hasRelicReady("superweaponavailyn")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_availyn_" + tile.getPosition(), "Move 3 Fighters With Availyn", FactionEmojis.belkosea));
         }
 
         boolean hasDevotionShips = space != null && (space.getUnitCount(Units.UnitType.Destroyer, p2) > 0 || space.getUnitCount(Units.UnitType.Cruiser, p2) > 0);
@@ -907,6 +963,15 @@ public class StartCombatService {
         if (isSpaceCombat && p1.hasAbility("munitions")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "munitionsReserves", "Use Munitions Reserves", FactionEmojis.Letnev));
+        }
+
+        if (p2.hasTech("dstoldr") && !game.isFowMode()) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
+        }
+        if (p1.hasTech("dstoldr")) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "virTraining", "Use V.I.R. Training", FactionEmojis.toldar));
         }
         if (p2.hasTech("dsvadey") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
@@ -1071,17 +1136,18 @@ public class StartCombatService {
             if (unitH instanceof Planet) {
                 nameOfHolder = Helper.getPlanetRepresentation(unitH.getName(), game);
                 for (Player p : List.of(p1, p2)) {
-                    // Sol Commander
                     Player otherP = p1;
                     if (p == p1) {
                         otherP = p2;
                     }
+                    // Sol Commander
                     if (p != game.getActivePlayer() && game.playerHasLeaderUnlockedOrAlliance(p, "solcommander") && isGroundCombat) {
                         String id = p.finChecker() + "utilizeSolCommander_" + unitH.getName();
                         String label = "Use Sol Commander on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Sol));
                     }
-                    if (p.hasUnit("atokera") && isGroundCombat && p.getReadiedPlanets().contains(unitH.getName()) && unitH.getUnitCount(UnitType.Mech, p) > 0) {
+                    // atokera
+                    if (p.hasUnit("atokera_mech") && isGroundCombat && p.getReadiedPlanets().contains(unitH.getName()) && unitH.getUnitCount(UnitType.Mech, p) > 0) {
                         String id = p.finChecker() + "utilizeAtokeraMech_" + unitH.getName();
                         String label = "Use Atokera Mech Ability on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.atokera));
@@ -1109,9 +1175,8 @@ public class StartCombatService {
                         String label = "Deploy Dunlain Reaper on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Letnev));
                     }
-                    // Assimilate
-
                 }
+                // Assimilate
                 if (p1.hasAbility("assimilate") && isGroundCombat
                     && (unitH.getUnitCount(Units.UnitType.Spacedock, p2.getColor()) > 0
                         || unitH.getUnitCount(Units.UnitType.Pds, p2.getColor()) > 0)) {
@@ -1167,7 +1232,7 @@ public class StartCombatService {
 
     private static String getSpaceCombatIntroMessage() {
         return """
-            ## Steps for Space Combat:
+            ## Steps for End of Movement & Space Combat:
             > 1. End of movement abilities (**Foresight**, _Stymie_, etc.)
             > 2. Space Cannon Offense
             > 3. Start of Combat (_Skilled Retreat_, _Morale Boost_, etc.)

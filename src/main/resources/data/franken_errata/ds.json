@@ -117,7 +117,7 @@
     {
         "ItemCategory": "HERO",
         "ItemId": "edynhero",
-        "alternateText": "Midir - Living Will (The Edyn Mandate) | Golden Order - Peace Eternal\nACTION: For each system with your mechs on the game board, draw 1 agenda. Reveal and resolve each agenda in any order as if you had cast 1 vote for an outcome of your choice. Other players cannot resolve abilities during this action.\n\nThen, purge this card.",
+        "alternateText": "[Franken only] Midir - Living Will (The Edyn Mandate) | Golden Order - Peace Eternal\nACTION: For each system with at least one of your mechs on the game board, draw 1 agenda. Reveal and resolve each agenda in any order as if you had cast 1 vote for an outcome of your choice. Other players cannot resolve abilities during this action.\n\nThen, purge this card.",
         "source": "ds"
     },
     {
@@ -171,6 +171,12 @@
             "HERO:gheminaherolady",
             "HERO:gheminaherolord"
         ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "the_lady_and_the_lord",
+        "alternateText": "[Franken only] During setup, place the Lady flagship token in your reinforcements with your chosen drafted Flagship and place both drafted Heroes next to your faction sheet. The Lady flagship token is a second flagship unit with the abilities and attributes listed on the Lady flagship card. You have 2 Heroes.",
         "source": "ds"
     },
     {
@@ -398,18 +404,6 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId": "iconoclasm",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "COMMANDER",
-        "ItemId": "lanefircommander",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId": "cunning",
         "AdditionalComponents": [
             "ABILITY:subterfuge"
@@ -448,6 +442,12 @@
     {
         "ItemCategory": "STARTINGFLEET",
         "ItemId": "khrask",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "lithoids",
         "Undraftable": true,
         "source": "ds"
     },
@@ -524,11 +524,18 @@
         "ItemCategory": "MECH",
         "ItemId": "nivyn_mech",
         "AdditionalComponents": [
-            "ABILITY:singularity_point"
+            "ABILITY:singularity_point",
+            "HERO:nivynhero"
         ],
         "OptionalSwaps": [
             "TECH:dsnivymf"
         ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "HERO",
+        "ItemId": "nivynhero",
+        "Undraftable": true,
         "source": "ds"
     },
     {
@@ -545,6 +552,12 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "desperados",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "nokarcommander",
         "Undraftable": true,
         "source": "ds"
     },

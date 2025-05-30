@@ -19,6 +19,9 @@ public class StatisticsPipeline {
     private StatisticsPipeline() {
         worker = new Thread(() -> {
             while (running || !statisticsQueue.isEmpty()) {
+                if (statisticsQueue.size() >= 10) {
+                    BotLogger.warning("Large number of games (" + statisticsQueue.size() + ") in the game render queue...");
+                }
                 try {
                     StatisticsPipeline.StatisticsEvent statisticsEvent = statisticsQueue.poll(2, TimeUnit.SECONDS);
                     if (statisticsEvent != null) {

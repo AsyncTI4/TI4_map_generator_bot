@@ -554,7 +554,7 @@
         "faction": "mirveda",
         "baseUpgrade": "pds2",
         "source": "ds",
-        "text": "Move 2, Capacity 1\nSPACE CANNON 4, BOMBARDMENT 4\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed.",
+        "text": "Move 2, Capacity 1\nSPACE CANNON 4, BOMBARDMENT 4\nThis unit is placed in a space area instead of on a planet.\nThis unit can move and retreat as if it were a ship.\nThis unit can be blockaded, if it is blockaded, it is destroyed.[Note: this unit cannot fire into adjacent systems by itself. Needs Mirveda commander. Also note that if it is alone and an enemy ship moves into its space, it will be blockaded and die before it can shoot PDS.]",
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/gauss_cannon_2.jpg?raw=true"
     },
     {
@@ -785,7 +785,7 @@
         "requirements": "YY",
         "faction": "vaden",
         "source": "ds",
-        "text": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities, you may exhaust this card to destroy that unit. After you produce 1 or more hits during a round of combat, you may spend 1 trade good to produce 1 additional hit.",
+        "text": "After another player's unit uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities, you may exhaust this card to destroy that unit.\nAfter you produce 1 or more hits during a round of combat, you may spend 1 trade good to produce 1 additional hit.",
         "shrinkName": true,
         "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/krovoz_strike_teams.png?raw=true"
     },
@@ -896,7 +896,7 @@
         "faction": "pharadn",
         "baseUpgrade": "inf2",
         "source": "ds",
-        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. At the start of your turn, place up to 1 of your captured infantry on a planet in a system that contains your structures, as if they were your own."
+        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. At the start of your turn, you may produce 1 infantry on a planet you control in a system that contains 1 of your structures. "
     },
     {
         "alias": "dspharb",
@@ -955,5 +955,48 @@
         "faction": "atokera",
         "source": "ds",
         "text": "Once during each of your actions, choose 1 of your units and 1 unit ability. That unit gains that unit ability with a value of 3, if applicable, until the end of that action. [Note: not currently automated by the bot]"
+    },
+    {
+        "alias": "dsbelky",
+        "name": "Synchrony Matrix",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "belkosea",
+        "source": "ds",
+        "text": "At the end of your turn, you may exhaust this card to ready 1 agent or ability card in your play area."
+    },
+    {
+        "alias": "dsbelkff",
+        "name": "Wyvern II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GB",
+        "faction": "belkosea",
+        "baseUpgrade": "ff2",
+        "source": "ds",
+        "text": "You may commit this unit to a planet as if it were a ground force. When combat ends, return it to the space area. Fighters in excess of your ships’ capacity count against your fleet pool. 1(x2), 8, 2; ANTI-FIGHTER BARRAGE 9(x2)"
+    },{
+        "alias": "dstoldb",
+        "name": "Emergency Modifications",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "toldar",
+        "source": "ds",
+        "text": "After a player activates a system, choose 1 unit on the game board; apply +2 to that unit's Capacity value, if it has one, until the end of this tactical action. "
+    },{
+        "alias": "dstoldr",
+        "name": "V.I.R. Training",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "toldar",
+        "source": "ds",
+        "text": "During each round of combat, you may cancel 1 hit your units produced to cancel up to 1 hit your opponent’s units produced."
     }
 ]

@@ -1,5 +1,8 @@
 package ti4.map;
 
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
+
 import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
@@ -19,10 +22,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import static java.util.function.Predicate.not;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,6 +55,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -90,7 +92,6 @@ import ti4.model.UnitModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.SourceEmojis;
-import ti4.service.fow.FOWPlusService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -110,12 +111,15 @@ public class Game extends GameProperties {
     // TODO (Jazz): These should be easily added to GameProperties
     private Map<String, Integer> discardActionCards = new LinkedHashMap<>();
     private Map<String, Integer> purgedActionCards = new LinkedHashMap<>();
-    private Map<String, Integer> displacedUnitsFrom1System = new HashMap<>();
     private Map<String, Integer> thalnosUnits = new HashMap<>();
     private Map<String, Integer> slashCommandsUsed = new HashMap<>();
     private Map<String, Integer> actionCardsSabotaged = new HashMap<>();
-    private Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
     private Map<String, String> currentAgendaVotes = new HashMap<>();
+    @Setter
+    @Getter
+    private Map<String, Map<UnitKey, List<Integer>>> tacticalActionDisplacement = new HashMap<>();
+    private @Deprecated Map<String, Integer> displacedUnitsFrom1System = new HashMap<>();
+    private @Deprecated Map<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<>();
 
     @Setter
     @Getter
@@ -252,6 +256,7 @@ public class Game extends GameProperties {
         FactionModel setupInfo = neutral.getFactionSetupInfo();
         Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
         neutral.setUnitsOwned(playerOwnedUnits);
+        neutral.addTech("ff2");
         return neutral;
     }
 
@@ -570,6 +575,7 @@ public class Game extends GameProperties {
         gameModes.put("HomebrewSC", isHomebrewSCMode());
         gameModes.put("Little Omega", isLittleOmega());
         gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
+        gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Homebrew", !isNormalGame);
 
         for (String tag : getTags()) {
@@ -588,7 +594,27 @@ public class Game extends GameProperties {
         return getRealPlayers().stream().anyMatch(p -> p.getFaction().toLowerCase().contains("franken"));
     }
 
+    public String gameJumpLinks() {
+        return String.format("%s %s %s", getName(), getTabletalkJumpLink(), getActionsJumpLink());
+    }
+
     @JsonIgnore
+    public String getTabletalkJumpLink() {
+        TextChannel tt = getTableTalkChannel();
+        if (tt == null) return "[no tt]";
+        return String.format("[__[Tabletalk](%s)__]", tt.getJumpUrl());
+
+    }
+
+    @JsonIgnore
+    public String getActionsJumpLink() {
+        TextChannel act = getActionsChannel();
+        if (act == null) return "[no actions]";
+        return String.format("[__[Actions](%s)__]", act.getJumpUrl());
+    }
+
+    @JsonIgnore
+    @Nullable
     public TextChannel getTableTalkChannel() {
         try {
             return AsyncTI4DiscordBot.jda.getTextChannelById(getTableTalkChannelID());
@@ -2367,6 +2393,10 @@ public class Game extends GameProperties {
         if (!getActionCards().isEmpty()) {
             String id = getActionCards().getFirst();
             Player player = getPlayer(userID);
+            if (player.hasAbility("deceive")) {
+                ButtonHelperFactionSpecific.resolveDeceive(player, this);
+                return null;
+            }
             if (player != null) {
                 getActionCards().remove(id);
                 player.setActionCard(id);
@@ -3264,8 +3294,7 @@ public class Game extends GameProperties {
 
     public Tile getTileByPosition(String position) {
         if (position == null) return null;
-        Tile tile = tileMap.get(position);
-        return tile == null && FOWPlusService.isActive(this) ? FOWPlusService.voidTile(position) : tile;
+        return tileMap.get(position);
     }
 
     public boolean isTileDuplicated(String tileID) {
@@ -3432,6 +3461,7 @@ public class Game extends GameProperties {
                     removePlanet(unitHolder);
                 }
             }
+            customHyperlaneData.remove(position);
         }
 
         tileMap.remove(position);

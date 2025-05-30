@@ -409,7 +409,28 @@
         "unlockCondition": "Always Unlocked",
         "source": "ds"
     },
-    
+    {
+        "id": "toldaragent",
+        "faction": "toldar",
+        "type": "agent",
+        "name": "Zhroth Khuvad",
+        "title": "Esteemed Philanthropist",
+        "abilityWindow": "When another player gains any number of commodities",
+        "abilityText": "You may exhaust this card to gain an equal number of commodities and convert that player's commodities to trade goods.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
+    {
+        "id": "belkoseaagent",
+        "faction": "belkosea",
+        "type": "agent",
+        "name": "Razalka Gris",
+        "title": "Ghost Squadron ",
+        "abilityWindow": "After a system is activated",
+        "abilityText":  "You may exhaust this card to choose 1 system; until the end of movement, other players' ships in that system do not affect ships' movement.",
+        "unlockCondition": "Always Unlocked",
+        "source": "ds"
+    },
     {
         "id": "atokeraagent",
         "faction": "atokera",
@@ -827,6 +848,29 @@
         "abilityWindow": "After you perform an action:",
         "abilityText": "If you won a combat during that action, you may perform an additional action. ",
         "unlockCondition": "Win 2 combats in 1 turn",
+        "source": "ds"
+    },
+    
+    {
+        "id": "toldarcommander",
+        "faction": "toldar",
+        "type": "commander",
+        "name": "Baird Feraux",
+        "title": "Reserved Strategist",
+        "abilityWindow": "During each round of combat:",
+        "abilityText": "If your opponent controls more units participating in that combat than you, one of your units may roll 1 additional combat die",
+        "unlockCondition": "Gain a second Code card",
+        "source": "ds"
+    },
+    {
+        "id": "belkoseacommander",
+        "faction": "belkosea",
+        "type": "commander",
+        "name": " Ciphus Gault",
+        "title": "Mercenary Demon",
+        "abilityWindow": "During each round of space combat:",
+        "abilityText": "Each of your units may use ANTI-FIGHTER BARRAGE instead of making a combat roll during that round of combat. [Note: not applicable to first round of combat, where both occur. Also note that the bot will not know to not roll for certain units. Just ignore any hits they produce if you chose to use AFB instead.]",
+        "unlockCondition": "Have 1 superweapon in your play area.",
         "source": "ds"
     },
     {
@@ -1298,6 +1342,18 @@
         "source": "ds"
     },
     {
+        "id": "belkoseahero",
+        "faction": "belkosea",
+        "type": "hero",
+        "name": "Spike",
+        "title": "The Reaper",
+        "abilityName": " Ace of Aces - Inspirational Pilot",
+        "abilityWindow": "At the start of combat",
+        "abilityText": "You may exhaust this card; if you do, during this combat, hits produced by your fighters’ ANTI-FIGHTER BARRAGE are instead produced against all ships (not just fighters). After you lose a combat, ready this card. [Note: this hero does not purge]",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
         "id": "atokerahero",
         "faction": "atokera",
         "type": "hero",
@@ -1306,6 +1362,18 @@
         "abilityName": "Fallen Sky - Judgment",
         "abilityWindow": "At the start of invasion:",
         "abilityText": "You may purge this card to commit any of your ships in the active system to planets as if they were ground forces; those units participate in combat. At the end of this tactical action, return those ships to the space area of the active system.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "ds"
+    },
+    {
+        "id": "toldarhero",
+        "faction": "toldar",
+        "type": "hero",
+        "name": "Acamont",
+        "title": " Concordat Marshall",
+        "abilityName": "Concord Renewed - Galactic Outreach",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Attach this card to a revealed public objective. Other players with the fewest victory points may score this objective without fulfilling its requirements; after another player scores this objective, the Toldar player gains 2 command tokens.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     }

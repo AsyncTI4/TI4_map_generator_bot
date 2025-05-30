@@ -44,8 +44,10 @@ public class DataMigrationManager {
     private static final Map<String, Function<Game, Boolean>> migrations;
     static {
         migrations = new HashMap<>();
+        migrations.put("cleanupFactionEmojis_110525", MigrationHelper::cleanupFactionEmojis);
         migrations.put("removeWekkersAbsolsPoliticalSecret_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecrets);
         migrations.put("removeWekkersAbsolsPoliticalSecretAgain_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
+        migrations.put("warnGamesWithOldDisplaceMap_270525", MigrationHelper::warnGamesWithOldDisplaceMap);
         //migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -90,8 +92,10 @@ public class DataMigrationManager {
         return Optional.empty();
     }
 
-    private static List<String> migrateGames(List<ManagedGame> games, String migrationName, Function<Game, Boolean> migrationMethod,
-        LocalDate migrationForGamesBeforeDate) {
+    private static List<String> migrateGames(
+        List<ManagedGame> games, String migrationName, Function<Game, Boolean> migrationMethod,
+        LocalDate migrationForGamesBeforeDate
+    ) {
         List<String> migrationsApplied = new ArrayList<>();
         for (var managedGame : games) {
             if (managedGame.isHasEnded()) continue;
@@ -99,8 +103,7 @@ public class DataMigrationManager {
             LocalDate mapCreatedOn = null;
             try {
                 mapCreatedOn = LocalDate.parse(managedGame.getCreationDate(), MAP_CREATED_ON_FORMAT);
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) {}
 
             if (mapCreatedOn == null || mapCreatedOn.isAfter(migrationForGamesBeforeDate)) {
                 continue;

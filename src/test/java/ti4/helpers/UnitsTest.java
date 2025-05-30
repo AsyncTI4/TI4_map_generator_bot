@@ -24,7 +24,7 @@ public class UnitsTest extends BaseTi4Test {
         private final String expectedColorId = "blu";
 
         private UnitKey buildUnitKey() {
-            return new UnitKey(expectedUnitType, expectedColorId);
+            return Units.getUnitKey(expectedUnitType, expectedColorId);
         }
 
         @Test
