@@ -400,6 +400,7 @@ public class MapGenerator implements AutoCloseable {
             WebHelper.putMap(game.getName(), mainImageBytes, false, null);
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game.getID(), websiteOverlays);
+            WebHelper.putPlayerData(game.getID(), game);
         } else if (isFoWPrivate) {
             Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
             WebHelper.putMap(game.getName(), mainImageBytes, true, player);

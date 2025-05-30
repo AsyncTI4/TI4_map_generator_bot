@@ -41,6 +41,7 @@ public class FowCommunicationThreadService {
     public static void checkNewNeighbors(Game game, Player player) {
         if (!isActive(game)) return;
 
+        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         Set<Set<Player>> checkedPairs = new HashSet<>();
         getGameThreadChannels(game).thenAccept(threads -> {
             for (Player p : game.getRealPlayers()) {
@@ -82,7 +83,7 @@ public class FowCommunicationThreadService {
         return player.getNeighbouringPlayers(true);
     }
 
-    public static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {
+    private static CompletableFuture<List<ThreadChannel>> getGameThreadChannels(Game game) {
         CompletableFuture<List<ThreadChannel>> future = new CompletableFuture<>();
 
         List<ThreadChannel> result = new ArrayList<>(game.getMainGameChannel().getThreadChannels());
@@ -114,7 +115,6 @@ public class FowCommunicationThreadService {
 
     private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<Set<Player>> checkedPairs, Game game) {
         boolean areAllowedToTalkInAgenda = areAllowedToTalkInAgenda(game);
-        ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
         for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
             ThreadChannel threadChannel = thread.getKey();
             String threadName = thread.getKey().getName();
