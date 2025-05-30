@@ -466,7 +466,7 @@ public class MessageHelper {
      * @return True if the message was sent successfully, false otherwise
      */
     public static boolean sendPrivateMessageToPlayer(Player player, Game game, String messageText) {
-        if (player != null && player.getUser().isBot() && !game.isCommunityMode()) {
+        if (player != null && player.getUser() != null && player.getUser().isBot() && !game.isCommunityMode()) {
             return true;
         }
         return sendPrivateMessageToPlayer(player, game, (MessageChannel) null, messageText, null, null);
