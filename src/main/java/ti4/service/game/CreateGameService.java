@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -170,10 +171,11 @@ public class CreateGameService {
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-
+        TextChannelManager chat = chatChannel.getManager();
+        TextChannelManager actions = actionsChannel.getManager();
         for (Member botHelper : nonGameBothelpers) {
-            chatChannel.getManager().putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).queue();
-            actionsChannel.getManager().putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).queue();
+            chat.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).complete();
+            actions.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0).complete();
         }
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
