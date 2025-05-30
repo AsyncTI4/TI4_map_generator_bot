@@ -466,7 +466,7 @@ public class MessageHelper {
      * @return True if the message was sent successfully, false otherwise
      */
     public static boolean sendPrivateMessageToPlayer(Player player, Game game, String messageText) {
-        if (player.getUser().isBot() && !game.isCommunityMode()) {
+        if (player != null && player.getUser().isBot() && !game.isCommunityMode()) {
             return true;
         }
         return sendPrivateMessageToPlayer(player, game, (MessageChannel) null, messageText, null, null);
@@ -486,7 +486,7 @@ public class MessageHelper {
     public static boolean sendPrivateMessageToPlayer(Player player, Game game, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
         if (messageText == null || messageText.isEmpty())
             return true; // blank message counts as a success
-        User user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
+        User user = player == null ? null : AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
         if (user == null) {
             sendMessageToChannel(feedbackChannel, failText);
             return false;
