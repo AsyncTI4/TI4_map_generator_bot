@@ -240,6 +240,7 @@ public class TacticalActionService {
 
         // Move units and place token and also determine some other heuristics
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, player, tile);
+        tile = game.getTileByPosition(tile.getPosition());
         spendAndPlaceTokenIfNecessary(event, game, player, tile);
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
             || tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0

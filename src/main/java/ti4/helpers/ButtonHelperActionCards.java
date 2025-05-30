@@ -1120,8 +1120,8 @@ public class ButtonHelperActionCards {
         p2.setCommodities(0);
         player.setTg(player.getTg() + comm);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " stole " + comm + "commodit " + (comm == 1 ? "y" : "ies")
-                + " from " + player.getFactionEmojiOrColor());
+            player.getRepresentationUnfogged() + " stole " + comm + " commodit" + (comm == 1 ? "y" : "ies")
+                + " from " + p2.getFactionEmojiOrColor());
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
             p2.getRepresentationUnfogged() + " your commodities were somehow stolen with _Salvage_.");
         ButtonHelper.deleteMessage(event);
@@ -1787,7 +1787,7 @@ public class ButtonHelperActionCards {
             }
             msg = new StringBuilder(msg.substring(0, msg.length() - 2) + "\n Total hits were " + hits);
             UnitKey key = Units.getUnitKey(UnitType.Infantry, p2.getColor());
-            DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, amount, uH, false);
+            DestroyUnitService.destroyUnit(event, game.getTileFromPlanet(planet), game, key, hits, uH, false);
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg.toString());
             if (hits > 0) {
                 if (p2.hasAbility("data_recovery")) {
