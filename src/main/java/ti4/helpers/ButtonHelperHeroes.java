@@ -1269,9 +1269,6 @@ public class ButtonHelperHeroes {
                 sendSftT = true;
             } else {
                 sendAlliance = true;
-                if (game.getPNOwner(id).hasLeaderUnlocked("bentorcommander")) {
-                    p2.setCommoditiesTotal(p2.getCommodities() + 1);
-                }
             }
         }
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
@@ -1508,12 +1505,10 @@ public class ButtonHelperHeroes {
                 player.removeAbility("policy_the_economy_empower");
                 msg += "removed _Policy - The Economy: Empower ➕_";
                 player.addAbility("policy_the_economy_exploit");
-                player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                 msg = msg
                     + " and added _Policy - The Economy: Exploit ➖_. Decreased commodities total by 1 (double check the value is correct).";
             } else if (player.hasAbility("policy_the_economy_exploit")) {
                 player.removeAbility("policy_the_economy_exploit");
-                player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
                 msg += "removed _Policy - The Economy: Exploit ➖_";
                 player.addAbility("policy_the_economy_empower");
                 msg += " and added _Policy - The Economy: Empower ➕_.";

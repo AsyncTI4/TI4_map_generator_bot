@@ -140,13 +140,6 @@ public class RemoveUnitService {
         if (toRemoveCount > 0 && event != null) {
             MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " missing.");
         }
-        Player player = game.getPlayerFromColorOrFaction(parsedUnit.getUnitKey().getColor());
-        if (player != null) {
-            if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
-                player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
-                    Units.getUnitKey(UnitType.Spacedock, player.getColor())));
-            }
-        }
 
         tile.getUnitHolders().values().forEach(unitHolder -> AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game));
         return allUnitsRemoved;
