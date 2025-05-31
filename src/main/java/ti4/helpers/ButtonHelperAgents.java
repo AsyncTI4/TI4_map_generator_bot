@@ -127,7 +127,7 @@ public class ButtonHelperAgents {
             p2.getRepresentationUnfogged() + " your " + commodities + " commodities have been washed by the Toldar agent.");
         p2.setTg(p2.getTg() + commodities);
         p2.setCommodities(0);
-        toldar.setCommodities(Math.min(toldar.getCommoditiesTotal(), toldar.getCommodities() + amount));
+        toldar.setCommodities(toldar.getCommodities() + amount);
         MessageHelper.sendMessageToChannel(toldar.getCorrectChannel(), toldar.getRepresentation() + " you now have " + toldar.getCommodities() + " commodities after using your agent");
         toldarAgentInitiation(game, toldar, amount);
     }
@@ -364,7 +364,7 @@ public class ButtonHelperAgents {
         ButtonHelper.resolveInfantryDestroy(player, amountToKill);
         message += ". " + amountToKill + " infantry were destroyed. " + Math.min(player.getCommoditiesTotal(), amountToKill) + " comms were gained and then converted to tgs";
         player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), amountToKill));
-        player.setCommodities(Math.max(0, player.getCommodities() - Math.min(player.getCommoditiesTotal(), amountToKill)));
+        player.setCommodities(Math.max(0, player.getCommodities() - amountToKill));
         RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
@@ -557,9 +557,6 @@ public class ButtonHelperAgents {
             if (activePlayer != null) {
                 int oldComms = activePlayer.getCommodities();
                 int newComms = oldComms + activePlayer.getNeighbourCount();
-                if (newComms > activePlayer.getCommoditiesTotal()) {
-                    newComms = activePlayer.getCommoditiesTotal();
-                }
                 activePlayer.setCommodities(newComms);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     player.getFactionEmoji()
@@ -1789,7 +1786,7 @@ public class ButtonHelperAgents {
         }
         String msg = player.getFactionEmojiOrColor() + " replenished commodities due to " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Tox, the Kyro" + (kyro.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        player.setCommodities(player.getCommoditiesTotal());
+        player.setCommodities(player.getCommodities()+player.getCommoditiesTotal());
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         cabalAgentInitiation(game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
@@ -1859,10 +1856,6 @@ public class ButtonHelperAgents {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         CommanderUnlockCheckService.checkPlayer(player, "titans", "saar", "rohdhna", "cheiran", "celdauri");
         AgendaHelper.ministerOfIndustryCheck(player, game, game.getTileFromPlanet(planet), event);
-        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
-            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
-                Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
-        }
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
         }

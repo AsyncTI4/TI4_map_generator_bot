@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.draft.items.AbilityDraftItem;
@@ -170,6 +171,9 @@ public abstract class DraftItem implements ModelInterface {
         BagDraft draftRules = player.getGame().getActiveBagDraft();
         DraftBag draftHand = player.getDraftHand();
         boolean isAtHandLimit = draftHand.getCategoryCount(ItemCategory) >= draftRules.getItemLimitForCategory(ItemCategory);
+        if (draftRules instanceof FrankenDraft) {
+            isAtHandLimit = draftHand.getCategoryCount(ItemCategory) >= FrankenDraft.getItemLimitForCategory(ItemCategory, player.getGame());
+        }
         if (isAtHandLimit) {
             return false;
         }
@@ -180,7 +184,11 @@ public abstract class DraftItem implements ModelInterface {
             if (ItemCategory == cat) {
                 continue;
             }
-            allOtherCategoriesAtHandLimit &= draftHand.getCategoryCount(cat) >= draftRules.getItemLimitForCategory(cat);
+            if (draftRules instanceof FrankenDraft) {
+                allOtherCategoriesAtHandLimit &= draftHand.getCategoryCount(cat) >= FrankenDraft.getItemLimitForCategory(cat, player.getGame());
+            } else {
+                allOtherCategoriesAtHandLimit &= draftHand.getCategoryCount(cat) >= draftRules.getItemLimitForCategory(cat);
+            }
         }
 
         if (hasDraftedThisBag) {

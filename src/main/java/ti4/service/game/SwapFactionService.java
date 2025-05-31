@@ -38,6 +38,11 @@ public class SwapFactionService {
             swapperPlayer.setDummy(true);
         }
 
+        if (game.isFowMode()) {
+            //Fog data is saved by userID so need to swap it too
+            game.getTileMap().values().forEach(tile -> tile.swapFogData(player, swapperPlayer));
+        }
+
         String before = "> **Before:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
         swapperPlayer.setUserName(removedPlayer.getUserName());
         swapperPlayer.setUserID(removedPlayer.getUserID());

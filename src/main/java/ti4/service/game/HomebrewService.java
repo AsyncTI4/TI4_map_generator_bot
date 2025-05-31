@@ -11,7 +11,6 @@ import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.OmegaPhaseModStatusHelper;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -140,6 +139,7 @@ public class HomebrewService {
             }
             case HBDSEXPLORES -> {
                 game.setDiscordantStarsMode(true);
+                game.setUnchartedSpaceStuff(true);
                 game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
                 game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
                 if (game.isAbsolMode()) {

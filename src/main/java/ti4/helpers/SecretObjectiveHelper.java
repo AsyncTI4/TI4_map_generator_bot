@@ -22,7 +22,6 @@ import ti4.service.info.ListPlayerInfoService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.HeroUnlockCheckService;
-import ti4.service.unit.AddUnitService;
 
 public class SecretObjectiveHelper {
 
@@ -262,5 +261,27 @@ public class SecretObjectiveHelper {
         }
         sb.append("\n");
         return sb.toString();
+    }
+
+    public static void resolveShowRandomSecretObjective(Game game, Player player, Player otherPlayer, GenericInteractionCreateEvent event) {
+        List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
+        if (secrets.isEmpty()) {
+            MessageHelper.sendMessageToEventChannel(event, "No secret objectives to reveal");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, otherPlayer.getRepresentationUnfogged() + ", target had no secret objectives to reveal");
+            return;
+        }
+
+        Collections.shuffle(secrets);
+        String soID = secrets.getFirst();
+
+        String sb = otherPlayer.getRepresentationUnfogged() + " you were shown the following random Secret Objective:\n" +
+            "> Player: " + player.getColorIfCanSeeStats(otherPlayer) + "\n" +
+            "> " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID) + "\n";
+
+        player.setSecret(soID);
+
+        MessageHelper.sendMessageToEventChannel(event, "## Random secret objective shown to " + otherPlayer.getColorIfCanSeeStats(player));
+        SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, sb);
     }
 }

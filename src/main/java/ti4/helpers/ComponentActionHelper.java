@@ -619,9 +619,8 @@ public class ComponentActionHelper {
             }
             case "dynamiscore", "absol_dynamiscore" -> {
                 int oldTg = player.getTg();
-                player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 if ("absol_dynamiscore".equals(relicID)) {
-                    player.setTg(oldTg + Math.min(player.getCommoditiesTotal() * 2, 10));
+                    player.setTg(oldTg + Math.min(player.getCommoditiesBase() * 2, 10));
                 } else {
                     player.setTg(oldTg + player.getCommoditiesTotal() + 2);
                 }
