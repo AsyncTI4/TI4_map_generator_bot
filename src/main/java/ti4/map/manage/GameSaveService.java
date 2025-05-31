@@ -403,6 +403,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + game.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.UNCHARTED_SPACE_STUFF + " " + game.isUnchartedSpaceStuff());
+        writer.write(System.lineSeparator());
         writer.write(Constants.VERBOSITY + " " + game.getOutputVerbosity());
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + game.isTestBetaFeaturesMode());
@@ -706,7 +708,9 @@ class GameSaveService {
 
             writer.write(Constants.COMMODITIES + " " + player.getCommodities());
             writer.write(System.lineSeparator());
-            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
+            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
             writer.write(System.lineSeparator());
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());

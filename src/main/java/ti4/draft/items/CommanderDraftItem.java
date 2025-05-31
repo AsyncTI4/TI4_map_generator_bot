@@ -1,12 +1,15 @@
 package ti4.draft.items;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
@@ -65,6 +68,29 @@ public class CommanderDraftItem extends DraftItem {
             List<String> leaders = faction.getLeaders();
             leaders.removeIf((String leader) -> !"commander".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
+                allItems.add(DraftItem.generate(Category.COMMANDER, leader));
+            }
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = buildAllItems(factions);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
+        String[] results = game.getStoredValue("bannedLeaders").split("finSep");
+        for (FactionModel faction : factions) {
+            List<String> leaders = faction.getLeaders();
+            leaders.removeIf((String leader) -> !"commander".equals(allLeaders.get(leader).getType()));
+            for (String leader : leaders) {
+                if (Arrays.asList(results).contains(leader)) {
+                    continue;
+                }
                 allItems.add(DraftItem.generate(Category.COMMANDER, leader));
             }
         }

@@ -426,6 +426,10 @@ public class Constants {
     public static final String QUICKSTART = "quickstart";
     public static final String SLICE_COUNT = "slice_count";
     public static final String FACTION_COUNT = "faction_count";
+    public static final String BAN_COMMODITIES = "ban_commodities";
+    public static final String BAN_FLEET = "ban_fleet";
+    public static final String BAN_HS = "ban_hs";
+    public static final String BAN_STARTING_TECH = "ban_starting_tech";
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
     public static final String INCLUDE_DS_TILES = "include_ds_tiles";
     public static final String INCLUDE_DS_FACTIONS = "include_ds_factions";
@@ -616,6 +620,7 @@ public class Constants {
     public static final String COMMODITIES = "commodities";
     public static final String PERSONAL_PING_INTERVAL = "personal_ping_interval";
     public static final String COMMODITIES_TOTAL = "commodities_total";
+    public static final String COMMODITIES_BASE = "commodities_base";
     public static final String STASIS_INFANTRY = "stasis_infantry";
     public static final String MARK_FOLLOWED = "mark_followed";
     public static final String AUTO_SABO_PASS_MEDIAN = "auto_sabo_pass_median";
@@ -963,7 +968,27 @@ public class Constants {
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
 
+    //ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET, BLUETILE, REDTILE, DRAFTORDER
+    public static final String ABILITY_LIMIT = "ability_limit";
+    public static final String TECH_LIMIT = "tech_limit";
+    public static final String AGENT_LIMIT = "agent_limit";
+    public static final String COMMANDER_LIMIT = "commander_limit";
+    public static final String HERO_LIMIT = "hero_limit";
+    public static final String MECH_LIMIT = "mech_limit";
+    public static final String FLAGSHIP_LIMIT = "flagship_limit";
+    public static final String COMMODITIES_LIMIT = "commodities_limit";
+    public static final String PN_LIMIT = "pn_limit";
+    public static final String HOMESYSTEM_LIMIT = "homesystem_limit";
+    public static final String STARTINGTECH_LIMIT = "startingtech_limit";
+    public static final String STARTINGFLEET_LIMIT = "startingfleet_limit";
+    public static final String BLUETILE_LIMIT = "bluetile_limit";
+    public static final String REDTILE_LIMIT = "redtile_limit";
+    public static final String FIRSTPICK_LIMIT = "firstpick_limit";
+    public static final String LATERPICK_LIMIT = "laterpick_limit";
+
     public static final String ABILITY = "ability";
+    public static final String BAN = "ban";
+    public static final String DRAFT_LIMITS = "draft_limits";
     public static final String BAN_ABILITY = "ban_ability";
     public static final String BAN_FACTION = "ban_faction";
     public static final String ABILITY_1 = "ability_1";

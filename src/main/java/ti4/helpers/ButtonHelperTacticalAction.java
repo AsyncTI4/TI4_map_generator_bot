@@ -374,7 +374,7 @@ public class ButtonHelperTacticalAction {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, button3);
         }
 
-        if (tile.isAnomaly() && player.getCommodities() < player.getCommoditiesTotal() && player.getActionCards().containsKey("harness")) {
+        if (tile.isAnomaly() && player.getActionCards().containsKey("harness")) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 player.getRepresentation() + ", you activated an anomaly, and so could now play _Harness Energy_.");
         }

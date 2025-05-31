@@ -54,9 +54,6 @@ class SendCommodities extends GameStateSubcommand {
         } else {
             int targetTG = targetPlayer.getCommodities();
             targetTG += sendCommodities;
-            if (targetTG > targetPlayer.getCommoditiesTotal()) {
-                targetTG = targetPlayer.getCommoditiesTotal();
-            }
             targetPlayer.setCommodities(targetTG);
         }
 
