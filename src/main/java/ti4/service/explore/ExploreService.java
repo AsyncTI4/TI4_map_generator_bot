@@ -512,12 +512,10 @@ public class ExploreService {
                 RelicHelper.drawRelicAndNotify(player, event, game);
             }
             case "ms1", "ms2" -> {
-                int oldComm = player.getCommodities();
-                ButtonHelperStats.replenishComms(event, game, player, true);
-                message = "Replenished Commodities (" + oldComm + "->" + player.getCommodities()
+                message = "Replenished Commodities (" + player.getCommodities() + "->" + player.getCommoditiesTotal()
                     + "). Reminder that this is optional, and that you may instead convert your existing commodities.";
                 MessageHelper.sendMessageToEventChannel(event, message);
-
+                ButtonHelperStats.replenishComms(event, game, player, true);
             }
             case Constants.MIRAGE -> {
                 String mirageID = Constants.MIRAGE;
@@ -789,7 +787,7 @@ public class ExploreService {
             case "hiddenlaboratory" -> {
                 MessageHelper.sendMessageToEventChannel(event, "# Exploring frontier in this system due to finding the _Hidden Laboratory_.");
                 AddTokenCommand.addToken(event, tile, Constants.FRONTIER, game);
-                ButtonHelper.resolveFullFrontierExplore(game, player, tile, event);
+                expFront(event, tile, game, player);
             }
             case "ancientshipyard" -> {
                 List<String> colors = tile == null ? List.of() : tile.getUnitHolders().get("space").getUnitColorsOnHolder();

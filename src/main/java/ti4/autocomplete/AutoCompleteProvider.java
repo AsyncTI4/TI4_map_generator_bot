@@ -122,7 +122,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6, Constants.BAN_FLEET, Constants.BAN_HS, Constants.BAN_STARTING_TECH, Constants.BAN_COMMODITIES -> {
+            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6 -> {
                 var options = searchModels(event, Mapper.getFactionsValues(), null);
                 event.replyChoices(options).queue();
             }
@@ -856,30 +856,6 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-
-            case Constants.BAN -> {
-                switch (optionName) {
-                    case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
-                        List<Command.Choice> options = searchModels(event, Mapper.getLeaders().values(), null);
-                        event.replyChoices(options).queue();
-                    }
-                    case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
-                        String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                        List<Command.Choice> options = Mapper.getTechs().values().stream()
-                            .filter(entry -> entry.getFaction().isPresent())
-                            .filter(entry -> entry.search(enteredValue))
-                            .limit(25)
-                            .map(entry -> new Command.Choice(entry.getAutoCompleteName(), entry.getAlias()))
-                            .collect(Collectors.toList());
-                        event.replyChoices(options).queue();
-                    }
-                    case Constants.TILE_NAME -> {
-                        var options = searchModels(event, TileHelper.getAllTileModels(), null);
-                        event.replyChoices(options).queue();
-                    }
-                }
-
-            }
         }
     }
 
@@ -890,7 +866,6 @@ public class AutoCompleteProvider {
                 var options = searchModels(event, TileHelper.getAllTileModels(), null);
                 event.replyChoices(options).queue();
             }
-
             case Constants.REMOVE_TILE -> {
                 if (!optionName.equals(Constants.POSITION)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();

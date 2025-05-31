@@ -28,10 +28,9 @@ class BanFaction extends GameStateSubcommand {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
-
-        Game game = getGame();
-        //GET ALL ABILITY OPTIONS AS STRING
         List<String> abilityIDs = new ArrayList<>();
+
+        //GET ALL ABILITY OPTIONS AS STRING
         for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.FACTION)).toList()) {
             abilityIDs.add(option.getAsString());
         }
@@ -39,6 +38,7 @@ class BanFaction extends GameStateSubcommand {
         abilityIDs.removeIf(StringUtils::isEmpty);
         abilityIDs.removeIf(a -> !Mapper.getFactionIDs().contains(a));
 
+        Game game = getGame();
         for (String ability : abilityIDs) {
             game.setStoredValue("bannedFactions", game.getStoredValue("bannedFactions") + "finSep" + ability);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(ability).getFactionName());

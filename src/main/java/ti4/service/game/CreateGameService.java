@@ -153,13 +153,7 @@ public class CreateGameService {
         List<Member> nonGameBothelpers = new ArrayList<>();
         if (bothelperRole != null) {
             for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
-                boolean inGame = false;
-                for (Member member : members) {
-                    if (member.getId().equalsIgnoreCase(botHelper.getId())) {
-                        inGame = true;
-                    }
-                }
-                if (!inGame) {
+                if (!members.contains(botHelper)) {
                     nonGameBothelpers.add(botHelper);
                 }
             }
