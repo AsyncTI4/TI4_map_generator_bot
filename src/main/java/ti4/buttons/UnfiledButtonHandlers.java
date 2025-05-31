@@ -746,7 +746,7 @@ public class UnfiledButtonHandlers {
             if (uH.getTokenList().contains("attachment_facilitylogisticshub.png")) {
                 String msg = player.getRepresentation() + " gained 1 commodity due to exhausting " + Helper.getPlanetRepresentation(planetName, game)
                     + " while it had a Logistics Hub Facility.";
-                player.setCommodities(Math.min(player.getCommodities() + 1, player.getCommoditiesTotal()));
+                player.setCommodities(player.getCommodities() + 1);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             if (uH.getTokenList().contains("attachment_facilityresearchlab.png")) {
@@ -1082,7 +1082,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("toldarPN")
     public static void toldarPN(ButtonInteractionEvent event, Player player, Game game) {
-        player.setCommodities(Math.min(player.getCommoditiesTotal(), player.getCommodities() + 3));
+        player.setCommodities(player.getCommodities() + 3);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " used the toldar promissory note to gain " +
             "3 commodities after winning a combat against someone with more VP than them. They can do this once per action. Their currently hold "
             + player.getCommodities() + " commodities");

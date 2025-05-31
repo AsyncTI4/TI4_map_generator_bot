@@ -1,11 +1,14 @@
 package ti4.draft.items;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.PromissoryNoteModel;
@@ -52,6 +55,26 @@ public class PNDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (String pnID : faction.getPromissoryNotes()) {
+                allItems.add(DraftItem.generate(Category.PN, pnID));
+            }
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = buildAllItems(factions, game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.PN);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        String[] results = game.getStoredValue("bannedPNs").split("finSep");
+        for (FactionModel faction : factions) {
+            for (String pnID : faction.getPromissoryNotes()) {
+                if (Arrays.asList(results).contains(pnID)) {
+                    continue;
+                }
                 allItems.add(DraftItem.generate(Category.PN, pnID));
             }
         }

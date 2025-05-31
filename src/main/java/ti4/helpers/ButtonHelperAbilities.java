@@ -1319,6 +1319,46 @@ public class ButtonHelperAbilities {
         return buttons;
     }
 
+    public static List<Button> getReturnableAxisOrders(Player player, Game game) {
+        List<Button> buttons = new ArrayList<>();
+        int maxCost = player.getCommodities();
+
+        Map<String, Integer> orderDeck = Map.of(
+            "axisorderdd", 1,
+            "axisorderddduplicate", 1,
+            "axisordercr", 1,
+            "axisordercrduplicate", 1,
+            "axisordercv", 2,
+            "axisordercvduplicate", 2,
+            "axisorderdn", 3,
+            "axisorderdnduplicate", 3);
+        for (Map.Entry<String, Integer> order : orderDeck.entrySet()) {
+            String orderName = order.getKey();
+            int orderCost = order.getValue();
+            if (orderCost <= maxCost) {
+                if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, orderName)) {
+                    Player p3 = player;
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.getRelics().contains(orderName)) {
+                            p3 = p2;
+                        }
+                    }
+                    buttons.add(Buttons.gray("returnAxisOrder_" + orderName + "_" + p3.getFaction(),
+                        "Return " + Mapper.getRelic(orderName).getName() + " held by " + p3.getColor()));
+                }
+            }
+
+        }
+        buttons.add(Buttons.red("deleteButtons", "Delete these buttons"));
+
+        return buttons;
+    }
+
+    @ButtonHandler("getAxisOrderReturns")
+    public static void getAxisOrderReturns(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to return an axis order to the deck, normally done because you bought one by mistake", getReturnableAxisOrders(player, game));
+    }
+
     @ButtonHandler("buyAxisOrder_")
     public static void resolveAxisOrderBuy(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String relicName = buttonID.split("_")[1];
@@ -1339,6 +1379,23 @@ public class ButtonHelperAbilities {
                 + ").");
         CommanderUnlockCheckService.checkPlayer(player, "axis");
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("returnAxisOrder_")
+    public static void returnAxisOrder(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String relicName = buttonID.split("_")[1];
+        String owner = buttonID.split("_")[2];
+        Player p2 = game.getPlayerFromColorOrFaction(owner);
+        p2.removeRelic(relicName);
+        if (p2 != player) {
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + " your axis order by the name of " + Mapper.getRelic(relicName).getName()
+                    + " was returned to the pile in order to fix a mistake");
+        }
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + " returned " + Mapper.getRelic(relicName).getName()
+                + " in order to fix a mistake");
+        ButtonHelper.deleteMessage(event);
     }
 
     public static List<Button> offerOlradinConnectButtons(Player player, Game game, String planetName) {

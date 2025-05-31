@@ -84,7 +84,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             case "uikos" -> {
                 int comms = player.getHarvestCounter();
                 player.setHarvestCounter(0);
-                player.setCommodities(Math.min(player.getCommoditiesTotal(), player.getCommodities() + comms));
+                player.setCommodities(player.getCommodities() + comms);
                 ButtonHelperAgents.toldarAgentInitiation(game, player, comms);
                 MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " + player.getCommodities() + " commodities (from the " + comms + " that were on the card)");
             }

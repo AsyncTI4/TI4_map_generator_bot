@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1296,9 +1296,7 @@ public class ButtonHelper {
                                 player.getRepresentation() + " returned _" + pnModel.getName() + "_ to "
                                     + nonActivePlayer.getRepresentation() + ".");
                         }
-                        if (pn.endsWith("_an") && nonActivePlayer.hasLeaderUnlocked("bentorcommander")) {
-                            player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
-                        }
+
                         if (pn.equalsIgnoreCase("dspntold")) {
                             game.setStoredValue("ccLimit" + player.getColor(), "15");
                             MessageHelper.sendMessageToChannel(channel,
@@ -3741,91 +3739,96 @@ public class ButtonHelper {
         }
         if ((player.hasTech("det") || game.isCptiExploreMode())
             && tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
-            if (player.hasAbility("voidsailors")) {
-                String cardID1 = game.drawExplore(Constants.FRONTIER);
-                String cardID2 = game.drawExplore(Constants.FRONTIER);
-                ExploreModel card1 = Mapper.getExplore(cardID1);
-                ExploreModel card2 = Mapper.getExplore(cardID2);
-                String name1 = card1.getName();
-                String name2 = card2.getName();
-                Button resolveExplore1 = Buttons.green(
-                    "resFrontier_" + cardID1 + "_" + tile.getPosition() + "_" + cardID2, "Choose " + name1);
-                Button resolveExplore2 = Buttons.green(
-                    "resFrontier_" + cardID2 + "_" + tile.getPosition() + "_" + cardID1, "Choose " + name2);
-                List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-                // code to draw 2 explores and get their names
-                // Send Buttons to decide which one to explore
-                String message = player.getRepresentationUnfogged() + ", please decide which card to resolve.";
-
-                if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-
-                    String pF = player.getFactionEmoji();
-                    MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Using **Voidsailors**, " + pF
-                        + " found a " + name1 + " and a " + name2 + " in " + tile.getRepresentation() + ".");
-
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        "Found a " + name1 + " and a " + name2 + " in " + tile.getRepresentation());
-                }
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-
-                String msg2 = "As a reminder of their text, the card abilities read as: \n";
-                msg2 += name1 + ": " + card1.getText() + "\n";
-                msg2 += name2 + ": " + card2.getText() + "\n";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
-            } else if (player.hasUnexhaustedLeader("lanefiragent")) {
-                String cardID = game.drawExplore(Constants.FRONTIER);
-                ExploreModel card = Mapper.getExplore(cardID);
-                String name1 = card.getName();
-                Button resolveExplore1 = Buttons.green(
-                    "lanefirAgentRes_Decline_frontier_" + cardID + "_" + tile.getPosition(), "Choose " + name1);
-                Button resolveExplore2 = Buttons.green("lanefirAgentRes_Accept_frontier_" + tile.getPosition(),
-                    "Use Lanefir Agent");
-                List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
-                String message = player.getRepresentationUnfogged()
-                    + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Vassa Hagi , the Lanefir"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                    + " agent, and thus may decline this exploration to draw another one instead.";
-                if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                    String pF = player.getFactionEmoji();
-                    MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                        pF + " found a " + name1 + " in " + tile.getRepresentation());
-                } else {
-                    String pF = player.getFactionEmoji();
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        pF + "Found a " + name1 + " and in " + tile.getRepresentation());
-                }
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-                String msg2 = "As a reminder of the text, the card reads as: \n";
-                msg2 += name1 + ": " + card.getText() + "\n";
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
-            } else {
-                ExploreService.expFront(event, tile, game, player);
-            }
-
-            if (player.hasAbility("migrant_fleet")) {
-                String msg3 = player.getRepresentation()
-                    + " after you resolve the frontier exploration, you may use your **Migrant Explorers** ability to explore a planet you control in an adjacent system.";
-                List<Button> buttons = new ArrayList<>();
-                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
-                    Tile tile2 = game.getTileByPosition(pos);
-                    for (Planet uH : tile2.getPlanetUnitHolders()) {
-                        String planet = uH.getName();
-                        if (isNotBlank(uH.getOriginalPlanetType())
-                            && player.getPlanetsAllianceMode().contains(planet)) {
-                            List<Button> planetButtons = getPlanetExplorationButtons(game, uH, player);
-                            buttons.addAll(planetButtons);
-                        }
-
-                    }
-                }
-                if (!buttons.isEmpty()) {
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg3, buttons);
-                }
-            }
+            resolveFullFrontierExplore(game, player, tile, event);
 
         }
+    }
+
+    public static void resolveFullFrontierExplore(Game game, Player player, Tile tile, GenericInteractionCreateEvent event) {
+        if (player.hasAbility("voidsailors")) {
+            String cardID1 = game.drawExplore(Constants.FRONTIER);
+            String cardID2 = game.drawExplore(Constants.FRONTIER);
+            ExploreModel card1 = Mapper.getExplore(cardID1);
+            ExploreModel card2 = Mapper.getExplore(cardID2);
+            String name1 = card1.getName();
+            String name2 = card2.getName();
+            Button resolveExplore1 = Buttons.green(
+                "resFrontier_" + cardID1 + "_" + tile.getPosition() + "_" + cardID2, "Choose " + name1);
+            Button resolveExplore2 = Buttons.green(
+                "resFrontier_" + cardID2 + "_" + tile.getPosition() + "_" + cardID1, "Choose " + name2);
+            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+            // code to draw 2 explores and get their names
+            // Send Buttons to decide which one to explore
+            String message = player.getRepresentationUnfogged() + ", please decide which card to resolve.";
+
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
+
+                String pF = player.getFactionEmoji();
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Using **Voidsailors**, " + pF
+                    + " found a " + name1 + " and a " + name2 + " in " + tile.getRepresentation() + ".");
+
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "Found a " + name1 + " and a " + name2 + " in " + tile.getRepresentation());
+            }
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+
+            String msg2 = "As a reminder of their text, the card abilities read as: \n";
+            msg2 += name1 + ": " + card1.getText() + "\n";
+            msg2 += name2 + ": " + card2.getText() + "\n";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
+        } else if (player.hasUnexhaustedLeader("lanefiragent")) {
+            String cardID = game.drawExplore(Constants.FRONTIER);
+            ExploreModel card = Mapper.getExplore(cardID);
+            String name1 = card.getName();
+            Button resolveExplore1 = Buttons.green(
+                "lanefirAgentRes_Decline_frontier_" + cardID + "_" + tile.getPosition(), "Choose " + name1);
+            Button resolveExplore2 = Buttons.green("lanefirAgentRes_Accept_frontier_" + tile.getPosition(),
+                "Use Lanefir Agent");
+            List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+            String message = player.getRepresentationUnfogged()
+                + " You have " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Vassa Hagi , the Lanefir"
+                + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                + " agent, and thus may decline this exploration to draw another one instead.";
+            if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
+                String pF = player.getFactionEmoji();
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(),
+                    pF + " found a " + name1 + " in " + tile.getRepresentation());
+            } else {
+                String pF = player.getFactionEmoji();
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    pF + "Found a " + name1 + " and in " + tile.getRepresentation());
+            }
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            String msg2 = "As a reminder of the text, the card reads as: \n";
+            msg2 += name1 + ": " + card.getText() + "\n";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg2);
+        } else {
+            ExploreService.expFront(event, tile, game, player);
+        }
+
+        if (player.hasAbility("migrant_fleet")) {
+            String msg3 = player.getRepresentation()
+                + " after you resolve the frontier exploration, you may use your **Migrant Explorers** ability to explore a planet you control in an adjacent system.";
+            List<Button> buttons = new ArrayList<>();
+            for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+                Tile tile2 = game.getTileByPosition(pos);
+                for (Planet uH : tile2.getPlanetUnitHolders()) {
+                    String planet = uH.getName();
+                    if (isNotBlank(uH.getOriginalPlanetType())
+                        && player.getPlanetsAllianceMode().contains(planet)) {
+                        List<Button> planetButtons = getPlanetExplorationButtons(game, uH, player);
+                        buttons.addAll(planetButtons);
+                    }
+
+                }
+            }
+            if (!buttons.isEmpty()) {
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg3, buttons);
+            }
+        }
+
     }
 
     @ButtonHandler("sendTradeHolder_")

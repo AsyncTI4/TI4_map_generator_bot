@@ -1007,9 +1007,6 @@ public class TransactionHelper {
                 } else {
                     int targetTG = p2.getCommodities();
                     targetTG += tgAmount;
-                    if (targetTG > p2.getCommoditiesTotal()) {
-                        targetTG = p2.getCommoditiesTotal();
-                    }
                     p2.setCommodities(targetTG);
                 }
                 ButtonHelperFactionSpecific.resolveDarkPactCheck(game, p1, p2, tgAmount);
@@ -1141,9 +1138,6 @@ public class TransactionHelper {
                         sendSftT = true;
                     } else {
                         sendAlliance = true;
-                        if (game.getPNOwner(id).hasLeaderUnlocked("bentorcommander")) {
-                            p2.setCommoditiesTotal(p2.getCommoditiesTotal() + 1);
-                        }
                     }
                 }
                 PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
