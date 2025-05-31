@@ -29,6 +29,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
+import ti4.service.unit.AddUnitService;
 
 public class AddTokenCommand extends AddRemoveTokenCommand {
 
@@ -109,26 +110,28 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                 UnitHolder planetUnitHolder = unitHolders.get(planet);
                 UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
-                if (planetUnitHolder != null && spaceUnitHolder != null) {
-                    Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
-                    for (Player player_ : game.getPlayers().values()) {
-                        String color = player_.getColor();
-                        planetUnitHolder.removeAllUnits(color);
-                    }
-                    Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                    for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                        UnitKey key = unitEntry.getKey();
-                        if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
-                            Integer count = spaceUnits.get(key);
-                            if (count == null) {
-                                count = unitEntry.getValue();
-                            } else {
-                                count += unitEntry.getValue();
+                Map<UnitKey, List<Integer>> units = new HashMap<>(planetUnitHolder.getUnitsByState());
+                for (Player player_ : game.getPlayers().values()) {
+                    String color = player_.getColor();
+                    planetUnitHolder.removeAllUnits(color);
+                }
+                for (Map.Entry<UnitKey, List<Integer>> unitEntry : units.entrySet()) {
+                    UnitKey key = unitEntry.getKey();
+                    Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
+                    if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
+                        String unitName = key.unitName();
+                        int state = 0;
+                        for (Integer count : unitEntry.getValue()) {
+                            if (count > 0) {
+                                //RemoveUnitService.removeUnits(event, tile, game, key.getColor(), count + " " + unitName + " " + planetUnitHolder.getName());
+                                AddUnitService.addUnits(event, tile, game, key.getColor(), count + " " + unitName);
+                                if (state == 1) {
+                                    spaceUnitHolder.addDamagedUnit(key, state);
+                                }
                             }
-                            spaceUnits.put(key, count);
+                            state++;
                         }
                     }
-
                 }
             }
             if (tokenID.contains("facility")) {

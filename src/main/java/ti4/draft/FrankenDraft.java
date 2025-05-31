@@ -50,14 +50,30 @@ public class FrankenDraft extends BagDraft {
                 if (!game.getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
                     limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category.toString()));
                 } else {
-                    limit = 3;
+                    if (game.getActiveBagDraft() instanceof PoweredFrankenDraft || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
+                        if (category == DraftItem.Category.ABILITY) {
+                            limit = 4;
+                        } else {
+                            limit = 3;
+                        }
+                    } else {
+                        limit = 3;
+                    }
                 }
             }
             case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> {
                 if (!game.getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
                     limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category.toString()));
                 } else {
-                    limit = 2;
+                    if (game.getActiveBagDraft() instanceof PoweredFrankenDraft || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
+                        if (category == DraftItem.Category.TECH) {
+                            limit = 3;
+                        } else {
+                            limit = 2;
+                        }
+                    } else {
+                        limit = 2;
+                    }
                 }
 
             }
