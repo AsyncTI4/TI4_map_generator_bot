@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -51,6 +52,8 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
+import ti4.draft.DraftItem;
+import ti4.draft.FrankenDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
@@ -377,6 +380,24 @@ public class Game extends GameProperties {
 
     public BagDraft getActiveBagDraft() {
         return activeDraft;
+    }
+
+    public int getFrankenBagSize() {
+        int size = 0;
+        boolean overRodeNormal = false;
+        ArrayList<DraftItem.Category> categories = new ArrayList<>(EnumSet.allOf(DraftItem.Category.class));
+        for (DraftItem.Category category : categories) {
+            if (!getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
+                overRodeNormal = true;
+            }
+            size += FrankenDraft.getItemLimitForCategory(category, this);
+        }
+        if (overRodeNormal) {
+            return size;
+        } else {
+            return activeDraft.getBagSize();
+        }
+
     }
 
     public void setBagDraft(BagDraft draft) {

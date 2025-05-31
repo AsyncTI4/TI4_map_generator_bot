@@ -31,7 +31,7 @@ class Stats extends GameStateSubcommand {
             .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy pool command token count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade good count - can use +1/-1 etc. to add/subtract"))
             .addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count - can use +1/-1 etc. to add/subtract"))
-            .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
+            .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_BASE, "Base commodity value"))
             .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number"))
             .addOptions(new OptionData(OptionType.INTEGER, Constants.TURN_COUNT, "Number of turns this round"))
             .addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a strategy card's played status; enter the initiative number"))
@@ -151,7 +151,7 @@ class Stats extends GameStateSubcommand {
             UserSettingsManager.save(userSettings);
         }
 
-        Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
+        Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_BASE, null, OptionMapping::getAsInt);
         if (commoditiesTotalCount != null) {
             PlayerStatsService.setTotalCommodities(event, player, commoditiesTotalCount);
         }
