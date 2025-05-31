@@ -38,11 +38,8 @@ class StartMilty extends GameStateSubcommand {
 
         // Sources (defaults already accounted for) -----------------------------------------------
         OptionMapping includeDsTilesOption = event.getOption(Constants.INCLUDE_DS_TILES);
-        if (includeDsTilesOption != null && includeDsTilesOption.getAsBoolean()) {
-
+        if (includeDsTilesOption != null && includeDsTilesOption.getAsBoolean())
             specs.getTileSources().add(ComponentSource.ds);
-            specs.getTileSources().add(ComponentSource.uncharted_space);
-        }
         OptionMapping includeDsFactionsOption = event.getOption(Constants.INCLUDE_DS_FACTIONS);
         if (includeDsFactionsOption != null && includeDsFactionsOption.getAsBoolean())
             specs.getFactionSources().add(ComponentSource.ds);

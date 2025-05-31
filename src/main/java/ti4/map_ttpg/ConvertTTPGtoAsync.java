@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -213,7 +212,7 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setFaction(asyncGame, AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
             asyncPlayer.setColor(AliasHandler.resolveColor(ttpgPlayer.getColorActual().toLowerCase()));
             asyncPlayer.setCommodities(ttpgPlayer.getCommodities());
-            asyncPlayer.setCommoditiesBase(ttpgPlayer.getMaxCommodities());
+            asyncPlayer.setCommoditiesTotal(ttpgPlayer.getMaxCommodities());
             asyncPlayer.setTg(ttpgPlayer.getTradeGoods());
             asyncPlayer.setTacticalCC(ttpgPlayer.getCommandTokens().getTactics());
             asyncPlayer.setFleetCC(ttpgPlayer.getCommandTokens().getFleet());
