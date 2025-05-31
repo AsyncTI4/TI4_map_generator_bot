@@ -7,13 +7,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.CombatMessageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -25,44 +29,75 @@ import ti4.message.MessageHelper;
 public class FOWCombatThreadMirroring {
 
   /*
-    Checks that event occured in a valid thread and is either a message from a player
-    participating in the combat or an allowed bot message and relays the message
-    to other mirrored combat threads.
+    Checks that event occured in a valid thread and is a message from a player
+    participating in the combat
   */  
   public static void mirrorEvent(MessageReceivedEvent event) {
-        String threadName = event.getChannel().getName();
-        boolean isFowCombatThread = event.getChannel() instanceof ThreadChannel
-            && threadName.contains("vs")
-            && threadName.contains("private");
-        if (!isFowCombatThread) {
+        if (!isFowCombatThread(event.getChannel()) || event.getAuthor().isBot()) {
             return;
         }
 
+        String threadName = event.getChannel().getName();
         String gameName = threadName.substring(0, threadName.indexOf("-"));
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
-        if (!managedGame.isFowMode()) {
-            return;
-        }
-
-        if (StringUtils.countMatches(threadName, "-") <= 4) {
+        if (managedGame == null) {
             return;
         }
 
         Game game = managedGame.getGame();
-        Player player = game.getPlayer(event.getAuthor().getId());
+        Player player = getCommunityModePlayer(event.getMember(), game);
+        Set<Player> combatParticipants = getCombatParticipants((ThreadChannel) event.getChannel(), game);
+        if (player == null || !player.isRealPlayer() || !combatParticipants.contains(player)) {
+            return;
+        }
+
+        String messageText = event.getMessage().getContentRaw();
+        String newMessageText = player.getRepresentationNoPing() + " said: " + messageText;  
+
+        boolean messageMirrored = mirrorMessage((ThreadChannel) event.getChannel(), player, game, newMessageText);
+        if (messageMirrored) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
+            event.getMessage().delete().queue();
+        }
+    }
+    
+    public static String parseCombatRollMessage(String messageText, Player player) {
+        String combat = matchPattern(messageText, "rolls for\\s+([^>]+>)");
+        String hits = matchPattern(messageText, "Total hits (\\d+)");
+        
+        return player.getRepresentationNoPing() + " rolled for " + combat + ": " 
+            + CombatMessageHelper.displayHitResults(Integer.valueOf(hits)).replace("\n", "");
+    }
+
+    private static boolean isFowCombatThread(Channel eventChannel) {
+        String threadName = eventChannel.getName();
+        return eventChannel instanceof ThreadChannel && threadName.contains("vs") && threadName.contains("private");
+    }
+
+    private static String matchPattern(String input, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        return matcher.find() ? matcher.group(1).trim() : null;
+    }
+
+    private static Player getCommunityModePlayer(Member member, Game game) {
+        Player player = game.getPlayer(member.getUser().getId());
         if (game.isCommunityMode()) {
-            List<Role> roles = event.getMember().getRoles();
+            List<Role> roles = member.getRoles();
             for (Player player2 : game.getPlayers().values()) {
                 if (roles.contains(player2.getRoleForCommunity())) {
                     player = player2;
                 }
             }
         }
+        return player;
+    }
 
+    private static Set<Player> getCombatParticipants(ThreadChannel combatChannel, Game game) {
+        String threadName = combatChannel.getName();
         String systemPos = threadName.split("-")[4];
         Tile tile = game.getTileByPosition(systemPos);
 
-        //Players to send real combat messages and accept messages from
         Player p1 = game.getPlayerFromColorOrFaction(matchPattern(threadName, "(?<=-)([^-]+)(?=-vs-)"));
         Player p2 = game.getPlayerFromColorOrFaction(matchPattern(threadName, "(?<=-vs-)([^-]+)(?=-)"));
         List<Player> playersWithUnits = ButtonHelper.getPlayersWithUnitsInTheSystem(game, tile);
@@ -81,15 +116,27 @@ public class FOWCombatThreadMirroring {
                 }
             }
         }
+        return combatParticipants;
+    }
 
-        String messageText = event.getMessage().getContentRaw();
-        boolean isPlayerInvalid = player == null || !player.isRealPlayer() || !combatParticipants.contains(player);
-        boolean isBotMessage = event.getAuthor().isBot();
-        if ((isPlayerInvalid || isBotMessage) && (!isBotMessage || !isAllowedBotMsg(messageText))) {
-            return;
-        }
-    
+    public static boolean mirrorCombatMessage(GenericInteractionCreateEvent event, Game game, String message) {
+        if (!isFowCombatThread(event.getChannel())) return false;
+
+        Player player = getCommunityModePlayer(event.getMember(), game);
+        return mirrorMessage((ThreadChannel) event.getChannel(), player, game, parseCombatRollMessage(message, player));
+    }
+
+    public static boolean mirrorMessage(GenericInteractionCreateEvent event, Game game, String message) {
+        if (!isFowCombatThread(event.getChannel())) return false;
+
+        return mirrorMessage((ThreadChannel) event.getChannel(), getCommunityModePlayer(event.getMember(), game), game, message);
+    }
+
+    private static boolean mirrorMessage(ThreadChannel channel, Player player, Game game, String message) {
         boolean messageMirrored = false;
+        String threadName = channel.getName();
+        Set<Player> combatParticipants = getCombatParticipants(channel, game);
+
         for (Player playerOther : game.getRealPlayers()) {
             if (player != null && playerOther == player) {
                 continue;
@@ -98,32 +145,12 @@ public class FOWCombatThreadMirroring {
             TextChannel pChan = (TextChannel) pChannel;
             if (pChan != null) {
                 boolean combatParticipant = combatParticipants.contains(playerOther);
-                String newMessage = combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "";
-                
-                //Combat roll
-                if (isBotMessage && isCombatRoll(messageText)) {
-                    newMessage += parseCombatRollMessage(messageText);
-                }
-
-                //Retreat
-                else if (isBotMessage && isRetreat(messageText)) {
-                    newMessage += "Someone is preparing to retreat";
-                }
-
-                //Assign hit
-                else if (isBotMessage && isAssignHit(messageText)) {
-                    String assignedHits = matchPattern(messageText, "(?i)(?:destroyed|sustained)\\s+(.+?)(?:\\s+in|$)");
-                    newMessage += "Someone assigned hits to " + assignedHits;
-                }
-                
-                //Normal message
-                else if (!isBotMessage && player != null) {
-                    newMessage += player.getRepresentationNoPing() + " said: " + messageText;  
-                }
+                String newMessage = (combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "")
+                    + StringUtils.substringBefore(message, "\n");
 
                 List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                 for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getName().contains(threadName) && threadChannel_ != event.getChannel()) {
+                    if (threadChannel_.getName().equals(threadName) && threadChannel_ != channel) {
                         MessageHelper.sendMessageToChannel(threadChannel_, newMessage);
                         messageMirrored = true;
                         break;
@@ -131,44 +158,6 @@ public class FOWCombatThreadMirroring {
                 }
             }
         }
-
-        if (!isBotMessage && player != null && messageMirrored) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
-            event.getMessage().delete().queue();
-        }
-    }
-
-    public static String parseCombatRollMessage(String messageText) {
-        String combat = matchPattern(messageText, "rolls for\\s+([^>]+>)");
-        String hits = matchPattern(messageText, "Total hits (\\d+)");
-
-        return "Someone rolled dice for " + combat
-            + " and got a total of **" + hits + " hit" + (hits.equals("1") ? "** " : "s** ")
-            + ":boom:".repeat(Math.max(0, Integer.parseInt(hits)));
-    }
-
-    private static boolean isAllowedBotMsg(String messageText) {
-        return !messageText.contains("said:") &&
-            (isCombatRoll(messageText)
-            || isRetreat(messageText) 
-            || isAssignHit(messageText));
-    }
-
-    private static boolean isCombatRoll(String messageText) {
-        return messageText.toLowerCase().contains("rolls for") && messageText.toLowerCase().contains("total hits");
-    }
-
-    private static boolean isRetreat(String messageText) {
-        return messageText.toLowerCase().contains("has announced a retreat");
-    }
-
-    private static boolean isAssignHit(String messageText) {
-        return messageText.toLowerCase().contains("destroyed") || messageText.toLowerCase().contains("sustained");
-    }
-
-    private static String matchPattern(String input, String regex) {
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-        return matcher.find() ? matcher.group(1).trim() : null;
+        return messageMirrored;
     }
 }
