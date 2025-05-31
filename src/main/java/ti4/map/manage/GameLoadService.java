@@ -1,7 +1,5 @@
 package ti4.map.manage;
 
-import static ti4.map.manage.GamePersistenceKeys.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -59,6 +57,8 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
+
+import static ti4.map.manage.GamePersistenceKeys.*;
 
 @UtilityClass
 class GameLoadService {
@@ -842,7 +842,6 @@ class GameLoadService {
                 case Constants.STRATEGY_CARD -> player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
-                case Constants.COMMODITIES_BASE -> player.setCommoditiesBase(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.AUTO_SABO_PASS_MEDIAN -> player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));

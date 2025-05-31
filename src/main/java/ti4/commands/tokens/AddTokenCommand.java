@@ -146,6 +146,9 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                     tile.addToken("attachment_facilityembassy" + +(embassy + 1) + ".png", planet);
                     ButtonHelperSCs.updateEmbassies(game, player, tile);
                 }
+                if (facility.contains("logistics")) {
+                    player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
+                }
             } else {
                 tile.addToken(tokenID, planet);
             }
