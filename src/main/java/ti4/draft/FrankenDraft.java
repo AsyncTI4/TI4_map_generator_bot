@@ -56,8 +56,9 @@ public class FrankenDraft extends BagDraft {
                         } else {
                             limit = 3;
                         }
+                    } else {
+                        limit = 3;
                     }
-                    limit = 3;
                 }
             }
             case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> {
@@ -70,8 +71,9 @@ public class FrankenDraft extends BagDraft {
                         } else {
                             limit = 2;
                         }
+                    } else {
+                        limit = 2;
                     }
-                    limit = 2;
                 }
 
             }
