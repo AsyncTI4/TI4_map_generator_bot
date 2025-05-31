@@ -1277,6 +1277,14 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
+    public String getColorIfCanSeeStats(Player viewingPlayer) {
+        if (getGame().isFowMode() && !FoWHelper.canSeeStatsOfPlayer(getGame(), this, viewingPlayer)) {
+            return "???";
+        }
+        return getColor();
+    }
+
+    @JsonIgnore
     public String getFactionEmojiRaw() {
         return super.getFactionEmoji();
     }
