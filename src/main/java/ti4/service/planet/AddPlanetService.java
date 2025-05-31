@@ -162,9 +162,6 @@ public class AddPlanetService {
                             if (token.contains("embassy")) {
                                 ButtonHelperSCs.updateEmbassies(game, player_, tile);
                             }
-                            if (token.contains("logistics")) {
-                                player_.setCommoditiesTotal(player_.getCommoditiesTotal() - 1);
-                            }
                             if (token.contains("superweapon")) {
                                 player_.removeRelic(token.replace(".png", "").replace("attachment", "").replace("_", ""));
                             }

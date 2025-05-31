@@ -27,6 +27,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MILTYMOD_MODE, "True to switch to MiltyMod mode (only compatabile with No Expansion Mode)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNCHARTED_SPACE_STUFF, "True to add the Uncharted Space Stuff to the draft pool."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Dane Tweet."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HIDDEN_AGENDA_MODE, "True to enable Hidden Agenda, per Dane Leek."));
@@ -57,6 +58,28 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean explorationMode = event.getOption(Constants.AGE_OF_EXPLORATION_MODE, null, OptionMapping::getAsBoolean);
         if (explorationMode != null) game.setAgeOfExplorationMode(explorationMode);
+
+        Boolean uncharted = event.getOption(Constants.UNCHARTED_SPACE_STUFF, null, OptionMapping::getAsBoolean);
+        if (uncharted != null) {
+            game.setUnchartedSpaceStuff(uncharted);
+            if (uncharted) {
+                game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
+                if (game.isAbsolMode()) {
+                    if (game.getTechnologyDeckID().contains("absol")) {
+                        game.setTechnologyDeckID("techs_ds_absol");
+                    }
+                    if (game.getRelicDeckID().contains("absol")) {
+                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
+                    }
+
+                } else {
+                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"));
+                    game.setTechnologyDeckID("techs_ds");
+
+                }
+            }
+        }
 
         Boolean minorMode = event.getOption(Constants.MINOR_FACTIONS_MODE, null, OptionMapping::getAsBoolean);
         if (minorMode != null) game.setMinorFactionsMode(minorMode);

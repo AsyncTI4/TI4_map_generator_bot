@@ -151,7 +151,6 @@ class SetPolicy extends GameStateSubcommand {
                 }
                 if (!player.hasAbility("policy_the_economy_exploit")) {
                     player.addAbility("policy_the_economy_exploit");
-                    player.setCommoditiesTotal(player.getCommoditiesTotal() - 1);
                     MessageHelper.sendMessageToEventChannel(event, "added _Policy - The Economy: Exploit ➖_. Decreased commodities total by 1 (double check the value is correct).");
                 } else if (player.hasAbility("policy_the_economy_exploit")) {
                     player.addAbility("policy_the_economy_exploit");
@@ -161,7 +160,6 @@ class SetPolicy extends GameStateSubcommand {
             } else if ("+".equals(pol3)) {
                 if (player.hasAbility("policy_the_economy_exploit")) {
                     player.removeAbility("policy_the_economy_exploit");
-                    player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
                     MessageHelper.sendMessageToEventChannel(event, "removed _Policy - The Economy: Exploit ➖_. Increased commodities total by 1 (double check the value is correct).");
                 }
                 player.addAbility("policy_the_economy_empower");

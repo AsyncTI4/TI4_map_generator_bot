@@ -41,7 +41,6 @@ public class UnlockLeaderService {
         }
 
         if (leaderID.contains("bentorcommander")) {
-            player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
             MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + ", your commodity value has been set to " + player.getCommoditiesTotal() + ".");
         }
 
