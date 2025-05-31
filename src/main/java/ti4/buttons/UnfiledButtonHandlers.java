@@ -85,6 +85,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.game.SwapFactionService;
@@ -1347,6 +1348,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentationNoPing() + " retreated all units in space to "
                 + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
+        FOWCombatThreadMirroring.mirrorMessage(event, game, player.getRepresentationNoPing() + " retreated all units in space");
         String message = player.getRepresentationUnfogged()
             + " Use below buttons to move any ground forces or conclude retreat.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
@@ -2301,7 +2303,7 @@ public class UnfiledButtonHandlers {
     public static void announceARetreat(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "## " + player.getRepresentationNoPing() + " has announced a retreat.";
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
-            msg += " Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
+            msg += "\n> Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
         }
         String combatName = "combatRoundTracker" + game.getActivePlayer().getFaction() + game.getActiveSystem()
             + "space";
@@ -2318,6 +2320,8 @@ public class UnfiledButtonHandlers {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }
+        FOWCombatThreadMirroring.mirrorMessage(event, game, msg.replace("## ", ""));
+
         if (Helper.getCCCount(game, player.getColor()) > 15) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that you are at the CC limit right now, so may need to pull a command counter off your sheet in order to retreat (unless you retreat to a system that has one)");
         }

@@ -153,6 +153,7 @@ public class CombatRollService {
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         message += rollForUnits(playerUnitsByQuantity, extraRolls, modifiers, tempMods, player, opponent, game, rollType, event, tile);
+        FOWCombatThreadMirroring.mirrorCombatMessage(event, game, message);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);
@@ -180,7 +181,7 @@ public class CombatRollService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         if (game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence && isFoWPrivateChannelRoll(player, event)) {
             //If roll was from pds button in private channel, send the result to the target
-            MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " " + FOWCombatThreadMirroring.parseCombatRollMessage(message).replace("Someone", player.getRepresentationNoPing()));
+            MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " " + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Roll result was sent to " + opponent.getRepresentationNoPing());
         }
         if (message.contains("adding +1, at the risk of your")) {

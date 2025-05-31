@@ -22,6 +22,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParseUnitService;
@@ -63,6 +64,7 @@ public class AssignHitsButtonHandlers {
             List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);
             MessageHelper.editMessageButtons(event, systemButtons);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
         }, x -> {});
         if (success) return;
 
@@ -97,6 +99,7 @@ public class AssignHitsButtonHandlers {
             List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);
             MessageHelper.editMessageButtons(event, systemButtons);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
         }, x -> {});
         if (success) return;
 
@@ -129,6 +132,7 @@ public class AssignHitsButtonHandlers {
             List<Button> repairButtons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, tile);
             MessageHelper.editMessageButtons(event, repairButtons);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
         }, x -> {
             // Refresh buttons if there was an error
             Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
@@ -160,6 +164,7 @@ public class AssignHitsButtonHandlers {
             List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);
             MessageHelper.editMessageButtons(event, systemButtons);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
 
             for (int x = 0; x < amt; x++) {
                 ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
