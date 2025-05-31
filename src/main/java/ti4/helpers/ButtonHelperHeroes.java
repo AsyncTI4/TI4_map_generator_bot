@@ -1240,7 +1240,7 @@ public class ButtonHelperHeroes {
         }
         String message2;
         // String ident = p1.getRepresentation();
-        String ident2 = p2.getRepresentation();
+        String ident2 = game.isFowMode() && !FoWHelper.canSeeStatsOfPlayer(game, p2, p1) ? "???" : p2.getRepresentation();
         String id = null;
         int pnIndex;
         pnIndex = Integer.parseInt(amountToTrans);

@@ -293,6 +293,22 @@ public class Tile {
         return tilePath;
     }
 
+    public void swapFogData(Player player1, Player player2) {
+        if (player1 == null || player2 == null) return;
+
+        Boolean fog1 = fog.remove(player1.getUserID());
+        if (fog1 != null) fog.put(player2.getUserID(), fog1);
+
+        String label1 = fogLabel.remove(player1.getUserID());
+        if (label1 != null) fogLabel.put(player2.getUserID(), label1);
+
+        Boolean fog2 = fog.remove(player2.getUserID());
+        if (fog2 != null) fog.put(player1.getUserID(), fog2);
+
+        String label2 = fogLabel.remove(player2.getUserID());
+        if (label2 != null) fogLabel.put(player1.getUserID(), label2);
+    }
+
     public Map<String, Boolean> getFog() {
         return new HashMap<>(fog);
     }

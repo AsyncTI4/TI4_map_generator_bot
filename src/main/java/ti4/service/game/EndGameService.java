@@ -110,14 +110,23 @@ public class EndGameService {
 
         //DELETE FOW CHANNELS
         if (game.isFowMode() && archiveChannels && !rematch) {
-            Category fogCategory = event.getGuild().getCategoriesByName(game.getName(), true).getFirst();
-            if (fogCategory != null) {
+            List<Category> fogCategories = event.getGuild().getCategoriesByName(game.getName(), true);
+            if (!fogCategories.isEmpty()) {
+                Category fogCategory = fogCategories.getFirst();
                 List<TextChannel> channels = new ArrayList<>(fogCategory.getTextChannels());
-                //Delay deletion so end of game messages have time to go through
-                for (TextChannel channel : channels) {
-                    channel.delete().queueAfter(2, TimeUnit.SECONDS);
+                // Delete channels with delay to avoid race condition and rate limits
+                for (int i = 0; i < channels.size(); i++) {
+                    TextChannel channel = channels.get(i);
+                    channel.delete().queueAfter(2 + i, TimeUnit.SECONDS, 
+                        success -> {}, 
+                        error -> BotLogger.warning("Failed to delete channel: " + channel.getName() + " - " + error.getMessage())
+                    );
                 }
-                fogCategory.delete().queueAfter(2, TimeUnit.SECONDS);
+                // Delete category after all channels are scheduled for deletion
+                fogCategory.delete().queueAfter(2 + channels.size(), TimeUnit.SECONDS,
+                    success -> {},
+                    error -> BotLogger.warning("Failed to delete category: " + fogCategory.getName() + " - " + error.getMessage())
+                );
             }
         }
 
