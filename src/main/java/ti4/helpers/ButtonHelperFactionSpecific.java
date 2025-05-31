@@ -1238,24 +1238,22 @@ public class ButtonHelperFactionSpecific {
         }
 
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, game);
-        Map<UnitKey, Integer> units = new HashMap<>(oriPlanet.getUnits());
-        String unitGroupRef = "";
-        for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
+        Map<UnitKey, List<Integer>> units = new HashMap<>(oriPlanet.getUnitsByState());
+        for (Map.Entry<UnitKey, List<Integer>> unitEntry : units.entrySet()) {
             UnitKey unitKey = unitEntry.getKey();
-            int amount = unitEntry.getValue();
-            String unitName = unitKey.unitName();
-
-            RemoveUnitService.removeUnits(event, game.getTileFromPlanet(origPlanet), game, hacan.getColor(), amount + " " + unitName + " " + origPlanet);
-            AddUnitService.addUnits(event, game.getTileFromPlanet(newPlanet), game, hacan.getColor(), amount + " " + unitName + " " + newPlanet);
-            if (!unitGroupRef.equalsIgnoreCase("units")) {
-                if (!unitName.equalsIgnoreCase("mech")) {
-                    unitGroupRef = "units";
-                } else if (unitGroupRef.equalsIgnoreCase("mech")) {
-                    unitGroupRef = "mechs";
-                } else {
-                    unitGroupRef = "mech";
+            int state = 0;
+            for (Integer amount : unitEntry.getValue()) {
+                if (amount > 0) {
+                    String unitName = unitKey.unitName();
+                    RemoveUnitService.removeUnits(event, game.getTileFromPlanet(origPlanet), game, hacan.getColor(), amount + " " + unitName + " " + origPlanet);
+                    AddUnitService.addUnits(event, game.getTileFromPlanet(newPlanet), game, hacan.getColor(), amount + " " + unitName + " " + newPlanet);
+                    if (state == 1) {
+                        game.getUnitHolderFromPlanet(newPlanet).addDamagedUnit(unitKey, state);
+                    }
                 }
+                state++;
             }
+
         }
         AddPlanetService.addPlanet(p2, origPlanet, game, event, false);
 
@@ -1265,7 +1263,7 @@ public class ButtonHelperFactionSpecific {
         String ident = hacan.getFactionEmoji();
         String message2 = ident + " traded the planet " + Helper.getPlanetRepresentation(origPlanet, game)
             + " to " + p2.getFactionEmojiOrColor()
-            + " and relocated the " + unitGroupRef + " to " + Helper.getPlanetRepresentation(newPlanet, game);
+            + " and relocated the units to " + Helper.getPlanetRepresentation(newPlanet, game);
         goAgainButtons.add(button);
         goAgainButtons.add(done);
         goAgainButtons.add(Buttons.green("demandSomething_" + p2.getColor(), "Expect something in return"));

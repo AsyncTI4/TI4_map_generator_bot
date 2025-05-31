@@ -50,6 +50,13 @@ public class FrankenDraft extends BagDraft {
                 if (!game.getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
                     limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category.toString()));
                 } else {
+                    if (game.getActiveBagDraft() instanceof PoweredFrankenDraft || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
+                        if (category == DraftItem.Category.ABILITY) {
+                            limit = 4;
+                        } else {
+                            limit = 3;
+                        }
+                    }
                     limit = 3;
                 }
             }
@@ -57,6 +64,13 @@ public class FrankenDraft extends BagDraft {
                 if (!game.getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
                     limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category.toString()));
                 } else {
+                    if (game.getActiveBagDraft() instanceof PoweredFrankenDraft || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
+                        if (category == DraftItem.Category.TECH) {
+                            limit = 3;
+                        } else {
+                            limit = 2;
+                        }
+                    }
                     limit = 2;
                 }
 
