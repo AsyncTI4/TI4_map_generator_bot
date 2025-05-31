@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -262,38 +261,27 @@ public class GMService {
             });
     }
 
-    @ButtonHandler("gmSystemLore")
-    public static void showSystemLoreButtons(Game game) {
-        showSystemLoreButtons(game, null);
+    @ButtonHandler("gmSystemLoreRefresh")
+    private static void refreshSystemLoreButtons(ButtonInteractionEvent event, Game game) {
+        showSystemLoreButtons(game);
+        event.getMessage().delete().queue();
     }
 
-    private static void showSystemLoreButtons(Game game, String originalMessageId) {
+    @ButtonHandler("gmSystemLore")
+    private static void showSystemLoreButtons(Game game) {
         StringBuffer sb = new StringBuffer("### System Lore\n");
         sb.append("-# Shown to the first player to conclude an action with units in the system.\n");
 
         List<Button> systemLoreButtons = new ArrayList<>();
-
         for (Map.Entry<String, String> lore : getSavedLore(game).entrySet()) {
             String position = lore.getKey();
-            String loreText = lore.getValue().replace("\n", " ");
-
             Tile tile = game.getTileByPosition(position);
-            sb.append("**").append(position).append("** ");
-            sb.append(tile != null ? tile.getRepresentation() : "").append(" - `");
-            sb.append(StringUtils.substring(loreText, 0, 50));
-            sb.append(loreText.length() > 50 ? "..." : "").append("`\n");
-
-            systemLoreButtons.add(Buttons.green("gmSystemLoreEdit_" + position + "~MDL", position));
+            systemLoreButtons.add(Buttons.green("gmSystemLoreEdit_" + position + "~MDL", position + " " + tile.getRepresentation()));
         }
         systemLoreButtons.add(Buttons.blue("gmSystemLoreEdit~MDL", "Add New"));
-        systemLoreButtons.add(Buttons.DONE_DELETE_BUTTONS);
+        systemLoreButtons.add(Buttons.gray("gmSystemLoreRefresh", "Refresh"));
 
-        if (originalMessageId == null) {
-            MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), sb.toString(), systemLoreButtons);
-        } else {
-            List<List<ActionRow>> buttonRows = MessageHelper.getPartitionedButtonLists(systemLoreButtons);
-            getGMChannel(game).editMessageById(originalMessageId, sb.toString()).setComponents(buttonRows.getFirst()).queue();
-        }
+        MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), sb.toString(), systemLoreButtons);
     }
 
     private static Map<String, String> getSavedLore(Game game) {
@@ -320,7 +308,7 @@ public class GMService {
             .setRequired(true)
             .setPlaceholder("000")
             .setMaxLength(4);
-        TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (empty to remove)", TextInputStyle.PARAGRAPH)
+        TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
             .setRequired(false)
             .setPlaceholder("There once was Mecatol...")
             .setMaxLength(420);
@@ -330,7 +318,7 @@ public class GMService {
             lore.setValue(getSavedLore(game).get(existingPosition));
         }
 
-        Modal editLoreModal = Modal.create("gmSystemLoreSave_" + event.getMessageId(), "Add Lore to Position")
+        Modal editLoreModal = Modal.create("gmSystemLoreSave", "Add Lore to Position")
             .addActionRow(position.build())
             .addActionRow(lore.build())
             .build();
@@ -338,9 +326,8 @@ public class GMService {
         event.replyModal(editLoreModal).queue();
     }
 
-    @ModalHandler("gmSystemLoreSave_")
+    @ModalHandler("gmSystemLoreSave")
     public static void saveSystemLore(ModalInteractionEvent event, Player player, Game game) {
-        String origMessageId = event.getModalId().replace("gmSystemLoreSave_", "");
         String position = event.getValue(Constants.POSITION).getAsString();
         String loreText = event.getValue(Constants.MESSAGE).getAsString();
 
@@ -352,15 +339,13 @@ public class GMService {
         Map<String, String> savedLoreMap = getSavedLore(game);
         if (StringUtils.isBlank(loreText)) {
             savedLoreMap.remove(position);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Lore from " + position);
         } else {
             savedLoreMap.put(position, loreText.replace(";", "").replace("|", ""));
-            MessageEmbed embed = buildLoreEmbed(game, position, loreText);
-            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getChannel(), 
-                "Saved Lore Preview", Arrays.asList(embed), Arrays.asList(Buttons.DONE_DELETE_BUTTONS));
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Saved Lore to " + position);
         }
 
         setSystemLore(game, savedLoreMap);
-        showSystemLoreButtons(game, origMessageId);
     }
 
     private static void setSystemLore(Game game, Map<String, String> systemLore) {
