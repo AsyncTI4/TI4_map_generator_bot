@@ -1321,7 +1321,6 @@ public class ButtonHelperAbilities {
 
     public static List<Button> getReturnableAxisOrders(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
-        int maxCost = player.getCommodities();
 
         Map<String, Integer> orderDeck = Map.of(
             "axisorderdd", 1,
@@ -1334,18 +1333,16 @@ public class ButtonHelperAbilities {
             "axisorderdnduplicate", 3);
         for (Map.Entry<String, Integer> order : orderDeck.entrySet()) {
             String orderName = order.getKey();
-            int orderCost = order.getValue();
-            if (orderCost <= maxCost) {
-                if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, orderName)) {
-                    Player p3 = player;
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (p2.getRelics().contains(orderName)) {
-                            p3 = p2;
-                        }
+
+            if (ButtonHelperFactionSpecific.somebodyHasThisRelic(game, orderName)) {
+                Player p3 = player;
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2.getRelics().contains(orderName)) {
+                        p3 = p2;
                     }
-                    buttons.add(Buttons.gray("returnAxisOrder_" + orderName + "_" + p3.getFaction(),
-                        "Return " + Mapper.getRelic(orderName).getName() + " held by " + p3.getColor()));
                 }
+                buttons.add(Buttons.gray("returnAxisOrder_" + orderName + "_" + p3.getFaction(),
+                    "Return " + Mapper.getRelic(orderName).getName() + " held by " + p3.getColor()));
             }
 
         }
