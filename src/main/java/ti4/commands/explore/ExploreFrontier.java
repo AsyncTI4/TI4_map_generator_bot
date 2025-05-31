@@ -5,11 +5,11 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Tile;
-import ti4.service.explore.ExploreService;
 
 class ExploreFrontier extends GameStateSubcommand {
 
@@ -25,6 +25,6 @@ class ExploreFrontier extends GameStateSubcommand {
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
         Game game = getGame();
         Tile tile = TileHelper.getTile(event, tileName, game);
-        ExploreService.expFront(event, tile, game, getPlayer(), force);
+        ButtonHelper.resolveFullFrontierExplore(game, getPlayer(), tile, event);
     }
 }

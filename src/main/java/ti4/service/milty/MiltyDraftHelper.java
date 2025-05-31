@@ -1,6 +1,10 @@
 package ti4.service.milty;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,8 +35,8 @@ import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
 import ti4.model.Source.ComponentSource;
-import ti4.model.TileModel.TileBack;
 import ti4.model.TileModel;
+import ti4.model.TileModel.TileBack;
 import ti4.model.WormholeModel;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -260,7 +264,10 @@ public class MiltyDraftHelper {
             ComponentSource.codex2,
             ComponentSource.codex3,
             ComponentSource.pok));
-        if (game.isDiscordantStarsMode()) sources.add(ComponentSource.ds);
+        if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
+            sources.add(ComponentSource.ds);
+            sources.add(ComponentSource.uncharted_space);
+        }
         initDraftTiles(manager, sources);
     }
 
@@ -304,13 +311,15 @@ public class MiltyDraftHelper {
     public static void initDraftTiles(MiltyDraftManager draftManager, List<ComponentSource> sources) {
         List<TileModel> allTiles = new ArrayList<>(TileHelper.getAllTileModels());
         for (TileModel tileModel : allTiles) {
-            if (isInvalid(tileModel)) continue;
 
+            if (isInvalid(tileModel)) continue;
+            //  System.out.println(tileModel.getSource() + tileModel.getName());
             if (!sources.contains(tileModel.getSource())) continue;
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
             draftManager.addDraftTile(draftTile);
+            // System.out.println("yes");
         }
     }
 

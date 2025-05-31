@@ -28,7 +28,8 @@ public class FrankenCommand implements ParentCommand {
         new ShowFrankenBag(),
         new ShowFrankenHand(),
         new FrankenViewCard(),
-        new BanAbility(),
+        new Ban(),
+        new DraftLimits(),
         new BanFaction(),
         new ApplyDraftBags(),
         new SetHomeSystemPosition()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
