@@ -95,9 +95,12 @@ public class ButtonHelperStats {
     public static void replenishComms(GenericInteractionCreateEvent event, Game game, Player player, boolean skipOutput) {
         String message, ident = player.getRepresentationNoPing();
         int initComm = player.getCommodities();
-        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
-
-        message = "Replenished commodities (" + initComm + "->" + player.getCommodities() + ")";
+        if (player.getCommodities() < player.getCommoditiesTotal()) {
+            player.setCommodities(player.getCommoditiesTotal());
+            message = "Replenished commodities (" + initComm + "->" + player.getCommodities() + ")";
+        } else {
+            message = "Already at maximum commodities.";
+        }
         int finalComm = player.getCommodities();
 
         if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), ident + " " + message);

@@ -105,6 +105,9 @@ public class StatusHelper {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "vadencommander")) {
                 int numScoredSOs = player.getSoScored();
                 int numScoredPos = player.getPublicVictoryPoints(false);
+                if (numScoredPos + player.getCommodities() > player.getCommoditiesTotal()) {
+                    numScoredPos = player.getCommoditiesTotal() - player.getCommodities();
+                }
                 player.setTg(player.getTg() + numScoredSOs);
                 if (numScoredSOs > 0) {
                     ButtonHelperAbilities.pillageCheck(player, game);

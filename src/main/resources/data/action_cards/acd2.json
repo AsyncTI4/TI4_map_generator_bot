@@ -253,7 +253,7 @@
         "name": "Derelict Station",
         "phase": "Action",
         "window": "After your ships move out of, into, or through a system that does not contain planets",
-        "text": "Explore a frontier token that is in that system or gain 2 trade goods.",
+        "text": "Explore a frontier token that is in that system or gain 2 commodities.",
         "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
         "source": "action_deck_2"
     },
@@ -432,7 +432,7 @@
         "name": "Heist",
         "phase": "Action",
         "window": "After you gain control of a planet that was controlled by another player",
-        "text": "Take up to 2 of that player's relic fragments. If you did not take any relic fragments, gain 2 trade goods.",
+        "text": "Either take up to 2 of that player's relic fragments or gain 2 trade goods.",
         "flavorText": "Mot awoke in a pool of his own blood. S'ula had the courtesy to let him live—just barely—but he was too weak to stand. So, he lay in front of the empty vault and wept.",
         "source": "action_deck_2"
     },
@@ -784,7 +784,7 @@
         "name": "Retrofit",
         "phase": "Action",
         "window": "After a player activates a system",
-        "text": "Choose 1 of your non-fighter ships. That unit gains SPACE CANNON 6, BOMBARDMENT 5, or SUSTAIN DAMAGE during this tactical action.",
+        "text": "Choose 1 of your non-fighter ships. That unit gains SPACE CANNON 5, BOMBARDMENT 5, and SUSTAIN DAMAGE during this tactical action.",
         "flavorText": "The massive cannon platform floated between two ships, held in place by tractor beams. Mendosa admired the engineering—right up until it fired and hurled itself into deep space.",
         "source": "action_deck_2"
     },
@@ -846,8 +846,8 @@
         "alias": "sensor_jam",
         "name": "Sensor Jam",
         "phase": "Action",
-        "window": "After a player moves ships into the active system",
-        "text": "Your cruisers and destroyers in the active system gain SUSTAIN DAMAGE during this tactical action.",
+        "window": "After a player activates a system",
+        "text": "Your cruisers and destroyers gain SUSTAIN DAMAGE during this tactical action.",
         "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
         "source": "action_deck_2"
     },
@@ -1017,7 +1017,7 @@
         "name": "Syndicate",
         "phase": "Action",
         "window": "Action",
-        "text": "Reveal a number of cards from the top of the action card deck equal to the number of players. Each player takes 1 of those cards of your choice.",
+        "text": "Draw and reveal a number of action cards from the deck equal to the number of players; give 1 of those cards to each other player and keep the rest.",
         "flavorText": "\"What if I'm not ready?\" the operative asked, looking away. Harka squeezed her hand. \"Believe in me, who believes in you.\"",
         "source": "action_deck_2"
     },

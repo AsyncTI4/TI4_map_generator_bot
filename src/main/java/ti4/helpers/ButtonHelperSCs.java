@@ -884,6 +884,7 @@ public class ButtonHelperSCs {
             }
             message += " to " + Helper.getPlanetRepresentation(planet, game);
             if (facility.contains("logistics")) {
+                player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
                 message += " Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect. Players will have to monitor this)";
             }
         }

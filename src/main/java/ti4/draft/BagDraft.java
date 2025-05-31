@@ -30,7 +30,7 @@ public abstract class BagDraft {
             return new OnePickFrankenDraft(game);
         }
         if ("poweredonepick_franken".equals(draftType)) {
-            return new PoweredOnePickFrankenDraft(game);
+          return new PoweredOnePickFrankenDraft(game);
         }
         return null;
     }
@@ -110,10 +110,10 @@ public abstract class BagDraft {
         player.setReadyToPassBag(ready);
     }
 
-    public String getLongBagRepresentation(DraftBag bag, Game game) {
+    public String getLongBagRepresentation(DraftBag bag) {
         StringBuilder sb = new StringBuilder();
         for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
+            sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat));
         }
         sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
         return sb.toString();
@@ -253,7 +253,7 @@ public abstract class BagDraft {
                 sb.append("❌");
             }
             sb.append(player.getRepresentationNoPing());
-            sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
+            sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getActiveBagDraft().getBagSize()).append(")");
             sb.append("\n");
         }
         return sb.toString();
