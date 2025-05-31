@@ -18,7 +18,6 @@ import ti4.buttons.Buttons;
 import ti4.draft.BagDraft;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
-import ti4.draft.FrankenDraft;
 import ti4.draft.items.SpeakerOrderDraftItem;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
@@ -63,7 +62,7 @@ public class FrankenDraftBagService {
                 for (DraftItem item : items) {
                     buttons.add(item.getAddButton());
                 }
-                String message = getLongCategoryRepresentation(draft, bag, category, game) +
+                String message = getLongCategoryRepresentation(draft, bag, category) +
                     "\nClick the buttons below to add or remove items from your faction.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
@@ -147,16 +146,7 @@ public class FrankenDraftBagService {
 
         int draftQueueCount = player.getDraftQueue().Contents.size();
         boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
-        boolean isQueueFull = draftQueueCount >= draft.getPicksFromNextBags();
-        if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
-            isQueueFull = draftQueueCount >= Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
-        }
-        if (isFirstDraft) {
-            isQueueFull = draftQueueCount >= draft.getPicksFromFirstBag();
-            if (!game.getStoredValue("frankenLimitFIRSTPICK").isEmpty()) {
-                isQueueFull = draftQueueCount >= Integer.parseInt(game.getStoredValue("frankenLimitFIRSTPICK"));
-            }
-        }
+        boolean isQueueFull = draftQueueCount >= draft.getPicksFromNextBags() && !isFirstDraft || draftQueueCount >= draft.getPicksFromFirstBag();
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " you cannot legally draft anything from this bag right now.");
         } else if (!isQueueFull) {
@@ -191,7 +181,7 @@ public class FrankenDraftBagService {
     public static Set<String> getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
         Set<String> bagRepresentationLines = new LinkedHashSet<>();
         StringBuilder sb = new StringBuilder("# __Draftable:__\n");
-
+        
         draftables.sort(Comparator.comparing(draftItem -> draftItem.ItemCategory));
         for (DraftItem item : draftables) {
             String nextItemDescrption = buildItemDescription(item);
@@ -228,14 +218,10 @@ public class FrankenDraftBagService {
         return bagRepresentationLines;
     }
 
-    public static String getLongCategoryRepresentation(BagDraft draft, DraftBag bag, DraftItem.Category cat, Game game) {
+    public static String getLongCategoryRepresentation(BagDraft draft, DraftBag bag, DraftItem.Category cat) {
         StringBuilder sb = new StringBuilder();
         sb.append("### ").append(cat.toString()).append(" (");
-        if (draft instanceof FrankenDraft) {
-            sb.append(bag.getCategoryCount(cat)).append("/").append(FrankenDraft.getItemLimitForCategory(cat, game));
-        } else {
-            sb.append(bag.getCategoryCount(cat)).append("/").append(draft.getItemLimitForCategory(cat));
-        }
+        sb.append(bag.getCategoryCount(cat)).append("/").append(draft.getItemLimitForCategory(cat));
         sb.append("):\n");
         for (DraftItem item : bag.Contents) {
             if (item.ItemCategory != cat) {
@@ -248,7 +234,7 @@ public class FrankenDraftBagService {
     }
 
     public static String getCurrentHandRepresentation(Game game, Player player) {
-        return game.getActiveBagDraft().getLongBagRepresentation(player.getDraftHand(), game);
+        return game.getActiveBagDraft().getLongBagRepresentation(player.getDraftHand());
     }
 
     public static String getDraftQueueRepresentation(Player player) {
@@ -295,13 +281,7 @@ public class FrankenDraftBagService {
         GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT); // Clear the status message so it will be regenerated
 
         int first = draft.getPicksFromFirstBag();
-        if (!game.getStoredValue("frankenLimitFIRSTPICK").isEmpty()) {
-            first = Integer.parseInt(game.getStoredValue("frankenLimitFIRSTPICK"));
-        }
         int next = draft.getPicksFromNextBags();
-        if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
-            next = Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
-        }
         String message = "# " + game.getPing() + " Franken Draft has started!\n" +
             "> As a reminder, for the first bag you pick " + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick " + next + " item" + (next == 1 ? "" : "s") + ".\n" +
             "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n" +
@@ -317,7 +297,7 @@ public class FrankenDraftBagService {
         }
         int index = 1;
         StringBuilder sb = new StringBuilder("Automatically setting players up as Franken factions:");
-        List<Integer> emojiNum = new ArrayList<>(List.of(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
+        List<Integer> emojiNum = new ArrayList<>(List.of( 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18));
         Collections.shuffle(emojiNum);
         boolean skipped = false;
         for (Player player : players) {
@@ -345,12 +325,13 @@ public class FrankenDraftBagService {
     public static void updateDraftStatusMessage(Game game) {
         String statusMessage = game.getActiveBagDraft().getDraftStatusMessage();
         GameMessageManager.getOne(game.getName(), GameMessageType.BAG_DRAFT)
-            .ifPresentOrElse(gameMessage -> game.getActionsChannel()
-                .retrieveMessageById(gameMessage.messageId())
-                .queue(message -> message.editMessage(statusMessage).queue()),
-                () -> {
-                    String newMessageId = game.getActionsChannel().sendMessage(statusMessage).complete().getId();
-                    GameMessageManager.add(game.getName(), newMessageId, GameMessageType.BAG_DRAFT, game.getLastModifiedDate());
-                });
+            .ifPresentOrElse(gameMessage ->
+                    game.getActionsChannel()
+                        .retrieveMessageById(gameMessage.messageId())
+                        .queue(message -> message.editMessage(statusMessage).queue()),
+                    () -> {
+                        String newMessageId = game.getActionsChannel().sendMessage(statusMessage).complete().getId();
+                        GameMessageManager.add(game.getName(), newMessageId, GameMessageType.BAG_DRAFT, game.getLastModifiedDate());
+                    });
     }
 }
