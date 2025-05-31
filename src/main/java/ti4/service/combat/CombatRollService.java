@@ -459,7 +459,7 @@ public class CombatRollService {
             }
             if (unitModel.getId().equalsIgnoreCase("belkosea_mech")) {
                 if (hitRolls > 0) {
-                    player.setCommodities(Math.min(player.getCommodities() + hitRolls, player.getCommoditiesTotal()));
+                    player.setCommodities(player.getCommodities() + hitRolls);
                     ButtonHelperAgents.toldarAgentInitiation(game, player, hitRolls);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
                         + " gained " + hitRolls + " commodities due to the Belkosea Mech ability (gain comms when producing hits).");

@@ -89,17 +89,24 @@ public class FoWHelper {
     }
 
     public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
-        if (!player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
+        if (game == null || !player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
             return false;
         }
         if (player == viewingPlayer) {
             return true;
         }
-
-        return game != null && (hasHomeSystemInView(player, viewingPlayer) 
-            || (hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer)) 
-            && !FOWPlusService.isActive(game)
-            || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
+        if (viewingPlayer.getAllianceMembers().contains(player.getFaction())) {
+            return true;
+        }
+        if ((hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer))
+            && !FOWPlusService.isActive(game)) {
+            return true;
+        }
+        FoWHelper.initializeFog(game, viewingPlayer, false);
+        if (hasHomeSystemInView(player, viewingPlayer)) {
+            return true;
+        }
+        return false;
     }
 
     /**

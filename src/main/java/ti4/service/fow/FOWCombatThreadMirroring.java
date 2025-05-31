@@ -112,7 +112,7 @@ public class FOWCombatThreadMirroring {
 
                 //Assign hit
                 else if (isBotMessage && isAssignHit(messageText)) {
-                    String assignedHits = matchPattern(messageText, "(?i)(?:removed|sustained)\\s+(.+?)(?:\\s+from|$)");
+                    String assignedHits = matchPattern(messageText, "(?i)(?:destroyed|sustained)\\s+(.+?)(?:\\s+in|$)");
                     newMessage += "Someone assigned hits to " + assignedHits;
                 }
                 
@@ -163,7 +163,7 @@ public class FOWCombatThreadMirroring {
     }
 
     private static boolean isAssignHit(String messageText) {
-        return messageText.toLowerCase().contains("removed") || messageText.toLowerCase().contains("sustained");
+        return messageText.toLowerCase().contains("destroyed") || messageText.toLowerCase().contains("sustained");
     }
 
     private static String matchPattern(String input, String regex) {

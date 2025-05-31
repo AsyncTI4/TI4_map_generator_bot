@@ -32,7 +32,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
@@ -860,7 +859,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("probeStep2_")
     public static void resolveProbeStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        ExploreService.expFront(event, tile, game, player);
+        ButtonHelper.resolveFullFrontierExplore(game, player, tile, event);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " explored the frontier token in " + tile.getRepresentation() + ".");
@@ -930,6 +929,51 @@ public class ButtonHelperActionCards {
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + " tell the bot which player you wish to purloin a random action card from.",
             buttons);
+    }
+
+    @ButtonHandler("psionicHammerStep1")
+    public static void resolvepPsionicHammerStep1(Player player, Game game, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        for (Player p2 : AgendaHelper.getPlayersWithMostPoints(game)) {
+            if (p2 == player) continue;
+
+            if (game.isFowMode()) {
+                buttons.add(Buttons.gray("psionicHammerStep2_" + p2.getFaction(), p2.getColorIfCanSeeStats(player)));
+            } else {
+                Button button = Buttons.gray("psionicHammerStep2_" + p2.getFaction(), " ");
+                String factionEmojiString = p2.getFactionEmoji();
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                buttons.add(button);
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "There are no valid targets for _Neural Hammer_.");
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " tell the bot which players random secret objective you would like to see.",
+                buttons);
+        }
+    }
+
+    @ButtonHandler("psionicHammerStep2_")
+    public static void resolvepPsionicHammerStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String message = "## " + p2.getRepresentationUnfogged() + ", you have been hammered to show a random unscored secret objective. Please press the button to resolve.";
+        MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), message, 
+            Buttons.green("psionicHammerStep3_" + player.getFaction(), "Show A Random Unscored Secret Objective"));
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + ", button to resolve Neural Hammer has been sent to " 
+            + p2.getColorIfCanSeeStats(player) + ".");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("psionicHammerStep3_")
+    public static void resolvepPsionicHammerStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        SecretObjectiveHelper.resolveShowRandomSecretObjective(game, player, p2, event);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("resolvePSStep1")

@@ -27,7 +27,21 @@ class PrivateCommunicationsCheck extends GameStateSubcommand {
         }
 
         Player commandUser = game.getPlayer(event.getUser().getId());
-        if (player.getFaction() != commandUser.getFaction() && !game.getPlayersWithGMRole().contains(commandUser)) {
+        if (commandUser == null) {
+            MessageHelper.replyToMessage(event, "You are not a player in this game.");
+            return;
+        }
+
+        boolean teammate = false;
+        for (Player p : game.getRealPlayers()) {
+            if (p.getTeamMateIDs().contains(commandUser.getUserID())) {
+                player = p;
+                teammate = true;
+                break;
+            }
+        }
+
+        if (player != commandUser && !game.getPlayersWithGMRole().contains(commandUser) && !teammate) {
             MessageHelper.replyToMessage(event, "Only GM can use this for another player.");
             return;
         }

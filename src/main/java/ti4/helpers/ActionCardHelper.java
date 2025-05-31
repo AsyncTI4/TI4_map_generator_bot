@@ -881,6 +881,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, player.getRepresentation()
                     + ", a reminder that you should declare how you are distributing the trade goods now, before other players choose whether they will Sabo.", codedButtons);
             }
+            
+            if (automationID.equals("psionic_hammer")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "psionicHammerStep1", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
 
             targetMsg = player.getRepresentation() + ", a reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
 

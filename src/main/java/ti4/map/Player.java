@@ -1025,19 +1025,69 @@ public class Player extends PlayerProperties {
         }
     }
 
+    @Override
+    public int getCommoditiesTotal() {
+        if (getCommoditiesBase() == 0) {
+            if (getFaction().contains("franken")) {
+                setCommoditiesBase(getCommoditiesTotal(true) - getCommoditiesBonus());
+            } else {
+                FactionModel setupInfo = getFactionSetupInfo();
+                if (setupInfo != null) {
+                    setCommoditiesBase(setupInfo.getCommodities());
+                } else {
+                    setCommoditiesBase(0);
+                }
+
+            }
+        }
+
+        return getCommoditiesBase() + getCommoditiesBonus();
+    }
+
+    public int getCommoditiesBonus() {
+        int bonus = 0;
+        //TODO fill out all possible bonuses
+        if (hasAbility("imperia") && getGame().playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
+            bonus++;
+        }
+        if (getAbilities().contains("policy_the_economy_exploit")) {
+            bonus += 2 - getCommoditiesBase();
+        }
+        if (hasAbility("necrophage")) {
+            bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
+        }
+        if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
+            bonus += 2;
+        }
+        if (getGame().isFacilitiesMode()) {
+            for (String planet : getPlanets()) {
+                UnitHolder unitHolder = getGame().getUnitHolderFromPlanet(planet);
+                if (unitHolder != null) {
+                    for (String token : unitHolder.getTokenList()) {
+                        if (token.contains("facility")) {
+                            if (token.contains("logistics")) {
+                                bonus++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return bonus;
+    }
+
+    public int getCommoditiesTotal(boolean old) {
+        return this.commoditiesTotal;
+
+    }
+
     public void addRelic(String relicID) {
         if (!getRelics().contains(relicID) || Constants.ENIGMATIC_DEVICE.equals(relicID)) {
-            if ("dynamiscore".equals(relicID) || "absol_dynamiscore".equals(relicID)) {
-                setCommoditiesTotal(getCommoditiesTotal() + 2);
-            }
             getRelics().add(relicID);
         }
     }
 
     public void removeRelic(String relicID) {
-        if ("dynamiscore".equals(relicID) || "absol_dynamiscore".equals(relicID)) {
-            setCommoditiesTotal(getCommoditiesTotal() - 2);
-        }
         getRelics().remove(relicID);
     }
 
@@ -1224,6 +1274,14 @@ public class Player extends PlayerProperties {
             return ColorEmojis.getColorEmojiWithName(getColor());
         }
         return getFactionEmoji();
+    }
+
+    @JsonIgnore
+    public String getColorIfCanSeeStats(Player viewingPlayer) {
+        if (getGame().isFowMode() && !FoWHelper.canSeeStatsOfPlayer(getGame(), this, viewingPlayer)) {
+            return "???";
+        }
+        return getColor();
     }
 
     @JsonIgnore
