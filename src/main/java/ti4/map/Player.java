@@ -1029,7 +1029,9 @@ public class Player extends PlayerProperties {
     public int getCommoditiesTotal() {
         if (getCommoditiesBase() == 0) {
             if (getFaction().contains("franken")) {
-                setCommoditiesBase(getCommoditiesTotal(true) - getCommoditiesBonus());
+                if (getCommoditiesTotal(true) - getCommoditiesBonus() > 0) {
+                    setCommoditiesBase(getCommoditiesTotal(true) - getCommoditiesBonus());
+                }
             } else {
                 FactionModel setupInfo = getFactionSetupInfo();
                 if (setupInfo != null) {
@@ -1046,9 +1048,12 @@ public class Player extends PlayerProperties {
 
     public int getCommoditiesBonus() {
         int bonus = 0;
-        //TODO fill out all possible bonuses
         if (hasAbility("imperia") && getGame().playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
+        } else {
+            if (hasLeaderUnlocked("bentorcommander")) {
+                bonus++;
+            }
         }
         if (getAbilities().contains("policy_the_economy_exploit")) {
             bonus += 2 - getCommoditiesBase();
