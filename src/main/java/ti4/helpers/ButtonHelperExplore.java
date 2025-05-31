@@ -14,6 +14,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ExploreEmojis;
+import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 
 public class ButtonHelperExplore {
@@ -21,7 +22,7 @@ public class ButtonHelperExplore {
     @ButtonHandler("exploreFront_")
     public static void exploreFront(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.replace("exploreFront_", "");
-        ButtonHelper.resolveFullFrontierExplore(game, player, game.getTileByPosition(pos), event);
+        ExploreService.expFront(event, game.getTileByPosition(pos), game, player);
         List<ActionRow> actionRow2 = new ArrayList<>();
         String exhaustedMessage = event.getMessage().getContentRaw();
         for (ActionRow row : event.getMessage().getActionRows()) {
@@ -84,24 +85,26 @@ public class ButtonHelperExplore {
             String fragid = fragmentsToPurge.getFirst();
             player.removeFragment(fragid);
             game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-            switch (fragid) {
+            switch (fragid)
+            {
                 case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message.append(" a " + ExploreEmojis.CFrag + "cultural");
-                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(" a " + ExploreEmojis.HFrag + "hazardous");
-                case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(" an " + ExploreEmojis.IFrag + "industrial");
-                case "urf1", "urf2", "urf3" -> message.append(" an " + ExploreEmojis.UFrag + "unknown");
-                default -> message.append(" ").append(fragid);
+                case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message.append(" a " + ExploreEmojis.HFrag + "hazardous");
+                case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message.append(" an " + ExploreEmojis.IFrag + "industrial");
+                case "urf1", "urf2", "urf3" ->  message.append(" an " + ExploreEmojis.UFrag + "unknown");
+                default ->  message.append(" ").append(fragid);
             }
             message.append(" relic fragment.");
         } else {
             for (String fragid : fragmentsToPurge) {
                 player.removeFragment(fragid);
                 game.setNumberOfPurgedFragments(game.getNumberOfPurgedFragments() + 1);
-                switch (fragid) {
+                switch (fragid)
+                {
                     case "crf1", "crf2", "crf3", "crf4", "crf5", "crf6", "crf7", "crf8", "crf9" -> message.append(ExploreEmojis.CFrag);
-                    case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" -> message.append(ExploreEmojis.HFrag);
-                    case "irf1", "irf2", "irf3", "irf4", "irf5" -> message.append(ExploreEmojis.IFrag);
-                    case "urf1", "urf2", "urf3" -> message.append(ExploreEmojis.UFrag);
-                    default -> message.append(" ").append(fragid);
+                    case "hrf1", "hrf2", "hrf3", "hrf4", "hrf5", "hrf6", "hrf7" ->  message.append(ExploreEmojis.HFrag);
+                    case "irf1", "irf2", "irf3", "irf4", "irf5" ->  message.append(ExploreEmojis.IFrag);
+                    case "urf1", "urf2", "urf3" ->  message.append(ExploreEmojis.UFrag);
+                    default ->  message.append(" ").append(fragid);
                 }
             }
             message.append(" relic fragments.");

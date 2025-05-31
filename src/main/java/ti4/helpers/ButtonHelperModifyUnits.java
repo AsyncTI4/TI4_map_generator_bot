@@ -1346,6 +1346,10 @@ public class ButtonHelperModifyUnits {
         CommanderUnlockCheckService.checkPlayer(player, "cheiran");
         CommanderUnlockCheckService.checkPlayer(player, "celdauri");
         CommanderUnlockCheckService.checkPlayer(player, "gledge");
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
+            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
+                Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
+        }
         if ("warsun".equalsIgnoreCase(unitLong)) {
             CommanderUnlockCheckService.checkPlayer(player, "muaat");
         }
@@ -1540,6 +1544,9 @@ public class ButtonHelperModifyUnits {
             tile = game.getTileFromPlanet(planetName);
             if (tile != null) {
                 AgendaHelper.ministerOfIndustryCheck(player, game, tile, event);
+            }
+            if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
+                player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game, Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
             }
         }
 

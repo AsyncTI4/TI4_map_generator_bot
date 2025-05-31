@@ -1,14 +1,11 @@
 package ti4.draft.items;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
-import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
@@ -51,26 +48,6 @@ public class TechDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
             for (var tech : faction.getFactionTech()) {
-                allItems.add(DraftItem.generate(DraftItem.Category.TECH, tech));
-            }
-        }
-        return allItems;
-    }
-
-    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = buildAllItems(factions, game);
-        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.TECH);
-        return allItems;
-    }
-
-    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = new ArrayList<>();
-        String[] results = game.getStoredValue("bannedTechs").split("finSep");
-        for (FactionModel faction : factions) {
-            for (var tech : faction.getFactionTech()) {
-                if (Arrays.asList(results).contains(tech)) {
-                    continue;
-                }
                 allItems.add(DraftItem.generate(DraftItem.Category.TECH, tech));
             }
         }

@@ -344,7 +344,7 @@ public class MiltyService {
         }
 
         // STARTING COMMODITIES
-        player.setCommoditiesBase(factionModel.getCommodities());
+        player.setCommoditiesTotal(factionModel.getCommodities());
 
         // STARTING PLANETS
         for (String planet : factionModel.getHomePlanets()) {
@@ -522,6 +522,10 @@ public class MiltyService {
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
+        }
+        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
+            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
+                Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

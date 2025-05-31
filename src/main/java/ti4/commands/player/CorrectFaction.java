@@ -51,7 +51,7 @@ class CorrectFaction extends GameStateSubcommand {
                 }
             }
         }
-
+        
         List<String> laws = new ArrayList<>(game.getLawsInfo().keySet());
         for (String law : laws) {
             if (game.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())) {
@@ -60,16 +60,16 @@ class CorrectFaction extends GameStateSubcommand {
         }
         player.setFaction(newFaction);
         FactionModel setupInfo = player.getFactionSetupInfo();
-
-        if (!player.getFaction().contains("franken")) {
+        
+        if(!player.getFaction().contains("franken")){
             player.getFactionTechs().clear();
             Set<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
             player.setUnitsOwned(playerOwnedUnits);
-            player.setCommoditiesBase(setupInfo.getCommodities());
+            player.setCommoditiesTotal(setupInfo.getCommodities());
         }
-
+        
         // STARTING COMMODITIES
-
+        
         for (String tech : setupInfo.getFactionTech()) {
             if (tech.trim().isEmpty()) {
                 continue;
