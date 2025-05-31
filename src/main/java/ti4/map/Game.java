@@ -3642,7 +3642,7 @@ public class Game extends GameProperties {
         // unlocked
         if (player.hasAbility("imperia")) {
             for (Player otherPlayer : getRealPlayers()) {
-                if (otherPlayer.equals(player))
+                if (otherPlayer.getFaction().equalsIgnoreCase(player.getFaction()))
                     continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
 
@@ -3672,7 +3672,7 @@ public class Game extends GameProperties {
         // that have the leader unlocked
         if (player.hasAbility("imperia")) {
             for (Player player_ : getRealPlayersNDummies()) {
-                if (player_.equals(player))
+                if (player_.getFaction().equalsIgnoreCase(player.getFaction()))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
                     if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
