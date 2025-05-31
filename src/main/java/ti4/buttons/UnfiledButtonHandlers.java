@@ -1348,6 +1348,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentationNoPing() + " retreated all units in space to "
                 + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
+        FOWCombatThreadMirroring.mirrorMessage(event, game, player.getRepresentationNoPing() + " retreated all units in space");
         String message = player.getRepresentationUnfogged()
             + " Use below buttons to move any ground forces or conclude retreat.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
