@@ -51,9 +51,8 @@ public class PlayerProperties {
     private int inRoundTurnCount;
     private int tg;
     private int commodities;
-    private int commoditiesTotal;
-    // private int commoditiesBonus; // TODO
-    // private int commoditiesBase;
+    public int commoditiesTotal;
+    private int commoditiesBase;
     private int crf;
     private int hrf;
     private int irf;

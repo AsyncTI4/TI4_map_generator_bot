@@ -1,12 +1,15 @@
 package ti4.draft.items;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.UnitModel;
@@ -76,6 +79,27 @@ public class MechDraftItem extends DraftItem {
         List<DraftItem> allItems = new ArrayList<>();
         Map<String, UnitModel> allUnits = Mapper.getUnits();
         for (FactionModel faction : factions) {
+            var units = faction.getUnits();
+            units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
+            allItems.add(DraftItem.generate(Category.MECH, units.getFirst()));
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = buildAllItems(factions, game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.MECH);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        Map<String, UnitModel> allUnits = Mapper.getUnits();
+        String[] results = game.getStoredValue("bannedMechs").split("finSep");
+        for (FactionModel faction : factions) {
+            if (Arrays.asList(results).contains(faction.getAlias())) {
+                continue;
+            }
             var units = faction.getUnits();
             units.removeIf((String unit) -> !"mech".equals(allUnits.get(unit).getBaseType()));
             allItems.add(DraftItem.generate(Category.MECH, units.getFirst()));
