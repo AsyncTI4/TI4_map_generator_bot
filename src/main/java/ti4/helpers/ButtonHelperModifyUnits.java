@@ -763,10 +763,6 @@ public class ButtonHelperModifyUnits {
         Tile tile = game.getTileByPosition(pos1);
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();
-            String representation = planetRepresentations.get(name);
-            if (representation == null) {
-                representation = name;
-            }
             UnitHolder unitHolder = entry.getValue();
             if (unitHolder instanceof Planet) {
                 int limit = unitHolder.getUnitCount(UnitType.Infantry, player.getColor());
@@ -774,8 +770,8 @@ public class ButtonHelperModifyUnits {
                     if (x > 2) {
                         break;
                     }
-                    String id = finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "infantry_" + representation;
-                    String label = "Retreat " + x + " Infantry on " + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
+                    String id = finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "_infantry_" + unitHolder.getName();
+                    String label = "Retreat " + x + " Infantry on " + Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     buttons.add(Buttons.green(id, label, UnitEmojis.infantry));
                 }
                 limit = unitHolder.getUnitCount(UnitType.Mech, player.getColor());
@@ -783,8 +779,8 @@ public class ButtonHelperModifyUnits {
                     if (x > 2) {
                         break;
                     }
-                    String id = finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "mech_" + representation;
-                    String label = "Retreat " + x + " Mech" + (x == 1 ? "" : "s") + " on " + Helper.getPlanetRepresentation(representation.toLowerCase(), game);
+                    String id = finChecker + "retreatGroundUnits_" + pos1 + "_" + pos2 + "_" + x + "_mech_" + unitHolder.getName();
+                    String label = "Retreat " + x + " Mech" + (x == 1 ? "" : "s") + " on " + Helper.getPlanetRepresentation(unitHolder.getName(), game);
                     buttons.add(Buttons.green(id, label, UnitEmojis.mech));
                 }
 
@@ -1028,29 +1024,20 @@ public class ButtonHelperModifyUnits {
     @ButtonHandler("retreatGroundUnits_")
     public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String buttonLabel = event.getButton().getLabel();
-        String rest = buttonID.replace("retreatGroundUnits_", "").replace("'", "");
-        String pos1 = rest.substring(0, rest.indexOf("_"));
-        rest = rest.replace(pos1 + "_", "");
-        String pos2 = rest.substring(0, rest.indexOf("_"));
-        rest = rest.replace(pos2 + "_", "");
-        int amount = Integer.parseInt(rest.charAt(0) + "");
-        rest = rest.substring(1);
-        String unitType;
-        String planet = "";
-        if (rest.contains("_")) {
-            unitType = rest.split("_")[0];
-            planet = rest.split("_")[1].replace(" ", "").toLowerCase();
-        } else {
-            unitType = rest;
-        }
+
+        String pos1 = buttonID.split("_")[1];
+        String pos2 = buttonID.split("_")[2];
+        int amount = Integer.parseInt(buttonID.split("_")[3]);
+        String unitType = buttonID.split("_")[4];
+        String planet = buttonID.split("_")[5];
 
         Tile src = game.getTileByPosition(pos1);
         Tile dest = game.getTileByPosition(pos2);
         boolean damaged = buttonLabel.toLowerCase().contains("damaged");
-        MoveUnitService.moveUnits(event, src, game, player.getColor(), amount + " " + unitType, dest, "space", damaged);
+        MoveUnitService.moveUnits(event, src, game, player.getColor(), amount + " " + unitType + " " + planet, dest, "space", damaged);
 
         List<Button> systemButtons = getRetreatingGroundTroopsButtons(player, game, pos1, pos2);
-        String retreatMessage = player.getFactionEmojiOrColor() + " retreated " + amount + " " + unitType + " on " + planet + " to "
+        String retreatMessage = player.getFactionEmojiOrColor() + " retreated " + amount + " " + unitType + " on " + Helper.getPlanetRepresentation(planet, game) + " to "
             + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), retreatMessage);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
