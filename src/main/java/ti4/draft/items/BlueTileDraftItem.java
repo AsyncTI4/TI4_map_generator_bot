@@ -1,12 +1,15 @@
 package ti4.draft.items;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.image.TileHelper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
@@ -78,6 +81,19 @@ public class BlueTileDraftItem extends DraftItem {
     public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager) {
         List<DraftItem> allItems = new ArrayList<>();
         for (MiltyDraftTile tile : draftManager.getBlue()) {
+            allItems.add(DraftItem.generate(DraftItem.Category.BLUETILE, tile.getTile().getTileID()));
+        }
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.BLUETILE);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(MiltyDraftManager draftManager, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        String[] results = game.getStoredValue("bannedTiles").split("finSep");
+        for (MiltyDraftTile tile : draftManager.getBlue()) {
+            if (Arrays.asList(results).contains(tile.getTile().getTileID())) {
+                continue;
+            }
             allItems.add(DraftItem.generate(DraftItem.Category.BLUETILE, tile.getTile().getTileID()));
         }
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.BLUETILE);

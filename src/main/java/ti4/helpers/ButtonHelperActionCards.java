@@ -32,7 +32,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.explore.ExploreService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
@@ -860,7 +859,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("probeStep2_")
     public static void resolveProbeStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        ExploreService.expFront(event, tile, game, player);
+        ButtonHelper.resolveFullFrontierExplore(game, player, tile, event);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmoji() + " explored the frontier token in " + tile.getRepresentation() + ".");

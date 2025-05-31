@@ -1,5 +1,7 @@
 package ti4.map.manage;
 
+import static ti4.map.manage.GamePersistenceKeys.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -58,8 +60,6 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
-import static ti4.map.manage.GamePersistenceKeys.*;
-
 @UtilityClass
 class GameLoadService {
 
@@ -73,7 +73,9 @@ class GameLoadService {
                 .map(path -> {
                     File file = path.toFile();
                     try {
+                        //   System.out.println(file.getName());
                         Game game = readGame(file);
+
                         if (game == null || game.getName() == null) {
                             BotLogger.warning("Could not load game. Game or game name is null: " + file.getName());
                             return null;
@@ -104,7 +106,7 @@ class GameLoadService {
     }
 
     @Nullable
-    private static Game readGame(@NotNull File gameFile) {
+    public static Game readGame(@NotNull File gameFile) {
         if (!gameFile.exists()) {
             BotLogger.error("Could not load map, map file does not exist: " + gameFile.getAbsolutePath());
             return null;
@@ -115,6 +117,7 @@ class GameLoadService {
             game.setOwnerID(gameFileLines.next());
             game.setOwnerName(gameFileLines.next());
             game.setName(gameFileLines.next());
+            //     System.out.println(game.getName() + " Start");
             while (gameFileLines.hasNext()) {
                 String data = gameFileLines.next();
                 if (MAPINFO.equals(data)) {
@@ -169,6 +172,7 @@ class GameLoadService {
                 return null;
             }
             game.setTileMap(tileMap);
+            //     System.out.println(game.getName() + " Finish");
             TransientGameInfoUpdater.update(game);
             return game;
         } catch (Exception e) {
@@ -276,9 +280,11 @@ class GameLoadService {
 
     private static void readGameInfo(Game game, String data) {
         String[] tokenizer = data.split(" ", 2);
+        //System.out.println("Made it to reading data about " + game.getName());
         if (tokenizer.length == 2) {
             String identification = tokenizer[0];
             String info = tokenizer[1];
+            //System.out.println(identification);
             switch (identification) {
                 case Constants.LATEST_COMMAND -> game.setLatestCommand(info);
                 case Constants.LATEST_OUTCOME_VOTED_FOR -> game.setLatestOutcomeVotedFor(info);

@@ -93,14 +93,14 @@
     {
         "alias": "superweaponavailyn",
         "name": "Superweapon Availyn",
-        "text": "This system is a nebula. During combat, you may exhaust this card to move up to 3 of your fighters on the game board into the active system. PRODUCTION 3",
+        "text": "This system is a nebula. During combat, you may exhaust this card to move up to 3 of your fighters on the game board into the active system. [Note: You must be participating in the combat] PRODUCTION 3",
         "isFakeRelic": true,
         "source": "ds"
     },
     {
         "alias": "superweaponcaled",
         "name": "Superweapon Caled",
-        "text": "During combat, if a straight line between this system and the active system would cross only parallel non-anomaly borders, you may exhaust this card to destroy 1 ship in that system.",
+        "text": "During combat, if a straight line between this system and the active system would cross only parallel non-anomaly borders, you may exhaust this card to destroy 1 ship in that system. [Note: You must be participating in the combat] ",
         "isFakeRelic": true,
         "source": "ds"
     },
