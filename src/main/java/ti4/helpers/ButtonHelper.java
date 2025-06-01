@@ -1011,12 +1011,12 @@ public class ButtonHelper {
         }
         if (FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             for (Player empy : player.getNeighbouringPlayers(false)) {
-                if (empy.hasTech("as") && empy != player) {
+                if (empy.hasTech("as") && empy != player
+                    && (!game.isFowMode() || FoWHelper.getTilePositionsToShow(game, empy).contains(game.getActiveSystem()))) {
                     List<Button> aetherButtons = new ArrayList<>();
                     aetherButtons.add(
                         Buttons.gray("declareUse_Aetherstream", "Declare Aetherstream", FactionEmojis.Empyrean));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                        empy.getCardsInfoThread(), "You can use aetherstream on this movement by "
+                    MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(), "You can use Aetherstream on this movement by "
                             + player.getRepresentationNoPing() + " to " + game.getActiveSystem(),
                         aetherButtons);
                 }
