@@ -511,6 +511,9 @@ class GameSaveService {
             writer.write(System.lineSeparator());
         }
 
+        writer.write(Constants.PRIORITY_TRACK_MODE + " " + game.getPriorityTrackMode());
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 

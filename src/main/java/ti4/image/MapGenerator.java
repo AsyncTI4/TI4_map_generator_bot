@@ -496,7 +496,7 @@ public class MapGenerator implements AutoCloseable {
         x = 10 + landscapeShift;
         int tempY = y;
         tempY = drawScoreTrack(tempY + 20);
-        if (game.isOmegaPhaseMode()) {
+        if (game.hasAnyPriorityTrackMode()) {
             tempY = drawPriorityTrack(tempY);
         }
         y = drawObjectives(tempY);
