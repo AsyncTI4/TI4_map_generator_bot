@@ -75,6 +75,7 @@ class AgendaResolveButtonHandler {
             String agendaName = agendaDetails.getName();
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# The hidden agenda was " + agendaName
                 + "! You can find it added as a law or in the discard.");
+            MessageHelper.sendMessageToChannelWithEmbed(game.getMainGameChannel(), "Hidden Agenda", agendaDetails.getRepresentationEmbed());
             aID = discardAgendas.get(id2);
         } else {
             aID = Integer.parseInt(agendaid);
