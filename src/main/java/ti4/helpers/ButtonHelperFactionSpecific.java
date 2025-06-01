@@ -1238,23 +1238,15 @@ public class ButtonHelperFactionSpecific {
         }
 
         UnitHolder oriPlanet = ButtonHelper.getUnitHolderFromPlanetName(origPlanet, game);
-        Map<UnitKey, List<Integer>> units = new HashMap<>(oriPlanet.getUnitsByState());
-        for (Map.Entry<UnitKey, List<Integer>> unitEntry : units.entrySet()) {
-            UnitKey unitKey = unitEntry.getKey();
-            int state = 0;
-            for (Integer amount : unitEntry.getValue()) {
-                if (amount > 0) {
-                    String unitName = unitKey.unitName();
-                    RemoveUnitService.removeUnits(event, game.getTileFromPlanet(origPlanet), game, hacan.getColor(), amount + " " + unitName + " " + origPlanet);
-                    AddUnitService.addUnits(event, game.getTileFromPlanet(newPlanet), game, hacan.getColor(), amount + " " + unitName + " " + newPlanet);
-                    if (state == 1) {
-                        game.getUnitHolderFromPlanet(newPlanet).addDamagedUnit(unitKey, state);
-                    }
-                }
-                state++;
+        UnitHolder newPlan = game.getUnitHolderFromPlanet(newPlanet);
+        for (UnitKey key : oriPlanet.getUnitKeys()) {
+            int amt = oriPlanet.getUnitCount(key);
+            var removed = oriPlanet.removeUnit(key, amt);
+            if (newPlan != null) {
+                newPlan.addUnitsWithStates(key, removed);
             }
-
         }
+
         AddPlanetService.addPlanet(p2, origPlanet, game, event, false);
 
         List<Button> goAgainButtons = new ArrayList<>();

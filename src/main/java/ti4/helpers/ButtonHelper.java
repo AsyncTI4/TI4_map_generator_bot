@@ -177,6 +177,10 @@ public class ButtonHelper {
                     + " died and auto-revived. You will be prompted to place them on a planet in your home system at the start of your next turn.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
+        } else {
+            if (player.hasUnit("mahact_infantry")) {
+                ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
+            }
         }
         if (player.hasTech("dsqhetinf")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
