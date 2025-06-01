@@ -1722,13 +1722,13 @@ public class Player extends PlayerProperties {
 
     @Override
     public void setCommodities(int comms) {
-        super.setCommodities(Math.clamp(comms, 0, getCommoditiesTotal()));
-        if (getCommoditiesTotal() == 0) super.setCommodities(comms);
+        super.setCommodities(Math.clamp(comms, 0, getCommoditiesBase() + getCommoditiesBonus()));
+        if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);
     }
 
     @JsonIgnore
     public String getCommoditiesRepresentation() {
-        return getCommodities() + "/" + getCommoditiesTotal();
+        return getCommodities() + "/" + (getCommoditiesBase() + getCommoditiesBonus());
     }
 
     @Override
