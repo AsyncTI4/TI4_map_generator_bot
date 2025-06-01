@@ -1389,6 +1389,17 @@ public class UnfiledButtonHandlers {
         }
     }
 
+    @ButtonHandler(value = "checkCombatACs", save = false)
+    public static void checkCombatACs(ButtonInteractionEvent event, Player player) {
+        String secretScoreMsg = "_ _\nClick a button below to play an action card";
+        List<Button> acButtons = ActionCardHelper.getCombatActionCardButtons(player);
+        if (!acButtons.isEmpty()) {
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, acButtons);
+        } else {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "You have no combat action cards");
+        }
+    }
+
     public static void soScoreFromHand(
         ButtonInteractionEvent event,
         String buttonID,
@@ -1913,43 +1924,7 @@ public class UnfiledButtonHandlers {
         String messageId = event.getInteraction().getMessage().getId();
         var gameMessage = GameMessageManager.getOne(game.getName(), messageId);
         int matchingFactionReactions = 0;
-        for (Player player : game.getRealPlayers()) {
-            boolean factionReacted = false;
-            String faction = player.getFaction();
-            if (gameMessage.isPresent() && gameMessage.get().factionsThatReacted().contains(faction)) {
-                factionReacted = true;
-            } else if (buttonID.contains("no_after")) {
-                if (game.getPlayersWhoHitPersistentNoAfter().contains(faction)) {
-                    factionReacted = true;
-                } else {
-                    Message mainMessage = event.getMessage();
-                    Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
-                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction != null) {
-                        factionReacted = true;
-                    }
-                }
-            } else if (buttonID.contains("no_when")) {
-                if (game.getPlayersWhoHitPersistentNoWhen().contains(faction)) {
-                    factionReacted = true;
-                } else {
-                    Message mainMessage = event.getMessage();
-                    Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
-                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction != null) {
-                        factionReacted = true;
-                    }
-                }
-            }
-            if (factionReacted) {
-                matchingFactionReactions++;
-            }
-        }
-        int numberOfPlayers = game.getRealPlayers().size();
-        if (matchingFactionReactions >= numberOfPlayers) {
-            respondAllPlayersReacted(event, game);
-            GameMessageManager.remove(game.getName(), messageId);
-        } else if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand"))) {
+        if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand"))) {
             boolean allReacted = true;
             for (Player player : game.getRealPlayers()) {
                 String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
@@ -1961,7 +1936,47 @@ public class UnfiledButtonHandlers {
             if (allReacted) {
                 respondAllPlayersReacted(event, game);
             }
+        } else {
+
+            for (Player player : game.getRealPlayers()) {
+                boolean factionReacted = false;
+                String faction = player.getFaction();
+                if (gameMessage.isPresent() && gameMessage.get().factionsThatReacted().contains(faction)) {
+                    factionReacted = true;
+                } else if (buttonID.contains("no_after")) {
+                    if (game.getPlayersWhoHitPersistentNoAfter().contains(faction)) {
+                        factionReacted = true;
+                    } else {
+                        Message mainMessage = event.getMessage();
+                        Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
+                        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                        if (reaction != null) {
+                            factionReacted = true;
+                        }
+                    }
+                } else if (buttonID.contains("no_when")) {
+                    if (game.getPlayersWhoHitPersistentNoWhen().contains(faction)) {
+                        factionReacted = true;
+                    } else {
+                        Message mainMessage = event.getMessage();
+                        Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
+                        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                        if (reaction != null) {
+                            factionReacted = true;
+                        }
+                    }
+                }
+                if (factionReacted) {
+                    matchingFactionReactions++;
+                }
+            }
+            int numberOfPlayers = game.getRealPlayers().size();
+            if (matchingFactionReactions >= numberOfPlayers) {
+                respondAllPlayersReacted(event, game);
+                GameMessageManager.remove(game.getName(), messageId);
+            }
         }
+
     }
 
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
@@ -3114,6 +3129,7 @@ public class UnfiledButtonHandlers {
             msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
+        ReactionService.addReaction(event, game, player);
         checkForAllReactions(event, game);
     }
 
