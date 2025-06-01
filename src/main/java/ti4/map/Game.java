@@ -434,7 +434,7 @@ public class Game extends GameProperties {
             if (player.getTotalVictoryPoints() >= getVp()) {
                 if (winner == null) {
                     winner = player;
-                } else if (isOmegaPhaseMode()) {
+                } else if (hasFullPriorityTrackMode()) {
                     if (player.hasPriorityPosition() && !winner.hasPriorityPosition()) {
                         winner = player;
                     } else if (player.hasPriorityPosition() && winner.hasPriorityPosition()) {
@@ -597,6 +597,7 @@ public class Game extends GameProperties {
         gameModes.put("Little Omega", isLittleOmega());
         gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
         gameModes.put("Omega Phase", isOmegaPhaseMode());
+        gameModes.put("Priority Track", hasAnyPriorityTrackMode());
         gameModes.put("Homebrew", !isNormalGame);
 
         for (String tag : getTags()) {

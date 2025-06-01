@@ -566,35 +566,14 @@ public class ButtonHelperActionCards {
             UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
             if (planetUnitHolder != null && spaceUnitHolder != null) {
 
-                Map<UnitKey, List<Integer>> units = new HashMap<>(planetUnitHolder.getUnitsByState());
-                for (Player player_ : game.getPlayers().values()) {
-                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
-                        continue;
-                    }
-                    String color = player_.getColor();
-                    planetUnitHolder.removeAllUnits(color);
-                }
-                for (Map.Entry<UnitKey, List<Integer>> unitEntry : units.entrySet()) {
-                    UnitKey key = unitEntry.getKey();
-
+                for (UnitKey key : planetUnitHolder.getUnitKeys()) {
                     Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
                     if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
                         continue;
                     }
-                    if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
-                        String unitName = key.unitName();
-                        int state = 0;
-                        for (Integer count : unitEntry.getValue()) {
-                            if (count > 0) {
-                                //RemoveUnitService.removeUnits(event, tile, game, key.getColor(), count + " " + unitName + " " + planetUnitHolder.getName());
-                                AddUnitService.addUnits(event, tile, game, key.getColor(), count + " " + unitName);
-                                if (state == 1) {
-                                    spaceUnitHolder.addDamagedUnit(key, state);
-                                }
-                            }
-                            state++;
-                        }
-                    }
+                    int amt = planetUnitHolder.getUnitCount(key);
+                    var removed = planetUnitHolder.removeUnit(key, amt);
+                    spaceUnitHolder.addUnitsWithStates(key, removed);
                 }
             }
         }

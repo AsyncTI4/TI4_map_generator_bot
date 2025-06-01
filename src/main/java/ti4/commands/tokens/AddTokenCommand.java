@@ -1,6 +1,5 @@
 package ti4.commands.tokens;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
-import ti4.service.unit.AddUnitService;
 
 public class AddTokenCommand extends AddRemoveTokenCommand {
 
@@ -110,27 +108,11 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                 UnitHolder planetUnitHolder = unitHolders.get(planet);
                 UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
-                Map<UnitKey, List<Integer>> units = new HashMap<>(planetUnitHolder.getUnitsByState());
-                for (Player player_ : game.getPlayers().values()) {
-                    String color = player_.getColor();
-                    planetUnitHolder.removeAllUnits(color);
-                }
-                for (Map.Entry<UnitKey, List<Integer>> unitEntry : units.entrySet()) {
-                    UnitKey key = unitEntry.getKey();
-                    Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
+                for (UnitKey key : planetUnitHolder.getUnitKeys()) {
+                    int amt = planetUnitHolder.getUnitCount(key);
+                    var removed = planetUnitHolder.removeUnit(key, amt);
                     if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
-                        String unitName = key.unitName();
-                        int state = 0;
-                        for (Integer count : unitEntry.getValue()) {
-                            if (count > 0) {
-                                //RemoveUnitService.removeUnits(event, tile, game, key.getColor(), count + " " + unitName + " " + planetUnitHolder.getName());
-                                AddUnitService.addUnits(event, tile, game, key.getColor(), count + " " + unitName);
-                                if (state == 1) {
-                                    spaceUnitHolder.addDamagedUnit(key, state);
-                                }
-                            }
-                            state++;
-                        }
+                        spaceUnitHolder.addUnitsWithStates(key, removed);
                     }
                 }
             }

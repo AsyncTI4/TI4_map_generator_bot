@@ -94,6 +94,7 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -176,6 +177,10 @@ public class ButtonHelper {
                     + " died and auto-revived. You will be prompted to place them on a planet in your home system at the start of your next turn.");
             player.setStasisInfantry(player.getStasisInfantry() + totalAmount);
             return;
+        } else {
+            if (player.hasUnit("mahact_infantry")) {
+                ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
+            }
         }
         if (player.hasTech("dsqhetinf")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -1006,12 +1011,12 @@ public class ButtonHelper {
         }
         if (FoWHelper.isTileAdjacentToAnAnomaly(game, game.getActiveSystem(), player)) {
             for (Player empy : player.getNeighbouringPlayers(false)) {
-                if (empy.hasTech("as") && empy != player) {
+                if (empy.hasTech("as") && empy != player
+                    && (!game.isFowMode() || FoWHelper.getTilePositionsToShow(game, empy).contains(game.getActiveSystem()))) {
                     List<Button> aetherButtons = new ArrayList<>();
                     aetherButtons.add(
                         Buttons.gray("declareUse_Aetherstream", "Declare Aetherstream", FactionEmojis.Empyrean));
-                    MessageHelper.sendMessageToChannelWithButtons(
-                        empy.getCardsInfoThread(), "You can use aetherstream on this movement by "
+                    MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(), "You can use Aetherstream on this movement by "
                             + player.getRepresentationNoPing() + " to " + game.getActiveSystem(),
                         aetherButtons);
                 }
@@ -4757,6 +4762,7 @@ public class ButtonHelper {
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         message += CombatRollService.rollForUnits(playerUnitsByQuantity, extraRolls, modifiers,
             tempMods, player, opponent, game, rollType, event, tile);
+        FOWCombatThreadMirroring.mirrorCombatMessage(event, game, message);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
         int h = Integer.parseInt(hits);

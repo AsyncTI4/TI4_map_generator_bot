@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 
 @Getter
 @Setter
@@ -136,6 +137,17 @@ public class GameProperties {
     private List<String> actionCards;
     private List<String> agendas;
     private List<String> events; // ignis_aurora
+
+    // Priority Track
+    private PriorityTrackMode priorityTrackMode = PriorityTrackMode.NONE;
+
+    public boolean hasAnyPriorityTrackMode() {
+        return priorityTrackMode != PriorityTrackMode.NONE;
+    }
+
+    public boolean hasFullPriorityTrackMode() {
+        return priorityTrackMode == PriorityTrackMode.FULL;
+    }
 
     // Misc Helpers
     public String getID() {

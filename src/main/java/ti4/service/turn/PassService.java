@@ -20,6 +20,12 @@ import ti4.message.MessageHelper;
 public class PassService {
 
     public static void passPlayerForRound(GenericInteractionCreateEvent event, Game game, Player player, boolean autoPass) {
+        if (game.isFowMode() && !player.isActivePlayer() && !autoPass) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "You are not the active player. If you need to, you can force pass with `/player stats passed:y`.");
+            return;
+        }
+
         player.setPassed(true);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
@@ -78,7 +84,7 @@ public class PassService {
             }
         }
 
-        if (game.isOmegaPhaseMode()) {
+        if (game.hasAnyPriorityTrackMode()) {
             PriorityTrackHelper.AssignPlayerToPriority(game, player, null);
         }
 

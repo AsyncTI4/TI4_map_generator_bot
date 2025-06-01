@@ -86,6 +86,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.unit.RemoveUnitService;
 
 public class Helper {
@@ -243,18 +244,7 @@ public class Helper {
             return;
         }
 
-        List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
-            players = getSpeakerOrderFromThisPlayer(imperialHolder, game);
-        } else {
-            if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
-            } else {
-                players = game.getActionPhaseTurnOrder();
-            }
-            Collections.rotate(players, -players.indexOf(imperialHolder));
-        }
-
+        List<Player> players = PlayStrategyCardService.getPlayersInFollowOrder(game, imperialHolder);
         for (Player player : players) {
             String message = player.getRepresentationUnfogged() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
@@ -313,9 +303,9 @@ public class Helper {
         if (game.getRealPlayers().size() > 10) {
             return "This game is too large to display a scoring summary";
         }
-        var playersInScoringOrder = game.isOmegaPhaseMode() ? PriorityTrackHelper.GetPriorityTrack(game) : game.getActionPhaseTurnOrder();
+        var playersInScoringOrder = game.hasFullPriorityTrackMode() ? PriorityTrackHelper.GetPriorityTrack(game) : game.getActionPhaseTurnOrder();
         for (Player player : playersInScoringOrder) {
-            if (!game.isOmegaPhaseMode()) {
+            if (!game.hasFullPriorityTrackMode()) {
                 int sc = player.getLowestSC();
                 rep.append(CardEmojis.getSCBackFromInteger(sc)).append(player.getRepresentation(false, false)).append("\n");
             } else {
@@ -440,8 +430,8 @@ public class Helper {
         return null;
     }
 
-    public static List<Player> getSpeakerOrPriorityOrder(Game game) {
-        if (!game.isOmegaPhaseMode()) {
+    public static List<Player> getSpeakerOrFullPriorityOrder(Game game) {
+        if (!game.hasFullPriorityTrackMode()) {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
 
@@ -450,21 +440,21 @@ public class Helper {
         return arrayPlayers;
     }
 
-    public static List<Player> getSpeakerOrPriorityOrderFromPlayer(Player player, Game game) {
-        var players = getSpeakerOrPriorityOrder(game);
+    public static List<Player> getSpeakerOrFullPriorityOrderFromPlayer(Player player, Game game) {
+        var players = getSpeakerOrFullPriorityOrder(game);
         if (player != null && players.indexOf(player) != -1) {
             Collections.rotate(players, -players.indexOf(player));
         }
         return players;
     }
 
-    public static int getPlayerSpeakerOrPriorityNumber(Player player, Game game) {
-        if (!game.isOmegaPhaseMode() && game.getSpeaker() == null) {
+    public static int getPlayerSpeakerOrFullPriorityNumber(Player player, Game game) {
+        if (!game.hasFullPriorityTrackMode() && game.getSpeaker() == null) {
             return 1;
-        } else if (game.isOmegaPhaseMode() && player.getPriorityPosition() < 1) {
+        } else if (game.hasFullPriorityTrackMode() && player.getPriorityPosition() < 1) {
             return 1;
         }
-        var players = getSpeakerOrPriorityOrder(game);
+        var players = getSpeakerOrFullPriorityOrder(game);
         return players.indexOf(player) + 1;
     }
 

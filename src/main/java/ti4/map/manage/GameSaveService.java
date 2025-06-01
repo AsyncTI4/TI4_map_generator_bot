@@ -511,6 +511,9 @@ class GameSaveService {
             writer.write(System.lineSeparator());
         }
 
+        writer.write(Constants.PRIORITY_TRACK_MODE + " " + game.getPriorityTrackMode());
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -705,12 +708,12 @@ class GameSaveService {
 
             writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
             writer.write(System.lineSeparator());
-
-            writer.write(Constants.COMMODITIES + " " + player.getCommodities());
-            writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES + " " + player.getCommodities());
+
             writer.write(System.lineSeparator());
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
