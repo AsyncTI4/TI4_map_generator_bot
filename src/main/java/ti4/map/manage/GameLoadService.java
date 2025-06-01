@@ -679,6 +679,7 @@ class GameLoadService {
                 case Constants.FACILITIES_MODE -> game.setFacilitiesMode(loadBooleanOrDefault(info, false));
                 case Constants.MINOR_FACTIONS_MODE -> game.setMinorFactionsMode(loadBooleanOrDefault(info, false));
                 case Constants.HIDDEN_AGENDA_MODE -> game.setHiddenAgendaMode(loadBooleanOrDefault(info, false));
+                case Constants.VOTC_MODE -> game.setVotCMode(loadBooleanOrDefault(info, false));
                 case Constants.SHOW_FULL_COMPONENT_TEXT -> game.setShowFullComponentTextEmbeds(loadBooleanOrDefault(info, false));
                 case Constants.GAME_HAS_ENDED -> game.setHasEnded(loadBooleanOrDefault(info, false));
                 case Constants.CREATION_DATE -> game.setCreationDate(info);
