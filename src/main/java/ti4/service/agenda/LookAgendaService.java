@@ -22,6 +22,9 @@ public class LookAgendaService {
 
     private static List<MessageEmbed> getAgendaEmbeds(int count, boolean fromBottom, Game game) {
         List<MessageEmbed> agendaEmbeds = new ArrayList<>();
+        if (count > game.getAgendas().size()) {
+            count = game.getAgendas().size();
+        }
         for (int i = 0; i < count; i++) {
             String agendaID = fromBottom ? game.lookAtBottomAgenda(i) : game.lookAtTopAgenda(i);
             if (agendaID != null) {

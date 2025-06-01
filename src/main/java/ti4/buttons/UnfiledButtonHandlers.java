@@ -85,6 +85,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
 import ti4.service.game.SwapFactionService;
@@ -1347,6 +1348,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentationNoPing() + " retreated all units in space to "
                 + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".");
+        FOWCombatThreadMirroring.mirrorMessage(event, game, player.getRepresentationNoPing() + " retreated all units in space");
         String message = player.getRepresentationUnfogged()
             + " Use below buttons to move any ground forces or conclude retreat.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
@@ -1386,6 +1388,17 @@ public class UnfiledButtonHandlers {
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, soButtons);
         } else {
             MessageHelper.sendEphemeralMessageToEventChannel(event, "You have no secret objectives you can score");
+        }
+    }
+
+    @ButtonHandler(value = "checkCombatACs", save = false)
+    public static void checkCombatACs(ButtonInteractionEvent event, Player player) {
+        String secretScoreMsg = "_ _\nClick a button below to play an action card";
+        List<Button> acButtons = ActionCardHelper.getCombatActionCardButtons(player);
+        if (!acButtons.isEmpty()) {
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, acButtons);
+        } else {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "You have no combat action cards");
         }
     }
 
@@ -1913,43 +1926,7 @@ public class UnfiledButtonHandlers {
         String messageId = event.getInteraction().getMessage().getId();
         var gameMessage = GameMessageManager.getOne(game.getName(), messageId);
         int matchingFactionReactions = 0;
-        for (Player player : game.getRealPlayers()) {
-            boolean factionReacted = false;
-            String faction = player.getFaction();
-            if (gameMessage.isPresent() && gameMessage.get().factionsThatReacted().contains(faction)) {
-                factionReacted = true;
-            } else if (buttonID.contains("no_after")) {
-                if (game.getPlayersWhoHitPersistentNoAfter().contains(faction)) {
-                    factionReacted = true;
-                } else {
-                    Message mainMessage = event.getMessage();
-                    Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
-                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction != null) {
-                        factionReacted = true;
-                    }
-                }
-            } else if (buttonID.contains("no_when")) {
-                if (game.getPlayersWhoHitPersistentNoWhen().contains(faction)) {
-                    factionReacted = true;
-                } else {
-                    Message mainMessage = event.getMessage();
-                    Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
-                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction != null) {
-                        factionReacted = true;
-                    }
-                }
-            }
-            if (factionReacted) {
-                matchingFactionReactions++;
-            }
-        }
-        int numberOfPlayers = game.getRealPlayers().size();
-        if (matchingFactionReactions >= numberOfPlayers) {
-            respondAllPlayersReacted(event, game);
-            GameMessageManager.remove(game.getName(), messageId);
-        } else if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand"))) {
+        if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand"))) {
             boolean allReacted = true;
             for (Player player : game.getRealPlayers()) {
                 String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
@@ -1961,7 +1938,47 @@ public class UnfiledButtonHandlers {
             if (allReacted) {
                 respondAllPlayersReacted(event, game);
             }
+        } else {
+
+            for (Player player : game.getRealPlayers()) {
+                boolean factionReacted = false;
+                String faction = player.getFaction();
+                if (gameMessage.isPresent() && gameMessage.get().factionsThatReacted().contains(faction)) {
+                    factionReacted = true;
+                } else if (buttonID.contains("no_after")) {
+                    if (game.getPlayersWhoHitPersistentNoAfter().contains(faction)) {
+                        factionReacted = true;
+                    } else {
+                        Message mainMessage = event.getMessage();
+                        Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
+                        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                        if (reaction != null) {
+                            factionReacted = true;
+                        }
+                    }
+                } else if (buttonID.contains("no_when")) {
+                    if (game.getPlayersWhoHitPersistentNoWhen().contains(faction)) {
+                        factionReacted = true;
+                    } else {
+                        Message mainMessage = event.getMessage();
+                        Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
+                        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                        if (reaction != null) {
+                            factionReacted = true;
+                        }
+                    }
+                }
+                if (factionReacted) {
+                    matchingFactionReactions++;
+                }
+            }
+            int numberOfPlayers = game.getRealPlayers().size();
+            if (matchingFactionReactions >= numberOfPlayers) {
+                respondAllPlayersReacted(event, game);
+                GameMessageManager.remove(game.getName(), messageId);
+            }
         }
+
     }
 
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
@@ -2301,7 +2318,7 @@ public class UnfiledButtonHandlers {
     public static void announceARetreat(ButtonInteractionEvent event, Player player, Game game) {
         String msg = "## " + player.getRepresentationNoPing() + " has announced a retreat.";
         if (game.playerHasLeaderUnlockedOrAlliance(player, "nokarcommander")) {
-            msg += " Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
+            msg += "\n> Since they have Jack Hallard, the Nokar commander, this means they may cancel 2 hits in this coming combat round.";
         }
         String combatName = "combatRoundTracker" + game.getActivePlayer().getFaction() + game.getActiveSystem()
             + "space";
@@ -2318,6 +2335,8 @@ public class UnfiledButtonHandlers {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         }
+        FOWCombatThreadMirroring.mirrorMessage(event, game, msg.replace("## ", ""));
+
         if (Helper.getCCCount(game, player.getColor()) > 15) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that you are at the CC limit right now, so may need to pull a command counter off your sheet in order to retreat (unless you retreat to a system that has one)");
         }
@@ -2835,6 +2854,8 @@ public class UnfiledButtonHandlers {
         String readiedCardsString = "All planets have been readied at the end of the agenda phase.";
         if (game.isOmegaPhaseMode()) {
             readiedCardsString = "All cards have been readied at the end of the omega phase.";
+        }
+        if (game.hasAnyPriorityTrackMode()) {
             if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
                 PriorityTrackHelper.PrintPriorityTrack(game);
@@ -3011,7 +3032,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("startStrategyPhase")
     public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
-        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+        if (game.hasAnyPriorityTrackMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
             PriorityTrackHelper.PrintPriorityTrack(game);
             return;
@@ -3114,6 +3135,7 @@ public class UnfiledButtonHandlers {
             msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
+        ReactionService.addReaction(event, game, player);
         checkForAllReactions(event, game);
     }
 
@@ -3341,7 +3363,7 @@ public class UnfiledButtonHandlers {
             ButtonHelper.offerSpeakerButtons(game, player);
             return;
         }
-        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+        if (game.hasAnyPriorityTrackMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             PriorityTrackHelper.CreateDefaultPriorityTrack(game);
             if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to fill the Priority Track with the default seating order. Use `/omegaphase assign_player_priority` to fill the track before proceeding.");

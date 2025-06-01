@@ -29,7 +29,9 @@ import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.SortHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -65,6 +67,12 @@ public class GMService {
         Buttons.gray("gmCheckPlayerHands_deadly", "Deadly Plots/Briberies", CardEmojis.ActionCard),
         Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
         Buttons.DONE_DELETE_BUTTONS);
+                
+    private static final List<Button> SYSTEM_LORE_BUTTONS = Arrays.asList(
+        Buttons.blue("gmSystemLoreEdit~MDL", "Add New"),
+        Buttons.gray("gmSystemLoreRefresh", "Refresh"),
+        Buttons.DONE_DELETE_BUTTONS
+    );
 
     private static final String ACTIVITY_LOG_THREAD = "-activity-log";
     private static final String STATUS_SUMMARY_THREAD = "Status Summaries";
@@ -72,14 +80,29 @@ public class GMService {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM HH:mm:ss");
 
+    private static final List<String> GM = List.of(
+        "Galactic Mechanic",
+        "Grape Muncher",
+        "Giant Moth",
+        "Gremlin Manager",
+        "Gnome Monarch",
+        "Gravity Manipulator",
+        "Giraffe Magician",
+        "Goblin Motivator",
+        "Gummybear Manufacturer",
+        "Gondola Maestro"
+    );
+
     public static void showGMButtons(Game game) {
         if (!game.isFowMode()) return;
-        MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), "GM Buttons", GMBUTTONS);
+
+        String title = RandomHelper.isOneInX(20) ? RandomHelper.pickRandomFromList(GM) : "Game Master";
+        MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), title + " Buttons", GMBUTTONS);
     }
 
     public static TextChannel getGMChannel(Game game) {
         List<TextChannel> channels = game.getGuild().getTextChannelsByName(game.getName() + "-gm-room", true);
-        return channels.isEmpty() ? null : channels.getFirst();
+        return channels.isEmpty() ? game.getMainGameChannel() : channels.getFirst();
     }
 
     public static void sendMessageToGMChannel(Game game, String msg) {
@@ -158,10 +181,12 @@ public class GMService {
         } else {
             List<Button> factionButtons = new ArrayList<>();
             for (Player player : game.getRealPlayers()) {
-                factionButtons.add(Buttons.green("gmShowGameAs_" + player.getFaction(), player.getColor() + ", " + player.getUserName(), player.getFactionEmoji()));
+                factionButtons.add(Buttons.green("gmShowGameAs_" + player.getFaction(), StringUtils.capitalize(player.getColor())
+                     + ", " + player.getUserName(), player.getFactionEmoji()));
             }
             factionButtons.add(Buttons.DONE_DELETE_BUTTONS);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select player who to view the game as:", factionButtons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+                "Select player who to view the game as:", factionButtons);
         }
     }
 
@@ -187,11 +212,13 @@ public class GMService {
                   for (Player player : game.getRealPlayers()) {
                       List<String> whens = AgendaHelper.getPossibleWhenNames(player);
                       if (!whens.isEmpty()) {
-                          sbWhens.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", whens)).append("\n");
+                          sbWhens.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ");
+                          sbWhens.append(String.join(", ", whens)).append("\n");
                       }
                       List<String> afters = AgendaHelper.getPossibleAfterNames(player);
                       if (!afters.isEmpty()) {
-                          sbAfters.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ").append(String.join(", ", afters)).append("\n");
+                          sbAfters.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ");
+                          sbAfters.append(String.join(", ", afters)).append("\n");
                       }
                   }
                   MessageHelper.sendMessageToChannel(event.getChannel(), sbWhens.toString());
@@ -262,38 +289,36 @@ public class GMService {
             });
     }
 
-    @ButtonHandler("gmSystemLore")
-    public static void showSystemLoreButtons(Game game) {
-        showSystemLoreButtons(game, null);
+    @ButtonHandler("gmSystemLoreRefresh")
+    private static void refreshSystemLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
+        showSystemLoreButtons(event, buttonID, game);
+        event.getMessage().delete().queue();
     }
 
-    private static void showSystemLoreButtons(Game game, String originalMessageId) {
-        StringBuffer sb = new StringBuffer("### System Lore\n");
-        sb.append("-# Shown to the first player to conclude an action with units in the system.\n");
+    @ButtonHandler("gmSystemLore")
+    private static void showSystemLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
+        String page = StringUtils.substringAfter(buttonID, "page");
+        int pageNum = StringUtils.isBlank(page) ? 1 : Integer.parseInt(page);
+        List<ActionRow> buttons = Buttons.paginateButtons(getSystemLoreButtons(game), SYSTEM_LORE_BUTTONS, pageNum, "gmSystemLore");
+        
+        if (StringUtils.isBlank(page)) {
+            String msg = "### System Lore\n-# Shown to the first player to conclude an action with units in the system.";
+            getGMChannel(game).sendMessage(msg).setComponents(buttons).queue();
+        } else {
+            event.getHook().editOriginalComponents(buttons).queue();
+        }
+    }
 
+    private static List<Button> getSystemLoreButtons(Game game) {
         List<Button> systemLoreButtons = new ArrayList<>();
-
         for (Map.Entry<String, String> lore : getSavedLore(game).entrySet()) {
             String position = lore.getKey();
-            String loreText = lore.getValue().replace("\n", " ");
-
             Tile tile = game.getTileByPosition(position);
-            sb.append("**").append(position).append("** ");
-            sb.append(tile != null ? tile.getRepresentation() : "").append(" - `");
-            sb.append(StringUtils.substring(loreText, 0, 50));
-            sb.append(loreText.length() > 50 ? "..." : "").append("`\n");
-
-            systemLoreButtons.add(Buttons.green("gmSystemLoreEdit_" + position + "~MDL", position));
+            systemLoreButtons.add(Buttons.green("gmSystemLoreEdit_" + position + "~MDL", 
+                position + " " + (tile == null ? "null" : tile.getRepresentation())));
         }
-        systemLoreButtons.add(Buttons.blue("gmSystemLoreEdit~MDL", "Add New"));
-        systemLoreButtons.add(Buttons.DONE_DELETE_BUTTONS);
-
-        if (originalMessageId == null) {
-            MessageHelper.sendMessageToChannelWithButtons(getGMChannel(game), sb.toString(), systemLoreButtons);
-        } else {
-            List<List<ActionRow>> buttonRows = MessageHelper.getPartitionedButtonLists(systemLoreButtons);
-            getGMChannel(game).editMessageById(originalMessageId, sb.toString()).setComponents(buttonRows.getFirst()).queue();
-        }
+        SortHelper.sortButtonsByTitle(systemLoreButtons);
+        return systemLoreButtons;
     }
 
     private static Map<String, String> getSavedLore(Game game) {
@@ -320,7 +345,7 @@ public class GMService {
             .setRequired(true)
             .setPlaceholder("000")
             .setMaxLength(4);
-        TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (empty to remove)", TextInputStyle.PARAGRAPH)
+        TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
             .setRequired(false)
             .setPlaceholder("There once was Mecatol...")
             .setMaxLength(420);
@@ -330,7 +355,7 @@ public class GMService {
             lore.setValue(getSavedLore(game).get(existingPosition));
         }
 
-        Modal editLoreModal = Modal.create("gmSystemLoreSave_" + event.getMessageId(), "Add Lore to Position")
+        Modal editLoreModal = Modal.create("gmSystemLoreSave", "Add Lore to Position")
             .addActionRow(position.build())
             .addActionRow(lore.build())
             .build();
@@ -338,9 +363,8 @@ public class GMService {
         event.replyModal(editLoreModal).queue();
     }
 
-    @ModalHandler("gmSystemLoreSave_")
+    @ModalHandler("gmSystemLoreSave")
     public static void saveSystemLore(ModalInteractionEvent event, Player player, Game game) {
-        String origMessageId = event.getModalId().replace("gmSystemLoreSave_", "");
         String position = event.getValue(Constants.POSITION).getAsString();
         String loreText = event.getValue(Constants.MESSAGE).getAsString();
 
@@ -352,15 +376,13 @@ public class GMService {
         Map<String, String> savedLoreMap = getSavedLore(game);
         if (StringUtils.isBlank(loreText)) {
             savedLoreMap.remove(position);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Lore from " + position);
         } else {
             savedLoreMap.put(position, loreText.replace(";", "").replace("|", ""));
-            MessageEmbed embed = buildLoreEmbed(game, position, loreText);
-            MessageHelper.sendMessageToChannelWithEmbedsAndButtons(event.getChannel(), 
-                "Saved Lore Preview", Arrays.asList(embed), Arrays.asList(Buttons.DONE_DELETE_BUTTONS));
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Saved Lore to " + position);
         }
 
         setSystemLore(game, savedLoreMap);
-        showSystemLoreButtons(game, origMessageId);
     }
 
     private static void setSystemLore(Game game, Map<String, String> systemLore) {

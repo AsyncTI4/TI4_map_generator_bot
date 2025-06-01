@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import ti4.helpers.Constants;
@@ -81,6 +82,8 @@ public class Buttons {
         buttonsWeb.add(REFRESH_MAP);
         return buttonsWeb;
     }
+
+    private static final int PAGE_SIZE = 20;
 
     /** A blue button (primary style) */
     public static Button blue(String buttonID, String buttonLabel) {
@@ -171,5 +174,45 @@ public class Buttons {
 
     public static Button declineAndNotify(String buttonLabel, String notificationMessage) {
         return gray("deleteMessage_" + notificationMessage, buttonLabel);
+    }
+
+    public static List<ActionRow> paginateButtons(List<Button> mainButtons, List<Button> persistentButtons,
+                                   int page, String pageButtonId) {
+        int totalPages = (int) Math.ceil((double) mainButtons.size() / PAGE_SIZE);
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int fromIndex = (currentPage - 1) * PAGE_SIZE;
+        int toIndex = Math.min(fromIndex + PAGE_SIZE, mainButtons.size());
+
+        List<Button> pageButtons = new ArrayList<>(mainButtons.subList(fromIndex, toIndex));
+
+        // Split main buttons into rows of max 5 (Discord limit)
+        List<ActionRow> rows = new ArrayList<>();
+        for (int i = 0; i < pageButtons.size(); i += 5) {
+            rows.add(ActionRow.of(pageButtons.subList(i, Math.min(i + 5, pageButtons.size()))));
+        }
+
+        // Prepare persistent + navigation buttons for their own row
+        List<Button> persistentAndNav = new ArrayList<>();
+        if (persistentButtons != null && !persistentButtons.isEmpty()) {
+            for (int i = 0; i < Math.min(3, persistentButtons.size()); i++) {
+                persistentAndNav.add(persistentButtons.get(i));
+            }
+        }
+        // Add navigation buttons if more than one page
+        if (totalPages > 1) {
+            if (currentPage > 1) {
+                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage - 1),
+                        "Previous Page", "⏪"));
+            }
+            if (currentPage < totalPages) {
+                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage + 1),
+                        "Next Page", "⏩"));
+            }
+        }
+        if (!persistentAndNav.isEmpty()) {
+            rows.add(ActionRow.of(persistentAndNav));
+        }
+
+        return rows;
     }
 }

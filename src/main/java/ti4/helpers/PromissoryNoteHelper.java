@@ -16,6 +16,8 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.BotLogger;
+import ti4.message.BotLogger.LogMessageOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TemporaryCombatModifierModel;
@@ -134,6 +136,10 @@ public class PromissoryNoteHelper {
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = game.getPNOwner(pnShortHand);
             if (owner == player || pnShortHand.endsWith("_ta")) {
+                continue;
+            }
+            if (owner == null) {
+                BotLogger.warning(new LogMessageOrigin(player), pnShortHand + " has no owner in game " + game.getName() + ".");
                 continue;
             }
 

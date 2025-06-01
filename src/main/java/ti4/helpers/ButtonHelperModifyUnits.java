@@ -36,6 +36,7 @@ import ti4.service.combat.CombatRollType;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.FlipTileService;
 import ti4.service.tactical.TacticalActionService;
@@ -979,7 +980,7 @@ public class ButtonHelperModifyUnits {
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
-        String msg = player.getRepresentation() + " you have had one of your units assigned a hit, please cancel the hit somehow (_Shields Holding_, SUSTAIN DAMAGE, etc.), or accept the lost of the unit.";
+        String msg = player.getRepresentation() + " you have had one of your units assigned a hit, please cancel the hit somehow (_Shields Holding_, SUSTAIN DAMAGE, etc.), or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
 
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
@@ -1040,6 +1041,8 @@ public class ButtonHelperModifyUnits {
         String retreatMessage = player.getFactionEmojiOrColor() + " retreated " + amount + " " + unitType + " on " + Helper.getPlanetRepresentation(planet, game) + " to "
             + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), retreatMessage);
+        FOWCombatThreadMirroring.mirrorMessage(event, game, player.getRepresentationNoPing() 
+            + " retreated " + amount + " " + unitType + " on " + planet);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }

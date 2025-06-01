@@ -64,6 +64,7 @@ public class ParseUnitService {
         String originalUnit;
         if (NumberUtils.isDigits(firstToken)) {
             count = Math.max(Integer.parseInt(firstToken), 1);
+            if (!unitInfoTokenizer.hasMoreTokens()) return null;
             originalUnit = unitInfoTokenizer.nextToken();
         } else {
             originalUnit = firstToken;

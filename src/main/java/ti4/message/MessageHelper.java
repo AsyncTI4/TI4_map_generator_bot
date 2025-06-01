@@ -307,6 +307,10 @@ public class MessageHelper {
     }
 
     public static void editMessageWithActionRowsAndFiles(ButtonInteractionEvent event, String message, List<ActionRow> rows, List<FileUpload> files) {
+
+        if (message.length() > 2000) {
+            message = message.substring(0, 1920) + "\nMessage shortened due to exceeding max char limit. Sorry";
+        }
         event.getHook().editOriginal(message).setComponents(rows).setFiles(files).queue();
     }
 
