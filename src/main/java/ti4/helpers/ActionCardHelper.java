@@ -198,6 +198,27 @@ public class ActionCardHelper {
         return acButtons;
     }
 
+    public static List<Button> getCombatActionCardButtons(Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> actionCards = player.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                ActionCardModel actionCard = Mapper.getActionCard(key);
+                String actionCardWindow = actionCard.getWindow();
+                if (ac_name != null) {
+                    if (actionCardWindow.contains("combat") || actionCardWindow.contains("roll") || actionCardWindow.contains("hit")) {
+                        acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, CardEmojis.ActionCard));
+                    }
+
+                }
+            }
+        }
+        return acButtons;
+    }
+
     public static void sendDiscardActionCardButtons(Player player, boolean doingAction) {
         List<Button> buttons = getDiscardActionCardButtons(player, doingAction);
         String msg = player.getRepresentationUnfogged() + " use buttons to discard an action card.";

@@ -36,6 +36,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -775,6 +776,7 @@ public class StartCombatService {
             return buttons;
         }
         buttons.add(Buttons.red("getDamageButtons_" + pos + "_" + groundOrSpace + "combat", "Assign Hits"));
+        buttons.add(Buttons.gray("checkCombatACs", "Check Combat ACs", CardEmojis.ActionCard));
         buttons.add(Buttons.green("getRepairButtons_" + pos, "Repair Damage"));
         buttons.add(Buttons.blue(
             "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
