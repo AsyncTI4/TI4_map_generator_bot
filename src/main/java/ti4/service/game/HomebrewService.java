@@ -12,6 +12,7 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.OmegaPhaseModStatusHelper;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -193,6 +194,7 @@ public class HomebrewService {
                 game.shuffleInBottomObjective(Constants.IMPERIUM_REX_ID, 5, 1);
                 game.setUpPeakableObjectives(0, 2);
                 game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_omegaphase"));
+                game.setPriorityTrackMode(PriorityTrackMode.FULL);
                 //Temporary measure: Remove incompatible components
                 game.removeACFromGame("hack");
                 game.removeAgendaFromGame("incentive");
