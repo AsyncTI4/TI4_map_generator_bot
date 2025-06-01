@@ -29,6 +29,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.RelicHelper;
+import ti4.helpers.SortHelper;
 import ti4.helpers.ThreadGetter;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -278,6 +279,8 @@ public class GMService {
             Tile tile = game.getTileByPosition(position);
             systemLoreButtons.add(Buttons.green("gmSystemLoreEdit_" + position + "~MDL", position + " " + tile.getRepresentation()));
         }
+        SortHelper.sortButtonsByTitle(systemLoreButtons);
+
         systemLoreButtons.add(Buttons.blue("gmSystemLoreEdit~MDL", "Add New"));
         systemLoreButtons.add(Buttons.gray("gmSystemLoreRefresh", "Refresh"));
 
