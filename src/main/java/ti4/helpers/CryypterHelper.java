@@ -16,7 +16,8 @@ import ti4.service.leader.UnlockLeaderService;
 
 public class CryypterHelper {
 
-    public static List<Button> getCryypterSC3Buttons(int sc) {
+    public static List<Button> getCryypterSC3Buttons(int sc) 
+    {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button noFollowButton = Buttons.blue("sc_no_follow_" + sc, "Not Following");
         Button drawCards = Buttons.gray("cryypterSC3Draw", "Draw Action Cards", CardEmojis.ActionCard);
@@ -24,23 +25,28 @@ public class CryypterHelper {
     }
 
     @ButtonHandler("cryypterSC3Draw")
-    public static void resolveCryypterSC3Draw(ButtonInteractionEvent event, Game game, Player player) {
+    public static void resolveCryypterSC3Draw(ButtonInteractionEvent event, Game game, Player player) 
+    {
         drawXPickYActionCards(game, player, 3, true);
     }
 
-    private static void drawXPickYActionCards(Game game, Player player, int draw, boolean addScheming) {
-        if (draw > 10) {
+    private static void drawXPickYActionCards(Game game, Player player, int draw, boolean addScheming) 
+    {
+        if (draw > 10) 
+        {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "You probably shouldn't need to ever draw more than 10 cards, double check what you're doing please.");
             return;
         }
         String message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") + ".";
-        if (addScheming && player.hasAbility("scheming")) {
+        if (addScheming && player.hasAbility("scheming")) 
+        {
             draw++;
             message = player.getRepresentation() + " drew " + draw + " action card" + (draw == 1 ? "" : "s") 
                 + " (**Scheming** increases this from the normal " + (draw-1) + " action card" + (draw == 2 ? "" : "s") + ").";
         }
 
-        for (int i = 0; i < draw; i++) {
+        for (int i = 0; i < draw; i++) 
+        {
             game.drawActionCard(player.getUserID());
         }
         ActionCardHelper.sendActionCardInfo(game, player);
@@ -51,19 +57,24 @@ public class CryypterHelper {
 
         ButtonHelper.checkACLimit(game, player);
         if (addScheming && player.hasAbility("scheming")) ActionCardHelper.sendDiscardActionCardButtons(player, false);
-        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) {
+        if (player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")) 
+        {
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 
-    public static void checkEnvoyUnlocks(Game game) {
-        if (!game.isVotcMode()) {
+    public static void checkEnvoyUnlocks(Game game) 
+    {
+        if (!game.isVotcMode()) 
+        {
             return;
         }
-        for (Player player : game.getRealPlayers()) {
+        for (Player player : game.getRealPlayers()) 
+        {
             Leader envoy = player.getLeaderByType("envoy").orElse(null);
-            if (envoy != null && envoy.isLocked()) {
+            if (envoy != null && envoy.isLocked()) 
+            {
                 UnlockLeaderService.unlockLeader(envoy.getId(), game, player);
             }
         }
@@ -81,5 +92,17 @@ public class CryypterHelper {
         //TODO: swap Xxcha and Keleres!Xxcha heroes
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Voices of the Council mode.");
     }
-    
+
+    public static string argentEnvoyReminder(Player player, Game game)
+    {
+        Player argent = Helper.getPlayerFromUnlockedLeader(game, "argentenvoy");
+        if (argent != null && argent != player) 
+        {
+            return " Reminder that Argent's Envoy is in play, and you may not wish to abstain.";
+        }
+        else
+        {
+            return "";
+        }
+    }
 }
