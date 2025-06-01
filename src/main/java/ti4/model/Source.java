@@ -29,7 +29,7 @@ public class Source {
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, riftset, omega_phase,
+        somno, ignis_aurora, asteroid, cryypter, voices_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, riftset, omega_phase,
 
         // catchall
         other;
@@ -114,6 +114,7 @@ public class Source {
                 case franken -> "Franken Draft [Homebrew Game Mode]";
                 case monuments -> "Monuments+ [Homebrew]";
                 case omega_phase -> "Omega Phase [Homebrew]";
+                case voices_of_the_council -> "Voices of the Council [Homebrew]";
                 default -> toString();
             };
         }

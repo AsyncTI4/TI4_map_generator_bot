@@ -1,0 +1,11 @@
+[
+    {
+        "alias": "cryypter_pi",
+        "name": "Predictive Intelligence",
+        "types": ["CYBERNETIC"],
+        "requirements": "Y",
+        "source": "voices_of_the_council",
+        "text": "During the action phase, you may exhaust this card to redistribute your command tokens.\nWhen you predict or cast votes during the agenda phase, you may exhaust this card to cast 4 additional votes for that outcome (even if a game effect would prevent you from voting); if that outcome is resolved, ready this card.",
+        "homebrewReplacesID": "pi"
+    }
+]
