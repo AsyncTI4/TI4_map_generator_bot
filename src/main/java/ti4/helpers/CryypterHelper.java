@@ -69,4 +69,17 @@ public class CryypterHelper {
         }
     }
 
+    public static void votcSetup(Game game)
+    {
+        game.setVotCMode(true);
+        game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_cryypter"));
+        game.setTechnologyDeckID("techs_cryypter");
+        game.swapInVariantTechs();
+        game.setStrategyCardSet("votc");
+        //TODO: Implement swap function to only replace specific ACs
+        game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_deck_2"));
+        //TODO: swap Xxcha and Keleres!Xxcha heroes
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Voices of the Council mode.");
+    }
+    
 }
