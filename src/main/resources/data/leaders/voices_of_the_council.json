@@ -284,6 +284,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "You may discard 1 law from play. Gain the speaker token, then look at the top 5 cards of the agenda deck. Choose up to 2 to resolve as if you had cast up to 5 votes for an outcome of your choice; discard the rest. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
+        "homebrewReplacesID": "xxchahero",
         "source": "voices_of_the_council"
     },
     {
@@ -296,6 +297,7 @@
         "abilityWindow": "After an agenda is revealed:",
         "abilityText": "You may cast up to 6 additional votes on this agenda. Predict aloud an outcome of this agenda. For each player that abstains or votes for another outcome, gain 1 trade goods and 1 command token. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
+        "homebrewReplacesID": "keleresheroodlynn",
         "source": "voices_of_the_council"
     }
 ]
