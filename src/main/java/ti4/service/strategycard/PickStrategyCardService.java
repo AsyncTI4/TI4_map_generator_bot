@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -181,9 +180,7 @@ public class PickStrategyCardService {
             return pickOrder;
         }
 
-        List<Player> activePlayers = game.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .collect(Collectors.toList());
+        List<Player> activePlayers = Helper.getSpeakerOrFullPriorityOrder(game);
         if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
             Collections.reverse(activePlayers);
         }
