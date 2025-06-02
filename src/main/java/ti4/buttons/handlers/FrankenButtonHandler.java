@@ -92,7 +92,7 @@ class FrankenButtonHandler {
             case TECH -> FrankenFactionTechService.addFactionTechs(event, player, List.of(itemID));
             case AGENT, COMMANDER, HERO -> FrankenLeaderService.addLeaders(event, player, List.of(itemID));
             case MECH, FLAGSHIP -> FrankenUnitService.addUnits(event, player, List.of(itemID));
-            case COMMODITIES -> PlayerStatsService.setTotalCommodities(event, player, (player.getCommoditiesTotal() + ((CommoditiesDraftItem) draftItem).getCommodities()));
+            case COMMODITIES -> PlayerStatsService.setTotalCommodities(event, player, (player.getCommoditiesTotal(true) + ((CommoditiesDraftItem) draftItem).getCommodities()));
             case PN -> FrankenPromissoryService.addPromissoryNotes(event, player.getGame(), player, List.of(itemID));
             case STARTINGTECH -> addStartingTech(event, player, itemID);
         }
