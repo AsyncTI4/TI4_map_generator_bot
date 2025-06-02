@@ -107,4 +107,23 @@ public class CryypterHelper {
             return "";
         }
     }
+
+    public static void addVotCAfterButtons(Game game, List<Button> afterButtons)
+    {
+        for (Player player : game.getPlayers().values()) 
+        {
+            for (Leader leader : player.getLeaders().values())
+            {
+                LeaderModel leaderModel = leader.getLeaderModel();
+                if(!leader.isLocked() && leaderModel.getAbilityWindow() == "After an agenda is revealed:")
+                {
+                    FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
+                    String leaderDisplay = factionModel.getShortName() + " " + leaderModel.getType();
+                    String finChecker = "FFCC_" + player.getFaction() + "_";
+                    afterButtons.add(Buttons.gray(finChecker + "play_after_" + leaderDisplay, "Play " + leaderModel.getName() + " (" + leaderDisplay + ")", factionModel.getFactionEmoji()));
+                }
+            }
+        }
+    }
+    
 }
