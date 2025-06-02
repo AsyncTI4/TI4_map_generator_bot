@@ -371,9 +371,10 @@ class AgendaResolveButtonHandler {
                 if ("standardization".equalsIgnoreCase(agID)) {
                     player2.setTacticalCC(3);
                     player2.setStrategicCC(2);
-                    player2.setFleetCC(3);
+                    int amount = Math.clamp(3 - player2.getMahactCC().size(), 0, 3);
+                    player2.setFleetCC(amount);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/3/2.");
+                        "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/" + player2.getFleetCC() + "/2.");
                     ButtonHelper.checkFleetInEveryTile(player2, game, event);
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {
