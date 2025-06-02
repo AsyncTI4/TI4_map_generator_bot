@@ -112,7 +112,6 @@ public class GameProperties {
     private @ExportableField boolean omegaPhaseMode;
     private @ExportableField boolean homebrew;
     private @ExportableField boolean homebrewSCMode;
-    private @ExportableField boolean votcMode;
     private @ExportableField String spinMode = "OFF";
     private @ExportableField boolean fastSCFollowMode;
     private @ExportableField boolean extraSecretMode;
