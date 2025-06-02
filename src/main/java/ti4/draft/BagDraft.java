@@ -59,7 +59,9 @@ public abstract class BagDraft {
         List<Player> players = owner.getRealPlayers();
         for (Player p : players) {
             if (!p.getCurrentDraftBag().Contents.isEmpty() || !p.getDraftQueue().Contents.isEmpty()) {
-                return false;
+                if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
+                    return false;
+                }
             }
         }
         return true;
