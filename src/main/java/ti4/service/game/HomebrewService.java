@@ -75,7 +75,7 @@ public class HomebrewService {
         game.setDiscordantStarsMode(false);
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
-        game.setVotCMode(false);
+        game.setVotcMode(false);
         game.setStoredValue("homebrewMode", "");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             "Set all homebrew options off. You need manually check and fix decks, VPs, objectives etc. that might've been set.");
