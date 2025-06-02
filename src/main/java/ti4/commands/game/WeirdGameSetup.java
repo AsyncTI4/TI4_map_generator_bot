@@ -273,14 +273,14 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
+            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_cryypter"))) return false;
             if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
-            game.setTechnologyDeckID("techs_pok");
+            game.setTechnologyDeckID("techs_cryypter");
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
-            game.swapOutVariantTechs();
+            game.swapInVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
             game.setVotcMode(true);
@@ -288,9 +288,22 @@ class WeirdGameSetup extends GameStateSubcommand {
             // Add envoys to players
             for (Player player : game.getPlayers().values()) {
                 String faction = player.getFaction();
+
+                if (player.hasLeader("xxchahero"))
+                {
+                    player.removeLeader("xxchahero");
+                    player.addLeader("votc_xxchahero");
+                }
+                if (player.hasLeader("keleresheroodlynn"))
+                {
+                    player.removeLeader("keleresheroodlynn");
+                    player.addLeader("votc_keleresheroxxcha");
+                }
+                
                 if (faction.startsWith("keleres")) {
                     faction = "keleres";
                 }
+                
                 String leaderID = faction + "envoy";
                 if (Mapper.isValidLeader(leaderID)) {
                     player.addLeader(leaderID);
