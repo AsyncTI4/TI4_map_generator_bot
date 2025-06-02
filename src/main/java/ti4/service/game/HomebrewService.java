@@ -207,7 +207,6 @@ public class HomebrewService {
                 OmegaPhaseModStatusHelper.PrintGreeting(game);
             }
             case HBVOTC -> {
-                game.setVotCMode(true);
                 CryypterHelper.votcSetup(game, event);
             }
         }
