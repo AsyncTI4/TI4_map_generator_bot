@@ -23,8 +23,7 @@ public class ResourceHelper {
     private final Map<String, String> generalCache = new HashMap<>();
     private final Map<String, String> planetCache = new HashMap<>();
 
-    private ResourceHelper() {
-    }
+    private ResourceHelper() {}
 
     public static ResourceHelper getInstance() {
         if (resourceHelper == null) {
@@ -198,7 +197,7 @@ public class ResourceHelper {
         return null;
     }
 
-    private static File getFile(String folder, String name) {
+    public static File getFile(String folder, String name) {
         return new File(Storage.getResourcePath() + File.separator + folder + name);
     }
 

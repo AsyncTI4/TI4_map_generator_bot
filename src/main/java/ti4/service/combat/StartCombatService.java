@@ -1,5 +1,6 @@
 package ti4.service.combat;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -357,6 +359,24 @@ public class StartCombatService {
         if ((player1.hasTech("dslaner") && player1.getAtsCount() > 0) || (player2.hasTech("dslaner") && player2.getAtsCount() > 0)) {
             List<Button> lanefirATSButtons = ButtonHelperFactionSpecific.getLanefirATSButtons(player1, player2);
             MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from _ATS Armaments_:", lanefirATSButtons);
+        }
+
+        if (tile.isHomeSystem() && isGroundCombat && game.getStoredValue("audioSent").isEmpty()) {
+            for (Player p3 : game.getRealPlayers()) {
+                if (p3.getHomeSystemTile() == tile) {
+                    File audioFile = ResourceHelper.getFile("voices/" + p3.getFaction() + "/", "homedefense.mp3");
+                    if (audioFile.exists()) {
+                        MessageHelper.sendFileToChannel(threadChannel, audioFile);
+                        game.setStoredValue("audioSent", "Yes");
+                    }
+                    Player invader = game.getActivePlayer();
+                    File audioFile2 = ResourceHelper.getFile("voices/" + invader.getFaction() + "/", "homeinvasion.mp3");
+                    if (audioFile2.exists() && invader != p3) {
+                        MessageHelper.sendFileToChannel(threadChannel, audioFile2);
+                        game.setStoredValue("audioSent", "Yes");
+                    }
+                }
+            }
         }
     }
 
