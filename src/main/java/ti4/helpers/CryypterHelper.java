@@ -93,7 +93,7 @@ public class CryypterHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Voices of the Council mode.");
     }
 
-    public static string argentEnvoyReminder(Player player, Game game)
+    public static String argentEnvoyReminder(Player player, Game game)
     {
         Player argent = Helper.getPlayerFromUnlockedLeader(game, "argentenvoy");
         if (argent != null && argent != player) 
