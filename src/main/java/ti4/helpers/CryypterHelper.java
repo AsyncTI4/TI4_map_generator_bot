@@ -83,6 +83,8 @@ public class CryypterHelper {
 
     public static void votcSetup(Game game, ButtonInteractionEvent event)
     {
+        
+        game.setVotcMode(true);
         game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_cryypter"));
         game.setTechnologyDeckID("techs_cryypter");
         game.swapInVariantTechs();
