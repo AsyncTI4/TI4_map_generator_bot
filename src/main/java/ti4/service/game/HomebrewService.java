@@ -208,7 +208,7 @@ public class HomebrewService {
             }
             case HBVOTC -> {
                 game.setVotCMode(true);
-                CryypterlHelper.votcSetup(game, event);
+                CryypterHelper.votcSetup(game, event);
             }
         }
     }
