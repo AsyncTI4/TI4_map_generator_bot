@@ -386,7 +386,7 @@ public class ButtonHelperTacticalAction {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, game, tile, event);
             }
         } else {
-            if (player.hasAbility("awaken")) {
+            if (player.hasAbility("awaken") || player.hasUnit("titans_flagship") || player.hasUnit("sigma_ul_flagship_1") || player.hasUnit("sigma_ul_flagship_2")) {
                 ButtonHelper.resolveTitanShenanigansOnActivation(player, game, tile, event);
             }
         }
