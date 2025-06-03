@@ -196,7 +196,12 @@ public class AgendaHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "You have declined to queue an \"after\". You can change your mind with this button.", buttons);
             offerPreVote(player);
-            resolveWhenQueue(event, game);
+            String alreadyResolved = game.getStoredValue("whensResolved");
+            if (alreadyResolved.isEmpty()) {
+                resolveWhenQueue(event, game);
+            } else {
+                resolveAfterQueue(event, game);
+            }
         }
     }
 
