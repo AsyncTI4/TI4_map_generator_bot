@@ -2213,15 +2213,14 @@ public class ButtonHelper {
         if (whatIsItFor.contains("mahactAgent")) {
             String faction = whatIsItFor.replace("mahactAgent", "");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-            Player mahact = game.getPlayerFromColorOrFaction(faction);
-            if (mahact == null) {
-                msg = "Yo, this is a notice that someone removed your command token from " + tileRep;
-            } else if (game.isFowMode()) {
-                msg = mahact.getRepresentationUnfogged() + " this is a notice that someone removed your command token from " + tileRep;
+            Player mahact = player;
+            player = game.getPlayerFromColorOrFaction(faction);
+            if (game.isFowMode()) {
+                msg = player.getRepresentationUnfogged() + " this is a notice that someone removed your command token from " + tileRep;
             } else {
-                msg = mahact.getRepresentationUnfogged() + " this is a notice that " + msg + " using ";
-                msg += (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "");
-                msg += "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "");
+                msg = player.getRepresentationUnfogged() + " this is a notice that " + msg + " using ";
+                msg += (mahact.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "");
+                msg += "Jae Mir Kan, the Mahact" + (mahact.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "");
                 msg += " agent.";
             }
         }
