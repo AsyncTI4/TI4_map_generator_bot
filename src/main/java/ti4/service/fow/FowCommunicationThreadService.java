@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -42,7 +43,7 @@ public class FowCommunicationThreadService {
         if (!isActive(game)) return;
 
         ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
-        Set<Set<Player>> checkedPairs = new HashSet<>();
+        Set<String> checkedPairs = new HashSet<>();
         getGameThreadChannels(game).thenAccept(threads -> {
             for (Player p : game.getRealPlayers()) {
                 Set<Player> neighbors = getNeighbors(game, p);
@@ -113,18 +114,18 @@ public class FowCommunicationThreadService {
         return threadMap;
     }
 
-    private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<Set<Player>> checkedPairs, Game game) {
+    private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<String> checkedPairs, Game game) {
         boolean areAllowedToTalkInAgenda = areAllowedToTalkInAgenda(game);
         for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
             ThreadChannel threadChannel = thread.getKey();
             String threadName = thread.getKey().getName();
             Player otherPlayer = thread.getValue();
 
-            Set<Player> playerPair = Set.of(player, otherPlayer);
-            if (checkedPairs.contains(playerPair)) {
+            String pairKey = Stream.of(player.getColor(), otherPlayer.getColor()).sorted().collect(Collectors.joining("-"));
+            if (checkedPairs.contains(pairKey)) {
                 continue; // Skip if we already checked this pair
             }
-            checkedPairs.add(playerPair);
+            checkedPairs.add(pairKey);
 
             boolean areNeighbors = neighbors.contains(otherPlayer);
             boolean threadLocked = threadName.contains(NO_CHAR);
