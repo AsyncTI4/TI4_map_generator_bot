@@ -38,6 +38,9 @@ public class UnitRenderGenerator {
 
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
 
+    // Map to store unit coordinates organized by faction
+    private final Map<String, List<Point>> unitCoordinatesByFaction = new HashMap<>();
+
     private record ImagePosition(
         int originalX,
         int originalY,
@@ -173,6 +176,10 @@ public class UnitRenderGenerator {
                 ImagePosition imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
+
+                // Collect unit coordinates by faction
+                String factionKey = player.getFaction();
+                unitCoordinatesByFaction.computeIfAbsent(factionKey, k -> new ArrayList<>()).add(new Point(imageX, imageY));
 
                 if (containsDMZ || (isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
                     String badPath = resourceHelper.getPositionFile("badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
@@ -641,5 +648,16 @@ public class UnitRenderGenerator {
             case "sd", "csd", "plenaryorbital" -> new Point(-10, 20); // Space Dock
             default -> new Point(0, 0);
         };
+    }
+
+    /**
+     * Returns a map of unit coordinates organized by faction.
+     * The map contains faction names as keys and lists of pixel coordinates as values.
+     * Coordinates represent the top-left corner of where each unit was rendered.
+     *
+     * @return Map where keys are faction names and values are lists of unit coordinates
+     */
+    public Map<String, List<Point>> getUnitCoordinatesByFaction() {
+        return new HashMap<>(unitCoordinatesByFaction);
     }
 }
