@@ -655,7 +655,9 @@ public class Player extends PlayerProperties {
                     + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType()
                     + "`\n> Units Owned: `"
                     + getUnitsOwned() + "`";
-                BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
+                if (!getGame().isFrankenGame()) {
+                    BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
+                } 
                 return message;
             }
         }
