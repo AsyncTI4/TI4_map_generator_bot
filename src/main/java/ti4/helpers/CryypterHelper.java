@@ -10,6 +10,8 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
+import ti4.model.FactionModel;
+import ti4.model.LeaderModel;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
@@ -147,7 +149,7 @@ public class CryypterHelper
     
     private static void votcRiderButtons(Player player, List<Button> buttons, boolean play)
     {
-        for (Leader leader : player.getLeaders().values())
+        for (Leader leader : player.getLeaders())
         {
             LeaderModel leaderModel = leader.getLeaderModel();
             if(!leader.isLocked() && leaderModel.getAbilityWindow() == "After an agenda is revealed:")
