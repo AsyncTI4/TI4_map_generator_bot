@@ -5,7 +5,6 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Exhaust each cultural planet owned by other players.",
-        "automationID": "abs",
         "flavorText": "The images depicted a race that Rin had never seen before. Curious. Could it be that this was a race that was exterminated by the Lazax?",
         "source": "voices_of_the_council"
     },
@@ -42,7 +41,6 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
-        "automationID": "diplo_pressure",
         "flavorText": "The Arborec emissary leaned close, and Brother Milor flinched at the faint whiff of decay. \"You do not understand,\" Dirzuga Ohao rasped. \"You must support this measure.\"",
         "source": "voices_of_the_council"
     },
@@ -52,7 +50,6 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
-        "automationID": "diplo_pressure",
         "flavorText": "Brother Milor shook his head. \"The Brotherhood can not support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
         "source": "voices_of_the_council"
     },
@@ -62,7 +59,6 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
-        "automationID": "diplo_pressure",
         "flavorText": "It would be unfortunate, the Arborec Dirzuga said, \"if your supplies of diraxium were to dry up. How would your fleet defend you if we stopped supplying its fuel?\"",
         "source": "voices_of_the_council"
     },
@@ -72,7 +68,6 @@
         "phase": "Agenda",
         "window": "After an agenda is revealed",
         "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
-        "automationID": "diplo_pressure",
         "flavorText": "Damn you! Brother MIlor hissed. \"You leave us no choice but to fight in your war.\" Dirzuga Ohao smiled, dead skin stretching over her teeth.",
         "source": "voices_of_the_council"
     }

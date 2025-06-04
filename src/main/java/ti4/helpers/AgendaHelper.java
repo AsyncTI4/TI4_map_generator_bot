@@ -43,6 +43,7 @@ import ti4.cron.AutoPingCron;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
+import ti4.helpers.CryypterHelper;
 import ti4.image.BannerGenerator;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -835,6 +836,9 @@ public class AgendaHelper {
         if (player.hasAbility("future_sight")) {
             msg += " Reminder that you have **Future Sight** and may not wish to abstain.";
         }
+        
+        msg += CryypterHelper.argentEnvoyReminder(player, game);
+        
         Player argent = Helper.getPlayerFromAbility(game, "zeal");
         if (game.isOmegaPhaseMode()) {
             if (argent != null) {
