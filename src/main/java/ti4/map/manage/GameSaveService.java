@@ -618,6 +618,13 @@ class GameSaveService {
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES + " " + player.getCommodities());
+            writer.write(System.lineSeparator());
+
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getEvents(), writer, Constants.EVENTS);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
@@ -781,13 +788,6 @@ class GameSaveService {
                 fogOfWarSystems.append(";");
             }
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
-            writer.write(System.lineSeparator());
-
-            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
-            writer.write(System.lineSeparator());
-            writer.write(Constants.COMMODITIES + " " + player.getCommodities());
             writer.write(System.lineSeparator());
             writer.write(Constants.CARDS_INFO_THREAD_CHANNEL_ID + " " + player.getCardsInfoThreadID());
             writer.write(System.lineSeparator());
