@@ -12,7 +12,7 @@ import ti4.model.UnitModel;
 @UtilityClass
 public class FrankenUnitService {
 
-    public static void addUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs) {
+    public static void addUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean allowDuplicates) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
@@ -20,9 +20,12 @@ public class FrankenUnitService {
             if (player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player had this unit)");
             } else {
-                UnitModel oldBaseType;
-                while ((oldBaseType = player.getUnitByBaseType(unitModel.getBaseType())) != null)
-                    player.removeOwnedUnitByID(oldBaseType.getAlias());
+                if(!allowDuplicates) {
+                    UnitModel oldBaseType;
+                    while ((oldBaseType = player.getUnitByBaseType(unitModel.getBaseType())) != null) {
+                        player.removeOwnedUnitByID(oldBaseType.getAlias());
+                    }
+                }
                 sb.append("> ").append(unitID);
                 player.addOwnedUnitByID(unitID);
             }
