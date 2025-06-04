@@ -1,5 +1,6 @@
 package ti4.helpers;
 
+import java.awt.Point;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,10 +12,12 @@ import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,7 +83,7 @@ public class WebHelper {
         }
     }
 
-    public static void putPlayerData(String gameId, Game game) {
+    public static void putPlayerData(String gameId, Game game, Map<String, List<Point>> factionCoordinates) {
         if (!sendingToWeb())  return;
 
         try {
@@ -89,8 +92,22 @@ public class WebHelper {
             for (Player player : game.getPlayers().values()) {
                 playerDataList.add(WebPlayerArea.fromPlayer(player, tileMap));
             }
-            String json = objectMapper.writeValueAsString(playerDataList);
 
+            Map<String, List<String>> factionCoordinatesStrings = factionCoordinates != null
+                ? factionCoordinates.entrySet().stream()
+                    .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream()
+                                      .map(point -> point.x + "," + point.y)
+                                      .collect(Collectors.toList())
+                    ))
+                : new HashMap<>();
+
+            Map<String, Object> webData = new HashMap<>();
+            webData.put("playerData", playerDataList);
+            webData.put("factionCoordinates", factionCoordinatesStrings);
+
+            String json = objectMapper.writeValueAsString(webData);
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))
                     .key(String.format("webdata/%s/%s.json", gameId, gameId))
@@ -146,7 +163,7 @@ public class WebHelper {
         int eligible = 0;
         int uploaded = 0;
         int currentBatchSize  = 0;
-      
+
         try (var outputStream = new ByteArrayOutputStream(INITIAL_STAT_BUFFER_SIZE)) {
             try (SequenceWriter writer = objectMapper.writer().writeValuesAsArray(outputStream)) {
                 for (ManagedGame managedGame : GameManager.getManagedGames()) {
