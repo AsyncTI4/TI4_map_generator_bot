@@ -110,6 +110,10 @@ public class MapGenerator implements AutoCloseable {
     private int maxY = -1;
     private boolean isFoWPrivate;
     private Player fowPlayer;
+
+    // Map to aggregate unit coordinates by faction from all tiles with global coordinates
+    private final Map<String, List<Point>> globalUnitCoordinatesByFaction = new HashMap<>();
+
     private StopWatch debugAbsoluteStartTime;
     private StopWatch debugTileTime;
     private StopWatch debugImageGraphicsTime;
@@ -198,7 +202,7 @@ public class MapGenerator implements AutoCloseable {
         graphics = mainImage.getGraphics();
     }
 
-    /** 
+    /**
      * Returns the height for the sections Objectives (above 5) + Laws + Events + Players + idk what EXTRA_Y is for
     */
     private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
@@ -400,7 +404,7 @@ public class MapGenerator implements AutoCloseable {
             WebHelper.putMap(game.getName(), mainImageBytes, false, null);
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game.getID(), websiteOverlays);
-            WebHelper.putPlayerData(game.getID(), game);
+            WebHelper.putPlayerData(game.getID(), game, globalUnitCoordinatesByFaction);
         } else if (isFoWPrivate) {
             Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
             WebHelper.putMap(game.getName(), mainImageBytes, true, player);
@@ -2139,8 +2143,12 @@ public class MapGenerator implements AutoCloseable {
             int tileX = positionPoint.x + EXTRA_X - TILE_PADDING;
             int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING;
 
-            BufferedImage tileImage = new TileGenerator(game, event, displayType).draw(tile, step);
+            TileGenerator tileGenerator = new TileGenerator(game, event, displayType);
+            BufferedImage tileImage = tileGenerator.draw(tile, step);
             graphics.drawImage(tileImage, tileX, tileY, null);
+
+            // Aggregate unit coordinates with global translation
+            aggregateGlobalUnitCoordinates(tileGenerator, tileX, tileY);
         } catch (Exception exception) {
             BotLogger.error(
                 "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(),
@@ -2208,7 +2216,7 @@ public class MapGenerator implements AutoCloseable {
 
     /**
      * Gives the width of the map part of the image
-     * TO DO: 
+     * TO DO:
      * - fix the "ringCount == minRingCount" ternary (see comment)
      * - some variables are never used...
      * @param game
@@ -2262,5 +2270,36 @@ public class MapGenerator implements AutoCloseable {
 
     String getGameName() {
         return game.getName();
+    }
+
+    /**
+     * Get the aggregated global unit coordinates by faction from all tiles
+     * @return Map where key is faction/player identifier and value is list of global coordinates
+     */
+    public Map<String, List<Point>> getGlobalUnitCoordinatesByFaction() {
+        return new HashMap<>(globalUnitCoordinatesByFaction);
+    }
+
+    /**
+     * Helper method to aggregate unit coordinates from a TileGenerator with global translation
+     * @param tileGenerator The TileGenerator to get coordinates from
+     * @param tileX The global X offset for this tile
+     * @param tileY The global Y offset for this tile
+     */
+    private void aggregateGlobalUnitCoordinates(TileGenerator tileGenerator, int tileX, int tileY) {
+        Map<String, List<Point>> tileCoordinates = tileGenerator.getUnitCoordinatesByFaction();
+        if (tileCoordinates != null) {
+            for (Map.Entry<String, List<Point>> entry : tileCoordinates.entrySet()) {
+                String faction = entry.getKey();
+                List<Point> coordinates = entry.getValue();
+
+                // Apply global translation to each coordinate
+                List<Point> globalCoordinates = coordinates.stream()
+                    .map(point -> new Point(point.x + tileX, point.y + tileY))
+                    .collect(Collectors.toList());
+
+                globalUnitCoordinatesByFaction.computeIfAbsent(faction, k -> new ArrayList<>()).addAll(globalCoordinates);
+            }
+        }
     }
 }
