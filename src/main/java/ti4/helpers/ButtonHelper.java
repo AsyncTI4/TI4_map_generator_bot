@@ -165,7 +165,7 @@ public class ButtonHelper {
 
     public static void resolveInfantryDestroy(Player player, int totalAmount) {
         resolveInfantryRemoval(player, totalAmount);
-        if (totalAmount <= 0 || !player.hasInf2Tech()) return;
+        if (totalAmount <= 0 || (!player.hasInf2Tech() && !player.hasUnit("mahact_infantry"))) return;
         if (player.getUnitsOwned().contains("pharadn_infantry") || player.getUnitsOwned().contains("pharadn_infantry2"))
             return;
 
@@ -180,6 +180,7 @@ public class ButtonHelper {
         } else {
             if (player.hasUnit("mahact_infantry")) {
                 ButtonHelperFactionSpecific.offerMahactInfButtons(player, player.getGame());
+                return;
             }
         }
         if (player.hasTech("dsqhetinf")) {
@@ -1017,7 +1018,7 @@ public class ButtonHelper {
                     aetherButtons.add(
                         Buttons.gray("declareUse_Aetherstream", "Declare Aetherstream", FactionEmojis.Empyrean));
                     MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(), "You can use Aetherstream on this movement by "
-                            + player.getRepresentationNoPing() + " to " + game.getActiveSystem(),
+                        + player.getRepresentationNoPing() + " to " + game.getActiveSystem(),
                         aetherButtons);
                 }
             }

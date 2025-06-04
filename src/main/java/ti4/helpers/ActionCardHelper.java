@@ -883,6 +883,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if (automationID.equals("courageous")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "courageousStarter", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if (automationID.equals("veto")) {
                 codedButtons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "resolveVeto", "Reveal next Agenda"));
                 sendResolveMsgToMainChannel(introMsg, codedButtons, player, game);
@@ -902,7 +906,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, player.getRepresentation()
                     + ", a reminder that you should declare how you are distributing the trade goods now, before other players choose whether they will Sabo.", codedButtons);
             }
-            
+
             if (automationID.equals("psionic_hammer")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "psionicHammerStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
@@ -915,16 +919,16 @@ public class ActionCardHelper {
             }
 
             if (automationID.equals("direct_hit") || automationID.equals("courageous")) {
-                MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "ship (if multiple)"), codedButtons);
+                MessageHelper.sendMessageToChannel(channel2, String.format(targetMsg, "ship (if multiple)"));
             }
 
             if (automationID.equals("parley")) {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "planet (if multiple)"), codedButtons);
             }
 
-            if (automationID.equals("reverse_engineer")) {
-                MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "action card (if multiple)"), codedButtons);
-            }
+            // if (automationID.equals("reverse_engineer")) {
+            //     MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "action card (if multiple)"), codedButtons);
+            // }
 
             if (automationID.equals("ghost_squad")) {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "ground forces"), codedButtons);

@@ -911,6 +911,18 @@ public class ButtonHelperFactionSpecific {
         player.setActualHits(player.getActualHits() + totalHits);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
         ButtonHelper.deleteTheOneButton(event);
+        if (totalHits > 0 && !game.isFowMode()) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+                    continue;
+                }
+                if (FoWHelper.playerHasShipsInSystem(p2, game.getTileFromPositionOrAlias(game.getActiveSystem()))) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_spacecombat", "Assign Hits"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), p2.getRepresentation() + " you can use the buttons to assign hits", buttons);
+                }
+            }
+        }
     }
 
     public static void rollForBelkoseaPN(Player player) {
