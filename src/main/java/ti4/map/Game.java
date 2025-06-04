@@ -3663,7 +3663,7 @@ public class Game extends GameProperties {
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
-                if (pnOwner != null && !pnOwner.equals(player) && pnOwner.hasLeaderUnlocked(leaderID)) {
+                if (pnOwner != null && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction()) && pnOwner.hasLeaderUnlocked(leaderID)) {
                     return true;
                 }
             }

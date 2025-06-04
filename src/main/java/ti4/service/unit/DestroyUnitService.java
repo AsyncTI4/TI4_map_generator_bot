@@ -93,17 +93,19 @@ public class DestroyUnitService {
 
         // Handle other destroyed units individually
         for (RemovedUnit u : units)
-            handleDestroyedUnit(event, game, units, u);
+            handleDestroyedUnit(event, game, units, u, combat);
     }
 
     // TODO: Jazz add the rest of the destroy code here
-    private static void handleDestroyedUnit(GenericInteractionCreateEvent event, Game game, List<RemovedUnit> allUnits, RemovedUnit unit) {
+    private static void handleDestroyedUnit(GenericInteractionCreateEvent event, Game game, List<RemovedUnit> allUnits, RemovedUnit unit, boolean combat) {
         int totalAmount = unit.getTotalRemoved();
         Player player = game.getPlayerFromColorOrFaction(unit.unitKey().getColorID());
 
         List<Player> capturing = CaptureUnitService.listCapturingFlagshipPlayers(game, allUnits, unit);
         List<Player> devours = CaptureUnitService.listCapturingCombatPlayers(game, unit);
-        capturing.addAll(devours);
+        if (combat) {
+            capturing.addAll(devours);
+        }
 
         switch (unit.unitKey().getUnitType()) {
             case Infantry -> {
@@ -130,11 +132,11 @@ public class DestroyUnitService {
             if (!counted.add(cabal.getColorID())) continue;
             CaptureUnitService.executeCapture(event, game, cabal, unit);
         }
-        if (player != null && player.hasAbility("heroism")) {
+        if (player != null && combat && player.hasAbility("heroism") && (unit.unitKey().getUnitType() == UnitType.Infantry || unit.unitKey().getUnitType() == UnitType.Fighter)) {
             ButtonHelperFactionSpecific.cabalEatsUnit(player, game, player, totalAmount, unit.unitKey().unitName(), event);
         }
         Player mentakHero = game.getPlayerFromColorOrFaction(game.getStoredValue("mentakHero"));
-        if (mentakHero != null) {
+        if (mentakHero != null && combat) {
             ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, game, mentakHero, totalAmount, unit.unitKey().unitName(), event, unit.tile());
         }
     }

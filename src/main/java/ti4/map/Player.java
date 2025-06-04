@@ -1722,7 +1722,7 @@ public class Player extends PlayerProperties {
 
     @Override
     public void setCommodities(int comms) {
-        int num = Math.clamp(comms, 0, getCommoditiesBase() + getCommoditiesBonus());
+        int num = Math.clamp(comms, 0, getCommoditiesTotal());
         if (hasAbility("necrophage") && (getCommoditiesBonus() == 0 || getCommoditiesBase() == 0)) {
             num = Math.clamp(comms, 0, getCommoditiesBase() + 10);
         }
