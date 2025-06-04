@@ -15,7 +15,8 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.UnlockLeaderService;
 
-public class CryypterHelper {
+public class CryypterHelper 
+{
 
     public static List<Button> getCryypterSC3Buttons(int sc) 
     {
@@ -83,7 +84,6 @@ public class CryypterHelper {
 
     public static void votcSetup(Game game, ButtonInteractionEvent event)
     {
-        
         game.setVotcMode(true);
         game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_cryypter"));
         game.setTechnologyDeckID("techs_cryypter");
@@ -107,23 +107,64 @@ public class CryypterHelper {
             return "";
         }
     }
-
+    
+    //TODO: Add "CryypterHelper.handleVotCRiders(event, player, riderName);" to near end of AgendaHelper.play_after(), currently line 3370
+    public static void handleVotCRiders(ButtonInteractionEvent event, Player player, String riderName)
+    {
+        String votcRiderName = riderName.replace("votc_", "");
+        if ("keleresx hero".equalsIgnoreCase(votcRiderName)) 
+        {
+            Leader playerLeader = player.getLeader("votc_keleresheroxxcha").orElse(null);
+            if (playerLeader != null) 
+            {
+                String message = player.getRepresentation() + " played " +
+                    Helper.getLeaderFullRepresentation(playerLeader);
+                boolean purged = player.removeLeader(playerLeader);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
+            }
+        }
+        else if (votcRiderName.contains("envoy"))
+        {
+            //TODO: Implement play envoy logic
+        }
+    }
+    
+    //TODO: Add "CryypterHelper.addVotCAfterButtons(game, afterButtons);" to near end of AgendaHelper.getAfterButtons(), currently line 1650
     public static void addVotCAfterButtons(Game game, List<Button> afterButtons)
     {
         for (Player player : game.getPlayers().values()) 
         {
-            for (Leader leader : player.getLeaders().values())
+            votcRiderButtons(player, afterButtons, true);
+        }
+    }
+
+    //TODO: Add "CryypterHelper.addVotCRiderQueueButtons(player, buttons);" to end of AgendaHelper.getPossibleAferButtons(), currently line 397
+    public static void addVotCRiderQueueButtons(Player player, List<Button> buttons)
+    {
+        votcRiderButtons(player, buttons, false);
+    }
+    
+    private static void votcRiderButtons(Player player, List<Button> buttons, boolean play)
+    {
+        for (Leader leader : player.getLeaders().values())
+        {
+            LeaderModel leaderModel = leader.getLeaderModel();
+            if(!leader.isLocked() && leaderModel.getAbilityWindow() == "After an agenda is revealed:")
             {
-                LeaderModel leaderModel = leader.getLeaderModel();
-                if(!leader.isLocked() && leaderModel.getAbilityWindow() == "After an agenda is revealed:")
+                FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
+                String buttonID = "votc_" + leaderModel.getFaction() + " " + leaderModel.getType();
+                String buttonLabel = leaderModel.getName() + " (" + factionModel.getShortName() + " " + leaderModel.getType() + ")";
+                if(play)
                 {
-                    FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
-                    String leaderDisplay = factionModel.getShortName() + " " + leaderModel.getType();
                     String finChecker = "FFCC_" + player.getFaction() + "_";
-                    afterButtons.add(Buttons.gray(finChecker + "play_after_" + leaderDisplay, "Play " + leaderModel.getName() + " (" + leaderDisplay + ")", factionModel.getFactionEmoji()));
+                    buttons.add(Buttons.gray(finChecker + "play_after_" + buttonID, "Play " + buttonLabel, factionModel.getFactionEmoji()));
+                }
+                else
+                {
+                    buttons.add(Buttons.red("queue_after_" + buttonID, buttonLabel));
                 }
             }
         }
     }
-    
 }
