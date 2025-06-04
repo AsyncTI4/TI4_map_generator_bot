@@ -71,6 +71,7 @@ public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
+            System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName() + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue());
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);
@@ -431,7 +432,9 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.AUTO_ARCHIVE_DURATION -> event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
+            case Constants.AUTO_ARCHIVE_DURATION -> {
+                event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
+            }
             case Constants.PLANET_TYPE -> {
                 List<String> allPlanetTypes = Arrays.stream(PlanetTypeModel.PlanetType.values())
                     .map(PlanetTypeModel.PlanetType::toString)
@@ -782,9 +785,9 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveDeveloperCommandAutoComplete(
-        @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-        @NotNull String optionName
-    ) {
+                @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
+                @NotNull String optionName
+            ) {
         if (!subCommandName.equals(Constants.SET_SETTING)) return;
         switch (optionName) {
             case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
@@ -798,9 +801,9 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveSearchCommandAutoComplete(
-        @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-        @NotNull String optionName
-    ) {
+                @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
+                @NotNull String optionName
+            ) {
         if (!optionName.equals(Constants.SEARCH)) return;
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         List<Command.Choice> options = null;
@@ -816,7 +819,7 @@ public class AutoCompleteProvider {
             case Constants.SEARCH_DECKS -> options = searchModels(event, Mapper.getDecks().values(), source);
             case Constants.SEARCH_EVENTS -> options = searchModels(event, Mapper.getEvents().values(), source);
             case Constants.SEARCH_EXPLORES -> options = searchModels(event, Mapper.getExplores().values(), source);
-            case Constants.SEARCH_FACTIONS -> options = searchModels(event, Mapper.getFactionsValues(), source);
+            case Constants.SEARCH_FACTIONS -> options = searchModels(event, Mapper.getFactions().values(), source);
             // no /search franken_errata yet
             // no /search generic_cards yet
             case Constants.SEARCH_LEADERS -> options = searchModels(event, Mapper.getLeaders().values(), source);
@@ -839,6 +842,7 @@ public class AutoCompleteProvider {
             /* From others */
             // none of them are populated from here
         }
+        System.out.println(options.toString());
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList())).queue();
     }
 
