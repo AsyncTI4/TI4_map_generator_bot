@@ -618,13 +618,6 @@ class GameSaveService {
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
-            writer.write(System.lineSeparator());
-            writer.write(Constants.COMMODITIES + " " + player.getCommodities());
-            writer.write(System.lineSeparator());
-
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getEvents(), writer, Constants.EVENTS);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
@@ -714,6 +707,8 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
+
+            //old spot
 
             writer.write(System.lineSeparator());
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
@@ -822,6 +817,12 @@ class GameSaveService {
                 writer.write(System.lineSeparator());
             }
 
+            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES + " " + player.getCommodities());
+            writer.write(System.lineSeparator());
             writer.write(ENDPLAYER);
             writer.write(System.lineSeparator());
         }

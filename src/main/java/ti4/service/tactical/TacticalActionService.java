@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
-
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
@@ -195,7 +194,7 @@ public class TacticalActionService {
     }
 
     public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
-        boolean skipPlacingAbilities = game.isNaaluAgent() || game.isL1Hero();
+        boolean skipPlacingAbilities = game.isNaaluAgent() || game.isL1Hero() || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
         if (!skipPlacingAbilities && !CommandCounterHelper.hasCC(event, player.getColor(), tile) && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 player.setTacticalCC(player.getTacticalCC() + 1);
