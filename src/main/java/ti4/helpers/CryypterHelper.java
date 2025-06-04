@@ -151,7 +151,7 @@ public class CryypterHelper
     {
         for (Leader leader : player.getLeaders())
         {
-            LeaderModel leaderModel = leader.getLeaderModel();
+            LeaderModel leaderModel = leader.getLeaderModel().orElse(null);
             if(!leader.isLocked() && leaderModel.getAbilityWindow() == "After an agenda is revealed:")
             {
                 FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
