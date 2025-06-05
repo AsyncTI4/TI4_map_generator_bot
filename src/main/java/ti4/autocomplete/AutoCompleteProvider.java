@@ -71,7 +71,7 @@ public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
-            System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName() + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue());
+            //System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName() + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue()); // Debug line
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);
@@ -842,7 +842,7 @@ public class AutoCompleteProvider {
             /* From others */
             // none of them are populated from here
         }
-        System.out.println(options.toString());
+        //System.out.println(options.toString()); // Debug line
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList())).queue();
     }
 
@@ -870,7 +870,6 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-
             case Constants.BAN -> {
                 switch (optionName) {
                     case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
@@ -892,7 +891,6 @@ public class AutoCompleteProvider {
                         event.replyChoices(options).queue();
                     }
                 }
-
             }
         }
     }
@@ -904,7 +902,6 @@ public class AutoCompleteProvider {
                 var options = searchModels(event, TileHelper.getAllTileModels(), null);
                 event.replyChoices(options).queue();
             }
-
             case Constants.REMOVE_TILE -> {
                 if (!optionName.equals(Constants.POSITION)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();
