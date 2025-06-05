@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
-import org.jetbrains.annotations.Nullable;
-
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 public class PlayerProperties {
@@ -117,4 +117,15 @@ public class PlayerProperties {
     private List<String> mahactCC = new ArrayList<>();
     private List<String> factionTechs = new ArrayList<>();
     private List<String> purgedTechs = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PlayerProperties that)) return false;
+        return Objects.equals(userID, that.userID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(userID);
+    }
 }
