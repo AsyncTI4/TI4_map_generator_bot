@@ -644,7 +644,7 @@ public class ButtonHelperAgents {
             if (p2 == null)
                 return;
             p2.addSpentThing("Exhausted " + ssruuClever + "Rond Bri'ay, the Roh'Dhna" + ssruuSlash + " agent, for 1 command token.");
-            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
             String trueIdentity2 = p2.getRepresentationUnfogged();
             String message2 = trueIdentity2 + ", your current command tokens are " + p2.getCCRepresentation()
                 + ". Use buttons to gain command tokens.";
@@ -1786,7 +1786,7 @@ public class ButtonHelperAgents {
         }
         String msg = player.getFactionEmojiOrColor() + " replenished commodities due to " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Tox, the Kyro" + (kyro.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        player.setCommodities(player.getCommodities()+player.getCommoditiesTotal());
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         cabalAgentInitiation(game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

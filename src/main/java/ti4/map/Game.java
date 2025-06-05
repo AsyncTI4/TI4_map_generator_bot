@@ -787,6 +787,21 @@ public class Game extends GameProperties {
         checkingForAllReacts.put(key, value);
     }
 
+    public int changeCommsOnPlanet(int change, String planet) {
+        int amountRemaining = 0;
+        if (!getStoredValue("CommsOnPlanet" + planet).isEmpty()) {
+            int thereAlready = Integer.parseInt(getStoredValue("CommsOnPlanet" + planet));
+            change += thereAlready;
+        }
+        if (change > 0) {
+            amountRemaining = change;
+            setStoredValue("CommsOnPlanet" + planet, "" + change);
+        } else {
+            removeStoredValue("CommsOnPlanet" + planet);
+        }
+        return amountRemaining;
+    }
+
     public String getStoredValue(String key) {
         String value = getFactionsThatReactedToThis(key);
         return StringHelper.unescape(value);

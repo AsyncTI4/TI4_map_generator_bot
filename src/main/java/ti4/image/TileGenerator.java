@@ -1403,6 +1403,7 @@ public class TileGenerator {
                     xDelta += 10;
                 }
             }
+
         } else {
             oldFormatPlanetTokenAdd(tile, tileGraphics, unitHolder, controlList);
         }

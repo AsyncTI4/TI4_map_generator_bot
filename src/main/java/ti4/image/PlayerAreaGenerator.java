@@ -32,7 +32,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -1875,6 +1874,25 @@ public class PlayerAreaGenerator {
                 DrawingUtil.drawTextVertically(graphics, planetModel.getShortName().toUpperCase(), x + deltaX + 9, y + 144, Storage.getFont16());
             } else {
                 DrawingUtil.drawTextVertically(graphics, planetModel.getShortName().toUpperCase(), x + deltaX + 7, y + 144, Storage.getFont18());
+            }
+
+            if (!game.getStoredValue("CommsOnPlanet" + planet.getName()).isEmpty()) {
+                int comms = Integer.parseInt(game.getStoredValue("CommsOnPlanet" + planet.getName()));
+                graphics.setColor(Color.GRAY);
+                graphics.setFont(Storage.getFont26());
+                int offset2 = 20 - graphics.getFontMetrics().stringWidth("" + comms) / 2;
+                if (game.isFacilitiesMode()) {
+                    graphics.setColor(ColorUtil.TradeGoodColor);
+                }
+                graphics.drawString(Integer.toString(comms), x + deltaX + 15 + offset2, y + 67);
+            }
+            if (player.getHarvestCounter() > 0 && planet.getName().equalsIgnoreCase("uikos")) {
+                int comms = player.getHarvestCounter();
+                graphics.setFont(Storage.getFont26());
+                int offset2 = 20 - graphics.getFontMetrics().stringWidth("" + comms) / 2;
+                graphics.setColor(Color.GRAY);
+
+                graphics.drawString(Integer.toString(comms), x + deltaX + offset2 - 10, y + 69);
             }
 
             return deltaX + 56;
