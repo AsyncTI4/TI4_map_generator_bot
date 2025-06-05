@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +44,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperCommanders {
 
@@ -154,7 +154,7 @@ public class ButtonHelperCommanders {
     @ButtonHandler("olradinCommanderStep2_")
     public static void olradinCommanderStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planetID = buttonID.split("_")[1];
-        Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+        Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
         int count = Math.max(planet.getInfluence(), planet.getResources());
         PlanetExhaust.doAction(player, planetID, game);
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -448,7 +448,7 @@ public class ButtonHelperCommanders {
     public static List<Button> resolveFlorzenCommander(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
-            Planet planetReal = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet planetReal = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);

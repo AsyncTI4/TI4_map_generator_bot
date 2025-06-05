@@ -7,15 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.CommandHelper;
@@ -61,14 +60,13 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
         if (player.hasAbility("classified_developments")) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Info on your superweapons are as follows:\n");
-            sb.append(Mapper.getRelic("superweaponavailyn").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponcaled").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponglatison").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweapongrom").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponmors").getSimpleRepresentation()).append("\n");
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
+            String sb = "Info on your superweapons are as follows:\n" +
+                Mapper.getRelic("superweaponavailyn").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponcaled").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponglatison").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweapongrom").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponmors").getSimpleRepresentation() + "\n";
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
         }
     }
 
@@ -105,7 +103,7 @@ public class ActionCardHelper {
             if (representation == null) {
                 representation = planet;
             }
-            sb.append("\n> Planet: ").append(representation).append("");
+            sb.append("\n> Planet: ").append(representation);
         }
         sb.append("\n");
         return sb.toString();

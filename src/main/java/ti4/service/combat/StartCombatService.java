@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jetbrains.annotations.Nullable;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -16,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -589,7 +588,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win a combat during this action " +
                     "you may take an additional action (Qhet Commander Ability)");
             }
-            if (player.getPromissoryNotes().keySet().contains("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
+            if (player.getPromissoryNotes().containsKey("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " reminder you have the Qhet promissory note.");
             }
