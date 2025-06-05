@@ -44,7 +44,6 @@ import ti4.website.WebsiteOverlay;
 public class WebHelper {
 
     private static final String TI4_ULTIMATE_STATISTICS_API_KEY = System.getenv("TI4_ULTIMATE_STATISTICS_API_KEY");
-    private static final int INITIAL_STAT_BUFFER_SIZE = 1024 * 1024 * 100; // 100 MB
     private static final int STAT_BATCH_SIZE = 200;
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final S3AsyncClient s3AsyncClient = S3AsyncClient.builder().region(Region.US_EAST_1).build();
@@ -152,6 +151,7 @@ public class WebHelper {
         }
     }
 
+    // If this becomes a resource hog again, the next step would probably be to switch to MultipartUpload
     public static void putStats() throws IOException {
         if (!sendingToWeb()) return;
 
