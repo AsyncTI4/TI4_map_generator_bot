@@ -1,6 +1,8 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +26,7 @@ public class WebPlayerArea {
     private String displayName;
     private boolean passed;
     private boolean eliminated;
+    private boolean active;
 
     // Command counters
     private int tacticalCC;
@@ -50,6 +53,7 @@ public class WebPlayerArea {
     // Strategy cards and promissory notes
     private Set<Integer> followedSCs;
     private List<Integer> unfollowedSCs;
+    private List<Integer> exhaustedSCs;
     private List<String> promissoryNotesInPlayArea;
 
     // Technologies
@@ -95,7 +99,10 @@ public class WebPlayerArea {
     // Unit information map
     private Map<String, UnitCountInfo> unitCounts;
 
-    public static WebPlayerArea fromPlayer(Player player, Map<String, Tile> tileMap) {
+    // Nombox units by faction
+    private Map<String, List<String>> nombox;
+
+    public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
 
         // Basic properties
@@ -105,6 +112,7 @@ public class WebPlayerArea {
         webPlayerArea.setDisplayName(player.getDisplayName());
         webPlayerArea.setPassed(player.isPassed());
         webPlayerArea.setEliminated(player.isEliminated());
+        webPlayerArea.setActive(player.isActivePlayer());
 
         // Command counters
         webPlayerArea.setTacticalCC(player.getTacticalCC());
@@ -131,6 +139,7 @@ public class WebPlayerArea {
         // Strategy cards and promissory notes
         webPlayerArea.setFollowedSCs(player.getFollowedSCs());
         webPlayerArea.setUnfollowedSCs(player.getUnfollowedSCs());
+        webPlayerArea.setExhaustedSCs(player.getExhaustedSCs());
         webPlayerArea.setPromissoryNotesInPlayArea(player.getPromissoryNotesInPlayArea());
 
         // Technologies
@@ -175,9 +184,18 @@ public class WebPlayerArea {
 
         // get reinforcement count
         Map<Units.UnitKey, Integer> unitMapCount = new HashMap<>();
+        Map<String, Tile> tileMap = game.getTileMap();
         for (Tile tile : tileMap.values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 fillUnits(unitMapCount, unitHolder);
+            }
+        }
+
+        // Add nombox units to the count (excluding them from reinforcements)
+        for (Player gamePlayer : game.getPlayers().values()) {
+            UnitHolder nombox = gamePlayer.getNomboxTile().getSpaceUnitHolder();
+            if (nombox != null) {
+                fillUnits(unitMapCount, nombox);
             }
         }
 
@@ -194,12 +212,38 @@ public class WebPlayerArea {
 
         webPlayerArea.setUnitCounts(unitInfoMap);
 
+        // Populate nombox data for all players
+        Map<String, List<String>> nomboxData = new HashMap<>();
+        for (Player gamePlayer : game.getPlayers().values()) {
+            UnitHolder nombox = gamePlayer.getNomboxTile().getSpaceUnitHolder();
+            if (nombox != null && !nombox.getUnitKeys().isEmpty()) {
+                List<String> unitList = new ArrayList<>();
+
+                // Group units by type to get counts
+                Map<String, Integer> unitCounts = new HashMap<>();
+                for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
+                    String unitId = unitKey.asyncID();
+                    int count = nombox.getUnitCount(unitKey);
+                    unitCounts.put(unitId, unitCounts.getOrDefault(unitId, 0) + count);
+                }
+
+                // Create "unitId,count" strings
+                for (Map.Entry<String, Integer> entry : unitCounts.entrySet()) {
+                    unitList.add(entry.getKey() + "," + entry.getValue());
+                }
+
+                nomboxData.put(gamePlayer.getFaction(), unitList);
+            }
+        }
+        webPlayerArea.setNombox(nomboxData);
+
         return webPlayerArea;
     }
 
     private static void fillUnits(Map<Units.UnitKey, Integer> unitCount, UnitHolder unitHolder) {
         for (Units.UnitKey uk : unitHolder.getUnitKeys()) {
             if (uk.getUnitType() == Units.UnitType.Infantry || uk.getUnitType() == Units.UnitType.Fighter) {
+                unitCount.put(uk, unitCount.getOrDefault(uk, 0) + 1);
                 continue;
             }
 
