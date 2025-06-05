@@ -38,8 +38,8 @@ public class UnitRenderGenerator {
 
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
 
-    // Map to store unit coordinates organized by faction
-    private final Map<String, List<Point>> unitCoordinatesByFaction = new HashMap<>();
+    // Map to store unit coordinates organized by faction and unit ID
+    private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
 
     private record ImagePosition(
         int originalX,
@@ -177,9 +177,13 @@ public class UnitRenderGenerator {
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
 
-                // Collect unit coordinates by faction
+                // Collect unit coordinates by faction and unit ID
                 String factionKey = player.getFaction();
-                unitCoordinatesByFaction.computeIfAbsent(factionKey, k -> new ArrayList<>()).add(new Point(imageX, imageY));
+                String unitId = unitKey.asyncID();
+                unitCoordinatesByFaction
+                    .computeIfAbsent(factionKey, k -> new HashMap<>())
+                    .computeIfAbsent(unitId, k -> new ArrayList<>())
+                    .add(new Point(imageX, imageY));
 
                 if (containsDMZ || (isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
                     String badPath = resourceHelper.getPositionFile("badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
@@ -651,13 +655,13 @@ public class UnitRenderGenerator {
     }
 
     /**
-     * Returns a map of unit coordinates organized by faction.
-     * The map contains faction names as keys and lists of pixel coordinates as values.
+     * Returns a map of unit coordinates organized by faction and unit ID.
+     * The map contains faction names as keys, unit IDs as secondary keys, and lists of pixel coordinates as values.
      * Coordinates represent the top-left corner of where each unit was rendered.
      *
-     * @return Map where keys are faction names and values are lists of unit coordinates
+     * @return Map where keys are faction names, secondary keys are unit IDs, and values are lists of unit coordinates
      */
-    public Map<String, List<Point>> getUnitCoordinatesByFaction() {
+    public Map<String, Map<String, List<Point>>> getUnitCoordinatesByFaction() {
         return new HashMap<>(unitCoordinatesByFaction);
     }
 }

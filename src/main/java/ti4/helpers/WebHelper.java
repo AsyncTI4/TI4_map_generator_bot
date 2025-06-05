@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,29 +85,33 @@ public class WebHelper {
         }
     }
 
-    public static void putPlayerData(String gameId, Game game, Map<String, List<Point>> factionCoordinates) {
+    public static void putPlayerData(String gameId, Game game, Map<String, Map<String, List<Point>>> factionCoordinates) {
         if (!sendingToWeb())  return;
 
         try {
             List<WebPlayerArea> playerDataList = new ArrayList<>();
-            Map<String, Tile> tileMap = game.getTileMap();
             for (Player player : game.getPlayers().values()) {
-                playerDataList.add(WebPlayerArea.fromPlayer(player, tileMap));
+                playerDataList.add(WebPlayerArea.fromPlayer(player, game));
             }
 
-            Map<String, List<String>> factionCoordinatesStrings = factionCoordinates != null
+            Map<String, Map<String, List<String>>> factionCoordinatesStrings = factionCoordinates != null
                 ? factionCoordinates.entrySet().stream()
                     .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> entry.getValue().stream()
-                                      .map(point -> point.x + "," + point.y)
-                                      .collect(Collectors.toList())
+                        entry -> entry.getValue().entrySet().stream()
+                                      .collect(Collectors.toMap(
+                                          Map.Entry::getKey,
+                                          unitEntry -> unitEntry.getValue().stream()
+                                                              .map(point -> point.x + "," + point.y)
+                                                              .collect(Collectors.toList())
+                                      ))
                     ))
                 : new HashMap<>();
 
             Map<String, Object> webData = new HashMap<>();
             webData.put("playerData", playerDataList);
             webData.put("factionCoordinates", factionCoordinatesStrings);
+            webData.put("lawsInPlay", new HashSet<>(game.getLaws().keySet()));
 
             String json = objectMapper.writeValueAsString(webData);
             PutObjectRequest request = PutObjectRequest.builder()
