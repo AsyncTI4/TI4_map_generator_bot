@@ -569,8 +569,7 @@ public class PlayStrategyCardService {
 
         if (scModel.usesAutomationForSCID("pok7technology")) {
             Player raOwner = game.getPNOwner("ra");
-            if (raOwner == null) return false;
-            return true;
+            return raOwner != null;
         }
 
         return false;

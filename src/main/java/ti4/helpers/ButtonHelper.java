@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,11 +14,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -41,6 +34,10 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -108,6 +105,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class ButtonHelper {
 
     public static String getButtonRepresentation(Button button) {
@@ -159,7 +158,6 @@ public class ButtonHelper {
                 buttons.add(Buttons.red("deleteButtons", "Decline to drop Mech"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message3, buttons);
             }
-            return;
         }
     }
 
@@ -1941,7 +1939,7 @@ public class ButtonHelper {
             if (tile != null && tile.isHomeSystem(game)) {
                 continue;
             }
-            Planet p = (Planet) getUnitHolderFromPlanetName(planet, game);
+            Planet p = getUnitHolderFromPlanetName(planet, game);
             if (p != null && (p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
                 || p.getUnitCount(UnitType.Pds, player.getColor()) > 0
                 || (p.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasAbility("byssus")))) {
@@ -1964,7 +1962,7 @@ public class ButtonHelper {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            Planet p = (Planet) getUnitHolderFromPlanetName(planet, game);
+            Planet p = getUnitHolderFromPlanetName(planet, game);
             if (p != null && (p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
                 || p.getUnitCount(UnitType.Pds, player.getColor()) > 0
                 || (p.getUnitCount(UnitType.Mech, player.getColor()) > 0 && player.hasAbility("byssus")))) {
@@ -1988,7 +1986,7 @@ public class ButtonHelper {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            Planet p = (Planet) getUnitHolderFromPlanetName(planet, game);
+            Planet p = getUnitHolderFromPlanetName(planet, game);
             if (p != null && (p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0
                 || p.getUnitCount(UnitType.Pds, player.getColor()) > 0
                 || p.getUnitCount(UnitType.Infantry, player.getColor()) > 0
@@ -2011,7 +2009,7 @@ public class ButtonHelper {
             if (tile == null || tile == hs || FoWHelper.getAdjacentTiles(game, hs.getPosition(), player, false).contains(tile.getPosition())) {
                 continue;
             }
-            Planet p = (Planet) getUnitHolderFromPlanetName(planet, game);
+            Planet p = getUnitHolderFromPlanetName(planet, game);
             if (p != null && p.getUnitCount(UnitType.Spacedock, player.getColor()) > 0) {
                 count++;
             }
@@ -4220,7 +4218,7 @@ public class ButtonHelper {
             Tile tile = game.getTileByPosition(pos);
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 != player && player.getAllianceMembers().contains(p2.getFaction())) {
-                    if (unitHolderName.toLowerCase().equalsIgnoreCase("space")) {
+                    if (unitHolderName.equalsIgnoreCase("space")) {
                         if (FoWHelper.playerHasShipsInSystem(player, tile)) {
                             resolveCombatRoll(p2, game, event, buttonID, false);
                         }
@@ -5708,7 +5706,6 @@ public class ButtonHelper {
     public static void listPath(ButtonInteractionEvent event, Game game, Player player) {
         if (player.getPathTokenCounter() < 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not have any path tokens");
-            return;
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "You have " + player.getPathTokenCounter() + " path tokens");
