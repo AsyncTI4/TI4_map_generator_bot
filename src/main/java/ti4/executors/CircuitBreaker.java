@@ -10,7 +10,7 @@ import ti4.message.BotLogger;
 
 public class CircuitBreaker {
 
-    private static final int CIRCUIT_BREAK_THRESHOLD = 5;
+    private static final int CIRCUIT_BREAK_THRESHOLD = 10;
     private static final int MINUTES_TO_WAIT_BEFORE_CLOSING = 5;
     private static final int MINUTES_TO_WAIT_BEFORE_RESETTING_THRESHOLD = 1;
 
