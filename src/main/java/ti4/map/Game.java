@@ -3707,7 +3707,7 @@ public class Game extends GameProperties {
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
-                if (pnOwner != null && !pnOwner.getUserID().equals(player.getUserID())) {
+                if (pnOwner != null && !pnOwner.equals(player)) {
                     for (Leader playerLeader : pnOwner.getLeaders()) {
                         if (leaderIsFake(playerLeader.getId())) {
                             continue;
@@ -3725,7 +3725,7 @@ public class Game extends GameProperties {
         // that have the leader unlocked
         if (player.hasAbility("imperia")) {
             for (Player otherPlayer : getRealPlayers()) {
-                if (otherPlayer.getUserID().equals(player.getUserID()))
+                if (otherPlayer.equals(player))
                     continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
 
