@@ -27,12 +27,39 @@ public class GameOptionService {
         hexBorderButtons.add(Buttons.gray("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "Show borders around systems with player's ships.", hexBorderButtons);
 
-        sendShowOwnedPNsInPlayerAreaButton(game, channel);
+        //sendShowOwnedPNsInPlayerAreaButton(game, channel);
+        List<Button> daneLinkButtons = getDaneLeakModeButtons(game);
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "Enable or Disable the latest Dane Modes.", daneLinkButtons);
     }
 
     public static final Button showOwnedPNs_ON = Buttons.green("showOwnedPNsInPlayerArea_turnOFF", "ON");
     public static final Button showOwnedPNs_OFF = Buttons.red("showOwnedPNsInPlayerArea_turnON", "OFF");
-    public static void sendShowOwnedPNsInPlayerAreaButton(Game game,MessageChannel channel) {
+
+    public static List<Button> getDaneLeakModeButtons(Game game) {
+        List<Button> daneLinkButtons = new ArrayList<>();
+
+        if (game.isMinorFactionsMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_minorFactions_disable", "Disable Minor Factions"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_minorFactions_enable", "Enable Minor Factions"));
+        }
+        if (game.isHiddenAgendaMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_hiddenAgenda_disable", "Disable Hidden Agenda"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_hiddenAgenda_enable", "Enable Hidden Agenda"));
+        }
+        if (game.isAgeOfExplorationMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_ageOfExploration_disable", "Disable Age of Exploration"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_ageOfExploration_enable", "Enable Age of Exploration"));
+        }
+
+        daneLinkButtons.add(Buttons.gray("deleteButtons", "Done"));
+
+        return daneLinkButtons;
+    }
+
+    public static void sendShowOwnedPNsInPlayerAreaButton(Game game, MessageChannel channel) {
         List<Button> buttons = new ArrayList<>();
         if (game.isShowOwnedPNsInPlayerArea()) { //button shows current status
             buttons.add(showOwnedPNs_ON);
