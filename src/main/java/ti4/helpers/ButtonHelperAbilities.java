@@ -1,20 +1,17 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
@@ -46,6 +43,8 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperAbilities {
 
@@ -968,7 +967,7 @@ public class ButtonHelperAbilities {
             if (planetName.contains("custodia") || planetName.contains("ghoti")) {
                 continue;
             }
-            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
             if (planet == null) {
                 continue;
             }
@@ -998,7 +997,7 @@ public class ButtonHelperAbilities {
             if (planetName.contains("custodia") || planetName.contains("ghoti")) {
                 continue;
             }
-            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
             if (planet == null) {
                 continue;
             }
@@ -1010,6 +1009,7 @@ public class ButtonHelperAbilities {
             for (String token : planet.getTokenList()) {
                 if (token.contains("superweapon")) {
                     hasSuperweapon = true;
+                    break;
                 }
             }
             if (!hasSuperweapon) {
@@ -1586,7 +1586,7 @@ public class ButtonHelperAbilities {
         String planetName = buttonID.split("_")[1];
         int oldTg = player.getTg();
         player.setTg(oldTg + 4);
-        Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+        Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         planet.addToken(Constants.GLEDGE_CORE_PNG);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmojiOrColor() + " Cracked the Mantle of "

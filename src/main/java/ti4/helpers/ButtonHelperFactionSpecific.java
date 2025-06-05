@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,9 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -25,6 +20,8 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
@@ -67,6 +64,8 @@ import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperFactionSpecific {
 
@@ -303,7 +302,7 @@ public class ButtonHelperFactionSpecific {
         String planet = buttonID.split("_")[1];
 
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game,
-            (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
+            ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " due to your mech ability, you may explore "
                 + Helper.getPlanetRepresentation(planet, game) + " twice now.");
@@ -2646,7 +2645,7 @@ public class ButtonHelperFactionSpecific {
 
     @ModalHandler("blindIFFSelection_")
     public static void doBlindIFF(ModalInteractionEvent event, Player player, Game game) {
-        String modalId[] = event.getModalId().split("_");
+        String[] modalId = event.getModalId().split("_");
         String type = modalId[1];
         String origMessageId = modalId[2];
         String position = event.getValue(Constants.POSITION).getAsString().trim();

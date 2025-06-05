@@ -16,7 +16,7 @@ public class PlanetLayoutModel {
     private Integer extraIcons = 0;
 
     public enum ResInfLocation {
-        BottomLeft, BottomRight, TopLeft, TopRight;
+        BottomLeft, BottomRight, TopLeft, TopRight
     }
 
     public UnitTokenPosition generateUnitTokenPosition() {
