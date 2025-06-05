@@ -578,7 +578,7 @@ public class Player extends PlayerProperties {
 
     /**
      * Returns whether the player owns a unit containing the given substring.
-     * 
+     *
      * @param unitIDSubstring The substring to
      * @return true if player owns a unit containing the given substring; false otherwise
      */
@@ -655,7 +655,7 @@ public class Player extends PlayerProperties {
                     + getUnitsOwned() + "`";
                 if (!getGame().isFrankenGame()) {
                     BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
-                } 
+                }
                 return message;
             }
         }
@@ -2550,6 +2550,17 @@ public class Player extends PlayerProperties {
             }
         }
         return unfollowedSCs;
+    }
+
+    @JsonIgnore
+    public List<Integer> getExhaustedSCs() {
+        List<Integer> exhaustedSCs = new ArrayList<>();
+        for (int sc : getSCs()) {
+            if (!getGame().getStoredValue("exhaustedSC" + sc).isEmpty()) {
+                exhaustedSCs.add(sc);
+            }
+        }
+        return exhaustedSCs;
     }
 
     public void checkCommanderUnlock(String factionToCheck) {
