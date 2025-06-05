@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
+import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -69,6 +70,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
+import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -94,6 +96,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.option.GameOptionService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.player.RefreshCardsService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -158,6 +161,39 @@ public class UnfiledButtonHandlers {
     public static void fogAllianceAgentStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
         ButtonHelperHeroes.argentHeroStep3(game, player, event, buttonID);
+    }
+
+    @ButtonHandler("enableDaneMode_")
+    public static void enableDaneMode(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String mode = buttonID.split("_")[1];
+        boolean enable = buttonID.split("_")[2].equalsIgnoreCase("enable");
+        String message = "Successfully " + buttonID.split("_")[2] + "d the ";
+        if (mode.equalsIgnoreCase("hiddenagenda")) {
+            game.setHiddenAgendaMode(enable);
+            message += " Hidden Agenda Mode. Nothing more needs to be done.";
+        }
+        if (mode.equalsIgnoreCase("minorFactions")) {
+            game.setMinorFactionsMode(enable);
+            message += " Minor Factions Mode. ";
+            if (enable) {
+                message += "You will need to decide how you want to draft the minor factions. This site has a decent setup for it, "
+                    + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that a neutral player "
+                    + "has been set up, and you can add 3 infantry to the minor faction planets pretty easily with /add_units.";
+                List<String> unusedColors = game.getUnusedColors().stream().map(ColorModel::getName).toList();
+                String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                game.setupNeutralPlayer(color);
+                message += "\nNeutral player has been set as " + color + ".";
+            }
+        }
+        if (mode.equalsIgnoreCase("ageOfExploration")) {
+            game.setAgeOfExplorationMode(enable);
+            message += " Age of Exploration Mode. Nothing more needs to be done.";
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        List<Button> buttons = GameOptionService.getDaneLeakModeButtons(game);
+        event.getMessage().editMessage(event.getMessage().getContentRaw()).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+            .queue();
+
     }
 
     @ButtonHandler(value = "requestAllFollow_", save = false)
@@ -751,11 +787,12 @@ public class UnfiledButtonHandlers {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             if (uH.getTokenList().contains("attachment_facilityresearchlab.png")) {
-                player.setHarvestCounter(player.getHarvestCounter() + 1);
+                int amountThereNow = game.changeCommsOnPlanet(1, planetName);
+
                 String msg = player.getRepresentation() + " gained 1 trade good on the research lab due to exhausting "
                     + Helper.getPlanetRepresentation(planetName, game)
-                    + " while it had a Research Lab on it. It now has " + player.getHarvestCounter()
-                    + " trade goods on it, which can be adjusted with /ds set_planet_tradegoods";
+                    + " while it had a Research Lab on it. It now has " + amountThereNow
+                    + " trade goods on it.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
