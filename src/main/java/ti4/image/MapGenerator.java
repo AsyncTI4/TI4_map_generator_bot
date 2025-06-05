@@ -112,7 +112,7 @@ public class MapGenerator implements AutoCloseable {
     private Player fowPlayer;
 
     // Map to aggregate unit coordinates by faction from all tiles with global coordinates
-    private final Map<String, List<Point>> globalUnitCoordinatesByFaction = new HashMap<>();
+    private final Map<String, Map<String, List<Point>>> globalUnitCoordinatesByFaction = new HashMap<>();
 
     private StopWatch debugAbsoluteStartTime;
     private StopWatch debugTileTime;
@@ -2274,9 +2274,9 @@ public class MapGenerator implements AutoCloseable {
 
     /**
      * Get the aggregated global unit coordinates by faction from all tiles
-     * @return Map where key is faction/player identifier and value is list of global coordinates
+     * @return Map where key is faction/player identifier, secondary key is unit ID, and value is list of global coordinates
      */
-    public Map<String, List<Point>> getGlobalUnitCoordinatesByFaction() {
+    public Map<String, Map<String, List<Point>>> getGlobalUnitCoordinatesByFaction() {
         return new HashMap<>(globalUnitCoordinatesByFaction);
     }
 
@@ -2287,18 +2287,26 @@ public class MapGenerator implements AutoCloseable {
      * @param tileY The global Y offset for this tile
      */
     private void aggregateGlobalUnitCoordinates(TileGenerator tileGenerator, int tileX, int tileY) {
-        Map<String, List<Point>> tileCoordinates = tileGenerator.getUnitCoordinatesByFaction();
+        Map<String, Map<String, List<Point>>> tileCoordinates = tileGenerator.getUnitCoordinatesByFaction();
         if (tileCoordinates != null) {
-            for (Map.Entry<String, List<Point>> entry : tileCoordinates.entrySet()) {
-                String faction = entry.getKey();
-                List<Point> coordinates = entry.getValue();
+            for (Map.Entry<String, Map<String, List<Point>>> factionEntry : tileCoordinates.entrySet()) {
+                String faction = factionEntry.getKey();
+                Map<String, List<Point>> unitMap = factionEntry.getValue();
 
-                // Apply global translation to each coordinate
-                List<Point> globalCoordinates = coordinates.stream()
-                    .map(point -> new Point(point.x + tileX, point.y + tileY))
-                    .collect(Collectors.toList());
+                for (Map.Entry<String, List<Point>> unitEntry : unitMap.entrySet()) {
+                    String unitId = unitEntry.getKey();
+                    List<Point> coordinates = unitEntry.getValue();
 
-                globalUnitCoordinatesByFaction.computeIfAbsent(faction, k -> new ArrayList<>()).addAll(globalCoordinates);
+                    // Apply global translation to each coordinate
+                    List<Point> globalCoordinates = coordinates.stream()
+                        .map(point -> new Point(point.x + tileX, point.y + tileY))
+                        .collect(Collectors.toList());
+
+                    globalUnitCoordinatesByFaction
+                        .computeIfAbsent(faction, k -> new HashMap<>())
+                        .computeIfAbsent(unitId, k -> new ArrayList<>())
+                        .addAll(globalCoordinates);
+                }
             }
         }
     }
