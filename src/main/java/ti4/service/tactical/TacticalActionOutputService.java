@@ -139,12 +139,16 @@ public class TacticalActionOutputService {
                     lines.add(unitStr);
                     continue;
                 }
+                String color = "";
+                if (!key.getColor().equalsIgnoreCase(player.getColor())) {
+                    color = " " + key.getColor() + " ";
+                }
                 for (UnitState state : UnitState.values()) {
                     int amt = states.get(state.ordinal());
                     if (amt == 0) continue;
 
                     String stateStr = (state == UnitState.none) ? "" : " " + state.humanDescr();
-                    String unitMoveStr = linePrefix + " moved " + amt + stateStr + " " + key.unitEmoji();
+                    String unitMoveStr = linePrefix + " moved " + amt + color + stateStr + " " + key.unitEmoji();
 
                     String unitHolderStr = (uh instanceof Planet p) ? " from the planet " + p.getRepresentation(game) : "";
                     unitMoveStr += unitHolderStr;

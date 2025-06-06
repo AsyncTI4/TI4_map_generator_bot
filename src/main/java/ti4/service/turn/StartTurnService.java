@@ -337,6 +337,9 @@ public class StartTurnService {
             if (player.getTechs().contains("cm")) {
                 startButtons.add(Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
+            if (game.isOrdinianC1Mode() && !ButtonHelper.isCoatlHealed(game) && player == ButtonHelper.getPlayerWhoControlsCoatl(game)) {
+                startButtons.add(Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6r)", FactionEmojis.Argent));
+            }
             if (player.getTechs().contains("dspharinf") && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game).isEmpty()) {
                 startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Inf", FactionEmojis.pharadn));
             }

@@ -34,5 +34,20 @@
         "spaceOrPlanet": "planet",
         "aliasList": ["custodianvp", "token_custodianvp"],
         "source": "base"
+    },
+    {
+        "id": "custc1",
+        "imagePath": "token_custc1.png",
+        "spaceOrPlanet": "space",
+        "aliasList": ["custc1"],
+        "source": "base"
+    },
+    {
+        "id": "custvpc1",
+        "imagePath": "token_custvpc1.png",
+        "spaceOrPlanet": "space",
+        "aliasList": ["custvpc1"],
+        "source": "base"
     }
+
 ]
