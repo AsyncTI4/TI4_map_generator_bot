@@ -331,6 +331,12 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
+            case Constants.SCENARIO -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                var tokens = List.of("ordinian (codex 1)");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
+                event.replyChoices(options).queue();
+            }
             case Constants.DECK_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Map<String, DeckModel> decks = Mapper.getDecks();
@@ -785,9 +791,9 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveDeveloperCommandAutoComplete(
-                @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                @NotNull String optionName
-            ) {
+        @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
+        @NotNull String optionName
+    ) {
         if (!subCommandName.equals(Constants.SET_SETTING)) return;
         switch (optionName) {
             case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
@@ -801,9 +807,9 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveSearchCommandAutoComplete(
-                @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                @NotNull String optionName
-            ) {
+        @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
+        @NotNull String optionName
+    ) {
         if (!optionName.equals(Constants.SEARCH)) return;
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         List<Command.Choice> options = null;
