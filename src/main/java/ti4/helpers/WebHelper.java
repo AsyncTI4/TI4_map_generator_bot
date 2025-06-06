@@ -110,12 +110,8 @@ public class WebHelper {
                     ))
                 : new HashMap<>();
 
-            // Generate tile positions data using WebTilePositions
             WebTilePositions webTilePositions = WebTilePositions.fromGame(game);
-
-            // Generate tile unit data using WebTileUnitData
             Map<String, WebTileUnitData> tileUnitData = WebTileUnitData.fromGame(game);
-
             Map<String, Object> webData = new HashMap<>();
             webData.put("playerData", playerDataList);
             webData.put("factionCoordinates", factionCoordinatesStrings);

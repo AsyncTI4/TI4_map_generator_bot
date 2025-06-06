@@ -43,35 +43,24 @@ public class WebTileUnitData {
 
         for (Map.Entry<String, UnitHolder> holderEntry : tile.getUnitHolders().entrySet()) {
             String holderName = holderEntry.getKey();
-            UnitHolder unitHolder = holderEntry.getValue();
-
-            if (!unitHolder.hasUnits()) {
-                continue; // Skip holders with no units
-            }
-
             boolean isSpace = Constants.SPACE.equals(holderName);
+            UnitHolder unitHolder = holderEntry.getValue();
+            if (!unitHolder.hasUnits()) {
+                continue;
+            }
 
             // Group units by faction
             Map<String, Map<String, Integer>> factionUnits = new HashMap<>();
-
             for (UnitKey unitKey : unitHolder.getUnitKeys()) {
                 Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
-                if (player == null) {
-                    continue; // Skip units without valid players
+                int unitCount = unitHolder.getUnitCount(unitKey);
+                String unitId = getUnitIdFromType(unitKey.getUnitType());
+
+                if (player == null || unitId == null || unitCount <= 0) {
+                    continue;
                 }
 
                 String faction = player.getFaction();
-                int unitCount = unitHolder.getUnitCount(unitKey);
-
-                if (unitCount <= 0) {
-                    continue; // Skip units with zero count
-                }
-
-                String unitId = getUnitIdFromType(unitKey.getUnitType());
-                if (unitId == null) {
-                    continue; // Skip unknown unit types
-                }
-
                 factionUnits
                     .computeIfAbsent(faction, k -> new HashMap<>())
                     .put(unitId, unitCount);
