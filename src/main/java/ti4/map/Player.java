@@ -18,7 +18,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -33,10 +39,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
@@ -1804,6 +1806,15 @@ public class Player extends PlayerProperties {
     }
 
     public boolean controlsMecatol(boolean includeAlliance) {
+
+        if (getGame().isOrdinianC1Mode()) {
+            Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(getGame());
+            if (p2 != null && p2.getFaction().equalsIgnoreCase(getFaction())) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         if (includeAlliance)
             return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
         return CollectionUtils.containsAny(getPlanets(), Constants.MECATOLS);

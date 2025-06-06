@@ -96,6 +96,7 @@ public class GameProperties {
     private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
     private @ExportableField boolean hiddenAgendaMode;
+    private @ExportableField boolean ordinianC1Mode;
     private @ExportableField boolean allianceMode;
     private @ExportableField boolean communityMode;
     private @ExportableField boolean competitiveTIGLGame;

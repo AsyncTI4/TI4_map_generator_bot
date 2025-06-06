@@ -339,7 +339,14 @@ public class MiltyService {
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-            tile = new Tile("51", "tr");
+            String pos = "tr";
+            if (positionHS.equalsIgnoreCase("307") || positionHS.equalsIgnoreCase("310")) {
+                pos = "br";
+            }
+            if (positionHS.equalsIgnoreCase("313") || positionHS.equalsIgnoreCase("316")) {
+                pos = "bl";
+            }
+            tile = new Tile("51", pos);
             game.setTile(tile);
         }
 
