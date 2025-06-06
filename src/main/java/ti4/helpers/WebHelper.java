@@ -41,6 +41,8 @@ import ti4.message.BotLogger;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.settings.GlobalSettings;
 import ti4.website.WebsiteOverlay;
+import ti4.helpers.WebTilePositions;
+import ti4.helpers.WebTileUnitData;
 
 public class WebHelper {
 
@@ -108,10 +110,14 @@ public class WebHelper {
                     ))
                 : new HashMap<>();
 
+            WebTilePositions webTilePositions = WebTilePositions.fromGame(game);
+            Map<String, WebTileUnitData> tileUnitData = WebTileUnitData.fromGame(game);
             Map<String, Object> webData = new HashMap<>();
             webData.put("playerData", playerDataList);
             webData.put("factionCoordinates", factionCoordinatesStrings);
             webData.put("lawsInPlay", new HashSet<>(game.getLaws().keySet()));
+            webData.put("tilePositions", webTilePositions.getTilePositions());
+            webData.put("tileUnitData", tileUnitData);
 
             String json = objectMapper.writeValueAsString(webData);
             PutObjectRequest request = PutObjectRequest.builder()
