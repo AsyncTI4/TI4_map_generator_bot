@@ -15,6 +15,12 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -27,11 +33,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
@@ -834,9 +835,9 @@ public class AgendaHelper {
         if (player.hasAbility("future_sight")) {
             msg += " Reminder that you have **Future Sight** and may not wish to abstain.";
         }
-        
+
         msg += CryypterHelper.argentEnvoyReminder(player, game);
-        
+
         Player argent = Helper.getPlayerFromAbility(game, "zeal");
         if (game.isOmegaPhaseMode()) {
             if (argent != null) {
@@ -2592,7 +2593,7 @@ public class AgendaHelper {
             totalPlanetVotes += voteAmount;
         }
         if (!game.getLaws().containsKey("absol_government")) {
-            if (player.hasAbility("zeal")) {
+            if (player.hasAbility("zeal") || (game.isOrdinianC1Mode() && player == ButtonHelper.getPlayerWhoControlsCoatl(game))) {
                 int numPlayers = 0;
                 for (Player player_ : game.getPlayers().values()) {
                     if (player_.isRealPlayer())
@@ -3089,7 +3090,7 @@ public class AgendaHelper {
             return additionalVotesAndSources;
         }
         // Argent Zeal
-        if (player.hasAbility("zeal")) {
+        if (player.hasAbility("zeal") || (game.isOrdinianC1Mode() && player == ButtonHelper.getPlayerWhoControlsCoatl(game))) {
             long playerCount = game.getPlayers().values().stream().filter(Player::isRealPlayer).count();
             additionalVotesAndSources.put(FactionEmojis.Argent + "Zeal", Math.toIntExact(playerCount));
         }

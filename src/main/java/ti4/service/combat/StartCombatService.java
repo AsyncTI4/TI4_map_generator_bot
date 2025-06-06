@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -14,7 +16,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
@@ -440,6 +441,10 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against the ships of "
                         + player.getFactionEmojiOrColor() + " due to the ability of the Quetzecoatl (the Argent flagship).");
                 }
+            }
+            if (game.isOrdinianC1Mode() && (tile.getSpaceUnitHolder().getTokenList().contains("token_custc1.png") || tile.getSpaceUnitHolder().getTokenList().contains("token_custvpc1.png"))) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against ships in this system "
+                    + " due to the ability of the Coatl (the Argent flagship represented as the custodians token).");
             }
         }
     }

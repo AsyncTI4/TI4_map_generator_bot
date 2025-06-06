@@ -404,6 +404,21 @@ public class ButtonHelperTacticalAction {
             }
         }
 
+        if (player.hasAbility("plague_reservoir") && player.hasTech("dsvaylr")) {
+            for (Planet planetUH : tile.getPlanetUnitHolders()) {
+                String planet = planetUH.getName();
+                if (player.getPlanetsAllianceMode().contains(planetUH.getName())) {
+                    String msg10 = player.getRepresentationUnfogged()
+                        + " when you get to the invasion step of the tactical action, you may have an opportunity to use Scavenger Exos on "
+                        + Helper.getPlanetRepresentation(planet, game)
+                        + ". Only use this on one planet, per the plague reservoir ability.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
+                        ButtonHelper.getScavengerExosButtons(player));
+                    break;
+                }
+            }
+        }
+
         // Send buttons to move
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Use buttons to select the first system you wish to move from.", systemButtons);
 
@@ -449,7 +464,20 @@ public class ButtonHelperTacticalAction {
             }
             UnitHolder unitHolder = entry.getValue();
             for (UnitKey unitKey : unitHolder.getUnitKeys()) {
-                if (!player.unitBelongsToPlayer(unitKey)) continue;
+                if (!player.unitBelongsToPlayer(unitKey)) {
+                    boolean belongsToUnlockedAlly = false;
+                    UnitType uT = unitKey.getUnitType();
+                    if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
+                        for (Player p2 : game.getRealPlayers()) {
+                            if (p2.unitBelongsToPlayer(unitKey) && player.getAllianceMembers().contains(p2.getFaction()) && !tile.hasPlayerCC(p2)) {
+                                belongsToUnlockedAlly = true;
+                            }
+                        }
+                    }
+                    if (!belongsToUnlockedAlly) {
+                        continue;
+                    }
+                }
                 if (unitHolder instanceof Planet && !(movableFromPlanets.contains(unitKey.getUnitType())))
                     continue;
 
