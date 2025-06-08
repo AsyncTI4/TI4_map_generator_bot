@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -36,6 +37,7 @@ public class MiltyDraftButtonHandlers {
     @ButtonHandler("miltyFactionInfo_")
     private void sendAvailableFactionInfo(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         if (player == null) return;
+        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         String whichOnes = buttonID.replace("miltyFactionInfo_", "");
         List<FactionModel> displayFactions = new ArrayList<>();
         switch (whichOnes) {

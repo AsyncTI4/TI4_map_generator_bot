@@ -24,6 +24,7 @@ import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units;
 import ti4.helpers.settingsFramework.menus.GameSettings;
@@ -277,6 +278,7 @@ public class MiltyService {
 
     public static void secondHalfOfPlayerSetup(Player player, Game game, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
         Map<String, Player> players = game.getPlayers();
+        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
