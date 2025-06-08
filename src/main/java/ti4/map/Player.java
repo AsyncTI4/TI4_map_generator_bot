@@ -441,7 +441,7 @@ public class Player extends PlayerProperties {
             }
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equals(threadName)) {
+                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
                     return threadChannel_;
                 }
