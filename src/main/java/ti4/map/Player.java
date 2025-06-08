@@ -412,7 +412,7 @@ public class Player extends PlayerProperties {
 
                 // SEARCH FOR EXISTING OPEN THREAD
                 for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
                     }
@@ -422,7 +422,7 @@ public class Player extends PlayerProperties {
                 if (useComplete) {
                     hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                     for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                        if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                        if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                             setCardsInfoThreadID(threadChannel_.getId());
                             return threadChannel_;
                         }
@@ -435,9 +435,13 @@ public class Player extends PlayerProperties {
 
         // ATTEMPT TO FIND BY NAME
         try {
+            List<ThreadChannel> threadChannels2 = actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
+            if (!threadChannels2.isEmpty()) {
+                return threadChannels2.getFirst();
+            }
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equals(threadName)) {
+                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
                     return threadChannel_;
                 }
@@ -447,7 +451,7 @@ public class Player extends PlayerProperties {
             if (useComplete) {
                 if (hiddenThreadChannels.isEmpty()) hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
+                    if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
                     }
