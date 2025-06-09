@@ -1,13 +1,9 @@
-package ti4.helpers;
+package ti4.website;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import lombok.Data;
+import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.*;
 
@@ -96,11 +92,15 @@ public class WebPlayerArea {
     private Integer acCount;
     private Integer pnCount;
 
+    // victory points
+    private Integer totalVps;
+
     // Unit information map
     private Map<String, UnitCountInfo> unitCounts;
 
     // Nombox units by faction
     private Map<String, List<String>> nombox;
+
 
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -182,6 +182,9 @@ public class WebPlayerArea {
         webPlayerArea.setAcCount(player.getAc());
         webPlayerArea.setPnCount(player.getPnCount());
 
+        // victory points
+        webPlayerArea.setTotalVps(player.getTotalVictoryPoints());
+
         // get reinforcement count
         Map<Units.UnitKey, Integer> unitMapCount = new HashMap<>();
         Map<String, Tile> tileMap = game.getTileMap();
@@ -236,7 +239,6 @@ public class WebPlayerArea {
             }
         }
         webPlayerArea.setNombox(nomboxData);
-
         return webPlayerArea;
     }
 
