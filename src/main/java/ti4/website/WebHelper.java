@@ -1,4 +1,4 @@
-package ti4.helpers;
+package ti4.website;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -34,15 +34,11 @@ import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.settings.GlobalSettings;
-import ti4.website.WebsiteOverlay;
-import ti4.helpers.WebTilePositions;
-import ti4.helpers.WebTileUnitData;
 
 public class WebHelper {
 
@@ -96,29 +92,20 @@ public class WebHelper {
                 playerDataList.add(WebPlayerArea.fromPlayer(player, game));
             }
 
-            Map<String, Map<String, List<String>>> factionCoordinatesStrings = factionCoordinates != null
-                ? factionCoordinates.entrySet().stream()
-                    .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().entrySet().stream()
-                                      .collect(Collectors.toMap(
-                                          Map.Entry::getKey,
-                                          unitEntry -> unitEntry.getValue().stream()
-                                                              .map(point -> point.x + "," + point.y)
-                                                              .collect(Collectors.toList())
-                                      ))
-                    ))
-                : new HashMap<>();
-
             WebTilePositions webTilePositions = WebTilePositions.fromGame(game);
             Map<String, WebTileUnitData> tileUnitData = WebTileUnitData.fromGame(game);
+            WebStatTilePositions webStatTilePositions = WebStatTilePositions.fromGame(game);
+            // TO BE ADDED SOON
+            // WebObjectives webObjectives = WebObjectives.fromGame(game);
+            // webData.put("objectives", webObjectives);
             Map<String, Object> webData = new HashMap<>();
             webData.put("playerData", playerDataList);
-            webData.put("factionCoordinates", factionCoordinatesStrings);
             webData.put("lawsInPlay", new HashSet<>(game.getLaws().keySet()));
             webData.put("tilePositions", webTilePositions.getTilePositions());
             webData.put("tileUnitData", tileUnitData);
+            webData.put("statTilePositions", webStatTilePositions.getStatTilePositions());
 
+            webData.put("vpsToWin", game.getVp());
             String json = objectMapper.writeValueAsString(webData);
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))

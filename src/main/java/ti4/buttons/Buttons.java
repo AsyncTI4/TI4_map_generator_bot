@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.helpers.WebHelper;
+import ti4.website.WebHelper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.service.emoji.CardEmojis;
