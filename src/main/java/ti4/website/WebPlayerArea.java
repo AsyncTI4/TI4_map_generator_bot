@@ -145,20 +145,33 @@ public class WebPlayerArea {
         webPlayerArea.setCommoditiesTotal(player.getCommoditiesTotal());
 
         // Resource and influence totals
-        webPlayerArea.setResources(Helper.getPlayerResourcesAvailable(player, game));
-        webPlayerArea.setInfluence(Helper.getPlayerInfluenceAvailable(player, game));
-        webPlayerArea.setTotResources(Helper.getPlayerResourcesTotal(player, game));
-        webPlayerArea.setTotInfluence(Helper.getPlayerInfluenceTotal(player, game));
+        Integer resources = Helper.getPlayerResourcesAvailable(player, game);
+        Integer influence = Helper.getPlayerInfluenceAvailable(player, game);
+        Integer totResources = Helper.getPlayerResourcesTotal(player, game);
+        Integer totInfluence = Helper.getPlayerInfluenceTotal(player, game);
+
+        webPlayerArea.setResources(resources != null ? resources : 0);
+        webPlayerArea.setInfluence(influence != null ? influence : 0);
+        webPlayerArea.setTotResources(totResources != null ? totResources : 0);
+        webPlayerArea.setTotInfluence(totInfluence != null ? totInfluence : 0);
 
         // Optimal resource and influence calculations
-        webPlayerArea.setOptimalResources(Helper.getPlayerOptimalResourcesAvailable(player, game));
-        webPlayerArea.setOptimalInfluence(Helper.getPlayerOptimalInfluenceAvailable(player, game));
-        webPlayerArea.setFlexValue(Helper.getPlayerFlexResourcesInfluenceAvailable(player, game));
+        Integer optimalResources = Helper.getPlayerOptimalResourcesAvailable(player, game);
+        Integer optimalInfluence = Helper.getPlayerOptimalInfluenceAvailable(player, game);
+        Integer flexValue = Helper.getPlayerFlexResourcesInfluenceAvailable(player, game);
+
+        webPlayerArea.setOptimalResources(optimalResources != null ? optimalResources : 0);
+        webPlayerArea.setOptimalInfluence(optimalInfluence != null ? optimalInfluence : 0);
+        webPlayerArea.setFlexValue(flexValue != null ? flexValue : 0);
 
         // Total optimal resource and influence calculations (all planets)
-        webPlayerArea.setTotOptimalResources(Helper.getPlayerOptimalResourcesTotal(player, game));
-        webPlayerArea.setTotOptimalInfluence(Helper.getPlayerOptimalInfluenceTotal(player, game));
-        webPlayerArea.setTotFlexValue(Helper.getPlayerFlexResourcesInfluenceTotal(player, game));
+        Integer totOptimalResources = Helper.getPlayerOptimalResourcesTotal(player, game);
+        Integer totOptimalInfluence = Helper.getPlayerOptimalInfluenceTotal(player, game);
+        Integer totFlexValue = Helper.getPlayerFlexResourcesInfluenceTotal(player, game);
+
+        webPlayerArea.setTotOptimalResources(totOptimalResources != null ? totOptimalResources : 0);
+        webPlayerArea.setTotOptimalInfluence(totOptimalInfluence != null ? totOptimalInfluence : 0);
+        webPlayerArea.setTotFlexValue(totFlexValue != null ? totFlexValue : 0);
 
         // Fragments
         webPlayerArea.setCrf(player.getCrf());
