@@ -1,7 +1,6 @@
 package ti4.map;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -148,7 +147,8 @@ abstract public class UnitHolder {
         List<Integer> counts = unitsByState.get(unit);
         int totalCount = getTotalUnitCount(counts);
         if (totalCount <= 0) {
-            return new ArrayList<>(unitsByState.remove(unit));
+            unitsByState.remove(unit);
+            return UnitState.emptyList();
         }
 
         List<Integer> unitsRemoved = UnitState.emptyList();
