@@ -7,12 +7,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.NotNull;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.helpers.ButtonHelper;
+import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -49,7 +47,7 @@ public class RemoveUnitService {
         public Player getPlayer(Game game) {
             return game.getPlayerFromColorOrFaction(unitKey().getColorID());
         }
-    };
+    }
 
     @NotNull
     public List<RemovedUnit> removeAllUnits(GenericInteractionCreateEvent event, Tile tile, Game game, UnitHolder unitHolder) {

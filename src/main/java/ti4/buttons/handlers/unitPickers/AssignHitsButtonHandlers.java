@@ -48,7 +48,7 @@ public class AssignHitsButtonHandlers {
             UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
             UnitType type = Units.findUnitType(matcher.group("unittype"));
             String planetName = matcher.group("planet");
-
+            String color = matcher.group("color");
             UnitHolder holder = planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
             ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(game, player, matcher);
             if (remove) {
@@ -121,7 +121,7 @@ public class AssignHitsButtonHandlers {
             boolean prefersState = matcher.group("state") != null && StringUtils.isNotBlank(matcher.group("state"));
             UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
             String planetName = matcher.group("planet");
-
+            String color = matcher.group("color");
             UnitHolder holder = planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
             UnitKey key = Units.getUnitKey(type, player.getColorID());
             if (holder != null) holder.removeDamagedUnit(key, amt);
@@ -153,7 +153,7 @@ public class AssignHitsButtonHandlers {
             boolean prefersState = matcher.group("state") != null && StringUtils.isNotBlank(matcher.group("state"));
             UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
             String planetName = matcher.group("planet");
-
+            String color = matcher.group("color");
             UnitHolder holder = planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
             if (holder != null) holder.addDamagedUnit(Units.getUnitKey(type, player.getColorID()), amt);
 

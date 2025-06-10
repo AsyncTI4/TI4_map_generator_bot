@@ -6,7 +6,7 @@
         "name": "Dirzuga Ohao",
         "title": "Flaah Cultivator",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may place 1 infantry from your reinforcements on a planet that does not contain other players’ units and is adjacent to a planet you control.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, place 1 infantry from your reinforcements on a planet that does not contain other players’ units and is adjacent to 2 of your ground forces.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -28,7 +28,7 @@
         "name": "What Hope Flees From",
         "title": "Inexorable Doom",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may capture 1 unit from your reinforcements with a cost less than or equal to the number of players that cast votes for the resolved outcome.",
+        "abilityText": "Choose an outcome; if it is not resolved and you predicted it or cast 5 or more votes for it, you may capture 1 unit from your reinforcements with a cost less than or equal to the number of players that cast votes for the resolved outcome.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -39,7 +39,7 @@
         "name": "San Omairo",
         "title": "Pathmaker",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may exhaust this card to choose a player who voted for that outcome. If you predicted or cast 5 or more votes for another outcome, you may place or move a Creuss wormhole token into a non-home system that contains a planet that player controls.",
+        "abilityText": "Choose an outcome; if it is not resolved and you predicted it or cast 5 or more votes for it, you may place or move a Creuss wormhole token into a non-home system that contains a planet controlled by a player who voted for the resolved outcome.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -61,7 +61,7 @@
         "name": "Huldran",
         "title": "Return On Investment",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Each other player that voted for that agenda may gain 1 trade good.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, each other player that cast 5 or more votes for that agenda may gain 1 commodity.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -72,7 +72,7 @@
         "name": "Yaluga Huin",
         "title": "Dean of Patents",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Place a control token on a technology you own. Players must place 1 trade good on this card to research technologies with your control tokens. At the end of the status phase, gain the trade goods on this card.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, place a control token on a technology you own. When a player researches a technology with your control token on it, gain 1 trade good.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -94,7 +94,7 @@
         "name": "A6AH3",
         "title": "Calculated Presence",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may exhaust this card and remove 1 of your dreadnoughts adjacent to Mecatol Rex from the board to discard the agenda instead; it is resolved with no effect and is not replaced.",
+        "abilityText": "Choose an outcome; if it is not resolved and you predicted it or cast 5 or more votes for it, you may exhaust this card and remove 1 of your dreadnoughts in or adjacent to Mecatol Rex’s system from the board to discard the agenda instead; it is resolved with no effect and is not replaced.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -105,7 +105,7 @@
         "name": "Legate Erran",
         "title": "Wheels Of Industry",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may choose a system that contains 1 of your space docks. Replace 1 of your non-fighter ships in that system with a dreadnought from your reinforcements, or place 1 cruiser or destroyer in that system.",
+        "abilityText": "Choose an outcome; if it is not resolved and you predicted it or cast 5 or more votes for it, you may exhaust this card to place 1 ship with a cost of 4 or less in a system containing your ships.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -116,7 +116,7 @@
         "name": "Keer En Hanaan",
         "title": "Archon Of Unity",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may exhaust this card to choose a player who can vote who did not vote for that outcome. Replace 1 command token in your fleet pool with 1 from that player’s reinforcements if it does not already contain 1 of that player's tokens.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, you may exhaust this card to choose a player who voted for a different outcome. Replace 1 command token in your fleet pool with 1 from that player’s reinforcements if it does not already contain 1 of that player's tokens.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -138,7 +138,7 @@
         "name": "Moltosh",
         "title": "Feed The Flames",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may gain a command token and place it in your strategy pool.",
+        "abilityText": "Choose an outcome; if it is not resolved and you predicted it or cast 5 or more votes for it, you may gain a command token and place it in your strategy pool.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -160,7 +160,7 @@
         "name": "Tam And Kurn",
         "title": "Horizon Walkers",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may look at the top card of an exploration deck. If it is a relic fragment, you may exhaust this card to gain it.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, look at the top card of the Relic deck, then you may exhaust this card to either put that card on the bottom of the deck, or purge 2 relic fragments of the same type to gain that card.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -171,7 +171,7 @@
         "name": "Nekro Incisul",
         "title": "Network Infiltrator",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Choose an outcome and a player. If that player votes for that outcome, they cast additional votes equal to the number of technologies that player owns that you also own.",
+        "abilityText": "Choose an outcome and a player. If that player votes for that outcome, they cast additional votes equal to the number of technologies that player owns that you also own. If that outcome is resolved, you count as having cast 5 votes for that outcome.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -193,7 +193,7 @@
         "name": "Qui'rek",
         "title": "Broodmaster",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may place 2 fighters from your reinforcements in a system that contains 1 or more of your ships.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, you may place up to 3 fighters from your reinforcements in a system that contains 1 or more of your ships.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -204,7 +204,7 @@
         "name": "Kelg Melkov",
         "title": "Logistics Officer",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may move 1 of your ships to an adjacent system that contains 1 or more of your ships or space docks.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, you may move 1 of your ships to an adjacent system that contains 1 or more of your ships or space docks.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -215,7 +215,7 @@
         "name": "Ronald Wiley",
         "title": "Political Rally",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "You may ready each planet you control in 1 system.",
+        "abilityText": "Choose an outcome; if it is resolved and you predicted it or cast 5 or more votes for it, you may ready each planet you control in 1 system.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -226,7 +226,7 @@
         "name": "Hermetecon",
         "title": "The Seeker",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "If you predicted or cast 5 or more votes for another outcome, you may exhaust this card and choose a player who voted for the resolved outcome. Place or move 1 sleeper token onto a non-home planet that player controls that does not have a sleeper token.",
+        "abilityText": "Choose an outcome; if it is not resolved and you predicted it or cast 5 or more votes for it, you may exhaust this card to place or move 1 sleeper token onto a non-home planet that does not have a sleeper token and is controlled by a player who voted for the resolved outcome.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
@@ -284,6 +284,7 @@
         "abilityWindow": "ACTION:",
         "abilityText": "You may discard 1 law from play. Gain the speaker token, then look at the top 5 cards of the agenda deck. Choose up to 2 to resolve as if you had cast up to 5 votes for an outcome of your choice; discard the rest. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
+        "homebrewReplacesID": "xxchahero",
         "source": "voices_of_the_council"
     },
     {
@@ -296,6 +297,7 @@
         "abilityWindow": "After an agenda is revealed:",
         "abilityText": "You may cast up to 6 additional votes on this agenda. Predict aloud an outcome of this agenda. For each player that abstains or votes for another outcome, gain 1 trade goods and 1 command token. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
+        "homebrewReplacesID": "keleresheroodlynn",
         "source": "voices_of_the_council"
     }
 ]

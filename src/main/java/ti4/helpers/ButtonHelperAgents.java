@@ -8,14 +8,13 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
@@ -644,7 +643,7 @@ public class ButtonHelperAgents {
             if (p2 == null)
                 return;
             p2.addSpentThing("Exhausted " + ssruuClever + "Rond Bri'ay, the Roh'Dhna" + ssruuSlash + " agent, for 1 command token.");
-            List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+            List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
             String trueIdentity2 = p2.getRepresentationUnfogged();
             String message2 = trueIdentity2 + ", your current command tokens are " + p2.getCCRepresentation()
                 + ". Use buttons to gain command tokens.";
@@ -1700,7 +1699,7 @@ public class ButtonHelperAgents {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             Tile tile = game.getTileFromPlanet(p.getName());
             if (tile != null && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game) && ButtonHelper.checkForTechSkips(game, planet)
                 || tile.isHomeSystem()) {
@@ -1786,7 +1785,7 @@ public class ButtonHelperAgents {
         }
         String msg = player.getFactionEmojiOrColor() + " replenished commodities due to " + (kyro.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Tox, the Kyro" + (kyro.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.";
-        player.setCommodities(player.getCommodities()+player.getCommoditiesTotal());
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         cabalAgentInitiation(game, player);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

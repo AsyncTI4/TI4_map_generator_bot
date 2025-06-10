@@ -157,7 +157,7 @@
         "name": "Covert Operation",
         "phase": "Action",
         "window": "After you move ships into the active system",
-        "text": "Remove 1 of your ships or ground forces from a system that does not contain 1 of your command tokens and place that unit in the space area of the active system.",
+        "text": "Remove 1 of your ships or ground forces from the game board and place that unit in the space area of the active system.",
         "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
         "source": "action_deck_2"
     },
@@ -658,7 +658,7 @@
         "name": "Pivot",
         "phase": "Action",
         "window": "Action",
-        "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
+        "text": "Discard 1-3 action cards from your hand to draw an equal number of action cards.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
         "source": "action_deck_2"
     },
@@ -676,7 +676,7 @@
         "name": "Propaganda",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to that planet's influence value.",
+        "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to its influence value.",
         "flavorText": "The Federation anthem blared from the holoscreen as troops paraded across it. \"They're doing their part. Are you? Join the Mobile Legion and save the galaxy!\"",
         "source": "action_deck_2"
     },

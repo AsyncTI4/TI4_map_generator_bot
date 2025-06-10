@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.experimental.UtilityClass;
 import ti4.json.ObjectMapperFactory;
 import ti4.map.Game;
@@ -36,7 +35,7 @@ public class SaveMapPojo { //
     }
 
     private <T, C extends T> List<String> saveProps(C obj, Class<T> clazz) {
-        T props = (T) obj;
+        T props = obj;
         List<String> saveValues = new ArrayList<>();
         for (Field f : clazz.getDeclaredFields()) {
             String saveVal = getSaveStringForField(f, props);
@@ -50,7 +49,7 @@ public class SaveMapPojo { //
             int firstSpace = prop.indexOf(' ');
             String fieldName = prop.substring(0, firstSpace);
             String value = prop.substring(firstSpace + 1);
-            setFieldToValue((T) obj, clazz, fieldName, value);
+            setFieldToValue(obj, clazz, fieldName, value);
         }
         return obj;
     }
@@ -78,7 +77,7 @@ public class SaveMapPojo { //
             String strVal = getOutputFromField(val, name);
             return name + " " + strVal;
         } catch (Exception e) {
-            System.out.println(e.toString());
+            System.out.println(e);
         }
         return null;
     }

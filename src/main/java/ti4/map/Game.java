@@ -787,6 +787,21 @@ public class Game extends GameProperties {
         checkingForAllReacts.put(key, value);
     }
 
+    public int changeCommsOnPlanet(int change, String planet) {
+        int amountRemaining = 0;
+        if (!getStoredValue("CommsOnPlanet" + planet).isEmpty()) {
+            int thereAlready = Integer.parseInt(getStoredValue("CommsOnPlanet" + planet));
+            change += thereAlready;
+        }
+        if (change > 0) {
+            amountRemaining = change;
+            setStoredValue("CommsOnPlanet" + planet, "" + change);
+        } else {
+            removeStoredValue("CommsOnPlanet" + planet);
+        }
+        return amountRemaining;
+    }
+
     public String getStoredValue(String key) {
         String value = getFactionsThatReactedToThis(key);
         return StringHelper.unescape(value);
@@ -1523,6 +1538,9 @@ public class Game extends GameProperties {
 
     public boolean isCustodiansScored() {
         boolean custodiansTaken = false;
+        if (isOrdinianC1Mode()) {
+            return ButtonHelper.isCoatlHealed(this);
+        }
         String idC = "";
         for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(0)) {
@@ -3639,19 +3657,15 @@ public class Game extends GameProperties {
         if (!leaderID.contains("commander"))
             return false;
 
-        // check if player has any allainces with players that have the commander
-        // unlocked
+        // check if player has any alliances with players that have the commander unlocked
         if (player.hasAbility("imperia")) {
             for (Player otherPlayer : getRealPlayers()) {
                 if (otherPlayer.getFaction().equalsIgnoreCase(player.getFaction()))
                     continue;
-                if (player.getMahactCC().contains(otherPlayer.getColor())) {
-
-                    if (otherPlayer.hasLeaderUnlocked(leaderID)) {
-                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
-                            return leaderID.contains(otherPlayer.getFaction());
-                        }
-                    }
+                if (player.getMahactCC().contains(otherPlayer.getColor())
+                    && otherPlayer.hasLeaderUnlocked(leaderID) && isAllianceMode()
+                    && "mahact".equalsIgnoreCase(player.getFaction())) {
+                    return leaderID.contains(otherPlayer.getFaction());
                 }
             }
         }
@@ -3663,7 +3677,7 @@ public class Game extends GameProperties {
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
-                if (pnOwner != null && !pnOwner.equals(player) && pnOwner.hasLeaderUnlocked(leaderID)) {
+                if (pnOwner != null && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction()) && pnOwner.hasLeaderUnlocked(leaderID)) {
                     return true;
                 }
             }
@@ -3689,13 +3703,12 @@ public class Game extends GameProperties {
 
     public List<Leader> playerUnlockedLeadersOrAlliance(Player player) {
         List<Leader> leaders = new ArrayList<>(player.getLeaders());
-        // check if player has any allainces with players that have the commander
+        // check if player has any alliances with players that have the commander
         // unlocked
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
-
                     for (Leader playerLeader : pnOwner.getLeaders()) {
                         if (leaderIsFake(playerLeader.getId())) {
                             continue;
@@ -3716,7 +3729,6 @@ public class Game extends GameProperties {
                 if (otherPlayer.equals(player))
                     continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
-
                     for (Leader playerLeader : otherPlayer.getLeaders()) {
                         if (leaderIsFake(playerLeader.getId())) {
                             continue;
@@ -3724,10 +3736,9 @@ public class Game extends GameProperties {
                         if (!playerLeader.getId().contains("commander")) {
                             continue;
                         }
-                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
-                            if (!playerLeader.getId().contains(otherPlayer.getFaction())) {
-                                continue;
-                            }
+                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())
+                            && !playerLeader.getId().contains(otherPlayer.getFaction())) {
+                            continue;
                         }
                         leaders.add(playerLeader);
                     }
@@ -3989,6 +4000,10 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Tile getMecatolTile() {
+
+        if (isOrdinianC1Mode()) {
+            return ButtonHelper.getTileWithCoatl(this);
+        }
         for (String mr : Constants.MECATOL_SYSTEMS) {
             Tile tile = getTile(mr);
             if (tile != null)
