@@ -121,6 +121,10 @@ public class WebPlayerArea {
     // Nombox units by faction
     private Map<String, List<String>> nombox;
 
+    // Special token reinforcements
+    private Integer sleeperTokensReinf;
+    private List<String> ghostWormholesReinf;
+
 
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -236,6 +240,44 @@ public class WebPlayerArea {
 
         // secret objectives
         webPlayerArea.setNumScoreableSecrets(player.getMaxSOCount());
+
+        // Special token reinforcements
+        // Sleeper tokens (Titans faction only)
+        if (player.hasAbility("awaken")) {
+            webPlayerArea.setSleeperTokensReinf(5 - game.getSleeperTokensPlacedCount());
+        } else {
+            webPlayerArea.setSleeperTokensReinf(0);
+        }
+
+        // Ghost wormhole tokens (Ghost faction only)
+        if ("ghost".equalsIgnoreCase(player.getFaction())) {
+            List<String> ghostWormholesInReinf = new ArrayList<>();
+
+            // Check which wormholes are on the map
+            boolean alphaOnMap = false;
+            boolean betaOnMap = false;
+            boolean gammaOnMap = false;
+
+            String alphaID = Mapper.getTokenID("creussalpha");
+            String betaID = Mapper.getTokenID("creussbeta");
+            String gammaID = Mapper.getTokenID("creussgamma");
+
+            for (Tile tile : game.getTileMap().values()) {
+                Set<String> tileTokens = tile.getUnitHolders().get("space").getTokenList();
+                alphaOnMap |= tileTokens.contains(alphaID);
+                betaOnMap |= tileTokens.contains(betaID);
+                gammaOnMap |= tileTokens.contains(gammaID);
+            }
+
+            // Add wormholes that are NOT on the map (i.e., in reinforcements)
+            if (!alphaOnMap) ghostWormholesInReinf.add("creussalpha");
+            if (!betaOnMap) ghostWormholesInReinf.add("creussbeta");
+            if (!gammaOnMap) ghostWormholesInReinf.add("creussgamma");
+
+            webPlayerArea.setGhostWormholesReinf(ghostWormholesInReinf);
+        } else {
+            webPlayerArea.setGhostWormholesReinf(new ArrayList<>());
+        }
 
         // get reinforcement count
         Map<Units.UnitKey, Integer> unitMapCount = new HashMap<>();
