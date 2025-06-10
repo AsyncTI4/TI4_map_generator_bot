@@ -125,7 +125,7 @@ public class WebTileUnitData {
 
                     // For now, we'll treat all tokens as non-faction specific
                     // If tokens become faction-specific in the future, we can update this logic
-                    WebEntityData tokenData = new WebEntityData(token, entityType, 1);
+                    WebEntityData tokenData = new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
                     factionTokens.computeIfAbsent("neutral", k -> new ArrayList<>()).add(tokenData);
                 }
 

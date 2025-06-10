@@ -3,6 +3,7 @@ package ti4.website;
 import java.util.*;
 
 import lombok.Data;
+import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.*;
@@ -33,6 +34,22 @@ public class WebPlayerArea {
     private int tg;
     private int commodities;
     private int commoditiesTotal;
+
+    // Resource and influence totals
+    private int resources;
+    private int influence;
+    private int totResources;
+    private int totInfluence;
+
+    // Optimal resource and influence calculations
+    private int optimalResources;
+    private int optimalInfluence;
+    private int flexValue;
+
+    // Total optimal resource and influence calculations (all planets)
+    private int totOptimalResources;
+    private int totOptimalInfluence;
+    private int totFlexValue;
 
     // Fragments
     private int crf;
@@ -95,6 +112,9 @@ public class WebPlayerArea {
     // victory points
     private Integer totalVps;
 
+    // secret objectives
+    private Integer numScoreableSecrets;
+
     // Unit information map
     private Map<String, UnitCountInfo> unitCounts;
 
@@ -123,6 +143,22 @@ public class WebPlayerArea {
         webPlayerArea.setTg(player.getTg());
         webPlayerArea.setCommodities(player.getCommodities());
         webPlayerArea.setCommoditiesTotal(player.getCommoditiesTotal());
+
+        // Resource and influence totals
+        webPlayerArea.setResources(Helper.getPlayerResourcesAvailable(player, game));
+        webPlayerArea.setInfluence(Helper.getPlayerInfluenceAvailable(player, game));
+        webPlayerArea.setTotResources(Helper.getPlayerResourcesTotal(player, game));
+        webPlayerArea.setTotInfluence(Helper.getPlayerInfluenceTotal(player, game));
+
+        // Optimal resource and influence calculations
+        webPlayerArea.setOptimalResources(Helper.getPlayerOptimalResourcesAvailable(player, game));
+        webPlayerArea.setOptimalInfluence(Helper.getPlayerOptimalInfluenceAvailable(player, game));
+        webPlayerArea.setFlexValue(Helper.getPlayerFlexResourcesInfluenceAvailable(player, game));
+
+        // Total optimal resource and influence calculations (all planets)
+        webPlayerArea.setTotOptimalResources(Helper.getPlayerOptimalResourcesTotal(player, game));
+        webPlayerArea.setTotOptimalInfluence(Helper.getPlayerOptimalInfluenceTotal(player, game));
+        webPlayerArea.setTotFlexValue(Helper.getPlayerFlexResourcesInfluenceTotal(player, game));
 
         // Fragments
         webPlayerArea.setCrf(player.getCrf());
@@ -184,6 +220,9 @@ public class WebPlayerArea {
 
         // victory points
         webPlayerArea.setTotalVps(player.getTotalVictoryPoints());
+
+        // secret objectives
+        webPlayerArea.setNumScoreableSecrets(player.getMaxSOCount());
 
         // get reinforcement count
         Map<Units.UnitKey, Integer> unitMapCount = new HashMap<>();
