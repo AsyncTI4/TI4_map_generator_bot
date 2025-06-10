@@ -2571,7 +2571,7 @@ public class Player extends PlayerProperties {
     public List<Integer> getExhaustedSCs() {
         List<Integer> exhaustedSCs = new ArrayList<>();
         for (int sc : getSCs()) {
-            if (!getGame().getStoredValue("exhaustedSC" + sc).isEmpty()) {
+            if (getGame().getPlayedSCs().contains(sc)) {
                 exhaustedSCs.add(sc);
             }
         }
