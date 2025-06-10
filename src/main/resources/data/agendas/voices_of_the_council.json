@@ -435,7 +435,7 @@
         "type": "Directive",
         "target": "For/Against",
         "text1": "For: Each player places 1 mech from their reinforcements on a planet they control in their home system for every 5 votes cast \"For\" by that player.",
-        "text2": "Against: Each player chooses 1 if their mechs for each player that cast fewer votes, and replaces the rest with 1 infantry from their reinforcements.",
+        "text2": "Against: Each player chooses 1 of their mechs for each player that cast fewer votes, and replaces the rest with 1 infantry from their reinforcements.",
         "source": "voices_of_the_council"
     },
     {

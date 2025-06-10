@@ -12,6 +12,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.settings.users.UserSettingsManager;
+import ti4.website.WebHelper;
 
 public class PlayerTitleHelper {
 

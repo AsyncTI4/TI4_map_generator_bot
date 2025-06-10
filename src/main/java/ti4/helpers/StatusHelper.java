@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.collections4.ListUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -115,7 +114,7 @@ public class StatusHelper {
                     player.getRepresentationUnfogged() + " you gained " + numScoredSOs + " trade good" + (numScoredSOs == 1 ? "" : "s")
                         + " and " + numScoredPos + " commodit" + (numScoredSOs == 1 ? "y" : "ies") + " due to Komdar Borodin, the Vaden Commander.");
             }
-            if (player.getPromissoryNotes().keySet().contains("dspnuyda") && !player.getPromissoryNotesOwned().contains("dspnuyda")) {
+            if (player.getPromissoryNotes().containsKey("dspnuyda") && !player.getPromissoryNotesOwned().contains("dspnuyda")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " reminder this is the window to use the Uydai promissory note");
             }

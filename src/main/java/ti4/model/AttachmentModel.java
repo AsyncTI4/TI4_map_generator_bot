@@ -14,17 +14,16 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String name;
     private String imagePath;
-    private List<String> techSpeciality = new ArrayList<>();
-    private List<String> planetTypes = new ArrayList<>();
+    private String token;
+    private Boolean isFakeAttachment; // is an attachment on backend, but should not be displayed as one
     private int resourcesModifier;
     private int influenceModifier;
-    private String abilityText;
-    private String token;
+    private List<String> planetTypes = new ArrayList<>();
+    private List<String> techSpeciality = new ArrayList<>();
     private Boolean isLegendary;
-    private Boolean isFakeAttachment; // is an attachment on backend, but should not be displayed as one
-
     private int spaceCannonHitsOn;
     private int spaceCannonDieCount;
+    private String abilityText;
     private ComponentSource source;
 
     @Override
@@ -81,6 +80,10 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
+        if (getSpaceCannonHitsOn() != 0 || getSpaceCannonDieCount() != 0) sb.append("Space Cannon: ").append(getSpaceCannonHitsOn()).append("x").append(getSpaceCannonDieCount()).append("\n");
+        if (getAbilityText() != null) sb.append("Ability: ").append(getAbilityText()).append("\n");
+        if (getToken().isPresent()) sb.append("Token: ").append(getToken().get()).append("\n");
+        if (getIsFakeAttachment() != null) sb.append("(fake attachment)\n");
         eb.setDescription(sb.toString());
 
         sb = new StringBuilder();
@@ -95,11 +98,17 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        return getName().contains(searchString)
-            || getId().contains(searchString)
-            || (isLegendary() && "legendary".contains(searchString))
-            || getSource().toString().contains(searchString)
-            || getAutoCompleteName().contains(searchString);
+        return getName().toLowerCase().contains(searchString.toLowerCase())
+            || getId().toLowerCase().contains(searchString.toLowerCase())
+            || (getToken().isPresent() && getToken().get().toLowerCase().contains(searchString.toLowerCase()))
+            || (getResourcesModifier() != 0 && "resources".contains(searchString.toLowerCase()))
+            || (getInfluenceModifier() != 0 && "influence".contains(searchString.toLowerCase()))
+            || (getPlanetTypes() != null && getPlanetTypes().toString().contains(searchString.toLowerCase()))
+            || (getTechSpeciality() != null && getTechSpeciality().toString().contains(searchString.toLowerCase()))
+            || (isLegendary() && "legendary".contains(searchString.toLowerCase()))
+            || (getSpaceCannonHitsOn() != 0 && "space cannon".contains(searchString.toLowerCase()))
+            || (isFakeAttachment() && "fake".contains(searchString.toLowerCase()))
+            || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
 
     }
 }

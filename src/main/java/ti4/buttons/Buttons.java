@@ -3,14 +3,13 @@ package ti4.buttons;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.helpers.WebHelper;
+import ti4.website.WebHelper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.service.emoji.CardEmojis;
@@ -23,7 +22,7 @@ import ti4.service.emoji.TechEmojis;
 public class Buttons {
 
     public enum ButtonColor {
-        green, red, gray, blue;
+        green, red, gray, blue
     }
 
     public static final Button GET_A_TECH = green("acquireATech", "Get a Technology");

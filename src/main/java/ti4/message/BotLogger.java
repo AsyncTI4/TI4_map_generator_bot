@@ -1,18 +1,15 @@
 package ti4.message;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -20,10 +17,15 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.cron.CronManager;
 import ti4.cron.InteractionLogCron;
-import ti4.helpers.*;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
+import ti4.helpers.DiscordWebhook;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.listeners.ModalListener;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -607,7 +609,7 @@ public class BotLogger {
 		private Player player;
 
 		@Getter
-		private String originTime;
+		private final String originTime;
 
 		public LogMessageOrigin(@Nonnull Guild guild) {
 			this.guild = guild;
@@ -758,7 +760,7 @@ public class BotLogger {
 				case ModalInteractionEvent mEvent -> builder.append("used modal ")
 					.append(ModalListener.getModalDebugText(mEvent))
 					.append("\n");
-				default -> builder.append("initiated an unexpected event of type `").append(event.getType().toString()).append("`\n");
+				default -> builder.append("initiated an unexpected event of type `").append(event.getType()).append("`\n");
 			}
 
 			return builder;
@@ -800,13 +802,13 @@ public class BotLogger {
 
 		// Implementor's note: These fields must have getters, as this is how the subclasses override the statics without changing them for all subclasses
 		@Getter
-		private static String channelName = "";
+		private static final String channelName = "";
 
 		@Getter
-		private static String threadName = "";
+		private static final String threadName = "";
 
 		@Getter
-		private static String messagePrefix = "";
+		private static final String messagePrefix = "";
 
 		protected String message = "";
 

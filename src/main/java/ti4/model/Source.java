@@ -20,7 +20,7 @@ public class Source {
         base, pok, codex1, codex2, codex3,
 
         //big homebrew
-        ds, absol, franken, uncharted_space, monuments,
+        ds, absol, franken, uncharted_space, monuments, blue_reverie,
 
         // lil homebrew
         lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises,

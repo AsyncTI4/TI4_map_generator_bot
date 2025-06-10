@@ -1,5 +1,6 @@
 package ti4.service.combat;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -358,6 +360,24 @@ public class StartCombatService {
             List<Button> lanefirATSButtons = ButtonHelperFactionSpecific.getLanefirATSButtons(player1, player2);
             MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from _ATS Armaments_:", lanefirATSButtons);
         }
+
+        if (tile.isHomeSystem() && isGroundCombat && game.getStoredValue("audioSent").isEmpty()) {
+            for (Player p3 : game.getRealPlayers()) {
+                if (p3.getHomeSystemTile() == tile) {
+                    File audioFile = ResourceHelper.getFile("voices/" + p3.getFaction() + "/", "homedefense.mp3");
+                    if (audioFile.exists()) {
+                        MessageHelper.sendFileToChannel(threadChannel, audioFile);
+                        game.setStoredValue("audioSent", "Yes");
+                    }
+                    Player invader = game.getActivePlayer();
+                    File audioFile2 = ResourceHelper.getFile("voices/" + invader.getFaction() + "/", "homeinvasion.mp3");
+                    if (audioFile2.exists() && invader != p3) {
+                        MessageHelper.sendFileToChannel(threadChannel, audioFile2);
+                        game.setStoredValue("audioSent", "Yes");
+                    }
+                }
+            }
+        }
     }
 
     private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
@@ -421,6 +441,10 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against the ships of "
                         + player.getFactionEmojiOrColor() + " due to the ability of the Quetzecoatl (the Argent flagship).");
                 }
+            }
+            if (game.isOrdinianC1Mode() && (tile.getSpaceUnitHolder().getTokenList().contains("token_custc1.png") || tile.getSpaceUnitHolder().getTokenList().contains("token_custvpc1.png"))) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against ships in this system "
+                    + " due to the ability of the Coatl (the Argent flagship represented as the custodians token).");
             }
         }
     }
@@ -569,7 +593,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win a combat during this action " +
                     "you may take an additional action (Qhet Commander Ability)");
             }
-            if (player.getPromissoryNotes().keySet().contains("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
+            if (player.getPromissoryNotes().containsKey("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " reminder you have the Qhet promissory note.");
             }

@@ -79,6 +79,9 @@ public class TileGenerator {
     private final String focusTile;
     private final DisplayType displayType;
 
+    // Map to aggregate unit coordinates by faction from all UnitRenderGenerator calls
+    private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
+
     public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         this(game, event, displayType, 0, "000", null);
     }
@@ -102,6 +105,38 @@ public class TileGenerator {
         return game.isFowMode() && event != null &&
             (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
                 event instanceof UserOverridenGenericInteractionCreateEvent);
+    }
+
+    /**
+     * Get the aggregated unit coordinates by faction from all UnitRenderGenerator calls
+     * @return Map where key is faction/player identifier, secondary key is unit ID, and value is list of coordinates
+     */
+    public Map<String, Map<String, List<Point>>> getUnitCoordinatesByFaction() {
+        return new HashMap<>(unitCoordinatesByFaction);
+    }
+
+    /**
+     * Helper method to aggregate unit coordinates from a UnitRenderGenerator into the main map
+     * @param unitRenderGenerator The UnitRenderGenerator to get coordinates from
+     */
+    private void aggregateUnitCoordinates(UnitRenderGenerator unitRenderGenerator) {
+        Map<String, Map<String, List<Point>>> renderCoordinates = unitRenderGenerator.getUnitCoordinatesByFaction();
+        if (renderCoordinates != null) {
+            for (Map.Entry<String, Map<String, List<Point>>> factionEntry : renderCoordinates.entrySet()) {
+                String faction = factionEntry.getKey();
+                Map<String, List<Point>> unitMap = factionEntry.getValue();
+
+                for (Map.Entry<String, List<Point>> unitEntry : unitMap.entrySet()) {
+                    String unitId = unitEntry.getKey();
+                    List<Point> coordinates = unitEntry.getValue();
+
+                    unitCoordinatesByFaction
+                        .computeIfAbsent(faction, k -> new HashMap<>())
+                        .computeIfAbsent(unitId, k -> new ArrayList<>())
+                        .addAll(coordinates);
+                }
+            }
+        }
     }
 
     public FileUpload createFileUpload() {
@@ -310,7 +345,7 @@ public class TileGenerator {
                 }
 
                 // add icons to wormholes for agendas
-                // Worhmole recon:  For: alpha||beta WH systems are adjacent to each other 
+                // Worhmole recon:  For: alpha||beta WH systems are adjacent to each other
                 // Travel ban:      For: alpha/beta WH have no effect during movement
                 // Nexus:           For: alpha/beta WH **in Nexus** have no effect during movement
                 // Shared research: For: Units can move through nebulae
@@ -332,7 +367,7 @@ public class TileGenerator {
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
                     && (tile.getTileID().equals("82b"))
-                    && !(ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban")) // 
+                    && !(ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban")) //
                 ) {
                     // avoid doubling up, which is important when using the transparent symbol
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
@@ -465,7 +500,7 @@ public class TileGenerator {
                         Graphics2D g2d = (Graphics2D) tileGraphics;
                         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                        // Calculate water height  
+                        // Calculate water height
                         double waterHeight;
                         if (capacity + ignoredFs > 0) {
                             waterHeight = 20.0 * capacityUsed / (capacity + ignoredFs);
@@ -473,7 +508,7 @@ public class TileGenerator {
                             waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
                         }
 
-                        // Draw brown box (3 sides)  
+                        // Draw brown box (3 sides)
 
                         g2d.setStroke(new BasicStroke(6));
 
@@ -485,17 +520,17 @@ public class TileGenerator {
                             gearY = gearY - 55;
                         }
 
-                        //g2d.setColor(new Color(128, 197, 222));  
-                        //g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);   
-                        //g2d.setColor(new Color(122, 127, 128)); 
+                        //g2d.setColor(new Color(128, 197, 222));
+                        //g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);
+                        //g2d.setColor(new Color(122, 127, 128));
 
-                        //g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);  
+                        //g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);
 
-                        // Right side  
-                        //g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);  
+                        // Right side
+                        //g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);
 
-                        // Bottom side  
-                        //g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);  
+                        // Bottom side
+                        //g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);
                         tileGraphics.drawImage(carrierImage, gearX + 24, gearY + 60, null);
                         g2d.setColor(Color.WHITE);
                         tileGraphics.setFont(Storage.getFont12());
@@ -520,7 +555,9 @@ public class TileGenerator {
                     if (unitHolder != spaceUnitHolder) {
                         addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
                     }
-                    new UnitRenderGenerator(game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer).render();
+                    UnitRenderGenerator unitRenderGenerator = new UnitRenderGenerator(game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer);
+                    unitRenderGenerator.render();
+                    aggregateUnitCoordinates(unitRenderGenerator);
                 }
             }
             case Distance -> {
@@ -1374,6 +1411,7 @@ public class TileGenerator {
                     xDelta += 10;
                 }
             }
+
         } else {
             oldFormatPlanetTokenAdd(tile, tileGraphics, unitHolder, controlList);
         }

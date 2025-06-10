@@ -412,7 +412,7 @@ public class Player extends PlayerProperties {
 
                 // SEARCH FOR EXISTING OPEN THREAD
                 for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
                     }
@@ -422,7 +422,7 @@ public class Player extends PlayerProperties {
                 if (useComplete) {
                     hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                     for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                        if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                        if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                             setCardsInfoThreadID(threadChannel_.getId());
                             return threadChannel_;
                         }
@@ -435,9 +435,13 @@ public class Player extends PlayerProperties {
 
         // ATTEMPT TO FIND BY NAME
         try {
+            List<ThreadChannel> threadChannels2 = actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
+            if (!threadChannels2.isEmpty()) {
+                return threadChannels2.getFirst();
+            }
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equals(threadName)) {
+                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
                     return threadChannel_;
                 }
@@ -447,7 +451,7 @@ public class Player extends PlayerProperties {
             if (useComplete) {
                 if (hiddenThreadChannels.isEmpty()) hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
+                    if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
                     }
@@ -580,7 +584,7 @@ public class Player extends PlayerProperties {
 
     /**
      * Returns whether the player owns a unit containing the given substring.
-     * 
+     *
      * @param unitIDSubstring The substring to
      * @return true if player owns a unit containing the given substring; false otherwise
      */
@@ -655,7 +659,9 @@ public class Player extends PlayerProperties {
                     + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType()
                     + "`\n> Units Owned: `"
                     + getUnitsOwned() + "`";
-                BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
+                if (!getGame().isFrankenGame()) {
+                    BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
+                }
                 return message;
             }
         }
@@ -1722,7 +1728,11 @@ public class Player extends PlayerProperties {
 
     @Override
     public void setCommodities(int comms) {
-        super.setCommodities(Math.clamp(comms, 0, getCommoditiesBase() + getCommoditiesBonus()));
+        int num = Math.clamp(comms, 0, getCommoditiesTotal());
+        if (hasAbility("necrophage") && (getCommoditiesBonus() == 0 || getCommoditiesBase() == 0)) {
+            num = Math.clamp(comms, 0, getCommoditiesBase() + 10);
+        }
+        super.setCommodities(num);
         if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);
     }
 
@@ -1800,6 +1810,15 @@ public class Player extends PlayerProperties {
     }
 
     public boolean controlsMecatol(boolean includeAlliance) {
+
+        if (getGame().isOrdinianC1Mode()) {
+            Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(getGame());
+            if (p2 != null && p2.getFaction().equalsIgnoreCase(getFaction())) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         if (includeAlliance)
             return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
         return CollectionUtils.containsAny(getPlanets(), Constants.MECATOLS);
@@ -2548,6 +2567,17 @@ public class Player extends PlayerProperties {
         return unfollowedSCs;
     }
 
+    @JsonIgnore
+    public List<Integer> getExhaustedSCs() {
+        List<Integer> exhaustedSCs = new ArrayList<>();
+        for (int sc : getSCs()) {
+            if (!getGame().getStoredValue("exhaustedSC" + sc).isEmpty()) {
+                exhaustedSCs.add(sc);
+            }
+        }
+        return exhaustedSCs;
+    }
+
     public void checkCommanderUnlock(String factionToCheck) {
         CommanderUnlockCheckService.checkPlayer(this, factionToCheck);
     }
@@ -2577,5 +2607,16 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean hasPriorityPosition() {
         return this.getPriorityPosition() != -1 && this.getPriorityPosition() != 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Player that)) return false;
+        return Objects.equals(getUserID(), that.getUserID());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getUserID());
     }
 }

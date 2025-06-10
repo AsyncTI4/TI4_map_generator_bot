@@ -71,6 +71,7 @@ public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
+            //System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName() + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue()); // Debug line
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);
@@ -330,6 +331,12 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
+            case Constants.SCENARIO -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                var tokens = List.of("ordinian (codex 1)");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
+                event.replyChoices(options).queue();
+            }
             case Constants.DECK_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Map<String, DeckModel> decks = Mapper.getDecks();
@@ -431,7 +438,9 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.AUTO_ARCHIVE_DURATION -> event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
+            case Constants.AUTO_ARCHIVE_DURATION -> {
+                event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
+            }
             case Constants.PLANET_TYPE -> {
                 List<String> allPlanetTypes = Arrays.stream(PlanetTypeModel.PlanetType.values())
                     .map(PlanetTypeModel.PlanetType::toString)
@@ -816,7 +825,7 @@ public class AutoCompleteProvider {
             case Constants.SEARCH_DECKS -> options = searchModels(event, Mapper.getDecks().values(), source);
             case Constants.SEARCH_EVENTS -> options = searchModels(event, Mapper.getEvents().values(), source);
             case Constants.SEARCH_EXPLORES -> options = searchModels(event, Mapper.getExplores().values(), source);
-            case Constants.SEARCH_FACTIONS -> options = searchModels(event, Mapper.getFactionsValues(), source);
+            case Constants.SEARCH_FACTIONS -> options = searchModels(event, Mapper.getFactions().values(), source);
             // no /search franken_errata yet
             // no /search generic_cards yet
             case Constants.SEARCH_LEADERS -> options = searchModels(event, Mapper.getLeaders().values(), source);
@@ -839,6 +848,7 @@ public class AutoCompleteProvider {
             /* From others */
             // none of them are populated from here
         }
+        //System.out.println(options.toString()); // Debug line
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList())).queue();
     }
 
@@ -866,7 +876,6 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-
             case Constants.BAN -> {
                 switch (optionName) {
                     case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
@@ -888,7 +897,6 @@ public class AutoCompleteProvider {
                         event.replyChoices(options).queue();
                     }
                 }
-
             }
         }
     }
@@ -900,7 +908,6 @@ public class AutoCompleteProvider {
                 var options = searchModels(event, TileHelper.getAllTileModels(), null);
                 event.replyChoices(options).queue();
             }
-
             case Constants.REMOVE_TILE -> {
                 if (!optionName.equals(Constants.POSITION)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();

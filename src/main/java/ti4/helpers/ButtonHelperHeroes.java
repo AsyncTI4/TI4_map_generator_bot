@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +7,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitKey;
@@ -54,6 +51,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperHeroes {
 
@@ -575,7 +574,7 @@ public class ButtonHelperHeroes {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (p != null && (type.equalsIgnoreCase(p.getOriginalPlanetType())
                 || p.getTokenList().contains("attachment_titanspn.png"))) {
                 buttons.add(Buttons.green("attachAttachment_" + planet + "_" + attachment,
@@ -1089,11 +1088,11 @@ public class ButtonHelperHeroes {
                 player.getFactionEmoji() + "You don't have the Belkosea hero.");
             return;
         }
-        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" refreshed ")
-            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        String message = player.getRepresentation() + " refreshed " +
+            Helper.getLeaderFullRepresentation(playerLeader);
         playerLeader.setExhausted(false);
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteTheOneButton(event);
 
     }
@@ -1106,11 +1105,11 @@ public class ButtonHelperHeroes {
                 player.getFactionEmoji() + "You don't have the Belkosea hero.");
             return;
         }
-        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" exhausted ")
-            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        String message = player.getRepresentation() + " exhausted " +
+            Helper.getLeaderFullRepresentation(playerLeader);
         playerLeader.setExhausted(true);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
+        MessageHelper.sendMessageToChannel(event.getChannel(), message + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
         ButtonHelper.deleteTheOneButton(event);
     }
 
