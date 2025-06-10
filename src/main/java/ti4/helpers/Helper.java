@@ -2036,6 +2036,10 @@ public class Helper {
         return getAvailablePlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
     }
 
+    public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game game) {
+        return getTotalPlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
+    }
+
     public static Map<String, Integer> getLastEntryInHashMap(Map<String, Integer> linkedHashMap) {
         int count = 1;
         for (Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {

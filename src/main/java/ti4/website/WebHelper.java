@@ -92,15 +92,33 @@ public class WebHelper {
                 playerDataList.add(WebPlayerArea.fromPlayer(player, game));
             }
 
-            WebTilePositions webTilePositions = WebTilePositions.fromGame(game);
+                                    WebTilePositions webTilePositions = WebTilePositions.fromGame(game);
             Map<String, WebTileUnitData> tileUnitData = WebTileUnitData.fromGame(game);
             WebStatTilePositions webStatTilePositions = WebStatTilePositions.fromGame(game);
-            // TO BE ADDED SOON
-            // WebObjectives webObjectives = WebObjectives.fromGame(game);
-            // webData.put("objectives", webObjectives);
+            WebObjectives webObjectives = WebObjectives.fromGame(game);
+            WebCardPool webCardPool = WebCardPool.fromGame(game);
+
+            // Create laws with metadata
+            List<WebLaw> lawsInPlay = new ArrayList<>();
+            for (Map.Entry<String, Integer> lawEntry : game.getLaws().entrySet()) {
+                WebLaw webLaw = WebLaw.fromGameLaw(lawEntry.getKey(), lawEntry.getValue(), game);
+                lawsInPlay.add(webLaw);
+            }
+
+            // Create strategy cards with trade goods and pick status
+            List<WebStrategyCard> strategyCards = new ArrayList<>();
+            for (Integer scNumber : game.getScTradeGoods().keySet()) {
+                if (scNumber == 0) continue; // Skip the special "0" SC (Naalu's zero token)
+                WebStrategyCard webSC = WebStrategyCard.fromGameStrategyCard(scNumber, game);
+                strategyCards.add(webSC);
+            }
+
             Map<String, Object> webData = new HashMap<>();
+            webData.put("objectives", webObjectives);
             webData.put("playerData", playerDataList);
-            webData.put("lawsInPlay", new HashSet<>(game.getLaws().keySet()));
+            webData.put("lawsInPlay", lawsInPlay);
+            webData.put("cardPool", webCardPool);
+            webData.put("strategyCards", strategyCards);
             webData.put("tilePositions", webTilePositions.getTilePositions());
             webData.put("tileUnitData", tileUnitData);
             webData.put("statTilePositions", webStatTilePositions.getStatTilePositions());
