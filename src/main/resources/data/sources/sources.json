@@ -65,6 +65,13 @@
         ]
     },
     {
+        "source":"codex4",
+        "name":"Codex IV",
+        "canal":"official",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"New relics, Galactic Events, Scenario"
+    },
+    {
         "source":"ds",
         "name":"Discordant Stars",
         "canal":"community",

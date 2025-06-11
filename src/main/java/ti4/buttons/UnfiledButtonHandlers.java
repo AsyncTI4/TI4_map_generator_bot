@@ -1,5 +1,7 @@
 package ti4.buttons;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +12,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
@@ -23,12 +29,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
-import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
@@ -67,7 +69,6 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
-import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
@@ -102,8 +103,6 @@ import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * TODO: move all of these methods to a better location, closer to the original button call and/or other related code
@@ -169,24 +168,29 @@ public class UnfiledButtonHandlers {
         String message = "Successfully " + buttonID.split("_")[2] + "d the ";
         if (mode.equalsIgnoreCase("hiddenagenda")) {
             game.setHiddenAgendaMode(enable);
-            message += " Hidden Agenda Mode. Nothing more needs to be done.";
+            message += "Hidden Agenda Mode. Nothing more needs to be done.";
         }
         if (mode.equalsIgnoreCase("minorFactions")) {
             game.setMinorFactionsMode(enable);
-            message += " Minor Factions Mode. ";
+            message += "Minor Factions Mode. ";
             if (enable) {
                 message += "You will need to decide how you want to draft the minor factions. This site has a decent setup for it, "
-                    + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that a neutral player "
-                    + "has been set up, and you can add 3 infantry to the minor faction planets pretty easily with /add_units.";
-                List<String> unusedColors = game.getUnusedColors().stream().map(ColorModel::getName).toList();
-                String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
-                game.setupNeutralPlayer(color);
-                message += "\nNeutral player has been set as " + color + ".";
+                    + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that you need to set up a neutral player "
+                    + "after the draft finishes with /special2 setup_neutral_player, and you can add 3 infantry to the minor faction planets pretty easily with /add_units.";
+
             }
         }
         if (mode.equalsIgnoreCase("ageOfExploration")) {
             game.setAgeOfExplorationMode(enable);
-            message += " Age of Exploration Mode. Nothing more needs to be done.";
+            message += "Age of Exploration Mode. Nothing more needs to be done.";
+        }
+        if (mode.equalsIgnoreCase("ageOfCommerce")) {
+            game.setAgeOfCommerceMode(enable);
+            message += "Age of Commerce Mode. Nothing more needs to be done.";
+        }
+        if (mode.equalsIgnoreCase("totalWar")) {
+            game.setTotalWarMode(enable);
+            message += "Total War Mode. Nothing more needs to be done.";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         List<Button> buttons = GameOptionService.getDaneLeakModeButtons(game);
@@ -2302,6 +2306,37 @@ public class UnfiledButtonHandlers {
     public static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         RelicHelper.drawRelicAndNotify(player, event, game);
         doAnotherAction(event, player, game);
+    }
+
+    @ButtonHandler("neuraloopPart1")
+    public static void neuraloopPart1(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String poID = buttonID.split(";")[1];
+        String type = buttonID.split(";")[2];
+        String msg = player.getRepresentation() + " choose the relic you want to purge in order to replace the objective with a " + type;
+        List<Button> buttons = RelicHelper.getNeuraLoopButton(player, poID, type, game);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("neuraloopPart2")
+    public static void neuraloopPart2(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String poID = buttonID.split(";")[1];
+        String type = buttonID.split(";")[2];
+        String relic = buttonID.split(";")[3];
+        player.removeRelic(relic);
+        player.removeExhaustedRelic(relic);
+        game.removeRevealedObjective(poID);
+        String msg = player.getRepresentation() + " choose to use the Neuraloop relic and purge their " + Mapper.getRelic(relic).getName() + " relic in order to replace the recently revealed objective with a random " + type + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        if (type.equalsIgnoreCase("stage1")) {
+            RevealPublicObjectiveService.revealS1(game, event, game.getActionsChannel(), true);
+        } else if (type.equalsIgnoreCase("stage2")) {
+            RevealPublicObjectiveService.revealS2(game, event, game.getActionsChannel(), true);
+        } else {
+            RevealPublicObjectiveService.revealSO(game, event, game.getActionsChannel());
+        }
+
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("drawRelic")

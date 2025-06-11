@@ -1011,7 +1011,7 @@ public class ButtonHelper {
             }
         }
         if (!game.isFowMode() && activeSystem.isAsteroidField() && !player.getTechs().contains("amd")
-            && !player.getTechs().contains("absol_amd")) {
+            && !player.getTechs().contains("absol_amd") && !player.getRelics().contains("circletofthevoid")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + player.getRepresentation()
                 + " this is a __friendly__ reminder that you do not have antimass deflectors");
         }
@@ -3206,12 +3206,16 @@ public class ButtonHelper {
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(
             "mallice", "hexmallice", "mirage", "hopesend", "primor", // PoK
-            "silence", "prism", "echo", "domna", "uikos"); // DS
+            "silence", "prism", "echo", "domna", "uikos", "ordinianc4"); // DS
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
+            String pass = "";
+            if (planet.contains("ordinian")) {
+                pass = " (Upon Pass Turn)";
+            }
             if (player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet)) {
                 String id = player.finChecker() + "planetAbilityExhaust_" + planet;
-                endButtons.add(Buttons.green(id, "Use " + prettyPlanet + " Ability", PlanetEmojis.getPlanetEmojiOrNull(planet)));
+                endButtons.add(Buttons.green(id, "Use " + prettyPlanet + " Ability" + pass, PlanetEmojis.getPlanetEmojiOrNull(planet)));
             }
         }
 

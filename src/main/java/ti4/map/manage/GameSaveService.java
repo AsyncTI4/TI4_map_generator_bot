@@ -417,7 +417,13 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.HIDDEN_AGENDA_MODE + " " + game.isHiddenAgendaMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.TOTAL_WAR_MODE + " " + game.isTotalWarMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.AGE_OF_COMMERCE_MODE + " " + game.isAgeOfCommerceMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.ORDINIAN_C1_MODE + " " + game.isOrdinianC1Mode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.LIBERATION_C4_MODE + " " + game.isLiberationC4Mode());
         writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());

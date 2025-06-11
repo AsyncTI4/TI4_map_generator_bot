@@ -272,6 +272,7 @@ public class MiltyService {
             tileSources.add(Source.ComponentSource.codex1);
             tileSources.add(Source.ComponentSource.codex2);
             tileSources.add(Source.ComponentSource.codex3);
+            tileSources.add(Source.ComponentSource.codex4);
             factionSources = new ArrayList<>(tileSources);
         }
     }
