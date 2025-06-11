@@ -89,6 +89,7 @@ public class WebPlayerArea {
     private List<Leader> leaders;
     private List<String> leaderIDs;
     private Map<String, Integer> secretsScored;
+    private Map<String, Integer> secretsUnscored;
 
     // Additional properties
     private String flexibleDisplayName;
@@ -118,13 +119,18 @@ public class WebPlayerArea {
     // Unit information map
     private Map<String, UnitCountInfo> unitCounts;
 
-    // Nombox units by faction
+    // Nombox units by faction )mostly cabal)
     private Map<String, List<String>> nombox;
 
     // Special token reinforcements
     private Integer sleeperTokensReinf;
     private List<String> ghostWormholesReinf;
 
+    // Mahact faction-specific: edict "stolen" fleet supply
+    private List<String> mahactEdict;
+
+    // Debt tokens: debt that this player is OWED by other players (faction/color -> count)
+    private Map<String, Integer> debtTokens;
 
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -215,6 +221,7 @@ public class WebPlayerArea {
         webPlayerArea.setLeaders(player.getLeaders());
         webPlayerArea.setLeaderIDs(player.getLeaderIDs());
         webPlayerArea.setSecretsScored(player.getSecretsScored());
+        webPlayerArea.setSecretsUnscored(player.getSecretsUnscored());
 
         // Additional properties
         webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());
@@ -309,30 +316,54 @@ public class WebPlayerArea {
 
         webPlayerArea.setUnitCounts(unitInfoMap);
 
-        // Populate nombox data for all players
+        // Populate nombox data for players with captured units
         Map<String, List<String>> nomboxData = new HashMap<>();
-        for (Player gamePlayer : game.getPlayers().values()) {
-            UnitHolder nombox = gamePlayer.getNomboxTile().getSpaceUnitHolder();
-            if (nombox != null && !nombox.getUnitKeys().isEmpty()) {
-                List<String> unitList = new ArrayList<>();
-
-                // Group units by type to get counts
-                Map<String, Integer> unitCounts = new HashMap<>();
-                for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
-                    String unitId = unitKey.asyncID();
+        UnitHolder nombox = player.getNomboxTile().getSpaceUnitHolder();
+        if (nombox != null && !nombox.getUnitKeys().isEmpty()) {
+            // Group units by their actual faction (captured units)
+            Map<String, Map<String, Integer>> unitsByFaction = new HashMap<>();
+            for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
+                String unitId = unitKey.asyncID();
+                // Get the actual player/faction that owns this captured unit
+                Player unitOwner = game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
+                if (unitOwner != null) {
+                    String unitFaction = unitOwner.getFaction();
                     int count = nombox.getUnitCount(unitKey);
+
+                    unitsByFaction.computeIfAbsent(unitFaction, k -> new HashMap<>());
+                    Map<String, Integer> unitCounts = unitsByFaction.get(unitFaction);
                     unitCounts.put(unitId, unitCounts.getOrDefault(unitId, 0) + count);
                 }
+            }
 
-                // Create "unitId,count" strings
-                for (Map.Entry<String, Integer> entry : unitCounts.entrySet()) {
-                    unitList.add(entry.getKey() + "," + entry.getValue());
+            // Create "unitId,count" strings for each faction
+            for (Map.Entry<String, Map<String, Integer>> factionEntry : unitsByFaction.entrySet()) {
+                String faction = factionEntry.getKey();
+                List<String> unitList = new ArrayList<>();
+                for (Map.Entry<String, Integer> unitEntry : factionEntry.getValue().entrySet()) {
+                    unitList.add(unitEntry.getKey() + "," + unitEntry.getValue());
                 }
-
-                nomboxData.put(gamePlayer.getFaction(), unitList);
+                nomboxData.put(faction, unitList);
             }
         }
         webPlayerArea.setNombox(nomboxData);
+
+        // Mahact edict: only applies if the player is mahact and loads the mahact's "stolen" fleet supply
+        if (player.hasAbility("edict")) {
+            webPlayerArea.setMahactEdict(player.getMahactCC());
+        } else {
+            webPlayerArea.setMahactEdict(new ArrayList<>());
+        }
+
+        // Debt tokens: debt that this player is OWED by other players (only include entries with count > 0)
+        Map<String, Integer> debtTokens = new HashMap<>();
+        for (Map.Entry<String, Integer> debtEntry : player.getDebtTokens().entrySet()) {
+            if (debtEntry.getValue() > 0) {
+                debtTokens.put(debtEntry.getKey(), debtEntry.getValue());
+            }
+        }
+        webPlayerArea.setDebtTokens(debtTokens);
+
         return webPlayerArea;
     }
 
