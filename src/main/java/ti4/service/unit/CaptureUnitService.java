@@ -92,7 +92,7 @@ public class CaptureUnitService {
                 playerOpponents.add(p2);
             }
         }
-        if (owner != game.getActivePlayer() && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
+        if (owner != game.getActivePlayer() && game.getActivePlayer() != null && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
             playerOpponents.add(game.getActivePlayer());
         }
         return playerOpponents;
