@@ -1,13 +1,10 @@
-package ti4.helpers;
+package ti4.website;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import lombok.Data;
+import ti4.helpers.Helper;
+import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.*;
 
@@ -37,6 +34,22 @@ public class WebPlayerArea {
     private int tg;
     private int commodities;
     private int commoditiesTotal;
+
+    // Resource and influence totals
+    private int resources;
+    private int influence;
+    private int totResources;
+    private int totInfluence;
+
+    // Optimal resource and influence calculations
+    private int optimalResources;
+    private int optimalInfluence;
+    private int flexValue;
+
+    // Total optimal resource and influence calculations (all planets)
+    private int totOptimalResources;
+    private int totOptimalInfluence;
+    private int totFlexValue;
 
     // Fragments
     private int crf;
@@ -76,6 +89,7 @@ public class WebPlayerArea {
     private List<Leader> leaders;
     private List<String> leaderIDs;
     private Map<String, Integer> secretsScored;
+    private Map<String, Integer> secretsUnscored;
 
     // Additional properties
     private String flexibleDisplayName;
@@ -96,11 +110,27 @@ public class WebPlayerArea {
     private Integer acCount;
     private Integer pnCount;
 
+    // victory points
+    private Integer totalVps;
+
+    // secret objectives
+    private Integer numScoreableSecrets;
+
     // Unit information map
     private Map<String, UnitCountInfo> unitCounts;
 
-    // Nombox units by faction
+    // Nombox units by faction )mostly cabal)
     private Map<String, List<String>> nombox;
+
+    // Special token reinforcements
+    private Integer sleeperTokensReinf;
+    private List<String> ghostWormholesReinf;
+
+    // Mahact faction-specific: edict "stolen" fleet supply
+    private List<String> mahactEdict;
+
+    // Debt tokens: debt that this player is OWED by other players (faction/color -> count)
+    private Map<String, Integer> debtTokens;
 
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
@@ -123,6 +153,35 @@ public class WebPlayerArea {
         webPlayerArea.setTg(player.getTg());
         webPlayerArea.setCommodities(player.getCommodities());
         webPlayerArea.setCommoditiesTotal(player.getCommoditiesTotal());
+
+        // Resource and influence totals
+        Integer resources = Helper.getPlayerResourcesAvailable(player, game);
+        Integer influence = Helper.getPlayerInfluenceAvailable(player, game);
+        Integer totResources = Helper.getPlayerResourcesTotal(player, game);
+        Integer totInfluence = Helper.getPlayerInfluenceTotal(player, game);
+
+        webPlayerArea.setResources(resources != null ? resources : 0);
+        webPlayerArea.setInfluence(influence != null ? influence : 0);
+        webPlayerArea.setTotResources(totResources != null ? totResources : 0);
+        webPlayerArea.setTotInfluence(totInfluence != null ? totInfluence : 0);
+
+        // Optimal resource and influence calculations
+        Integer optimalResources = Helper.getPlayerOptimalResourcesAvailable(player, game);
+        Integer optimalInfluence = Helper.getPlayerOptimalInfluenceAvailable(player, game);
+        Integer flexValue = Helper.getPlayerFlexResourcesInfluenceAvailable(player, game);
+
+        webPlayerArea.setOptimalResources(optimalResources != null ? optimalResources : 0);
+        webPlayerArea.setOptimalInfluence(optimalInfluence != null ? optimalInfluence : 0);
+        webPlayerArea.setFlexValue(flexValue != null ? flexValue : 0);
+
+        // Total optimal resource and influence calculations (all planets)
+        Integer totOptimalResources = Helper.getPlayerOptimalResourcesTotal(player, game);
+        Integer totOptimalInfluence = Helper.getPlayerOptimalInfluenceTotal(player, game);
+        Integer totFlexValue = Helper.getPlayerFlexResourcesInfluenceTotal(player, game);
+
+        webPlayerArea.setTotOptimalResources(totOptimalResources != null ? totOptimalResources : 0);
+        webPlayerArea.setTotOptimalInfluence(totOptimalInfluence != null ? totOptimalInfluence : 0);
+        webPlayerArea.setTotFlexValue(totFlexValue != null ? totFlexValue : 0);
 
         // Fragments
         webPlayerArea.setCrf(player.getCrf());
@@ -162,6 +221,7 @@ public class WebPlayerArea {
         webPlayerArea.setLeaders(player.getLeaders());
         webPlayerArea.setLeaderIDs(player.getLeaderIDs());
         webPlayerArea.setSecretsScored(player.getSecretsScored());
+        webPlayerArea.setSecretsUnscored(player.getSecretsUnscored());
 
         // Additional properties
         webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());
@@ -181,6 +241,50 @@ public class WebPlayerArea {
         webPlayerArea.setSoCount(player.getSo());
         webPlayerArea.setAcCount(player.getAc());
         webPlayerArea.setPnCount(player.getPnCount());
+
+        // victory points
+        webPlayerArea.setTotalVps(player.getTotalVictoryPoints());
+
+        // secret objectives
+        webPlayerArea.setNumScoreableSecrets(player.getMaxSOCount());
+
+        // Special token reinforcements
+        // Sleeper tokens (Titans faction only)
+        if (player.hasAbility("awaken")) {
+            webPlayerArea.setSleeperTokensReinf(5 - game.getSleeperTokensPlacedCount());
+        } else {
+            webPlayerArea.setSleeperTokensReinf(0);
+        }
+
+        // Ghost wormhole tokens (Ghost faction only)
+        if ("ghost".equalsIgnoreCase(player.getFaction())) {
+            List<String> ghostWormholesInReinf = new ArrayList<>();
+
+            // Check which wormholes are on the map
+            boolean alphaOnMap = false;
+            boolean betaOnMap = false;
+            boolean gammaOnMap = false;
+
+            String alphaID = Mapper.getTokenID("creussalpha");
+            String betaID = Mapper.getTokenID("creussbeta");
+            String gammaID = Mapper.getTokenID("creussgamma");
+
+            for (Tile tile : game.getTileMap().values()) {
+                Set<String> tileTokens = tile.getUnitHolders().get("space").getTokenList();
+                alphaOnMap |= tileTokens.contains(alphaID);
+                betaOnMap |= tileTokens.contains(betaID);
+                gammaOnMap |= tileTokens.contains(gammaID);
+            }
+
+            // Add wormholes that are NOT on the map (i.e., in reinforcements)
+            if (!alphaOnMap) ghostWormholesInReinf.add("creussalpha");
+            if (!betaOnMap) ghostWormholesInReinf.add("creussbeta");
+            if (!gammaOnMap) ghostWormholesInReinf.add("creussgamma");
+
+            webPlayerArea.setGhostWormholesReinf(ghostWormholesInReinf);
+        } else {
+            webPlayerArea.setGhostWormholesReinf(new ArrayList<>());
+        }
 
         // get reinforcement count
         Map<Units.UnitKey, Integer> unitMapCount = new HashMap<>();
@@ -212,30 +316,53 @@ public class WebPlayerArea {
 
         webPlayerArea.setUnitCounts(unitInfoMap);
 
-        // Populate nombox data for all players
+        // Populate nombox data for players with captured units
         Map<String, List<String>> nomboxData = new HashMap<>();
-        for (Player gamePlayer : game.getPlayers().values()) {
-            UnitHolder nombox = gamePlayer.getNomboxTile().getSpaceUnitHolder();
-            if (nombox != null && !nombox.getUnitKeys().isEmpty()) {
-                List<String> unitList = new ArrayList<>();
-
-                // Group units by type to get counts
-                Map<String, Integer> unitCounts = new HashMap<>();
-                for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
-                    String unitId = unitKey.asyncID();
+        UnitHolder nombox = player.getNomboxTile().getSpaceUnitHolder();
+        if (nombox != null && !nombox.getUnitKeys().isEmpty()) {
+            // Group units by their actual faction (captured units)
+            Map<String, Map<String, Integer>> unitsByFaction = new HashMap<>();
+            for (Units.UnitKey unitKey : nombox.getUnitKeys()) {
+                String unitId = unitKey.asyncID();
+                // Get the actual player/faction that owns this captured unit
+                Player unitOwner = game.getPlayerByColorID(unitKey.getColorID()).orElse(null);
+                if (unitOwner != null) {
+                    String unitFaction = unitOwner.getFaction();
                     int count = nombox.getUnitCount(unitKey);
+
+                    unitsByFaction.computeIfAbsent(unitFaction, k -> new HashMap<>());
+                    Map<String, Integer> unitCounts = unitsByFaction.get(unitFaction);
                     unitCounts.put(unitId, unitCounts.getOrDefault(unitId, 0) + count);
                 }
+            }
 
-                // Create "unitId,count" strings
-                for (Map.Entry<String, Integer> entry : unitCounts.entrySet()) {
-                    unitList.add(entry.getKey() + "," + entry.getValue());
+            // Create "unitId,count" strings for each faction
+            for (Map.Entry<String, Map<String, Integer>> factionEntry : unitsByFaction.entrySet()) {
+                String faction = factionEntry.getKey();
+                List<String> unitList = new ArrayList<>();
+                for (Map.Entry<String, Integer> unitEntry : factionEntry.getValue().entrySet()) {
+                    unitList.add(unitEntry.getKey() + "," + unitEntry.getValue());
                 }
-
-                nomboxData.put(gamePlayer.getFaction(), unitList);
+                nomboxData.put(faction, unitList);
             }
         }
         webPlayerArea.setNombox(nomboxData);
+
+        // Mahact edict: only applies if the player is mahact and loads the mahact's "stolen" fleet supply
+        if (player.hasAbility("edict")) {
+            webPlayerArea.setMahactEdict(player.getMahactCC());
+        } else {
+            webPlayerArea.setMahactEdict(new ArrayList<>());
+        }
+
+        // Debt tokens: debt that this player is OWED by other players (only include entries with count > 0)
+        Map<String, Integer> debtTokens = new HashMap<>();
+        for (Map.Entry<String, Integer> debtEntry : player.getDebtTokens().entrySet()) {
+            if (debtEntry.getValue() > 0) {
+                debtTokens.put(debtEntry.getKey(), debtEntry.getValue());
+            }
+        }
+        webPlayerArea.setDebtTokens(debtTokens);
 
         return webPlayerArea;
     }

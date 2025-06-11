@@ -29,13 +29,18 @@ import ti4.model.TileModel;
 
 //Handles positions of map
 public class PositionMapper {
+    private static final int RING_MAX_COUNT = 8;
+    private static final int RING_MIN_COUNT = 3;
+    private static final int HORIZONTAL_TILE_SPACING = 260;
+    private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
+
+
     private static final Properties tileImageCoordinates = new Properties();
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
     private static final Properties playerInfo8ring = new Properties();
     private static final Properties stats = new Properties();
     private static final Properties reinforcements = new Properties();
-
     private static final Properties tileAdjacencies = new Properties();
 
     public static void init() {
@@ -86,6 +91,34 @@ public class PositionMapper {
             }
         }
         return positions;
+    }
+
+    public static Point getScaledTilePosition(Game game, String position, int x, int y) {
+        int ringCount = game.getRingCount();
+        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+        if (ringCount == RING_MIN_COUNT) {
+            x += HORIZONTAL_TILE_SPACING;
+        }
+        if (ringCount < RING_MAX_COUNT) {
+            int lower = RING_MAX_COUNT - ringCount;
+
+            if ("tl".equalsIgnoreCase(position)) {
+                y -= 150;
+            } else if ("bl".equalsIgnoreCase(position)) {
+                y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
+            } else if ("tr".equalsIgnoreCase(position)) {
+                x -= lower * HORIZONTAL_TILE_SPACING * 2;
+                y -= 150;
+            } else if ("br".equalsIgnoreCase(position)) {
+                x -= lower * HORIZONTAL_TILE_SPACING * 2;
+                y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
+            } else {
+                x -= lower * HORIZONTAL_TILE_SPACING;
+                y -= lower * SPACE_FOR_TILE_HEIGHT;
+            }
+            return new Point(x, y);
+        }
+        return new Point(x, y);
     }
 
     @Nullable
