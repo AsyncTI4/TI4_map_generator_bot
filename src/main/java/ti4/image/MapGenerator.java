@@ -32,13 +32,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
 
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
@@ -48,6 +45,7 @@ import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.WebHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -471,6 +469,8 @@ public class MapGenerator implements AutoCloseable {
 
         // GAME FUN NAME
         deltaY = 35;
+        deltaY = 35;
+        y += 40; //needed for ghost HS on br
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(game.getCustomName(), landscapeShift, y);

@@ -238,7 +238,7 @@ public class TacticalActionOutputService {
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
-        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
+        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd") && !player.getRelics().contains("circletofthevoid")) {
             baseMoveValue = 1;
         }
         if (skipBonus) return baseMoveValue;
