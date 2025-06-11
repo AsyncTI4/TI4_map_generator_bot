@@ -254,6 +254,12 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
+            case "nekroc4r" -> {
+                List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
+                String message = player.getRepresentation() + " choose one of the options for this tech:";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                sendNextActionButtonsIfButtonEvent(event, game, player);
+            }
             case "dsuydag" -> {
                 deleteIfButtonEvent(event);
                 ActionCardHelper.doRise(player, event, game);

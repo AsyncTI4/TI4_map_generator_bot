@@ -9,11 +9,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
+import ti4.commands.player.AddAllianceMember;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.RelicModel;
+import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyService;
 import ti4.service.objectives.DrawSecretService;
@@ -33,6 +37,9 @@ public class StartScenario extends GameStateSubcommand {
 
         if (scenario != null && scenario.contains("ordinian")) {
             startOrdinianCodex1(game, event);
+        }
+        if (scenario != null && scenario.contains("liberation")) {
+            startLiberationCodex4(game, event);
         }
         MessageHelper.replyToMessage(event, "Successfully started the scenario");
     }
@@ -82,6 +89,98 @@ public class StartScenario extends GameStateSubcommand {
         game.addCustomPO("Coatl Control", 1);
         game.addCustomPO("Coatl HS", 1);
         center.addToken("token_custc1.png", "space");
+        CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
+
+    }
+
+    public static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
+        game.setLiberationC4Mode(true);
+        var factions = List.of("ghost", "xxcha", "sol", "naaz", "nekro", "nomad");
+        if (game.getRealPlayers().size() == 0) {
+            AddTileListService.addTileListToMap(game, "{c41} 21 35 77 63 48 70 68 60 47 76 25 66 30 72 27 26 22 75 1 74 67 8 62 79 14 31 29 53 41 34 17 65 45 57 64 49", event);
+        }
+        List<Player> players = new ArrayList<>();
+        for (Player player : game.getPlayers().values()) {
+            if (!player.isRealPlayer()) {
+                players.add(player);
+            }
+        }
+        for (String faction : factions) {
+            if (game.getPlayerFromColorOrFaction(faction) == null) {
+                int face = ThreadLocalRandom.current().nextInt(0, players.size());
+                Tile tile = game.getTileFromPositionOrAlias(faction);
+                if (faction.equalsIgnoreCase("ghost")) {
+                    tile = game.getTileFromPositionOrAlias("creussgate");
+                }
+                boolean speaker = false;
+                if (faction.equalsIgnoreCase("nekro")) {
+                    speaker = true;
+                }
+                String color = players.get(face).getNextAvailableColour();
+                if (faction.equalsIgnoreCase("ghost")) {
+                    color = "red";
+                }
+                if (tile != null) {
+                    MiltyService.secondHalfOfPlayerSetup(players.get(face), game, color, faction, tile.getPosition(), event, speaker);
+                    players.remove(face);
+                }
+            }
+        }
+
+        Player nekro = game.getPlayerFromColorOrFaction("nekro");
+        Tile center = game.getTileByPosition("000");
+        if (nekro != null) {
+            nekro.addTech("nekroc4y");
+            nekro.addTech("nekroc4r");
+            nekro.setFleetCC(4);
+            AddUnitService.addUnits(event, center, game, nekro.getColor(), "2 dread, 2 carriers, 4 ff, 4 inf o");
+            nekro.refreshPlanet("ordinianc4");
+        }
+
+        Player ghost = game.getPlayerFromColorOrFaction("ghost");
+        Tile gate = game.getTileByPosition("313");
+        if (ghost != null) {
+            AddUnitService.addUnits(event, gate, game, ghost.getColor(), "1 cruiser, 1 carrier, 2 inf");
+            ghost.removeLeader("ghostagent");
+            ghost.removeLeader("ghostcommander");
+            ghost.removeLeader("ghosthero");
+            ghost.addLeader("redcreussagent");
+            ghost.addLeader("redcreusscommander");
+            ghost.addLeader("redcreusshero");
+        }
+        List<String> allRelics = game.getAllRelics();
+
+        Player nomad = game.getPlayerFromColorOrFaction("nomad");
+        String relicID = "neuraloop";
+        if (nomad != null) {
+            allRelics.remove(relicID);
+            nomad.addRelic(relicID);
+            RelicModel relicModel = Mapper.getRelic(relicID);
+            String message = nomad.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
+            MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        }
+
+        Player naaz = game.getPlayerFromColorOrFaction("naaz");
+        relicID = "circletofthevoid";
+        if (naaz != null) {
+            allRelics.remove(relicID);
+            naaz.addRelic(relicID);
+            RelicModel relicModel = Mapper.getRelic(relicID);
+            String message = naaz.getFactionEmoji() + " Drew Relic: " + relicModel.getName();
+            MessageHelper.sendMessageToChannelWithEmbed(event.getMessageChannel(), message, relicModel.getRepresentationEmbed(false, true));
+        }
+
+        Player sol = game.getPlayerFromColorOrFaction("sol");
+        Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
+        if (sol != null && xxcha != null) {
+            AddAllianceMember.makeAlliancePartners(sol, xxcha, event, game);
+            xxcha.addLeader("orlandohero");
+        }
+        game.addCustomPO("Liberate Ordinian", 1);
+        if (game.getRealPlayers().size() == 6) {
+            DrawSecretService.dealSOToAll(event, 2, game);
+        }
+        CommanderUnlockCheckService.checkPlayer(nekro, "nekro");
 
     }
 
