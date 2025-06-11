@@ -2118,6 +2118,8 @@
         "cost": 2,
         "combatHitsOn": 7,
         "combatDieCount": 1,
+        "afbHitsOn": 8,
+        "afbDieCount": 1,
         "isShip": true
     },
     {
@@ -2130,11 +2132,13 @@
         "source": "ds",
         "faction": "qhet",
         "moveValue": 3,
-        "capacityValue": 2,
+        "capacityValue": 1,
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
         "combatDieCount": 1,
+        "afbHitsOn": 5,
+        "afbDieCount": 2,
         "isShip": true,
         "ability": "If the active system contains another player's units, this unit may move through systems that contain ships controlled by different other players."
     },

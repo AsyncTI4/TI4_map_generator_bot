@@ -931,7 +931,7 @@
         "faction": "qhet",
         "baseUpgrade": "cr2",
         "source": "ds",
-        "text": "Cost 2, Combat 6, Move 3, Capacity 2\nIf the active system contains another player's units, this unit may move through systems that contain ships controlled by different other players."
+        "text": "Cost 2, Combat 6, Move 3, Capacity 1, AFB 5 (x2)\nIf the active system contains another player's units, this unit may move through systems that contain ships controlled by different other players."
     },
     {
         "alias": "dsatokcr",

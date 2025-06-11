@@ -1337,7 +1337,7 @@
         "title": "Shield of Qhet",
         "abilityName": "Logistical Supremacy - War Unbound",
         "abilityWindow": "ACTION:",
-        "abilityText": "Place this card near the game board; until the end of this game round, after you resolve an action, if you won a combat during that action, you may resolve an additional action or gain 1 command token.",
+        "abilityText": " Place this card near the game board; until the end of this game round, after you win a combat, you may remove 1 of your command tokens from the active system or draw 1 action card.At the end of this game round, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },
