@@ -114,6 +114,7 @@ public class WebHelper {
             }
 
             Map<String, Object> webData = new HashMap<>();
+            webData.put("versionSchema", 1);
             webData.put("objectives", webObjectives);
             webData.put("playerData", playerDataList);
             webData.put("lawsInPlay", lawsInPlay);

@@ -14,6 +14,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.Planet;
 
 @Data
 public class WebTileUnitData {
@@ -147,28 +148,25 @@ public class WebTileUnitData {
             }
         }
 
-        // Determine planet control after processing all units and tokens
-        for (Map.Entry<String, UnitHolder> holderEntry : tile.getUnitHolders().entrySet()) {
-            String holderName = holderEntry.getKey();
-            boolean isSpace = Constants.SPACE.equals(holderName);
-            UnitHolder unitHolder = holderEntry.getValue();
+        // Determine planet control for ALL planets in the tile, not just those with units/tokens
+        for (Planet planet : tile.getPlanetUnitHolders()) {
+            String holderName = planet.getName();
 
-            if (!isSpace && tileData.planets.containsKey(holderName)) {
-                WebTilePlanet planetData = tileData.planets.get(holderName);
+            // Ensure planet data exists
+            WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
 
-                // Determine controlling player from control tokens
-                String controllingFaction = null;
-                if (!unitHolder.getControlList().isEmpty()) {
-                    // Get the first control token (there should only be one)
-                    String controlToken = unitHolder.getControlList().iterator().next();
-                    Player controllingPlayer = DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlToken);
-                    if (controllingPlayer != null) {
-                        controllingFaction = controllingPlayer.getFaction();
-                    }
+            // Determine controlling player from control tokens
+            String controllingFaction = null;
+            if (!planet.getControlList().isEmpty()) {
+                // Get the first control token (there should only be one)
+                String controlToken = planet.getControlList().iterator().next();
+                Player controllingPlayer = DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlToken);
+                if (controllingPlayer != null) {
+                    controllingFaction = controllingPlayer.getFaction();
                 }
-
-                planetData.setControlledBy(controllingFaction);
             }
+
+            planetData.setControlledBy(controllingFaction);
         }
 
         return tileData;
