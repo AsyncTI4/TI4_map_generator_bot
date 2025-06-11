@@ -40,7 +40,7 @@ public class GameManager {
     }
 
     @Nullable
-    static Game get(String gameName) {
+    public static Game get(String gameName) {
         if (!isValid(gameName)) {
             return null;
         }
