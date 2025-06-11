@@ -1604,7 +1604,7 @@ public class ButtonHelperAbilities {
     public static List<Button> getButtonsForPossibleTechForNekro(Player nekro, List<String> currentList, Game game) {
         List<Button> techToGain = new ArrayList<>();
         for (String tech : currentList) {
-            if (game.isOrdinianC1Mode() && Mapper.getTech(tech).isFactionTech()) {
+            if ((game.isOrdinianC1Mode() || game.isLiberationC4Mode()) && Mapper.getTech(tech).isFactionTech()) {
                 continue;
             }
             techToGain.add(Buttons.green("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",

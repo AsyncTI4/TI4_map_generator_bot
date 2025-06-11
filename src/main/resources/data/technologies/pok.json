@@ -1061,5 +1061,32 @@
         "shortName": "Agency\nSupply Net.",
         "shrinkName": false,
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network.jpg?raw=true"
+    },
+    
+    {
+        "alias": "nekroc4y",
+        "name": "Null Reference",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "nekro",
+        "source": "pok",
+        "text": "When one of your ships is destroyed, you may produce a ship of the same type at a space dock in your home system.",
+        "shortName": "Null Ref",
+        "shrinkName": true
+    },
+    {
+        "alias": "nekroc4r",
+        "name": "Error Error",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "nekro",
+        "source": "pok",
+        "text": "ACTION: Exhaust this card to place 1 PDS on a planet you control. \nACTION: Exhaust this card to repair all of your damaged units. \nACTION: Exhaust this card and discard 1 action card to draw 1 action card.",
+        "shortName": "Error",
+        "shrinkName": false
     }
 ]

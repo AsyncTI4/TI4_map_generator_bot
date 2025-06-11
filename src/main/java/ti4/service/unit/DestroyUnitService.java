@@ -8,10 +8,14 @@ import java.util.Set;
 import org.apache.commons.lang3.function.Consumers;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -20,6 +24,8 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.UnitModel;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.unit.RemoveUnitService.RemovedUnit;
 
 public class DestroyUnitService {
@@ -107,6 +113,8 @@ public class DestroyUnitService {
             capturing.addAll(devours);
         }
 
+        List<Player> killers = CaptureUnitService.listProbableKiller(game, unit);
+
         switch (unit.unitKey().getUnitType()) {
             case Infantry -> {
                 capturing.addAll(CaptureUnitService.listCapturingMechPlayers(game, allUnits, unit));
@@ -138,6 +146,39 @@ public class DestroyUnitService {
         Player mentakHero = game.getPlayerFromColorOrFaction(game.getStoredValue("mentakHero"));
         if (mentakHero != null && combat) {
             ButtonHelperFactionSpecific.mentakHeroProducesUnit(player, game, mentakHero, totalAmount, unit.unitKey().unitName(), event, unit.tile());
+        }
+        if (player != null && player.hasTech("nekroc4y") && !combat && unit.tile() != player.getHomeSystemTile() && player.getHomeSystemTile() != null) {
+            UnitModel uni = player.getUnitFromUnitKey(unit.unitKey());
+            if (uni != null && uni.getIsShip()) {
+                if (player.hasUnit("ghoti_flagship") || ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock).contains(player.getHomeSystemTile())) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "useNekroNullRef", "Use Null Reference (Upon Each Destroy)", FactionEmojis.Nekro));
+                    buttons.add(Buttons.red("deleteButtons", "Decline", FactionEmojis.Nekro));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " you can produce one of your recently destroyed ships at your home system", buttons);
+                }
+            }
+        }
+        if (game.isTotalWarMode() && player != null) {
+            UnitModel uni = player.getUnitFromUnitKey(unit.unitKey());
+            int cost = (int) Math.ceil(uni.getCost());
+            int winnings = cost * unit.getTotalRemoved();
+            if (killers.isEmpty()) {
+                List<Button> buttons = new ArrayList<>();
+                for (Player p2 : game.getRealPlayers()) {
+                    buttons.add(Buttons.gray("totalWarCommGain_" + winnings + "_" + p2.getFaction(), p2.getFactionNameOrColor()));
+                }
+                buttons.add(Buttons.red("deleteButtons", "No one"));
+                String msg = player.getRepresentation() + " tell the bot who killed your " + unit.getTotalRemoved() + " " + unit.unitKey().getUnitType().getUnitTypeEmoji();
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+            } else {
+                Player killer = killers.getFirst();
+                String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(killer, game);
+                int newAmount = game.changeCommsOnPlanet(winnings, planet);
+                MessageHelper.sendMessageToChannel(killer.getCorrectChannel(), killer.getRepresentationNoPing() + " added " + winnings +
+                    " commodities to the planet of " + Helper.getPlanetRepresentation(planet, game) + " (which has " + newAmount + " commodities on it now) by destroying " + unit.getTotalRemoved() +
+                    " of " + player.getRepresentationNoPing() + "'s " + unit.unitKey().getUnitType().getUnitTypeEmoji() +
+                    "\nIf this was a mistake, adjust the commodities with /ds set_planet_comms");
+            }
         }
     }
 

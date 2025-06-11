@@ -1260,6 +1260,22 @@ public class Game extends GameProperties {
         }
     }
 
+    public Map.Entry<String, Integer> revealStage2Random() {
+        Collections.shuffle(publicObjectives2);
+        return revealObjective(publicObjectives2);
+    }
+
+    public Map.Entry<String, Integer> revealStage1Random() {
+        Collections.shuffle(publicObjectives1);
+        return revealObjective(publicObjectives1);
+    }
+
+    public Map.Entry<String, Integer> revealSOAsPO() {
+
+        return revealSecretObjective();
+
+    }
+
     public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
         List<String> objectiveList = type == 1 ? publicObjectives1Peakable : publicObjectives2Peakable;
         if (objectiveList.size() + 1 < sizeOfBottom) {
@@ -1450,6 +1466,22 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public Entry<String, Integer> revealSecretObjective() {
+        Collections.shuffle(getSecretObjectives());
+        String id = getSecretObjectives().getFirst();
+        removeSOFromGame(id);
+        addToSoToPoList(id);
+        //addRevealedPublicObjective(id);
+        Integer so = addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
+        for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+            if (entry.getKey().equals(Mapper.getSecretObjectivesJustNames().get(id))) {
+                return entry;
+            }
+        }
+
+        return null;
+    }
+
     public Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
         if (objectiveList.contains(id)) {
             objectiveList.remove(id);
@@ -1510,6 +1542,11 @@ public class Game extends GameProperties {
         return false;
     }
 
+    public void removeRevealedObjective(String id) {
+        revealedPublicObjectives.remove(id);
+        soToPoList.remove(id);
+    }
+
     public String getCustodiansTaker() {
         if (!isCustodiansScored()) {
             return null;
@@ -1540,6 +1577,9 @@ public class Game extends GameProperties {
         boolean custodiansTaken = false;
         if (isOrdinianC1Mode()) {
             return ButtonHelper.isCoatlHealed(this);
+        }
+        if (isLiberationC4Mode()) {
+            return true;
         }
         String idC = "";
         for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -4004,6 +4044,9 @@ public class Game extends GameProperties {
         if (isOrdinianC1Mode()) {
             return ButtonHelper.getTileWithCoatl(this);
         }
+        if (isLiberationC4Mode()) {
+            return getTileFromPlanet("ordinianc4");
+        }
         for (String mr : Constants.MECATOL_SYSTEMS) {
             Tile tile = getTile(mr);
             if (tile != null)
@@ -4183,7 +4226,7 @@ public class Game extends GameProperties {
         sources.add(ComponentSource.codex1);
         sources.add(ComponentSource.codex2);
         sources.add(ComponentSource.codex3);
-
+        sources.add(ComponentSource.codex4);
         if (!isBaseGameMode())
             sources.add(ComponentSource.pok);
         if (isAbsolMode())
