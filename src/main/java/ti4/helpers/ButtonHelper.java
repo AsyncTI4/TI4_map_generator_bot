@@ -100,6 +100,7 @@ import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
+import ti4.service.regex.RegexService;
 import ti4.service.tech.ShowTechDeckService;
 import ti4.service.transaction.SendDebtService;
 import ti4.service.turn.EndTurnService;
@@ -1072,6 +1073,16 @@ public class ButtonHelper {
                 player.getRepresentation()
                     + " use buttons to resolve a build for the Duha Menaimon (the Arborec flagship).",
                 buttons);
+        }
+        // All players get to use Magen 
+        for (Player magenPlayer : game.getPlayers().values()) {
+            boolean has = activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
+            if (!has || !magenPlayer.hasTech("md")) continue;
+
+            String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
+            Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
+            String magenMsg = magenPlayer.getRepresentation() + " you can use **Magen Defense Grid** to place an infantry with each of your structures in the active system.";
+            MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
         }
 
         for (Player nonActivePlayer : game.getPlayers().values()) {
@@ -2576,6 +2587,38 @@ public class ButtonHelper {
             bevent.getMessage();
             deleteTheOneButton(bevent, bevent.getButton().getId(), true);
         }
+    }
+
+    @ButtonHandler("useMagenDefense_")
+    private static void useMagenDefenseGrid(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String regex = "useMagenDefense_" + RegexHelper.posRegex(game);
+        RegexService.runMatcher(regex, buttonID, matcher -> {
+            String pos = matcher.group("pos");
+            Tile tile = game.getTileByPosition(pos);
+
+            int total = 0;
+            UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
+
+            String msg = player.getFactionEmoji() + " resolved **__Magen Defense Grid__** on " + tile.getPosition() + ":";
+            for (UnitHolder uh : tile.getUnitHolders().values()) {
+                int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
+                if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
+                if (count > 0) {
+                    total += count;
+                    uh.addUnit(infKey, count);
+                    String emoji = infKey.unitEmoji().emojiString();
+                    String infStr = emoji.repeat(count);
+                    if (count > 6) infStr += "(" + count + " total)";
+                    if (uh instanceof Space) {
+                        msg += "\n-# > " + emoji.repeat(count) + " added to Space.";
+                    } else {
+                        msg += "\n-# > " + emoji.repeat(count) + " added to " + Helper.getPlanetRepresentation(uh.getName(), game);
+                    }
+                }
+            }
+            ButtonHelper.deleteMessage(event);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, Integer.toString(total)));
+        });
     }
 
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
@@ -4862,7 +4905,7 @@ public class ButtonHelper {
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
         message += CombatRollService.rollForUnits(playerUnitsByQuantity, extraRolls, modifiers,
-            tempMods, player, opponent, game, rollType, event, tile);
+            tempMods, player, opponent, game, rollType, event, tile, combatOnHolder);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, game, message);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
