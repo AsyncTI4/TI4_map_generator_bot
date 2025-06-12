@@ -263,6 +263,7 @@ public class MiltyDraftHelper {
             ComponentSource.codex1,
             ComponentSource.codex2,
             ComponentSource.codex3,
+            ComponentSource.codex4,
             ComponentSource.pok));
         if (game.isDiscordantStarsMode() || game.isUnchartedSpaceStuff()) {
             sources.add(ComponentSource.ds);

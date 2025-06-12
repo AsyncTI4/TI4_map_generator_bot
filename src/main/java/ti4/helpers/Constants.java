@@ -345,7 +345,7 @@ public class Constants {
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
-    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec");
+    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4");
     public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec");
 
     public static final int SPACE_RADIUS = 115;
@@ -689,6 +689,7 @@ public class Constants {
     public static final String RELIC_PURGE = "purge";
     public static final String SHUFFLE_BACK = "shuffle_back";
     public static final String ADD_BACK_INTO_DECK = "add_back_into_deck";
+    public static final String ADD_CODEX_RELICS = "add_codex_relics";
     public static final String RELIC_INFO = "info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
@@ -1060,7 +1061,10 @@ public class Constants {
     public static final String FACILITIES_MODE = "facilities_mode";
     public static final String MINOR_FACTIONS_MODE = "minor_factions_mode";
     public static final String HIDDEN_AGENDA_MODE = "hidden_agenda_mode";
+    public static final String AGE_OF_COMMERCE_MODE = "age_of_commerce_mode";
+    public static final String TOTAL_WAR_MODE = "total_war_mode";
     public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
+    public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";

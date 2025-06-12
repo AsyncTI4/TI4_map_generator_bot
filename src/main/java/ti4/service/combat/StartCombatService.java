@@ -361,6 +361,14 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from _ATS Armaments_:", lanefirATSButtons);
         }
 
+        for (Player p : game.getRealPlayers()) {
+            // offer buttons for all crimson commander holders
+            offerRedGhostCommanderButtons(p, game, event);
+        }
+
+        CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
+        CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
+
         if (tile.isHomeSystem() && isGroundCombat && game.getStoredValue("audioSent").isEmpty()) {
             for (Player p3 : game.getRealPlayers()) {
                 if (p3.getHomeSystemTile() == tile) {
@@ -377,6 +385,15 @@ public class StartCombatService {
                     }
                 }
             }
+        }
+    }
+
+    public static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
+            String message = player.getRepresentation(true, true) + " Resolve Red Creuss Commander using buttons\n> (note this is not available until the end of combat)";
+            message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
+            List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         }
     }
 
@@ -815,6 +832,17 @@ public class StartCombatService {
             }
         }
 
+        if (p1.hasTech("nekroc4y") && isSpaceCombat && tile != p1.getHomeSystemTile() && p1.getHomeSystemTile() != null) {
+            if (p1.hasUnit("ghoti_flagship") || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock).contains(p1.getHomeSystemTile())) {
+                buttons.add(Buttons.green(p1.getFinsFactionCheckerPrefix() + "useNekroNullRef", "Use Null Reference (Upon Each Destroy)", FactionEmojis.Nekro));
+            }
+        }
+        if (p2.hasTech("nekroc4y") && isSpaceCombat && tile != p2.getHomeSystemTile() && p2.getHomeSystemTile() != null && !game.isFowMode()) {
+            if (p2.hasUnit("ghoti_flagship") || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
+                buttons.add(Buttons.green(p2.getFinsFactionCheckerPrefix() + "useNekroNullRef", "Use Null Reference (Upon Each Destroy)", FactionEmojis.Nekro));
+            }
+        }
+
         for (Player agentHolder : game.getRealPlayers()) {
             String finChecker = "FFCC_" + agentHolder.getFaction() + "_";
 
@@ -1109,11 +1137,42 @@ public class StartCombatService {
 
         if (p1.hasLeaderUnlocked("kortalihero")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p2.getFaction(), "Purge Kortali Hero", FactionEmojis.dihmohn));
+            buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p2.getFaction(), "Purge Kortali Hero", FactionEmojis.kortali));
         }
         if (p2.hasLeaderUnlocked("kortalihero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p1.getFaction(), "Purge Kortali Hero", FactionEmojis.kortali));
+        }
+
+        if (p1.hasLeaderUnlocked("redcreusshero") && isSpaceCombat) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "purgeRedCreussHero_" + tile.getPosition(), "Purge Red Creuss Hero", FactionEmojis.Ghost));
+        }
+        if (p2.hasLeaderUnlocked("redcreusshero") && !game.isFowMode() && isSpaceCombat) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "purgeRedCreussHero_" + tile.getPosition(), "Purge Red Creuss Hero", FactionEmojis.Ghost));
+        }
+
+        if (game.isLiberationC4Mode()) {
+            if (tile.getTileID().equalsIgnoreCase("c41")) {
+                Player sol = game.getPlayerFromColorOrFaction("sol");
+                Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
+                if (sol == p1 || sol == p2 || xxcha == p1 || xxcha == p2) {
+                    if (xxcha.hasLeaderUnlocked("orlandohero")) {
+                        buttons.add(Buttons.gray(xxcha.getFinsFactionCheckerPrefix() + "purgeOrlandoHero_" + tile.getPosition(), "Purge Orlando Hero", FactionEmojis.Xxcha));
+                    }
+                }
+            }
+            if (!game.getCustomPublicVP().keySet().contains("Control Ordinian")) {
+                Player nekro = game.getPlayerFromColorOrFaction("nekro");
+                if (nekro == p1 || nekro == p2) {
+                    String po_name = "Liberate Ordinian";
+                    int value = game.getRevealedPublicObjectives().get(po_name);
+                    if (game.getRevealedPublicObjectives().get(po_name) != null) {
+                        buttons.add(Buttons.gray(Constants.PO_SCORING + value, "Score " + po_name + " (Win against Nekro)"));
+                    }
+                }
+            }
         }
 
         if (ButtonHelper.getTilesOfUnitsWithBombard(p1, game).contains(tile)

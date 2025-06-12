@@ -8,12 +8,14 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.RelicHelper;
 import ti4.image.MapRenderPipeline;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.SecretObjectiveModel;
 import ti4.service.StatusCleanupService;
 import ti4.service.info.ListPlayerInfoService;
 
@@ -21,11 +23,28 @@ import ti4.service.info.ListPlayerInfoService;
 public class RevealPublicObjectiveService {
 
     public static void revealS2(Game game, GenericInteractionCreateEvent event, MessageChannel channel) {
-        Map.Entry<String, Integer> objective = game.revealStage2();
+        revealS2(game, event, channel, false);
+    }
+
+    public static void revealS2(Game game, GenericInteractionCreateEvent event, MessageChannel channel, boolean random) {
+        Map.Entry<String, Integer> objective;
+        if (random) {
+            objective = game.revealStage2Random();
+        } else {
+            objective = game.revealStage2();
+        }
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
+        RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
         MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Stage 2 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
+        if (game.isLiberationC4Mode()) {
+            if (game.getRevealedPublicObjectives().get("Control Ordinian") == null || game.getRevealedPublicObjectives().get("Control Ordinian") == 0) {
+
+                game.addCustomPO("Control Ordinian", 2);
+                MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Liberate Ordinian is no longer scorable. Control Ordinian is now available to be scored (status phase to control ordinian, 2 VP)**");
+            }
+        }
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(channel,
@@ -55,6 +74,7 @@ public class RevealPublicObjectiveService {
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
             }
         }
+
     }
 
     public static void revealTwoStage2(Game game, GenericInteractionCreateEvent event, MessageChannel channel) {
@@ -83,11 +103,43 @@ public class RevealPublicObjectiveService {
         game.setStrategyCardsPerPlayer(maxSCsPerPlayer);
     }
 
+    public static void revealSO(Game game, GenericInteractionCreateEvent event, MessageChannel channel) {
+        Map.Entry<String, Integer> objective = game.revealSecretObjective();
+        RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
+
+        SecretObjectiveModel po = Mapper.getSecretObjective(objective.getKey());
+        if (po == null) {
+            Map<String, String> sos = Mapper.getSecretObjectivesJustNames();
+            for (String key : sos.keySet()) {
+                if (sos.get(key).equalsIgnoreCase(objective.getKey())) {
+                    po = Mapper.getSecretObjective(key);
+                }
+            }
+        }
+        MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Secret Objective Turned Public Objective Revealed**");
+        if (po != null) {
+            channel.sendMessageEmbeds(List.of(po.getRepresentationEmbed()))
+                .queue(m -> m.pin().queue());
+        }
+
+    }
+
     public String revealS1(Game game, GenericInteractionCreateEvent event, MessageChannel channel) {
-        Map.Entry<String, Integer> objective = game.revealStage1();
+        return revealS1(game, event, channel, false);
+    }
+
+    public String revealS1(Game game, GenericInteractionCreateEvent event, MessageChannel channel, boolean random) {
+
+        Map.Entry<String, Integer> objective;
+        if (random) {
+            objective = game.revealStage1Random();
+        } else {
+            objective = game.revealStage1();
+        }
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Stage 1 Public Objective Revealed**");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
+        RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode() && objective.getKey() != Constants.IMPERIUM_REX_ID) {
                 MessageHelper.sendMessageToChannel(channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));

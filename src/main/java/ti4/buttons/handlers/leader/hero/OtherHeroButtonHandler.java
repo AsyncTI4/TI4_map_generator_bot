@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperHeroes;
 import ti4.helpers.CommandCounterHelper;
@@ -22,6 +23,7 @@ import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
@@ -267,6 +269,56 @@ public class OtherHeroButtonHandler {
                 "Queen Nadalia, the Kortali hero, was not purged - something went wrong.");
         }
         ButtonHelperHeroes.offerStealRelicButtons(game, player, buttonID, event);
+    }
+
+    @ButtonHandler("purgeOrlandoHero_")
+    public static void purgeOrlandoHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
+        Leader playerLeader = player.unsafeGetLeader("orlandohero");
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                message + "  the Orlando hero, has been purged.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                " the Orlando was not purged - something went wrong.");
+        }
+        String msg = player.getRepresentationNoPing() + " please select the unit that recently died with which you wish to resolve the orlando hero on.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
+        ButtonHelper.deleteTheOneButton(event);
+
+    }
+
+    @ButtonHandler("purgeRedCreussHero_")
+    public static void purgeRedCreussHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
+        Leader playerLeader = player.unsafeGetLeader("redcreusshero");
+        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        boolean purged = player.removeLeader(playerLeader);
+        if (purged) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                message + "  the Red Creuss hero, has been purged.");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                " the Red Creuss was not purged - something went wrong.");
+        }
+        String pos = buttonID.split("_")[1];
+        Tile tile = game.getTileByPosition(pos);
+        UnitHolder captureUnitHolder = player.getNombox();
+        UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
+        if (captureUnitHolder != null && spaceUnitHolder != null) {
+            for (UnitKey key : captureUnitHolder.getUnitKeys()) {
+                Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
+                if (player_ != player) {
+                    continue;
+                }
+                int amt = captureUnitHolder.getUnitCount(key);
+                var removed = captureUnitHolder.removeUnit(key, amt);
+                spaceUnitHolder.addUnitsWithStates(key, removed);
+            }
+        }
+        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("glimmersHeroOn_")

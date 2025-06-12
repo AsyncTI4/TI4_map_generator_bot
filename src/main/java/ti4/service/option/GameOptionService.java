@@ -29,7 +29,7 @@ public class GameOptionService {
 
         //sendShowOwnedPNsInPlayerAreaButton(game, channel);
         List<Button> daneLinkButtons = getDaneLeakModeButtons(game);
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "Enable or Disable the latest Dane Modes.", daneLinkButtons);
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "Enable or Disable Galactic Events.", daneLinkButtons);
     }
 
     public static final Button showOwnedPNs_ON = Buttons.green("showOwnedPNsInPlayerArea_turnOFF", "ON");
@@ -52,6 +52,16 @@ public class GameOptionService {
             daneLinkButtons.add(Buttons.red("enableDaneMode_ageOfExploration_disable", "Disable Age of Exploration"));
         } else {
             daneLinkButtons.add(Buttons.green("enableDaneMode_ageOfExploration_enable", "Enable Age of Exploration"));
+        }
+        if (game.isTotalWarMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_totalWar_disable", "Disable Total War"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_totalWar_enable", "Enable Total War"));
+        }
+        if (game.isAgeOfCommerceMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_ageOfCommerce_disable", "Disable Age of Commerce"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_ageOfCommerce_enable", "Enable Age of Commerce"));
         }
 
         daneLinkButtons.add(Buttons.gray("deleteButtons", "Done"));

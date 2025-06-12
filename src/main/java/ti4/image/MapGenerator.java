@@ -32,10 +32,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
 
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.*;
@@ -462,6 +460,8 @@ public class MapGenerator implements AutoCloseable {
 
         // GAME FUN NAME
         deltaY = 35;
+        deltaY = 35;
+        y += 40; //needed for ghost HS on br
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(game.getCustomName(), landscapeShift, y);
@@ -2066,7 +2066,6 @@ public class MapGenerator implements AutoCloseable {
                 exception);
         }
     }
-
 
     /**
      * Gives the number of rings of the map

@@ -111,6 +111,9 @@ public class TransactionHelper {
 
                             ButtonHelper.resolveAllianceMemberPlanetTrade(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction() + "_" + exhausted);
                         }
+                        case "Technology" -> {
+                            receiver.addTech(furtherDetail);
+                        }
                         case "dmz" -> ButtonHelper.resolveDMZTrade(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
                         default -> resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);
                     }
@@ -237,6 +240,7 @@ public class TransactionHelper {
                         }
                     }
                     case "Frags" -> trans.append(ExploreEmojis.getFragEmoji(furtherDetail).toString().repeat(amountToTransact));
+                    case "Technology" -> trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "Planets", "AlliancePlanets", "dmz" -> trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
                     case "action" -> trans.append("An in-game ").append(furtherDetail).append(" action");
                     case "details" -> trans.append(furtherDetail.replace("fin777", " "));
@@ -518,6 +522,17 @@ public class TransactionHelper {
                 }
 
             }
+            case "Technology" -> {
+                message += " Click the tech you wish to " + requestOrOffer + ".";
+                for (String tech : p1.getTechs()) {
+                    if (resolveAgeOfCommerceTechCheck(p1, p2, tech, game)) {
+                        stuffToTransButtons.add(Buttons.gray(
+                            "offerToTransact_Technology_" + p1.getFaction() + "_" + p2.getFaction() + "_" + tech,
+                            Mapper.getTech(tech).getName()));
+                    }
+                }
+
+            }
             case "AlliancePlanets" -> {
                 message += " Click the planet you wish to " + requestOrOffer + ".";
                 for (String planet : p1.getPlanets()) {
@@ -660,6 +675,21 @@ public class TransactionHelper {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
+    }
+
+    public static boolean resolveAgeOfCommerceTechCheck(Player owner, Player receiver, String tech, Game game) {
+        if (!Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().orElse("").isEmpty()) {
+            return false;
+        }
+        if (receiver.getTechs().contains(tech)) {
+            return false;
+        }
+        if (receiver.getNotResearchedFactionTechs().contains(tech)) {
+            return false;
+        }
+
+        return true;
+
     }
 
     @ModalHandler("finishDealDetails_")
@@ -930,6 +960,17 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), "Reminder that, unlike other things,"
                     + " you may only send a player 1 promissory note in each transaction (and you may only perform one transaction with each other player on a turn).");
             }
+            case "Technology" -> {
+                String message = "Click the tech you wish to send";
+                for (String tech : p1.getTechs()) {
+                    if (resolveAgeOfCommerceTechCheck(p1, p2, tech, game)) {
+                        Button transact = Buttons.gray(finChecker + "send_Technology_" + p2.getFaction() + "_" + tech,
+                            Mapper.getTech(tech).getName());
+                        stuffToTransButtons.add(transact);
+                    }
+                }
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
+            }
             case "Frags" -> {
                 String message = "Click the amount of relic fragments you wish to send";
 
@@ -1166,6 +1207,10 @@ public class TransactionHelper {
                 RelicHelper.sendFrags(event, p1, p2, trait, fragNum, game);
                 message2 = "";
             }
+            case "Technology" -> {
+                p2.addTech(amountToTrans);
+                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " you received the tech " + Mapper.getTech(amountToTrans) + " from a transaction");
+            }
         }
         Button button = Buttons.gray(finChecker + "transactWith_" + p2.getColor(),
             "Send something else to player?");
@@ -1200,7 +1245,7 @@ public class TransactionHelper {
         // if(game.getRealPlayers().size() > 26){
         //     return true;
         // }
-        return player == player2 || !"action".equalsIgnoreCase(game.getPhaseOfGame())
+        return player == player2 || !"action".equalsIgnoreCase(game.getPhaseOfGame()) || game.isAgeOfCommerceMode()
             || player.hasAbility("guild_ships") || player.getPromissoryNotesInPlayArea().contains("convoys")
             || player2.getPromissoryNotesInPlayArea().contains("convoys") || player2.hasAbility("guild_ships")
             || player.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys") || player2.getPromissoryNotesInPlayArea().contains("sigma_trade_convoys")
@@ -1295,6 +1340,9 @@ public class TransactionHelper {
         if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             stuffToTransButtons.add(Buttons.green("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
         }
+        if (game.isAgeOfCommerceMode()) {
+            stuffToTransButtons.add(Buttons.green("newTransact_Technology_" + p1.getFaction() + "_" + p2.getFaction(), "Technology"));
+        }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).isEmpty()) {
             stuffToTransButtons.add(Buttons.green("newTransact_AlliancePlanets_" + p1.getFaction() + "_" + p2.getFaction(), "Alliance Planets", p2.getFactionEmoji()));
         }
@@ -1359,6 +1407,9 @@ public class TransactionHelper {
         }
         if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             stuffToTransButtons.add(Buttons.green(finChecker + "transact_Planets_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
+        }
+        if (game.isAgeOfCommerceMode()) {
+            stuffToTransButtons.add(Buttons.green(finChecker + "transact_Technology_" + p2.getFaction(), "Technology"));
         }
         if (!ButtonHelper.getTradePlanetsWithAlliancePartnerButtons(p1, p2, game).isEmpty()) {
             stuffToTransButtons.add(Buttons.green(finChecker + "transact_AlliancePlanets_" + p2.getFaction(), "Alliance Planets", p2.getFactionEmoji()));

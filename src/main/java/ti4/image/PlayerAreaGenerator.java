@@ -967,7 +967,11 @@ public class PlayerAreaGenerator {
 
             if (Mapper.isValidLeader(leader.getId())) {
                 LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-                drawFactionIconImage(graphics, leaderModel.getFaction(), x + deltaX - 1, y + 108, 42, 42);
+                String fac = leaderModel.getFaction();
+                if (leader.getId().contains("redcreuss")) {
+                    fac = "redcreuss";
+                }
+                drawFactionIconImage(graphics, fac, x + deltaX - 1, y + 108, 42, 42);
             }
 
             if (leader.getTgCount() != 0) {
