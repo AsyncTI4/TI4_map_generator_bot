@@ -137,7 +137,8 @@ public class WebObjectives {
             return null;
         }
 
-        String name = po.getName();
+        String displayKey = revealed ? key : "UNREVEALED_" + String.format("%04d", (int)(Math.random() * 10000));
+        String name = revealed ? po.getName() : "UNREVEALED";
         int pointValue = po.getPoints();
 
         boolean isMultiScoring = Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || game.isFowMode();
@@ -145,7 +146,7 @@ public class WebObjectives {
         List<String> scoredFactions = getScoredFactions(game, key);
         List<String> peekingFactions = getPeekingFactions(game, key);
 
-        return new ObjectiveInfo(key, name, pointValue, revealed, isMultiScoring, scoredFactions, peekingFactions);
+        return new ObjectiveInfo(displayKey, name, pointValue, revealed, isMultiScoring, scoredFactions, peekingFactions);
     }
 
     private static ObjectiveInfo createCustomObjectiveInfo(Game game, String key, int pointValue) {

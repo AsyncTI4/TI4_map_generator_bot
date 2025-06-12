@@ -92,7 +92,7 @@ public class WebHelper {
                 playerDataList.add(WebPlayerArea.fromPlayer(player, game));
             }
 
-                                    WebTilePositions webTilePositions = WebTilePositions.fromGame(game);
+            WebTilePositions webTilePositions = WebTilePositions.fromGame(game);
             Map<String, WebTileUnitData> tileUnitData = WebTileUnitData.fromGame(game);
             WebStatTilePositions webStatTilePositions = WebStatTilePositions.fromGame(game);
             WebObjectives webObjectives = WebObjectives.fromGame(game);
@@ -114,7 +114,7 @@ public class WebHelper {
             }
 
             Map<String, Object> webData = new HashMap<>();
-            webData.put("versionSchema", 1);
+            webData.put("versionSchema", 2);
             webData.put("objectives", webObjectives);
             webData.put("playerData", playerDataList);
             webData.put("lawsInPlay", lawsInPlay);
@@ -123,8 +123,9 @@ public class WebHelper {
             webData.put("tilePositions", webTilePositions.getTilePositions());
             webData.put("tileUnitData", tileUnitData);
             webData.put("statTilePositions", webStatTilePositions.getStatTilePositions());
-
+            webData.put("ringCount", game.getRingCount());
             webData.put("vpsToWin", game.getVp());
+
             String json = objectMapper.writeValueAsString(webData);
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))
