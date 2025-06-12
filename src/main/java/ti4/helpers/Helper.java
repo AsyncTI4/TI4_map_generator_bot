@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,6 +20,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -38,9 +42,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -2390,6 +2391,17 @@ public class Helper {
 
     public static void checkEndGame(Game game, Player player) {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
+            if (game.isLiberationC4Mode()) {
+                if (player.getFaction().equalsIgnoreCase("sol") || player.getFaction().equalsIgnoreCase("xxcha")) {
+                    Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
+                    Player sol = game.getPlayerFromColorOrFaction("sol");
+                    if (sol != null && xxcha != null && (sol.getTotalVictoryPoints() > 11 || xxcha.getTotalVictoryPoints() > 11) && sol.getTotalVictoryPoints() > 9 && xxcha.getTotalVictoryPoints() > 9) {
+                        //good
+                    } else {
+                        return;
+                    }
+                }
+            }
             List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode()) {
                 buttons.add(Buttons.green("gameEnd", "End Game"));

@@ -515,41 +515,71 @@ public class ButtonHelperActionCards {
         Tile tile = game.getTileFromPositionOrAlias(game.getActiveSystem());
         // Actually roll for each unit
         int totalHits = 0;
-        StringBuilder resultBuilder = new StringBuilder(result);
-
         UnitModel unit = player.getUnitByBaseType(baseType);
-        int numOfUnit = 0;
-
-        if (type.equalsIgnoreCase("courageous")) {
-            numOfUnit = 2;
-        }
         int toHit = unit.getCombatDieHitsOnForAbility(CombatRollType.combatround);
         int modifierToHit = 0;
         int extraRollsForUnit = 0;
         int numRollsPerUnit = 1;
-        int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
-        List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
-        player.setExpectedHitsTimes10(
-            player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
-        int hitRolls = DiceHelper.countSuccesses(resultRolls);
-        totalHits += hitRolls;
-        String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit,
-            numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
-        resultBuilder.append(unitRoll);
 
-        result = resultBuilder.toString();
-        result += CombatMessageHelper.displayHitResults(totalHits);
-        player.setActualHits(player.getActualHits() + totalHits);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
+        if (type.equalsIgnoreCase("courageous")) {
+            StringBuilder resultBuilder = new StringBuilder(result);
 
-        if (hitRolls > 0) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
-                    continue;
+            int numOfUnit = 2;
+
+            int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+            List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+            player.setExpectedHitsTimes10(
+                player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+            int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            totalHits += hitRolls;
+            String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit,
+                numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+            resultBuilder.append(unitRoll);
+
+            result = resultBuilder.toString();
+            result += CombatMessageHelper.displayHitResults(totalHits);
+            player.setActualHits(player.getActualHits() + totalHits);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
+
+            if (hitRolls > 0) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+                        continue;
+                    }
+                    if (FoWHelper.playerHasShipsInSystem(p2, game.getTileFromPositionOrAlias(game.getActiveSystem()))) {
+                        List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(p2, game, tile, "assaultcannoncombat");
+                        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + " you can use the buttons to destroy your ship(s)", buttons);
+                    }
                 }
-                if (FoWHelper.playerHasShipsInSystem(p2, game.getTileFromPositionOrAlias(game.getActiveSystem()))) {
-                    List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(p2, game, tile, "assaultcannoncombat");
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + " you can use the buttons to destroy your ship(s)", buttons);
+            }
+        } else {
+            for (UnitHolder uH : tile.getUnitHolders().values()) {
+                for (UnitKey key : uH.getUnitKeys()) {
+                    Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
+                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
+                        continue;
+                    }
+                    int numOfUnit = uH.getUnitCount(key);
+                    totalHits = 0;
+                    result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
+                    StringBuilder resultBuilder = new StringBuilder(result);
+                    resultBuilder.append("Rolling against " + numOfUnit + " " + key.getUnitType().getUnitTypeEmoji() + " owned by " + key.getColor() + "\n");
+                    int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+                    List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                    player.setExpectedHitsTimes10(
+                        player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+                    int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                    totalHits += hitRolls;
+                    String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit,
+                        numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+                    resultBuilder.append(unitRoll);
+
+                    result = resultBuilder.toString();
+                    result += CombatMessageHelper.displayHitResults(totalHits);
+                    player.setActualHits(player.getActualHits() + totalHits);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
+                    uH.removeUnit(key, hitRolls);
+
                 }
             }
         }
@@ -2191,6 +2221,20 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    public static List<Button> getCircletButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
+                if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                    buttons.add(Buttons.green("probeStep2_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)));
+                }
+
+            }
+        }
+        return buttons;
+    }
+
     @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveReverse_", "");
@@ -2261,5 +2305,21 @@ public class ButtonHelperActionCards {
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static String getBestResPlanetInHomeSystem(Player player, Game game) {
+        String planetName = "";
+        int count = 0;
+        for (String planet : player.getPlanets()) {
+            Planet p = game.getPlanetsInfo().get(planet);
+            if (p != null && p.getResources() > count) {
+                if (game.getTileFromPlanet(planet) == player.getHomeSystemTile()) {
+
+                    count = p.getResources();
+                    planetName = planet;
+                }
+            }
+        }
+        return planetName;
     }
 }

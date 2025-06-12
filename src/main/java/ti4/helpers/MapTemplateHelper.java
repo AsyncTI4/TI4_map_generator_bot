@@ -173,7 +173,7 @@ public class MapTemplateHelper {
 
                 if (tile.getPos() != null && tile.getCustodians() != null && tile.getCustodians()) {
                     Tile newgametile = game.getTileByPosition(tile.getPos());
-                    if (newgametile != null) AddTileService.addCustodianToken(newgametile); //only works on MR for now
+                    if (newgametile != null) AddTileService.addCustodianToken(newgametile, game); //only works on MR for now
                 }
             }
         }

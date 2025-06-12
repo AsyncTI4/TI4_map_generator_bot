@@ -88,7 +88,7 @@ public class AddTileListService {
                 throw new Exception("Could not find tile: " + tileID);
             }
             Tile tile = new Tile(tileID, position);
-            AddTileService.addCustodianToken(tile);
+            AddTileService.addCustodianToken(tile, game);
             game.setTile(tile);
         }
         return badTiles;
@@ -101,7 +101,7 @@ public class AddTileListService {
             game.setTile(tile);
             if (game.getTileByPosition("000") == null) {
                 tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
-                AddTileService.addCustodianToken(tile);
+                AddTileService.addCustodianToken(tile, game);
                 game.setTile(tile);
             }
         } catch (Exception e) {
@@ -113,7 +113,7 @@ public class AddTileListService {
             AddFrontierTokensService.addFrontierTokens(event, game);
             MessageHelper.sendMessageToChannel(channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
         }
-        if (!game.isOrdinianC1Mode()) {
+        if (!game.isOrdinianC1Mode() && !game.isLiberationC4Mode()) {
             MessageHelper.sendMessageToChannelWithButtons(
                 game.getMainGameChannel(), "Press this button after every player is setup.",
                 List.of(Buttons.green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));

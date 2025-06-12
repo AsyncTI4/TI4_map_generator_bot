@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
@@ -236,6 +237,15 @@ public class AddPlanetService {
                 }
 
             }
+        }
+
+        if (!game.getStoredValue("CommsOnPlanet" + planet).isEmpty() && game.isTotalWarMode()) {
+            int comms = Integer.parseInt(game.getStoredValue("CommsOnPlanet" + planet));
+            String planet2 = ButtonHelperActionCards.getBestResPlanetInHomeSystem(player, game);
+            game.changeCommsOnPlanet(-comms, planet);
+            game.changeCommsOnPlanet(comms, planet2);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), comms + " commodities were moved from the planet of " + Helper.getPlanetRepresentation(planet, game) + " to the planet of " + Helper.getPlanetRepresentation(planet2, game));
+
         }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {

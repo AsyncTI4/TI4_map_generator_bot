@@ -1288,6 +1288,14 @@ public class Player extends PlayerProperties {
     }
 
     @JsonIgnore
+    public String getFactionNameOrColor() {
+        if (getGame().isFowMode() || FoWHelper.isPrivateGame(getGame())) {
+            return StringUtils.capitalize(getColor());
+        }
+        return Mapper.getFaction(getFaction()).getFactionName();
+    }
+
+    @JsonIgnore
     public String getColorIfCanSeeStats(Player viewingPlayer) {
         if (getGame().isFowMode() && !FoWHelper.canSeeStatsOfPlayer(getGame(), this, viewingPlayer)) {
             return "???";
@@ -1731,6 +1739,9 @@ public class Player extends PlayerProperties {
         int num = Math.clamp(comms, 0, getCommoditiesTotal());
         if (hasAbility("necrophage") && (getCommoditiesBonus() == 0 || getCommoditiesBase() == 0)) {
             num = Math.clamp(comms, 0, getCommoditiesBase() + 10);
+        }
+        if (getGame().isAgeOfCommerceMode() && comms > 0) {
+            num = comms;
         }
         super.setCommodities(num);
         if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);

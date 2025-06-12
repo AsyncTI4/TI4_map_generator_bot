@@ -17,7 +17,7 @@ public class Source {
         //   (or you can use the search functionality of your IDE ofc)
 
         // official
-        base, pok, codex1, codex2, codex3,
+        base, pok, codex1, codex2, codex3, codex4,
 
         //big homebrew
         ds, absol, franken, uncharted_space, monuments, blue_reverie,
@@ -55,21 +55,21 @@ public class Source {
 
         public boolean isOfficial() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3 -> true;
+                case base, pok, codex1, codex2, codex3, codex4 -> true;
                 default -> false;
             };
         }
 
         public boolean isPok() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3 -> true;
+                case base, pok, codex1, codex2, codex3, codex4 -> true;
                 default -> false;
             };
         }
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, ds, uncharted_space -> true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space -> true;
                 default -> false;
             };
         }
@@ -107,6 +107,7 @@ public class Source {
                 case codex1 -> "Codex 1 - Omega Techs";
                 case codex2 -> "Codex 2 - Relics";
                 case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
+                case codex4 -> "Codex 4 - Relics";
                 case ds -> "Discordant Stars [Homebrew]";
                 case absol -> "Absol's Mod [Homebrew]";
                 case flagshipping -> "Flagshipping [Homebrew]";
