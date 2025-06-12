@@ -135,6 +135,18 @@
         "shortName": "X-89 Bact. Weapon"
     },
     {
+        "alias": "x89c4",
+        "name": "X-89 Bacterial Weapon ΩΩ",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "source": "codex4",
+        "text": "Double the hits produced by your units' BOMBARDMENT and ground combat rolls.\nExhaust each planet you use BOMBARDMENT against.",
+        "initials": "X89",
+        "shortName": "X-89 Bact. Weapon"
+    },
+    {
         "alias": "pa",
         "name": "Psychoarchaeology",
         "types": [
@@ -185,14 +197,13 @@
     },
     {
         "alias": "md",
-        "name": "Magen Defense Grid Ω",
+        "name": "Magen Defense Grid ΩΩ",
         "types": [
             "WARFARE"
         ],
         "requirements": "R",
-        "source": "codex1",
-        "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit and assign it to 1 of your opponent's ground forces.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/magen_defense_grid_omega.png?raw=true",
+        "source": "codex4",
+        "text": "When any player activates a system that contains 1 or more of your structures, place 1 infantry from your reinforcements with each of those structures.\nAt the start of ground combat on a planet that contains 1 or more of your structures, produce 1 hit and assign it to 1 of your opponent's ground forces.",
         "initials": "MDG",
         "shortName": "Magen Def. Grid"
     },
