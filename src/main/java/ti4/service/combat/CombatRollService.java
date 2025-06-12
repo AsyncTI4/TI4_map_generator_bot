@@ -152,7 +152,7 @@ public class CombatRollService {
         tempMods.addAll(tempOpponentMods);
 
         String message = CombatMessageHelper.displayCombatSummary(player, tile, combatOnHolder, rollType);
-        message += rollForUnits(playerUnitsByQuantity, extraRolls, modifiers, tempMods, player, opponent, game, rollType, event, tile);
+        message += rollForUnits(playerUnitsByQuantity, extraRolls, modifiers, tempMods, player, opponent, game, rollType, event, tile, combatOnHolder);
         FOWCombatThreadMirroring.mirrorCombatMessage(event, game, message);
         String hits = StringUtils.substringAfter(message, "Total hits ");
         hits = hits.split(" ")[0].replace("*", "");
@@ -368,7 +368,7 @@ public class CombatRollService {
         List<NamedCombatModifierModel> tempMods,
         Player player, Player opponent,
         Game game, CombatRollType rollType,
-        GenericInteractionCreateEvent event, Tile activeSystem
+        GenericInteractionCreateEvent event, Tile activeSystem, UnitHolder unitHolder
     ) {
         String result = "";
 
@@ -588,8 +588,18 @@ public class CombatRollService {
         }
         result = resultBuilder.toString();
 
-        result += CombatMessageHelper.displayHitResults(totalHits);
+        boolean usesX89c4 = false;
+        if (totalHits > 0 && player.hasTech("x89c4") && (rollType == CombatRollType.combatround || rollType == CombatRollType.bombardment) && (!unitHolder.equals("space") || rollType == CombatRollType.bombardment)) {
+            usesX89c4 = true;
+            totalHits *= 2;
+        }
+
+        result += CombatMessageHelper.displayHitResults(totalHits, usesX89c4);
         player.setActualHits(player.getActualHits() + totalHits);
+        if (usesX89c4) {
+            result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hits using " + Mapper.getTech("x89c4").getNameRepresentation();
+        }
+
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0 && !game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
             result += "\n" + player.getFactionEmoji() + " You have _The Crown of Thalnos_ and may reroll " + (totalMisses == 1 ? "the miss" : "misses")
                 + ", adding +1, at the risk of your " + (totalMisses == 1 ? "troop's life" : "troops' lives") + ".";
