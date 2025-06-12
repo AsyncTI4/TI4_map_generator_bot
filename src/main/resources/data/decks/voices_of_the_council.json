@@ -24,7 +24,7 @@
         "name": "Voices of the Council Techs",
         "type": "technology",
         "description": "All techs for Voices of the Council",
-        "cardIDs": ["amd", "gd", "fl", "lwd", "nm", "dxa", "hm", "x89", "ps", "md",
+        "cardIDs": ["amd", "gd", "fl", "lwd", "nm", "dxa", "hm", "x89c4", "ps", "md",
             "da", "asc", "st", "gls", "td", "ie", "ws", "sd2", "lw2", "l4", "cm",
             "pws2", "qdn", "ac2", "sdn2", "mc", "hcf2", "vax", "exo2", "cr2", "scc",
             "lgf", "it", "mi", "bio", "nes", "ffac2", "mr", "pm", "so2", "wg", "ds",

@@ -94,7 +94,7 @@ public class CombatMessageHelper {
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_9.toString(), DiceEmojis.d10blue_9.toString());
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_0.toString(), DiceEmojis.d10blue_0.toString());
         }
-        
+
         String winnu_sigma = "";
         if ("sigma_winnu_flagship_2".equals(unitModel.getId())) {
             winnu_sigma = "-# The number of dice may not be correct; if so, you will need to manually roll the extra.\n";
@@ -103,8 +103,10 @@ public class CombatMessageHelper {
         return String.format("> `%sx`%s %s %s - %s hit%s\n%s", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix, winnu_sigma);
     }
 
-    public static String displayModifiers(String prefixText, Map<UnitModel, Integer> units,
-        List<NamedCombatModifierModel> modifiers) {
+    public static String displayModifiers(
+        String prefixText, Map<UnitModel, Integer> units,
+        List<NamedCombatModifierModel> modifiers
+    ) {
         String result = "";
         if (!modifiers.isEmpty()) {
 
@@ -145,6 +147,13 @@ public class CombatMessageHelper {
         return String.format("\n**Total hits %s** %s\n", totalHits, ":boom:".repeat(Math.max(0, totalHits)));
     }
 
+    public static String displayHitResults(int totalHits, boolean x89) {
+        String fmt = "\n**Total hits %s** %s\n";
+        String emoji = x89 ? MiscEmojis.DoubleBoom.emojiString() : ":boom:";
+        int hits = Math.max(0, x89 ? totalHits / 2 : totalHits);
+        return String.format(fmt, totalHits, emoji.repeat(hits));
+    }
+
     public static String displayCombatSummary(Player player, Tile tile, UnitHolder combatOnHolder, CombatRollType rollType) {
         String holderName = combatOnHolder.getName();
         Planet holderPlanet = null;
@@ -161,8 +170,7 @@ public class CombatMessageHelper {
         String combatTypeName = StringUtils.capitalize(holderName) + " combat";
         if (rollType != CombatRollType.combatround) {
             combatTypeName = rollType.getValue();
-            if (rollType == CombatRollType.bombardment || rollType == CombatRollType.AFB)
-            {
+            if (rollType == CombatRollType.bombardment || rollType == CombatRollType.AFB) {
                 combatTypeName = combatTypeName.toUpperCase();
             }
             if (holderPlanet != null) {
