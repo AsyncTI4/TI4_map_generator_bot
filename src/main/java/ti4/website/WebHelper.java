@@ -15,10 +15,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -242,15 +244,19 @@ public class WebHelper {
             });
     }
 
+    public static void putMap(String gameName, byte[] imageBytes) {
+        putMap(gameName, imageBytes, false, null);
+    }
+
     public static void putMap(String gameName, byte[] imageBytes, boolean frog, Player player) {
         if (!sendingToWeb()) return;
 
         try {
             String mapPath;
             if (frog && player != null) {
-                mapPath = "fogmap/" + player.getUserID() + "/%s/%s.webp";
+                mapPath = "fogmap/" + player.getUserID() + "/%s/%s.jpg";
             } else {
-                mapPath = "map/%s/%s.webp";
+                mapPath = "map/%s/%s.jpg";
             }
 
             LocalDateTime date = LocalDateTime.now();
@@ -259,7 +265,7 @@ public class WebHelper {
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
                 .key(String.format(mapPath, gameName, dtstamp))
-                .contentType("image/webp")
+                .contentType("image/jpg")
                 .build();
             s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(imageBytes))
                 .exceptionally(e -> {
