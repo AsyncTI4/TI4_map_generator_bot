@@ -640,9 +640,11 @@ public class BotLogger {
 			this.originTime = DateTimeHelper.getCurrentTimestamp();
 		}
 
-		public LogMessageOrigin(@Nonnull Player player) {
-			this.player = player;
-			this.game = player.getGame();
+		public LogMessageOrigin(@Nullable Player player) {
+			if (player != null) {
+				this.player = player;
+				this.game = player.getGame();
+			}
 			if (game != null) {
 				this.guild = game.getGuild();
 				this.channel = game.getMainGameChannel();
@@ -723,7 +725,6 @@ public class BotLogger {
 
 		/**
 		 * Append the "Game:" portion of a log message to a StringBuilder.
-		 * @param builder - The StringBuilder to which the game string is appended
 		 * @return The StringBuilder passed into builder
 		 */
 		@Nullable
@@ -738,7 +739,6 @@ public class BotLogger {
 
 		/**
 		 * Append the "Event:" portion of a log message to a StringBuilder.
-		 * @param builder - The StringBuilder to which the event string is appended
 		 * @return The StringBuilder passed into builder
 		 */
 		@Nullable
