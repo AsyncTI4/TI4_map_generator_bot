@@ -7,7 +7,7 @@ public enum ColorEmojis implements TI4Emoji {
 
     // Colors
     black, bloodred, blue, brown, chocolate, chrome, rainbow, sherbet, rose, emerald, ethereal, forest, gold, gray, green, lavender, //
-    lightgray, lime, navy, orange, orca, petrol, pink, purple, red, spring, sunset, tan, teal, turquoise, yellow, //
+    lightgray, lime, navy, orange, orca, petrol, pink, purple, red, ruby, spring, sunset, tan, teal, turquoise, yellow, //
     copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, magma, glacier, plaid, harlequin, //
     splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
     splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
@@ -60,6 +60,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "rbw", "rainbow" -> rainbow + "**Rainbow**";
             case "sbt", "sherbet" -> sherbet + "**Sherbet**";
             case "eth", "ethereal" -> ethereal + "**Ethereal**";
+            case "rby", "ruby" -> ruby + "**Ruby**";
             case "cpr", "copper" -> copper + "**Copper**";
             case "plm", "plum" -> plum + "**Plum**";
             case "pch", "peach" -> peach + "**Peach**";
@@ -132,6 +133,7 @@ public enum ColorEmojis implements TI4Emoji {
             case "rbw", "rainbow" -> rainbow;
             case "sbt", "sherbet" -> sherbet;
             case "eth", "ethereal" -> ethereal;
+            case "rby", "ruby" -> ruby;
             case "cpr", "copper" -> copper;
             case "plm", "plum" -> plum;
             case "pch", "peach" -> peach;
