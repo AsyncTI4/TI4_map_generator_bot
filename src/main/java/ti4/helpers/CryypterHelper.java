@@ -110,11 +110,12 @@ public class CryypterHelper
         }
     }
     
-    //TODO: Add "CryypterHelper.handleVotCRiders(event, player, riderName);" to near end of AgendaHelper.play_after(), currently line 3370
-    public static void handleVotCRiders(ButtonInteractionEvent event, Player player, String riderName)
+    //TODO: Add "CryypterHelper.handleVotCRiders(event, game, player, riderName);" to near end of AgendaHelper.play_after(), currently line 3370
+    public static void handleVotCRiders(ButtonInteractionEvent event, Game game, Player player, String riderName)
     {
         String votcRiderName = riderName.replace("votc_", "");
-        if ("keleresx hero".equalsIgnoreCase(votcRiderName)) 
+
+        if ("keleresxhero".equalsIgnoreCase(votcRiderName)) 
         {
             Leader playerLeader = player.getLeader("votc_keleresheroxxcha").orElse(null);
             if (playerLeader != null) 
@@ -128,7 +129,11 @@ public class CryypterHelper
         }
         else if (votcRiderName.contains("envoy"))
         {
-            //TODO: Implement play envoy logic
+            Leader playerLeader = player.getLeader(votcRiderName).orElse(null);
+            if (playerLeader != null) 
+            {
+                ExhaustLeaderService.exhaustLeader(game, player, playerLeader);
+            }
         }
     }
     
@@ -155,7 +160,7 @@ public class CryypterHelper
             if(!leader.isLocked() && leaderModel.getAbilityWindow() == "After an agenda is revealed:")
             {
                 FactionModel factionModel = Mapper.getFaction(leaderModel.getFaction());
-                String buttonID = "votc_" + leaderModel.getFaction() + " " + leaderModel.getType();
+                String buttonID = "votc_" + leaderModel.getFaction() + leaderModel.getType();
                 String buttonLabel = leaderModel.getName() + " (" + factionModel.getShortName() + " " + leaderModel.getType() + ")";
                 if(play)
                 {
@@ -166,6 +171,74 @@ public class CryypterHelper
                 {
                     buttons.add(Buttons.red("queue_after_" + buttonID, buttonLabel));
                 }
+            }
+        }
+    }
+
+    public static void handleAdditionalVoteSources(Player player)
+    {
+        if (player.hasTechReady("cryypter_pi")) 
+        {
+            additionalVotesAndSources.put(TechEmojis.CyberneticTech + "_Predictive Intelligence_", 4);
+        }
+        //Nekro envoy
+        if(player.getLeader("winnuenvoy").orElse(null) != null )
+        {
+            if(player.getExhaustedPlanets().contains("mr"))
+            {
+                additionalVotesAndSources.put(FactionEmojis.Winnu + " envoy with Mecatol Rex", 6);
+            }
+            else if(player.getExhaustedPlanets().contains("winnu")
+            {
+                additionalVotesAndSources.put(FactionEmojis.Winnu + " envoy with Winnu", 4);
+            }
+        }
+    }
+
+    //TODO: Add "CryypterHelper.exhaustForVotes(player, thing);" to end of "if" clause of AgendaHelper.exhaustForVotes(), currently line 2469
+    public static void exhaustForVotes(Player player, String component)
+    {
+        //Yin envoy exhausting other player's planet
+        if(component.contains("yinenvoy"))
+        {
+            if (!prevoting) {
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    player.getRepresentation()
+                        + " please remove 1 infantry to pay for the Yin Envoy.",
+                    ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, "infantry"));
+            }
+        }
+    }
+
+    getPlanetButtonsVersion2 2574
+
+    public static void checkForAssigningAbilities(Game game) {
+        for (Player player : game.getRealPlayers()) {
+            game.setStoredValue("Mentak Envoy " + player.getFaction(), "");
+            if (player.getLeader("mentakenvoy").orElse(null) != null) {
+                String msg = player.getRepresentation()
+                    + " you have the option to pre-assign the declaration of using your Envoy on someone."
+                    + " When they are up to vote, it will ping them saying that you wish to use your Envoy, and then it will be your job to clarify."
+                    + " Feel free to not preassign if you don't wish to use it on this agenda.";
+                List<Button> buttons2 = new ArrayList<>();
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player) {
+                        continue;
+                    }
+                    if (!game.isFowMode()) {
+                        buttons2.add(Buttons.gray(
+                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
+                                + p2.getFaction(),
+                            p2.getFaction()));
+                    } else {
+                        buttons2.add(Buttons.gray(
+                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
+                                + p2.getFaction(),
+                            p2.getColor()));
+                    }
+                }
+                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
             }
         }
     }
