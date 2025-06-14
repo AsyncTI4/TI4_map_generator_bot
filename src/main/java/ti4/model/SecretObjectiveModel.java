@@ -13,7 +13,7 @@ import ti4.model.Source.ComponentSource;
 import ti4.service.emoji.CardEmojis;
 
 @Data
-public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
+public class SecretObjectiveModel implements ColorableModelInterface<SecretObjectiveModel>, EmbeddableModel {
     private String alias;
     private String name;
     private String phase;
@@ -23,6 +23,34 @@ public class SecretObjectiveModel implements ModelInterface, EmbeddableModel {
     private String imageURL;
     private ComponentSource source;
     private List<String> searchTags = new ArrayList<>();
+    private SecretObjectiveModel sourceModel; // used for duped promissory notes, to know their source
+
+    /**
+     * @return true if this is duplicated from a generic colour promissory note
+     */
+    public boolean isDupe() {
+        return sourceModel != null;
+    }
+
+    public boolean isColorable() {
+        return alias != null && alias.contains("<color>");
+    }
+
+    @Override
+    public SecretObjectiveModel duplicateAndSetColor(ColorModel newColor) {
+        SecretObjectiveModel so = new SecretObjectiveModel();
+        so.setAlias(this.alias.replace("<color>", newColor.getName()));
+        so.setName(this.name.replace("<color>", newColor.getDisplayName()));
+        so.setPhase(this.phase);
+        so.setText(this.text.replace("<color>", newColor.getName()));
+        so.setPoints(this.points);
+        so.setHomebrewReplacesID(this.homebrewReplacesID);
+        so.setImageURL(this.getImageURL());
+        so.setSource(this.source);
+        so.setSearchTags(new ArrayList<>(searchTags));
+        so.setSourceModel(this);
+        return so;
+    }
 
     public boolean isValid() {
         return alias != null
