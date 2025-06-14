@@ -10,7 +10,7 @@ public enum ColorEmojis implements TI4Emoji {
     lightgray, lime, navy, orange, orca, petrol, pink, purple, red, ruby, spring, sunset, tan, teal, turquoise, yellow, //
     copper, plum, peach, rust, tropical, jupiter, poison, vapourwave, watermelon, checker, paintball, wasp, magma, glacier, plaid, harlequin, //
     splitbloodred, splitblue, splitchocolate, splitemerald, splitgold, splitgreen, splitlime, splitnavy, splitorange, //
-    splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset; //
+    splitpetrol, splitpink, splitpurple, splitrainbow, splitred, splittan, splitteal, splitturquoise, splityellow, riftset, nightmare, dawn; //
 
     public static String getColorEmojiWithName(String color) {
         if (getColorEmojiWithNameLegacy(color) != null) {
@@ -95,6 +95,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "splitptr", "splitpetrol" -> splitpetrol + "**SplitPetrol**";
             case "splitrbw", "splitrainbow" -> splitrainbow + "**SplitRainbow**";
             case "ero", "riftset" -> riftset + "**RiftSet**";
+            case "nm", "nightmare" -> nightmare + "**Nightmare**";
+            case "dw", "dawn" -> dawn + "**Dawn**";
             default -> null;
         };
     }
@@ -168,6 +170,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "splitptr", "splitpetrol" -> splitpetrol;
             case "splitrbw", "splitrainbow" -> splitrainbow;
             case "ero", "riftset" -> riftset;
+            case "dw", "dawn" -> dawn;
+            case "nm", "nightmare" -> nightmare;
 
             default -> TI4Emoji.getRandomGoodDog();
         };
