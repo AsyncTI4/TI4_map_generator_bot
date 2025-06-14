@@ -4743,9 +4743,7 @@ public class ButtonHelper {
                     if (state.isDamaged() || !canDamage) continue;
                     int max = Math.min(oneButtonPerUnit ? 1 : 2, unitHolder.getUnitCountForState(unitKey, state));
                     for (int x = 1; x <= max; x++) {
-                        if (combat) {
-                            buttons.add(buildAssignHitButton(player, tile, unitHolder, state, unitKey, x, true));
-                        }
+                        buttons.add(buildAssignHitButton(player, tile, unitHolder, state, unitKey, x, true));
                     }
                 }
                 // Then, all assign hits buttons for all states
