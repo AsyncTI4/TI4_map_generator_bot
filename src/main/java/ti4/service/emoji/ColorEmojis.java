@@ -170,6 +170,8 @@ public enum ColorEmojis implements TI4Emoji {
             case "splitptr", "splitpetrol" -> splitpetrol;
             case "splitrbw", "splitrainbow" -> splitrainbow;
             case "ero", "riftset" -> riftset;
+            case "dw", "dawn" -> dawn;
+            case "nm", "nightmare" -> nightmare;
 
             default -> TI4Emoji.getRandomGoodDog();
         };
