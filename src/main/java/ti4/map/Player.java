@@ -1054,12 +1054,8 @@ public class Player extends PlayerProperties {
 
     public int getCommoditiesBonus() {
         int bonus = 0;
-        if (hasAbility("imperia") && getGame().playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
+        if (getGame().playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
             bonus++;
-        } else {
-            if (hasLeaderUnlocked("bentorcommander")) {
-                bonus++;
-            }
         }
         if (getAbilities().contains("policy_the_economy_exploit")) {
             bonus += 2 - getCommoditiesBase();
