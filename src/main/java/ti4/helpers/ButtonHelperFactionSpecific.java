@@ -2049,7 +2049,7 @@ public class ButtonHelperFactionSpecific {
         String faction = buttonID.split("_")[2];
         int winnings = Integer.parseInt(commAmount);
         Player killer = game.getPlayerFromColorOrFaction(faction);
-        String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(player, game);
+        String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(killer, game);
         int newAmount = game.changeCommsOnPlanet(winnings, planet);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(killer.getCorrectChannel(), killer.getRepresentationNoPing() + " added " + winnings +
