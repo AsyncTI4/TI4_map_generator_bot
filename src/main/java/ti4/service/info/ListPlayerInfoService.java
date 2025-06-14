@@ -434,7 +434,14 @@ public class ListPlayerInfoService {
                 if (player.hasAbility("privileged_citizenry")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
                 }
-                return counter;
+                if (player.hasAbility("orbital_foundaries")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                }
+                int maxPlanets = counter;
+                if (player.getHomeSystemTile() != null) {
+                    maxPlanets = Math.max(0, player.getPlanetsAllianceMode().size() - player.getHomeSystemTile().getPlanetUnitHolders().size());
+                }
+                return Math.min(counter, maxPlanets);
             }
             case "corner", "unify_colonies", "corner_omegaphase" -> {
                 int max = 0;
