@@ -183,5 +183,13 @@
         "textColor": "black",
         "primaryColor": { "red": 35, "green": 104, "blue": 200 },
         "hue": "BLUE"
+    },
+    {
+        "alias": "rby",
+        "name": "ruby",
+        "aliases": ["rby"],
+        "textColor": "black",
+        "primaryColor": { "red": 212, "green": 43, "blue": 75 },
+        "hue": "RED"
     }
 ]
