@@ -1,6 +1,5 @@
 package ti4;
 
-import javax.imageio.ImageIO;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -244,11 +243,6 @@ public class AsyncTI4DiscordBot {
         if (DataMigrationManager.runMigrations()) {
             BotLogger.info("RAN MIGRATIONS");
         }
-
-        // START ASYNC PIPELINES
-        ImageIO.setUseCache(false);
-        MapRenderPipeline.start();
-        StatisticsPipeline.start();
 
         // START CRONS
         AutoPingCron.register();

@@ -2,7 +2,6 @@ package ti4.executors;
 
 import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +19,9 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class ExecutorManager {
 
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Math.max(2, Runtime.getRuntime().availableProcessors()));
+    private static final int TASK_TIMEOUT_SECONDS = 30;
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newVirtualThreadPerTaskExecutor();
     private static final Set<String> executionLocks = ConcurrentHashMap.newKeySet();
 
     public static void runAsync(String name, String gameName, MessageChannel messageChannel, Runnable runnable) {
@@ -33,12 +34,13 @@ public class ExecutorManager {
         if (!canExecuteGameCommand(gameName, messageChannel)) {
             return;
         }
-        Runnable onCancel = () -> {
-            MessageHelper.sendMessageToChannel(messageChannel, "The last command timed out and was cancelled. Double check the map state " +
-                "and use undo if the command partially completed.");
+        Runnable onTimeout = () -> {
+            MessageHelper.sendMessageToChannel(messageChannel, "The last command timed out. Wait a few minutes and double check the map state.");
             executionLocks.remove(gameName);
         };
-        runAsync(name, wrapWithLockRelease(gameName, runnable), onCancel);
+        var lockReleaseRunnable = wrapWithLockRelease(gameName, runnable);
+        var timedRunnable = new TimedRunnable(name, lockReleaseRunnable);
+        runAsync(name, timedRunnable, onTimeout);
     }
 
     private static boolean canExecuteGameCommand(String gameName, MessageChannel messageChannel) {
@@ -87,20 +89,19 @@ public class ExecutorManager {
         runAsync(name, runnable, null);
     }
 
-    private static void runAsync(String name, Runnable runnable, Runnable onCancel) {
-        var timedRunnable = new TimedRunnable(name, runnable);
-        CompletableFuture
-            .runAsync(timedRunnable, EXECUTOR_SERVICE)
-            .orTimeout(30, TimeUnit.SECONDS)
+    private static void runAsync(String name, TimedRunnable runnable, Runnable onTimeout) {
+        CompletableFuture.runAsync(runnable, EXECUTOR_SERVICE)
+            .orTimeout(TASK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .whenComplete((result, exception) -> {
-                if (exception instanceof TimeoutException || exception instanceof CancellationException) {
+                // This does not cancel the task, just reports that it exceeded the timeout threshold
+                if (exception instanceof TimeoutException) {
                     CircuitBreaker.incrementThresholdCount();
-                    BotLogger.error("Timed out while waiting for async task to finish. Canceled. Task name: " + name, exception);
-                    if (onCancel != null) {
-                        onCancel.run();
+                    BotLogger.error("Timeout occurred during task: " + name, exception);
+                    if (onTimeout != null) {
+                        onTimeout.run();
                     }
                 } else if (exception != null) {
-                    BotLogger.error("Async task finished with an error. Task name: " + name, exception);
+                    BotLogger.error("Error occurred during task: " + name, exception);
                 }
             });
     }
@@ -108,7 +109,7 @@ public class ExecutorManager {
     public static boolean shutdown() {
         EXECUTOR_SERVICE.shutdown();
         try {
-            if (!EXECUTOR_SERVICE.awaitTermination(20, TimeUnit.SECONDS)) {
+            if (!EXECUTOR_SERVICE.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
                 EXECUTOR_SERVICE.shutdownNow();
                 return false;
             }
