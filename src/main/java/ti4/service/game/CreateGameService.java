@@ -555,7 +555,7 @@ public class CreateGameService {
                     return category.getName();
                 }
             } catch (Exception e) {
-                BotLogger.warning("Could not parse integers within category name: " + category.getName(), e);
+                //BotLogger.warning("Could not parse integers within category name: " + category.getName(), e);
             }
         }
 
