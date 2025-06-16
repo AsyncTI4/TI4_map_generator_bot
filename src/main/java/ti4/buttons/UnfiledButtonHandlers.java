@@ -395,11 +395,8 @@ public class UnfiledButtonHandlers {
             String message = player.getRepresentationUnfogged()
                 + ", please choose the planet you wish to put your structure on.";
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "placeOneNDone_dontskip");
-            if (!game.isFowMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-            } else {
-                MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-            }
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getFactionEmojiOrColor() + " trade goods increased by 1 " + player.gainTG(1) + ".");
@@ -1767,11 +1764,11 @@ public class UnfiledButtonHandlers {
                 boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
-                    && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    buttons.add(
-                        Buttons.red("exhaustTech_sar", "Exhaust Self-Assembly Routines", TechEmojis.WarfareTech));
-                }
+                // if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
+                //     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
+                //     buttons.add(
+                //         Buttons.red("exhaustTech_sar", "Exhaust Self-Assembly Routines", TechEmojis.WarfareTech));
+                // } //sar is handled elsewhere
                 if (player.hasTechReady("htp") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
