@@ -185,10 +185,13 @@ public class StartCombatService {
         game.setStoredValue(combatName2, "");
 
         TextChannel textChannel = (TextChannel) channel;
+
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
                 initializeCombatThread(threadChannel_, game, player1, player2, tile, event, spaceOrGround, null, unitHolderName);
+                CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
+                CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
                 return;
             }
         }
@@ -213,6 +216,8 @@ public class StartCombatService {
             threadChannel.queue(tc -> initializeCombatThread(tc, game, player1, player2, tile, event,
                 spaceOrGround, systemWithContext, unitHolderName));
         });
+        CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
+        CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
     }
 
     private static void initializeCombatThread(
@@ -365,9 +370,6 @@ public class StartCombatService {
             // offer buttons for all crimson commander holders
             offerRedGhostCommanderButtons(p, game, event);
         }
-
-        CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
-        CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
 
         if (tile.isHomeSystem() && isGroundCombat && game.getStoredValue("audioSent").isEmpty()) {
             for (Player p3 : game.getRealPlayers()) {
