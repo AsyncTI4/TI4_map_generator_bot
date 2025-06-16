@@ -100,7 +100,7 @@ public class MapTemplateHelper {
 
     private static Tile getTileFromTemplateTile(MapTemplateTile tile) {
         List<String> backupColors = Arrays.asList("red", "blue", "yellow", "emerald", "lavender", "petrol", "chocolate",
-            "ethereal", "ruby", "forest", "gold", "green", "grey", "navy", "spring", "teal", "black", "lightgrey", "rainbow",
+            "ethereal", "forest", "gold", "green", "grey", "navy", "spring", "teal", "black", "lightgrey", "rainbow",
             "turquoise", "lightbrown", "orange", "pink", "sunset", "bloodred", "brown", "chrome", "purple", "rose", "white", "tan");
 
         String tileID = null;
