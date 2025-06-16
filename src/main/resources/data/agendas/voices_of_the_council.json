@@ -149,7 +149,7 @@
         "type": "Directive",
         "target": "For/Against. When this agenda resolves, the speaker rolls 1 die. If the result is 6-10, the chosen players may research 2 technologies. If the result is 1-5, destroy all units in the chosen system, and each player with units in systems adjacent to the chosen system destroys 3 of their units in each of those systems.",
         "text1": "For: Choose all players and Mecatol Rex's system.",
-        "text2": "Against: Choose the player that cast the most votes 'For' and that player's home system.",
+        "text2": "Against: The player that cast the most votes 'For' is chosen, and choses a system that contains a planet they control.",
         "source": "voices_of_the_council"
     },
     {
@@ -166,8 +166,8 @@
         "name": "Minister of Commerce",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain this card: After the owner of this card replenishes commodities, they gain 1 trade good for each player that is their neighbor.",
-        "text2": "Gain 3 trade goods",
+        "text1": "* Gain this card: After the owner of this card replenishes commodities, they gain 1 trade good for each player that is their neighbor.",
+        "text2": "* Gain 3 trade goods",
         "mapText": "After you replenish commodities, gain 1 trade good for each player that is your neighbor.",
         "source": "voices_of_the_council"
     },
@@ -176,8 +176,8 @@
         "name": "Minister of Exploration",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain this card: When the owner of this card gains control of a planet, they gain 1 trade good.",
-        "text2": "Explore 1 planet you control",
+        "text1": "*Gain this card: When the owner of this card gains control of a planet, they gain 1 trade good.",
+        "text2": "*Explore 1 planet you control",
         "mapText": "When you gain control of a planet, you gain 1 trade good.",
         "source": "voices_of_the_council"
     },
@@ -186,8 +186,8 @@
         "name": "Minister of Industry",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain this card: When the owner of this card places a space dock in a system, his units in that system may use their PRODUCTION abilities. When the owner of this card places a PDS in a system, he may produce 1 unit in that system.",
-        "text2": "Place 1 structure on a planet you control",
+        "text1": "*Gain this card: When the owner of this card places a space dock in a system, his units in that system may use their PRODUCTION abilities. When the owner of this card places a PDS in a system, he may produce 1 unit in that system.",
+        "text2": "*Place 1 structure on a planet you control",
         "mapText": "When you place a space dock in a system, your units in that system may use their PRODUCTION abilities. When you place a PDS in a system, you may produce 1 unit in that system.",
         "source": "voices_of_the_council"
     },
@@ -196,8 +196,8 @@
         "name": "Minister of Peace",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain this card: After a player activates a system that contains 1 or more of a different player's units, the owner of this card may discard this card - immediately end the active player's turn.",
-        "text2": "Choose a system containing a planet you control. Each other non-elected player places a command token from their reinforcements in that system.",
+        "text1": "*Gain this card: After a player activates a system that contains 1 or more of a different player's units, the owner of this card may discard this card - immediately end the active player's turn.",
+        "text2": "*Choose a system containing a planet you control. Each other non-elected player places a command token from their reinforcements in that system.",
         "mapText": "After a player activates a system that contains 1 or more of a different player's units, you may discard this card - immediately end the active player's turn.",
         "source": "voices_of_the_council"
     },
@@ -206,8 +206,8 @@
         "name": "Minister of Policy",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain this card: At the end of the status phase, the owner of this card draws 1 action card.",
-        "text2": "Draw 2 action cards.",
+        "text1": "*Gain this card: At the end of the status phase, the owner of this card draws 1 action card.",
+        "text2": "*Draw 2 action cards.",
         "mapText": "The owner of this card can have 3 additional action cards. At the end of the status phase, you draw 1 action card.",
         "source": "voices_of_the_council"
     },
@@ -216,8 +216,8 @@
         "name": "Minister of Sciences",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain this card: The owner of this card does not need to spend resources or influence to research technology.",
-        "text2": "You may spend a token from your strategy pool to research 1 technology",
+        "text1": "*Gain this card: The owner of this card does not need to spend resources or influence to research technology.",
+        "text2": "*You may spend a token from your strategy pool to research 1 technology",
         "mapText": "You do not need to spend resources or influence to research technology.",
         "source": "voices_of_the_council"
     },
@@ -226,8 +226,8 @@
         "name": "Minister of War",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain this card: The owner of this card may discard this card after performing an action to remove 1 of their command counters from the game board and return it to their reinforcements - then they may perform 1 additional action.",
-        "text2": "Use the PRODUCTION ability of 1 of your units.",
+        "text1": "*Gain this card: The owner of this card may discard this card after performing an action to remove 1 of their command counters from the game board and return it to their reinforcements - then they may perform 1 additional action.",
+        "text2": "*Use the PRODUCTION ability of 1 of your units.",
         "mapText": "Discard this card after performing an action to return 1 of your command counters from the game board to your reinforcements. then you may perform 1 additional action.",
         "source": "voices_of_the_council"
     },
@@ -263,8 +263,8 @@
         "name": "Prophecy of Ixth",
         "type": "Law",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain this card: The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
-        "text2": "Place 1 fighter from your reinforcements in any number of systems that contains 1 or more of your space docks or ships and no other player’s ships.",
+        "text1": "*Gain this card: The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
+        "text2": "*Place 1 fighter from your reinforcements in any number of systems that contains 1 or more of your space docks or ships and no other player’s ships.",
         "mapText": "Apply +1 to the result of your fighter's combat rolls. When you use PRODUCTION, discard this card unless you produce 2 or more fighters.",
         "source": "voices_of_the_council"
     },
@@ -273,8 +273,8 @@
         "name": "Public Execution",
         "type": "Directive",
         "target": "Elect Player (The runner-up resolves one of the following, then the elected player resolves the other)",
-        "text1": "Discard all of your action cards. If you have the speaker token, give it to the player on your left. You cannot vote, play action cards, or use faction abilities during this agenda phase.",
-        "text2": "Reveal all your action cards. You cannot vote, play action cards, or use faction abilities during this agenda phase.",
+        "text1": "*Discard all of your action cards. If you have the speaker token, give it to the player on your left. You cannot vote, play action cards, or use faction abilities during this agenda phase.",
+        "text2": "*Reveal all your action cards. You cannot vote, play action cards, or use faction abilities during this agenda phase.",
         "source": "voices_of_the_council"
     },
     {
@@ -358,8 +358,8 @@
         "name": "Armed Forces Standardization",
         "type": "Directive",
         "target": "Elect Player (The runner-up resolves one of the following, then the elected player resolves the other)",
-        "text1": "Gain command tokens so that you have 3 tokens each in your tactic and fleet pools, and 2 tokens in your strategy pool, losing any excess tokens.",
-        "text2": "Remove 1 command token from your pool with the most tokens and place it in your pool with the least tokens.",
+        "text1": "*Gain command tokens so that you have 3 tokens each in your tactic and fleet pools, and 2 tokens in your strategy pool, losing any excess tokens.",
+        "text2": "*Remove 1 command token from your pool with the most tokens and place it in your pool with the least tokens.",
         "source": "voices_of_the_council"
     },
     {
@@ -405,8 +405,8 @@
         "name": "Minister of Antiquities",
         "type": "Directive",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain a relic",
-        "text2": "Search an exploration deck that matches a planet you control for a relic fragment, gain it, then shuffle the deck.",
+        "text1": "*Gain a relic",
+        "text2": "*Search an exploration deck that matches a planet you control for a relic fragment, gain it, then shuffle the deck.",
         "source": "voices_of_the_council"
     },
     {
@@ -424,8 +424,8 @@
         "name": "Political Censure",
         "type": "Law",
         "target": "Elect Player (The runner-up chooses 1 of the following to resolve, then the elected player resolves the other)",
-        "text1": "Gain this card and 1 victory point: The owner of this card cannot play action cards. If the owner of this card loses this card, they lose 1 victory point.",
-        "text2": "Discard half your action cards, rounded up, then draw 1 secret objective.",
+        "text1": "*Gain this card and 1 victory point: The owner of this card cannot play action cards. If the owner of this card loses this card, they lose 1 victory point.",
+        "text2": "*Discard half your action cards, rounded up, then draw 1 secret objective.",
         "mapText": "Gain this card and 1 victory point. You cannot play action cards. If you lose this card, you lose 1 victory point.",
         "source": "voices_of_the_council"
     },
@@ -453,8 +453,8 @@
         "name": "Research Grant Reallocation",
         "type": "Directive",
         "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
-        "text1": "Gain a technology. Then, for each prerequisite on that technology, remove 1 token from your fleet pool and return it to your reinforcements.",
-        "text2": "You may spend a command token from your fleet pool to gain 1 technology with no prerequisites owned by another player.",
+        "text1": "*Gain a technology. Then, for each prerequisite on that technology, remove 1 token from your fleet pool and return it to your reinforcements.",
+        "text2": "*You may spend a command token from your fleet pool to gain 1 technology with no prerequisites owned by another player.",
         "source": "voices_of_the_council"
     },
     {
@@ -462,8 +462,8 @@
         "name": "Search Warrant",
         "type": "Law",
         "target": "Elect Player (The runner-up chooses 1 of the following to resolve, then the elected player resolves the other)",
-        "text1": "Gain this card and draws 2 secret objectives. The owner of this card plays with their secret objectives revealed.",
-        "text2": "Reveal your secret objectives, then draw 1 secret objective",
+        "text1": *"Gain this card and draws 2 secret objectives. The owner of this card plays with their secret objectives revealed.",
+        "text2": "*Reveal your secret objectives, then draw 1 secret objective",
         "mapText": "You play with your secret objectives revealed.",
         "source": "voices_of_the_council"
     }
