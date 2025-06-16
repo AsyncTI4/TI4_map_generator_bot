@@ -1274,6 +1274,7 @@ public class AgendaHelper {
                     + ", you are being skipped because you cannot vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                    CryypterHelper.checkForMentakEnvoy(nextInLine, game);
                     skippedMessage = realIdentity2
                         + ", you are being skipped because you told the bot you wanted to preset an abstention.";
                     game.setStoredValue("Abstain On Agenda", game
@@ -1296,6 +1297,7 @@ public class AgendaHelper {
                             getSummaryOfVotes(game, true) + "\n ");
                     }
                     ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                    CryypterHelper.checkForMentakEnvoy(nextInLine, game);
                     MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
                     resolvingAnAgendaVote("resolveAgendaVote_" + votes, event, game, nextInLine);
                     return;
@@ -1345,6 +1347,7 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannelWithButtons(nextInLine.getCorrectChannel(), message, buttons);
                 }
                 ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                CryypterHelper.checkForMentakEnvoy(nextInLine, game);
             } else {
                 winner = getWinner(game);
                 if (!"".equalsIgnoreCase(winner) && !winner.contains("*")) {
@@ -1777,6 +1780,7 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannelWithButtons(nextInLine.getCorrectChannel(), message, buttons);
             }
             ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+            CryypterHelper.checkForMentakEnvoy(nextInLine, game);
         } else {
             game.getMainGameChannel().sendMessage("Cannot find voting info, sorry. Please resolve automatically")
                 .queue();
@@ -3640,6 +3644,7 @@ public class AgendaHelper {
             // offerEveryonePreAbstain(game);
             offerEveryoneWhensQueue(game);
             checkForAssigningGeneticRecombination(game);
+            CryypterHelper.checkForAssigningMentakEnvoy(game);
             checkForPoliticalSecret(game);
         }
         if (cov) {
