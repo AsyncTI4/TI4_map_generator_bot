@@ -1,6 +1,22 @@
 package ti4.image;
 
-import java.awt.*;
+import static org.apache.commons.lang3.StringUtils.*;
+
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -8,13 +24,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.Storage;
 import ti4.image.MapGenerator.HorizontalAlign;
@@ -23,8 +40,6 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.ColorModel;
 import ti4.service.emoji.TI4Emoji;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @UtilityClass
 public class DrawingUtil {
@@ -258,6 +273,9 @@ public class DrawingUtil {
                 factionFile = ResourceHelper.getInstance()
                     .getFactionFile(Mapper.getFaction(factionID).getHomebrewReplacesID().get() + ".png");
             }
+        }
+        if (factionFile == null) {
+            factionFile = ResourceHelper.getInstance().getFactionFile(StringUtils.capitalize(factionID) + ".png");
         }
         if (factionFile == null) {
             if (factionID.equalsIgnoreCase("fogalliance") || factionID.equalsIgnoreCase("generic")) {
