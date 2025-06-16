@@ -70,10 +70,10 @@ public class CryypterHelper
 
     public static void checkEnvoyUnlocks(Game game) 
     {
-        if (!game.isVotcMode()) 
-        {
-            return;
-        }
+        //if (!game.isVotcMode()) 
+        //{
+        //    return;
+        //}
         for (Player player : game.getRealPlayers()) 
         {
             Leader envoy = player.getLeaderByType("envoy").orElse(null);
@@ -109,6 +109,126 @@ public class CryypterHelper
             return "";
         }
     }
+    
+    
+    public static void checkForMentakEnvoy(Player voter, Game game) {
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == voter) {
+                continue;
+            }
+            Leader playerLeader = player.getLeader("mentakenvoy").orElse(null);
+            if (playerLeader != null) {
+                if (game.getStoredValue("Mentak Envoy " + p2.getFaction()).contains(voter.getFaction())) 
+                {
+                    ExhaustLeaderService.exhaustLeader(game, p2, playerLeader); //p2.exhaustTech("gr");
+                    String msg = p2.getRepresentation(false, true) + " is using the Mentak Envoy to force "
+                        + voter.getRepresentation(false, true)
+                        + " to vote a particular way. The Envoy has been exhausted, the owner should elaborate on which way to vote.";
+                    MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), msg);
+                    boolean hasPNs = voter.getPnCount() > 0;
+                    boolean hasEnoughTGs = voter.getTg() > 1;
+                    if (hasPNs || hasEnoughTGs) {
+                        msg = voter.getRepresentation(false, true) +
+                            " has the option to give 1 promissory note or 2 trade goods to ignore the effect of Mentak Envoy.";
+                        List<Button> conclusionButtons = new ArrayList<>();
+                        String finChecker = "FFCC_" + voter.getFaction() + "_";
+                        Button accept = Buttons.blue(finChecker
+                            + "mentakEnvoy_"
+                            + p2.getUserID() + "_"
+                            + "accept", "Vote For Chosen Outcome");
+                        conclusionButtons.add(accept);
+                        if(hasPNs)
+                        {
+                            Button PNdecline = Buttons.red(finChecker
+                            + "mentakEnvoy_"
+                            + p2.getUserID() + "_"
+                            + "PNdecline", "Send 1 promissory note");
+                            conclusionButtons.add(decline);
+                        }
+                        else
+                        {
+                            Button TGdecline = Buttons.red(finChecker
+                            + "mentakEnvoy_"
+                            + p2.getUserID() + "_"
+                            + "TGdecline", "Send 2 trade goods");
+                            conclusionButtons.add(decline);
+                        }
+                        MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), msg,
+                        conclusionButtons);
+                    }
+                }
+            }
+        }
+    }
+
+    @ButtonHandler("mentakEnvoy")
+    public static void resolveMentakEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String[] fields = buttonID.split("_");
+        Player mentakPlayer = game.getPlayer(fields[1]);
+        String choice = fields[2];
+        if (choice.equals("accept")) {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getRepresentation()
+                    + " has chosen to vote for the outcome indicated by "
+                    + mentakPlayer.getRepresentation()
+                    + ".");
+        } 
+        else if (choice.equals("PNdecline"))
+        {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getRepresentation()
+                    + " has chosen to send a promissory note and may vote in any manner that they wish.");
+            List<Button> stuffToTransButtons getForcedPNSendButtons(game, mentakPlayer, player);
+            String message = player.getRepresentationUnfogged() + ", you have been forced to give a promissory note. Please select which promissory note you would like to send.";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
+        }
+        else 
+        {
+            player.setTg(player.getTg() - 2);
+            mentakPlayer.setTg(mentakPlayer.getTg() + 2);
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getRepresentation()
+                    + " has given 2 trade goods and may vote in any manner that they wish.");
+        }
+        event.getMessage().delete().queue();
+    }
+    
+    public static void checkForAssigningMentakEnvoy(Game game) 
+    {
+        for (Player player : game.getRealPlayers()) {
+            game.setStoredValue("Mentak Envoy " + player.getFaction(), "");
+            if (player.hasUnexhaustedLeader("mentakenvoy")) {
+                String msg = player.getRepresentation()
+                    + " you have the option to pre-assign the declaration of using your Envoy on someone."
+                    + " When they are up to vote, it will ping them saying that you wish to use your Envoy, and then it will be your job to clarify."
+                    + " Feel free to not preassign if you don't wish to use it on this agenda.";
+                List<Button> buttons2 = new ArrayList<>();
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player) {
+                        continue;
+                    }
+                    if (!game.isFowMode()) {
+                        buttons2.add(Buttons.gray(
+                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
+                                + p2.getFaction(),
+                            p2.getFaction()));
+                    } else {
+                        buttons2.add(Buttons.gray(
+                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
+                                + p2.getFaction(),
+                            p2.getColor()));
+                    }
+                }
+                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
+            }
+        }
+    }
+
+
+
+
+    //for later
     
     //TODO: Add "CryypterHelper.handleVotCRiders(event, game, player, riderName);" to near end of AgendaHelper.play_after(), currently line 3370
     public static void handleVotCRiders(ButtonInteractionEvent event, Game game, Player player, String riderName)
@@ -210,36 +330,21 @@ public class CryypterHelper
         }
     }
 
-    getPlanetButtonsVersion2 2574
-
-    public static void checkForAssigningAbilities(Game game) {
-        for (Player player : game.getRealPlayers()) {
-            game.setStoredValue("Mentak Envoy " + player.getFaction(), "");
-            if (player.getLeader("mentakenvoy").orElse(null) != null) {
-                String msg = player.getRepresentation()
-                    + " you have the option to pre-assign the declaration of using your Envoy on someone."
-                    + " When they are up to vote, it will ping them saying that you wish to use your Envoy, and then it will be your job to clarify."
-                    + " Feel free to not preassign if you don't wish to use it on this agenda.";
-                List<Button> buttons2 = new ArrayList<>();
-                for (Player p2 : game.getRealPlayers()) {
-                    if (p2 == player) {
-                        continue;
-                    }
-                    if (!game.isFowMode()) {
-                        buttons2.add(Buttons.gray(
-                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
-                                + p2.getFaction(),
-                            p2.getFaction()));
-                    } else {
-                        buttons2.add(Buttons.gray(
-                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
-                                + p2.getFaction(),
-                            p2.getColor()));
-                    }
-                }
-                buttons2.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
-            }
+    //getPlanetButtonsVersion2 2574
+    public static void getVoteSourceButtons()
+    {
+        if (player.hasTechReady("cryypter_pi")) 
+        {
+             planetButtons.add(Buttons.blue("exhaustForVotes_cryypterpi_4", "Use Predictive Intelligence Votes (4)",
+                    TechEmojis.CyberneticTech));
         }
+    }
+
+    
+
+    //AgendaHelper.getWinningRiders(), currently line 1832
+    public static void handleVotCRiders()
+    {
+        
     }
 }
