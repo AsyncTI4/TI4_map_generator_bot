@@ -1767,11 +1767,11 @@ public class UnfiledButtonHandlers {
                 boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
-                    && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    buttons.add(
-                        Buttons.red("exhaustTech_sar", "Exhaust Self-Assembly Routines", TechEmojis.WarfareTech));
-                }
+                // if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
+                //     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
+                //     buttons.add(
+                //         Buttons.red("exhaustTech_sar", "Exhaust Self-Assembly Routines", TechEmojis.WarfareTech));
+                // } //sar is handled elsewhere
                 if (player.hasTechReady("htp") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
