@@ -1,482 +1,106 @@
 [
-  {
-    "alias": "sigma_valley",
-    "name": "All In The Valley Of Death",
-    "phase": "Action",
-    "text": "Win a combat in a system that contains 3 or more command tokens.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "simga_undertaking",
-    "name": "Custodial Undertaking",
-    "phase": "Status",
-    "text": "When you draw this objective, reveal it, then look at 1 Stage I public objective from the deck and attach it face down to this card.\nThis objective has the requirements of the attached public objective.\nIf you would discard this card, shuffle the attached public objective into the Stage I public objective deck.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_conglomerate",
-    "name": "Found Conglomerate",
-    "phase": "Status",
-    "text": "Control more planets of 1 trait than each other player.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_sunblock",
-    "name": "Block Out The Sun",
-    "phase": "Action",
-    "text": "Have 8 or more fighters in the active system after winning a space combat.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_exclave",
-    "name": "Carve Out An Exclave",
-    "phase": "Status",
-    "text": "Control all planets in a system that is not adjacent to a planet you control or any of your units.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_orca",
-    "name": "Code Orca",
-    "phase": "Status",
-    "text": "Control a planet in the orca player's home system.\nIf you are the orca player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitred",
-    "name": "Code Split Red",
-    "phase": "Status",
-    "text": "Control a planet in the split red player's home system.\nIf you are the split red player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitblue",
-    "name": "Code Split Blue",
-    "phase": "Status",
-    "text": "Control a planet in the split blue player's home system.\nIf you are the split blue player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitgreen",
-    "name": "Code Split Green",
-    "phase": "Status",
-    "text": "Control a planet in the split green player's home system.\nIf you are the split green player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitpurple",
-    "name": "Code Split Purple",
-    "phase": "Status",
-    "text": "Control a planet in the split purple player's home system.\nIf you are the split purple player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitorange",
-    "name": "Code Split Orange",
-    "phase": "Status",
-    "text": "Control a planet in the split orange player's home system.\nIf you are the split orange player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splityellow",
-    "name": "Code Split Yellow",
-    "phase": "Status",
-    "text": "Control a planet in the split yellow player's home system.\nIf you are the split yellow player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitpink",
-    "name": "Code Split Pink",
-    "phase": "Status",
-    "text": "Control a planet in the split pink player's home system.\nIf you are the split pink player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitlime",
-    "name": "Code Split Lime",
-    "phase": "Status",
-    "text": "Control a planet in the split lime player's home system.\nIf you are the split lime player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splittan",
-    "name": "Code Split Tan",
-    "phase": "Status",
-    "text": "Control a planet in the split tan player's home system.\nIf you are the split tan player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitteal",
-    "name": "Code Split Teal",
-    "phase": "Status",
-    "text": "Control a planet in the split teal player's home system.\nIf you are the split teal player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitpetrol",
-    "name": "Code Split Petrol",
-    "phase": "Status",
-    "text": "Control a planet in the split petrol player's home system.\nIf you are the split petrol player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitturquoise",
-    "name": "Code Split Turquoise",
-    "phase": "Status",
-    "text": "Control a planet in the split turquoise player's home system.\nIf you are the split turquoise player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitgold",
-    "name": "Code Split Gold",
-    "phase": "Status",
-    "text": "Control a planet in the split gold player's home system.\nIf you are the split gold player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitbloodred",
-    "name": "Code Split Blood Red",
-    "phase": "Status",
-    "text": "Control a planet in the split blood red player's home system.\nIf you are the split blood red player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitnavy",
-    "name": "Code Split Navy",
-    "phase": "Status",
-    "text": "Control a planet in the split navy player's home system.\nIf you are the split navy player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitchocolate",
-    "name": "Code Split Chocolate",
-    "phase": "Status",
-    "text": "Control a planet in the split chocolate player's home system.\nIf you are the split chocolate player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitemerald",
-    "name": "Code Split Emerald",
-    "phase": "Status",
-    "text": "Control a planet in the split emerald player's home system.\nIf you are the split emerald player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_splitrainbow",
-    "name": "Code Split Rainbow",
-    "phase": "Status",
-    "text": "Control a planet in the split rainbow player's home system.\nIf you are the split rainbow player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_chrome",
-    "name": "Code Chrome",
-    "phase": "Status",
-    "text": "Control a planet in the chrome player's home system.\nIf you are the chrome player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_sunset",
-    "name": "Code Sunset",
-    "phase": "Status",
-    "text": "Control a planet in the sunset player's home system.\nIf you are the sunset player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_turquoise",
-    "name": "Code Turquoise",
-    "phase": "Status",
-    "text": "Control a planet in the turquoise player's home system.\nIf you are the turquoise player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_gold",
-    "name": "Code Gold",
-    "phase": "Status",
-    "text": "Control a planet in the gold player's home system.\nIf you are the gold player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_blood_red",
-    "name": "Code Blood Red",
-    "phase": "Status",
-    "text": "Control a planet in the blood red player's home system.\nIf you are the blood red player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_navy",
-    "name": "Code Navy",
-    "phase": "Status",
-    "text": "Control a planet in the navy player's home system.\nIf you are the navy player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_chocolate",
-    "name": "Code Chocolate",
-    "phase": "Status",
-    "text": "Control a planet in the chocolate player's home system.\nIf you are the chocolate player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_emerald",
-    "name": "Code Emerald",
-    "phase": "Status",
-    "text": "Control a planet in the emerald player's home system.\nIf you are the emerald player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_rainbow",
-    "name": "Code Rainbow",
-    "phase": "Status",
-    "text": "Control a planet in the rainbow player's home system.\nIf you are the rainbow player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_light_gray",
-    "name": "Code Light Gray",
-    "phase": "Status",
-    "text": "Control a planet in the light gray player's home system.\nIf you are the light gray player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_red",
-    "name": "Code Red",
-    "phase": "Status",
-    "text": "Control a planet in the red player's home system.\nIf you are the red player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_orange",
-    "name": "Code Orange",
-    "phase": "Status",
-    "text": "Control a planet in the orange player's home system.\nIf you are the orange player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_yellow",
-    "name": "Code Yellow",
-    "phase": "Status",
-    "text": "Control a planet in the yellow player's home system.\nIf you are the yellow player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_green",
-    "name": "Code Green",
-    "phase": "Status",
-    "text": "Control a planet in the green player's home system.\nIf you are the green player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_blue",
-    "name": "Code Blue",
-    "phase": "Status",
-    "text": "Control a planet in the blue player's home system.\nIf you are the blue player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_purple",
-    "name": "Code Purple",
-    "phase": "Status",
-    "text": "Control a planet in the purple player's home system.\nIf you are the purple player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_pink",
-    "name": "Code Pink",
-    "phase": "Status",
-    "text": "Control a planet in the pink player's home system.\nIf you are the pink player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_black",
-    "name": "Code Black",
-    "phase": "Status",
-    "text": "Control a planet in the black player's home system.\nIf you are the black player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_petrol",
-    "name": "Code Petrol",
-    "phase": "Status",
-    "text": "Control a planet in the petrol player's home system.\nIf you are the petrol player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_brown",
-    "name": "Code Brown",
-    "phase": "Status",
-    "text": "Control a planet in the brown player's home system.\nIf you are the brown player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_gray",
-    "name": "Code Gray",
-    "phase": "Status",
-    "text": "Control a planet in the gray player's home system.\nIf you are the gray player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_tan",
-    "name": "Code Tan",
-    "phase": "Status",
-    "text": "Control a planet in the tan player's home system.\nIf you are the tan player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_forest",
-    "name": "Code Forest",
-    "phase": "Status",
-    "text": "Control a planet in the forest player's home system.\nIf you are the forest player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_teal",
-    "name": "Code Teal",
-    "phase": "Status",
-    "text": "Control a planet in the teal player's home system.\nIf you are the teal player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_rose",
-    "name": "Code Rose",
-    "phase": "Status",
-    "text": "Control a planet in the rose player's home system.\nIf you are the rose player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_lime",
-    "name": "Code Lime",
-    "phase": "Status",
-    "text": "Control a planet in the lime player's home system.\nIf you are the lime player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_lavender",
-    "name": "Code Lavender",
-    "phase": "Status",
-    "text": "Control a planet in the lavender player's home system.\nIf you are the lavender player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_spring",
-    "name": "Code Spring",
-    "phase": "Status",
-    "text": "Control a planet in the spring player's home system.\nIf you are the spring player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_code_ethereal",
-    "name": "Code Ethereal",
-    "phase": "Status",
-    "text": "Control a planet in the ethereal player's home system.\nIf you are the ethereal player: Control a planet in each of 2 other player's home systems.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_pizza",
-    "name": "Custodial Pizza Delivery",
-    "phase": "Action",
-    "text": "End a tactical action with a ground force on Mecatol Rex that began the action on a planet in your home system.\n**2VP**",
-    "points": 2,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_parliament",
-    "name": "Parliamentary Supremacy",
-    "phase": "Agenda",
-    "text": "Be the only player to vote on an agenda.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_peaceful",
-    "name": "Peaceful Annexure",
-    "phase": "Action",
-    "text": "Gain control of a planet from another player during a tactical action in which you did not participate in a combat.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_scrape",
-    "name": "Scrape The Bottom Of The Barrel",
-    "phase": "Status",
-    "text": "Control 4 planets that each have 0 resources or 0 influence.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_annihilation",
-    "name": "Total Annihilation",
-    "phase": "Action",
-    "text": "When you win a combat, have 4 or more units unassigned after your opponent has destroyed all their units in that combat.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_attrition",
-    "name": "War Of Attrition",
-    "phase": "Action",
-    "text": "Win a space combat where all of your units that participated in  that combat had a combat value of 8 or greater.",
-    "points": 1,
-    "source": "sigma"
-  },
-  {
-    "alias": "sigma_behind",
-    "name": "Work Behind The Scenes",
-    "phase": "Agenda",
-    "text": "Have more influence on readied planets at the start of the \"Ready Planets\" step than all other players combined.",
-    "points": 1,
-    "source": "sigma"
-  }
+    {
+        "alias": "sigma_valley",
+        "name": "All In The Valley Of Death",
+        "phase": "Action",
+        "text": "Win a combat in a system that contains 3 or more command tokens.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "simga_undertaking",
+        "name": "Custodial Undertaking",
+        "phase": "Status",
+        "text": "When you draw this objective, reveal it, then look at 1 Stage I public objective from the deck and attach it face down to this card.\nThis objective has the requirements of the attached public objective.\nIf you would discard this card, shuffle the attached public objective into the Stage I public objective deck.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_conglomerate",
+        "name": "Found Conglomerate",
+        "phase": "Status",
+        "text": "Control more planets of 1 trait than each other player.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_sunblock",
+        "name": "Block Out The Sun",
+        "phase": "Action",
+        "text": "Have 8 or more fighters in the active system after winning a space combat.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_exclave",
+        "name": "Carve Out An Exclave",
+        "phase": "Status",
+        "text": "Control all planets in a system that is not adjacent to a planet you control or any of your units.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_code_<color>",
+        "name": "Code <color>",
+        "phase": "Status",
+        "text": "Control a planet in the <color> player's home system.\nIf you are the <color> player: Control a planet in each of 2 other player's home systems.\n**2VP**",
+        "points": 2,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_pizza",
+        "name": "Custodial Pizza Delivery",
+        "phase": "Action",
+        "text": "End a tactical action with a ground force on Mecatol Rex that began the action on a planet in your home system.\n**2VP**",
+        "points": 2,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_parliament",
+        "name": "Parliamentary Supremacy",
+        "phase": "Agenda",
+        "text": "Be the only player to vote on an agenda.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_peaceful",
+        "name": "Peaceful Annexure",
+        "phase": "Action",
+        "text": "Gain control of a planet from another player during a tactical action in which you did not participate in a combat.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_scrape",
+        "name": "Scrape The Bottom Of The Barrel",
+        "phase": "Status",
+        "text": "Control 4 planets that each have 0 resources or 0 influence.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_annihilation",
+        "name": "Total Annihilation",
+        "phase": "Action",
+        "text": "When you win a combat, have 4 or more units unassigned after your opponent has destroyed all their units in that combat.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_attrition",
+        "name": "War Of Attrition",
+        "phase": "Action",
+        "text": "Win a space combat where all of your units that participated in  that combat had a combat value of 8 or greater.",
+        "points": 1,
+        "source": "sigma"
+    },
+    {
+        "alias": "sigma_behind",
+        "name": "Work Behind The Scenes",
+        "phase": "Agenda",
+        "text": "Have more influence on readied planets at the start of the \"Ready Planets\" step than all other players combined.",
+        "points": 1,
+        "source": "sigma"
+    }
 ]

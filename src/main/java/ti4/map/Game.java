@@ -3697,19 +3697,6 @@ public class Game extends GameProperties {
         if (!leaderID.contains("commander"))
             return false;
 
-        // check if player has any alliances with players that have the commander unlocked
-        if (player.hasAbility("imperia")) {
-            for (Player otherPlayer : getRealPlayers()) {
-                if (otherPlayer.getFaction().equalsIgnoreCase(player.getFaction()))
-                    continue;
-                if (player.getMahactCC().contains(otherPlayer.getColor())
-                    && otherPlayer.hasLeaderUnlocked(leaderID) && isAllianceMode()
-                    && "mahact".equalsIgnoreCase(player.getFaction())) {
-                    return leaderID.contains(otherPlayer.getFaction());
-                }
-            }
-        }
-
         if (leaderIsFake(leaderID)) {
             return false;
         }
@@ -3730,9 +3717,6 @@ public class Game extends GameProperties {
                 if (player_.getFaction().equalsIgnoreCase(player.getFaction()))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
-                    if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
-                        return leaderID.contains(player_.getFaction());
-                    }
                     return true;
                 }
             }
