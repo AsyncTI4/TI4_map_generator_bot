@@ -147,6 +147,7 @@ class FrankenButtonHandler {
                 case "confirm_draft" -> {
                     player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
+                    // TODO BAG_QUEUE pass the current bag into the next player's queue
                     draft.setPlayerReadyToPass(player, true);
 
                     // Clear out all existing messages

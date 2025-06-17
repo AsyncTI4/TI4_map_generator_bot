@@ -71,6 +71,7 @@ public abstract class BagDraft {
         return true;
     }
 
+    // TODO BAG_QUEUE not needed for queueing
     public void passBags() {
         List<Player> players = owner.getRealPlayers();
         DraftBag firstPlayerBag = players.getFirst().getCurrentDraftBag();
@@ -82,6 +83,7 @@ public abstract class BagDraft {
 
     public void giveBagToPlayer(DraftBag bag, Player player) {
         player.setCurrentDraftBag(bag);
+        // TODO this logic is duplicated in playerHasDraftableItemInBag()
         boolean newBagCanBeDraftedFrom = false;
         for (DraftItem item : bag.Contents) {
             if (item.isDraftable(player)) {
@@ -89,12 +91,14 @@ public abstract class BagDraft {
                 break;
             }
         }
+        // TODO BAG_QUEUE instead just pass the bag
         player.setReadyToPassBag(!newBagCanBeDraftedFrom);
         MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
             Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
     }
 
+    // TODO BAG_QUEUE not needed for queueing
     public boolean allPlayersReadyToPass() {
         for (Player p : owner.getRealPlayers()) {
             if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
@@ -108,6 +112,7 @@ public abstract class BagDraft {
         return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
     }
 
+    // TODO BAG_QUEUE not needed for queueing
     public void setPlayerReadyToPass(Player player, boolean ready) {
         if (ready && !player.isReadyToPassBag()) {
             player.setReadyToPassBag(true);
@@ -249,6 +254,7 @@ public abstract class BagDraft {
 
     @JsonIgnore
     public String getDraftStatusMessage() {
+        // TODO BAG_QUEUE represent queued bags
         StringBuilder sb = new StringBuilder();
         sb.append("### __Draft Status__:\n");
         for (Player player : owner.getRealPlayers()) {
