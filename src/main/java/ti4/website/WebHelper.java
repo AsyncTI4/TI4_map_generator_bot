@@ -15,12 +15,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -242,10 +240,6 @@ public class WebHelper {
                     BotLogger.info("Statistics upload complete.");
                 }
             });
-    }
-
-    public static void putMap(String gameName, byte[] imageBytes) {
-        putMap(gameName, imageBytes, false, null);
     }
 
     public static void putMap(String gameName, byte[] imageBytes, boolean frog, Player player) {

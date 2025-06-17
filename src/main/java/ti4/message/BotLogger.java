@@ -640,9 +640,11 @@ public class BotLogger {
 			this.originTime = DateTimeHelper.getCurrentTimestamp();
 		}
 
-		public LogMessageOrigin(@Nonnull Player player) {
-			this.player = player;
-			this.game = player.getGame();
+		public LogMessageOrigin(@Nullable Player player) {
+			if (player != null) {
+				this.player = player;
+				this.game = player.getGame();
+			}
 			if (game != null) {
 				this.guild = game.getGuild();
 				this.channel = game.getMainGameChannel();
