@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,14 +13,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
@@ -340,7 +338,7 @@ public class Tile {
     }
 
     public String getFogLabel(Player player) {
-        return fogLabel.get(player.getUserID());
+        return player == null ? null : fogLabel.get(player.getUserID());
     }
 
     public void setFogLabel(@NotNull Player player, String fogLabel_) {
