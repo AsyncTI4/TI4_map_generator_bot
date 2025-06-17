@@ -90,7 +90,8 @@ public class Player extends PlayerProperties {
     // The items a player has drafted already
     private DraftBag draftHand = new DraftBag();
     // The bag a player is currently drafting from
-    private DraftBag currentDraftBag = new DraftBag();
+    @Nullable
+    private DraftBag currentDraftBag = null;
     // The items a player is selecting from their current draft bag
     private final DraftBag draftItemQueue = new DraftBag();
     // The bags waiting for a player
@@ -1793,8 +1794,8 @@ public class Player extends PlayerProperties {
         draftHand = hand;
     }
 
-    public DraftBag getCurrentDraftBag() {
-        return currentDraftBag;
+    public Optional<DraftBag> getCurrentDraftBag() {
+        return Optional.ofNullable(currentDraftBag);
     }
 
     public void setCurrentDraftBag(DraftBag bag) {

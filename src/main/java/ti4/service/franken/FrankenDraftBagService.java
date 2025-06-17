@@ -135,8 +135,14 @@ public class FrankenDraftBagService {
             return;
         }
 
-        List<DraftItem> draftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
-        List<DraftItem> undraftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
+        DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
+        if (currentBag == null) {
+            MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), player.getRepresentationUnfogged() + " you are waiting for other players to finish drafting.");
+            return;
+        }
+
+        List<DraftItem> draftables = new ArrayList<>(currentBag.Contents);
+        List<DraftItem> undraftables = new ArrayList<>(currentBag.Contents);
         draftables.removeIf(draftItem -> !draftItem.isDraftable(player));
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
 

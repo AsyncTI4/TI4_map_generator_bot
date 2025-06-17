@@ -139,9 +139,13 @@ class FrankenButtonHandler {
         if (!action.contains(":")) {
             switch (action) {
                 case "reset_queue" -> {
-                    player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
-                    player.resetDraftQueue();
-                    FrankenDraftBagService.showPlayerBag(game, player);
+                    DraftBag bag = player.getCurrentDraftBag().orElse(null);
+                    if (bag != null) {
+                        bag.Contents.addAll(player.getDraftQueue().Contents);
+                        player.resetDraftQueue();
+                        FrankenDraftBagService.showPlayerBag(game, player);
+                    }
+                    // TODO BAG_QUEUE report something if bag is null.
                     return;
                 }
                 case "confirm_draft" -> {
@@ -157,7 +161,11 @@ class FrankenButtonHandler {
                         }
                     });
                     MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(player.getCurrentDraftBag()));
+                    DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
+                    // TODO better error handling?
+                    if (currentBag != null) {
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(currentBag));
+                    }
                     FrankenDraftBagService.displayPlayerHand(game, player);
                     if (draft.isDraftStageComplete()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
@@ -181,7 +189,14 @@ class FrankenButtonHandler {
                 }
             }
         }
-        DraftBag currentBag = player.getCurrentDraftBag();
+
+        DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
+
+        if (currentBag == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Something went wrong. You have no draft bag and are not allowed to draft right now. Please wait for a bag.");
+            return;
+        }
+
         DraftItem selectedItem = DraftItem.generateFromAlias(action);
 
         if (!selectedItem.isDraftable(player)) {

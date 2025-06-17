@@ -59,7 +59,8 @@ public abstract class BagDraft {
         List<Player> players = owner.getRealPlayers();
 
         for (Player p : players) {
-            if (!p.getCurrentDraftBag().Contents.isEmpty() || !p.getDraftQueue().Contents.isEmpty()) {
+            boolean bagIsNoneOrEmpty = p.getCurrentDraftBag().filter(bag -> !bag.Contents.isEmpty()).isEmpty();
+            if (!bagIsNoneOrEmpty || !p.getDraftQueue().Contents.isEmpty()) {
                 if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
                     return false;
                 }
@@ -74,9 +75,11 @@ public abstract class BagDraft {
     // TODO BAG_QUEUE not needed for queueing
     public void passBags() {
         List<Player> players = owner.getRealPlayers();
-        DraftBag firstPlayerBag = players.getFirst().getCurrentDraftBag();
+        // Safety: method should only be run if not queueing bags
+        DraftBag firstPlayerBag = players.getFirst().getCurrentDraftBag().get();
         for (int i = 0; i < players.size() - 1; i++) {
-            giveBagToPlayer(players.get(i + 1).getCurrentDraftBag(), players.get(i));
+            // Safety: method should only be run if not queueing bags
+            giveBagToPlayer(players.get(i + 1).getCurrentDraftBag().get(), players.get(i));
         }
         giveBagToPlayer(firstPlayerBag, players.getLast());
     }
@@ -109,7 +112,11 @@ public abstract class BagDraft {
     }
 
     public boolean playerHasDraftableItemInBag(Player player) {
-        return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
+        if (player.getCurrentDraftBag().isEmpty()) {
+            return false;
+        }
+        // Safety: just checked the bag exists
+        return player.getCurrentDraftBag().get().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
     }
 
     // TODO BAG_QUEUE not needed for queueing

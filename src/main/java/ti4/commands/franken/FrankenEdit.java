@@ -2,6 +2,8 @@ package ti4.commands.franken;
 
 import java.util.Objects;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -48,7 +50,7 @@ class FrankenEdit extends GameStateSubcommand {
             MessageHelper.sendMessageToUser("====================\n" + game.getName() +
                 " Frankendraft Status\n====================", event.getUser());
             for (var player : game.getRealPlayers()) {
-                dmPlayerBag(game, player, player.getCurrentDraftBag(), "Held Bag", event.getUser());
+                dmPlayerBag(game, player, player.getCurrentDraftBag().orElse(null), "Held Bag", event.getUser());
                 dmPlayerBag(game, player, player.getDraftHand(), "Hand", event.getUser());
                 dmPlayerBag(game, player, player.getDraftQueue(), "Queue", event.getUser());
             }
@@ -70,7 +72,11 @@ class FrankenEdit extends GameStateSubcommand {
         DraftBag editingBag = null;
         String bagName = "";
         if (command.contains("Bag")) {
-            editingBag = editingPlayer.getCurrentDraftBag();
+            // TODO BAG_QUEUE fuller editing support is probably wanted
+            // including editing queued bags, creating bags, deleting bags,
+            // moving bags.
+            // Safety: editingBag being null is already handled below
+            editingBag = editingPlayer.getCurrentDraftBag().orElse(null);
             bagName = "Held Bag";
         }
         if (command.contains("Hand")) {
@@ -102,12 +108,16 @@ class FrankenEdit extends GameStateSubcommand {
         }
     }
 
-    private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName, User user) {
+    private void dmPlayerBag(Game game, Player player, @Nullable DraftBag bag, String bagName, User user) {
         StringBuilder sb = new StringBuilder();
-        sb.append(game.getName()).append(" ").append(player.getUserName()).append(" Current ").append(bagName).append(":\n");
-        for (DraftItem item : bag.Contents) {
-            sb.append(item.getAlias());
-            sb.append("\n");
+        if (bag == null) {
+            sb.append(game.getName()).append(" ").append(player.getUserName()).append(" No Current ").append(bagName).append(":\n");
+        } else {
+            sb.append(game.getName()).append(" ").append(player.getUserName()).append(" Current ").append(bagName).append(":\n");
+            for (DraftItem item : bag.Contents) {
+                sb.append(item.getAlias());
+                sb.append("\n");
+            }
         }
         MessageHelper.sendMessageToUser(sb.toString(), user);
     }

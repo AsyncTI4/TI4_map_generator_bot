@@ -656,8 +656,11 @@ class GameSaveService {
             writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.DRAFT_BAG + " " + player.getCurrentDraftBag().toStoreString());
-            writer.write(System.lineSeparator());
+            DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
+            if (currentBag != null) {
+                writer.write(Constants.DRAFT_BAG + " " + currentBag.toStoreString());
+                writer.write(System.lineSeparator());
+            }
 
             writer.write(Constants.DRAFT_HAND + " " + player.getDraftHand().toStoreString());
             writer.write(System.lineSeparator());
