@@ -709,10 +709,6 @@ public class BotLogger {
 			return "No mention available";
 		}
 
-		/**
-		 * Get name of the most granular source.
-		 * @return The most granular name as a string
-		 */
 		@Nonnull
 		public String getStrictestName() {
 			if (channel != null) return "| Channel \"" + channel.getName() + "\"";
@@ -723,11 +719,6 @@ public class BotLogger {
 			return "No name available";
 		}
 
-		/**
-		 * Append the "Game:" portion of a log message to a StringBuilder.
-		 * @param builder - The StringBuilder to which the game string is appended
-		 * @return The StringBuilder passed into builder
-		 */
 		@Nullable
 		public StringBuilder getGameInfo() {
 			if (game != null) {
@@ -738,11 +729,6 @@ public class BotLogger {
 			return null;
 		}
 
-		/**
-		 * Append the "Event:" portion of a log message to a StringBuilder.
-		 * @param builder - The StringBuilder to which the event string is appended
-		 * @return The StringBuilder passed into builder
-		 */
 		@Nullable
 		public StringBuilder getEventString() {
 			if (event == null) return null;
