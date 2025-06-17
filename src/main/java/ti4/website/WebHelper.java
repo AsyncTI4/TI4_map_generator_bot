@@ -248,9 +248,9 @@ public class WebHelper {
         try {
             String mapPath;
             if (frog && player != null) {
-                mapPath = "fogmap/" + player.getUserID() + "/%s/%s.webp";
+                mapPath = "fogmap/" + player.getUserID() + "/%s/%s.jpg";
             } else {
-                mapPath = "map/%s/%s.webp";
+                mapPath = "map/%s/%s.jpg";
             }
 
             LocalDateTime date = LocalDateTime.now();
@@ -259,7 +259,7 @@ public class WebHelper {
             PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(webProperties.getProperty("bucket"))
                 .key(String.format(mapPath, gameName, dtstamp))
-                .contentType("image/webp")
+                .contentType("image/jpg")
                 .build();
             s3AsyncClient.putObject(request, AsyncRequestBody.fromBytes(imageBytes))
                 .exceptionally(e -> {

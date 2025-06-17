@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -8,32 +15,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.DateTimeHelper;
-import ti4.helpers.DisplayType;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.PlayerStatsHelper;
-import ti4.helpers.Storage;
+import ti4.helpers.*;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.website.WebHelper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -51,7 +58,6 @@ import ti4.model.StrategyCardModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
-import ti4.website.WebHelper;
 import ti4.website.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
@@ -404,7 +410,7 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
-        mainImageBytes = ImageHelper.writeWebp(mainImage);
+        mainImageBytes = ImageHelper.writeJpg(mainImage);
         if (debug) debugImageGraphicsTime.stop();
     }
 
