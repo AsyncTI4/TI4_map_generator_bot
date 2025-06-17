@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
@@ -85,9 +87,14 @@ public class Player extends PlayerProperties {
 
     private final Game game;
 
+    // The items a player has drafted already
     private DraftBag draftHand = new DraftBag();
+    // The bag a player is currently drafting from
     private DraftBag currentDraftBag = new DraftBag();
+    // The items a player is selecting from their current draft bag
     private final DraftBag draftItemQueue = new DraftBag();
+    // The bags waiting for a player
+    private Queue<DraftBag> draftBagQueue = new ArrayDeque<>();
     private List<Leader> leaders = new ArrayList<>();
     private final List<TemporaryCombatModifierModel> newTempCombatModifiers = new ArrayList<>();
     private List<TemporaryCombatModifierModel> tempCombatModifiers = new ArrayList<>();
@@ -1798,6 +1805,14 @@ public class Player extends PlayerProperties {
         return draftItemQueue;
     }
 
+    public Queue<DraftBag> getDraftBagQueue() {
+        return draftBagQueue;
+    }
+
+    public void setDraftBagQueue(Queue<DraftBag> queue) {
+        draftBagQueue = queue;
+    }
+
     @JsonIgnore
     public boolean hasIIHQ() {
         return hasTech("iihq");
@@ -1870,6 +1885,21 @@ public class Player extends PlayerProperties {
             items.add(DraftItem.generateFromAlias(item));
         }
         draftItemQueue.Contents = items;
+    }
+
+    public void loadQueuedDraftBags(String saveString) {
+        BotLogger.info("Loading draft bag from \"" + saveString + "\" for " + getRepresentationNoPing());
+        // TODO re-use DraftBag parser and house it in DraftBag
+        Queue<DraftBag> queue = new ArrayDeque<>();
+        for (String bagString : saveString.split(";")) {
+            DraftBag newBag = new DraftBag();
+            for (String item : bagString.split(",")) {
+                newBag.Contents.add(DraftItem.generateFromAlias(item));
+            }
+            queue.add(newBag);
+        }
+        draftBagQueue = queue;
+        BotLogger.info("Loaded " + draftBagQueue.size() + " queued bags");
     }
 
     public void queueDraftItem(DraftItem item) {

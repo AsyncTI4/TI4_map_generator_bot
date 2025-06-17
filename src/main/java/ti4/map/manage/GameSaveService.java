@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.draft.DraftBag;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -662,6 +663,13 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DRAFT_QUEUE + " " + player.getDraftQueue().toStoreString());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.DRAFT_BAG_QUEUE + " ");
+            for (DraftBag bag : player.getDraftBagQueue()) {
+                // Assumption: draft items' aliases will never contain semicolons
+                writer.write(bag.toStoreString() + ";");
+            }
             writer.write(System.lineSeparator());
 
             writer.write(Constants.FACTION_TECH + " " + String.join(",", player.getFactionTechs()));
