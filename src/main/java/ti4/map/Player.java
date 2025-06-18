@@ -1816,10 +1816,6 @@ public class Player extends PlayerProperties {
         return draftBagQueue;
     }
 
-    public void setDraftBagQueue(Queue<DraftBag> queue) {
-        draftBagQueue = queue;
-    }
-
     @JsonIgnore
     public boolean hasIIHQ() {
         return hasTech("iihq");

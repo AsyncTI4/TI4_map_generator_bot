@@ -265,9 +265,10 @@ public class FrankenDraftBagService {
         return sb.toString();
     }
 
-    public static void clearPlayerHands(Game game) {
+    public static void clearPlayerHandsAndQueues(Game game) {
         for (Player player : game.getRealPlayers()) {
             player.setDraftHand(new DraftBag());
+            player.getDraftBagQueue().clear();
         }
     }
 
