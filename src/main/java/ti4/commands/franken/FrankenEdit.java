@@ -58,7 +58,8 @@ class FrankenEdit extends GameStateSubcommand {
         }
 
         if ("forceSwap".equals(command)) {
-            FrankenDraftBagService.passBags(game);
+            // TODO BAG_QUEUE this no longer makes sense
+            // FrankenDraftBagService.passBags(game);
             return;
         }
 

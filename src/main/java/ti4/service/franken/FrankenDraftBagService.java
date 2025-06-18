@@ -130,11 +130,6 @@ public class FrankenDraftBagService {
     public static void showPlayerBag(Game game, Player player) {
         BagDraft draft = game.getActiveBagDraft();
         ThreadChannel bagChannel = draft.regenerateBagChannel(player);
-        if (player.isReadyToPassBag()) {
-            MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), player.getRepresentationUnfogged() + " your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
-            return;
-        }
-
         DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
         if (currentBag == null) {
             MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), player.getRepresentationUnfogged() + " you are waiting for other players to finish drafting.");
@@ -182,16 +177,6 @@ public class FrankenDraftBagService {
             }
         }
 
-    }
-
-    public static void passBags(Game game) {
-        GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT); // Clear the status message so it will be regenerated
-        game.getActiveBagDraft().passBags();
-        for (Player p2 : game.getRealPlayers()) {
-            showPlayerBag(game, p2);
-        }
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Bags have been passed");
-        updateDraftStatusMessage(game);
     }
 
     public static Set<String> getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
@@ -308,6 +293,7 @@ public class FrankenDraftBagService {
         if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
             next = Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
         }
+        // TODO BAG_QUEUE fix message
         String message = "# " + game.getPing() + " Franken Draft has started!\n" +
             "> As a reminder, for the first bag you pick " + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick " + next + " item" + (next == 1 ? "" : "s") + ".\n" +
             "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n" +

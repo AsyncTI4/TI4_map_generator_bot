@@ -14,6 +14,8 @@ import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -151,8 +153,6 @@ class FrankenButtonHandler {
                 case "confirm_draft" -> {
                     player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
                     player.resetDraftQueue();
-                    // TODO BAG_QUEUE pass the current bag into the next player's queue
-                    draft.setPlayerReadyToPass(player, true);
 
                     // Clear out all existing messages
                     draft.findExistingBagChannel(player).getHistory().retrievePast(100).queue(m -> {
@@ -160,6 +160,7 @@ class FrankenButtonHandler {
                             draft.findExistingBagChannel(player).deleteMessages(m).queue();
                         }
                     });
+                    // TODO BAG_QUEUE more accurate message
                     MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
                     DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
                     // TODO better error handling?
@@ -167,20 +168,19 @@ class FrankenButtonHandler {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(currentBag));
                     }
                     FrankenDraftBagService.displayPlayerHand(game, player);
+
+                    draft.passBag(player);
+
+                    // Clear the status message so it will be regenerated
+                    GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT);
+                    FrankenDraftBagService.updateDraftStatusMessage(game);
+
                     if (draft.isDraftStageComplete()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
                         FrankenDraftBagService.applyDraftBags(event, game);
                         return;
                     }
-                    int passCounter = 0;
-                    while (draft.allPlayersReadyToPass()) {
-                        FrankenDraftBagService.passBags(game);
-                        passCounter++;
-                        if (passCounter > game.getRealPlayers().size()) {
-                            MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " an error has occurred where nobody is able to draft any cards, but there are cards still in the bag. Please notify @developer");
-                            break;
-                        }
-                    }
+
                     return;
                 }
                 case "show_bag" -> {
@@ -203,14 +203,17 @@ class FrankenButtonHandler {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Something went wrong. You are not allowed to draft " + selectedItem.getShortDescription() + " right now. Please select another item.");
             return;
         }
+        // TODO check what happens if a player attempts to draft an item not in the bag. This kinda looks like the item would just appear.
         currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(action));
         player.queueDraftItem(DraftItem.generateFromAlias(action));
 
-        if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
-            draft.setPlayerReadyToPass(player, true);
-        }
+        // // TODO this shouldn't be reachable; queueDraftItem can't leave an empty item queue
+        // if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
+        //     draft.setPlayerReadyToPass(player, true);
+        // }
 
         FrankenDraftBagService.showPlayerBag(game, player);
+        // TODO this throws an error "Unknown message"
         event.getMessage().delete().queue();
     }
 }

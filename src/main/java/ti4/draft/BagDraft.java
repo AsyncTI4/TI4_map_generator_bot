@@ -72,43 +72,62 @@ public abstract class BagDraft {
         return true;
     }
 
-    // TODO BAG_QUEUE not needed for queueing
-    public void passBags() {
-        List<Player> players = owner.getRealPlayers();
-        // Safety: method should only be run if not queueing bags
-        DraftBag firstPlayerBag = players.getFirst().getCurrentDraftBag().get();
-        for (int i = 0; i < players.size() - 1; i++) {
-            // Safety: method should only be run if not queueing bags
-            giveBagToPlayer(players.get(i + 1).getCurrentDraftBag().get(), players.get(i));
+    /** Take player's current bag and enqueue it with the next player. */
+    public void passBag(Player player) {
+        DraftBag bag = player.takeCurrentDraftBag().orElse(null);
+        // TODO maybe report somewhere when empty bags are dropped?
+        if (bag != null && !bag.Contents.isEmpty()) {
+            Player nextPlayer = getNextPlayer(player);
+            BotLogger.info("Passing bag from " + player.getRepresentationNoPing() + " to " + nextPlayer.getRepresentationNoPing());
+            enqueueBag(nextPlayer, bag);
         }
-        giveBagToPlayer(firstPlayerBag, players.getLast());
+        if (player.getCurrentDraftBag().isEmpty()) dequeueBag(player);
+    }
+
+    /** Dequeue the next bag waiting for player and set it as their current bag. */
+    private void dequeueBag(Player player) {
+        assert player.getCurrentDraftBag().isEmpty();
+        DraftBag bag = player.getDraftBagQueue().poll();
+        if (bag != null) {
+            BotLogger.info("Dequeueing bag for " + player.getRepresentationNoPing());
+            giveBagToPlayer(bag, player);
+            // TODO where else could this showPlayerBag() call be?
+            FrankenDraftBagService.showPlayerBag(owner, player);
+        }
+    }
+
+    /** Enqueue a bag with a player. */
+    private void enqueueBag(Player player, DraftBag bag) {
+        BotLogger.info("Enqueueing bag for "+ player.getRepresentationNoPing());
+        player.getDraftBagQueue().add(bag);
+        if (player.getCurrentDraftBag().isEmpty()) {
+            dequeueBag(player);
+        }
+    }
+
+    public Player getNextPlayer(Player player) {
+        List<Player> players = owner.getRealPlayers();
+        int index = players.indexOf(player);
+        if (index == -1) {
+            // TODO throw something interesting probably
+            return null;
+        }
+        int nextIndex = (index + 1) % players.size();
+        return players.get(nextIndex);
     }
 
     public void giveBagToPlayer(DraftBag bag, Player player) {
         player.setCurrentDraftBag(bag);
-        // TODO this logic is duplicated in playerHasDraftableItemInBag()
-        boolean newBagCanBeDraftedFrom = false;
-        for (DraftItem item : bag.Contents) {
-            if (item.isDraftable(player)) {
-                newBagCanBeDraftedFrom = true;
-                break;
-            }
+        if (playerHasDraftableItemInBag(player)) {
+            MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
+                Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
+        } else {
+            // TODO since we're passing the unusable bag recursively, the failure state where no-one can draft from it isn't caught anyhere and just crashes with infinite depth. Fix that. Maybe look ahead to find the correct destination player? But can't pass directly to them, that would change the order of bags. In any case, restore the old error message.
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " you have been passed a new draft bag, but nothing in it is draftable for you.");
+            passBag(player);
         }
-        // TODO BAG_QUEUE instead just pass the bag
-        player.setReadyToPassBag(!newBagCanBeDraftedFrom);
-        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
-            Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
-    }
-
-    // TODO BAG_QUEUE not needed for queueing
-    public boolean allPlayersReadyToPass() {
-        for (Player p : owner.getRealPlayers()) {
-            if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
-                setPlayerReadyToPass(p, true);
-            }
-        }
-        return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
     }
 
     public boolean playerHasDraftableItemInBag(Player player) {
@@ -117,15 +136,6 @@ public abstract class BagDraft {
         }
         // Safety: just checked the bag exists
         return player.getCurrentDraftBag().get().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
-    }
-
-    // TODO BAG_QUEUE not needed for queueing
-    public void setPlayerReadyToPass(Player player, boolean ready) {
-        if (ready && !player.isReadyToPassBag()) {
-            player.setReadyToPassBag(true);
-            FrankenDraftBagService.updateDraftStatusMessage(owner);
-        }
-        player.setReadyToPassBag(ready);
     }
 
     public String getLongBagRepresentation(DraftBag bag, Game game) {
@@ -261,18 +271,20 @@ public abstract class BagDraft {
 
     @JsonIgnore
     public String getDraftStatusMessage() {
-        // TODO BAG_QUEUE represent queued bags
         StringBuilder sb = new StringBuilder();
         sb.append("### __Draft Status__:\n");
         for (Player player : owner.getRealPlayers()) {
             sb.append("> ");
-            if (player.isReadyToPassBag()) {
-                sb.append("✅");
-            } else {
-                sb.append("❌");
-            }
             sb.append(player.getRepresentationNoPing());
             sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
+            if (player.getCurrentDraftBag().isPresent()) {
+                sb.append(" 💰");
+            }
+            if (player.getDraftBagQueue().size() > 0) {
+                sb.append(" (");
+                player.getDraftBagQueue().forEach(bag -> sb.append("💰"));
+                sb.append(" queued )");
+            }
             sb.append("\n");
         }
         return sb.toString();

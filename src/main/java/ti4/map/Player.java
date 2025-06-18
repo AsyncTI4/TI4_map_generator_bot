@@ -1802,6 +1802,12 @@ public class Player extends PlayerProperties {
         currentDraftBag = bag;
     }
 
+    public Optional<DraftBag> takeCurrentDraftBag() {
+        Optional<DraftBag> bag = getCurrentDraftBag();
+        setCurrentDraftBag(null);
+        return bag;
+    }
+
     public DraftBag getDraftQueue() {
         return draftItemQueue;
     }
