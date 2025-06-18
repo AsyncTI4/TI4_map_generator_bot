@@ -20,7 +20,7 @@ import ti4.service.leader.UnlockLeaderService;
 
 public class CryypterHelper 
 {
-    //Revised Politics
+    //Revised Politics SC
     public static List<Button> getCryypterSC3Buttons(int sc) 
     {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
