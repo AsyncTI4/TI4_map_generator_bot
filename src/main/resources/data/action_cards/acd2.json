@@ -121,7 +121,7 @@
         "name": "Chain Reaction",
         "phase": "Action",
         "window": "After you destroy 1 of your opponent's ships",
-        "text": "Roll 2 dice. For each result equal to or greater than that ship's combat value, produce 1 hit against your opponent's ships and roll again; this ability cannot produce more than 4 hits.",
+        "text": "Roll 2 dice. For each result equal to or greater than that ship's combat value, produce 1 hit that your opponent must assign to 1 of their ships and roll again; this ability cannot produce more than 3 hits.",
         "flavorText": "As Jace tore through the enemy line, his ordnance erupted into a symphony of explosions.",
         "source": "action_deck_2"
     },
