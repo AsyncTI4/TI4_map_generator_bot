@@ -293,11 +293,10 @@ public class FrankenDraftBagService {
         if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
             next = Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
         }
-        // TODO BAG_QUEUE fix message
         String message = "# " + game.getPing() + " Franken Draft has started!\n" +
             "> As a reminder, for the first bag you pick " + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick " + next + " item" + (next == 1 ? "" : "s") + ".\n" +
             "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n" +
-            "> Once you have made your " + next + " pick" + (next == 1 ? "" : "s") + " (" + first + " in the first bag), the bags will automatically be passed once everyone is ready.";
+            "> Once you have made your " + next + " pick" + (next == 1 ? "" : "s") + " (" + first + " in the first bag), your bag will automatically be passed to the next player. If they already have a bag, your bag will be added to their queue.";
 
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
     }
