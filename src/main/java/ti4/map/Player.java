@@ -1896,14 +1896,9 @@ public class Player extends PlayerProperties {
 
     public void loadQueuedDraftBags(String saveString) {
         BotLogger.info("Loading draft bag from \"" + saveString + "\" for " + getRepresentationNoPing());
-        // TODO re-use DraftBag parser and house it in DraftBag
         Queue<DraftBag> queue = new ArrayDeque<>();
         for (String bagString : saveString.split(";")) {
-            DraftBag newBag = new DraftBag();
-            for (String item : bagString.split(",")) {
-                newBag.Contents.add(DraftItem.generateFromAlias(item));
-            }
-            queue.add(newBag);
+            queue.add(DraftBag.fromStoreString(bagString));
         }
         draftBagQueue = queue;
         BotLogger.info("Loaded " + draftBagQueue.size() + " queued bags");

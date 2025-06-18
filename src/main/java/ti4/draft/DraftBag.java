@@ -19,6 +19,14 @@ public class DraftBag {
         return sb.toString();
     }
 
+    public static DraftBag fromStoreString(String storeString) {
+        DraftBag bag = new DraftBag();
+        for (String item : storeString.split(",")) {
+            bag.Contents.add(DraftItem.generateFromAlias(item));
+        }
+        return bag;
+    }
+
     public int getCategoryCount(DraftItem.Category cat) {
         int count = 0;
         for (DraftItem item: Contents) {
