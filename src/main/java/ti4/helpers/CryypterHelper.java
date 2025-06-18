@@ -5,7 +5,6 @@ import java.util.List;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
-import ti4.helpers.ActionCardHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -308,7 +307,7 @@ public class CryypterHelper
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getRepresentation()
                     + " has chosen to resolve the effect of the Yssaril Envoy.");
-            resolveActionCard(event, game, player, fields[3], -1, null);
+            ActionCardHelper.resolveActionCard(event, game, player, fields[3], -1, null);
         }
         
         event.getMessage().delete().queue();
