@@ -14,6 +14,7 @@ import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -162,8 +163,10 @@ class FrankenButtonHandler {
                     });
                     MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your draft bag is being passed to your right.");
                     DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
-                    // TODO better error handling?
-                    if (currentBag != null) {
+                    if (currentBag == null) {
+                        // This should never occur. The player just picked from their current bag; it could be empty, but not non-existent.
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(event, player), "Tried to pass a null bag");
+                    } else {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(currentBag));
                     }
                     FrankenDraftBagService.displayPlayerHand(game, player);
