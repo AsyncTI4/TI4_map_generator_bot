@@ -95,7 +95,11 @@ public class GameProperties {
     private @ExportableField boolean ageOfExplorationMode;
     private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
+    private @ExportableField boolean totalWarMode;
+    private @ExportableField boolean ageOfCommerceMode;
     private @ExportableField boolean hiddenAgendaMode;
+    private @ExportableField boolean ordinianC1Mode;
+    private @ExportableField boolean liberationC4Mode;
     private @ExportableField boolean allianceMode;
     private @ExportableField boolean communityMode;
     private @ExportableField boolean competitiveTIGLGame;

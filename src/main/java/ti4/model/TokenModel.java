@@ -63,9 +63,9 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if(getSpaceOrPlanet() != null) sb.append("Location: ").append(getSpaceOrPlanet().toString()).append("\n");
-        if(getTokenPlanetName() != null) sb.append("Planet: ").append(getTokenPlanetName().toString()).append("\n");
-        if(getAttachmentID() != null) sb.append("Attachment: ").append(getAttachmentID().toString()).append("\n");
+        if(getSpaceOrPlanet() != null) sb.append("Location: ").append(getSpaceOrPlanet()).append("\n");
+        if(getTokenPlanetName() != null) sb.append("Planet: ").append(getTokenPlanetName()).append("\n");
+        if(getAttachmentID() != null) sb.append("Attachment: ").append(getAttachmentID()).append("\n");
         if(getWormholes() != null) sb.append("Wormhole(s): ").append(getWormholes().toString()).append("\n");
         if(getIsAnomaly() != null) sb.append("Anomaly ");
         if(getIsRift() != null) sb.append("Rift ");
@@ -91,9 +91,9 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
             || (getTokenPlanetName() != null && getTokenPlanetName().toLowerCase().contains(searchString.toLowerCase()))
             || (getAttachmentID() != null && getAttachmentID().toLowerCase().contains(searchString.toLowerCase()))
             || (getWormholes() != null && getWormholes().toString().toLowerCase().contains(searchString.toLowerCase()))
-            || (getIsAnomaly() != null && getIsAnomaly() == true && "anomaly".contains(searchString.toLowerCase()))
-            || (getIsRift() != null && getIsRift() == true && "gravity rift".contains(searchString.toLowerCase()))
-            || (getIsNebula() != null && getIsNebula() == true && "nebula".contains(searchString.toLowerCase()))
+            || (getIsAnomaly() != null && getIsAnomaly() && "anomaly".contains(searchString.toLowerCase()))
+            || (getIsRift() != null && getIsRift() && "gravity rift".contains(searchString.toLowerCase()))
+            || (getIsNebula() != null && getIsNebula() && "nebula".contains(searchString.toLowerCase()))
             || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
     }
 

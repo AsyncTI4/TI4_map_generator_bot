@@ -289,7 +289,7 @@ public class ButtonHelperSCs {
             return;
         }
         int initComm = player.getCommodities();
-        player.setCommodities(player.getCommoditiesTotal());
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok5trade")) {
@@ -336,7 +336,9 @@ public class ButtonHelperSCs {
         int tg = player.getTg();
         player.setTg(tg + commoditiesTotal);
         ButtonHelperAbilities.pillageCheck(player, game);
-        player.setCommodities(0);
+        if (!game.isAgeOfCommerceMode()) {
+            player.setCommodities(0);
+        }
 
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -776,6 +778,7 @@ public class ButtonHelperSCs {
         for (String fac : usedFacilities) {
             if (fac.contains("facilityembassy")) {
                 hasEmbassy = true;
+                break;
             }
         }
         if (!hasEmbassy) {

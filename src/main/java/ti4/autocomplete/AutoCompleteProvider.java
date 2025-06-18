@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.commands.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -71,7 +72,7 @@ public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
-            System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName() + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue());
+            //System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName() + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue()); // Debug line
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);
@@ -124,7 +125,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6, Constants.BAN_FLEET, Constants.BAN_HS, Constants.BAN_STARTING_TECH, Constants.BAN_COMMODITIES -> {
+            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6, Constants.BAN_FLEET, Constants.BAN_HS, Constants.BAN_STARTING_TECH, Constants.BAN_COMMODITIES, GameStatisticsFilterer.WINNING_FACTION_FILTER -> {
                 var options = searchModels(event, Mapper.getFactionsValues(), null);
                 event.replyChoices(options).queue();
             }
@@ -328,6 +329,12 @@ public class AutoCompleteProvider {
             case Constants.CREUSS_TOKEN_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 var tokens = List.of("alpha", "beta", "gamma");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
+                event.replyChoices(options).queue();
+            }
+            case Constants.SCENARIO -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)");
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
@@ -785,9 +792,9 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveDeveloperCommandAutoComplete(
-                @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                @NotNull String optionName
-            ) {
+        @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
+        @NotNull String optionName
+    ) {
         if (!subCommandName.equals(Constants.SET_SETTING)) return;
         switch (optionName) {
             case Constants.SETTING_TYPE -> event.replyChoiceStrings("string", "number", "bool").queue();
@@ -801,9 +808,9 @@ public class AutoCompleteProvider {
     }
 
     private static void resolveSearchCommandAutoComplete(
-                @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
-                @NotNull String optionName
-            ) {
+        @NotNull CommandAutoCompleteInteractionEvent event, @NotNull String subCommandName,
+        @NotNull String optionName
+    ) {
         if (!optionName.equals(Constants.SEARCH)) return;
         ComponentSource source = ComponentSource.fromString(event.getOption(Constants.SOURCE, null, OptionMapping::getAsString));
         List<Command.Choice> options = null;
@@ -842,7 +849,7 @@ public class AutoCompleteProvider {
             /* From others */
             // none of them are populated from here
         }
-        System.out.println(options.toString());
+        //System.out.println(options.toString()); // Debug line
         event.replyChoices(Objects.requireNonNullElse(options, Collections.emptyList())).queue();
     }
 
@@ -870,7 +877,6 @@ public class AutoCompleteProvider {
                     }
                 }
             }
-
             case Constants.BAN -> {
                 switch (optionName) {
                     case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
@@ -892,7 +898,6 @@ public class AutoCompleteProvider {
                         event.replyChoices(options).queue();
                     }
                 }
-
             }
         }
     }
@@ -904,7 +909,6 @@ public class AutoCompleteProvider {
                 var options = searchModels(event, TileHelper.getAllTileModels(), null);
                 event.replyChoices(options).queue();
             }
-
             case Constants.REMOVE_TILE -> {
                 if (!optionName.equals(Constants.POSITION)) return;
                 Game game = GameManager.getManagedGame(gameName).getGame();

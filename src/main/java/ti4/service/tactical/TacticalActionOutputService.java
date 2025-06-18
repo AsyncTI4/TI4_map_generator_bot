@@ -139,12 +139,16 @@ public class TacticalActionOutputService {
                     lines.add(unitStr);
                     continue;
                 }
+                String color = "";
+                if (!key.getColor().equalsIgnoreCase(player.getColor())) {
+                    color = " " + key.getColor() + " ";
+                }
                 for (UnitState state : UnitState.values()) {
                     int amt = states.get(state.ordinal());
                     if (amt == 0) continue;
 
                     String stateStr = (state == UnitState.none) ? "" : " " + state.humanDescr();
-                    String unitMoveStr = linePrefix + " moved " + amt + stateStr + " " + key.unitEmoji();
+                    String unitMoveStr = linePrefix + " moved " + amt + color + stateStr + " " + key.unitEmoji();
 
                     String unitHolderStr = (uh instanceof Planet p) ? " from the planet " + p.getRepresentation(game) : "";
                     unitMoveStr += unitHolderStr;
@@ -234,7 +238,7 @@ public class TacticalActionOutputService {
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
-        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd")) {
+        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd") && !player.getRelics().contains("circletofthevoid")) {
             baseMoveValue = 1;
         }
         if (skipBonus) return baseMoveValue;

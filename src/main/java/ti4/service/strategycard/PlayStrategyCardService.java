@@ -438,6 +438,9 @@ public class PlayStrategyCardService {
                     } else if (player.getPromissoryNotesInPlayArea().contains("convoys")) {
                         MessageHelper.sendMessageToChannel(m5,
                             "The **Trade** player has _Trade Convoys_, and thus may perform transactions with all players.");
+                    } else if (game.isAgeOfCommerceMode()) {
+                        MessageHelper.sendMessageToChannel(m5,
+                            "The Age of Commerce Galactic event is in play, and thus the **Trade** player may perform transactions with all players.");
                     } else {
                         StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");
                         StringBuilder notNeighborsMsg = new StringBuilder("__Not__ neighbors with the **Trade** holder:");
@@ -569,8 +572,7 @@ public class PlayStrategyCardService {
 
         if (scModel.usesAutomationForSCID("pok7technology")) {
             Player raOwner = game.getPNOwner("ra");
-            if (raOwner == null) return false;
-            return true;
+            return raOwner != null;
         }
 
         return false;

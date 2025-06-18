@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ButtonHelperActionCards;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
@@ -187,6 +188,16 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
                 ButtonHelper.getDacxiveButtons(planet, player));
         }
+
+        if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
+            && player.hasTech("dsvaylr") && !doubleCheck) {
+            String msg10 = player.getRepresentationUnfogged()
+                + " you may have an opportunity to use Scavenger Exos on "
+                + Helper.getPlanetRepresentation(planet, game)
+                + ". Click to confirm a combat occurred and to draw 1 AC or delete these buttons. (Note: this tech is max once per action)";
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
+                ButtonHelper.getScavengerExosButtons(player));
+        }
         if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer()
             && (unitHolder.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
@@ -226,6 +237,15 @@ public class AddPlanetService {
                 }
 
             }
+        }
+
+        if (!game.getStoredValue("CommsOnPlanet" + planet).isEmpty() && game.isTotalWarMode()) {
+            int comms = Integer.parseInt(game.getStoredValue("CommsOnPlanet" + planet));
+            String planet2 = ButtonHelperActionCards.getBestResPlanetInHomeSystem(player, game);
+            game.changeCommsOnPlanet(-comms, planet);
+            game.changeCommsOnPlanet(comms, planet2);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), comms + " commodities were moved from the planet of " + Helper.getPlanetRepresentation(planet, game) + " to the planet of " + Helper.getPlanetRepresentation(planet2, game));
+
         }
 
         if (game.playerHasLeaderUnlockedOrAlliance(player, "naazcommander") && !setup) {

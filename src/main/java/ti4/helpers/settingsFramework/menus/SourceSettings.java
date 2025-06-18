@@ -123,7 +123,7 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
-        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3));
+        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (unchartedSpace.isVal()) sources.add(ComponentSource.uncharted_space);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         //if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
@@ -137,12 +137,12 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
-        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3));
+        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         //if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
-        if(ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
+        if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
@@ -179,16 +179,14 @@ public class SourceSettings extends SettingsMenu {
                 // Decks for ABSOL
                 String agenda = ignis ? "agendas_baldrick" : "agendas_pok";
 
-                
                 String sc = ignis ? "ignis_aurora" : "pok";
-                
+
                 game.setStrategyCardSet(sc);
                 game.setEventDeckID("events_baldrick");
                 // set 'em up
                 decks.getRelics().setChosenKey(relic);
                 decks.getTechs().setChosenKey(techs);
                 decks.getAgendas().setChosenKey(agenda);
-                
 
                 String absolDS = "Reset your decks to include all of the Ignis cards.";
                 String pokStr = "Reset your decks to include only PoK cards.";

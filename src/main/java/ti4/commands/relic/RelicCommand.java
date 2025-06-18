@@ -22,9 +22,9 @@ public class RelicCommand implements ParentCommand {
         new RelicShuffleBack(),
         new RelicShowRemaining(),
         new RelicAddBackIntoDeck(),
+        new RelicAddCodexRelics(),
         new RelicSendFragments(),
-        new RelicPurgeFragments()
-    ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new RelicPurgeFragments()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

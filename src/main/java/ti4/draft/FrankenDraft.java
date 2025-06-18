@@ -47,8 +47,8 @@ public class FrankenDraft extends BagDraft {
         int limit = 0;
         switch (category) {
             case ABILITY, BLUETILE -> {
-                if (!game.getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
-                    limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category.toString()));
+                if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
+                    limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
                 } else {
                     if (game.getActiveBagDraft() instanceof PoweredFrankenDraft || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
                         if (category == DraftItem.Category.ABILITY) {
@@ -62,8 +62,8 @@ public class FrankenDraft extends BagDraft {
                 }
             }
             case TECH, REDTILE, STARTINGFLEET, STARTINGTECH, HOMESYSTEM, PN, COMMODITIES, FLAGSHIP, MECH, HERO, COMMANDER, AGENT -> {
-                if (!game.getStoredValue("frankenLimit" + category.toString()).isEmpty()) {
-                    limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category.toString()));
+                if (!game.getStoredValue("frankenLimit" + category).isEmpty()) {
+                    limit = Integer.parseInt(game.getStoredValue("frankenLimit" + category));
                 } else {
                     if (game.getActiveBagDraft() instanceof PoweredFrankenDraft || game.getActiveBagDraft() instanceof PoweredOnePickFrankenDraft) {
                         if (category == DraftItem.Category.TECH) {

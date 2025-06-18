@@ -636,9 +636,6 @@
         "AdditionalComponents": [
             "ABILITY:fine_print"
         ],
-        "OptionalSwaps": [
-            "MECH:vaden_mech"
-        ],
         "source": "ds"
     },
     {
@@ -654,15 +651,14 @@
             "ABILITY:binding_debts",
             "ABILITY:fine_print"
         ],
-        "OptionalSwaps": [
-            "MECH:vaden_mech"
-        ],
         "source": "ds"
     },
     {
         "ItemCategory": "MECH",
         "ItemId": "vaden_mech",
-        "Undraftable": true,
+        "AdditionalComponents": [
+            "ABILITY:fine_print"
+        ],
         "source": "ds"
     },
     {

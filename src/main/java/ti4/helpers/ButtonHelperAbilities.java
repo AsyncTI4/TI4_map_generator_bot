@@ -968,7 +968,7 @@ public class ButtonHelperAbilities {
             if (planetName.contains("custodia") || planetName.contains("ghoti")) {
                 continue;
             }
-            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
             if (planet == null) {
                 continue;
             }
@@ -998,7 +998,7 @@ public class ButtonHelperAbilities {
             if (planetName.contains("custodia") || planetName.contains("ghoti")) {
                 continue;
             }
-            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
             if (planet == null) {
                 continue;
             }
@@ -1010,6 +1010,7 @@ public class ButtonHelperAbilities {
             for (String token : planet.getTokenList()) {
                 if (token.contains("superweapon")) {
                     hasSuperweapon = true;
+                    break;
                 }
             }
             if (!hasSuperweapon) {
@@ -1586,7 +1587,7 @@ public class ButtonHelperAbilities {
         String planetName = buttonID.split("_")[1];
         int oldTg = player.getTg();
         player.setTg(oldTg + 4);
-        Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+        Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         planet.addToken(Constants.GLEDGE_CORE_PNG);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmojiOrColor() + " Cracked the Mantle of "
@@ -1603,6 +1604,9 @@ public class ButtonHelperAbilities {
     public static List<Button> getButtonsForPossibleTechForNekro(Player nekro, List<String> currentList, Game game) {
         List<Button> techToGain = new ArrayList<>();
         for (String tech : currentList) {
+            if ((game.isOrdinianC1Mode() || game.isLiberationC4Mode()) && Mapper.getTech(tech).isFactionTech()) {
+                continue;
+            }
             techToGain.add(Buttons.green("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                 Mapper.getTech(tech).getName()));
         }

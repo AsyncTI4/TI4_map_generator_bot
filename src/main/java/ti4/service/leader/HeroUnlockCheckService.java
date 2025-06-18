@@ -1,5 +1,6 @@
 package ti4.service.leader;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,7 +17,14 @@ import ti4.map.Player;
 public class HeroUnlockCheckService {
     public static void checkIfHeroUnlocked(Game game, Player player) {
         Leader playerLeader = player.getLeader(Constants.HERO).orElse(null);
-        if (playerLeader == null || !playerLeader.isLocked()) {
+        if (game.isLiberationC4Mode() && player.getFaction().equalsIgnoreCase("nekro")) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (!p2.getFaction().equalsIgnoreCase("nekro")) {
+                    checkIfHeroUnlocked(game, p2);
+                }
+            }
+        }
+        if (playerLeader == null) {
             return;
         }
         int scoredSOCount = player.getSecretsScored().size();
@@ -34,8 +42,22 @@ public class HeroUnlockCheckService {
             }
         }
         int scoredObjectiveCount = scoredPOCount + scoredSOCount;
-        if (scoredObjectiveCount >= 3) {
-            UnlockLeaderService.unlockLeader("hero", game, player);
+        List<Leader> heroesToUnlock = new ArrayList<>();
+        for (Leader leader : player.getLeaders()) {
+            if (leader.getId().contains("orlandohero")) {
+                Player nekro = game.getPlayerFromColorOrFaction("nekro");
+                if (nekro != null && leader.isLocked() && nekro.getTotalVictoryPoints() > 4) {
+                    heroesToUnlock.add(leader);
+                }
+            } else {
+                if (leader.getId().contains("hero") && leader.isLocked() && scoredObjectiveCount >= 3) {
+                    heroesToUnlock.add(leader);
+                }
+            }
         }
+        for (Leader hero : heroesToUnlock) {
+            UnlockLeaderService.unlockLeader(hero.getId(), game, player);
+        }
+
     }
 }

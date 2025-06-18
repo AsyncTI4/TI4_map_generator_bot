@@ -29,11 +29,11 @@ public class AddTileService {
     public static void addTile(Game game, Tile tile) {
         game.removeTile(tile.getPosition()); //remove old tile first to clean up associated planet ownership
         game.setTile(tile);
-        addCustodianToken(tile);
+        addCustodianToken(tile, game);
     }
 
-    public static void addCustodianToken(Tile tile) {
-        if (!tile.isMecatol()) {
+    public static void addCustodianToken(Tile tile, Game game) {
+        if (!tile.isMecatol() || game.isLiberationC4Mode()) {
             return;
         }
         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
@@ -56,6 +56,7 @@ public class AddTileService {
         sources.add(ComponentSource.codex1);
         sources.add(ComponentSource.codex2);
         sources.add(ComponentSource.codex3);
+        sources.add(ComponentSource.codex4);
         sources.add(ComponentSource.pok);
         if (game.isDiscordantStarsMode()) {
             sources.add(ComponentSource.ds);
@@ -70,40 +71,40 @@ public class AddTileService {
     public static List<TileModel> availableTiles(Set<ComponentSource> sources, RandomOption type, Set<TileModel> existingTileModels, List<String> drawnTiles) {
         List<TileModel> availableTiles = new ArrayList<>();
         switch (type) {
-          case BR:
-              List<Supplier<List<TileModel>>> tileFinders = new Random().nextBoolean()
-                  ? List.of(() -> findBlueTiles(sources, existingTileModels, drawnTiles),
-                            () -> findRedTiles(sources, existingTileModels, drawnTiles))
-                  : List.of(() -> findRedTiles(sources, existingTileModels, drawnTiles),
-                            () -> findBlueTiles(sources, existingTileModels, drawnTiles));
+            case BR:
+                List<Supplier<List<TileModel>>> tileFinders = new Random().nextBoolean()
+                    ? List.of(() -> findBlueTiles(sources, existingTileModels, drawnTiles),
+                        () -> findRedTiles(sources, existingTileModels, drawnTiles))
+                    : List.of(() -> findRedTiles(sources, existingTileModels, drawnTiles),
+                        () -> findBlueTiles(sources, existingTileModels, drawnTiles));
 
-              for (Supplier<List<TileModel>> tileFinder : tileFinders) {
-                  availableTiles = tileFinder.get();
-                  if (!availableTiles.isEmpty()) {
-                      break;
-                  }
-              }
-              break;
-          case B:
-              availableTiles = findBlueTiles(sources, existingTileModels, drawnTiles);
-              break;
-          case R:
-              availableTiles = findRedTiles(sources, existingTileModels, drawnTiles);
-              break;
-          case HS:
-              availableTiles = TileHelper.getAllTileModels().stream()
-                  .filter(tileModel -> TileBack.GREEN.equals(tileModel.getTileBack()))
-                  .filter(tileModel -> sources.contains(tileModel.getSource()))
-                  .filter(tileModel -> !existingTileModels.contains(tileModel))
-                  .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
-                  .filter(tileModel -> new Tile(tileModel.getId(), "none").isHomeSystem())
-                  .collect(Collectors.toList());
-              break;
-          case HL:
-              availableTiles = TileHelper.getAllTileModels().stream()
-                  .filter(TileModel::isHyperlane)
-                  .collect(Collectors.toList());
-              break;
+                for (Supplier<List<TileModel>> tileFinder : tileFinders) {
+                    availableTiles = tileFinder.get();
+                    if (!availableTiles.isEmpty()) {
+                        break;
+                    }
+                }
+                break;
+            case B:
+                availableTiles = findBlueTiles(sources, existingTileModels, drawnTiles);
+                break;
+            case R:
+                availableTiles = findRedTiles(sources, existingTileModels, drawnTiles);
+                break;
+            case HS:
+                availableTiles = TileHelper.getAllTileModels().stream()
+                    .filter(tileModel -> TileBack.GREEN.equals(tileModel.getTileBack()))
+                    .filter(tileModel -> sources.contains(tileModel.getSource()))
+                    .filter(tileModel -> !existingTileModels.contains(tileModel))
+                    .filter(tileModel -> !drawnTiles.contains(tileModel.getId()))
+                    .filter(tileModel -> new Tile(tileModel.getId(), "none").isHomeSystem())
+                    .collect(Collectors.toList());
+                break;
+            case HL:
+                availableTiles = TileHelper.getAllTileModels().stream()
+                    .filter(TileModel::isHyperlane)
+                    .collect(Collectors.toList());
+                break;
         }
         return availableTiles;
     }
@@ -127,17 +128,14 @@ public class AddTileService {
     }
 
     public enum RandomOption {
-        B("Blue tile"), 
-        R("Red tile"), 
-        HS("Home System"), 
-        HL("Hyperlane"), 
-        BR("50/50 for Blue/Red tile");
+        B("Blue tile"), R("Red tile"), HS("Home System"), HL("Hyperlane"), BR("50/50 for Blue/Red tile");
 
         private final String description;
+
         RandomOption(String description) {
             this.description = description;
         }
-      
+
         public String getAutoCompleteName() {
             return this + ": " + description;
         }

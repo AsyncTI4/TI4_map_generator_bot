@@ -2,7 +2,7 @@ package ti4.service.statistics;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.helpers.WebHelper;
+import ti4.website.WebHelper;
 
 public class StatisticsOptInOutService {
 
