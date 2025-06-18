@@ -6,6 +6,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
@@ -32,7 +33,8 @@ public class MuaatHeroService {
 
         //Add the muaat supernova to the map and copy over the space unitholder
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
+        Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition());
+        UnitHolder novaSpace = novaTile.getSpaceUnitHolder();
 
         game.removeTile(tile.getPosition());
         game.setTile(novaTile);
