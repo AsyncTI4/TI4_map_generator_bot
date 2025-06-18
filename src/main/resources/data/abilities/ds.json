@@ -249,30 +249,30 @@
         "id": "abyssal_embrace",
         "name": "Abyssal Embrace",
         "faction": "ghoti",
-        "permanentEffect": "When you create the game board",
-        "window": "Place the Ghoti Space tile where your home system would normally be placed. The Ghoti Space system is not a home system.",
+        "window": "When you create the game board",
+        "windowEffect": "Place the Ghoti Space tile where your home system would normally be placed. The Ghoti Space system is not a home system.",
         "source": "ds"
     },
     {
         "id": "mobile_command",
         "name": "Mobile Command",
         "faction": "ghoti",
-        "window": "The system that contains your flagship is your home system. Your flagship cannot be captured and you cannot score public objectives if your flagship is not on the game board.",
+        "permanentEffect": "The system that contains your flagship is your home system. Your flagship cannot be captured and you cannot score public objectives if your flagship is not on the game board.",
         "source": "ds"
     },
     {
         "id": "spawning_grounds",
         "name": "Spawning Grounds",
         "faction": "ghoti",
-        "permanentEffect": "During setup",
-        "window": "Gain and ready the Ghoti planet card and its legendary planet ability card; you cannot lose those cards.",
+        "window": "During setup",
+        "windowEffect": "Gain and ready the Ghoti planet card and its legendary planet ability card; you cannot lose those cards.",
         "source": "ds"
     },
     {
         "id": "celestial_reclamation",
         "name": "Celestial Reclamation",
         "faction": "gledge",
-        "window": "Planets that contain Core tokens have a base resource value of 2 and influence value of 0. Core tokens cannot be removed from the planet that contains them.",
+        "permanentEffect": "Planets that contain Core tokens have a base resource value of 2 and influence value of 0. Core tokens cannot be removed from the planet that contains them.",
         "source": "ds",
         "shortName": "Celestial Reclamatn"
     },
