@@ -19,7 +19,7 @@ import ti4.service.leader.UnlockLeaderService;
 
 public class CryypterHelper 
 {
-
+    //Revised Politics
     public static List<Button> getCryypterSC3Buttons(int sc) 
     {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
@@ -68,6 +68,21 @@ public class CryypterHelper
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
     }
 
+    //VotC Setup
+    public static void votcSetup(Game game, ButtonInteractionEvent event)
+    {
+        game.setVotcMode(true);
+        game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_cryypter"));
+        game.setTechnologyDeckID("techs_cryypter");
+        game.swapInVariantTechs();
+        game.setStrategyCardSet("votc");
+        //TODO: Implement swap function to only replace specific ACs
+        game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_deck_2"));
+        //TODO: swap Xxcha and Keleres!Xxcha heroes
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Voices of the Council mode.");
+    }
+
+    //Envoys
     public static void checkEnvoyUnlocks(Game game) 
     {
         //if (!game.isVotcMode()) 
@@ -84,19 +99,6 @@ public class CryypterHelper
         }
     }
 
-    public static void votcSetup(Game game, ButtonInteractionEvent event)
-    {
-        game.setVotcMode(true);
-        game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_cryypter"));
-        game.setTechnologyDeckID("techs_cryypter");
-        game.swapInVariantTechs();
-        game.setStrategyCardSet("votc");
-        //TODO: Implement swap function to only replace specific ACs
-        game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_deck_2"));
-        //TODO: swap Xxcha and Keleres!Xxcha heroes
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Voices of the Council mode.");
-    }
-
     public static String argentEnvoyReminder(Player player, Game game)
     {
         Player argent = Helper.getPlayerFromUnlockedLeader(game, "argentenvoy");
@@ -109,15 +111,48 @@ public class CryypterHelper
             return "";
         }
     }
-    
+
+
+    public static void checkForAssigningMentakEnvoy(Game game) 
+    {
+        for (Player player : game.getRealPlayers()) {
+            game.setStoredValue("Mentak Envoy " + player.getFaction(), "");
+            if (player.hasUnexhaustedLeader("mentakenvoy")) {
+                String msg = player.getRepresentation()
+                    + " you have the option to pre-assign the declaration of using your Envoy on someone."
+                    + " When they are up to vote, it will ping them saying that you wish to use your Envoy, and then it will be your job to clarify."
+                    + " Feel free to not preassign if you don't wish to use it on this agenda.";
+                List<Button> buttons2 = new ArrayList<>();
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player) {
+                        continue;
+                    }
+                    if (!game.isFowMode()) {
+                        buttons2.add(Buttons.gray(
+                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
+                                + p2.getFaction(),
+                            p2.getFaction()));
+                    } else {
+                        buttons2.add(Buttons.gray(
+                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
+                                + p2.getFaction(),
+                            p2.getColor()));
+                    }
+                }
+                buttons2.add(Buttons.red("deleteButtons", "Decline"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
+            }
+        }
+    }
     
     public static void checkForMentakEnvoy(Player voter, Game game) {
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == voter) {
                 continue;
             }
-            Leader playerLeader = player.getLeader("mentakenvoy").orElse(null);
-            if (playerLeader != null) {
+            Leader playerLeader = p2.getLeader("mentakenvoy").orElse(null);
+            if (playerLeader != null) 
+            {
                 if (game.getStoredValue("Mentak Envoy " + p2.getFaction()).contains(voter.getFaction())) 
                 {
                     ExhaustLeaderService.exhaustLeader(game, p2, playerLeader); //p2.exhaustTech("gr");
@@ -127,7 +162,8 @@ public class CryypterHelper
                     MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), msg);
                     boolean hasPNs = voter.getPnCount() > 0;
                     boolean hasEnoughTGs = voter.getTg() > 1;
-                    if (hasPNs || hasEnoughTGs) {
+                    if (hasPNs || hasEnoughTGs) 
+                    {
                         msg = voter.getRepresentation(false, true) +
                             " has the option to give 1 promissory note or 2 trade goods to ignore the effect of Mentak Envoy.";
                         List<Button> conclusionButtons = new ArrayList<>();
@@ -192,41 +228,94 @@ public class CryypterHelper
         }
         event.getMessage().delete().queue();
     }
+
     
-    public static void checkForAssigningMentakEnvoy(Game game) 
+    
+    //TODO: ActionCardHelper.resolveActionCard(), 376
+    public static void checkForAssigningYssarilEnvoy(GenericInteractionCreateEvent event, Game game, Player player, String acID)
     {
-        for (Player player : game.getRealPlayers()) {
-            game.setStoredValue("Mentak Envoy " + player.getFaction(), "");
-            if (player.hasUnexhaustedLeader("mentakenvoy")) {
-                String msg = player.getRepresentation()
-                    + " you have the option to pre-assign the declaration of using your Envoy on someone."
-                    + " When they are up to vote, it will ping them saying that you wish to use your Envoy, and then it will be your job to clarify."
-                    + " Feel free to not preassign if you don't wish to use it on this agenda.";
+        if (player.hasUnexhaustedLeader("yssarilenvoy") && game.getPhaseOfGame() != null && game.getPhaseOfGame().equalsIgnoreCase("agenda"))
+        {
+            String msg = player.getRepresentation()
+                    + " you have the option to user your Envoy on someone."
+                    + " It will ping them saying that they may copy the effect of the AC you just played.";
                 List<Button> buttons2 = new ArrayList<>();
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2 == player) {
                         continue;
                     }
+                    String buttonText = "offerYssarilEnvoy_Yssaril Envoy " + player.getFaction() + "_"
+                                + p2.getFaction() + "_"
+                                + acID;
                     if (!game.isFowMode()) {
-                        buttons2.add(Buttons.gray(
-                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
-                                + p2.getFaction(),
-                            p2.getFaction()));
+                        buttons2.add(Buttons.gray(buttonText, p2.getFaction()));
                     } else {
-                        buttons2.add(Buttons.gray(
-                            "resolvePreassignment_Mentak Envoy " + player.getFaction() + "_"
-                                + p2.getFaction(),
-                            p2.getColor()));
+                        buttons2.add(Buttons.gray(buttonText, p2.getColor()));
                     }
                 }
                 buttons2.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons2);
-            }
         }
+    }
+
+    @ButtonHandler("offerYssarilEnvoy")
+    public static void offerYssarilEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) 
+    {
+        String[] fields = buttonID.split("_");
+        Player yssarilPlayer = game.getPlayer(fields[1]);
+        Player targetPlayer = game.getPlayer(fields[2]);
+
+        String msg = yssarilPlayer.getRepresentation(false, true) + " is using the Yssaril Envoy to allow "
+                        + targetPlayer.getRepresentation(false, true)
+                        + " to copy the effect of their AC. The Envoy has been exhausted.";
+        MessageHelper.sendMessageToChannel(targetPlayer.getCorrectChannel(), msg);
+        
+        msg = targetPlayer.getRepresentation(false, true) +
+            " has the option to accept or ignore the effect of the Yssaril Envoy.";
+        List<Button> conclusionButtons = new ArrayList<>();
+        String finChecker = "FFCC_" + voter.getFaction() + "_";
+        Button accept = Buttons.blue(finChecker
+            + "yssarilEnvoy_"
+            + yssarilPlayer.getUserID() + "_"
+            + "accept" + "_"               
+            + fields[2], "Copy the AC");
+        conclusionButtons.add(accept);
+        
+        Button decline = Buttons.red(finChecker
+            + "yssarilEnvoy_"
+            + yssarilPlayer.getUserID() + "_"
+            + "decline", "Decline");
+        conclusionButtons.add(decline);
+        
+        MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), msg,
+        conclusionButtons);
+        //event.getMessage().delete().queue();
+    }
+
+    @ButtonHandler("yssarilEnvoy")
+    public static void resolveYssarilEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String[] fields = buttonID.split("_");
+        Player yssarilPlayer = game.getPlayer(fields[1]);
+        String choice = fields[2];
+        if (choice.equals("decline")) {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getRepresentation()
+                    + " has chosen not to resolve the effect of the Yssaril Envoy.");
+        } 
+        else 
+        {
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                player.getRepresentation()
+                    + " has chosen to resolve the effect of the Yssaril Envoy.");
+            resolveActionCard(event, game, player, fields[3], -1, null);
+        }
+        
+        event.getMessage().delete().queue();
     }
 
 
 
+    
 
     //for later
     
