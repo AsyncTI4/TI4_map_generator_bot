@@ -234,7 +234,7 @@ public class CryypterHelper
     //TODO: ActionCardHelper.resolveActionCard(), 376
     public static void checkForAssigningYssarilEnvoy(GenericInteractionCreateEvent event, Game game, Player player, String acID)
     {
-        if (player.hasUnexhaustedLeader("yssarilenvoy") && game.getPhaseOfGame() != null && game.getPhaseOfGame().equalsIgnoreCase("agenda"))
+        if (player.hasUnexhaustedLeader("yssarilenvoy") && game.getPhaseOfGame() != null && game.getPhaseOfGame().startsWith("agenda"))
         {
             String msg = player.getRepresentation()
                     + " you have the option to user your Envoy on someone."
