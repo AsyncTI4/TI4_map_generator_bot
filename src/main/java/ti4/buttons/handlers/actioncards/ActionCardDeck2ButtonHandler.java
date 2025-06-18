@@ -15,7 +15,6 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
@@ -117,22 +116,22 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("resolveChainReaction")
     public static void resolveChainReaction(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        int hits = 1;
-        StringBuilder msg = new StringBuilder("The _Chain Reaction_ rolled: ");
-        int currentRequirement = 7;
-        Die die;
-        while ((die = new Die(currentRequirement)).isSuccess()) {
-            hits++;
-            currentRequirement++;
-            msg.append(die.getResult()).append(" :boom: ");
-        }
-        msg.append(die.getResult());
-        List<Button> buttons = new ArrayList<>();
-        if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
-            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hit" + (hits == 1 ? "" : "s")));
-        }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + "\n " + player.getRepresentation() +
-            " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Effect changed, so old implementation was deprecated. Roll manually.");
+//        StringBuilder msg = new StringBuilder("The _Chain Reaction_ rolled: ");
+//        int currentRequirement = 7;
+//        Die die;
+//        while ((die = new Die(currentRequirement)).isSuccess()) {
+//            hits++;
+//            currentRequirement++;
+//            msg.append(die.getResult()).append(" :boom: ");
+//        }
+//        msg.append(die.getResult());
+//        List<Button> buttons = new ArrayList<>();
+//        if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
+//            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hit" + (hits == 1 ? "" : "s")));
+//        }
+//        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + "\n " + player.getRepresentation() +
+//            " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
 
     @ButtonHandler("resolveFlawlessStrategy")

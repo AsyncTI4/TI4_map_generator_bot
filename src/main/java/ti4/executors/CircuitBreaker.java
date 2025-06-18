@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import lombok.Getter;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.cron.CronManager;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 public class CircuitBreaker {
 
@@ -19,9 +21,9 @@ public class CircuitBreaker {
     private static boolean open;
     private static LocalDateTime closeDateTime;
 
-    public synchronized static void incrementThresholdCount() {
+    public synchronized static boolean incrementThresholdCount() {
         if (open) {
-            return;
+            return false;
         }
         thresholdCount++;
         if (thresholdCount == 1) {
@@ -34,6 +36,7 @@ public class CircuitBreaker {
             BotLogger.error("Excess errors or timeouts have caused the circuit breaker to open. The bot will not accept commands for " +
                 MINUTES_TO_WAIT_BEFORE_CLOSING + " minutes.");
         }
+        return true;
     }
 
     private synchronized static void reset() {
@@ -45,7 +48,16 @@ public class CircuitBreaker {
         thresholdCount = 0;
     }
 
-    public static Duration getDurationUtilClose() {
+    public static boolean checkIsOpenAndPostWarningIfTrue(MessageChannel messageChannel) {
+        if (CircuitBreaker.isOpen()) {
+            Duration durationUntilCircuitCloses = CircuitBreaker.getDurationUtilClose();
+            MessageHelper.sendMessageToChannel(messageChannel, "The bot is taking a breather. Try again in " +
+                durationUntilCircuitCloses.toMinutes() + " minutes and " + durationUntilCircuitCloses.getSeconds() % 60 + " seconds.");
+        }
+        return isOpen();
+    }
+
+    private static Duration getDurationUtilClose() {
         if (!open || closeDateTime == null) return Duration.ZERO;
         return Duration.between(LocalDateTime.now(), closeDateTime).isNegative()
             ? Duration.ZERO
