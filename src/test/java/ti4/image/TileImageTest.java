@@ -17,6 +17,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.model.FactionModel;
+import ti4.service.map.TokenPlanetService;
 import ti4.testUtils.BaseTi4Test;
 
 /**
@@ -38,7 +39,7 @@ public class TileImageTest extends BaseTi4Test {
 
     @AfterAll
     public static void readyForProduction() {
-        Assertions.assertEquals(testMode, TestMode.Compare);
+        Assertions.assertEquals(TestMode.Compare, testMode);
     }
 
     @BeforeAll
@@ -87,7 +88,7 @@ public class TileImageTest extends BaseTi4Test {
         testGame.setTile(emptyAlpha);
 
         TileImageTestHelper.addTokensToHolder(emptyAlpha, "space", "token_mirage.png");
-        Helper.addMirageToTile(emptyAlpha);
+        TokenPlanetService.addTokenPlanetToTile(testGame, emptyAlpha, "mirage");
         TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, emptyAlpha, "mirage", UnitType.Infantry, UnitType.Infantry, UnitType.Infantry);
 
         TileImageTestHelper.runTest(emptyAlpha, "Mirage.png");
@@ -99,11 +100,11 @@ public class TileImageTest extends BaseTi4Test {
         Tile rigels = new Tile("76", "102");
         testGame.setTile(rigels);
 
-        TileImageTestHelper.addTokensToHolder(rigels, "space", "token_mirage.png");
-        Helper.addMirageToTile(rigels);
+        TileImageTestHelper.addTokensToHolder(rigels, "space", "token_cradle.png");
+        TokenPlanetService.addTokenPlanetToTile(testGame, rigels, "cradle");
         TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, rigels, "rigeli", UnitType.Infantry);
         TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, rigels, "rigelii", UnitType.Infantry);
-        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, rigels, "mirage", UnitType.Infantry);
+        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, rigels, "cradle", UnitType.Infantry);
 
         TileImageTestHelper.runTest(rigels, "TripleMirage.png");
     }

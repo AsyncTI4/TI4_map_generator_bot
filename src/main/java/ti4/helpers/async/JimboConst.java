@@ -87,7 +87,7 @@ public class JimboConst {
         otherTiles = new ArrayList<>();
         List<TileModel> ignore = Stream.of(blueTiles, redTiles, greenTiles, hyperlaneTiles, draftTiles).flatMap(Collection::stream).toList();
         allTilesSorted.stream().filter(t -> !ignore.contains(t))
-            .filter(t -> t.getSource() == ComponentSource.fow)
+            .filter(t -> t.getSource() != ComponentSource.fow)
             .forEach(otherTiles::add);
 
         setupHyperlanes();
