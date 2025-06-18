@@ -1,6 +1,8 @@
 package ti4.helpers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -15,7 +17,10 @@ import ti4.model.FactionModel;
 import ti4.model.LeaderModel;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.FactionEmojis;
+import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.UnlockLeaderService;
 
 public class CryypterHelper 
@@ -180,7 +185,7 @@ public class CryypterHelper
                             + "mentakEnvoy_"
                             + p2.getUserID() + "_"
                             + "PNdecline", "Send 1 promissory note");
-                            conclusionButtons.add(decline);
+                            conclusionButtons.add(PNdecline);
                         }
                         else
                         {
@@ -188,7 +193,7 @@ public class CryypterHelper
                             + "mentakEnvoy_"
                             + p2.getUserID() + "_"
                             + "TGdecline", "Send 2 trade goods");
-                            conclusionButtons.add(decline);
+                            conclusionButtons.add(TGdecline);
                         }
                         MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), msg,
                         conclusionButtons);
@@ -215,7 +220,7 @@ public class CryypterHelper
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getRepresentation()
                     + " has chosen to send a promissory note and may vote in any manner that they wish.");
-            List<Button> stuffToTransButtons = getForcedPNSendButtons(game, mentakPlayer, player);
+            List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, mentakPlayer, player);
             String message = player.getRepresentationUnfogged() + ", you have been forced to give a promissory note. Please select which promissory note you would like to send.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
         }
@@ -231,8 +236,6 @@ public class CryypterHelper
     }
 
     
-    
-    //TODO: ActionCardHelper.resolveActionCard(), 376
     public static void checkForAssigningYssarilEnvoy(GenericInteractionCreateEvent event, Game game, Player player, String acID)
     {
         if (player.hasUnexhaustedLeader("yssarilenvoy") && game.getPhaseOfGame() != null && game.getPhaseOfGame().startsWith("agenda"))
@@ -274,7 +277,7 @@ public class CryypterHelper
         msg = targetPlayer.getRepresentation(false, true) +
             " has the option to accept or ignore the effect of the Yssaril Envoy.";
         List<Button> conclusionButtons = new ArrayList<>();
-        String finChecker = "FFCC_" + voter.getFaction() + "_";
+        String finChecker = "FFCC_" + targetPlayer.getFaction() + "_";
         Button accept = Buttons.blue(finChecker
             + "yssarilEnvoy_"
             + yssarilPlayer.getUserID() + "_"
@@ -294,11 +297,12 @@ public class CryypterHelper
     }
 
     @ButtonHandler("yssarilEnvoy")
-    public static void resolveYssarilEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void resolveYssarilEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) 
+    {
         String[] fields = buttonID.split("_");
-        Player yssarilPlayer = game.getPlayer(fields[1]);
         String choice = fields[2];
-        if (choice.equals("decline")) {
+        if (choice.equals("decline")) 
+        {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getRepresentation()
                     + " has chosen not to resolve the effect of the Yssaril Envoy.");
@@ -318,7 +322,7 @@ public class CryypterHelper
 
     
 
-    //for later
+    //for later, WIP
     
     //TODO: Add "CryypterHelper.handleVotCRiders(event, game, player, riderName);" to near end of AgendaHelper.play_after(), currently line 3370
     public static void handleVotCRiders(ButtonInteractionEvent event, Game game, Player player, String riderName)
@@ -332,7 +336,7 @@ public class CryypterHelper
             {
                 String message = player.getRepresentation() + " played " +
                     Helper.getLeaderFullRepresentation(playerLeader);
-                boolean purged = player.removeLeader(playerLeader);
+                player.removeLeader(playerLeader);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                     message + " - Odlynn Myrr, the Keleres (Xxcha) hero, has been purged.");
             }
@@ -385,7 +389,7 @@ public class CryypterHelper
         }
     }
 
-    public static void handleAdditionalVoteSources(Player player)
+    public static void handleAdditionalVoteSources(Player player, Map<String, Integer> additionalVotesAndSources)
     {
         if (player.hasTechReady("cryypter_pi")) 
         {
@@ -406,7 +410,7 @@ public class CryypterHelper
     }
 
     //TODO: Add "CryypterHelper.exhaustForVotes(player, thing);" to end of "if" clause of AgendaHelper.exhaustForVotes(), currently line 2469
-    public static void exhaustForVotes(Player player, String component)
+    public static void exhaustForVotes(Game game, Player player, String component, boolean prevoting)
     {
         //Yin envoy exhausting other player's planet
         if(component.contains("yinenvoy"))
@@ -421,7 +425,7 @@ public class CryypterHelper
     }
 
     //getPlanetButtonsVersion2 2574
-    public static void getVoteSourceButtons()
+    public static void getVoteSourceButtons(Player player, List<Button> planetButtons)
     {
         if (player.hasTechReady("cryypter_pi")) 
         {
