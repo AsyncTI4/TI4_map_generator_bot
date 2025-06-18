@@ -20,15 +20,15 @@ public final class ExecutionHistoryManager {
     static {
         Runnable logLongExecutions = () -> {
             var now = Instant.now();
-            for (Map.Entry<Integer, Execution> entry : executionStartTimes.entrySet()) {
-                var elapsedDuration = Duration.between(entry.getValue().startTime, now);
+            for (Execution execution : executionStartTimes.values()) {
+                var elapsedDuration = Duration.between(execution.startTime, now);
                 var elapsedMinutes = elapsedDuration.toMinutes();
                 var elapsedSeconds = elapsedDuration.toSeconds() % 60;
                 if (elapsedMinutes >= 2) {
                     BotLogger.error("A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds + " seconds. " +
-                        "Task name: " + entry.getValue().name);
+                        "Task name: " + execution.name);
                 } else if (elapsedMinutes == 1 && CircuitBreaker.incrementThresholdCount()) {
-                    BotLogger.warning("Incremented circuit breaker threshold. Task name: " + entry.getValue().name);
+                    BotLogger.warning("Incremented circuit breaker threshold. Task name: " + execution.name);
                 }
             }
         };
