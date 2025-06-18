@@ -214,7 +214,7 @@ public class CryypterHelper
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getRepresentation()
                     + " has chosen to send a promissory note and may vote in any manner that they wish.");
-            List<Button> stuffToTransButtons getForcedPNSendButtons(game, mentakPlayer, player);
+            List<Button> stuffToTransButtons = getForcedPNSendButtons(game, mentakPlayer, player);
             String message = player.getRepresentationUnfogged() + ", you have been forced to give a promissory note. Please select which promissory note you would like to send.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, stuffToTransButtons);
         }
@@ -397,7 +397,7 @@ public class CryypterHelper
             {
                 additionalVotesAndSources.put(FactionEmojis.Winnu + " envoy with Mecatol Rex", 6);
             }
-            else if(player.getExhaustedPlanets().contains("winnu")
+            else if(player.getExhaustedPlanets().contains("winnu"))
             {
                 additionalVotesAndSources.put(FactionEmojis.Winnu + " envoy with Winnu", 4);
             }
