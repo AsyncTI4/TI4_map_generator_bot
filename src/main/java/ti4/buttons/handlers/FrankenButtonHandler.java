@@ -160,8 +160,7 @@ class FrankenButtonHandler {
                             draft.findExistingBagChannel(player).deleteMessages(m).queue();
                         }
                     });
-                    // TODO BAG_QUEUE more accurate message
-                    MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+                    MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your draft bag is being passed to your right.");
                     DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
                     // TODO better error handling?
                     if (currentBag != null) {
