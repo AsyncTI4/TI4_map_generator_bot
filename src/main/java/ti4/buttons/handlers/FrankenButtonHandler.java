@@ -15,6 +15,7 @@ import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.message.BotLogger.LogMessageOrigin;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -143,12 +144,13 @@ class FrankenButtonHandler {
             switch (action) {
                 case "reset_queue" -> {
                     DraftBag bag = player.getCurrentDraftBag().orElse(null);
-                    if (bag != null) {
+                    if (bag == null) {
+                        BotLogger.warning(new LogMessageOrigin(event, player), "Tried to reset draft selection while no current bag.");
+                    } else {
                         bag.Contents.addAll(player.getDraftQueue().Contents);
                         player.resetDraftQueue();
                         FrankenDraftBagService.showPlayerBag(game, player);
                     }
-                    // TODO BAG_QUEUE report something if bag is null.
                     return;
                 }
                 case "confirm_draft" -> {
