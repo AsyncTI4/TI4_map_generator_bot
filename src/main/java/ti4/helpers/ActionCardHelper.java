@@ -374,6 +374,8 @@ public class ActionCardHelper {
             }
         }
 
+        CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
+        
         if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);
         } else {
