@@ -442,7 +442,7 @@ public class Helper {
 
     public static List<Player> getSpeakerOrFullPriorityOrderFromPlayer(Player player, Game game) {
         var players = getSpeakerOrFullPriorityOrder(game);
-        if (player != null && players.indexOf(player) != -1) {
+        if (player != null && players.contains(player)) {
             Collections.rotate(players, -players.indexOf(player));
         }
         return players;
@@ -2037,6 +2037,10 @@ public class Helper {
         return getAvailablePlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
     }
 
+    public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game game) {
+        return getTotalPlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
+    }
+
     public static Map<String, Integer> getLastEntryInHashMap(Map<String, Integer> linkedHashMap) {
         int count = 1;
         for (Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
@@ -2387,6 +2391,17 @@ public class Helper {
 
     public static void checkEndGame(Game game, Player player) {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
+            if (game.isLiberationC4Mode()) {
+                if (player.getFaction().equalsIgnoreCase("sol") || player.getFaction().equalsIgnoreCase("xxcha")) {
+                    Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
+                    Player sol = game.getPlayerFromColorOrFaction("sol");
+                    if (sol != null && xxcha != null && (sol.getTotalVictoryPoints() > 11 || xxcha.getTotalVictoryPoints() > 11) && sol.getTotalVictoryPoints() > 9 && xxcha.getTotalVictoryPoints() > 9) {
+                        //good
+                    } else {
+                        return;
+                    }
+                }
+            }
             List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode()) {
                 buttons.add(Buttons.green("gameEnd", "End Game"));

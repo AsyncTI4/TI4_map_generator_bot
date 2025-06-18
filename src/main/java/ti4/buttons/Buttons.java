@@ -3,14 +3,13 @@ package ti4.buttons;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.helpers.WebHelper;
+import ti4.website.WebHelper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.service.emoji.CardEmojis;
@@ -19,11 +18,12 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.image.Mapper;
 
 public class Buttons {
 
     public enum ButtonColor {
-        green, red, gray, blue;
+        green, red, gray, blue
     }
 
     public static final Button GET_A_TECH = green("acquireATech", "Get a Technology");
@@ -69,11 +69,69 @@ public class Buttons {
         REFRESH_PLANET_INFO,
         FACTION_EMBED);
 
+    /**
+     * Check if a game is standard PoK or only uses 4/4/4 homebrew
+     */
+    private static boolean isStandardPoKOrOnly444(Game game) {
+        if (game == null) return false;
+
+        // FIRST: Check that NO other homebrew elements are present
+        if (game.isHomebrew() // explicit homebrew flag
+            || game.isExtraSecretMode()
+            || game.isFowMode()
+            || game.isAgeOfExplorationMode()
+            || game.isFacilitiesMode()
+            || game.isMinorFactionsMode()
+            || game.isLightFogMode()
+            || game.isRedTapeMode()
+            || game.isDiscordantStarsMode()
+            || game.isFrankenGame()
+            || game.isMiltyModMode()
+            || game.isAbsolMode()
+            || game.isVotcMode()
+            || game.isPromisesPromisesMode()
+            || game.isFlagshippingMode()
+            || game.isAllianceMode()
+            || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
+            || game.isHomebrewSCMode()
+            || game.isCommunityMode()
+            || game.getPlayerCountForMap() < 3
+            || game.getPlayerCountForMap() > 8) {
+
+            return false; // Has other homebrew elements, not standard
+        }
+
+        // Check decks, tiles, and factions are official
+        try {
+            if (!game.checkAllDecksAreOfficial()
+                || !game.checkAllTilesAreOfficial()
+                || game.getFactions().stream()
+                    .map(Mapper::getFaction)
+                    .filter(java.util.Objects::nonNull)
+                    .anyMatch(faction -> !faction.getSource().isOfficial())) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false; // If we can't verify, assume not standard
+        }
+
+        // SECOND: Now check if it's either completely standard OR just 4/4/4
+        boolean isStandard10VP = game.getVp() == 10 &&
+                                game.getMaxSOCountPerPlayer() == 3;
+
+        boolean is444Mode = game.getVp() == 12 &&
+                           game.getMaxSOCountPerPlayer() == 4;
+
+        return isStandard10VP || is444Mode;
+    }
+
     public static List<Button> mapImageButtons(Game game) {
         List<Button> buttonsWeb = new ArrayList<>();
         if (game != null && !game.isFowMode()) {
             if (WebHelper.sendingToWeb()) {
-                buttonsWeb.add(Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View"));
+                String baseUrl = "https://ti4.westaddisonheavyindustries.com/game/" + game.getName();
+                String url = isStandardPoKOrOnly444(game) ? baseUrl + "/newui" : baseUrl;
+                buttonsWeb.add(Button.link(url, "Website View"));
             }
             buttonsWeb.add(PLAYER_INFO);
         }

@@ -53,6 +53,7 @@ public class Constants {
     public static final String SPIN_TILES_IN_RINGS = "spin_tiles_in_rings";
     public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
     public static final String OFFER_AFKTIME_OPTIONS = "offer_afktime_options";
+    public static final String WIPE_TURN_TIME = "wipe_turn_time";
     public static final String ALLIANCE_MEMBERS = "alliance_members";
     public static final String AFK_HOURS = "afk_hours";
     public static final String FOW_CATEGORY = "fow_category";
@@ -68,6 +69,7 @@ public class Constants {
     public static final String SHOW_UNSCORED_SOS = "show_unscored_sos";
     public static final String SHOW_GAME_INFO = "show_game_info";
     public static final String GAME_NAME = "game_name";
+    public static final String SCENARIO = "scenario";
     public static final String CONTROL_GAME_CREATION = "control_game_creation";
     public static final String ALLOW_GAME_CREATION = "allow_game_creation";
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
@@ -153,6 +155,7 @@ public class Constants {
     public static final String SC_COUNT_FOR_MAP = "sc_count_for_map";
     public static final String VP_COUNT = "vp_count";
     public static final String JOIN = "join";
+    public static final String START_SCENARIO = "start_scenario";
     public static final String ADD = "add";
     public static final String COMPARE_AFK_TIMES = "compare_afk_times";
     public static final String REPLACE = "replace";
@@ -342,7 +345,7 @@ public class Constants {
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
-    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec");
+    public static final List<String> MECATOLS = List.of(MR, "nn", "ll", "rexatolmec", "ordinianc4");
     public static final List<String> MECATOL_SYSTEMS = List.of("18", "fin1", "fin2", "rexmec");
 
     public static final int SPACE_RADIUS = 115;
@@ -686,6 +689,7 @@ public class Constants {
     public static final String RELIC_PURGE = "purge";
     public static final String SHUFFLE_BACK = "shuffle_back";
     public static final String ADD_BACK_INTO_DECK = "add_back_into_deck";
+    public static final String ADD_CODEX_RELICS = "add_codex_relics";
     public static final String RELIC_INFO = "info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
@@ -1057,6 +1061,10 @@ public class Constants {
     public static final String FACILITIES_MODE = "facilities_mode";
     public static final String MINOR_FACTIONS_MODE = "minor_factions_mode";
     public static final String HIDDEN_AGENDA_MODE = "hidden_agenda_mode";
+    public static final String AGE_OF_COMMERCE_MODE = "age_of_commerce_mode";
+    public static final String TOTAL_WAR_MODE = "total_war_mode";
+    public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
+    public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
@@ -1075,7 +1083,7 @@ public class Constants {
     public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
     public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
     public static final String LANEFIR_ATS_COUNT = "ats_count";
-    public static final String SET_PLANET_TRADEGOODS = "set_planet_tradegoods";
+    public static final String SET_PLANET_COMMS = "set_planet_comms";
     public static final String PILLAGE_COUNT = "pillage_count";
     public static final String SARWEEN_COUNT = "sarween_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";
@@ -1086,6 +1094,7 @@ public class Constants {
     public static final String ZELIAN_HERO = "zelian_hero";
     public static final String NAALU_COMMANDER = "naalu_commander";
     public static final String MOVE_CREUSS_WORMHOLE = "move_creuss_wormhole";
+    public static final String MOVE_COATL = "move_coatl";
     public static final String GARDEN_WORLDS = "garden_worlds";
     public static final String GARDEN_WORLDS_PNG = "attachment_garden_worlds.png";
     public static final String CREUSS_TOKEN_NAME = "creuss_token_name";

@@ -80,7 +80,7 @@ public class TileGenerator {
     private final DisplayType displayType;
 
     // Map to aggregate unit coordinates by faction from all UnitRenderGenerator calls
-    private final Map<String, List<Point>> unitCoordinatesByFaction = new HashMap<>();
+    private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
 
     public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         this(game, event, displayType, 0, "000", null);
@@ -109,9 +109,9 @@ public class TileGenerator {
 
     /**
      * Get the aggregated unit coordinates by faction from all UnitRenderGenerator calls
-     * @return Map where key is faction/player identifier and value is list of coordinates
+     * @return Map where key is faction/player identifier, secondary key is unit ID, and value is list of coordinates
      */
-    public Map<String, List<Point>> getUnitCoordinatesByFaction() {
+    public Map<String, Map<String, List<Point>>> getUnitCoordinatesByFaction() {
         return new HashMap<>(unitCoordinatesByFaction);
     }
 
@@ -120,13 +120,21 @@ public class TileGenerator {
      * @param unitRenderGenerator The UnitRenderGenerator to get coordinates from
      */
     private void aggregateUnitCoordinates(UnitRenderGenerator unitRenderGenerator) {
-        Map<String, List<Point>> renderCoordinates = unitRenderGenerator.getUnitCoordinatesByFaction();
+        Map<String, Map<String, List<Point>>> renderCoordinates = unitRenderGenerator.getUnitCoordinatesByFaction();
         if (renderCoordinates != null) {
-            for (Map.Entry<String, List<Point>> entry : renderCoordinates.entrySet()) {
-                String faction = entry.getKey();
-                List<Point> coordinates = entry.getValue();
+            for (Map.Entry<String, Map<String, List<Point>>> factionEntry : renderCoordinates.entrySet()) {
+                String faction = factionEntry.getKey();
+                Map<String, List<Point>> unitMap = factionEntry.getValue();
 
-                unitCoordinatesByFaction.computeIfAbsent(faction, k -> new ArrayList<>()).addAll(coordinates);
+                for (Map.Entry<String, List<Point>> unitEntry : unitMap.entrySet()) {
+                    String unitId = unitEntry.getKey();
+                    List<Point> coordinates = unitEntry.getValue();
+
+                    unitCoordinatesByFaction
+                        .computeIfAbsent(faction, k -> new HashMap<>())
+                        .computeIfAbsent(unitId, k -> new ArrayList<>())
+                        .addAll(coordinates);
+                }
             }
         }
     }
@@ -1403,6 +1411,7 @@ public class TileGenerator {
                     xDelta += 10;
                 }
             }
+
         } else {
             oldFormatPlanetTokenAdd(tile, tileGraphics, unitHolder, controlList);
         }

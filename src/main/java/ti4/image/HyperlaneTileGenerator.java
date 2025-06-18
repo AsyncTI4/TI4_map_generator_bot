@@ -1,19 +1,6 @@
 package ti4.image;
 
-import ti4.ResourceHelper;
-import ti4.map.Game;
-import ti4.map.Tile;
-import ti4.service.map.CustomHyperlaneService;
-
-import static ti4.image.TileGenerator.TILE_HEIGHT;
-import static ti4.image.TileGenerator.TILE_WIDTH;
-
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -26,6 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import ti4.ResourceHelper;
+import ti4.map.Game;
+import ti4.map.Tile;
+import ti4.service.map.CustomHyperlaneService;
+
+import static ti4.image.TileGenerator.TILE_HEIGHT;
+import static ti4.image.TileGenerator.TILE_WIDTH;
 
 public class HyperlaneTileGenerator {
 
@@ -68,7 +63,7 @@ public class HyperlaneTileGenerator {
     }
 
     //Line format
-    private static enum HLStroke {
+    private enum HLStroke {
         GLOW(20, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f)),
         GAP(10, AlphaComposite.getInstance(AlphaComposite.CLEAR, 0.0f)),
         CORE(4, AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));

@@ -43,7 +43,7 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
         MessageHelper.replyToMessage(event, "Neutral player has been set as " + color + ".");
     }
 
-    private String pickNeutralColor(List<String> unusedColors) {
+    public String pickNeutralColor(List<String> unusedColors) {
         Random random = new Random();
         int randomIndex = random.nextInt(unusedColors.size());
         return unusedColors.get(randomIndex);

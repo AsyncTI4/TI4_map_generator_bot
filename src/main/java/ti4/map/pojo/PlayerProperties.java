@@ -6,9 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jetbrains.annotations.Nullable;
-
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 public class PlayerProperties {

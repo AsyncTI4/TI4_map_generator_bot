@@ -1,7 +1,5 @@
 package ti4;
 
-import static org.reflections.scanners.Scanners.*;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,13 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import javax.imageio.ImageIO;
-
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -29,6 +20,10 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ti4.commands.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CloseLaunchThreadsCron;
@@ -71,6 +66,8 @@ import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
 import ti4.settings.GlobalSettings.ImplementedSettings;
 
+import static org.reflections.scanners.Scanners.SubTypes;
+
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
@@ -90,10 +87,8 @@ public class AsyncTI4DiscordBot {
     public static Guild guildSenary;
     public static Guild guildSeptenary;
     public static Guild guildFogOfWar;
-    public static Guild guildFogOfWarSecondary;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
-    public static final Set<Guild> searchOnlyGuilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new LinkedList<>();
 
@@ -248,11 +243,6 @@ public class AsyncTI4DiscordBot {
         if (DataMigrationManager.runMigrations()) {
             BotLogger.info("RAN MIGRATIONS");
         }
-
-        // START ASYNC PIPELINES
-        ImageIO.setUseCache(false);
-        MapRenderPipeline.start();
-        StatisticsPipeline.start();
 
         // START CRONS
         AutoPingCron.register();

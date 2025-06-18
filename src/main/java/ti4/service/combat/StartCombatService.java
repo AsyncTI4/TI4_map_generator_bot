@@ -185,10 +185,13 @@ public class StartCombatService {
         game.setStoredValue(combatName2, "");
 
         TextChannel textChannel = (TextChannel) channel;
+
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
                 initializeCombatThread(threadChannel_, game, player1, player2, tile, event, spaceOrGround, null, unitHolderName);
+                CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
+                CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
                 return;
             }
         }
@@ -213,6 +216,8 @@ public class StartCombatService {
             threadChannel.queue(tc -> initializeCombatThread(tc, game, player1, player2, tile, event,
                 spaceOrGround, systemWithContext, unitHolderName));
         });
+        CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
+        CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
     }
 
     private static void initializeCombatThread(
@@ -361,6 +366,11 @@ public class StartCombatService {
             MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from _ATS Armaments_:", lanefirATSButtons);
         }
 
+        for (Player p : game.getRealPlayers()) {
+            // offer buttons for all crimson commander holders
+            offerRedGhostCommanderButtons(p, game, event);
+        }
+
         if (tile.isHomeSystem() && isGroundCombat && game.getStoredValue("audioSent").isEmpty()) {
             for (Player p3 : game.getRealPlayers()) {
                 if (p3.getHomeSystemTile() == tile) {
@@ -377,6 +387,15 @@ public class StartCombatService {
                     }
                 }
             }
+        }
+    }
+
+    public static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
+            String message = player.getRepresentation(true, true) + " Resolve Red Creuss Commander using buttons\n> (note this is not available until the end of combat)";
+            message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
+            List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         }
     }
 
@@ -441,6 +460,10 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against the ships of "
                         + player.getFactionEmojiOrColor() + " due to the ability of the Quetzecoatl (the Argent flagship).");
                 }
+            }
+            if (game.isOrdinianC1Mode() && (tile.getSpaceUnitHolder().getTokenList().contains("token_custc1.png") || tile.getSpaceUnitHolder().getTokenList().contains("token_custvpc1.png"))) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against ships in this system "
+                    + " due to the ability of the Coatl (the Argent flagship represented as the custodians token).");
             }
         }
     }
@@ -589,7 +612,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win a combat during this action " +
                     "you may take an additional action (Qhet Commander Ability)");
             }
-            if (player.getPromissoryNotes().keySet().contains("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
+            if (player.getPromissoryNotes().containsKey("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " reminder you have the Qhet promissory note.");
             }
@@ -808,6 +831,17 @@ public class StartCombatService {
             }
             if (!game.isFowMode() && p2.hasTechReady("sc")) {
                 buttons.add(Buttons.green(p2.getFinsFactionCheckerPrefix() + "applytempcombatmod__" + "tech" + "__" + "sc", "Use Supercharge", FactionEmojis.Naaz));
+            }
+        }
+
+        if (p1.hasTech("nekroc4y") && isSpaceCombat && tile != p1.getHomeSystemTile() && p1.getHomeSystemTile() != null) {
+            if (p1.hasUnit("ghoti_flagship") || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock).contains(p1.getHomeSystemTile())) {
+                buttons.add(Buttons.green(p1.getFinsFactionCheckerPrefix() + "useNekroNullRef", "Use Null Reference (Upon Each Destroy)", FactionEmojis.Nekro));
+            }
+        }
+        if (p2.hasTech("nekroc4y") && isSpaceCombat && tile != p2.getHomeSystemTile() && p2.getHomeSystemTile() != null && !game.isFowMode()) {
+            if (p2.hasUnit("ghoti_flagship") || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
+                buttons.add(Buttons.green(p2.getFinsFactionCheckerPrefix() + "useNekroNullRef", "Use Null Reference (Upon Each Destroy)", FactionEmojis.Nekro));
             }
         }
 
@@ -1105,11 +1139,42 @@ public class StartCombatService {
 
         if (p1.hasLeaderUnlocked("kortalihero")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p2.getFaction(), "Purge Kortali Hero", FactionEmojis.dihmohn));
+            buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p2.getFaction(), "Purge Kortali Hero", FactionEmojis.kortali));
         }
         if (p2.hasLeaderUnlocked("kortalihero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p1.getFaction(), "Purge Kortali Hero", FactionEmojis.kortali));
+        }
+
+        if (p1.hasLeaderUnlocked("redcreusshero") && isSpaceCombat) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "purgeRedCreussHero_" + tile.getPosition(), "Purge Red Creuss Hero", FactionEmojis.Ghost));
+        }
+        if (p2.hasLeaderUnlocked("redcreusshero") && !game.isFowMode() && isSpaceCombat) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "purgeRedCreussHero_" + tile.getPosition(), "Purge Red Creuss Hero", FactionEmojis.Ghost));
+        }
+
+        if (game.isLiberationC4Mode()) {
+            if (tile.getTileID().equalsIgnoreCase("c41")) {
+                Player sol = game.getPlayerFromColorOrFaction("sol");
+                Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
+                if (sol == p1 || sol == p2 || xxcha == p1 || xxcha == p2) {
+                    if (xxcha.hasLeaderUnlocked("orlandohero")) {
+                        buttons.add(Buttons.gray(xxcha.getFinsFactionCheckerPrefix() + "purgeOrlandoHero_" + tile.getPosition(), "Purge Orlando Hero", FactionEmojis.Xxcha));
+                    }
+                }
+            }
+            if (!game.getCustomPublicVP().keySet().contains("Control Ordinian")) {
+                Player nekro = game.getPlayerFromColorOrFaction("nekro");
+                if (nekro == p1 || nekro == p2) {
+                    String po_name = "Liberate Ordinian";
+                    int value = game.getRevealedPublicObjectives().get(po_name);
+                    if (game.getRevealedPublicObjectives().get(po_name) != null) {
+                        buttons.add(Buttons.gray(Constants.PO_SCORING + value, "Score " + po_name + " (Win against Nekro)"));
+                    }
+                }
+            }
         }
 
         if (ButtonHelper.getTilesOfUnitsWithBombard(p1, game).contains(tile)

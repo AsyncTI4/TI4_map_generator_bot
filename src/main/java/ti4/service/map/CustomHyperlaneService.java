@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -20,6 +18,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -280,7 +279,7 @@ public class CustomHyperlaneService {
         }
 
         MessageHelper.sendMessageToChannel(event.getChannel(), 
-            "Transformed: " + success.toString() + "\nCould not transform: " + failed.toString());
+            "Transformed: " + success + "\nCould not transform: " + failed);
     }
 
     private static List<String> getStaticHyperlanePositions(Game game) {

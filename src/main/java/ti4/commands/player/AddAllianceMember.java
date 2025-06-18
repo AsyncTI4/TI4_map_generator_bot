@@ -1,5 +1,6 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -10,7 +11,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-class AddAllianceMember extends GameStateSubcommand {
+public class AddAllianceMember extends GameStateSubcommand {
 
     public AddAllianceMember() {
         super(Constants.ADD_ALLIANCE_MEMBER, "Add an alliance member", true, true);
@@ -31,6 +32,10 @@ class AddAllianceMember extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");
             return;
         }
+        makeAlliancePartners(player, otherPlayer, event, game);
+    }
+
+    public static void makeAlliancePartners(Player player, Player otherPlayer, GenericInteractionCreateEvent event, Game game) {
         String currentMembers = otherPlayer.getAllianceMembers();
         if (!otherPlayer.getAllianceMembers().contains(player.getFaction())) {
             otherPlayer.addAllianceMember(player.getFaction() + player.getAllianceMembers());

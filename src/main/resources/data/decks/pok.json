@@ -312,7 +312,10 @@
             "shard",
             "stellarconverter",
             "thalnos",
-            "titanprototype"
+            "titanprototype",
+            "neuraloop",
+            "circletofthevoid",
+            "bookoflatvinia"
         ],
         "source": "pok"
     },
@@ -419,6 +422,7 @@
             "dxa",
             "hm",
             "x89",
+            "x89c4",
             "ps",
             "md",
             "da",
@@ -511,6 +515,7 @@
             "dxa",
             "hm",
             "x89",
+            "x89c4",
             "ps",
             "md_base",
             "da",

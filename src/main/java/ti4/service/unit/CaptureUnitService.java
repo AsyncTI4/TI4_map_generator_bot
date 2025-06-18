@@ -79,6 +79,25 @@ public class CaptureUnitService {
         return playersWithDevour;
     }
 
+    public static List<Player> listProbableKiller(Game game, RemovedUnit removed) {
+        UnitHolder combatOnHolder = removed.uh();
+        Set<String> counted = new HashSet<>();
+        List<Player> playerOpponents = new ArrayList<>();
+        Player owner = removed.getPlayer(game);
+        for (UnitKey key : combatOnHolder.getUnitKeys()) {
+            if (!counted.add(key.getColorID())) continue;
+
+            Player p2 = game.getPlayerByUnitKey(key).orElse(null);
+            if (p2 != null && p2 != owner && !p2.getAllianceMembers().contains(owner.getFaction())) {
+                playerOpponents.add(p2);
+            }
+        }
+        if (owner != game.getActivePlayer() && game.getActivePlayer() != null && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
+            playerOpponents.add(game.getActivePlayer());
+        }
+        return playerOpponents;
+    }
+
     public static void executeCapture(GenericInteractionCreateEvent event, Game game, Player cabal, RemovedUnit unit) {
         Player player = unit.getPlayer(game);
         String name = unit.unitKey().unitName();

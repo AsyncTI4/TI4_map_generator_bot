@@ -10,14 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -80,8 +79,8 @@ public class FoWHelper {
     }
 
     public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
-        for (Player player : game.getPlayers().values()) {
-            if (faction.equals(player.getFaction())) {
+        for (Player player : game.getRealPlayers()) {
+            if (faction.equalsIgnoreCase(player.getFaction())) {
                 return canSeeStatsOfPlayer(game, player, viewingPlayer);
             }
         }
@@ -103,10 +102,7 @@ public class FoWHelper {
             return true;
         }
         FoWHelper.initializeFog(game, viewingPlayer, false);
-        if (hasHomeSystemInView(player, viewingPlayer)) {
-            return true;
-        }
-        return false;
+        return hasHomeSystemInView(player, viewingPlayer);
     }
 
     /**
@@ -230,7 +226,7 @@ public class FoWHelper {
     }
 
     public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow, boolean includeTile) {
-        if (FOWPlusService.isVoid(game, position)) 
+        if (FOWPlusService.isVoid(game, position))
             return new HashSet<>();
 
         Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
@@ -385,7 +381,7 @@ public class FoWHelper {
                 // the hyperlane doesn't exist & doesn't go that direction, skip.
                 continue;
             }
-            
+
             if (!FOWPlusService.shouldTraverseAdjacency(game, position_, dirFrom)) {
                 continue;
             }
@@ -605,7 +601,7 @@ public class FoWHelper {
             wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
         }
 
-        boolean ghostAgent = player != null && player.isActivePlayer() 
+        boolean ghostAgent = player != null && player.isActivePlayer()
             && !StringUtils.isEmpty(game.getStoredValue("ghostagent_active")) && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
         for (Tile tile_ : allTiles) {
             String position_ = tile_.getPosition();
@@ -783,7 +779,7 @@ public class FoWHelper {
 
     public static boolean playerHasFightersInSystem(Player player, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
-        if (tile == null || colorID == null) return false; 
+        if (tile == null || colorID == null) return false;
 
         UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
@@ -859,8 +855,8 @@ public class FoWHelper {
             if (player_.isRealPlayer()) {
                 String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentationForButtons() + " has been pinged:\n>>> "
                     + message;
-                List<Button> refreshButton = viewSystemButton 
-                    ? StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event) 
+                List<Button> refreshButton = viewSystemButton
+                    ? StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event)
                     : new ArrayList<>();
                 MessageHelper.sendMessageToChannelWithButtons(player_.getPrivateChannel(), playerMessage, refreshButton);
             }

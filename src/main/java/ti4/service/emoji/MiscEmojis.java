@@ -11,7 +11,7 @@ public enum MiscEmojis implements TI4Emoji {
     // Tokens
     Custodians, CustodiansVP, tg, NomadCoin, comm, Sleeper, Wash, //
     WHalpha, WHbeta, WHgamma, CreussAlpha, CreussBeta, CreussGamma, //
-    LegendaryPlanet, SpeakerToken,
+    LegendaryPlanet, SpeakerToken, DoubleBoom,
 
     // Res / Inf
     influence, resources, ResInf, //
