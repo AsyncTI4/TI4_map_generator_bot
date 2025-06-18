@@ -5,7 +5,7 @@
         "type": "Law",
         "target": "For/Against",
         "text1": "For: Each player that cast 5 or more votes \"For\" places a control token on this card. After a player researches a technology, that player must destroy 1 of their non-fighter ships - that ship must have a total cost at least equal to the number of tokens on this card, if able.",
-        "text2": "Against: AAt the start of the next strategy phase, each player exhausts 1 planet for each technology that they own, reduced by 1 for each player that cast fewer votes For.",
+        "text2": "Against: At the start of the next strategy phase, each player exhausts 1 planet for each technology that they own, reduced by 1 for each player that cast fewer votes For.",
         "mapText": "After a player researches a technology, that player must destroy 1 of their non-fighter ships - that ship must have a total cost at least equal to the number of tokens on this card, if able.",
         "source": "voices_of_the_council"
     },
@@ -462,7 +462,7 @@
         "name": "Search Warrant",
         "type": "Law",
         "target": "Elect Player (The runner-up chooses 1 of the following to resolve, then the elected player resolves the other)",
-        "text1": *"Gain this card and draws 2 secret objectives. The owner of this card plays with their secret objectives revealed.",
+        "text1": "*Gain this card and draws 2 secret objectives. The owner of this card plays with their secret objectives revealed.",
         "text2": "*Reveal your secret objectives, then draw 1 secret objective",
         "mapText": "You play with your secret objectives revealed.",
         "source": "voices_of_the_council"
