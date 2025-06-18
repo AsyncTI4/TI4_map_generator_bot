@@ -120,8 +120,8 @@
         "alias": "chain_reaction",
         "name": "Chain Reaction",
         "phase": "Action",
-        "window": "After you destroy 1 of your opponent's non-fighter ships",
-        "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die. If the result is 8 or greater, produce 1 additional hit and roll again; this ability cannot produce more than 4 hits.",
+        "window": "After you destroy 1 of your opponent's ships",
+        "text": "Roll 2 dice. For each result equal to or greater than that ship's combat value, produce 1 hit against your opponent's ships and roll again; this ability cannot produce more than 4 hits.",
         "flavorText": "As Jace tore through the enemy line, his ordnance erupted into a symphony of explosions.",
         "source": "action_deck_2"
     },
@@ -1035,7 +1035,7 @@
         "name": "Unexpected Strategy",
         "phase": "Any",
         "window": "When you would place a token from your strategy pool or reinforcements on the game board",
-        "text": "Gain 1 command token instead.",
+        "text": "Gain that token instead.",
         "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
         "source": "action_deck_2"
     },
