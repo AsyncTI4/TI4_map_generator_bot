@@ -270,10 +270,10 @@ public class ButtonHelperFactionSpecific {
             }
         }
 
-        if (player.getHonorCounter() < -1) {
+        if (player.getDishonorCounter() > 1) {
             if (!player.hasAbility("thwart")) {
                 player.addAbility("thwart");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the thwart honor card\n" + Mapper.getAbility("thwart").getRepresentation());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the thwart dishonor card\n" + Mapper.getAbility("thwart").getRepresentation());
             }
         } else {
             if (player.hasAbility("thwart")) {
@@ -281,7 +281,7 @@ public class ButtonHelperFactionSpecific {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the thwart honor card");
             }
         }
-        if (player.getHonorCounter() < -4) {
+        if (player.getDishonorCounter() > 4) {
             if (!player.hasAbility("deceive")) {
                 player.addAbility("deceive");
                 CommanderUnlockCheckService.checkPlayer(player, "toldar");
@@ -293,7 +293,7 @@ public class ButtonHelperFactionSpecific {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the deceive honor card");
             }
         }
-        if (player.getHonorCounter() < -7) {
+        if (player.getDishonorCounter() > 7) {
             if (!player.hasAbility("scourge")) {
                 player.addAbility("scourge");
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the scourge honor card. Every one of their PNs has been purged. In order to score SOs as POs, use /status po_add_custom and /status po_score\n" + Mapper.getAbility("scourge").getRepresentation());
@@ -322,11 +322,13 @@ public class ButtonHelperFactionSpecific {
         }
         if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {
             player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
+            player.setDishonorCounter(Math.min(8 - player.getHonorCounter(), player.getDishonorCounter()));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1 honor by beating someone with more VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
         }
         if (p2.getTotalVictoryPoints() < player.getTotalVictoryPoints()) {
-            player.setHonorCounter(Math.max(-8, player.getHonorCounter() - 1));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost 1 honor by beating someone with less VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+            player.setDishonorCounter(Math.min(8, player.getDishonorCounter() + 1));
+            player.setHonorCounter(Math.min(8 - player.getDishonorCounter(), player.getHonorCounter()));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1 dishonor by beating someone with less VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
         }
         correctHonorAbilities(player, game);
 
