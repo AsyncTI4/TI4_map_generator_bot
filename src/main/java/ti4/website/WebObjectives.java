@@ -9,6 +9,7 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.PublicObjectiveModel;
+import ti4.service.info.ListPlayerInfoService;
 
 @Data
 public class WebObjectives {
@@ -22,10 +23,13 @@ public class WebObjectives {
         private boolean isMultiScoring;
         private List<String> scoredFactions;
         private List<String> peekingFactions;
+        private Map<String, Integer> factionProgress;
+        private int progressThreshold;
 
         public ObjectiveInfo(String key, String name, int pointValue,
                            boolean revealed, boolean isMultiScoring,
-                           List<String> scoredFactions, List<String> peekingFactions) {
+                           List<String> scoredFactions, List<String> peekingFactions,
+                           Map<String, Integer> factionProgress, int progressThreshold) {
             this.key = key;
             this.name = name;
             this.pointValue = pointValue;
@@ -33,6 +37,8 @@ public class WebObjectives {
             this.isMultiScoring = isMultiScoring;
             this.scoredFactions = scoredFactions != null ? scoredFactions : new ArrayList<>();
             this.peekingFactions = peekingFactions != null ? peekingFactions : new ArrayList<>();
+            this.factionProgress = factionProgress != null ? factionProgress : new HashMap<>();
+            this.progressThreshold = progressThreshold;
         }
     }
 
@@ -145,8 +151,10 @@ public class WebObjectives {
 
         List<String> scoredFactions = getScoredFactions(game, key);
         List<String> peekingFactions = getPeekingFactions(game, key);
+        Map<String, Integer> factionProgress = getFactionProgress(game, key, revealed);
+        int progressThreshold = revealed ? ListPlayerInfoService.getObjectiveThreshold(key, game) : 0;
 
-        return new ObjectiveInfo(displayKey, name, pointValue, revealed, isMultiScoring, scoredFactions, peekingFactions);
+        return new ObjectiveInfo(displayKey, name, pointValue, revealed, isMultiScoring, scoredFactions, peekingFactions, factionProgress, progressThreshold);
     }
 
     private static ObjectiveInfo createCustomObjectiveInfo(Game game, String key, int pointValue) {
@@ -154,8 +162,10 @@ public class WebObjectives {
 
         List<String> scoredFactions = getScoredFactions(game, key);
         List<String> peekingFactions = new ArrayList<>(); // Custom objectives don't have peeking
+        Map<String, Integer> factionProgress = getFactionProgress(game, key, true);
+        int progressThreshold = ListPlayerInfoService.getObjectiveThreshold(key, game);
 
-        return new ObjectiveInfo(key, key, pointValue, true, isMultiScoring, scoredFactions, peekingFactions);
+        return new ObjectiveInfo(key, key, pointValue, true, isMultiScoring, scoredFactions, peekingFactions, factionProgress, progressThreshold);
     }
 
     private static List<String> getScoredFactions(Game game, String objectiveKey) {
@@ -190,5 +200,23 @@ public class WebObjectives {
             })
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
+    }
+
+    private static Map<String, Integer> getFactionProgress(Game game, String objectiveKey, boolean revealed) {
+        Map<String, Integer> factionProgress = new HashMap<>();
+
+        // Only calculate progress for revealed objectives
+        if (!revealed) {
+            return factionProgress;
+        }
+
+        for (Player player : game.getRealPlayers()) {
+            if (player.getFaction() != null) {
+                int progress = ListPlayerInfoService.getPlayerProgressOnObjective(objectiveKey, game, player);
+                factionProgress.put(player.getFaction(), progress);
+            }
+        }
+
+        return factionProgress;
     }
 }
