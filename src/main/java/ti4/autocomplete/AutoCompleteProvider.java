@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
+import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.commands.uncategorized.ServerPromoteCommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
@@ -124,7 +125,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6, Constants.BAN_FLEET, Constants.BAN_HS, Constants.BAN_STARTING_TECH, Constants.BAN_COMMODITIES -> {
+            case Constants.FACTION, Constants.FACTION2, Constants.FACTION3, Constants.FACTION4, Constants.FACTION5, Constants.FACTION6, Constants.BAN_FLEET, Constants.BAN_HS, Constants.BAN_STARTING_TECH, Constants.BAN_COMMODITIES, GameStatisticsFilterer.WINNING_FACTION_FILTER -> {
                 var options = searchModels(event, Mapper.getFactionsValues(), null);
                 event.replyChoices(options).queue();
             }

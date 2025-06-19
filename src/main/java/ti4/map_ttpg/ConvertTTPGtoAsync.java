@@ -647,7 +647,7 @@ public class ConvertTTPGtoAsync {
                         }
 
                         if (Constants.MIRAGE.equalsIgnoreCase(attachmentResolved)) {
-                            Helper.addMirageToTile(tile);
+                            Helper.addTokenPlanetToTile(asyncGame, tile, Constants.MIRAGE);
                             tile.addToken(tokenFileName, Constants.SPACE);
                         }
                     } else {

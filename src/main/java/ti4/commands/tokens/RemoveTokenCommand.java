@@ -19,20 +19,21 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
+import ti4.service.map.TokenPlanetService;
 
 public class RemoveTokenCommand extends AddRemoveTokenCommand {
 
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-                new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                        .setRequired(true)
-                        .setAutoComplete(true),
-                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
-                        .setAutoComplete(true));
+            new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                .setRequired(true)
+                .setAutoComplete(true),
+            new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -60,6 +61,7 @@ public class RemoveTokenCommand extends AddRemoveTokenCommand {
                     removeToken(event, tile, tokenID, false);
                 }
                 removeToken(event, tile, tokenID, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
+                TokenPlanetService.removeTokenPlanetFromTile(game, Mapper.getTokenKey(tokenID));
                 game.clearPlanetsCache();
             }
         } else {

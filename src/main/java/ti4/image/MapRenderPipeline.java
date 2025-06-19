@@ -2,27 +2,25 @@ package ti4.image;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.Nullable;
+import ti4.executors.CircuitBreaker;
+import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
 import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
 import ti4.settings.GlobalSettings;
 
 public class MapRenderPipeline {
 
-    private static final int TASK_TIMEOUT_SECONDS = 30;
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
@@ -33,6 +31,9 @@ public class MapRenderPipeline {
     }
 
     private static void render(RenderEvent renderEvent) {
+        if (CircuitBreaker.isOpen()) {
+            return;
+        }
         var timedRunnable = new TimedRunnable("Render event task for " + renderEvent.game.getName(),
                 EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
                 () -> {
@@ -47,17 +48,7 @@ public class MapRenderPipeline {
                     }
                 });
 
-        CompletableFuture.runAsync(timedRunnable, EXECUTOR_SERVICE)
-            .orTimeout(TASK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .whenComplete((result, exception) -> {
-                if (exception instanceof TimeoutException) {
-                    BotLogger.error("Timeout occurred while rendering map: " + renderEvent.game.getName(), exception);
-                    MessageHelper.sendMessageToChannel(renderEvent.event.getMessageChannel(),
-                        "A timeout occurred while rendering the map. Wait a few minutes and check the map state.");
-                } else if (exception != null) {
-                    BotLogger.error("Error occurred while rendering map: " + renderEvent.game.getName(), exception);
-                }
-            });
+        ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
     private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {

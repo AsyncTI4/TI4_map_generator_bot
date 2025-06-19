@@ -90,7 +90,8 @@
     {
         "id": "customwinnu",
         "imagePath": "token_winnu.png",
-        "source": "other" },
+        "source": "other"
+    },
     {
         "id": "speaker",
         "imagePath": "token_speaker.png",
@@ -185,5 +186,21 @@
         "spaceOrPlanet": "space",
         "wormholes": ["VORTEX"],
         "source": "eronous"
+    },
+    {
+        "id": "illusion",
+        "imagePath": "token_illusion.png",
+        "spaceOrPlanet": "space",
+        "tokenPlanetName": "illusion",
+        "aliasList": ["illusion", "token_illusion"],
+        "source": "other"
+    },
+    {
+        "id": "phantasm",
+        "imagePath": "token_phantasm.png",
+        "spaceOrPlanet": "space",
+        "tokenPlanetName": "phantasm",
+        "aliasList": ["phantasm", "token_phantasm"],
+        "source": "other"
     }
 ]
