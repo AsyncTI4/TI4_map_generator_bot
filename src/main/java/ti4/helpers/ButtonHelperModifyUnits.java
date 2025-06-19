@@ -271,7 +271,7 @@ public class ButtonHelperModifyUnits {
                         ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
                     }
 
-                    if (player.hasUnit("sardakk_mech") && unitModel.getUnitType() == UnitType.Mech) {
+                    if (player.hasUnit("sardakk_mech") && unitModel.getUnitType() == UnitType.Mech && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                         msg.append("> Valkyrie Exoskeleton mech generated ").append(min).append(" hit").append(min == 1 ? "" : "s").append(" \n");
                         sardakkMechHits = min;
                     }

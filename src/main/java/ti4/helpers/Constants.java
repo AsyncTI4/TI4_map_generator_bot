@@ -1096,6 +1096,7 @@ public class Constants {
     public static final String SARWEEN_COUNT = "sarween_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";
     public static final String HONOR_COUNT = "honor_count";
+    public static final String DISHONOR_COUNT = "dishonor_count";
     public static final String HARVEST_COUNT = "harvest_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";
