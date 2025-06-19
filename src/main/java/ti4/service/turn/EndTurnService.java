@@ -26,8 +26,9 @@ public class EndTurnService {
         if (turnOrder.isEmpty()) {
             return null;
         }
-        while (!turnOrder.getLast().equals(currentPlayer))
+        while (!turnOrder.getLast().equals(currentPlayer) && turnOrder.contains(currentPlayer)) {
             Collections.rotate(turnOrder, 1);
+        }
         for (Player p : turnOrder) {
             if (!p.isPassed() && !p.isEliminated()) {
                 return p;
@@ -100,7 +101,6 @@ public class EndTurnService {
             ButtonHelperAgents.checkForEdynAgentActive(game, event);
             return;
         }
-
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
             GameMessageManager
