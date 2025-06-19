@@ -97,7 +97,7 @@ public abstract class BagDraft {
     /** Enqueue a bag with a player. */
     public void enqueueBag(Player player, DraftBag bag) {
         BotLogger.info("Enqueueing bag for "+ player.getRepresentationNoPing());
-        boolean hadCurrentBag = player.getCurrentDraftBag().isEmpty();
+        boolean hadCurrentBag = player.getCurrentDraftBag().isPresent();
         player.getDraftBagQueue().add(bag);
         if (!hadCurrentBag) {
             playerHasNewBag(player);
