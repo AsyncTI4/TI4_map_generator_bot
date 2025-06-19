@@ -1,0 +1,24 @@
+{
+    "id": "oasis",
+    "tileId": null,
+    "name": "Oasis",
+    "aliases": ["oasis"],
+    "positionInTile": null,
+    "resources": 2,
+    "influence": 1,
+    "factionHomeworld": null,
+    "planetType": "HAZARDOUS",
+    "cardImagePath": null,
+    "techSpecialties": null,
+    "legendaryAbilityName": "Unlikely Return",
+    "legendaryAbilityText": "At the end of your turn, you may place a destroyer from your reinforcements in a system that contains no planets and no other player's ships.",
+    "legendaryAbilityFlavourText": "*It is legend that deep within space, an oasis serves as a beacon of hope to lost ships.*",
+    "planetLayout": {
+        "unitHolderName": "oasis",
+        "resourcesLocation": "BottomRight",
+        "centerPosition": { "x": 87, "y": 55 }
+    },
+    "contrastColor": "blue",
+    "flavourText": "*This rogue planet has eluded documentation for millennia. Its few reports have come from the lost crews that have claimed to have stumbled upon it. No expedition has ever been able to confirm its existence.*",
+    "source": "ascendant_sun"
+}
