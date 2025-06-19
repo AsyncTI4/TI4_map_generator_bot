@@ -3355,13 +3355,10 @@ public class Game extends GameProperties {
     }
 
     public Tile getTile(String tileID) {
-        if ("mirage".equalsIgnoreCase(tileID)) {
-            for (Tile tile : tileMap.values()) {
-                for (UnitHolder uh : tile.getUnitHolders().values()) {
-                    if (uh.getTokenList() != null && (uh.getTokenList().contains("mirage")
-                        || uh.getTokenList().contains("token_mirage.png"))) {
-                        return tile;
-                    }
+        if (Constants.TOKEN_PLANETS.contains(tileID)) {
+            for (Tile t : tileMap.values()) {
+                if (t.getUnitHolderFromPlanet(tileID) != null) {
+                    return t;
                 }
             }
         }

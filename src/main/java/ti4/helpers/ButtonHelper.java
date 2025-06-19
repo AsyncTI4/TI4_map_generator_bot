@@ -3249,7 +3249,9 @@ public class ButtonHelper {
         // Legendary Planets
         List<String> implementedLegendaryPlanets = List.of(
             "mallice", "hexmallice", "mirage", "hopesend", "primor", // PoK
-            "silence", "prism", "echo", "domna", "uikos", "ordinianc4"); // DS
+            "ordinianc4", // Codex 4
+            "silence", "prism", "echo", "domna", "uikos", // DS
+            "illusion", "phantasm"); // Other
         for (String planet : implementedLegendaryPlanets) {
             String prettyPlanet = Mapper.getPlanet(planet).getName();
             String pass = "";
