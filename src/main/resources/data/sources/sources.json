@@ -220,5 +220,15 @@
         "data": [
             "Official channel: ?"
         ]
+    },
+    {
+        "source":"fowplus",
+        "name":"FoW+",
+        "canal":"community",
+        "subcanal":"personal projs",
+        "credits":"Solax",
+        "description":"Make Fog of War more foggy",
+        "data": [
+        ]
     }
 ]
