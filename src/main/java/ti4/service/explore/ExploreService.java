@@ -393,7 +393,7 @@ public class ExploreService {
                     }
 
                     if (Constants.MIRAGE.equalsIgnoreCase(token)) {
-                        Helper.addMirageToTile(tile);
+                        Helper.addTokenPlanetToTile(game, tile, Constants.MIRAGE);
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
                     }
@@ -946,6 +946,11 @@ public class ExploreService {
                 sb.append("\n> ").append(entry.getValue().getFirst().getText().replace("\n", "\n> "));
             } else {
                 sb.append("1. ").append(emoji).append(" _").append(exploreName).append("_ (`").append(String.join("`, `", ids)).append("`)");
+                if (!entry.getValue().getFirst().getAttachmentId().orElse("nothin").equalsIgnoreCase("nothin")) {
+                    if (!entry.getValue().getFirst().getAlias().equalsIgnoreCase("gw") && !entry.getValue().getFirst().getType().equalsIgnoreCase("frontier")) {
+                        sb.append(" [ATTACHMENT]");
+                    }
+                }
                 if (showPercents && ids.size() > 1) {
                     sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
                 }

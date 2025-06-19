@@ -999,15 +999,16 @@ public class Mapper {
     }
 
     public static List<String> getTokensFromProperties() {
-        return Stream.of(attachments.keySet(), tokens_fromProperties.keySet()).flatMap(Collection::stream)
+        return Stream.of(attachments.keySet(), tokens_fromProperties.keySet(), tokens.keySet()).flatMap(Collection::stream)
             .filter(String.class::isInstance)
             .map(String.class::cast)
             .sorted()
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet())
+            .stream().toList();
     }
 
     public static TokenModel getToken(String id) {
-        return tokens.get(id);
+        return tokens.get(getTokenKey(id));
     }
 
     public static boolean isValidToken(String id) {
@@ -1042,6 +1043,17 @@ public class Mapper {
 
     public static String getTokenID(String tokenID) {
         return tokens_fromProperties.getProperty(tokenID);
+    }
+
+    public static String getTokenKey(String tokenID) {
+        for (Entry<String, TokenModel> token : tokens.entrySet()) {
+            String key = token.getKey();
+            String val = token.getValue().getImagePath();
+            if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key))
+                return key;
+        }
+        System.out.println("Could not resolve token: " + tokenID);
+        return tokenID;
     }
 
     // Color Tokens

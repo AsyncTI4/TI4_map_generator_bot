@@ -86,6 +86,7 @@ public class PlayerProperties {
     private int pathTokenCounter;
     private int harvestCounter;
     private int honorCounter;
+    private int dishonorCounter;
 
     // OLRADIN POLICY ONCE PER ACTION EXHAUST PLANET ABILITIES
     private boolean hasUsedEconomyEmpowerAbility;

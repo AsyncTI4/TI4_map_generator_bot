@@ -95,7 +95,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 ButtonHelperAgents.toldarAgentInitiation(game, player, comms);
                 MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " + player.getCommodities() + " commodities (from the " + comms + " that were on the card)");
             }
-            case "mirage" -> {
+            case "mirage", "illusion", "phantasm" -> {
                 output = "Use buttons to put 2 fighters with your ships.";
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
             }

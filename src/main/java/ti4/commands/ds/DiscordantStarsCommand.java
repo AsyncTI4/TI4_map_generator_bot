@@ -24,6 +24,7 @@ public class DiscordantStarsCommand implements ParentCommand {
         new ATS(),
         new PathToken(),
         new HonorCount(),
+        new DishonorCount(),
         new SetPlanetTradeGoods())
         .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

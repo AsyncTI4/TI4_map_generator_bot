@@ -1,0 +1,18 @@
+[
+    {
+        "id": "cradle",
+        "imagePath": "token_cradle.png",
+        "spaceOrPlanet": "space",
+        "tokenPlanetName": "cradle",
+        "aliasList": ["cradle", "token_cradle"],
+        "source": "ascendant_sun"
+    },
+    {
+        "id": "oasis",
+        "imagePath": "token_oasis.png",
+        "spaceOrPlanet": "space",
+        "tokenPlanetName": "oasis",
+        "aliasList": ["oasis", "token_oasis"],
+        "source": "ascendant_sun"
+    }
+]
