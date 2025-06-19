@@ -147,15 +147,15 @@ class FrankenButtonHandler {
                     if (bag == null) {
                         BotLogger.warning(new LogMessageOrigin(event, player), "Tried to reset draft selection while no current bag.");
                     } else {
-                        bag.Contents.addAll(player.getDraftQueue().Contents);
-                        player.resetDraftQueue();
+                        bag.Contents.addAll(player.getDraftItemSelection().Contents);
+                        player.resetDraftSelection();
                         FrankenDraftBagService.showPlayerBag(game, player);
                     }
                     return;
                 }
                 case "confirm_draft" -> {
-                    player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
-                    player.resetDraftQueue();
+                    player.getDraftHand().Contents.addAll(player.getDraftItemSelection().Contents);
+                    player.resetDraftSelection();
 
                     // Clear out all existing messages
                     draft.findExistingBagChannel(player).getHistory().retrievePast(100).queue(m -> {
@@ -209,7 +209,7 @@ class FrankenButtonHandler {
         }
         // TODO check what happens if a player attempts to draft an item not in the bag. This kinda looks like the item would just appear.
         currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(action));
-        player.queueDraftItem(DraftItem.generateFromAlias(action));
+        player.selectDraftItem(DraftItem.generateFromAlias(action));
 
         // // TODO this shouldn't be reachable; queueDraftItem can't leave an empty item queue
         // if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {

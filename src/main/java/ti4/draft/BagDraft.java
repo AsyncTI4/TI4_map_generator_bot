@@ -60,7 +60,7 @@ public abstract class BagDraft {
 
         for (Player p : players) {
             boolean bagIsNoneOrEmpty = p.getCurrentDraftBag().isEmpty() || p.getCurrentDraftBag().get().Contents.isEmpty();
-            if (!bagIsNoneOrEmpty || !p.getDraftQueue().Contents.isEmpty()) {
+            if (!bagIsNoneOrEmpty || !p.getDraftItemSelection().Contents.isEmpty()) {
                 if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
                     return false;
                 }
@@ -266,8 +266,8 @@ public abstract class BagDraft {
         return null;
     }
 
-    public boolean playerHasItemInQueue(Player p) {
-        return !p.getDraftQueue().Contents.isEmpty();
+    public boolean playerHasItemSelected(Player p) {
+        return !p.getDraftItemSelection().Contents.isEmpty();
     }
 
     @JsonIgnore

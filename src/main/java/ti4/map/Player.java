@@ -90,7 +90,7 @@ public class Player extends PlayerProperties {
     /** The items a player has drafted already. */
     private DraftBag draftHand = new DraftBag();
     /** The items a player is selecting from their current draft bag. */
-    private final DraftBag draftItemQueue = new DraftBag();
+    private final DraftBag draftItemSelection = new DraftBag();
     /** The bags waiting for a player. The head of the queue is the bag they're currently drafting from. */
     private Queue<DraftBag> draftBagQueue = new ArrayDeque<>();
     private List<Leader> leaders = new ArrayList<>();
@@ -1795,8 +1795,8 @@ public class Player extends PlayerProperties {
         return Optional.ofNullable(getDraftBagQueue().peek());
     }
 
-    public DraftBag getDraftQueue() {
-        return draftItemQueue;
+    public DraftBag getDraftItemSelection() {
+        return draftItemSelection;
     }
 
     public Queue<DraftBag> getDraftBagQueue() {
@@ -1866,7 +1866,7 @@ public class Player extends PlayerProperties {
         for (String item : saveString) {
             items.add(DraftItem.generateFromAlias(item));
         }
-        draftItemQueue.Contents = items;
+        draftItemSelection.Contents = items;
     }
 
     public void loadQueuedDraftBags(String saveString) {
@@ -1879,12 +1879,12 @@ public class Player extends PlayerProperties {
         BotLogger.info("Loaded " + draftBagQueue.size() + " queued bags");
     }
 
-    public void queueDraftItem(DraftItem item) {
-        draftItemQueue.Contents.add(item);
+    public void selectDraftItem(DraftItem item) {
+        draftItemSelection.Contents.add(item);
     }
 
-    public void resetDraftQueue() {
-        draftItemQueue.Contents.clear();
+    public void resetDraftSelection() {
+        draftItemSelection.Contents.clear();
     }
 
     @JsonIgnore

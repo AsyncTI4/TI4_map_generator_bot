@@ -42,7 +42,7 @@ public class Constants {
     public static final String DRAFT_HAND = "franken_personal_bag";
     // TODO no longer really an accurate name; it's now a queue of bags
     public static final String DRAFT_BAG = "franken_bag_to_pass";
-    public static final String DRAFT_QUEUE = "franken_items_to_draft";
+    public static final String DRAFT_SELECTION = "franken_items_to_draft";
     public static final String SHOW_GAME = "show_game";
     public static final String ONLY_LAST_MONTH = "only_last_month";
     public static final String FOWGM = "fowgm";

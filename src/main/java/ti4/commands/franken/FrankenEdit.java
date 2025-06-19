@@ -52,7 +52,7 @@ class FrankenEdit extends GameStateSubcommand {
             for (var player : game.getRealPlayers()) {
                 dmPlayerBag(game, player, player.getCurrentDraftBag().orElse(null), "Held Bag", event.getUser());
                 dmPlayerBag(game, player, player.getDraftHand(), "Hand", event.getUser());
-                dmPlayerBag(game, player, player.getDraftQueue(), "Queue", event.getUser());
+                dmPlayerBag(game, player, player.getDraftItemSelection(), "Queue", event.getUser());
             }
             return;
         }
@@ -85,7 +85,7 @@ class FrankenEdit extends GameStateSubcommand {
             bagName = "Hand";
         }
         if (command.contains("Queue")) {
-            editingBag = editingPlayer.getDraftQueue();
+            editingBag = editingPlayer.getDraftItemSelection();
             bagName = "Queue";
         }
 

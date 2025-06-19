@@ -146,33 +146,33 @@ public class FrankenDraftBagService {
             MessageHelper.sendMessageToChannel(bagChannel, line);
         }
 
-        int draftQueueCount = player.getDraftQueue().Contents.size();
+        int draftSelectionCount = player.getDraftItemSelection().Contents.size();
         boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
-        boolean isQueueFull = draftQueueCount >= draft.getPicksFromNextBags();
+        boolean isSelectionFull = draftSelectionCount >= draft.getPicksFromNextBags();
         if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
-            isQueueFull = draftQueueCount >= Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
+            isSelectionFull = draftSelectionCount >= Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
         }
         if (isFirstDraft) {
-            isQueueFull = draftQueueCount >= draft.getPicksFromFirstBag();
+            isSelectionFull = draftSelectionCount >= draft.getPicksFromFirstBag();
             if (!game.getStoredValue("frankenLimitFIRSTPICK").isEmpty()) {
-                isQueueFull = draftQueueCount >= Integer.parseInt(game.getStoredValue("frankenLimitFIRSTPICK"));
+                isSelectionFull = draftSelectionCount >= Integer.parseInt(game.getStoredValue("frankenLimitFIRSTPICK"));
             }
         }
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " you cannot legally draft anything from this bag right now.");
-        } else if (!isQueueFull) {
+        } else if (!isSelectionFull) {
             MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentationUnfogged() + " please select an item to draft:", getSelectionButtons(draftables, player));
         }
 
-        if (draftQueueCount > 0) {
-            List<Button> queueButtons = new ArrayList<>();
-            if (isQueueFull || draftables.isEmpty()) {
-                queueButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I wish to draft these cards."));
+        if (draftSelectionCount > 0) {
+            List<Button> selectionButtons = new ArrayList<>();
+            if (isSelectionFull || draftables.isEmpty()) {
+                selectionButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I wish to draft these cards."));
             }
-            queueButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue", "I wish to draft different cards."));
-            MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Queue:__\n> You are drafting the following from this bag:\n" + getDraftQueueRepresentation(player), queueButtons);
+            selectionButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue", "I wish to draft different cards."));
+            MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Selection:__\n> You are drafting the following from this bag:\n" + getDraftSelectionRepresentation(player), selectionButtons);
 
-            if (isQueueFull || draftables.isEmpty()) {
+            if (isSelectionFull || draftables.isEmpty()) {
                 MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " please confirm or reset your draft picks.");
             }
         }
@@ -242,9 +242,9 @@ public class FrankenDraftBagService {
         return game.getActiveBagDraft().getLongBagRepresentation(player.getDraftHand(), game);
     }
 
-    public static String getDraftQueueRepresentation(Player player) {
+    public static String getDraftSelectionRepresentation(Player player) {
         StringBuilder sb = new StringBuilder();
-        DraftBag currentBag = player.getDraftQueue();
+        DraftBag currentBag = player.getDraftItemSelection();
         for (DraftItem item : currentBag.Contents) {
             sb.append(buildItemDescription(item));
             sb.append("\n");
@@ -280,7 +280,7 @@ public class FrankenDraftBagService {
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
             game.getActiveBagDraft().enqueueBag(player, bags.get(i));
-            player.resetDraftQueue();
+            player.resetDraftSelection();
 
             showPlayerBag(game, player);
         }

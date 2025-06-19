@@ -663,7 +663,7 @@ class GameSaveService {
             writer.write(Constants.DRAFT_HAND + " " + player.getDraftHand().toStoreString());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.DRAFT_QUEUE + " " + player.getDraftQueue().toStoreString());
+            writer.write(Constants.DRAFT_SELECTION + " " + player.getDraftItemSelection().toStoreString());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.FACTION_TECH + " " + String.join(",", player.getFactionTechs()));
