@@ -324,6 +324,26 @@ public class CombatModHelper {
 
                 }
             }
+            case "arcane_defender" -> {
+                if (tile != null) {
+                    for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                        if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
+                            if (player.getPlanets().contains(uH.getName())) {
+                                boolean allThere = true;
+                                for (Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
+                                    if (uH.getUnitCount(entry.getKey().getUnitType(), player) != entry.getValue()) {
+                                        allThere = false;
+                                    }
+                                }
+                                if (allThere) {
+                                    meetsCondition = true;
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
             case "vaylerianhero" -> {
                 if (player == game.getActivePlayer()
                     && !game.getStoredValue("vaylerianHeroActive").isEmpty()) {
@@ -452,18 +472,19 @@ public class CombatModHelper {
                                 scalingCount += 1;
                             }
                         }
-                    } else {
-                        if (player.getHonorCounter() < -1) {
-                            scalingCount += 1;
-                            if (player.getHonorCounter() < -4) {
-                                scalingCount += 1;
-                                if (player.getHonorCounter() < -7) {
-                                    scalingCount += 1;
-                                }
-                            }
-
-                        }
                     }
+
+                    if (player.getDishonorCounter() > 1) {
+                        scalingCount += 1;
+                        if (player.getDishonorCounter() < 4) {
+                            scalingCount += 1;
+                            if (player.getDishonorCounter() < 7) {
+                                scalingCount += 1;
+                            }
+                        }
+
+                    }
+
                 }
                 case Constants.LAW -> scalingCount = game.getLaws().size();
                 case Constants.MOD_OPPONENT_PO_EXCLUSIVE_SCORED -> {

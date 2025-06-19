@@ -365,7 +365,7 @@ public class ButtonHelperAbilities {
         trapNames.add("Feint");
         trapNames.add("Gravitic Inhibitor");
         trapNames.add("Account Siphon");
-        trapNames.add("Saboteurs");
+        //trapNames.add("Saboteurs");
         return trapNames;
     }
 
@@ -1439,12 +1439,22 @@ public class ButtonHelperAbilities {
             sb.append(player.getRepresentationUnfogged()).append(" Gained relic fragment\n");
             player.addFragment(cardID);
             game.purgeExplore(cardID);
+        } else {
+            if (buttonID.contains("prof")) {
+                sb.append(player.getRepresentationUnfogged()).append(" Gained 1 commodity\n");
+                player.setCommodities(player.getCommodities() + 1);
+            }
+        }
+        if (!buttonID.contains("prof")) {
+            event.getMessage().delete().queue();
+        } else {
+            ButtonHelper.deleteTheOneButton(event);
         }
 
         CommanderUnlockCheckService.checkPlayer(player, "kollecc");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
-        event.getMessage().delete().queue();
+
     }
 
     public static List<Button> getOlradinPreserveButtons(Game game, Player player, String planet) {

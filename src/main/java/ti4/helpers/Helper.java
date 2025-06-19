@@ -368,7 +368,7 @@ public class Helper {
         String key3 = "potentialScorePOBlockers";
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
-        if (game.getStoredValue(key2).length() < 2
+        if ((game.getStoredValue(key2).length() < 2 && game.getStoredValue(key2b).length() < 2)
             || game.getHighestScore() + 1 > game.getVp()) {
             return;
         }
@@ -398,6 +398,9 @@ public class Helper {
                         game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3b,
                         game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                }
+                if (game.getHighestScore() + 1 > game.getVp()) {
+                    return;
                 }
             } else {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
