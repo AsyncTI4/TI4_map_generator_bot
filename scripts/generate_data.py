@@ -118,6 +118,15 @@ CONFIGS = {
         'sort_key': 'id',
         'is_array_data': False,
         'blacklist': [],
+    },
+    'abilities': {
+        'input_folder': 'src/main/resources/data/abilities',
+        'output_file': 'abilities.ts',
+        'type_import': 'Ability',
+        'export_name': 'abilities',
+        'sort_key': 'alias',
+        'is_array_data': True,
+        'blacklist': [],
     }
 }
 
