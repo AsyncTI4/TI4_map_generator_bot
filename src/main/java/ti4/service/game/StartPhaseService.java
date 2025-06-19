@@ -474,9 +474,19 @@ public class StartPhaseService {
                 }
             }
         }
-        if (game.getTile("SIG02") != null && !game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Please destroy all units in the Pulsar.");
-        }
+        
+        // Pulsar destruction logic
+        game.getTileMap().values().stream().filter(tile -> tile.getTileID().equals("sig02")).forEach(pulsar -> {
+            pulsar.getSpaceUnitHolder().getUnitColorsOnHolder().forEach(playerColor -> {
+                pulsar.removeAllUnits(playerColor);
+                Player p = game.getPlayerFromColorOrFaction(playerColor);
+                if (p.isRealPlayer()) {
+                    MessageHelper.sendMessageToChannel(p.getCorrectChannel(), 
+                        p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition() + ") were destroyed.");
+                }
+            });
+        });
+
         if ("action_deck_2".equals(game.getAcDeckID()) && game.getRound() > 1) {
             handleStartOfStrategyForAcd2(game);
         }

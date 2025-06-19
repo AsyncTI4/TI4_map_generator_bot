@@ -30,6 +30,10 @@ class Info extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        if (event.getChannel().getName().endsWith("-private")) {
+            MessageHelper.replyToMessage(event, "This command cannot be used in private channel.");
+            return;
+        }
         StringBuilder sb = getGameInfo(getGame(), event);
         MessageHelper.replyToMessage(event, sb.toString());
     }
