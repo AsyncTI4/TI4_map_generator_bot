@@ -21,11 +21,13 @@ public class WebTileUnitData {
     private Map<String, List<WebEntityData>> space;
     private Map<String, WebTilePlanet> planets;
     private List<String> ccs;
+    private boolean isAnomaly;
 
     public WebTileUnitData() {
         this.space = new HashMap<>();
         this.planets = new HashMap<>();
         this.ccs = new ArrayList<>();
+        this.isAnomaly = false;
     }
 
     public static Map<String, WebTileUnitData> fromGame(Game game) {
@@ -46,6 +48,9 @@ public class WebTileUnitData {
 
     private static WebTileUnitData extractTileUnitData(Tile tile, Game game) {
         WebTileUnitData tileData = new WebTileUnitData();
+
+        // Set anomaly status
+        tileData.setAnomaly(tile.isAnomaly(game));
 
         // Extract command tokens from space
         UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
