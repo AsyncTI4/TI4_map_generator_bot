@@ -564,13 +564,16 @@ public class PlayerAreaGenerator {
     }
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.getHonorCounter() < 1 && player.getPathTokenCounter() < 1) {
+        if (player.getDishonorCounter() < 1 && player.getHonorCounter() < 1 && player.getPathTokenCounter() < 1) {
             return xDeltaFromRightSide;
         }
         if (player.getHonorCounter() > 0) {
             DrawingUtil.superDrawStringCenteredDefault(graphics, "Honor Count: " + player.getHonorCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
         } else {
             DrawingUtil.superDrawStringCenteredDefault(graphics, "Path Token Count: " + player.getPathTokenCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
+        }
+        if (player.getDishonorCounter() > 0) {
+            DrawingUtil.superDrawStringCenteredDefault(graphics, "Dishonor Count: " + player.getHonorCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 100);
         }
         return xDeltaFromRightSide + 200;
     }

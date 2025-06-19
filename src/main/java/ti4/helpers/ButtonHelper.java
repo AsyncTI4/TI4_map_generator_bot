@@ -4556,6 +4556,7 @@ public class ButtonHelper {
         Tile tile = game.getTileFromPlanet("mallice");
 
         if (tile != null && "82b".equals(tile.getTileID())) {
+            boolean hasCC = tile.hasPlayerCC(player);
             String position = tile.getPosition();
             game.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82a");
@@ -4572,6 +4573,9 @@ public class ButtonHelper {
             }
             tile = new Tile(planetTileName, position);
             game.setTile(tile);
+            if (hasCC) {
+                CommandCounterHelper.addCC(event, player, tile);
+            }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Unflipped Mallice");
         }
     }
