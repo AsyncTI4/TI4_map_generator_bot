@@ -74,34 +74,33 @@ public abstract class BagDraft {
 
     /** Take player's current bag and enqueue it with the next player. */
     public void passBag(Player player) {
-        DraftBag bag = player.takeCurrentDraftBag().orElse(null);
+        DraftBag bag = dequeueBag(player);
+        assert bag != null;
         // TODO maybe report somewhere when empty bags are dropped?
-        if (bag != null && !bag.Contents.isEmpty()) {
+        if (!bag.Contents.isEmpty()) {
             Player nextPlayer = getNextPlayer(player);
             BotLogger.info("Passing bag from " + player.getRepresentationNoPing() + " to " + nextPlayer.getRepresentationNoPing());
             enqueueBag(nextPlayer, bag);
         }
-        if (player.getCurrentDraftBag().isEmpty()) dequeueBag(player);
     }
 
-    /** Dequeue the next bag waiting for player and set it as their current bag. */
-    private void dequeueBag(Player player) {
-        assert player.getCurrentDraftBag().isEmpty();
-        DraftBag bag = player.getDraftBagQueue().poll();
-        if (bag != null) {
-            BotLogger.info("Dequeueing bag for " + player.getRepresentationNoPing());
-            giveBagToPlayer(bag, player);
-            // TODO where else could this showPlayerBag() call be?
-            FrankenDraftBagService.showPlayerBag(owner, player);
+    /** Take player's current bag, and set their next queued bag as their current bag. */
+    private DraftBag dequeueBag(Player player) {
+        assert player.getCurrentDraftBag().isPresent();
+        DraftBag oldBag = player.getDraftBagQueue().poll();
+        if (player.getCurrentDraftBag().isPresent()) {
+            playerHasNewBag(player);
         }
+        return oldBag;
     }
 
     /** Enqueue a bag with a player. */
-    private void enqueueBag(Player player, DraftBag bag) {
+    public void enqueueBag(Player player, DraftBag bag) {
         BotLogger.info("Enqueueing bag for "+ player.getRepresentationNoPing());
+        boolean hadCurrentBag = player.getCurrentDraftBag().isEmpty();
         player.getDraftBagQueue().add(bag);
-        if (player.getCurrentDraftBag().isEmpty()) {
-            dequeueBag(player);
+        if (!hadCurrentBag) {
+            playerHasNewBag(player);
         }
     }
 
@@ -116,8 +115,8 @@ public abstract class BagDraft {
         return players.get(nextIndex);
     }
 
-    public void giveBagToPlayer(DraftBag bag, Player player) {
-        player.setCurrentDraftBag(bag);
+    private void playerHasNewBag(Player player) {
+        // The player got a new bag, maybe because their old bag was dequeued, or because a new bag was enqueued.
         if (playerHasDraftableItemInBag(player)) {
             MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
@@ -128,6 +127,8 @@ public abstract class BagDraft {
                 player.getRepresentationUnfogged() + " you have been passed a new draft bag, but nothing in it is draftable for you.");
             passBag(player);
         }
+        // TODO where else could this showPlayerBag() call be?
+        FrankenDraftBagService.showPlayerBag(owner, player);
     }
 
     public boolean playerHasDraftableItemInBag(Player player) {
@@ -277,14 +278,7 @@ public abstract class BagDraft {
             sb.append("> ");
             sb.append(player.getRepresentationNoPing());
             sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
-            if (player.getCurrentDraftBag().isPresent()) {
-                sb.append(" 💰");
-            }
-            if (player.getDraftBagQueue().size() > 0) {
-                sb.append(" (");
-                player.getDraftBagQueue().forEach(bag -> sb.append("💰"));
-                sb.append(" queued )");
-            }
+            player.getDraftBagQueue().forEach(bag -> sb.append("💰"));
             sb.append("\n");
         }
         return sb.toString();

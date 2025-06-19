@@ -87,14 +87,11 @@ public class Player extends PlayerProperties {
 
     private final Game game;
 
-    // The items a player has drafted already
+    /** The items a player has drafted already. */
     private DraftBag draftHand = new DraftBag();
-    // The bag a player is currently drafting from
-    @Nullable
-    private DraftBag currentDraftBag = null;
-    // The items a player is selecting from their current draft bag
+    /** The items a player is selecting from their current draft bag. */
     private final DraftBag draftItemQueue = new DraftBag();
-    // The bags waiting for a player
+    /** The bags waiting for a player. The head of the queue is the bag they're currently drafting from. */
     private Queue<DraftBag> draftBagQueue = new ArrayDeque<>();
     private List<Leader> leaders = new ArrayList<>();
     private final List<TemporaryCombatModifierModel> newTempCombatModifiers = new ArrayList<>();
@@ -1795,17 +1792,7 @@ public class Player extends PlayerProperties {
     }
 
     public Optional<DraftBag> getCurrentDraftBag() {
-        return Optional.ofNullable(currentDraftBag);
-    }
-
-    public void setCurrentDraftBag(DraftBag bag) {
-        currentDraftBag = bag;
-    }
-
-    public Optional<DraftBag> takeCurrentDraftBag() {
-        Optional<DraftBag> bag = getCurrentDraftBag();
-        setCurrentDraftBag(null);
-        return bag;
+        return Optional.ofNullable(getDraftBagQueue().peek());
     }
 
     public DraftBag getDraftQueue() {
@@ -1872,14 +1859,6 @@ public class Player extends PlayerProperties {
             newBag.Contents.add(DraftItem.generateFromAlias(item));
         }
         draftHand = newBag;
-    }
-
-    public void loadCurrentDraftBag(List<String> saveString) {
-        DraftBag newBag = new DraftBag();
-        for (String item : saveString) {
-            newBag.Contents.add(DraftItem.generateFromAlias(item));
-        }
-        currentDraftBag = newBag;
     }
 
     public void loadItemsToDraft(List<String> saveString) {

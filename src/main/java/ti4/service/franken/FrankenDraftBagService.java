@@ -279,7 +279,7 @@ public class FrankenDraftBagService {
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
-            game.getActiveBagDraft().giveBagToPlayer(bags.get(i), player);
+            game.getActiveBagDraft().enqueueBag(player, bags.get(i));
             player.resetDraftQueue();
 
             showPlayerBag(game, player);
