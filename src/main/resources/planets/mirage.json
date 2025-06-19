@@ -13,9 +13,8 @@
     "legendaryAbilityName": "Mirage Flight Academy",
     "legendaryAbilityText": "You may exhaust this card at the end of your turn to place up to 2 fighters from your reinforcements in any system that contains 1 or more of your ships",
     "legendaryAbilityFlavourText": "*Unsurprisingly, the triple-ace instructors emphasize strike-and-fade tactics and misdirection.*",
-    "planetLayout": {
     "isPlanet": true,
-    "unitPositions": {
+    "planetLayout": {
         "unitHolderName": "mirage",
         "resourcesLocation": "BottomLeft",
         "centerPosition": { "x": 70, "y": 55 }
