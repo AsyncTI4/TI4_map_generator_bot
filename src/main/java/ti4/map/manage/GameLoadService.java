@@ -218,9 +218,14 @@ class GameLoadService {
                         if (UNITS.equals(data)) {
                             unitHolderName = gameFileLines.next().toLowerCase();
                             if (tile != null) {
-                                if (Constants.MIRAGE.equals(unitHolderName)) {
-                                    Helper.addMirageToTile(tile);
-                                } else if (!tile.isSpaceHolderValid(unitHolderName)) {
+                                boolean found = false;
+                                for (String tp : Constants.TOKEN_PLANETS) {
+                                    if (unitHolderName.equals(tp)) {
+                                        Helper.addTokenPlanetToTile(game, tile, tp);
+                                        found = true;
+                                    }
+                                }
+                                if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(new BotLogger.LogMessageOrigin(game), game.getName() + ": Not valid unitholder detected: " + unitHolderName);
                                 }
                             }

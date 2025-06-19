@@ -1,8 +1,6 @@
 package ti4.image;
 
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -11,8 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import com.luciad.imageio.webp.CompressionType;
-import com.luciad.imageio.webp.WebPWriteParam;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -164,29 +160,6 @@ public class ImageHelper {
     public static byte[] writePng(BufferedImage image) {
         try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
             ImageIO.write(image, "png", byteArrayOutputStream);
-            return byteArrayOutputStream.toByteArray();
-        }
-    }
-
-    @SneakyThrows
-    public static byte[] writeWebp(BufferedImage image) {
-        var imageWithoutAlpha = image.getColorModel().hasAlpha() ? redrawWithoutAlpha(image) : image;
-        try (var byteArrayOutputStream = new ByteArrayOutputStream();
-                var imageOutputStream = ImageIO.createImageOutputStream(byteArrayOutputStream)) {
-            ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
-
-            WebPWriteParam writeParam = ((WebPWriteParam) writer.getDefaultWriteParam());
-            writeParam.setCompressionMode(WebPWriteParam.MODE_EXPLICIT);
-            writeParam.setCompressionType(CompressionType.Lossy);
-            writeParam.setUseSharpYUV(false);
-            writeParam.setAlphaCompressionAlgorithm(0);
-            //writeParam.setCompressionQuality(.5f);
-            //writeParam.setMethod(1); //0-6, lower is faster, higher is better quality
-
-            writer.setOutput(imageOutputStream);
-
-            // Encode
-            writer.write(null, new IIOImage(imageWithoutAlpha, null, null), writeParam);
             return byteArrayOutputStream.toByteArray();
         }
     }

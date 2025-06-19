@@ -1753,7 +1753,8 @@ public class PlayerAreaGenerator {
         try {
             Planet planet = planetsInfo.get(planetName);
             if (planet == null) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Planet " + planetName + " not found in game " + game.getName());
+                player.removePlanet(planetName);
+                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Planet " + planetName + " not found in game " + game.getName() + ". Removing planet from player.");
                 return deltaX;
             }
             PlanetModel planetModel = planet.getPlanetModel();

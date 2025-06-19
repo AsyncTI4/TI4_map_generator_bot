@@ -393,7 +393,7 @@ public class ExploreService {
                     }
 
                     if (Constants.MIRAGE.equalsIgnoreCase(token)) {
-                        Helper.addMirageToTile(tile);
+                        Helper.addTokenPlanetToTile(game, tile, Constants.MIRAGE);
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
                     }

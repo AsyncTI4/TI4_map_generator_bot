@@ -83,6 +83,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.map.TokenPlanetService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -542,13 +543,23 @@ public class Helper {
         return tokenPath;
     }
 
-    public static void addMirageToTile(Tile tile) {
-        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        if (unitHolders.get(Constants.MIRAGE) == null) {
-            Point mirageCenter = new Point(Constants.MIRAGE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
-                Constants.MIRAGE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
-            Planet planetObject = new Planet(Constants.MIRAGE, mirageCenter);
-            unitHolders.put(Constants.MIRAGE, planetObject);
+    public static Point getTokenPlanetCenterPosition(Tile tile, String tokenID) {
+        Point tokenPlanetPos = Constants.TOKEN_PLANET_POSITION;
+        Point offset = Constants.TOKEN_PLANET_CENTER_OFFSET;
+
+        Point position = new Point(tokenPlanetPos);
+        if (tile.getTileModel().getNumPlanets() == 3)
+            position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        position.translate(offset.x, offset.y);
+        return position;
+    }
+
+    public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {
+        Tile existingTile = game.getTileFromPlanet(planetName);
+        if (existingTile != null) {
+            TokenPlanetService.moveTokenPlanet(game, null, tile, planetName);
+        } else {
+            TokenPlanetService.addTokenPlanetToTile(game, tile, planetName);
         }
     }
 
