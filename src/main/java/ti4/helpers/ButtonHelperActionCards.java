@@ -1715,6 +1715,18 @@ public class ButtonHelperActionCards {
         }
     }
 
+    @ButtonHandler("resolveProfessionalArcheologists")
+    public static void resolveProfessionalArcheologists(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        ButtonHelper.deleteMessage(event);
+        buttons.add(Buttons.green("olradinPreserveStep2_industrial_prof", "Explore Industrial"));
+        buttons.add(Buttons.blue("olradinPreserveStep2_cultural_prof", "Explore Cultural"));
+        buttons.add(Buttons.red("olradinPreserveStep2_hazardous_prof", "Explore Hazardous"));
+        buttons.add(Buttons.gray("olradinPreserveStep2_frontier_prof", "Explore Frontier"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to resolve the AC", buttons);
+
+    }
+
     public static void checkForAssigningPublicDisgrace(Game game, Player player) {
         if (ButtonHelper.isPlayerElected(game, player, "censure")
             || ButtonHelper.isPlayerElected(game, player, "absol_censure")) {

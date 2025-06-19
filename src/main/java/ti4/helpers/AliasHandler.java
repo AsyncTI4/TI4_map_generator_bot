@@ -176,7 +176,8 @@ public class AliasHandler {
     }
 
     public static String resolveTile(String name) {
-        if ("mirage".equalsIgnoreCase(name)) {
+        List<String> tokenPlanets = Constants.TOKEN_PLANETS;
+        if (tokenPlanets.contains(name.toLowerCase())) {
             return name;
         }
         if (TileHelper.getTileById(name) != null) { // name is already an ID
