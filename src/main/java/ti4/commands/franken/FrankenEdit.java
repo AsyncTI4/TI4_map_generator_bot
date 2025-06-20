@@ -19,6 +19,7 @@ import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
 
 class FrankenEdit extends GameStateSubcommand {
+    private final String QUEUE_INDEX = "queue_index";
 
     public FrankenEdit() {
         super(Constants.FRANKEN_EDIT, "Frankendraft Edit Commands", true, true);
@@ -35,7 +36,8 @@ class FrankenEdit extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "1", "The card to edit"));
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "2", "Use with 'swap'. The card to swap Arg1 with."));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername"));
-
+        addOptions(new OptionData(OptionType.INTEGER, QUEUE_INDEX, "The index in the player's queue of the bag to edit. Default 0, the current bag.")
+            .setMinValue(0));
     }
 
     @Override
@@ -44,6 +46,8 @@ class FrankenEdit extends GameStateSubcommand {
         OptionMapping editOption = event.getOption(Constants.FRANKEN_EDIT_ACTION);
         OptionMapping card1 = event.getOption(Constants.FRANKEN_ITEM + "1");
         OptionMapping card2 = event.getOption(Constants.FRANKEN_ITEM + "2");
+        // For some reason, getAsLong doesn't type check.
+        int queueIndex = event.getOption(QUEUE_INDEX, 0, OptionMapping::getAsInt);
         String command = editOption.getAsString();
 
         if ("viewAll".equals(command)) {
@@ -78,12 +82,15 @@ class FrankenEdit extends GameStateSubcommand {
         DraftBag editingBag = null;
         String bagName = "";
         if (command.contains("Bag")) {
-            // TODO BAG_QUEUE fuller editing support is probably wanted
-            // including editing queued bags, creating bags, deleting bags,
-            // moving bags.
-            // Safety: editingBag being null is already handled below
-            editingBag = editingPlayer.getCurrentDraftBag().orElse(null);
-            bagName = "Held Bag";
+            // Hack for ArrayDeque not being a List
+            editingBag = editingPlayer.getDraftBagQueue().stream()
+                .skip(queueIndex)
+                .findFirst()
+                .orElse(null);
+            // TODO BAG_QUEUE fuller editing support might be wanted
+            // including creating bags, deleting bags,
+            // moving bags to arbitrary positions.
+            bagName = queueIndex == 0 ? "Held Bag" : "Queued bag " + queueIndex;
         }
         if (command.contains("Hand")) {
             editingBag = editingPlayer.getDraftHand();
