@@ -28,8 +28,8 @@ class FrankenEdit extends GameStateSubcommand {
             .addChoice("Swap Cards In Bag", "swapBag").addChoice("View Bag", "viewBag")
             .addChoice("Add Card To Hand", "addHand").addChoice("Remove Card From Hand", "removeHand")
             .addChoice("Swap Cards In Hand", "swapHand").addChoice("View Hand", "viewHand")
-            .addChoice("Add Card To Queue", "addQueue").addChoice("Remove Card From Queue", "removeQueue")
-            .addChoice("Swap Cards In Queue", "swapQueue").addChoice("View Queue", "viewQueue")
+            .addChoice("Add Card To Selection", "addQueue").addChoice("Remove Card From Selection", "removeQueue")
+            .addChoice("Swap Cards In Selection", "swapQueue").addChoice("View Selection", "viewQueue")
             .addChoice("View All", "viewAll")
             .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "1", "The card to edit"));
@@ -52,7 +52,7 @@ class FrankenEdit extends GameStateSubcommand {
             for (var player : game.getRealPlayers()) {
                 dmPlayerBag(game, player, player.getCurrentDraftBag().orElse(null), "Held Bag", event.getUser());
                 dmPlayerBag(game, player, player.getDraftHand(), "Hand", event.getUser());
-                dmPlayerBag(game, player, player.getDraftItemSelection(), "Queue", event.getUser());
+                dmPlayerBag(game, player, player.getDraftItemSelection(), "Selection", event.getUser());
             }
             return;
         }
