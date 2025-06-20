@@ -157,13 +157,6 @@ class FrankenButtonHandler {
                     player.getDraftHand().Contents.addAll(player.getDraftItemSelection().Contents);
                     player.resetDraftSelection();
 
-                    // Clear out all existing messages
-                    draft.findExistingBagChannel(player).getHistory().retrievePast(100).queue(m -> {
-                        if (!m.isEmpty()) {
-                            draft.findExistingBagChannel(player).deleteMessages(m).queue();
-                        }
-                    });
-                    MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your draft bag is being passed to your right.");
                     DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
                     if (currentBag == null) {
                         // This should never occur. The player just picked from their current bag; it could be empty, but not non-existent.
@@ -171,13 +164,10 @@ class FrankenButtonHandler {
                     } else {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(currentBag));
                     }
+
                     FrankenDraftBagService.displayPlayerHand(game, player);
 
                     draft.passBag(player);
-
-                    // Clear the status message so it will be regenerated
-                    GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT);
-                    FrankenDraftBagService.updateDraftStatusMessage(game);
 
                     if (draft.isDraftStageComplete()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");

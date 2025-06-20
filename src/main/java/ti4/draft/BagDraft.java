@@ -13,6 +13,8 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
 
@@ -87,6 +89,10 @@ public abstract class BagDraft {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 "Your draft bag has been passed to your right, and you are waiting to be passed a new bag.");
         }
+
+        // Clear the status message so it will be regenerated
+        GameMessageManager.remove(owner.getName(), GameMessageType.BAG_DRAFT);
+        FrankenDraftBagService.updateDraftStatusMessage(owner);
     }
 
     /** Take player's current bag, and set their next queued bag as their current bag. */
@@ -96,19 +102,21 @@ public abstract class BagDraft {
         if (player.getCurrentDraftBag().isPresent()) {
             playerHasNewBag(player);
         }
+        FrankenDraftBagService.showPlayerBag(owner, player);
         return oldBag;
     }
 
     /** Enqueue a bag with a player. */
     public void enqueueBag(Player player, DraftBag bag) {
         BotLogger.info("Enqueueing bag for "+ player.getRepresentationNoPing());
-        boolean hadCurrentBag = player.getCurrentDraftBag().isPresent();
+        boolean hadABagAlready = player.getCurrentDraftBag().isPresent();
         player.getDraftBagQueue().add(bag);
-        if (hadCurrentBag) {
+        if (hadABagAlready) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 "There are now " + (player.getDraftBagQueue().size() - 1) + " bags waiting for you after this one.");
         } else {
             playerHasNewBag(player);
+            FrankenDraftBagService.showPlayerBag(owner, player);
         }
     }
 
@@ -123,7 +131,7 @@ public abstract class BagDraft {
         return players.get(nextIndex);
     }
 
-    /** Handle player's current bag changing. */
+    /** Message player about their current bag changing. */
     private void playerHasNewBag(Player player) {
         // The player got a new bag, maybe because their old bag was dequeued, or because a new bag was enqueued.
         if (playerHasDraftableItemInBag(player)) {
@@ -136,8 +144,6 @@ public abstract class BagDraft {
                 player.getRepresentationUnfogged() + " you have been passed a new draft bag, but nothing in it is draftable for you.");
             passBag(player);
         }
-        // TODO where else could this showPlayerBag() call be?
-        FrankenDraftBagService.showPlayerBag(owner, player);
     }
 
     public boolean playerHasDraftableItemInBag(Player player) {
