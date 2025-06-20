@@ -124,6 +124,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Set up git remote with token authentication
+          git remote set-url origin https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/AsyncTI4/ti4_web_new.git
+
           # Create and switch to new branch
           BRANCH_NAME="auto-update-data-${{ github.run_number }}"
           git checkout -b "$BRANCH_NAME"
