@@ -24,7 +24,7 @@ class FrankenEdit extends GameStateSubcommand {
     public FrankenEdit() {
         super(Constants.FRANKEN_EDIT, "Frankendraft Edit Commands", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_EDIT_ACTION, "add/remove/swap/view")
-            .addChoice("Force Bag Swap", "forceSwap")
+            .addChoice("Force Bag Pass", "forceSwap")
             .addChoice("Add Card To Bag", "addBag").addChoice("Remove Card From Bag", "removeBag")
             .addChoice("Swap Cards In Bag", "swapBag").addChoice("View Bag", "viewBag")
             .addChoice("Add Card To Hand", "addHand").addChoice("Remove Card From Hand", "removeHand")
@@ -66,18 +66,17 @@ class FrankenEdit extends GameStateSubcommand {
             return;
         }
 
-        if ("forceSwap".equals(command)) {
-            // TODO BAG_QUEUE this no longer makes sense
-            // FrankenDraftBagService.passBags(game);
-            return;
-        }
-
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         if (playerOption == null) {
             MessageHelper.replyToMessage(event, "That command requires a player argument.");
             return;
         }
         Player editingPlayer = game.getPlayer(playerOption.getAsUser().getId());
+
+        if ("forceSwap".equals(command)) {
+            game.getActiveBagDraft().passBag(editingPlayer);
+            return;
+        }
 
         DraftBag editingBag = null;
         String bagName = "";
