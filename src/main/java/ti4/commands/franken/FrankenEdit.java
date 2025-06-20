@@ -50,7 +50,12 @@ class FrankenEdit extends GameStateSubcommand {
             MessageHelper.sendMessageToUser("====================\n" + game.getName() +
                 " Frankendraft Status\n====================", event.getUser());
             for (var player : game.getRealPlayers()) {
-                dmPlayerBag(game, player, player.getCurrentDraftBag().orElse(null), "Held Bag", event.getUser());
+                int index = 0;
+                for (DraftBag bag : player.getDraftBagQueue()) {
+                    String bagName = index == 0 ? "Held Bag" : "Bag " + index + " in queue";
+                    dmPlayerBag(game, player, bag, bagName, event.getUser());
+                    index++;
+                }
                 dmPlayerBag(game, player, player.getDraftHand(), "Hand", event.getUser());
                 dmPlayerBag(game, player, player.getDraftItemSelection(), "Selection", event.getUser());
             }
