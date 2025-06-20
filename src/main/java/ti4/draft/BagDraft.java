@@ -82,6 +82,11 @@ public abstract class BagDraft {
             BotLogger.info("Passing bag from " + player.getRepresentationNoPing() + " to " + nextPlayer.getRepresentationNoPing());
             enqueueBag(nextPlayer, bag);
         }
+
+        if (player.getCurrentDraftBag().isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                "Your draft bag has been passed to your right, and you are waiting to be passed a new bag.");
+        }
     }
 
     /** Take player's current bag, and set their next queued bag as their current bag. */
@@ -99,7 +104,10 @@ public abstract class BagDraft {
         BotLogger.info("Enqueueing bag for "+ player.getRepresentationNoPing());
         boolean hadCurrentBag = player.getCurrentDraftBag().isPresent();
         player.getDraftBagQueue().add(bag);
-        if (!hadCurrentBag) {
+        if (hadCurrentBag) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                "There are now " + (player.getDraftBagQueue().size() - 1) + " bags waiting for you after this one.");
+        } else {
             playerHasNewBag(player);
         }
     }
@@ -115,6 +123,7 @@ public abstract class BagDraft {
         return players.get(nextIndex);
     }
 
+    /** Handle player's current bag changing. */
     private void playerHasNewBag(Player player) {
         // The player got a new bag, maybe because their old bag was dequeued, or because a new bag was enqueued.
         if (playerHasDraftableItemInBag(player)) {
