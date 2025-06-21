@@ -125,8 +125,12 @@ public abstract class BagDraft {
             // TODO throw something interesting probably
             return null;
         }
-        int nextIndex = (index + 1) % players.size();
-        return players.get(nextIndex);
+
+        if (index == 0) {
+            return players.getLast();
+        }
+
+        return players.get(index - 1);
     }
 
     /** Message player about their current bag changing. */
