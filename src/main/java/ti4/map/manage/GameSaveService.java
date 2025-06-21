@@ -621,6 +621,9 @@ class GameSaveService {
             writer.write(Constants.HONOR_COUNT + " " + player.getHonorCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.DISHONOR_COUNT + " " + player.getDishonorCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 

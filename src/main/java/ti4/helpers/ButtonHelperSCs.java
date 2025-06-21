@@ -356,6 +356,9 @@ public class ButtonHelperSCs {
         player.addFollowedSC(tradeInitiative, event);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(tradeInitiative) && p2.getCommodities() > 0) {
+                if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
+                    continue;
+                }
                 int ogComms = p2.getCommodities();
                 int ogTG = p2.getTg();
                 if (p2.getCommodities() > washedCommsPower) {

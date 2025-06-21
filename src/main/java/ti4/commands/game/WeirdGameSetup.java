@@ -268,7 +268,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
             if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
-            game.setTechnologyDeckID("techs_pok");
+            game.setTechnologyDeckID("techs_pok_c4");
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);

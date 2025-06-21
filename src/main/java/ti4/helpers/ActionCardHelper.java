@@ -509,6 +509,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if (automationID.equals("professional_archeologists")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveProfessionalArcheologists", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if (automationID.equals("special_session")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveVeto", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);

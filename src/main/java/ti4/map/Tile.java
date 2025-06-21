@@ -64,11 +64,18 @@ public class Tile {
         initPlanetsAndSpace(tileID);
     }
 
-    public Tile(String tileID, String position, UnitHolder spaceHolder) {
+    public Tile(String tileID, String position, UnitHolder space) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
         initPlanetsAndSpace(tileID);
-        unitHolders.replace(Constants.SPACE, spaceHolder);
+
+        UnitHolder tileSpace = getSpaceUnitHolder();
+
+        // Copy stuff from space that can be copied
+        for (UnitKey unit : space.getUnitKeys())
+            tileSpace.addUnitsWithStates(unit, space.getUnitsByState().get(unit));
+        space.getCcList().forEach(tileSpace::addCC);
+        space.getControlList().forEach(tileSpace::addControl);
     }
 
     private void initPlanetsAndSpace(String tileID) {
@@ -392,8 +399,10 @@ public class Tile {
     }
 
     @JsonIgnore
-    public UnitHolder getSpaceUnitHolder() {
-        return unitHolders.get("space");
+    public Space getSpaceUnitHolder() {
+        UnitHolder space = unitHolders.get("space");
+        if (space instanceof Space s) return s;
+        return null;
     }
 
     @JsonIgnore
