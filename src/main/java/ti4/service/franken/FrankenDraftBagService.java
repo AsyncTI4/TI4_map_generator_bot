@@ -279,8 +279,8 @@ public class FrankenDraftBagService {
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
-            game.getActiveBagDraft().enqueueBag(player, bags.get(i));
             player.resetDraftSelection();
+            game.getActiveBagDraft().enqueueBag(player, bags.get(i));
         }
         GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT); // Clear the status message so it will be regenerated
 
