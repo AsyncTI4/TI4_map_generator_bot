@@ -21,6 +21,9 @@ public class DraftBag {
 
     public static DraftBag fromStoreString(String storeString) {
         DraftBag bag = new DraftBag();
+        if (storeString.equals("")) {
+            return bag;
+        }
         for (String item : storeString.split(",")) {
             bag.Contents.add(DraftItem.generateFromAlias(item));
         }

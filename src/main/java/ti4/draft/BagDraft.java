@@ -82,14 +82,17 @@ public abstract class BagDraft {
         DraftBag bag = dequeueBag(player);
         assert bag != null;
         // TODO maybe report somewhere when empty bags are dropped?
-        if (!bag.Contents.isEmpty()) {
+        if (bag.Contents.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                "You have emptied a draft bag.");
+        } else {
             Player nextPlayer = getNextPlayer(player);
             enqueueBag(nextPlayer, bag);
-        }
 
-        if (player.getCurrentDraftBag().isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                "Your draft bag has been passed to your right, and you are waiting to be passed a new bag.");
+            if (player.getCurrentDraftBag().isEmpty()) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                    "Your draft bag has been passed to your right, and you are waiting to be passed a new bag.");
+            }
         }
 
         // Clear the status message so it will be regenerated

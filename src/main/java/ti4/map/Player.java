@@ -1871,9 +1871,23 @@ public class Player extends PlayerProperties {
 
     public void loadQueuedDraftBags(String saveString) {
         Queue<DraftBag> queue = new ArrayDeque<>();
-        for (String bagString : saveString.split(";")) {
+
+        // This field is a series of 0 or more bagStrings, each terminated by a ";".
+        // bagStrings *may be empty*. (This occurs when selecting the last components from a bag.)
+        // If there is exactly one bag and it is non-empty, the terminating ";" is optional
+        //   (this occurs when loading a non-queueing game).
+        // TODO BAG_QUEUEING test loading from a non-queueing game
+        // The empty string is a list of 0 bags.
+        List<String> bagStrings = List.of(saveString.split(";", -1));
+        if (bagStrings.getLast().equals("")) {
+            bagStrings = bagStrings.subList(0, bagStrings.size() - 1);
+        }
+
+        for (String bagString : bagStrings) {
             queue.add(DraftBag.fromStoreString(bagString));
         }
+        // TODO BAG_QUEUEING remove this eventually
+        BotLogger.info("Loaded " + queue.size() + " bags from: " + saveString);
         draftBagQueue = queue;
     }
 
