@@ -24,8 +24,7 @@ import ti4.model.FactionModel;
 public class FactionRecordOfTechService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getFactionRecordOfTech", event, () -> getFactionRecordOfTech(event)));
+        StatisticsPipeline.queue(event, () -> getFactionRecordOfTech(event));
     }
 
     private void getFactionRecordOfTech(SlashCommandInteractionEvent event) {

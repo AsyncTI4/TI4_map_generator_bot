@@ -20,8 +20,7 @@ import ti4.message.MessageHelper;
 public class StellarConverterStatisticsService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getStellarConverterStatistics", event, () -> getStellarConverterStatistics(event)));
+        StatisticsPipeline.queue(event, () -> getStellarConverterStatistics(event));
     }
 
     private void getStellarConverterStatistics(SlashCommandInteractionEvent event) {

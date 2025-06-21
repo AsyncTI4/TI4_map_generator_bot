@@ -40,8 +40,13 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
-        ExecutorManager.runAsync("SlashCommandListener task " + event.getFullCommandName() + " for " + gameName,
-            gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorManager.runAsync(eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+    }
+
+    private static String eventToString(SlashCommandInteractionEvent event, String gameName) {
+        return "SlashCommandListener task for `" + event.getUser().getEffectiveName() + "`" +
+            (gameName == null ? "" : " in `" + gameName + "`") +
+            ": `" + event.getCommandString() + "`";
     }
 
     private static void process(SlashCommandInteractionEvent event) {
