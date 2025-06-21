@@ -86,6 +86,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guildQuinary;
     public static Guild guildSenary;
     public static Guild guildSeptenary;
+    public static Guild guildOctonary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
     public static final Set<Guild> guilds = new HashSet<>();
@@ -200,9 +201,16 @@ public class AsyncTI4DiscordBot {
             serversToCreateNewGamesOn.add(guildSeptenary);
         }
 
+        // Async: What's up Dock
+        if (args.length >= 12) {
+            guildOctonary = jda.getGuildById(args[11]);
+            success &= startBot(guildOctonary);
+            serversToCreateNewGamesOn.add(guildOctonary);
+        }
+
         // Async: FOW Chapter Secondary
-        //if (args.length >= 12) {
-        //    guildFogOfWarSecondary = jda.getGuildById(args[11]);
+        //if (args.length >= 13) {
+        //    guildFogOfWarSecondary = jda.getGuildById(args[12]);
         //    startBot(guildFogOfWarSecondary);
         //    fowServers.add(guildFogOfWarSecondary);
         //}
@@ -380,6 +388,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1313965793532186725")); // ppups's Server
         adminRoles.add(jda.getRoleById("1311111853912358922")); // TSI's Server
         adminRoles.add(jda.getRoleById("1368344911103000728")); // gozer's server (marshmallow manosphere)
+        adminRoles.add(jda.getRoleById("1378475691531567185")); // Hadouken's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
@@ -400,6 +409,7 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1313966002551128166")); // ppups's Server
         developerRoles.add(jda.getRoleById("1311111944832553090")); // TSI's Server
         developerRoles.add(jda.getRoleById("1368344979579338762")); // gozer's server (marshmallow manosphere)
+        developerRoles.add(jda.getRoleById("1378475796301217792")); // Hadouken's Server
         developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
@@ -423,6 +433,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1313965956338417784")); // ppups's Server
         bothelperRoles.add(jda.getRoleById("1311112004089548860")); // TSI's Server
         bothelperRoles.add(jda.getRoleById("1368345023745097898")); // gozer's server (marshmallow manosphere)
+        bothelperRoles.add(jda.getRoleById("1378475822528204901")); // Hadouken's Server
         bothelperRoles.removeIf(Objects::isNull);
     }
 
