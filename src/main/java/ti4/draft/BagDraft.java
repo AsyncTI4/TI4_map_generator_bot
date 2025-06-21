@@ -81,7 +81,6 @@ public abstract class BagDraft {
         // TODO maybe report somewhere when empty bags are dropped?
         if (!bag.Contents.isEmpty()) {
             Player nextPlayer = getNextPlayer(player);
-            BotLogger.info("Passing bag from " + player.getRepresentationNoPing() + " to " + nextPlayer.getRepresentationNoPing());
             enqueueBag(nextPlayer, bag);
         }
 
@@ -108,7 +107,6 @@ public abstract class BagDraft {
 
     /** Enqueue a bag with a player. */
     public void enqueueBag(Player player, DraftBag bag) {
-        BotLogger.info("Enqueueing bag for "+ player.getRepresentationNoPing());
         boolean hadABagAlready = player.getCurrentDraftBag().isPresent();
         player.getDraftBagQueue().add(bag);
         if (hadABagAlready) {

@@ -1870,13 +1870,11 @@ public class Player extends PlayerProperties {
     }
 
     public void loadQueuedDraftBags(String saveString) {
-        BotLogger.info("Loading draft bag from \"" + saveString + "\" for " + getRepresentationNoPing());
         Queue<DraftBag> queue = new ArrayDeque<>();
         for (String bagString : saveString.split(";")) {
             queue.add(DraftBag.fromStoreString(bagString));
         }
         draftBagQueue = queue;
-        BotLogger.info("Loaded " + draftBagQueue.size() + " queued bags");
     }
 
     public void selectDraftItem(DraftItem item) {
