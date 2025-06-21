@@ -13,6 +13,8 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
 
@@ -59,7 +61,8 @@ public abstract class BagDraft {
         List<Player> players = owner.getRealPlayers();
 
         for (Player p : players) {
-            if (!p.getCurrentDraftBag().Contents.isEmpty() || !p.getDraftQueue().Contents.isEmpty()) {
+            boolean bagIsNoneOrEmpty = p.getCurrentDraftBag().isEmpty() || p.getCurrentDraftBag().get().Contents.isEmpty();
+            if (!bagIsNoneOrEmpty || !p.getDraftItemSelection().Contents.isEmpty()) {
                 if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
                     return false;
                 }
@@ -71,49 +74,86 @@ public abstract class BagDraft {
         return true;
     }
 
-    public void passBags() {
+    /** Take player's current bag and enqueue it with the next player. */
+    public void passBag(Player player) {
+        DraftBag bag = dequeueBag(player);
+        assert bag != null;
+        // TODO maybe report somewhere when empty bags are dropped?
+        if (!bag.Contents.isEmpty()) {
+            Player nextPlayer = getNextPlayer(player);
+            enqueueBag(nextPlayer, bag);
+        }
+
+        if (player.getCurrentDraftBag().isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                "Your draft bag has been passed to your right, and you are waiting to be passed a new bag.");
+        }
+
+        // Clear the status message so it will be regenerated
+        GameMessageManager.remove(owner.getName(), GameMessageType.BAG_DRAFT);
+        FrankenDraftBagService.updateDraftStatusMessage(owner);
+    }
+
+    /** Take player's current bag, and set their next queued bag as their current bag. */
+    private DraftBag dequeueBag(Player player) {
+        assert player.getCurrentDraftBag().isPresent();
+        DraftBag oldBag = player.getDraftBagQueue().poll();
+        if (player.getCurrentDraftBag().isPresent()) {
+            playerHasNewBag(player);
+        }
+        FrankenDraftBagService.showPlayerBag(owner, player);
+        return oldBag;
+    }
+
+    /** Enqueue a bag with a player. */
+    public void enqueueBag(Player player, DraftBag bag) {
+        boolean hadABagAlready = player.getCurrentDraftBag().isPresent();
+        player.getDraftBagQueue().add(bag);
+        if (hadABagAlready) {
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                "There are now " + (player.getDraftBagQueue().size() - 1) + " bags waiting for you after this one.");
+        } else {
+            playerHasNewBag(player);
+            FrankenDraftBagService.showPlayerBag(owner, player);
+        }
+    }
+
+    public Player getNextPlayer(Player player) {
         List<Player> players = owner.getRealPlayers();
-        DraftBag firstPlayerBag = players.getFirst().getCurrentDraftBag();
-        for (int i = 0; i < players.size() - 1; i++) {
-            giveBagToPlayer(players.get(i + 1).getCurrentDraftBag(), players.get(i));
+        int index = players.indexOf(player);
+        if (index == -1) {
+            // TODO throw something interesting probably
+            return null;
         }
-        giveBagToPlayer(firstPlayerBag, players.getLast());
+
+        if (index == 0) {
+            return players.getLast();
+        }
+
+        return players.get(index - 1);
     }
 
-    public void giveBagToPlayer(DraftBag bag, Player player) {
-        player.setCurrentDraftBag(bag);
-        boolean newBagCanBeDraftedFrom = false;
-        for (DraftItem item : bag.Contents) {
-            if (item.isDraftable(player)) {
-                newBagCanBeDraftedFrom = true;
-                break;
-            }
+    /** Message player about their current bag changing. */
+    private void playerHasNewBag(Player player) {
+        // The player got a new bag, maybe because their old bag was dequeued, or because a new bag was enqueued.
+        if (playerHasDraftableItemInBag(player)) {
+            MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
+                Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
+        } else {
+            // TODO since we're passing the unusable bag recursively, the failure state where no-one can draft from it isn't caught anyhere and just crashes with infinite depth. Fix that. Maybe look ahead to find the correct destination player? But can't pass directly to them, that would change the order of bags. In any case, restore the old error message.
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " you have been passed a new draft bag, but nothing in it is draftable for you.");
+            passBag(player);
         }
-        player.setReadyToPassBag(!newBagCanBeDraftedFrom);
-        MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
-            player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
-            Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
-    }
-
-    public boolean allPlayersReadyToPass() {
-        for (Player p : owner.getRealPlayers()) {
-            if (!playerHasDraftableItemInBag(p) && !playerHasItemInQueue(p)) {
-                setPlayerReadyToPass(p, true);
-            }
-        }
-        return owner.getRealPlayers().stream().allMatch(Player::isReadyToPassBag);
     }
 
     public boolean playerHasDraftableItemInBag(Player player) {
-        return player.getCurrentDraftBag().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
-    }
-
-    public void setPlayerReadyToPass(Player player, boolean ready) {
-        if (ready && !player.isReadyToPassBag()) {
-            player.setReadyToPassBag(true);
-            FrankenDraftBagService.updateDraftStatusMessage(owner);
+        if (player.getCurrentDraftBag().isEmpty()) {
+            return false;
         }
-        player.setReadyToPassBag(ready);
+        // Safety: just checked the bag exists
+        return player.getCurrentDraftBag().get().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
     }
 
     public String getLongBagRepresentation(DraftBag bag, Game game) {
@@ -243,8 +283,8 @@ public abstract class BagDraft {
         return null;
     }
 
-    public boolean playerHasItemInQueue(Player p) {
-        return !p.getDraftQueue().Contents.isEmpty();
+    public boolean playerHasItemSelected(Player p) {
+        return !p.getDraftItemSelection().Contents.isEmpty();
     }
 
     @JsonIgnore
@@ -253,13 +293,9 @@ public abstract class BagDraft {
         sb.append("### __Draft Status__:\n");
         for (Player player : owner.getRealPlayers()) {
             sb.append("> ");
-            if (player.isReadyToPassBag()) {
-                sb.append("✅");
-            } else {
-                sb.append("❌");
-            }
             sb.append(player.getRepresentationNoPing());
             sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
+            player.getDraftBagQueue().forEach(bag -> sb.append("💰"));
             sb.append("\n");
         }
         return sb.toString();

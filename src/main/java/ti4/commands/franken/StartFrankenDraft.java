@@ -43,7 +43,7 @@ class StartFrankenDraft extends GameStateSubcommand {
         }
 
         FrankenDraftBagService.setUpFrankenFactions(game, event, force);
-        FrankenDraftBagService.clearPlayerHands(game);
+        FrankenDraftBagService.clearPlayerHandsAndQueues(game);
 
         if (draftMode == null) {
             game.setBagDraft(new FrankenDraft(game));

@@ -177,7 +177,7 @@ public abstract class DraftItem implements ModelInterface {
         if (isAtHandLimit) {
             return false;
         }
-        boolean hasDraftedThisBag = player.getDraftQueue().getCategoryCount(ItemCategory) > 0;
+        boolean hasDraftedThisBag = player.getDraftItemSelection().getCategoryCount(ItemCategory) > 0;
 
         boolean allOtherCategoriesAtHandLimit = true;
         for (Category cat : Category.values()) {

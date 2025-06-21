@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.draft.DraftBag;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
@@ -579,9 +580,6 @@ class GameSaveService {
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.READY_TO_PASS_BAG + " " + player.isReadyToPassBag());
-            writer.write(System.lineSeparator());
-
             writer.write(Constants.AUTO_PASS_WHENS_N_AFTERS + " " + player.isAutoPassOnWhensAfters());
             writer.write(System.lineSeparator());
 
@@ -658,13 +656,17 @@ class GameSaveService {
             writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.DRAFT_BAG + " " + player.getCurrentDraftBag().toStoreString());
+            writer.write(Constants.DRAFT_BAG + " ");
+            for (DraftBag bag : player.getDraftBagQueue()) {
+                // Assumption: draft items' aliases will never contain semicolons
+                writer.write(bag.toStoreString() + ";");
+            }
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DRAFT_HAND + " " + player.getDraftHand().toStoreString());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.DRAFT_QUEUE + " " + player.getDraftQueue().toStoreString());
+            writer.write(Constants.DRAFT_SELECTION + " " + player.getDraftItemSelection().toStoreString());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.FACTION_TECH + " " + String.join(",", player.getFactionTechs()));

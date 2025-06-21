@@ -2,6 +2,8 @@ package ti4.commands.franken;
 
 import java.util.Objects;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,23 +19,25 @@ import ti4.message.MessageHelper;
 import ti4.service.franken.FrankenDraftBagService;
 
 class FrankenEdit extends GameStateSubcommand {
+    private final String QUEUE_INDEX = "queue_index";
 
     public FrankenEdit() {
         super(Constants.FRANKEN_EDIT, "Frankendraft Edit Commands", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_EDIT_ACTION, "add/remove/swap/view")
-            .addChoice("Force Bag Swap", "forceSwap")
+            .addChoice("Force Bag Pass", "forceSwap")
             .addChoice("Add Card To Bag", "addBag").addChoice("Remove Card From Bag", "removeBag")
             .addChoice("Swap Cards In Bag", "swapBag").addChoice("View Bag", "viewBag")
             .addChoice("Add Card To Hand", "addHand").addChoice("Remove Card From Hand", "removeHand")
             .addChoice("Swap Cards In Hand", "swapHand").addChoice("View Hand", "viewHand")
-            .addChoice("Add Card To Queue", "addQueue").addChoice("Remove Card From Queue", "removeQueue")
-            .addChoice("Swap Cards In Queue", "swapQueue").addChoice("View Queue", "viewQueue")
+            .addChoice("Add Card To Selection", "addQueue").addChoice("Remove Card From Selection", "removeQueue")
+            .addChoice("Swap Cards In Selection", "swapQueue").addChoice("View Selection", "viewQueue")
             .addChoice("View All", "viewAll")
             .setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "1", "The card to edit"));
         addOptions(new OptionData(OptionType.STRING, Constants.FRANKEN_ITEM + "2", "Use with 'swap'. The card to swap Arg1 with."));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playername"));
-
+        addOptions(new OptionData(OptionType.INTEGER, QUEUE_INDEX, "The index in the player's queue of the bag to edit. Default 0, the current bag.")
+            .setMinValue(0));
     }
 
     @Override
@@ -42,21 +46,23 @@ class FrankenEdit extends GameStateSubcommand {
         OptionMapping editOption = event.getOption(Constants.FRANKEN_EDIT_ACTION);
         OptionMapping card1 = event.getOption(Constants.FRANKEN_ITEM + "1");
         OptionMapping card2 = event.getOption(Constants.FRANKEN_ITEM + "2");
+        // For some reason, getAsLong doesn't type check.
+        int queueIndex = event.getOption(QUEUE_INDEX, 0, OptionMapping::getAsInt);
         String command = editOption.getAsString();
 
         if ("viewAll".equals(command)) {
             MessageHelper.sendMessageToUser("====================\n" + game.getName() +
                 " Frankendraft Status\n====================", event.getUser());
             for (var player : game.getRealPlayers()) {
-                dmPlayerBag(game, player, player.getCurrentDraftBag(), "Held Bag", event.getUser());
+                int index = 0;
+                for (DraftBag bag : player.getDraftBagQueue()) {
+                    String bagName = index == 0 ? "Held Bag" : "Bag " + index + " in queue";
+                    dmPlayerBag(game, player, bag, bagName, event.getUser());
+                    index++;
+                }
                 dmPlayerBag(game, player, player.getDraftHand(), "Hand", event.getUser());
-                dmPlayerBag(game, player, player.getDraftQueue(), "Queue", event.getUser());
+                dmPlayerBag(game, player, player.getDraftItemSelection(), "Selection", event.getUser());
             }
-            return;
-        }
-
-        if ("forceSwap".equals(command)) {
-            FrankenDraftBagService.passBags(game);
             return;
         }
 
@@ -67,18 +73,30 @@ class FrankenEdit extends GameStateSubcommand {
         }
         Player editingPlayer = game.getPlayer(playerOption.getAsUser().getId());
 
+        if ("forceSwap".equals(command)) {
+            game.getActiveBagDraft().passBag(editingPlayer);
+            return;
+        }
+
         DraftBag editingBag = null;
         String bagName = "";
         if (command.contains("Bag")) {
-            editingBag = editingPlayer.getCurrentDraftBag();
-            bagName = "Held Bag";
+            // Hack for ArrayDeque not being a List
+            editingBag = editingPlayer.getDraftBagQueue().stream()
+                .skip(queueIndex)
+                .findFirst()
+                .orElse(null);
+            // TODO BAG_QUEUE fuller editing support might be wanted
+            // including creating bags, deleting bags,
+            // moving bags to arbitrary positions.
+            bagName = queueIndex == 0 ? "Held Bag" : "Queued bag " + queueIndex;
         }
         if (command.contains("Hand")) {
             editingBag = editingPlayer.getDraftHand();
             bagName = "Hand";
         }
         if (command.contains("Queue")) {
-            editingBag = editingPlayer.getDraftQueue();
+            editingBag = editingPlayer.getDraftItemSelection();
             bagName = "Queue";
         }
 
@@ -102,12 +120,16 @@ class FrankenEdit extends GameStateSubcommand {
         }
     }
 
-    private void dmPlayerBag(Game game, Player player, DraftBag bag, String bagName, User user) {
+    private void dmPlayerBag(Game game, Player player, @Nullable DraftBag bag, String bagName, User user) {
         StringBuilder sb = new StringBuilder();
-        sb.append(game.getName()).append(" ").append(player.getUserName()).append(" Current ").append(bagName).append(":\n");
-        for (DraftItem item : bag.Contents) {
-            sb.append(item.getAlias());
-            sb.append("\n");
+        if (bag == null) {
+            sb.append(game.getName()).append(" ").append(player.getUserName()).append(" No Current ").append(bagName).append("\n");
+        } else {
+            sb.append(game.getName()).append(" ").append(player.getUserName()).append(" Current ").append(bagName).append(":\n");
+            for (DraftItem item : bag.Contents) {
+                sb.append(item.getAlias());
+                sb.append("\n");
+            }
         }
         MessageHelper.sendMessageToUser(sb.toString(), user);
     }
