@@ -29,8 +29,7 @@ import ti4.message.MessageHelper;
 public class DiceLuckService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getDiceLuck", event, () -> getDiceLuck(event)));
+        StatisticsPipeline.queue(event, () -> getDiceLuck(event));
     }
 
     private void getDiceLuck(SlashCommandInteractionEvent event) {
