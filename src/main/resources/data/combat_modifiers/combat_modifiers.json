@@ -324,6 +324,22 @@
         ]
     },
     {
+        "alias": "plus1_roll_in_arcane_citadel",
+        "type": "mods",
+        "value": "+1",
+        "persistenceType": "CONDITIONAL",
+        "condition": "arcane_defender",
+        "scope": "_groundforce_",
+        "forCombatAbility": "combatround",
+        "related": [
+            {
+                "type": "custom",
+                "alias": "custom",
+                "message": ":shield: Defenders get +1 to rolls in the arcane citadel."
+            }
+        ]
+    },
+    {
         "alias": "nivyn_commander",
         "type": "extrarolls",
         "value": "+1",

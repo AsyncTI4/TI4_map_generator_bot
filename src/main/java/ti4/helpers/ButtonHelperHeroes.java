@@ -575,7 +575,7 @@ public class ButtonHelperHeroes {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (p != null && (type.equalsIgnoreCase(p.getOriginalPlanetType())
                 || p.getTokenList().contains("attachment_titanspn.png"))) {
                 buttons.add(Buttons.green("attachAttachment_" + planet + "_" + attachment,
@@ -1089,11 +1089,11 @@ public class ButtonHelperHeroes {
                 player.getFactionEmoji() + "You don't have the Belkosea hero.");
             return;
         }
-        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" refreshed ")
-            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        String message = player.getRepresentation() + " refreshed " +
+            Helper.getLeaderFullRepresentation(playerLeader);
         playerLeader.setExhausted(false);
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteTheOneButton(event);
 
     }
@@ -1106,11 +1106,11 @@ public class ButtonHelperHeroes {
                 player.getFactionEmoji() + "You don't have the Belkosea hero.");
             return;
         }
-        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" exhausted ")
-            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        String message = player.getRepresentation() + " exhausted " +
+            Helper.getLeaderFullRepresentation(playerLeader);
         playerLeader.setExhausted(true);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
+        MessageHelper.sendMessageToChannel(event.getChannel(), message + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1324,11 +1324,13 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.green("stealRelic_" + victim.getFaction() + "_" + relic,
                 "Steal " + Mapper.getRelic(relic).getName()));
         }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
         String msg = player.getRepresentationUnfogged() + ", please choose the relic you wish to steal.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
 
     }
 
+    @ButtonHandler("stealRelic_")
     public static void stealRelic(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         String faction = buttonID.split("_")[1];

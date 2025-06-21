@@ -94,6 +94,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.option.GameOptionService;
 import ti4.service.planet.AddPlanetToPlayAreaService;
 import ti4.service.player.RefreshCardsService;
 import ti4.service.strategycard.PlayStrategyCardService;
@@ -158,6 +159,44 @@ public class UnfiledButtonHandlers {
     public static void fogAllianceAgentStep3(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ButtonHelper.deleteMessage(event);
         ButtonHelperHeroes.argentHeroStep3(game, player, event, buttonID);
+    }
+
+    @ButtonHandler("enableDaneMode_")
+    public static void enableDaneMode(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String mode = buttonID.split("_")[1];
+        boolean enable = buttonID.split("_")[2].equalsIgnoreCase("enable");
+        String message = "Successfully " + buttonID.split("_")[2] + "d the ";
+        if (mode.equalsIgnoreCase("hiddenagenda")) {
+            game.setHiddenAgendaMode(enable);
+            message += "Hidden Agenda Mode. Nothing more needs to be done.";
+        }
+        if (mode.equalsIgnoreCase("minorFactions")) {
+            game.setMinorFactionsMode(enable);
+            message += "Minor Factions Mode. ";
+            if (enable) {
+                message += "You will need to decide how you want to draft the minor factions. This site has a decent setup for it, "
+                    + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that you need to set up a neutral player "
+                    + "after the draft finishes with /special2 setup_neutral_player, and you can add 3 infantry to the minor faction planets pretty easily with /add_units.";
+
+            }
+        }
+        if (mode.equalsIgnoreCase("ageOfExploration")) {
+            game.setAgeOfExplorationMode(enable);
+            message += "Age of Exploration Mode. Nothing more needs to be done.";
+        }
+        if (mode.equalsIgnoreCase("ageOfCommerce")) {
+            game.setAgeOfCommerceMode(enable);
+            message += "Age of Commerce Mode. Nothing more needs to be done.";
+        }
+        if (mode.equalsIgnoreCase("totalWar")) {
+            game.setTotalWarMode(enable);
+            message += "Total War Mode. Nothing more needs to be done.";
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        List<Button> buttons = GameOptionService.getDaneLeakModeButtons(game);
+        event.getMessage().editMessage(event.getMessage().getContentRaw()).setComponents(ButtonHelper.turnButtonListIntoActionRowList(buttons))
+            .queue();
+
     }
 
     @ButtonHandler(value = "requestAllFollow_", save = false)
@@ -356,11 +395,8 @@ public class UnfiledButtonHandlers {
             String message = player.getRepresentationUnfogged()
                 + ", please choose the planet you wish to put your structure on.";
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "placeOneNDone_dontskip");
-            if (!game.isFowMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
-            } else {
-                MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
-            }
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getFactionEmojiOrColor() + " trade goods increased by 1 " + player.gainTG(1) + ".");
@@ -541,7 +577,7 @@ public class UnfiledButtonHandlers {
                 List<Button> absolPAButtons = new ArrayList<>();
                 absolPAButtons.add(Buttons.blue("getDiscardButtonsACs", "Discard", CardEmojis.ActionCard));
                 for (String planetID : player.getReadiedPlanets()) {
-                    Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+                    Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
                     if (planet != null && isNotBlank(planet.getOriginalPlanetType())) {
                         List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planet, player);
                         absolPAButtons.addAll(planetButtons);
@@ -751,11 +787,12 @@ public class UnfiledButtonHandlers {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
             if (uH.getTokenList().contains("attachment_facilityresearchlab.png")) {
-                player.setHarvestCounter(player.getHarvestCounter() + 1);
+                int amountThereNow = game.changeCommsOnPlanet(1, planetName);
+
                 String msg = player.getRepresentation() + " gained 1 trade good on the research lab due to exhausting "
                     + Helper.getPlanetRepresentation(planetName, game)
-                    + " while it had a Research Lab on it. It now has " + player.getHarvestCounter()
-                    + " trade goods on it, which can be adjusted with /ds set_planet_tradegoods";
+                    + " while it had a Research Lab on it. It now has " + amountThereNow
+                    + " trade goods on it.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
@@ -1046,10 +1083,7 @@ public class UnfiledButtonHandlers {
         ButtonInteractionEvent event, Player player, String buttonID, Game game
     ) {
         String bID = buttonID.replace("movedNExplored_", "");
-        boolean dsdihmy = false;
-        if (bID.startsWith("dsdihmy_")) {
-            dsdihmy = true;
-        }
+        boolean dsdihmy = bID.startsWith("dsdihmy_");
         String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
         ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1,
@@ -1391,6 +1425,17 @@ public class UnfiledButtonHandlers {
         }
     }
 
+    @ButtonHandler(value = "checkCombatACs", save = false)
+    public static void checkCombatACs(ButtonInteractionEvent event, Player player) {
+        String secretScoreMsg = "_ _\nClick a button below to play an action card";
+        List<Button> acButtons = ActionCardHelper.getCombatActionCardButtons(player);
+        if (!acButtons.isEmpty()) {
+            MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, secretScoreMsg, acButtons);
+        } else {
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "You have no combat action cards");
+        }
+    }
+
     public static void soScoreFromHand(
         ButtonInteractionEvent event,
         String buttonID,
@@ -1719,11 +1764,11 @@ public class UnfiledButtonHandlers {
                 boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
-                if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
-                    && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
-                    buttons.add(
-                        Buttons.red("exhaustTech_sar", "Exhaust Self-Assembly Routines", TechEmojis.WarfareTech));
-                }
+                // if (player.hasTechReady("sar") && !"muaatagent".equalsIgnoreCase(buttonID)
+                //     && !"arboHeroBuild".equalsIgnoreCase(buttonID) && !buttonID.contains("integrated")) {
+                //     buttons.add(
+                //         Buttons.red("exhaustTech_sar", "Exhaust Self-Assembly Routines", TechEmojis.WarfareTech));
+                // } //sar is handled elsewhere
                 if (player.hasTechReady("htp") && !"muaatagent".equalsIgnoreCase(buttonID)
                     && !"arboHeroBuild".equalsIgnoreCase(buttonID)) {
                     buttons.add(Buttons.red("exhaustTech_htp", "Exhaust Hegemonic Trade Policy", FactionEmojis.Winnu));
@@ -1915,43 +1960,7 @@ public class UnfiledButtonHandlers {
         String messageId = event.getInteraction().getMessage().getId();
         var gameMessage = GameMessageManager.getOne(game.getName(), messageId);
         int matchingFactionReactions = 0;
-        for (Player player : game.getRealPlayers()) {
-            boolean factionReacted = false;
-            String faction = player.getFaction();
-            if (gameMessage.isPresent() && gameMessage.get().factionsThatReacted().contains(faction)) {
-                factionReacted = true;
-            } else if (buttonID.contains("no_after")) {
-                if (game.getPlayersWhoHitPersistentNoAfter().contains(faction)) {
-                    factionReacted = true;
-                } else {
-                    Message mainMessage = event.getMessage();
-                    Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
-                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction != null) {
-                        factionReacted = true;
-                    }
-                }
-            } else if (buttonID.contains("no_when")) {
-                if (game.getPlayersWhoHitPersistentNoWhen().contains(faction)) {
-                    factionReacted = true;
-                } else {
-                    Message mainMessage = event.getMessage();
-                    Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
-                    MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-                    if (reaction != null) {
-                        factionReacted = true;
-                    }
-                }
-            }
-            if (factionReacted) {
-                matchingFactionReactions++;
-            }
-        }
-        int numberOfPlayers = game.getRealPlayers().size();
-        if (matchingFactionReactions >= numberOfPlayers) {
-            respondAllPlayersReacted(event, game);
-            GameMessageManager.remove(game.getName(), messageId);
-        } else if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand"))) {
+        if (buttonID != null && (buttonID.contains("po_scoring") || buttonID.contains("po_no_scoring") || buttonID.contains("so_no_scoring") || buttonID.contains("so_score_hand"))) {
             boolean allReacted = true;
             for (Player player : game.getRealPlayers()) {
                 String po = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "PO");
@@ -1963,7 +1972,47 @@ public class UnfiledButtonHandlers {
             if (allReacted) {
                 respondAllPlayersReacted(event, game);
             }
+        } else {
+
+            for (Player player : game.getRealPlayers()) {
+                boolean factionReacted = false;
+                String faction = player.getFaction();
+                if (gameMessage.isPresent() && gameMessage.get().factionsThatReacted().contains(faction)) {
+                    factionReacted = true;
+                } else if (buttonID.contains("no_after")) {
+                    if (game.getPlayersWhoHitPersistentNoAfter().contains(faction)) {
+                        factionReacted = true;
+                    } else {
+                        Message mainMessage = event.getMessage();
+                        Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
+                        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                        if (reaction != null) {
+                            factionReacted = true;
+                        }
+                    }
+                } else if (buttonID.contains("no_when")) {
+                    if (game.getPlayersWhoHitPersistentNoWhen().contains(faction)) {
+                        factionReacted = true;
+                    } else {
+                        Message mainMessage = event.getMessage();
+                        Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, event.getMessageId());
+                        MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+                        if (reaction != null) {
+                            factionReacted = true;
+                        }
+                    }
+                }
+                if (factionReacted) {
+                    matchingFactionReactions++;
+                }
+            }
+            int numberOfPlayers = game.getRealPlayers().size();
+            if (matchingFactionReactions >= numberOfPlayers) {
+                respondAllPlayersReacted(event, game);
+                GameMessageManager.remove(game.getName(), messageId);
+            }
         }
+
     }
 
     private static void respondAllPlayersReacted(ButtonInteractionEvent event, Game game) {
@@ -2218,6 +2267,7 @@ public class UnfiledButtonHandlers {
         for (String fac : usedFacilities) {
             if (fac.contains("facilityembassy")) {
                 hasEmbassy = true;
+                break;
             }
         }
         if (!hasEmbassy && (uH.getPlanetTypes().contains("industrial") || tPlanet.equalsIgnoreCase("mr"))) {
@@ -2253,6 +2303,37 @@ public class UnfiledButtonHandlers {
     public static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         RelicHelper.drawRelicAndNotify(player, event, game);
         doAnotherAction(event, player, game);
+    }
+
+    @ButtonHandler("neuraloopPart1")
+    public static void neuraloopPart1(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String poID = buttonID.split(";")[1];
+        String type = buttonID.split(";")[2];
+        String msg = player.getRepresentation() + " choose the relic you want to purge in order to replace the objective with a " + type;
+        List<Button> buttons = RelicHelper.getNeuraLoopButton(player, poID, type, game);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("neuraloopPart2")
+    public static void neuraloopPart2(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        String poID = buttonID.split(";")[1];
+        String type = buttonID.split(";")[2];
+        String relic = buttonID.split(";")[3];
+        player.removeRelic(relic);
+        player.removeExhaustedRelic(relic);
+        game.removeRevealedObjective(poID);
+        String msg = player.getRepresentation() + " choose to use the Neuraloop relic and purge their " + Mapper.getRelic(relic).getName() + " relic in order to replace the recently revealed objective with a random " + type + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        if (type.equalsIgnoreCase("stage1")) {
+            RevealPublicObjectiveService.revealS1(game, event, game.getActionsChannel(), true);
+        } else if (type.equalsIgnoreCase("stage2")) {
+            RevealPublicObjectiveService.revealS2(game, event, game.getActionsChannel(), true);
+        } else {
+            RevealPublicObjectiveService.revealSO(game, event, game.getActionsChannel());
+        }
+
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("drawRelic")
@@ -2839,6 +2920,8 @@ public class UnfiledButtonHandlers {
         String readiedCardsString = "All planets have been readied at the end of the agenda phase.";
         if (game.isOmegaPhaseMode()) {
             readiedCardsString = "All cards have been readied at the end of the omega phase.";
+        }
+        if (game.hasAnyPriorityTrackMode()) {
             if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
                 PriorityTrackHelper.PrintPriorityTrack(game);
@@ -3015,7 +3098,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("startStrategyPhase")
     public static void startStrategyPhase(ButtonInteractionEvent event, Game game) {
-        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+        if (game.hasAnyPriorityTrackMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
             PriorityTrackHelper.PrintPriorityTrack(game);
             return;
@@ -3118,6 +3201,7 @@ public class UnfiledButtonHandlers {
             msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
+        ReactionService.addReaction(event, game, player);
         checkForAllReactions(event, game);
     }
 
@@ -3345,7 +3429,7 @@ public class UnfiledButtonHandlers {
             ButtonHelper.offerSpeakerButtons(game, player);
             return;
         }
-        if (game.isOmegaPhaseMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
+        if (game.hasAnyPriorityTrackMode() && PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
             PriorityTrackHelper.CreateDefaultPriorityTrack(game);
             if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to fill the Priority Track with the default seating order. Use `/omegaphase assign_player_priority` to fill the track before proceeding.");

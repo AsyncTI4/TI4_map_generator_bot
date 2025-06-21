@@ -14,8 +14,7 @@ import ti4.message.MessageHelper;
 public class LifeTimeRecordService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getLifeTimeRecords", event, () -> getLifeTimeRecords(event)));
+        StatisticsPipeline.queue(event, () -> getLifeTimeRecords(event));
     }
 
     private void getLifeTimeRecords(SlashCommandInteractionEvent event) {

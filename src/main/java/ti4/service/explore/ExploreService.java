@@ -4,7 +4,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +33,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Leader;
@@ -359,25 +360,11 @@ public class ExploreService {
                         Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                         UnitHolder planetUnitHolder = unitHolders.get(planetID);
                         UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
-                        if (planetUnitHolder != null && spaceUnitHolder != null) {
-                            Map<Units.UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
-                            for (Player player_ : game.getPlayers().values()) {
-                                String color = player_.getColor();
-                                planetUnitHolder.removeAllUnits(color);
-                            }
-                            Map<Units.UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                            for (Map.Entry<Units.UnitKey, Integer> unitEntry : units.entrySet()) {
-                                Units.UnitKey key = unitEntry.getKey();
-                                if (Set.of(Units.UnitType.Fighter, Units.UnitType.Infantry, Units.UnitType.Mech)
-                                    .contains(key.getUnitType())) {
-                                    Integer count = spaceUnits.get(key);
-                                    if (count == null) {
-                                        count = unitEntry.getValue();
-                                    } else {
-                                        count += unitEntry.getValue();
-                                    }
-                                    spaceUnits.put(key, count);
-                                }
+                        for (UnitKey key : planetUnitHolder.getUnitKeys()) {
+                            int amt = planetUnitHolder.getUnitCount(key);
+                            var removed = planetUnitHolder.removeUnit(key, amt);
+                            if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
+                                spaceUnitHolder.addUnitsWithStates(key, removed);
                             }
                         }
                     }
@@ -406,7 +393,7 @@ public class ExploreService {
                     }
 
                     if (Constants.MIRAGE.equalsIgnoreCase(token)) {
-                        Helper.addMirageToTile(tile);
+                        Helper.addTokenPlanetToTile(game, tile, Constants.MIRAGE);
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
                     }
@@ -959,6 +946,11 @@ public class ExploreService {
                 sb.append("\n> ").append(entry.getValue().getFirst().getText().replace("\n", "\n> "));
             } else {
                 sb.append("1. ").append(emoji).append(" _").append(exploreName).append("_ (`").append(String.join("`, `", ids)).append("`)");
+                if (!entry.getValue().getFirst().getAttachmentId().orElse("nothin").equalsIgnoreCase("nothin")) {
+                    if (!entry.getValue().getFirst().getAlias().equalsIgnoreCase("gw") && !entry.getValue().getFirst().getType().equalsIgnoreCase("frontier")) {
+                        sb.append(" [ATTACHMENT]");
+                    }
+                }
                 if (showPercents && ids.size() > 1) {
                     sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
                 }

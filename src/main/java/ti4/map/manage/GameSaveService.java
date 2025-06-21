@@ -417,6 +417,14 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.HIDDEN_AGENDA_MODE + " " + game.isHiddenAgendaMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.TOTAL_WAR_MODE + " " + game.isTotalWarMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.AGE_OF_COMMERCE_MODE + " " + game.isAgeOfCommerceMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ORDINIAN_C1_MODE + " " + game.isOrdinianC1Mode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.LIBERATION_C4_MODE + " " + game.isLiberationC4Mode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.SHOW_FULL_COMPONENT_TEXT + " " + game.isShowFullComponentTextEmbeds());
         writer.write(System.lineSeparator());
         writer.write(Constants.HACK_ELECTION_STATUS + " " + game.isHasHackElectionBeenPlayed());
@@ -510,6 +518,9 @@ class GameSaveService {
             writer.write(Constants.TIGL_RANK + " " + game.getMinimumTIGLRankAtGameStart());
             writer.write(System.lineSeparator());
         }
+
+        writer.write(Constants.PRIORITY_TRACK_MODE + " " + game.getPriorityTrackMode());
+        writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
@@ -612,6 +623,9 @@ class GameSaveService {
             writer.write(Constants.HONOR_COUNT + " " + player.getHonorCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.DISHONOR_COUNT + " " + player.getDishonorCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());
             writer.write(System.lineSeparator());
 
@@ -704,13 +718,9 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
-            writer.write(System.lineSeparator());
 
-            writer.write(Constants.COMMODITIES + " " + player.getCommodities());
-            writer.write(System.lineSeparator());
-            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
+            //old spot
+
             writer.write(System.lineSeparator());
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
@@ -785,7 +795,6 @@ class GameSaveService {
             }
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
             writer.write(System.lineSeparator());
-
             writer.write(Constants.CARDS_INFO_THREAD_CHANNEL_ID + " " + player.getCardsInfoThreadID());
             writer.write(System.lineSeparator());
 
@@ -819,6 +828,12 @@ class GameSaveService {
                 writer.write(System.lineSeparator());
             }
 
+            writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal(true));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES_BASE + " " + player.getCommoditiesBase());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES + " " + player.getCommodities());
+            writer.write(System.lineSeparator());
             writer.write(ENDPLAYER);
             writer.write(System.lineSeparator());
         }

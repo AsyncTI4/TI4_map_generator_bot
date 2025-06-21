@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -81,6 +82,12 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 output = "Use buttons to drop 2 infantry on a planet.";
                 buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "2gf", "placeOneNDone_skipbuild"));
             }
+            case "ordinianc4" -> {
+                ActionCardHelper.drawActionCards(game, player, 1, true);
+                String msg = "Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain 1 CC:";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
+            }
+
             case "uikos" -> {
                 int comms = player.getHarvestCounter();
                 player.setHarvestCounter(0);
@@ -88,7 +95,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 ButtonHelperAgents.toldarAgentInitiation(game, player, comms);
                 MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " + player.getCommodities() + " commodities (from the " + comms + " that were on the card)");
             }
-            case "mirage" -> {
+            case "mirage", "illusion", "phantasm" -> {
                 output = "Use buttons to put 2 fighters with your ships.";
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
             }

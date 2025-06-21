@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,6 +13,7 @@ import ti4.buttons.handlers.strategycard.PickStrategyCardButtonHandler;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -168,16 +168,37 @@ public class PickStrategyCardService {
     }
 
     public static List<Player> getSCPickOrder(Game game) {
-        if (game.isOmegaPhaseMode()) {
-            return PriorityTrackHelper.GetPriorityTrack(game);
+        if (game.hasAnyPriorityTrackMode()) {
+            List<Player> pickOrder = PriorityTrackHelper.GetPriorityTrack(game);
+            if (game.getPriorityTrackMode() == PriorityTrackMode.AFTER_SPEAKER) {
+                Player speaker = game.getSpeaker();
+                if (speaker != null) {
+                    pickOrder.remove(speaker);
+                    pickOrder.add(0, speaker);
+                }
+            }
+            return pickOrder;
         }
 
-        List<Player> activePlayers = game.getPlayers().values().stream()
-            .filter(Player::isRealPlayer)
-            .collect(Collectors.toList());
+        List<Player> activePlayers = Helper.getSpeakerOrFullPriorityOrder(game);
         if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
             Collections.reverse(activePlayers);
         }
         return activePlayers;
+    }
+
+    public static int getSCPickOrderNumber(Game game, Player player) {
+        List<Player> activePlayers = getSCPickOrder(game);
+        int scPickOrder = 1;
+        for (Player p : activePlayers) {
+            if (p == null || p.getFaction() == null) {
+                continue;
+            }
+            if (p.getFaction().equals(player.getFaction())) {
+                break;
+            }
+            scPickOrder++;
+        }
+        return scPickOrder;
     }
 }

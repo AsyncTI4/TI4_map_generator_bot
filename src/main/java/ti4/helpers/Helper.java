@@ -83,9 +83,11 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.map.TokenPlanetService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.strategycard.PlayStrategyCardService;
 import ti4.service.unit.RemoveUnitService;
 
 public class Helper {
@@ -243,18 +245,7 @@ public class Helper {
             return;
         }
 
-        List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
-            players = getSpeakerOrderFromThisPlayer(imperialHolder, game);
-        } else {
-            if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
-            } else {
-                players = game.getActionPhaseTurnOrder();
-            }
-            Collections.rotate(players, -players.indexOf(imperialHolder));
-        }
-
+        List<Player> players = PlayStrategyCardService.getPlayersInFollowOrder(game, imperialHolder);
         for (Player player : players) {
             String message = player.getRepresentationUnfogged() + " drew their queued secret objective from **Imperial**. ";
             if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
@@ -313,9 +304,9 @@ public class Helper {
         if (game.getRealPlayers().size() > 10) {
             return "This game is too large to display a scoring summary";
         }
-        var playersInScoringOrder = game.isOmegaPhaseMode() ? PriorityTrackHelper.GetPriorityTrack(game) : game.getActionPhaseTurnOrder();
+        var playersInScoringOrder = game.hasFullPriorityTrackMode() ? PriorityTrackHelper.GetPriorityTrack(game) : game.getActionPhaseTurnOrder();
         for (Player player : playersInScoringOrder) {
-            if (!game.isOmegaPhaseMode()) {
+            if (!game.hasFullPriorityTrackMode()) {
                 int sc = player.getLowestSC();
                 rep.append(CardEmojis.getSCBackFromInteger(sc)).append(player.getRepresentation(false, false)).append("\n");
             } else {
@@ -378,7 +369,7 @@ public class Helper {
         String key3 = "potentialScorePOBlockers";
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
-        if (game.getStoredValue(key2).length() < 2
+        if ((game.getStoredValue(key2).length() < 2 && game.getStoredValue(key2b).length() < 2)
             || game.getHighestScore() + 1 > game.getVp()) {
             return;
         }
@@ -408,6 +399,9 @@ public class Helper {
                         game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3b,
                         game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                }
+                if (game.getHighestScore() + 1 > game.getVp()) {
+                    return;
                 }
             } else {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
@@ -440,8 +434,8 @@ public class Helper {
         return null;
     }
 
-    public static List<Player> getSpeakerOrPriorityOrder(Game game) {
-        if (!game.isOmegaPhaseMode()) {
+    public static List<Player> getSpeakerOrFullPriorityOrder(Game game) {
+        if (!game.hasFullPriorityTrackMode()) {
             return getSpeakerOrderFromThisPlayer(game.getSpeaker(), game);
         }
 
@@ -450,21 +444,21 @@ public class Helper {
         return arrayPlayers;
     }
 
-    public static List<Player> getSpeakerOrPriorityOrderFromPlayer(Player player, Game game) {
-        var players = getSpeakerOrPriorityOrder(game);
-        if (player != null && players.indexOf(player) != -1) {
+    public static List<Player> getSpeakerOrFullPriorityOrderFromPlayer(Player player, Game game) {
+        var players = getSpeakerOrFullPriorityOrder(game);
+        if (player != null && players.contains(player)) {
             Collections.rotate(players, -players.indexOf(player));
         }
         return players;
     }
 
-    public static int getPlayerSpeakerOrPriorityNumber(Player player, Game game) {
-        if (!game.isOmegaPhaseMode() && game.getSpeaker() == null) {
+    public static int getPlayerSpeakerOrFullPriorityNumber(Player player, Game game) {
+        if (!game.hasFullPriorityTrackMode() && game.getSpeaker() == null) {
             return 1;
-        } else if (game.isOmegaPhaseMode() && player.getPriorityPosition() < 1) {
+        } else if (game.hasFullPriorityTrackMode() && player.getPriorityPosition() < 1) {
             return 1;
         }
-        var players = getSpeakerOrPriorityOrder(game);
+        var players = getSpeakerOrFullPriorityOrder(game);
         return players.indexOf(player) + 1;
     }
 
@@ -549,13 +543,23 @@ public class Helper {
         return tokenPath;
     }
 
-    public static void addMirageToTile(Tile tile) {
-        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        if (unitHolders.get(Constants.MIRAGE) == null) {
-            Point mirageCenter = new Point(Constants.MIRAGE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
-                Constants.MIRAGE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
-            Planet planetObject = new Planet(Constants.MIRAGE, mirageCenter);
-            unitHolders.put(Constants.MIRAGE, planetObject);
+    public static Point getTokenPlanetCenterPosition(Tile tile, String tokenID) {
+        Point tokenPlanetPos = Constants.TOKEN_PLANET_POSITION;
+        Point offset = Constants.TOKEN_PLANET_CENTER_OFFSET;
+
+        Point position = new Point(tokenPlanetPos);
+        if (tile.getTileModel().getNumPlanets() == 3)
+            position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        position.translate(offset.x, offset.y);
+        return position;
+    }
+
+    public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {
+        Tile existingTile = game.getTileFromPlanet(planetName);
+        if (existingTile != null) {
+            TokenPlanetService.moveTokenPlanet(game, null, tile, planetName);
+        } else {
+            TokenPlanetService.addTokenPlanetToTile(game, tile, planetName);
         }
     }
 
@@ -2047,6 +2051,10 @@ public class Helper {
         return getAvailablePlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
     }
 
+    public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Game game) {
+        return getTotalPlanetSumValue(game, player, Planet::getFlexResourcesOrInfluence);
+    }
+
     public static Map<String, Integer> getLastEntryInHashMap(Map<String, Integer> linkedHashMap) {
         int count = 1;
         for (Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
@@ -2397,6 +2405,17 @@ public class Helper {
 
     public static void checkEndGame(Game game, Player player) {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
+            if (game.isLiberationC4Mode()) {
+                if (player.getFaction().equalsIgnoreCase("sol") || player.getFaction().equalsIgnoreCase("xxcha")) {
+                    Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
+                    Player sol = game.getPlayerFromColorOrFaction("sol");
+                    if (sol != null && xxcha != null && (sol.getTotalVictoryPoints() > 11 || xxcha.getTotalVictoryPoints() > 11) && sol.getTotalVictoryPoints() > 9 && xxcha.getTotalVictoryPoints() > 9) {
+                        //good
+                    } else {
+                        return;
+                    }
+                }
+            }
             List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode()) {
                 buttons.add(Buttons.green("gameEnd", "End Game"));

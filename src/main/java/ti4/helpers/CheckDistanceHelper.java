@@ -79,9 +79,9 @@ public class CheckDistanceHelper {
                 int distance = i;
                 if (!existingPosition.equalsIgnoreCase(tilePosition)) {
                     if (tile == null
-                        || (tile.isNebula() && player != null && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research"))
-                        || (tile.isSupernova() && player != null && !player.getAbilities().contains("gashlai_physiology"))
-                        || (tile.isAsteroidField() && player != null && !player.getTechs().contains("amd") && !player.getTechs().contains("absol_amd"))) {
+                        || (tile.isNebula() && player != null && !player.getRelics().contains("circletofthevoid") && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research"))
+                        || (tile.isSupernova() && player != null && !player.getRelics().contains("circletofthevoid") && !player.getAbilities().contains("gashlai_physiology"))
+                        || (tile.isAsteroidField() && player != null && !player.getTechs().contains("amd") && !player.getRelics().contains("circletofthevoid") && !player.getTechs().contains("absol_amd"))) {
                         continue;
                     }
                 }

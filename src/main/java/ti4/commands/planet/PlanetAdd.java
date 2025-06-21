@@ -10,6 +10,7 @@ class PlanetAdd extends PlanetAddRemove {
 
     public PlanetAdd() {
         super(Constants.PLANET_ADD, "Add or transfer a planet card to your player area");
+
     }
 
     @Override

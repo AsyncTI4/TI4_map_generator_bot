@@ -75,6 +75,7 @@ class AgendaResolveButtonHandler {
             String agendaName = agendaDetails.getName();
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# The hidden agenda was " + agendaName
                 + "! You can find it added as a law or in the discard.");
+            MessageHelper.sendMessageToChannelWithEmbed(game.getMainGameChannel(), "Hidden Agenda", agendaDetails.getRepresentationEmbed());
             aID = discardAgendas.get(id2);
         } else {
             aID = Integer.parseInt(agendaid);
@@ -370,9 +371,10 @@ class AgendaResolveButtonHandler {
                 if ("standardization".equalsIgnoreCase(agID)) {
                     player2.setTacticalCC(3);
                     player2.setStrategicCC(2);
-                    player2.setFleetCC(3);
+                    int amount = Math.clamp(3 - player2.getMahactCC().size(), 0, 3);
+                    player2.setFleetCC(amount);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/3/2.");
+                        "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/" + player2.getFleetCC() + "/2.");
                     ButtonHelper.checkFleetInEveryTile(player2, game, event);
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {

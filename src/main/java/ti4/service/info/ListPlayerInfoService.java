@@ -20,6 +20,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.BotLogger.LogMessageOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
@@ -185,6 +186,15 @@ public class ListPlayerInfoService {
         String current = planets.get(index);
 
         Planet planet = game.getPlanetsInfo().get(current);
+        if (planet == null) {
+            BotLogger.warning(new LogMessageOrigin(player), "ListPlayerInfoService: Planet \"" + current + "\" not found for game " + game.getName());
+            return backtrack(planets,
+                currentResources,
+                currentInfluence,
+                index + 1,
+                usedPlanets,
+                remainingTradeGoods, goal, player, game, closestScore);
+        }
         int resources = planet.getResources();
         int influence = planet.getInfluence();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -424,7 +434,14 @@ public class ListPlayerInfoService {
                 if (player.hasAbility("privileged_citizenry")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
                 }
-                return counter;
+                if (player.hasAbility("orbital_foundaries")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                }
+                int maxPlanets = counter;
+                if (player.getHomeSystemTile() != null) {
+                    maxPlanets = Math.max(0, player.getPlanetsAllianceMode().size() - player.getHomeSystemTile().getPlanetUnitHolders().size());
+                }
+                return Math.min(counter, maxPlanets);
             }
             case "corner", "unify_colonies", "corner_omegaphase" -> {
                 int max = 0;
@@ -706,7 +723,7 @@ public class ListPlayerInfoService {
             case "dfat" -> {
                 Tile tile = Optional.ofNullable(game.getTileFromPlanet("mallice"))
                     .orElseGet(() -> game.getTileFromPlanet("hexmallice"));
-                if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                     return 0;
                 } else {
                     return 1;
@@ -736,7 +753,7 @@ public class ListPlayerInfoService {
                 Tile mecatol = game.getMecatolTile();
                 boolean controlsMecatol = player.getPlanets().stream()
                     .anyMatch(Constants.MECATOLS::contains);
-                if (mecatol == null || !FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
+                if (!FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {
                     return ButtonHelper.checkNumberShips(player, mecatol);

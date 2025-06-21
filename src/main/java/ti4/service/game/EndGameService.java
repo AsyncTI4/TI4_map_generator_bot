@@ -87,8 +87,8 @@ public class EndGameService {
         Category inLimboCategory = limbos.isEmpty() ? null : limbos.getFirst();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
-        Category og = tableTalkChannel.getParentCategory();
-        if (inLimboCategory != null && archiveChannels && !rematch) {
+        Category og = actionsChannel.getParentCategory();
+        if (!game.isFowMode() && inLimboCategory != null && archiveChannels && !rematch) {
             if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
                 cleanUpInLimboCategory(event.getGuild(), 3);
             }

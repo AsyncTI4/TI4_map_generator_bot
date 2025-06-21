@@ -12,6 +12,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.OmegaPhaseModStatusHelper;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
+import ti4.helpers.CryypterHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -27,7 +29,8 @@ public class HomebrewService {
     public enum Homebrew {
         HB444("4/4/4", "4 secrets, 4 stage 1s, 4 stage 2s, 12 VP", null), HB456("4/5/6", "4 Secrets, 5 stage 1s, 6 stage2 (revealed 2 at a time), 14 VP", null), HBABSOLRELICSAGENDAS("Absol Relics/Agendas", "Use Absol Relics and Agendas", SourceEmojis.Absol), HBABSOLTECHSMECHS("Absol Techs/Mechs", "Use Absol Techs and Mechs", SourceEmojis.Absol), HBDSFACTIONS("DS Factions", "Discordant Stars Factions", SourceEmojis.DiscordantStars), HBDSEXPLORES("US Explores/Relics/ACs",
             "Uncharted Space Explores, Relics and Action Cards",
-            SourceEmojis.UnchartedSpace), HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2), HBREDTAPE("Red Tape", "Red Tape mode", null), HBIGNISAURORA("Ignis Aurora", "Ignis Aurora decks for SC/agendas/techs/events/relics", null), HBREMOVESFTT("No Supports", "Remove Support for the Thrones", null), HBHBSC("Homebrew SCs", "Indicate game uses homebrew Strategy Cards", CardEmojis.SCBackBlank), HBOMEGAPHASE("Omega Phase", "Enable Omega Phase homebrew mode", null);
+            SourceEmojis.UnchartedSpace), HBACDECK2("AC2 Deck", "Action Cards Deck 2", SourceEmojis.ActionDeck2), HBREDTAPE("Red Tape", "Red Tape mode", null), HBIGNISAURORA("Ignis Aurora", "Ignis Aurora decks for SC/agendas/techs/events/relics", null), HBREMOVESFTT("No Supports", "Remove Support for the Thrones", null), HBHBSC("Homebrew SCs", "Indicate game uses homebrew Strategy Cards", CardEmojis.SCBackBlank), HBOMEGAPHASE("Omega Phase", "Enable Omega Phase homebrew mode", null),
+            HBVOTC("Voices of the Council", "Voices of the Council mode", null);
 
         final String name;
         final String description;
@@ -72,6 +75,7 @@ public class HomebrewService {
         game.setDiscordantStarsMode(false);
         game.setAbsolMode(false);
         game.setOmegaPhaseMode(false);
+        game.setVotcMode(false);
         game.setStoredValue("homebrewMode", "");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             "Set all homebrew options off. You need manually check and fix decks, VPs, objectives etc. that might've been set.");
@@ -193,6 +197,7 @@ public class HomebrewService {
                 game.shuffleInBottomObjective(Constants.IMPERIUM_REX_ID, 5, 1);
                 game.setUpPeakableObjectives(0, 2);
                 game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_omegaphase"));
+                game.setPriorityTrackMode(PriorityTrackMode.FULL);
                 //Temporary measure: Remove incompatible components
                 game.removeACFromGame("hack");
                 game.removeAgendaFromGame("incentive");
@@ -200,6 +205,9 @@ public class HomebrewService {
 
                 VoiceOfTheCouncilHelper.ResetVoiceOfTheCouncil(game);
                 OmegaPhaseModStatusHelper.PrintGreeting(game);
+            }
+            case HBVOTC -> {
+                CryypterHelper.votcSetup(game, event);
             }
         }
     }

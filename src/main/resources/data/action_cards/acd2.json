@@ -120,8 +120,8 @@
         "alias": "chain_reaction",
         "name": "Chain Reaction",
         "phase": "Action",
-        "window": "After you destroy 1 of your opponent's non-fighter ships",
-        "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die. If the result is 8 or greater, produce 1 additional hit and roll again; this ability cannot produce more than 4 hits.",
+        "window": "After you destroy 1 of your opponent's ships",
+        "text": "Roll 2 dice. For each result equal to or greater than that ship's combat value, produce 1 hit that your opponent must assign to 1 of their ships and roll again; this ability cannot produce more than 3 hits.",
         "flavorText": "As Jace tore through the enemy line, his ordnance erupted into a symphony of explosions.",
         "source": "action_deck_2"
     },
@@ -157,7 +157,7 @@
         "name": "Covert Operation",
         "phase": "Action",
         "window": "After you move ships into the active system",
-        "text": "Remove 1 of your ships or ground forces from a system that does not contain 1 of your command tokens and place that unit in the space area of the active system.",
+        "text": "Remove 1 of your ships or ground forces from the game board and place that unit in the space area of the active system.",
         "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
         "source": "action_deck_2"
     },
@@ -658,7 +658,7 @@
         "name": "Pivot",
         "phase": "Action",
         "window": "Action",
-        "text": "Discard between 1 and 3 action cards from your hand to draw an equal number of action cards.",
+        "text": "Discard 1-3 action cards from your hand to draw an equal number of action cards.",
         "flavorText": "\"We must not become stagnant. Stagnation is what broke this galaxy,\" I48S said, barely hesitating at his patient's screams. \"Pain? Let's remove that.\"",
         "source": "action_deck_2"
     },
@@ -676,7 +676,7 @@
         "name": "Propaganda",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to that planet's influence value.",
+        "text": "Exhaust up to 2 of your non-home planets other than Mecatol Rex to place a number of infantry from your reinforcements on each of those planets equal to its influence value.",
         "flavorText": "The Federation anthem blared from the holoscreen as troops paraded across it. \"They're doing their part. Are you? Join the Mobile Legion and save the galaxy!\"",
         "source": "action_deck_2"
     },
@@ -1035,7 +1035,7 @@
         "name": "Unexpected Strategy",
         "phase": "Any",
         "window": "When you would place a token from your strategy pool or reinforcements on the game board",
-        "text": "Gain 1 command token instead.",
+        "text": "Gain that token instead.",
         "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
         "source": "action_deck_2"
     },

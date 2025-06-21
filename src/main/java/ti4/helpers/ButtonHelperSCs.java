@@ -40,6 +40,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.objectives.ScorePublicObjectiveService;
+import ti4.service.strategycard.PlayStrategyCardService;
 
 public class ButtonHelperSCs {
 
@@ -248,17 +249,7 @@ public class ButtonHelperSCs {
         if (game.getPhaseOfGame().contains("agenda")) {
             imperialHolder = game.getPlayer(game.getSpeakerUserID());
         }
-        List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
-            players = Helper.getSpeakerOrPriorityOrderFromPlayer(imperialHolder, game);
-        } else {
-            if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
-            } else {
-                players = game.getActionPhaseTurnOrder();
-            }
-            Collections.rotate(players, -players.indexOf(imperialHolder));
-        }
+        List<Player> players = PlayStrategyCardService.getPlayersInFollowOrder(game, imperialHolder);
         String key2 = "queueToDrawSOs";
         String key3 = "potentialBlockers";
         String message = " drew a secret objective.";
@@ -298,7 +289,7 @@ public class ButtonHelperSCs {
             return;
         }
         int initComm = player.getCommodities();
-        player.setCommodities(player.getCommoditiesTotal());
+        player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
             if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("pok5trade")) {
@@ -345,7 +336,9 @@ public class ButtonHelperSCs {
         int tg = player.getTg();
         player.setTg(tg + commoditiesTotal);
         ButtonHelperAbilities.pillageCheck(player, game);
-        player.setCommodities(0);
+        if (!game.isAgeOfCommerceMode()) {
+            player.setCommodities(0);
+        }
 
         StrategyCardModel scModel = null;
         for (int scNum : player.getUnfollowedSCs()) {
@@ -363,6 +356,9 @@ public class ButtonHelperSCs {
         player.addFollowedSC(tradeInitiative, event);
         for (Player p2 : game.getRealPlayers()) {
             if (p2.getSCs().contains(tradeInitiative) && p2.getCommodities() > 0) {
+                if (!p2.getPromissoryNotes().containsKey(p2.getColor() + "_ta")) {
+                    continue;
+                }
                 int ogComms = p2.getCommodities();
                 int ogTG = p2.getTg();
                 if (p2.getCommodities() > washedCommsPower) {
@@ -785,6 +781,7 @@ public class ButtonHelperSCs {
         for (String fac : usedFacilities) {
             if (fac.contains("facilityembassy")) {
                 hasEmbassy = true;
+                break;
             }
         }
         if (!hasEmbassy) {

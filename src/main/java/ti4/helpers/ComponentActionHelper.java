@@ -24,6 +24,7 @@ import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
+import ti4.service.BookOfLatviniaService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -60,6 +61,11 @@ public class ComponentActionHelper {
         }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
             Button tButton = Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts ");
+            compButtons.add(tButton);
+        }
+
+        if (game.isTotalWarMode() && game.changeCommsOnPlanet(0, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game)) > 9) {
+            Button tButton = Buttons.gray(finChecker + prefix + "doTotalWarPoint_", "Gain 1 VP (Total War)");
             compButtons.add(tButton);
         }
 
@@ -155,7 +161,7 @@ public class ComponentActionHelper {
                     rButton = Buttons.red(finChecker + prefix + "relic_" + relic, "Purge Enigmatic Device");
                     enigmaticSeen = true;
                 } else {
-                    List<String> exhaustRelics = List.of("titanprototype", "absol_jr");
+                    List<String> exhaustRelics = List.of("titanprototype", "absol_jr", "circletofthevoid");
                     if (exhaustRelics.contains(relic.toLowerCase())) {
                         if (!p1.getExhaustedRelics().contains(relic)) {
                             rButton = Buttons.blue(finChecker + prefix + "relic_" + relic, "Exhaust " + relicData.getName());
@@ -174,7 +180,7 @@ public class ComponentActionHelper {
         for (String pn : p1.getPromissoryNotes().keySet()) {
             PromissoryNoteModel prom = Mapper.getPromissoryNote(pn);
             if (pn != null && prom != null && prom.getOwner() != null
-                && !prom.getOwner().equalsIgnoreCase(p1.getFaction())
+                && game.getPNOwner(pn) != p1 && !prom.getOwner().equalsIgnoreCase(p1.getFaction())
                 && !prom.getOwner().equalsIgnoreCase(p1.getColor())
                 && !p1.getPromissoryNotesInPlayArea().contains(pn) && prom.getText() != null) {
                 String pnText = prom.getText();
@@ -301,7 +307,7 @@ public class ComponentActionHelper {
                 if (buttonID.contains("agent")) {
                     List<String> leadersThatNeedSpecialSelection = List.of(
                         "arborecagent", "naaluagent", "muaatagent", "xxchaagent",
-                        "axisagent", "bentoragent", "kolumeagent");
+                        "axisagent", "bentoragent", "kolumeagent", "redcreussagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
                         String message = p1.getRepresentationUnfogged() + " Use buttons to select the user of the agent";
@@ -556,6 +562,20 @@ public class ComponentActionHelper {
                 ButtonHelper.purge2StarCharters(p1);
                 DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
+            case "doTotalWarPoint" -> {
+                int remaining = game.changeCommsOnPlanet(-10, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
+                    + " spent 10 commodities on their home planets to score 1 point (total war ability). They have " + remaining + " comms remaining.");
+                String customPOName = "Total War VPs (" + p1.getFaction() + ")";
+                int vp = 1;
+                if (game.getCustomPublicVP().keySet().contains(customPOName)) {
+                    vp = game.getCustomPublicVP().get(customPOName) + 1;
+                    game.removeCustomPO(customPOName);
+                }
+                Integer poIndex = game.addCustomPO(customPOName, vp);
+                game.scorePublicObjective(p1.getUserID(), poIndex);
+                Helper.checkEndGame(game, p1);
+            }
         }
 
         if (!firstPart.contains("ability") && !firstPart.contains("getRelic") && !firstPart.contains("pn")) {
@@ -592,6 +612,12 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons3);
                 }
             }
+        } else if (relicID.equalsIgnoreCase("circletofthevoid")) {
+            player.addExhaustedRelic(relicID);
+            purgeOrExhaust = "exhausted";
+            List<Button> buttons2 = ButtonHelperActionCards.getCircletButtons(game, player);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                "Use buttons to decide which system you want to explore the frontier in.", buttons2);
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
             player.removeExhaustedRelic(relicID);
@@ -636,9 +662,10 @@ public class ComponentActionHelper {
                     ButtonHelper.getButtonsForStellar(player, game));
             }
             case "passturn" -> MessageHelper.sendMessageToChannelWithButton(event.getChannel(), null, Buttons.REDISTRIBUTE_CCs);
-            case "titanprototype", "absol_jr" -> {
+            case "titanprototype", "absol_jr", "circletofthevoid" -> {
                 // handled above
             }
+            case "bookoflatvinia" -> BookOfLatviniaService.purgeBookOfLatvinia(event, game, player);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(),
                 "This relic is not tied to any automation. Please resolve manually.");
         }

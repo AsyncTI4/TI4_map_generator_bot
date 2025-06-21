@@ -365,7 +365,7 @@ public class ButtonHelperAbilities {
         trapNames.add("Feint");
         trapNames.add("Gravitic Inhibitor");
         trapNames.add("Account Siphon");
-        trapNames.add("Saboteurs");
+        //trapNames.add("Saboteurs");
         return trapNames;
     }
 
@@ -968,7 +968,7 @@ public class ButtonHelperAbilities {
             if (planetName.contains("custodia") || planetName.contains("ghoti")) {
                 continue;
             }
-            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
             if (planet == null) {
                 continue;
             }
@@ -998,7 +998,7 @@ public class ButtonHelperAbilities {
             if (planetName.contains("custodia") || planetName.contains("ghoti")) {
                 continue;
             }
-            Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+            Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
             if (planet == null) {
                 continue;
             }
@@ -1010,6 +1010,7 @@ public class ButtonHelperAbilities {
             for (String token : planet.getTokenList()) {
                 if (token.contains("superweapon")) {
                     hasSuperweapon = true;
+                    break;
                 }
             }
             if (!hasSuperweapon) {
@@ -1438,12 +1439,22 @@ public class ButtonHelperAbilities {
             sb.append(player.getRepresentationUnfogged()).append(" Gained relic fragment\n");
             player.addFragment(cardID);
             game.purgeExplore(cardID);
+        } else {
+            if (buttonID.contains("prof")) {
+                sb.append(player.getRepresentationUnfogged()).append(" Gained 1 commodity\n");
+                player.setCommodities(player.getCommodities() + 1);
+            }
+        }
+        if (!buttonID.contains("prof")) {
+            event.getMessage().delete().queue();
+        } else {
+            ButtonHelper.deleteTheOneButton(event);
         }
 
         CommanderUnlockCheckService.checkPlayer(player, "kollecc");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
-        event.getMessage().delete().queue();
+
     }
 
     public static List<Button> getOlradinPreserveButtons(Game game, Player player, String planet) {
@@ -1586,7 +1597,7 @@ public class ButtonHelperAbilities {
         String planetName = buttonID.split("_")[1];
         int oldTg = player.getTg();
         player.setTg(oldTg + 4);
-        Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
+        Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetName, game);
         planet.addToken(Constants.GLEDGE_CORE_PNG);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getFactionEmojiOrColor() + " Cracked the Mantle of "
@@ -1603,6 +1614,9 @@ public class ButtonHelperAbilities {
     public static List<Button> getButtonsForPossibleTechForNekro(Player nekro, List<String> currentList, Game game) {
         List<Button> techToGain = new ArrayList<>();
         for (String tech : currentList) {
+            if ((game.isOrdinianC1Mode() || game.isLiberationC4Mode()) && Mapper.getTech(tech).isFactionTech()) {
+                continue;
+            }
             techToGain.add(Buttons.green("getTech_" + Mapper.getTech(tech).getAlias() + "__noPay",
                 Mapper.getTech(tech).getName()));
         }

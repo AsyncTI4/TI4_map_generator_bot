@@ -403,7 +403,7 @@ public class PlayStrategyCardService {
                         StringBuilder playerOrder = new StringBuilder("__Order for performing the Secondary ability:__\n");
                         for (int i = 0; i < playersInOrder.size(); i++) {
                             playerOrder.append("`").append(i + 1).append(".` ");
-                            if (game.isOmegaPhaseMode() && game.getPhaseOfGame().equals("action")) {
+                            if (game.hasFullPriorityTrackMode() && game.getPhaseOfGame().equals("action")) {
                                 int lowestSC = playersInOrder.get(i).getLowestSC();
                                 TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
                                 playerOrder.append(scEmoji);
@@ -438,6 +438,9 @@ public class PlayStrategyCardService {
                     } else if (player.getPromissoryNotesInPlayArea().contains("convoys")) {
                         MessageHelper.sendMessageToChannel(m5,
                             "The **Trade** player has _Trade Convoys_, and thus may perform transactions with all players.");
+                    } else if (game.isAgeOfCommerceMode()) {
+                        MessageHelper.sendMessageToChannel(m5,
+                            "The Age of Commerce Galactic event is in play, and thus the **Trade** player may perform transactions with all players.");
                     } else {
                         StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");
                         StringBuilder notNeighborsMsg = new StringBuilder("__Not__ neighbors with the **Trade** holder:");
@@ -549,13 +552,13 @@ public class PlayStrategyCardService {
         }
     }
 
-    private static List<Player> getPlayersInFollowOrder(Game game, Player player) {
+    public static List<Player> getPlayersInFollowOrder(Game game, Player player) {
         List<Player> players;
-        if (!game.isOmegaPhaseMode()) {
-            players = Helper.getSpeakerOrPriorityOrderFromPlayer(player, game);
+        if (!game.hasFullPriorityTrackMode()) {
+            players = Helper.getSpeakerOrFullPriorityOrderFromPlayer(player, game);
         } else {
             if (game.getPhaseOfGame().contains("agenda")) {
-                players = Helper.getSpeakerOrPriorityOrder(game);
+                players = Helper.getSpeakerOrFullPriorityOrder(game);
             } else {
                 players = game.getActionPhaseTurnOrder();
             }
@@ -565,12 +568,11 @@ public class PlayStrategyCardService {
     }
 
     private static boolean ShouldPrintFollowOrder(Game game, StrategyCardModel scModel) {
-        if (game.isOmegaPhaseMode()) return true;
+        if (game.hasFullPriorityTrackMode()) return true;
 
         if (scModel.usesAutomationForSCID("pok7technology")) {
             Player raOwner = game.getPNOwner("ra");
-            if (raOwner == null) return false;
-            return true;
+            return raOwner != null;
         }
 
         return false;

@@ -6,9 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jetbrains.annotations.Nullable;
-
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 public class PlayerProperties {
@@ -87,6 +86,7 @@ public class PlayerProperties {
     private int pathTokenCounter;
     private int harvestCounter;
     private int honorCounter;
+    private int dishonorCounter;
 
     // OLRADIN POLICY ONCE PER ACTION EXHAUST PLANET ABILITIES
     private boolean hasUsedEconomyEmpowerAbility;

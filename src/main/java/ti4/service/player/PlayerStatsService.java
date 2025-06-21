@@ -13,7 +13,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
@@ -35,13 +34,16 @@ public class PlayerStatsService {
         sb.append("> VP: ").append(player.getTotalVictoryPoints());
         sb.append("      ").append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(player.getTg());
         sb.append("      ").append(MiscEmojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
+
         sb.append("      ").append(ExploreEmojis.CFrag).append(player.getCrf());
         sb.append("   ").append(ExploreEmojis.IFrag).append(player.getIrf());
         sb.append("   ").append(ExploreEmojis.HFrag).append(player.getHrf());
         sb.append("   ").append(ExploreEmojis.UFrag).append(player.getUrf());
 
         sb.append("\n");
-
+        sb.append("> Base commodities: `").append(player.getCommoditiesBase()).append("`\n");
+        sb.append("> Bonus commodities: `").append(player.getCommoditiesBonus()).append("`\n");
+        sb.append("> Old total commodities: `").append(player.getCommoditiesTotal(true)).append("`\n");
         sb.append("> Command Tokens: `").append(player.getCCRepresentation()).append("`\n");
         sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");
         sb.append("> Unfollowed Strategy Cards: `").append(player.getUnfollowedSCs()).append("`\n");
@@ -250,7 +252,7 @@ public class PlayerStatsService {
         if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
             MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
         }
-        player.setCommoditiesBase(commoditiesTotalCount);
+        player.setCommoditiesBase(Math.max(0, commoditiesTotalCount));
         String message = ">  set **Base Commodities** to " + commoditiesTotalCount + MiscEmojis.comm;
         MessageHelper.sendMessageToEventChannel(event, message);
     }
