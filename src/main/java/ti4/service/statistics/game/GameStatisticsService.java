@@ -17,8 +17,7 @@ public class GameStatisticsService {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not determine stat type.");
             return;
         }
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent(getEventName(statType), event, () -> getGameStatistics(event, statType)));
+        StatisticsPipeline.queue(event, () -> getGameStatistics(event, statType));
     }
 
     private void getGameStatistics(SlashCommandInteractionEvent event, GameStatTypes statType) {
