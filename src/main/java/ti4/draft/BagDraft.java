@@ -2,6 +2,8 @@ package ti4.draft;
 
 import java.util.List;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -13,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.message.BotLogger.LogMessageOrigin;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
@@ -136,24 +139,34 @@ public abstract class BagDraft {
     /** Message player about their current bag changing. */
     private void playerHasNewBag(Player player) {
         // The player got a new bag, maybe because their old bag was dequeued, or because a new bag was enqueued.
+        DraftBag newBag = player.getCurrentDraftBag().orElse(null);
+        assert newBag != null;
+        assert !newBag.Contents.isEmpty();
         if (playerHasDraftableItemInBag(player)) {
             MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " you have been passed a new draft bag!",
                 Buttons.gray(FrankenDraftBagService.ACTION_NAME + "show_bag", "Click here to show your current bag"));
-        } else {
-            // TODO since we're passing the unusable bag recursively, the failure state where no-one can draft from it isn't caught anyhere and just crashes with infinite depth. Fix that. Maybe look ahead to find the correct destination player? But can't pass directly to them, that would change the order of bags. In any case, restore the old error message.
+        } else if (somePlayerCanDraftFrom(newBag)) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged() + " you have been passed a new draft bag, but nothing in it is draftable for you.");
             passBag(player);
+        } else {
+            MessageHelper.sendMessageToChannel(owner.getActionsChannel(), owner.getPing() + " an error has occurred where a bag contains cards that no player can draft. Please notify @developer");
+            BotLogger.warning(new LogMessageOrigin(player), "No-one can draft from bag: " + newBag.toStoreString());
         }
     }
 
+    /** Check that some player will eventually be able to use this bag. */
+    private boolean somePlayerCanDraftFrom(DraftBag bag) {
+        return owner.getRealPlayers().stream().anyMatch(player -> playerHasDraftableItemInBag(player, bag));
+    }
+
     public boolean playerHasDraftableItemInBag(Player player) {
-        if (player.getCurrentDraftBag().isEmpty()) {
-            return false;
-        }
-        // Safety: just checked the bag exists
-        return player.getCurrentDraftBag().get().Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
+        return playerHasDraftableItemInBag(player, player.getCurrentDraftBag().orElse(null));
+    }
+
+    public boolean playerHasDraftableItemInBag(Player player, @Nullable DraftBag bag) {
+        return bag != null && bag.Contents.stream().anyMatch(draftItem -> draftItem.isDraftable(player));
     }
 
     public String getLongBagRepresentation(DraftBag bag, Game game) {
