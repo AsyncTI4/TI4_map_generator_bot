@@ -19,6 +19,7 @@ import ti4.message.BotLogger.LogMessageOrigin;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.franken.FrankenDraftBagService;
 
 public abstract class BagDraft {
@@ -311,7 +312,7 @@ public abstract class BagDraft {
             sb.append("> ");
             sb.append(player.getRepresentationNoPing());
             sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
-            player.getDraftBagQueue().forEach(bag -> sb.append("💰"));
+            player.getDraftBagQueue().forEach(bag -> sb.append(MiscEmojis.DraftBag.toString()));
             sb.append("\n");
         }
         return sb.toString();
