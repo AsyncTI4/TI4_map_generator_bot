@@ -23,8 +23,7 @@ import ti4.model.FactionModel;
 public class GameWinsWithOtherFactionsService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getGameWinsWithOtherFactions", event, () -> getGameWinsWithOtherFactions(event)));
+        StatisticsPipeline.queue(event, () -> getGameWinsWithOtherFactions(event));
     }
 
     private void getGameWinsWithOtherFactions(SlashCommandInteractionEvent event) {
