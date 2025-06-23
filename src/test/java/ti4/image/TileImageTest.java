@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.helpers.ImageTestHelper.TestMode;
 import ti4.image.helpers.TileImageTestHelper;
@@ -43,7 +41,7 @@ public class TileImageTest extends BaseTi4Test {
     }
 
     @BeforeAll
-    private static void setupTestGame() {
+    public static void setupTestGame() {
         if (testGame != null) return;
         testGame = new Game();
         testGame.setName(" Test Tile Image Generation    ");

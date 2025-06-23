@@ -15,7 +15,7 @@ public class ThreadArchiveHelper {
     public static void checkThreadLimitAndArchive(Guild guild) {
         if (guild == null) return;
 
-        ExecutorManager.runAsyncIfNotRunning("ThreadArchiveHelper task for " + guild.getName(), () -> {
+        ExecutorManager.runAsyncIfNotRunning("ThreadArchiveHelper task for `" + guild.getName() + "`", () -> {
             try {
                 long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
                 int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(), Integer.class, 25);
