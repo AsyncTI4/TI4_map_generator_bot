@@ -7,10 +7,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -63,6 +64,19 @@ public class RemoveUnitService {
     public List<RemovedUnit> removeAllPlayerUnits(GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
+            ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
+            removed.addAll(removeUnit(event, tile, game, u));
+        }
+        return removed;
+    }
+
+    @NotNull
+    public List<RemovedUnit> removeAllPlayerNonStructureUnits(GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
+        List<RemovedUnit> removed = new ArrayList<>();
+        for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
+            if (uk.getUnitType() == UnitType.Pds || uk.getUnitType() == UnitType.Spacedock) {
+                continue;
+            }
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
             removed.addAll(removeUnit(event, tile, game, u));
         }

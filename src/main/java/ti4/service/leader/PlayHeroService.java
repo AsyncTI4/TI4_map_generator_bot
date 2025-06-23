@@ -170,7 +170,7 @@ public class PlayHeroService {
                     player.getRepresentationUnfogged() + ", all of your command tokens on the game have been returned to your reinforcements.");
                 for (Tile t : game.getTileMap().values()) {
                     if (CommandCounterHelper.hasCC(event, player.getColor(), t)) {
-                        RemoveCommandCounterService.fromTile(event, player.getColor(), t, game);
+                        RemoveCommandCounterService.fromTile(player.getColor(), t, game);
                     }
                 }
             }

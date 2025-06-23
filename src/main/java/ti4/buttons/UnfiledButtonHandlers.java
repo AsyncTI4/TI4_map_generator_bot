@@ -873,7 +873,7 @@ public class UnfiledButtonHandlers {
         String groundOrSpace = rest.split("_")[3];
         try (FileUpload systemWithContext = new TileGenerator(game, event, null, 0, pos).createFileUpload()) {
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-            List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace, event);
+            List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } catch (IOException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Failed to close FileUpload", e);
@@ -1737,7 +1737,7 @@ public class UnfiledButtonHandlers {
                 }
 
             }
-            ButtonHelper.checkFleetInEveryTile(player, game, event);
+            ButtonHelper.checkFleetInEveryTile(player, game);
 
         }
         if (("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
@@ -3084,7 +3084,7 @@ public class UnfiledButtonHandlers {
             if (game.isCcNPlasticLimit()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     "Your highest fleet count in a system is currently "
-                        + ButtonHelper.checkFleetInEveryTile(player, game, event)
+                        + ButtonHelper.checkFleetInEveryTile(player, game)
                         + ". That's how many command tokens you'll need to retain in your fleet pool to avoid removing ships.");
             }
         }

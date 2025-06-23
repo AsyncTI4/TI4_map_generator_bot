@@ -1155,7 +1155,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(channel, activePlayerident
                         + " lost 1 command token from fleet pool due to _Neuroglaive_ (" + cTG + "->"
                         + player.getFleetCC() + ")");
-                    checkFleetInEveryTile(player, game, event);
+                    checkFleetInEveryTile(player, game);
                 }
             }
             if (FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)) {
@@ -2275,7 +2275,7 @@ public class ButtonHelper {
             }
         }
 
-        RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
+        RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
 
         String finChecker = "FFCC_" + player.getFaction() + "_";
         if ("mahactCommander".equalsIgnoreCase(whatIsItFor)) {
@@ -2343,7 +2343,7 @@ public class ButtonHelper {
         MessageHelper.sendMessageToChannel(mahact.getCorrectChannel(),
             mahact.getRepresentationUnfogged() + " the " + target.getColor()
                 + " command token has been removed from your fleet pool");
-        ButtonHelper.checkFleetInEveryTile(mahact, game, event);
+        ButtonHelper.checkFleetInEveryTile(mahact, game);
         List<Button> conclusionButtons = new ArrayList<>();
         Button endTurn = Buttons.red(target.getFinsFactionCheckerPrefix() + "turnEnd", "End Turn");
         conclusionButtons.add(endTurn);
@@ -2862,11 +2862,11 @@ public class ButtonHelper {
         return hasAbility;
     }
 
-    public static int checkFleetInEveryTile(Player player, Game game, GenericInteractionCreateEvent event) {
+    public static int checkFleetInEveryTile(Player player, Game game) {
         int highest = 0;
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.playerHasUnitsInSystem(player, tile)) {
-                highest = Math.max(highest, checkFleetAndCapacity(player, game, tile, event)[0]);
+                highest = Math.max(highest, checkFleetAndCapacity(player, game, tile)[0]);
             }
         }
         Helper.isCCCountCorrect(player);
@@ -2875,21 +2875,20 @@ public class ButtonHelper {
     }
 
     public static int[] checkFleetAndCapacity(
-        Player player, Game game, Tile tile,
-        GenericInteractionCreateEvent event
+        Player player, Game game, Tile tile
     ) {
-        return checkFleetAndCapacity(player, game, tile, event, false, true);
+        return checkFleetAndCapacity(player, game, tile, false, true);
     }
 
     public static int[] checkFleetAndCapacity(
-        Player player, Game game, Tile tile, GenericInteractionCreateEvent event,
+        Player player, Game game, Tile tile,
         boolean ignoreFighters
     ) {
-        return checkFleetAndCapacity(player, game, tile, event, ignoreFighters, true);
+        return checkFleetAndCapacity(player, game, tile, ignoreFighters, true);
     }
 
     public static int[] checkFleetAndCapacity(
-        Player player, Game game, Tile tile, GenericInteractionCreateEvent event,
+        Player player, Game game, Tile tile,
         boolean ignoreFighters, boolean issuePing
     ) {
         String tileRepresentation = tile.getRepresentation();
@@ -3121,7 +3120,7 @@ public class ButtonHelper {
                     buttons.add(Buttons.red("deleteButtons",
                         "Dismiss These Buttons"));
 
-                    FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition(), player)
+                    FileUpload systemWithContext = new TileGenerator(game, null, null, 0, tile.getPosition(), player)
                         .createFileUpload();
                     MessageHelper.sendFileToChannelWithButtonsAfter(player.getCorrectChannel(), systemWithContext,
                         message,
@@ -4208,7 +4207,7 @@ public class ButtonHelper {
                 if (game.isFowMode()) {
                     channel = p2.getPrivateChannel();
                 }
-                RemoveCommandCounterService.fromTile(event, p2.getColor(), tile, game);
+                RemoveCommandCounterService.fromTile(p2.getColor(), tile, game);
                 String message = p2.getRepresentationUnfogged()
                     + " due to having Xuange, the Empyrean commander, your command token from the active system has been returned to your reinforcements."
                     + " Reminder that this is optional but was done automatically.";
@@ -6243,7 +6242,7 @@ public class ButtonHelper {
             for (String color : mahactP.getMahactCC()) {
                 if (Mapper.isValidColor(color) && !color.equalsIgnoreCase(player.getColor())) {
                     CommandCounterHelper.addCC(event, game, color, tile);
-                    Helper.isCCCountCorrect(event, game, color);
+                    Helper.isCCCountCorrect(game, color);
                 }
             }
             String message = player.getFactionEmoji() + " chose to use _Scepter of Dominion_ in the tile "
