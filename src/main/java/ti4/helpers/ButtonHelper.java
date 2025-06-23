@@ -3425,6 +3425,9 @@ public class ButtonHelper {
         for (Tile tile : game.getTileMap().values()) {
             if (tile.isEdgeOfBoard(game) && tile.getPosition().length() > 2
                 && (game.isDiscordantStarsMode() || FoWHelper.playerHasShipsInSystem(player, tile))) {
+                if (game.isAgeOfExplorationMode() && tile.isHomeSystem()) {
+                    continue;
+                }
                 buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "starChartsStep2_" + newTileID + "_"
                     + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
@@ -3443,6 +3446,9 @@ public class ButtonHelper {
         for (String pos2 : directlyAdjacentTiles) {
             Tile tile = game.getTileByPosition(pos2);
             if (tile != null && tile.isEdgeOfBoard(game) && !pos2.equalsIgnoreCase(pos)) {
+                if (game.isAgeOfExplorationMode() && tile.isHomeSystem()) {
+                    continue;
+                }
                 buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_"
                     + tile.getPosition() + "_" + pos, tile.getRepresentationForButtons(game, player)));
             }
