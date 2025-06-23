@@ -32,15 +32,15 @@ public class RemoveCCCommand extends AddRemoveTokenCommand {
             String ccID = Mapper.getCCID(color);
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Command token: " + color + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Command token: " + color + " is not valid and not supported.");
             }
             if (game.isFowMode()) {
                 String colorMention = ColorEmojis.getColorEmojiWithName(color);
-                FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " has removed a command token in the system.");
+                FoWHelper.pingSystem(game, tile.getPosition(), colorMention + " has removed a command token in the system.");
             }
 
             tile.removeCC(ccID);
-            Helper.isCCCountCorrect(event, game, color);
+            Helper.isCCCountCorrect(game, color);
         }
     }
 

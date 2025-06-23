@@ -1875,7 +1875,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
                                     + ", you lost 1 command token from your fleet pool due to voting the same way as a _Sanction_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+                            ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
                     if (winningR != null && specificVote.contains("Corporate Lobbying")) {
@@ -1887,7 +1887,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
                                     + " you gained trade goods due to voting the same way as _Corporate Lobbying_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+                            ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight")
@@ -3801,7 +3801,7 @@ public class AgendaHelper {
             }
         }
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+            ButtonHelper.checkFleetInEveryTile(p2, game);
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
             "Removed all ships from systems with alphas or betas wormholes. \nYou may use the button to get your technology.",

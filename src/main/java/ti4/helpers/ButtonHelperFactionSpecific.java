@@ -589,7 +589,7 @@ public class ButtonHelperFactionSpecific {
         String ident = player.getRepresentation(true, false);
         if (!player.getMahactCC().contains(color)) {
             player.addMahactCC(color);
-            Helper.isCCCountCorrect(event, game, color);
+            Helper.isCCCountCorrect(game, color);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ident + " added a " + color + " command token to their fleet pool.");
         } else {
@@ -1570,7 +1570,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getRepresentation()
                     + " has removed a command token from their fleet pool and may vote in any manner that they wish.");
-            ButtonHelper.checkFleetInEveryTile(player, game, event);
+            ButtonHelper.checkFleetInEveryTile(player, game);
         }
         event.getMessage().delete().queue();
     }
