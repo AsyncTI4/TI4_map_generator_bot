@@ -616,7 +616,7 @@
         "capacityUsed": 1,
         "cost": 8,
         "combatHitsOn": 5,
-        "combatDieCount": 2,
+        "combatDieCount": 3,
         "afbHitsOn": 5,
         "afbDieCount": 3,
         "sustainDamage": true,
