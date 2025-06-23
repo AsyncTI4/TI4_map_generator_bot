@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -840,11 +841,11 @@ public class FoWHelper {
     }
 
     /** Ping the players adjacent to a given system */
-    public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message) {
-        pingSystem(game, event, position, message, true);
+    public static void pingSystem(Game game, String position, String message) {
+        pingSystem(game, position, message, true);
     }
 
-    public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message, boolean viewSystemButton) {
+    public static void pingSystem(Game game, String position, String message, boolean viewSystemButton) {
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
             return;
@@ -856,7 +857,7 @@ public class FoWHelper {
                 String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentationForButtons() + " has been pinged:\n>>> "
                     + message;
                 List<Button> refreshButton = viewSystemButton
-                    ? StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event)
+                    ? StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture")
                     : new ArrayList<>();
                 MessageHelper.sendMessageToChannelWithButtons(player_.getPrivateChannel(), playerMessage, refreshButton);
             }

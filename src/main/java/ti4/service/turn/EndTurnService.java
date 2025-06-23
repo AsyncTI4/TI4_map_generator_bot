@@ -112,7 +112,7 @@ public class EndTurnService {
             game.removeStoredValue("ghostagent_active");
             FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn");
         }
-        ButtonHelper.checkFleetInEveryTile(mainPlayer, game, event);
+        ButtonHelper.checkFleetInEveryTile(mainPlayer, game);
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }

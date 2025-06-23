@@ -83,7 +83,7 @@ class EliminatePlayer extends GameStateSubcommand {
             }
             if (game.getSpeakerUserID().equalsIgnoreCase(player.getUserID())) {
                 boolean foundSpeaker = false;
-                for (Player p4 : Helper.getSpeakerOrderFromThisPlayer(player,game)) {
+                for (Player p4 : Helper.getSpeakerOrderFromThisPlayer(player, game)) {
                     if (foundSpeaker) {
                         game.setSpeakerUserID(p4.getUserID());
                         break;
@@ -124,7 +124,7 @@ class EliminatePlayer extends GameStateSubcommand {
             for (Tile tile : game.getTileMap().values()) {
                 tile.removeAllUnits(player.getColor());
                 if (!"null".equalsIgnoreCase(player.getColor()) && CommandCounterHelper.hasCC(event, player.getColor(), tile)) {
-                    RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
+                    RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
                 }
             }
             //discard all of a players ACs

@@ -442,9 +442,9 @@ public class TileGenerator {
                 for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
                     if (capacity == 0 && capacityUsed == 0) {
-                        ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[3];
-                        capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[2];
-                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[1];
+                        ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[3];
+                        capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[2];
+                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[1];
                     }
                 }
                 for (UnitHolder unitHolder : unitHolders) {

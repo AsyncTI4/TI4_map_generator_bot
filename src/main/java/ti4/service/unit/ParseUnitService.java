@@ -5,10 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.apache.commons.lang3.math.NumberUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;

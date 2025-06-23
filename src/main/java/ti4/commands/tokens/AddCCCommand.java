@@ -28,7 +28,7 @@ public class AddCCCommand extends AddRemoveTokenCommand {
                 }
             }
             CommandCounterHelper.addCC(event, game, color, tile);
-            Helper.isCCCountCorrect(event, game, color);
+            Helper.isCCCountCorrect(game, color);
         }
     }
 

@@ -193,7 +193,7 @@ public class PlayerTechService {
                     String ident = player.getFactionEmoji();
                     String msg = ident + " removed command token from " + tileRep + ".";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
+                    RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
                 }
             }
             case "td", "absol_td" -> // Transit Diodes
