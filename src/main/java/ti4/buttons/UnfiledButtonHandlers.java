@@ -661,7 +661,7 @@ public class UnfiledButtonHandlers {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         } else {
             player.setCommodities(player.getCommodities() - tgLoss);
-            player.addSpentThing(message);
+            player.addSpentThing("comm_" + tgLoss);
         }
         String editedMessage = Helper.buildSpentThingsMessage(player, game, whatIsItFor);
         Leader playerLeader = player.getLeader("keleresagent").orElse(null);

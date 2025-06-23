@@ -22,7 +22,7 @@ public class CaptureUnitService {
     public static List<Player> listCapturingMechPlayers(Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
         if (removedUnitType.unitKey().getUnitType() != UnitType.Infantry) return List.of();
         if (!(removedUnitType.uh() instanceof Planet planet)) return List.of();
-        if (!ButtonHelper.isLawInPlay(game, "articles_war")) return List.of();
+        if (ButtonHelper.isLawInPlay(game, "articles_war")) return List.of();
         Player destroyedPlayer = removedUnitType.getPlayer(game);
         if (destroyedPlayer == null) return List.of();
 
