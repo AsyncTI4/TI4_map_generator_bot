@@ -1924,7 +1924,7 @@ public class Helper {
         informUserCCOverLimit(player.getGame(), player.getColor(), ccCount);
     }
 
-    public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game game, String color) {
+    public static void isCCCountCorrect(Game game, String color) {
         int ccCount = getCCCount(game, color);
         informUserCCOverLimit(game, color, ccCount);
     }

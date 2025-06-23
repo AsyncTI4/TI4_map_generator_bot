@@ -320,7 +320,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
-        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
+        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + game.getActiveSystem()
             + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
@@ -330,7 +330,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke_")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
+        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + buttonID.split("_")[1]
             + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
@@ -1524,7 +1524,7 @@ public class ButtonHelperActionCards {
                 player.getRepresentationUnfogged() + ", you melted the space dock in " + tile.getRepresentation());
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your space dock in " + tile.getRepresentation() + " was melted.");
-            ButtonHelper.checkFleetAndCapacity(p2, game, tile, event);
+            ButtonHelper.checkFleetAndCapacity(p2, game, tile);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has melted the space dock that used to belong to "
