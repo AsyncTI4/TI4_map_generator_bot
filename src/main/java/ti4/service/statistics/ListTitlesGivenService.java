@@ -16,8 +16,7 @@ import ti4.message.MessageHelper;
 public class ListTitlesGivenService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("listTitlesGiven", event, () -> listTitlesGiven(event)));
+        StatisticsPipeline.queue(event, () -> listTitlesGiven(event));
     }
 
     private void listTitlesGiven(SlashCommandInteractionEvent event) {

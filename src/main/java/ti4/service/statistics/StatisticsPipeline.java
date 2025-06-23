@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.TimedRunnable;
@@ -16,12 +16,12 @@ public class StatisticsPipeline {
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
-    public static void queue(StatisticsPipeline.StatisticsEvent event) {
-        if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(event.event().getMessageChannel())) {
+    public static void queue(SlashCommandInteractionEvent event, Runnable runnable) {
+        if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(event.getMessageChannel())) {
             return;
         }
-        event.event.getHook().sendMessage("Your statistics are being processed, please hold...").setEphemeral(true).queue();
-        var timedRunnable = new TimedRunnable("Statistics event task for " + event.name, EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, event.runnable);
+        event.getHook().sendMessage("Your statistics are being processed, please hold...").setEphemeral(true).queue();
+        var timedRunnable = new TimedRunnable(eventToString(event), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, runnable);
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
@@ -36,5 +36,7 @@ public class StatisticsPipeline {
         }
     }
 
-    public record StatisticsEvent(String name, IReplyCallback event, Runnable runnable) {}
+    private static String eventToString(SlashCommandInteractionEvent event) {
+        return "StatisticsPipeline task for `" + event.getUser().getEffectiveName() + "`: `" + event.getCommandString() + "`";
+    }
 }

@@ -24,8 +24,7 @@ import ti4.message.MessageHelper;
 public class MedianTurnTimeService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getMedianTurnTime", event, () -> getMedianTurnTime(event)));
+        StatisticsPipeline.queue(event, () -> getMedianTurnTime(event));
     }
 
     private void getMedianTurnTime(SlashCommandInteractionEvent event) {

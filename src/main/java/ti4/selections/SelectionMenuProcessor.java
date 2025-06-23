@@ -19,7 +19,7 @@ public class SelectionMenuProcessor {
 
     public static void queue(StringSelectInteractionEvent event) {
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("SelectionMenuProcessor task for " + gameName, gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorManager.runAsync("SelectionMenuProcessor task for `" + gameName + "`", gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static void process(StringSelectInteractionEvent event) {

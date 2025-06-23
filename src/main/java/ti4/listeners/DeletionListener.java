@@ -1,8 +1,7 @@
 package ti4.listeners;
 
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nonnull;
+import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -20,7 +19,7 @@ public class DeletionListener extends ListenerAdapter {
     @Override
     public void onMessageDelete(@Nonnull MessageDeleteEvent event) {
         if (!validateEvent(event)) return;
-        ExecutorManager.runAsync("MessageDelete task", () -> handleMessageDelete(event));
+        ExecutorManager.runAsync("DeletionListener task", () -> handleMessageDelete(event));
     }
 
     private static boolean validateEvent(MessageDeleteEvent event) {
