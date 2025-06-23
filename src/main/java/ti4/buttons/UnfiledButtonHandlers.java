@@ -1971,6 +1971,7 @@ public class UnfiledButtonHandlers {
             }
             if (allReacted) {
                 respondAllPlayersReacted(event, game);
+                GameMessageManager.remove(game.getName(), messageId);
             }
         } else {
 
@@ -3202,7 +3203,7 @@ public class UnfiledButtonHandlers {
             event.getMessage().editMessage(msg).queue();
         }
         ReactionService.addReaction(event, game, player);
-        checkForAllReactions(event, game);
+        //checkForAllReactions(event, game);
     }
 
     @ButtonHandler(value = "refreshStatusSummary", save = false)
