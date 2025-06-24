@@ -938,8 +938,8 @@ class GameLoadService {
                 case Constants.TRANSACTION_ITEMS -> player.setTransactionItems(getCardList(tokenizer.nextToken()));
                 case Constants.TEAMMATE_IDS -> player.setTeamMateIDs(getCardList(tokenizer.nextToken()));
                 case Constants.FACTION_TECH -> player.setFactionTechs(getCardList(tokenizer.nextToken()));
-                case Constants.DRAFT_BAG -> player.loadCurrentDraftBag(getCardList(tokenizer.nextToken()));
-                case Constants.DRAFT_QUEUE -> player.loadItemsToDraft(getCardList(tokenizer.nextToken()));
+                case Constants.DRAFT_BAG -> player.loadQueuedDraftBags(tokenizer.nextToken());
+                case Constants.DRAFT_SELECTION -> player.loadItemsToDraft(getCardList(tokenizer.nextToken()));
                 case Constants.DRAFT_HAND -> player.loadDraftHand(getCardList(tokenizer.nextToken()));
                 case Constants.ABILITIES -> player.setAbilities(new HashSet<>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
@@ -1042,7 +1042,6 @@ class GameLoadService {
                     player.setFogFilter(filter);
                 }
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.READY_TO_PASS_BAG -> player.setReadyToPassBag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.AUTO_PASS_WHENS_N_AFTERS -> player.setAutoPassOnWhensAfters(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));

@@ -14,6 +14,10 @@ import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.BotLogger;
+import ti4.message.BotLogger.LogMessageOrigin;
+import ti4.message.GameMessageManager;
+import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
@@ -139,39 +143,38 @@ class FrankenButtonHandler {
         if (!action.contains(":")) {
             switch (action) {
                 case "reset_queue" -> {
-                    player.getCurrentDraftBag().Contents.addAll(player.getDraftQueue().Contents);
-                    player.resetDraftQueue();
-                    FrankenDraftBagService.showPlayerBag(game, player);
+                    DraftBag bag = player.getCurrentDraftBag().orElse(null);
+                    if (bag == null) {
+                        BotLogger.warning(new LogMessageOrigin(event, player), "Tried to reset draft selection while no current bag.");
+                    } else {
+                        bag.Contents.addAll(player.getDraftItemSelection().Contents);
+                        player.resetDraftSelection();
+                        FrankenDraftBagService.showPlayerBag(game, player);
+                    }
                     return;
                 }
                 case "confirm_draft" -> {
-                    player.getDraftHand().Contents.addAll(player.getDraftQueue().Contents);
-                    player.resetDraftQueue();
-                    draft.setPlayerReadyToPass(player, true);
+                    player.getDraftHand().Contents.addAll(player.getDraftItemSelection().Contents);
+                    player.resetDraftSelection();
 
-                    // Clear out all existing messages
-                    draft.findExistingBagChannel(player).getHistory().retrievePast(100).queue(m -> {
-                        if (!m.isEmpty()) {
-                            draft.findExistingBagChannel(player).deleteMessages(m).queue();
-                        }
-                    });
-                    MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), "Your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(player.getCurrentDraftBag()));
+                    DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
+                    if (currentBag == null) {
+                        // This should never occur. The player just picked from their current bag; it could be empty, but not non-existent.
+                        BotLogger.warning(new BotLogger.LogMessageOrigin(event, player), "Tried to pass a null bag");
+                    } else {
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are passing the following cards to your right:\n" + FrankenDraftBagService.getBagReceipt(currentBag));
+                    }
+
                     FrankenDraftBagService.displayPlayerHand(game, player);
+
+                    draft.passBag(player);
+
                     if (draft.isDraftStageComplete()) {
                         MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " the draft stage of the FrankenDraft is complete. Please select your abilities from your drafted hands.");
                         FrankenDraftBagService.applyDraftBags(event, game);
                         return;
                     }
-                    int passCounter = 0;
-                    while (draft.allPlayersReadyToPass()) {
-                        FrankenDraftBagService.passBags(game);
-                        passCounter++;
-                        if (passCounter > game.getRealPlayers().size()) {
-                            MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing() + " an error has occurred where nobody is able to draft any cards, but there are cards still in the bag. Please notify @developer");
-                            break;
-                        }
-                    }
+
                     return;
                 }
                 case "show_bag" -> {
@@ -180,21 +183,31 @@ class FrankenButtonHandler {
                 }
             }
         }
-        DraftBag currentBag = player.getCurrentDraftBag();
+
+        DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
+
+        if (currentBag == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Something went wrong. You have no draft bag and are not allowed to draft right now. Please wait for a bag.");
+            return;
+        }
+
         DraftItem selectedItem = DraftItem.generateFromAlias(action);
 
         if (!selectedItem.isDraftable(player)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Something went wrong. You are not allowed to draft " + selectedItem.getShortDescription() + " right now. Please select another item.");
             return;
         }
+        // TODO check what happens if a player attempts to draft an item not in the bag. This kinda looks like the item would just appear.
         currentBag.Contents.removeIf((DraftItem bagItem) -> bagItem.getAlias().equals(action));
-        player.queueDraftItem(DraftItem.generateFromAlias(action));
+        player.selectDraftItem(DraftItem.generateFromAlias(action));
 
-        if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
-            draft.setPlayerReadyToPass(player, true);
-        }
+        // // TODO this shouldn't be reachable; queueDraftItem can't leave an empty item queue
+        // if (!draft.playerHasDraftableItemInBag(player) && !draft.playerHasItemInQueue(player)) {
+        //     draft.setPlayerReadyToPass(player, true);
+        // }
 
         FrankenDraftBagService.showPlayerBag(game, player);
+        // TODO this throws an error "Unknown message"
         event.getMessage().delete().queue();
     }
 }

@@ -130,13 +130,14 @@ public class FrankenDraftBagService {
     public static void showPlayerBag(Game game, Player player) {
         BagDraft draft = game.getActiveBagDraft();
         ThreadChannel bagChannel = draft.regenerateBagChannel(player);
-        if (player.isReadyToPassBag()) {
-            MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), player.getRepresentationUnfogged() + " your Draft Bag is ready to pass and you are waiting for the other players to finish drafting.");
+        DraftBag currentBag = player.getCurrentDraftBag().orElse(null);
+        if (currentBag == null) {
+            MessageHelper.sendMessageToChannel(draft.findExistingBagChannel(player), player.getRepresentationUnfogged() + " you are waiting for other players to finish drafting.");
             return;
         }
 
-        List<DraftItem> draftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
-        List<DraftItem> undraftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
+        List<DraftItem> draftables = new ArrayList<>(currentBag.Contents);
+        List<DraftItem> undraftables = new ArrayList<>(currentBag.Contents);
         draftables.removeIf(draftItem -> !draftItem.isDraftable(player));
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
         Set<String> bagStringLines = getCurrentBagRepresentation(draftables, undraftables);
@@ -144,47 +145,37 @@ public class FrankenDraftBagService {
             MessageHelper.sendMessageToChannel(bagChannel, line);
         }
 
-        int draftQueueCount = player.getDraftQueue().Contents.size();
+        int draftSelectionCount = player.getDraftItemSelection().Contents.size();
         boolean isFirstDraft = player.getDraftHand().Contents.isEmpty();
-        boolean isQueueFull = draftQueueCount >= draft.getPicksFromNextBags();
+        boolean isSelectionFull = draftSelectionCount >= draft.getPicksFromNextBags();
         if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
-            isQueueFull = draftQueueCount >= Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
+            isSelectionFull = draftSelectionCount >= Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
         }
         if (isFirstDraft) {
-            isQueueFull = draftQueueCount >= draft.getPicksFromFirstBag();
+            isSelectionFull = draftSelectionCount >= draft.getPicksFromFirstBag();
             if (!game.getStoredValue("frankenLimitFIRSTPICK").isEmpty()) {
-                isQueueFull = draftQueueCount >= Integer.parseInt(game.getStoredValue("frankenLimitFIRSTPICK"));
+                isSelectionFull = draftSelectionCount >= Integer.parseInt(game.getStoredValue("frankenLimitFIRSTPICK"));
             }
         }
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " you cannot legally draft anything from this bag right now.");
-        } else if (!isQueueFull) {
+        } else if (!isSelectionFull) {
             MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentationUnfogged() + " please select an item to draft:", getSelectionButtons(draftables, player));
         }
 
-        if (draftQueueCount > 0) {
-            List<Button> queueButtons = new ArrayList<>();
-            if (isQueueFull || draftables.isEmpty()) {
-                queueButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I wish to draft these cards."));
+        if (draftSelectionCount > 0) {
+            List<Button> selectionButtons = new ArrayList<>();
+            if (isSelectionFull || draftables.isEmpty()) {
+                selectionButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I wish to draft these cards."));
             }
-            queueButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue", "I wish to draft different cards."));
-            MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Queue:__\n> You are drafting the following from this bag:\n" + getDraftQueueRepresentation(player), queueButtons);
+            selectionButtons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;reset_queue", "I wish to draft different cards."));
+            MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Selection:__\n> You are drafting the following from this bag:\n" + getDraftSelectionRepresentation(player), selectionButtons);
 
-            if (isQueueFull || draftables.isEmpty()) {
+            if (isSelectionFull || draftables.isEmpty()) {
                 MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " please confirm or reset your draft picks.");
             }
         }
 
-    }
-
-    public static void passBags(Game game) {
-        GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT); // Clear the status message so it will be regenerated
-        game.getActiveBagDraft().passBags();
-        for (Player p2 : game.getRealPlayers()) {
-            showPlayerBag(game, p2);
-        }
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Bags have been passed");
-        updateDraftStatusMessage(game);
     }
 
     public static Set<String> getCurrentBagRepresentation(List<DraftItem> draftables, List<DraftItem> undraftables) {
@@ -250,9 +241,9 @@ public class FrankenDraftBagService {
         return game.getActiveBagDraft().getLongBagRepresentation(player.getDraftHand(), game);
     }
 
-    public static String getDraftQueueRepresentation(Player player) {
+    public static String getDraftSelectionRepresentation(Player player) {
         StringBuilder sb = new StringBuilder();
-        DraftBag currentBag = player.getDraftQueue();
+        DraftBag currentBag = player.getDraftItemSelection();
         for (DraftItem item : currentBag.Contents) {
             sb.append(buildItemDescription(item));
             sb.append("\n");
@@ -273,9 +264,10 @@ public class FrankenDraftBagService {
         return sb.toString();
     }
 
-    public static void clearPlayerHands(Game game) {
+    public static void clearPlayerHandsAndQueues(Game game) {
         for (Player player : game.getRealPlayers()) {
             player.setDraftHand(new DraftBag());
+            player.getDraftBagQueue().clear();
         }
     }
 
@@ -286,10 +278,8 @@ public class FrankenDraftBagService {
         List<Player> realPlayers = game.getRealPlayers();
         for (int i = 0; i < realPlayers.size(); i++) {
             Player player = realPlayers.get(i);
-            game.getActiveBagDraft().giveBagToPlayer(bags.get(i), player);
-            player.resetDraftQueue();
-
-            showPlayerBag(game, player);
+            player.resetDraftSelection();
+            game.getActiveBagDraft().enqueueBag(player, bags.get(i));
         }
         GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT); // Clear the status message so it will be regenerated
 
@@ -301,12 +291,16 @@ public class FrankenDraftBagService {
         if (!game.getStoredValue("frankenLimitLATERPICK").isEmpty()) {
             next = Integer.parseInt(game.getStoredValue("frankenLimitLATERPICK"));
         }
+
         String message = "# " + game.getPing() + " Franken Draft has started!\n" +
             "> As a reminder, for the first bag you pick " + first + " item" + (first == 1 ? "" : "s") + ", and for all the bags after that you pick " + next + " item" + (next == 1 ? "" : "s") + ".\n" +
             "> After each pick, the draft thread will be recreated. Sometimes discord will lag while sending long messages, so the buttons may take a few seconds to show up\n" +
-            "> Once you have made your " + next + " pick" + (next == 1 ? "" : "s") + " (" + first + " in the first bag), the bags will automatically be passed once everyone is ready.";
-
+            "> Once you have made your " + next + " pick" + (next == 1 ? "" : "s") + " (" + first + " in the first bag), your bag will automatically be passed to the next player. If they already have a bag, your bag will be added to their queue.";
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message);
+
+        // Clear the status message to avoid reusing one from previous drafts
+        GameMessageManager.remove(game.getName(), GameMessageType.BAG_DRAFT);
+        FrankenDraftBagService.updateDraftStatusMessage(game);
     }
 
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {

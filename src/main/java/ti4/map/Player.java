@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
@@ -85,9 +87,12 @@ public class Player extends PlayerProperties {
 
     private final Game game;
 
+    /** The items a player has drafted already. */
     private DraftBag draftHand = new DraftBag();
-    private DraftBag currentDraftBag = new DraftBag();
-    private final DraftBag draftItemQueue = new DraftBag();
+    /** The items a player is selecting from their current draft bag. */
+    private final DraftBag draftItemSelection = new DraftBag();
+    /** The bags waiting for a player. The head of the queue is the bag they're currently drafting from. */
+    private Queue<DraftBag> draftBagQueue = new ArrayDeque<>();
     private List<Leader> leaders = new ArrayList<>();
     private final List<TemporaryCombatModifierModel> newTempCombatModifiers = new ArrayList<>();
     private List<TemporaryCombatModifierModel> tempCombatModifiers = new ArrayList<>();
@@ -1786,16 +1791,16 @@ public class Player extends PlayerProperties {
         draftHand = hand;
     }
 
-    public DraftBag getCurrentDraftBag() {
-        return currentDraftBag;
+    public Optional<DraftBag> getCurrentDraftBag() {
+        return Optional.ofNullable(getDraftBagQueue().peek());
     }
 
-    public void setCurrentDraftBag(DraftBag bag) {
-        currentDraftBag = bag;
+    public DraftBag getDraftItemSelection() {
+        return draftItemSelection;
     }
 
-    public DraftBag getDraftQueue() {
-        return draftItemQueue;
+    public Queue<DraftBag> getDraftBagQueue() {
+        return draftBagQueue;
     }
 
     @JsonIgnore
@@ -1856,28 +1861,42 @@ public class Player extends PlayerProperties {
         draftHand = newBag;
     }
 
-    public void loadCurrentDraftBag(List<String> saveString) {
-        DraftBag newBag = new DraftBag();
-        for (String item : saveString) {
-            newBag.Contents.add(DraftItem.generateFromAlias(item));
-        }
-        currentDraftBag = newBag;
-    }
-
     public void loadItemsToDraft(List<String> saveString) {
         List<DraftItem> items = new ArrayList<>();
         for (String item : saveString) {
             items.add(DraftItem.generateFromAlias(item));
         }
-        draftItemQueue.Contents = items;
+        draftItemSelection.Contents = items;
     }
 
-    public void queueDraftItem(DraftItem item) {
-        draftItemQueue.Contents.add(item);
+    public void loadQueuedDraftBags(String saveString) {
+        Queue<DraftBag> queue = new ArrayDeque<>();
+
+        // This field is a series of 0 or more bagStrings, each terminated by a ";".
+        // bagStrings *may be empty*. (This occurs when selecting the last components from a bag.)
+        // If there is exactly one bag and it is non-empty, the terminating ";" is optional
+        //   (this occurs when loading a non-queueing game).
+        // TODO BAG_QUEUEING test loading from a non-queueing game
+        // The empty string is a list of 0 bags.
+        List<String> bagStrings = List.of(saveString.split(";", -1));
+        if (bagStrings.getLast().equals("")) {
+            bagStrings = bagStrings.subList(0, bagStrings.size() - 1);
+        }
+
+        for (String bagString : bagStrings) {
+            queue.add(DraftBag.fromStoreString(bagString));
+        }
+        // TODO BAG_QUEUEING remove this eventually
+        BotLogger.info("Loaded " + queue.size() + " bags from: " + saveString);
+        draftBagQueue = queue;
     }
 
-    public void resetDraftQueue() {
-        draftItemQueue.Contents.clear();
+    public void selectDraftItem(DraftItem item) {
+        draftItemSelection.Contents.add(item);
+    }
+
+    public void resetDraftSelection() {
+        draftItemSelection.Contents.clear();
     }
 
     @JsonIgnore
