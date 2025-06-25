@@ -4,7 +4,7 @@
         "name": "Gravity Wave",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Remove all your ships from this system and place them in any adjacent system. Then place a Gravity Rift token in this system. [Note: Only ships will survive]",
+        "text": "Remove all your non-infantry units from this system and place them in any adjacent system. Then place a Gravity Rift token in this system. [Note: Infantry will not survive.]",
         "flavorText": "Gravity twisted violently, ejecting vessels into nearby space.",
         "source": "fowplus"
     },
@@ -40,7 +40,7 @@
         "name": "Quantum Spoor",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Gain 1 technology of your choice that at least one neighbor owns.",
+        "text": "Gain 1 non-faction technology owned by at least one of your neighbors.",
         "flavorText": "Our sensors caught the residue of something massive. We followed its path — and found data impossible to fake.",
         "source": "fowplus"
     },
@@ -50,7 +50,7 @@
         "name": "Founder's Sacrifice",
         "type": "Industrial",
         "resolution": "Instant",
-        "text": "You may place a Space Dock from your reinforcements on this planet. If you did, destroy all your ground forces on the planet.",
+        "text": "You may place a Space Dock from your reinforcements on this planet. If you do, destroy all your ground forces on the planet.",
         "flavorText": "They did not build the dock. They became it.",
         "source": "fowplus"
     }

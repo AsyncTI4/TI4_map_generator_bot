@@ -809,6 +809,7 @@ public class ExploreService {
             }
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
+        FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
@@ -840,13 +841,17 @@ public class ExploreService {
     }
 
     public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force) {
+        expFront(event, tile, game, player, force, null);
+    }
+
+    public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force, String cardID) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename) || force) {
             if (space.getTokenList().contains(frontierFilename)) {
                 space.removeToken(frontierFilename);
             }
-            String cardID = game.drawExplore(Constants.FRONTIER);
+            cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
             String messageText = player.getRepresentation() + (force ? " force" : "") + " explored the " + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
 
