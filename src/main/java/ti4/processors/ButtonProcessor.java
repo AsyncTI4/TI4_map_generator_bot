@@ -37,8 +37,13 @@ public class ButtonProcessor {
         BotLogger.logButton(event);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("ButtonProcessor task " + event.getButton().getLabel() + " for " + gameName,
-            gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorManager.runAsync(eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+    }
+
+    private static String eventToString(ButtonInteractionEvent event, String gameName) {
+        return "ButtonProcessor task for `" + event.getUser().getEffectiveName() + "`" +
+            (gameName == null ? "" : " in `" + gameName + "`") +
+            ": `" + ButtonHelper.getButtonRepresentation(event.getButton()) + "`";
     }
 
     private static void process(ButtonInteractionEvent event) {

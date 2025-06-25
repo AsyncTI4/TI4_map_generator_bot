@@ -21,8 +21,7 @@ import ti4.model.ActionCardModel;
 public class ListSlashCommandsUsedService {
 
     public static void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("listSlashCommandsUsed", event, () -> listSlashCommandsUsed(event)));
+        StatisticsPipeline.queue(event, () -> listSlashCommandsUsed(event));
     }
 
     private static void listSlashCommandsUsed(SlashCommandInteractionEvent event) {

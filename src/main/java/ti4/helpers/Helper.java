@@ -1121,11 +1121,10 @@ public class Helper {
                 Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
                 if (planet == null) {
-                    if (thing.contains("reduced commodities")) {
-                        String comms = StringUtils.substringAfter(thing, "by ");
-                        comms = StringUtils.substringBefore(comms, " (");
-                        keleresAgent = Integer.parseInt(comms);
-                        msg.append("Keleres Agent for ").append(comms).append(" comms\n");
+                    if (thing.contains("comms")) {
+                        String comms = StringUtils.substringAfter(thing, "_");
+                        keleresAgent += Integer.parseInt(comms);
+                        msg.append("Keleres Agent for ").append(comms).append(" commoditiess\n");
                     } else {
                         msg.append(thing).append("\n");
                     }
@@ -1925,7 +1924,7 @@ public class Helper {
         informUserCCOverLimit(player.getGame(), player.getColor(), ccCount);
     }
 
-    public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game game, String color) {
+    public static void isCCCountCorrect(Game game, String color) {
         int ccCount = getCCCount(game, color);
         informUserCCOverLimit(game, color, ccCount);
     }

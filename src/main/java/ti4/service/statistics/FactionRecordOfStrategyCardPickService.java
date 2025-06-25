@@ -22,8 +22,7 @@ import ti4.model.FactionModel;
 public class FactionRecordOfStrategyCardPickService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getFactionStrategyCardPickRecord", event, () -> getFactionStrategyCardPickRecord(event)));
+        StatisticsPipeline.queue(event, () -> getFactionStrategyCardPickRecord(event));
     }
 
     private void getFactionStrategyCardPickRecord(SlashCommandInteractionEvent event) {

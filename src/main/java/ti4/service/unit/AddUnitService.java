@@ -28,8 +28,8 @@ public class AddUnitService {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unit.uh().getName(), game);
 
             String color = unit.unitKey().getColorID();
-            handleFogOfWar(event, tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
-            checkFleetCapacity(event, tile, color, game);
+            handleFogOfWar(tile, color, game, unit.unitKey() + " " + unit.getTotalRemoved());
+            checkFleetCapacity(tile, color, game);
         }
     }
 
@@ -42,8 +42,8 @@ public class AddUnitService {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
         }
 
-        handleFogOfWar(event, tile, color, game, unitList);
-        checkFleetCapacity(event, tile, color, game);
+        handleFogOfWar(tile, color, game, unitList);
+        checkFleetCapacity(tile, color, game);
     }
 
     public static void addUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
@@ -54,16 +54,16 @@ public class AddUnitService {
             AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, parsedUnit.getLocation(), game);
         }
 
-        handleFogOfWar(event, tile, color, game, unitList);
-        checkFleetCapacity(event, tile, color, game);
+        handleFogOfWar(tile, color, game, unitList);
+        checkFleetCapacity(tile, color, game);
     }
 
-    private static void handleFogOfWar(GenericInteractionCreateEvent event, Tile tile, String color, Game game, String unitList) {
+    private static void handleFogOfWar(Tile tile, String color, Game game, String unitList) {
         if (!game.isFowMode()) return;
 
         if (isTileAlreadyPinged(game, tile)) return;
 
-        FoWHelper.pingSystem(game, event, tile.getPosition(),
+        FoWHelper.pingSystem(game, tile.getPosition(),
             ColorEmojis.getColorEmojiWithName(color) + " has modified units in the system: " + unitList);
 
         markTileAsPinged(game, tile);
@@ -77,10 +77,10 @@ public class AddUnitService {
         game.setTileAsPinged(tile.getPosition());
     }
 
-    private static void checkFleetCapacity(GenericInteractionCreateEvent event, Tile tile, String color, Game game) {
+    private static void checkFleetCapacity(Tile tile, String color, Game game) {
         Player player = game.getPlayerFromColorOrFaction(color);
         if (player != null) {
-            ButtonHelper.checkFleetAndCapacity(player, game, tile, event);
+            ButtonHelper.checkFleetAndCapacity(player, game, tile);
             CommanderUnlockCheckService.checkPlayer(player, "naalu", "cabal", "obsidian");
         }
     }

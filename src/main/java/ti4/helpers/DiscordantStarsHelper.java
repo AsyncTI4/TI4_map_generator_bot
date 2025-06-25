@@ -261,7 +261,7 @@ public class DiscordantStarsHelper {
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
         if (ids.size() == 1) {
-            ButtonHelper.detTileAdditionStep1(player, ids.getFirst());
+            ButtonHelper.starChartStep1(game, player, ids.getFirst());
         }
     }
 
@@ -291,12 +291,9 @@ public class DiscordantStarsHelper {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Use `/map add_tile` to add it to the map.");
 
         event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
-        if (ids.size() == 1) { 
-            if (game.isDiscordantStarsMode()) {
-                ButtonHelper.starChartStep1(game, player, ids.getFirst());
-            } else {
-                ButtonHelper.detTileAdditionStep1(player, ids.getFirst());
-            }
+        if (ids.size() == 1) {
+            ButtonHelper.starChartStep1(game, player, ids.getFirst());
+
         } else {
             ButtonHelper.starChartStep0(player, ids);
         }

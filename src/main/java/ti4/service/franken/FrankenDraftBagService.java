@@ -139,7 +139,6 @@ public class FrankenDraftBagService {
         List<DraftItem> undraftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
         draftables.removeIf(draftItem -> !draftItem.isDraftable(player));
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
-
         Set<String> bagStringLines = getCurrentBagRepresentation(draftables, undraftables);
         for (String line : bagStringLines) {
             MessageHelper.sendMessageToChannel(bagChannel, line);
