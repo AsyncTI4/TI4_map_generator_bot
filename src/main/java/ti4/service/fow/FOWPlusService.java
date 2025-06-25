@@ -229,8 +229,8 @@ public class FOWPlusService {
 
             case FOWPLUS_EXPLORE_VORTEX:
                 AddTokenCommand.addToken(event, tile, "vortex", game);
-                FoWHelper.pingSystem(game, event, tile.getPosition(), "Space warps unnaturally.");
-                int nonCarriedFF = ButtonHelper.checkFleetAndCapacity(player, game, tile, event)[4];
+                FoWHelper.pingSystem(game, tile.getPosition(), "Space warps unnaturally.");
+                int nonCarriedFF = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[4];
                 if (nonCarriedFF > 0) {
                     RemoveUnitService.removeUnit(event, tile, game, player, tile.getSpaceUnitHolder(), UnitType.Fighter, nonCarriedFF);
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() 
@@ -308,7 +308,7 @@ public class FOWPlusService {
             + (infs > 0 ? " " + infs + " " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs) + " was left behind." : ""));
 
         AddTokenCommand.addToken(event, currentTile, "gravityrift", game);
-        FoWHelper.pingSystem(game, event, currentPos, "Gravity phenomenon detected.");
+        FoWHelper.pingSystem(game, currentPos, "Gravity phenomenon detected.");
         event.getMessage().delete().queue();
     }
 
