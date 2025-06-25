@@ -3142,7 +3142,7 @@ public class ButtonHelper {
             return capNCap;
         }
         int[] capNCap2 = { ((numFighter2sFleet + numOfCapitalShips + 1) / 2),
-            numInfNFightersNMechs - numFighter2s + ignoredFs, capacity, fightersIgnored };
+            numInfNFightersNMechs - numFighter2s + ignoredFs, capacity, fightersIgnored, numFighter2s };
         return capNCap2;
     }
 
