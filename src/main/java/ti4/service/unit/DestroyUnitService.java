@@ -190,7 +190,7 @@ public class DestroyUnitService {
                     }
                     StringBuilder message2 = new StringBuilder();
                     message2.append(player.getRepresentation());
-                    message2.append(" has detonated the bomb.");
+                    message2.append(" has detonated the bomb");
                     DisasterWatchHelper.postTileInDisasterWatch(game, event, unit.tile(), 0, message2 + ".");
 
                 }
