@@ -2625,7 +2625,9 @@ public class AgendaHelper {
 
             if (CollectionUtils.containsAny(player.getRelics(),
                 List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
-                int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size();
+                int count = (int) player.getRelics().stream()
+                    .filter(s -> s.contains("absol_shardofthethrone"))
+                    .count();
                 int shardVotes = 2 * count; // +2 votes per Absol shard
                 Button button = Buttons.gray("exhaustForVotes_absolShard_" + shardVotes,
                     "Use Shard of the Throne Votes (" + shardVotes + ")", SourceEmojis.Absol);
@@ -3125,7 +3127,9 @@ public class AgendaHelper {
         }
 
         // Absol Shard of the Throne
-        int shardCount = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size();
+        int shardCount = (int) player.getRelics().stream()
+            .filter(s -> s.contains("absol_shardofthethrone"))
+            .count();
         if (shardCount > 0) { // +2 votes per Absol shard
             int shardVotes = 2 * shardCount;
             additionalVotesAndSources.put(
