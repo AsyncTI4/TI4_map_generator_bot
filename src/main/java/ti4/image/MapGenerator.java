@@ -129,10 +129,12 @@ public class MapGenerator implements AutoCloseable {
             scoreTokenSpacing = 30;
 
         // Height of objectives section (=0 when there is 5 or less objectives in the column with most objectives)
-        int stage1PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
-            .filter(Mapper.getPublicObjectivesStage1()::containsKey).toList().size();
-        int stage2PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
-            .filter(Mapper.getPublicObjectivesStage2()::containsKey).toList().size();
+        int stage1PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
+            .filter(Mapper.getPublicObjectivesStage1()::containsKey)
+            .count();
+        int stage2PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
+            .filter(Mapper.getPublicObjectivesStage2()::containsKey)
+            .count();
         int otherObjCount = game.getRevealedPublicObjectives().size() - stage1PublicObjCount - stage2PublicObjCount;
         stage1PublicObjCount = game.getPublicObjectives1Peakable().size() + stage1PublicObjCount;
         stage2PublicObjCount = game.getPublicObjectives2Peakable().size() + stage2PublicObjCount;
