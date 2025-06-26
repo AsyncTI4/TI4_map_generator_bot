@@ -1524,12 +1524,12 @@ public class ButtonHelperActionCards {
                 player.getRepresentationUnfogged() + ", you melted the space dock in " + tile.getRepresentation());
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your space dock in " + tile.getRepresentation() + " was melted.");
-            ButtonHelper.checkFleetAndCapacity(p2, game, tile);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has melted the space dock that used to belong to "
                     + p2.getRepresentationUnfogged() + " in " + tile.getRepresentation() + ".");
         }
+        ButtonHelper.checkFleetAndCapacity(p2, game, tile);
         if (p2.hasAbility("data_recovery")) {
             ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
         }
