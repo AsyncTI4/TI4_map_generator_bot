@@ -26,14 +26,6 @@ public class WebTileUnitData {
     private List<String> ccs;
     private boolean isAnomaly;
     private Map<String, Integer> production;
-    private Map<String, WebTileCapacityData> capacity;
-
-    @Data
-    public static class WebTileCapacityData {
-        private Integer total;      // Total capacity available
-        private Integer used;       // Capacity currently used
-        private Integer ignored;    // Fighter capacity ignored (from space docks, etc.)
-    }
 
     public WebTileUnitData() {
         this.space = new HashMap<>();
@@ -41,7 +33,6 @@ public class WebTileUnitData {
         this.ccs = new ArrayList<>();
         this.isAnomaly = false;
         this.production = new HashMap<>();
-        this.capacity = new HashMap<>();
     }
 
     public static Map<String, WebTileUnitData> fromGame(Game game) {
@@ -208,27 +199,6 @@ public class WebTileUnitData {
             int productionValue = Helper.getProductionValue(player, game, tile, false);
             if (productionValue > 0) {
                 tileData.production.put(color, productionValue);
-            }
-
-            // Calculate capacity data for this player in this tile
-            try {
-                int[] capacityData = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, false, false);
-                // capacityData array: [numOfCapitalShips, capacityUsed, totalCapacity, fightersIgnored]
-                int capacityUsed = capacityData[1];
-                int totalCapacity = capacityData[2];
-                int fightersIgnored = capacityData[3];
-
-                if (capacityUsed > 0 || totalCapacity > 0 || fightersIgnored > 0) {
-                    WebTileCapacityData capData = new WebTileCapacityData();
-                    capData.setTotal(totalCapacity);
-                    capData.setUsed(capacityUsed);
-                    if (fightersIgnored > 0) {
-                        capData.setIgnored(fightersIgnored);
-                    }
-                    tileData.capacity.put(color, capData);
-                }
-            } catch (Exception e) {
-                // If capacity calculation fails, skip it
             }
         }
 
