@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
@@ -15,6 +17,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.Planet;
+import ti4.model.UnitModel;
 
 @Data
 public class WebTileUnitData {
@@ -22,12 +25,23 @@ public class WebTileUnitData {
     private Map<String, WebTilePlanet> planets;
     private List<String> ccs;
     private boolean isAnomaly;
+    private Map<String, Integer> production;
+    private Map<String, WebTileCapacityData> capacity;
+
+    @Data
+    public static class WebTileCapacityData {
+        private Integer total;      // Total capacity available
+        private Integer used;       // Capacity currently used
+        private Integer ignored;    // Fighter capacity ignored (from space docks, etc.)
+    }
 
     public WebTileUnitData() {
         this.space = new HashMap<>();
         this.planets = new HashMap<>();
         this.ccs = new ArrayList<>();
         this.isAnomaly = false;
+        this.production = new HashMap<>();
+        this.capacity = new HashMap<>();
     }
 
     public static Map<String, WebTileUnitData> fromGame(Game game) {
@@ -38,7 +52,7 @@ public class WebTileUnitData {
             Tile tile = entry.getValue();
 
             if (tile != null && tile.getTileID() != null && !"-1".equals(tile.getTileID()) && !"null".equals(tile.getTileID())) {
-                WebTileUnitData unitData = extractTileUnitData(tile, game);
+                WebTileUnitData unitData = extractTileUnitData(game, tile);
                 tileUnitData.put(position, unitData);
             }
         }
@@ -46,7 +60,7 @@ public class WebTileUnitData {
         return tileUnitData;
     }
 
-    private static WebTileUnitData extractTileUnitData(Tile tile, Game game) {
+    private static WebTileUnitData extractTileUnitData(Game game, Tile tile) {
         WebTileUnitData tileData = new WebTileUnitData();
 
         // Set anomaly status
@@ -153,7 +167,6 @@ public class WebTileUnitData {
             }
         }
 
-        // Determine planet control for ALL planets in the tile, not just those with units/tokens
         for (Planet planet : tile.getPlanetUnitHolders()) {
             String holderName = planet.getName();
 
@@ -172,6 +185,51 @@ public class WebTileUnitData {
             }
 
             planetData.setControlledBy(controllingFaction);
+
+            // Set commodities count for Discordant Stars comms on planets functionality
+            String commsStorageKey = "CommsOnPlanet" + holderName;
+            if (!game.getStoredValue(commsStorageKey).isEmpty()) {
+                try {
+                    int comms = Integer.parseInt(game.getStoredValue(commsStorageKey));
+                    if (comms > 0) {
+                        planetData.setCommodities(comms);
+                    }
+                } catch (NumberFormatException e) {
+                    // Ignore invalid stored values
+                }
+            }
+        }
+
+        // Calculate production and capacity for each player
+        for (Player player : game.getRealPlayers()) {
+            String color = player.getColor();
+
+            // Calculate production value for this player in this tile
+            int productionValue = Helper.getProductionValue(player, game, tile, false);
+            if (productionValue > 0) {
+                tileData.production.put(color, productionValue);
+            }
+
+            // Calculate capacity data for this player in this tile
+            try {
+                int[] capacityData = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, false, false);
+                // capacityData array: [numOfCapitalShips, capacityUsed, totalCapacity, fightersIgnored]
+                int capacityUsed = capacityData[1];
+                int totalCapacity = capacityData[2];
+                int fightersIgnored = capacityData[3];
+
+                if (capacityUsed > 0 || totalCapacity > 0 || fightersIgnored > 0) {
+                    WebTileCapacityData capData = new WebTileCapacityData();
+                    capData.setTotal(totalCapacity);
+                    capData.setUsed(capacityUsed);
+                    if (fightersIgnored > 0) {
+                        capData.setIgnored(fightersIgnored);
+                    }
+                    tileData.capacity.put(color, capData);
+                }
+            } catch (Exception e) {
+                // If capacity calculation fails, skip it
+            }
         }
 
         return tileData;
