@@ -68,6 +68,7 @@ public class GameProperties {
 
     // Customization Flags/Settings
     private boolean botFactionReacts;
+    private boolean botStratReacts;
     private boolean botShushing;
     private boolean ccNPlasticLimit = true;
     private boolean injectRulesLinks = true;

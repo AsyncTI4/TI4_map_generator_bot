@@ -26,6 +26,7 @@ import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
@@ -254,10 +255,11 @@ public class MessageListener extends ListenerAdapter {
                     });
             }
         }
-        if (managedGame == null || !managedGame.isFactionReactMode() || managedGame.isFowMode()) {
+        if (managedGame == null || (!managedGame.isFactionReactMode() && !managedGame.isStratReactMode()) || managedGame.isFowMode()) {
             return false;
         }
-        Player player = getPlayer(event, managedGame.getGame());
+        Game game = managedGame.getGame();
+        Player player = getPlayer(event, game);
         if (player == null || !player.isRealPlayer()) {
             return false;
         }
@@ -267,7 +269,21 @@ public class MessageListener extends ListenerAdapter {
                 .queue(messages -> {
                     if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
                         var emoji = Emoji.fromFormatted(player.getFactionEmoji());
-                        messages.getFirst().addReaction(emoji).queue();
+                        if (managedGame.isFactionReactMode()) {
+                            messages.getFirst().addReaction(emoji).queue();
+                        }
+                        if (managedGame.isStratReactMode()) {
+                            if (game.getPhaseOfGame().contains("action") && !game.isHomebrewSCMode() && player.getLowestSC() != 100) {
+                                var emoji2 = CardEmojis.getSCFrontFromInteger(player.getLowestSC());
+                                if (game.getPlayedSCs().contains(player.getLowestSC())) {
+                                    emoji2 = CardEmojis.getSCBackFromInteger(player.getLowestSC());
+                                }
+                                var demoji2 = emoji2.asEmoji();
+                                messages.getFirst().addReaction(demoji2).queue();
+
+                            }
+                        }
+
                     }
                 });
         } catch (Exception e) {

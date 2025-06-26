@@ -1,5 +1,7 @@
 package ti4.map;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -92,7 +93,9 @@ public class Planet extends UnitHolder {
         return tokenList.stream().anyMatch(token -> {
             AttachmentModel attach = Mapper.getAttachmentInfo(token);
             if (attach != null && attach.isFakeAttachment()) return false;
-
+            if (token.contains("superweapon")) return false;
+            if (token.contains("token_tomb")) return false;
+            if (token.contains("facility")) return false;
             if (token.contains("sleeper")) return false;
             if (token.contains("dmz_large")) return false;
             if (token.contains("custodiavigilia")) return false;
@@ -106,7 +109,9 @@ public class Planet extends UnitHolder {
         return tokenList.stream().filter(token -> {
             AttachmentModel attach = Mapper.getAttachmentInfo(token);
             if (attach != null && attach.isFakeAttachment()) return false;
-
+            if (token.contains("superweapon")) return false;
+            if (token.contains("token_tomb")) return false;
+            if (token.contains("facility")) return false;
             if (token.contains("sleeper")) return false;
             if (token.contains("dmz_large")) return false;
             if (token.contains("custodiavigilia")) return false;
