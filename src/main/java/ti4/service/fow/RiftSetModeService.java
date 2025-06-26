@@ -146,7 +146,7 @@ public class RiftSetModeService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, winner, false);
 
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(CRUCIBLE_PN);
-        MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you recieved " + CardEmojis.PN + pnModel.getName());
+        MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you received " + CardEmojis.PN + pnModel.getName());
     }
 
     public static void resolveExplore(String exploreCardId, Player player, Game game) {
