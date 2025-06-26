@@ -269,6 +269,7 @@ public class TacticalActionService {
             FOWPlusService.resolveVoidActivation(player, game);
             Button conclude = Buttons.red(player.finChecker() + "doneWithTacticalAction", "Conclude Tactical Action");
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "All units were lost to the void.", conclude);
+            ButtonHelper.deleteAllButtons(event);
             return;
         }
 

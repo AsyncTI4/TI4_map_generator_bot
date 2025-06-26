@@ -348,7 +348,7 @@ public class GMService {
         TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
             .setRequired(false)
             .setPlaceholder("There once was Mecatol...")
-            .setMaxLength(420);
+            .setMaxLength(1000);
 
         if (StringUtils.isNotBlank(existingPosition)) {
             position.setValue(existingPosition);

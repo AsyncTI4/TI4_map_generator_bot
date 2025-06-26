@@ -14,8 +14,8 @@ __**Communication Tips:**__
 __**Action Card Tips:**__
 > `/fow whisper anon:y` – Anonymously notify a player they are the target.
 > `/fow ping_system` – Announce a system/planet target to players who can see that system.
-> `/fow announce anon:y` – Make a public announcement to the main channel.
+> `/fow announce` – Make an anonymous announcement to the main channel.
 
-__**Combat tips:**__
+__**Combat Tips:**__
 > Each participant gets their own combat thread; spectators get a thread to spectate the interraction.
 > Messages in the combat thread relay between threads, so you can talk normally; no need to whisper.
