@@ -325,7 +325,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean hasInf2Tech() {// "dszeliinf"
         return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2")
-            || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2")
+            || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2") || getTechs().contains("dsqhetinf")
             || getTechs().contains("dszeliinf") || getUnitsOwned().contains("pharadn_infantry") || getUnitsOwned().contains("pharadn_infantry2");
     }
 
