@@ -1117,7 +1117,7 @@ public class Helper {
                 }
             }
             if (!found && !thing.contains("tg_") && !thing.contains("boon") && !thing.contains("warmachine")
-                && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")) {
+                && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("agent") && !thing.contains("Agent")) {
                 Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
                 if (planet == null) {
@@ -1189,7 +1189,7 @@ public class Helper {
                     res += 1;
                 }
                 if (thing.contains("aida")) {
-                    msg.append("> Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
+                    msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
                     if (thing.contains("_")) {
                         int upgrades = ButtonHelper.getNumberOfUnitUpgrades(player);
                         res += upgrades;
@@ -1201,8 +1201,8 @@ public class Helper {
                 }
                 if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg.append("> ").append(thing).append("\n");
-                } else if (thing.contains("Winnu Agent")) {
-                    msg.append("> ").append(thing).append("\n");
+                } else if (thing.contains("winnuagent")) {
+                    msg.append("> Used Winnu agent for 2 resources").append("\n");
                     res += 2;
                 } else if (thing.contains("Zealots Agent")) {
                     msg.append("> ").append(thing).append("(Best resources found were ").append(bestRes).append(")\n");

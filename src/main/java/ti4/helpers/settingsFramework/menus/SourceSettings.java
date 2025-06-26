@@ -44,7 +44,7 @@ public class SourceSettings extends SettingsMenu {
         // Initialize Settings to default values
         base = new BooleanSetting("BaseGame", "Base Game", true);
         pok = new BooleanSetting("PoK", "Prophecy of Kings", true);
-        codexes = new BooleanSetting("Codexes", "Codex 1-3", true);
+        codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());

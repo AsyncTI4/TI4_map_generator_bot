@@ -857,7 +857,12 @@ class AgendaResolveButtonHandler {
                         }
                         case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
                         case "6" -> scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
-                        case "7" -> scButtons.add(Buttons.GET_A_TECH);
+                        case "7" -> {
+                            scButtons.add(Buttons.GET_A_TECH);
+                            if (Helper.getPlayerFromAbility(game, "propogation") != null) {
+                                scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Gain 3 Command Tokens (for Nekro)"));
+                            }
+                        }
                         case "8" -> {
                             PlayStrategyCardService.handleSOQueueing(game, false);
                             scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
