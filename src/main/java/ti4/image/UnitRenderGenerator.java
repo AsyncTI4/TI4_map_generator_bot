@@ -38,6 +38,9 @@ public class UnitRenderGenerator {
 
     private final ResourceHelper resourceHelper = ResourceHelper.getInstance();
 
+    // Map to store unit coordinates organized by faction and unit ID
+    private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
+
     private record ImagePosition(
         int originalX,
         int originalY,
@@ -47,8 +50,8 @@ public class UnitRenderGenerator {
 
     private record SystemContext(
         boolean isSpace,
-        boolean isMirage,
-        boolean hasMirage,
+        boolean isTokenPlanet,
+        boolean hasTokenPlanet,
         boolean isJail,
         boolean showJail,
         Point unitOffset,
@@ -159,7 +162,7 @@ public class UnitRenderGenerator {
             // Contains pre-computed values common to this 'unit class'
             // (e.g. all fighters, all infantry, all mechs, etc.)
             PositioningContext posCtx = new PositioningContext(
-                unitHolder.getHolderCenterPosition(),
+                unitHolder.getHolderCenterPosition(tile),
                 unitHolder.getName(),
                 tile.getTileID(),
                 unitKey.asyncID(),
@@ -173,6 +176,14 @@ public class UnitRenderGenerator {
                 ImagePosition imagePos = calculateImagePosition(posCtx, position);
                 int imageX = imagePos.x();
                 int imageY = imagePos.y();
+
+                // Collect unit coordinates by faction and unit ID
+                String factionKey = player.getFaction();
+                String unitId = unitKey.asyncID();
+                unitCoordinatesByFaction
+                    .computeIfAbsent(factionKey, k -> new HashMap<>())
+                    .computeIfAbsent(unitId, k -> new ArrayList<>())
+                    .add(new Point(imageX, imageY));
 
                 if (containsDMZ || (isSpace && unitModel.getIsPlanetOnly()) || (!isSpace && unitModel.getIsSpaceOnly())) {
                     String badPath = resourceHelper.getPositionFile("badpos_" + (bulkUnitCount != null ? "tkn_" : "") + unitKey.asyncID() + ".png");
@@ -283,13 +294,10 @@ public class UnitRenderGenerator {
 
     private SystemContext buildSystemContext(Tile tile, UnitHolder unitHolder, Player frogPlayer) {
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
-        boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
-        boolean hasMirage = false;
-        if (isSpace) {
-            Set<String> tokenList = unitHolder.getTokenList();
-            hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage"))
-                && (tile.getPlanetUnitHolders().size() != 3 + 1);
-        }
+        boolean isTokenPlanet = Constants.TOKEN_PLANETS.contains(unitHolder.getName());
+        boolean hasTokenPlanet = unitHolder.getTokenList().stream()
+            .map(Mapper::getTokenKey)
+            .anyMatch(Constants.TOKEN_PLANETS::contains);
 
         Map<String, String> jailTiles = Map.of(
             "s11", "cabal",
@@ -317,8 +325,8 @@ public class UnitRenderGenerator {
 
         return new SystemContext(
             isSpace,
-            isMirage,
-            hasMirage,
+            isTokenPlanet,
+            hasTokenPlanet,
             isJail,
             showJail,
             unitOffset,
@@ -351,7 +359,7 @@ public class UnitRenderGenerator {
 
         int imageDmgX, imageDmgY;
 
-        if (ctx.isMirage) {
+        if (ctx.isTokenPlanet) {
             imageDmgX = imageX - TILE_PADDING;
             imageDmgY = imageY - TILE_PADDING;
         } else if (unitType == UnitType.Mech) {
@@ -593,6 +601,7 @@ public class UnitRenderGenerator {
     }
 
     private ImagePosition calculateImagePosition(PositioningContext posCtx, Point position) {
+        position = TileGenerator.offsetTokenPositionForTokenPlanets(position, unitHolder, tile);
         int xOriginal = posCtx.centerPosition.x + position.x;
         int yOriginal = posCtx.centerPosition.y + position.y;
 
@@ -601,15 +610,9 @@ public class UnitRenderGenerator {
         int imageY = position.y + TILE_PADDING;
 
         // Handle mirage positions
-        if (ctx.isMirage) {
-            if (posCtx.planetHolderSize() == 3 + 1) {
-                imageX += Constants.MIRAGE_TRIPLE_POSITION.x;
-                imageY += Constants.MIRAGE_TRIPLE_POSITION.y;
-            } else {
-                imageX += Constants.MIRAGE_POSITION.x;
-                imageY += Constants.MIRAGE_POSITION.y;
-            }
-        } else if (ctx.hasMirage) {
+        if (ctx.isTokenPlanet) {
+            // do nothing
+        } else if (ctx.hasTokenPlanet) {
             // Center the image
             imageX += (posCtx.unitImage.getWidth() / 2);
             imageY += (posCtx.unitImage.getHeight() / 2);
@@ -641,5 +644,16 @@ public class UnitRenderGenerator {
             case "sd", "csd", "plenaryorbital" -> new Point(-10, 20); // Space Dock
             default -> new Point(0, 0);
         };
+    }
+
+    /**
+     * Returns a map of unit coordinates organized by faction and unit ID.
+     * The map contains faction names as keys, unit IDs as secondary keys, and lists of pixel coordinates as values.
+     * Coordinates represent the top-left corner of where each unit was rendered.
+     *
+     * @return Map where keys are faction names, secondary keys are unit IDs, and values are lists of unit coordinates
+     */
+    public Map<String, Map<String, List<Point>>> getUnitCoordinatesByFaction() {
+        return new HashMap<>(unitCoordinatesByFaction);
     }
 }

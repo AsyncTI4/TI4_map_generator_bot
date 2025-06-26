@@ -110,6 +110,9 @@ public class Mapper {
     }
 
     public static void loadData() throws Exception {
+        // must be first for validating later models
+        importJsonObjectsFromFolder("factions", factions, FactionModel.class);
+
         importJsonObjectsFromFolder("abilities", abilities, AbilityModel.class);
         importJsonObjectsFromFolder("action_cards", actionCards, ActionCardModel.class);
         importJsonObjectsFromFolder("agendas", agendas, AgendaModel.class);
@@ -119,7 +122,6 @@ public class Mapper {
         importJsonObjectsFromFolder("decks", decks, DeckModel.class);
         importJsonObjectsFromFolder("events", events, EventModel.class);
         importJsonObjectsFromFolder("explores", explores, ExploreModel.class);
-        importJsonObjectsFromFolder("factions", factions, FactionModel.class);
         importJsonObjectsFromFolder("franken_errata", frankenErrata, DraftErrataModel.class);
         importJsonObjectsFromFolder("genericcards", genericCards, GenericCardModel.class);
         importJsonObjectsFromFolder("leaders", leaders, LeaderModel.class);
@@ -141,6 +143,7 @@ public class Mapper {
         readData("tokens.properties", tokens_fromProperties);
 
         duplicateObjectsForAllColors(promissoryNotes);
+        duplicateObjectsForAllColors(secretObjectives);
     }
 
     private static void readData(String propertyFileName, Properties properties) throws IOException {
@@ -410,7 +413,7 @@ public class Mapper {
         }
         return agendaModel.getMapText();
     }
-    
+
     public static String getAgendaType(String id) {
         AgendaModel agendaModel = agendas.get(id);
         if (agendaModel == null) {
@@ -456,7 +459,7 @@ public class Mapper {
             .filter(model -> model.searchSource(CompSource))
             .map(model -> model.getSource().toString()).toList();
     }
-    
+
     public static AttachmentModel getAttachmentInfo(String id) {
         AttachmentModel model = attachments.get(id);
         if (model != null) return model;
@@ -500,7 +503,7 @@ public class Mapper {
     }
 
     // no source field in colors data, missing 'private List<String> getColorsSources(ComponentSource CompSource)'
-    
+
     public static List<String> getColorIDs() {
         return new ArrayList<>(colors.values().stream().map(ColorModel::getAlias).toList());
     }
@@ -578,11 +581,13 @@ public class Mapper {
     public static Map<String, ExploreModel> getExplores() {
         return new HashMap<>(explores);
     }
+
     public static ExploreModel getExplore(String exploreId) {
         exploreId = exploreId.replace("extra1", "");
         exploreId = exploreId.replace("extra2", "");
         return explores.get(exploreId);
     }
+
     public static boolean isValidExplore(String exploreID) {
         return explores.containsKey(exploreID);
     }
@@ -753,7 +758,7 @@ public class Mapper {
     public static boolean isValidPromissoryNote(String id) {
         return promissoryNotes.containsKey(id);
     }
-    
+
     public static List<String> getPromissoryNotesSources(ComponentSource CompSource) {
         return Mapper.getPromissoryNotes().values().stream()
             .filter(model -> model.searchSource(CompSource))
@@ -804,7 +809,7 @@ public class Mapper {
         }
         return poList;
     }
-    
+
     public static PublicObjectiveModel getPublicObjective(String id) {
         return publicObjectives.get(id);
     }
@@ -833,7 +838,7 @@ public class Mapper {
     public static Map<String, RelicModel> getRelics() {
         return new HashMap<>(relics);
     }
-    
+
     public static RelicModel getRelic(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
@@ -905,7 +910,7 @@ public class Mapper {
     public static SourceModel getSource(String sourceID) {
         return sources.get(sourceID);
     }
-    
+
     public static boolean isValidSource(String sourceID) {
         return sources.containsKey(sourceID);
     }
@@ -917,8 +922,8 @@ public class Mapper {
 
     public static Map<String, StrategyCardSetModel> getStrategyCardSets() {
         return new HashMap<>(strategyCardSets);
-    }   
-    
+    }
+
     public static boolean isValidStrategyCardSet(String strategyCardSetID) {
         return strategyCardSets.containsKey(strategyCardSetID);
     }
@@ -964,7 +969,7 @@ public class Mapper {
     public static boolean isValidTech(String id) {
         return technologies.containsKey(id);
     }
-    
+
     public static List<String> getTechnologiesSources(ComponentSource CompSource) {
         return Mapper.getTechs().values().stream()
             .filter(model -> model.searchSource(CompSource))
@@ -994,15 +999,16 @@ public class Mapper {
     }
 
     public static List<String> getTokensFromProperties() {
-        return Stream.of(attachments.keySet(), tokens_fromProperties.keySet()).flatMap(Collection::stream)
+        return Stream.of(attachments.keySet(), tokens_fromProperties.keySet(), tokens.keySet()).flatMap(Collection::stream)
             .filter(String.class::isInstance)
             .map(String.class::cast)
             .sorted()
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet())
+            .stream().toList();
     }
 
-    public static TokenModel getToken(String id){
-        return tokens.get(id);
+    public static TokenModel getToken(String id) {
+        return tokens.get(getTokenKey(id));
     }
 
     public static boolean isValidToken(String id) {
@@ -1038,7 +1044,18 @@ public class Mapper {
     public static String getTokenID(String tokenID) {
         return tokens_fromProperties.getProperty(tokenID);
     }
-    
+
+    public static String getTokenKey(String tokenID) {
+        for (Entry<String, TokenModel> token : tokens.entrySet()) {
+            String key = token.getKey();
+            String val = token.getValue().getImagePath();
+            if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key))
+                return key;
+        }
+        System.out.println("Could not resolve token: " + tokenID);
+        return tokenID;
+    }
+
     // Color Tokens
 
     public static String getCCID(String color) {
@@ -1195,7 +1212,7 @@ public class Mapper {
 
     // ####################
     // Planets
-    
+
     public static Map<String, String> getPlanetRepresentations() {
         return TileHelper.getAllPlanetModels().stream()
             .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
@@ -1235,7 +1252,7 @@ public class Mapper {
             .filter(model -> model.searchSource(CompSource))
             .map(model -> model.getSource().toString()).toList();
     }
-    
+
     // Frontiers
 
     public static List<String> getFrontierTileIds() {

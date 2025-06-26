@@ -56,6 +56,7 @@ public class StartTurnService {
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setStoredValue("lawsDisabled", "no");
+        game.removeStoredValue("audioSent");
         game.checkSOLimit(player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
         boolean goingToPass = false;
@@ -335,6 +336,9 @@ public class StartTurnService {
             game.setJustPlayedComponentAC(false);
             if (player.getTechs().contains("cm")) {
                 startButtons.add(Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
+            }
+            if (game.isOrdinianC1Mode() && !ButtonHelper.isCoatlHealed(game) && player == ButtonHelper.getPlayerWhoControlsCoatl(game)) {
+                startButtons.add(Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6r)", FactionEmojis.Argent));
             }
             if (player.getTechs().contains("dspharinf") && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game).isEmpty()) {
                 startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Inf", FactionEmojis.pharadn));

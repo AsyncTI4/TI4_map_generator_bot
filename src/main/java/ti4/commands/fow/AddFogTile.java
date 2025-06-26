@@ -58,7 +58,7 @@ class AddFogTile extends GameStateSubcommand {
                 target.addFogTile(planetTileName, position, label);
                 sb2.append(" ").append(target.getRepresentation());
             }
-            sb.append("Added fog tile ").append(position).append(" (").append(planetTileName).append(") to").append(sb2.toString()).append("\n");
+            sb.append("Added fog tile ").append(position).append(" (").append(planetTileName).append(") to").append(sb2).append("\n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }

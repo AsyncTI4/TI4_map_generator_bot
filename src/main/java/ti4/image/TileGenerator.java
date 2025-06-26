@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -79,6 +80,9 @@ public class TileGenerator {
     private final String focusTile;
     private final DisplayType displayType;
 
+    // Map to aggregate unit coordinates by faction from all UnitRenderGenerator calls
+    private final Map<String, Map<String, List<Point>>> unitCoordinatesByFaction = new HashMap<>();
+
     public TileGenerator(@NotNull Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
         this(game, event, displayType, 0, "000", null);
     }
@@ -102,6 +106,38 @@ public class TileGenerator {
         return game.isFowMode() && event != null &&
             (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL) ||
                 event instanceof UserOverridenGenericInteractionCreateEvent);
+    }
+
+    /**
+     * Get the aggregated unit coordinates by faction from all UnitRenderGenerator calls
+     * @return Map where key is faction/player identifier, secondary key is unit ID, and value is list of coordinates
+     */
+    public Map<String, Map<String, List<Point>>> getUnitCoordinatesByFaction() {
+        return new HashMap<>(unitCoordinatesByFaction);
+    }
+
+    /**
+     * Helper method to aggregate unit coordinates from a UnitRenderGenerator into the main map
+     * @param unitRenderGenerator The UnitRenderGenerator to get coordinates from
+     */
+    private void aggregateUnitCoordinates(UnitRenderGenerator unitRenderGenerator) {
+        Map<String, Map<String, List<Point>>> renderCoordinates = unitRenderGenerator.getUnitCoordinatesByFaction();
+        if (renderCoordinates != null) {
+            for (Map.Entry<String, Map<String, List<Point>>> factionEntry : renderCoordinates.entrySet()) {
+                String faction = factionEntry.getKey();
+                Map<String, List<Point>> unitMap = factionEntry.getValue();
+
+                for (Map.Entry<String, List<Point>> unitEntry : unitMap.entrySet()) {
+                    String unitId = unitEntry.getKey();
+                    List<Point> coordinates = unitEntry.getValue();
+
+                    unitCoordinatesByFaction
+                        .computeIfAbsent(faction, k -> new HashMap<>())
+                        .computeIfAbsent(unitId, k -> new ArrayList<>())
+                        .addAll(coordinates);
+                }
+            }
+        }
     }
 
     public FileUpload createFileUpload() {
@@ -310,7 +346,7 @@ public class TileGenerator {
                 }
 
                 // add icons to wormholes for agendas
-                // Worhmole recon:  For: alpha||beta WH systems are adjacent to each other 
+                // Worhmole recon:  For: alpha||beta WH systems are adjacent to each other
                 // Travel ban:      For: alpha/beta WH have no effect during movement
                 // Nexus:           For: alpha/beta WH **in Nexus** have no effect during movement
                 // Shared research: For: Units can move through nebulae
@@ -332,7 +368,7 @@ public class TileGenerator {
                 }
                 if ((ButtonHelper.isLawInPlay(game, "nexus") || ButtonHelper.isLawInPlay(game, "absol_nexus"))
                     && (tile.getTileID().equals("82b"))
-                    && !(ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban")) // 
+                    && !(ButtonHelper.isLawInPlay(game, "travel_ban") || ButtonHelper.isLawInPlay(game, "absol_travelban")) //
                 ) {
                     // avoid doubling up, which is important when using the transparent symbol
                     BufferedImage blockedWormholeImage = ImageHelper.read(ResourceHelper.getInstance().getTokenFile("agenda_wormhole_blocked" + (reconstruction ? "_half" : "") + ".png"));
@@ -394,7 +430,7 @@ public class TileGenerator {
                 UnitHolder spaceUnitHolder = tile.getSpaceUnitHolder();
                 if (spaceUnitHolder != null) {
                     addSleeperToken(tile, tileGraphics, spaceUnitHolder, TileGenerator::isValidCustodianToken, game);
-                    addToken(tile, tileGraphics, spaceUnitHolder, game);
+                    drawTokensOnTile(tile, tileGraphics, spaceUnitHolder, game);
                     unitHolders.remove(spaceUnitHolder);
                     unitHolders.add(spaceUnitHolder);
                 }
@@ -406,9 +442,9 @@ public class TileGenerator {
                 for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
                     if (capacity == 0 && capacityUsed == 0) {
-                        ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[3];
-                        capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[2];
-                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, event, false, false)[1];
+                        ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[3];
+                        capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[2];
+                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[1];
                     }
                 }
                 for (UnitHolder unitHolder : unitHolders) {
@@ -465,7 +501,7 @@ public class TileGenerator {
                         Graphics2D g2d = (Graphics2D) tileGraphics;
                         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                        // Calculate water height  
+                        // Calculate water height
                         double waterHeight;
                         if (capacity + ignoredFs > 0) {
                             waterHeight = 20.0 * capacityUsed / (capacity + ignoredFs);
@@ -473,7 +509,7 @@ public class TileGenerator {
                             waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
                         }
 
-                        // Draw brown box (3 sides)  
+                        // Draw brown box (3 sides)
 
                         g2d.setStroke(new BasicStroke(6));
 
@@ -485,17 +521,17 @@ public class TileGenerator {
                             gearY = gearY - 55;
                         }
 
-                        //g2d.setColor(new Color(128, 197, 222));  
-                        //g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);   
-                        //g2d.setColor(new Color(122, 127, 128)); 
+                        //g2d.setColor(new Color(128, 197, 222));
+                        //g2d.fillRect(gearX+43, gearY+64+18 -(int)(waterHeight), 25, (int)waterHeight);
+                        //g2d.setColor(new Color(122, 127, 128));
 
-                        //g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);  
+                        //g2d.drawLine(gearX+40, gearY+64, gearX+40, gearY+64+20);
 
-                        // Right side  
-                        //g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);  
+                        // Right side
+                        //g2d.drawLine(gearX+40+30, gearY+64, gearX+40+30, gearY+64+20);
 
-                        // Bottom side  
-                        //g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);  
+                        // Bottom side
+                        //g2d.drawLine(gearX+40, gearY+64+20, gearX+40+30, gearY+64+20);
                         tileGraphics.drawImage(carrierImage, gearX + 24, gearY + 60, null);
                         g2d.setColor(Color.WHITE);
                         tileGraphics.setFont(Storage.getFont12());
@@ -520,7 +556,9 @@ public class TileGenerator {
                     if (unitHolder != spaceUnitHolder) {
                         addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
                     }
-                    new UnitRenderGenerator(game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer).render();
+                    UnitRenderGenerator unitRenderGenerator = new UnitRenderGenerator(game, displayType, tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, fowPlayer);
+                    unitRenderGenerator.render();
+                    aggregateUnitCoordinates(unitRenderGenerator);
                 }
             }
             case Distance -> {
@@ -1004,11 +1042,7 @@ public class TileGenerator {
                             }
                         }
 
-                        Point position = planet.getHolderCenterPosition();
-                        if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3 + 1)) {
-                            position = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
-                                Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
-                        }
+                        Point position = planet.getHolderCenterPosition(tile);
                         position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
 
                         tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
@@ -1086,13 +1120,10 @@ public class TileGenerator {
                             }
                         }
 
-                        Point position = planet.getHolderCenterPosition();
-                        if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3 + 1)) {
-                            position = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
-                                Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
-                        }
+                        Point position = planet.getHolderCenterPosition(tile);
                         if (number > 1) {
-                            position = new Point(position.x - 20 + count * 40 / (number - 1), position.y - 20 + count * 40 / (number - 1));
+                            int offset = -20 + count * 40 / (number - 1);
+                            position.translate(offset, offset);
                         }
                         position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
 
@@ -1170,11 +1201,7 @@ public class TileGenerator {
                         }
                     }
 
-                    Point position = planet.getHolderCenterPosition();
-                    if (planet.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3 + 1)) {
-                        position = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
-                            Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
-                    }
+                    Point position = planet.getHolderCenterPosition(tile);
                     position = new Point(position.x - w / 2 + TILE_PADDING, position.y - h / 2 + TILE_PADDING);
                     if (number == 1) {
                         tileGraphics.drawImage(backgroundOuter, position.x - padding, position.y - padding, null);
@@ -1291,7 +1318,7 @@ public class TileGenerator {
             try {
                 image = ImageHelper.read(ccPath);
 
-                Point centerPosition = unitHolder.getHolderCenterPosition();
+                Point centerPosition = unitHolder.getHolderCenterPosition(tile);
 
                 Player player = DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), ccID);
                 boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
@@ -1319,11 +1346,23 @@ public class TileGenerator {
         }
     }
 
+    public static Point offsetTokenPositionForTokenPlanets(Point position, UnitHolder planet, Tile tile) {
+        if (position == null)
+            return position;
+        if (Constants.TOKEN_PLANETS.contains(planet.getName())) {
+            Point centerPosition = planet.getHolderCenterPosition(tile);
+            Point offset = Constants.TOKEN_PLANET_CENTER_OFFSET;
+            position = new Point(position);
+            position.translate(centerPosition.x - offset.x, centerPosition.y - offset.y);
+        }
+        return position;
+    }
+
     private void addControl(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, List<Rectangle> rectangles) {
         List<String> controlList = new ArrayList<>(unitHolder.getControlList());
         UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
         if (unitTokenPosition != null) {
-            Point centerPosition = unitHolder.getHolderCenterPosition();
+            Point centerPosition = unitHolder.getHolderCenterPosition(tile);
             int xDelta = 0;
             for (String controlID : controlList) {
                 if (controlID.contains(Constants.SLEEPER)) {
@@ -1333,18 +1372,8 @@ public class TileGenerator {
                 Player player = DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlID);
                 boolean convertToGeneric = isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer);
 
-                boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
                 Point position = unitTokenPosition.getPosition(controlID);
-                if (isMirage) {
-                    if (tile.getPlanetUnitHolders().size() == 3 + 1) {
-                        position = Constants.MIRAGE_TRIPLE_POSITION;
-                    } else if (position == null) {
-                        position = Constants.MIRAGE_POSITION;
-                    } else {
-                        position.x += Constants.MIRAGE_POSITION.x;
-                        position.y += Constants.MIRAGE_POSITION.y;
-                    }
-                }
+                position = offsetTokenPositionForTokenPlanets(position, unitHolder, tile);
 
                 float scale = 1.0f;
                 BufferedImage controlTokenImage = ImageHelper.readScaled(Mapper.getCCPath(controlID), scale);
@@ -1374,6 +1403,7 @@ public class TileGenerator {
                     xDelta += 10;
                 }
             }
+
         } else {
             oldFormatPlanetTokenAdd(tile, tileGraphics, unitHolder, controlList);
         }
@@ -1381,11 +1411,7 @@ public class TileGenerator {
 
     private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Function<String, Boolean> isValid, Game game) {
         BufferedImage tokenImage;
-        Point centerPosition = unitHolder.getHolderCenterPosition();
-        if (unitHolder.getName().equalsIgnoreCase("mirage") && (tile.getPlanetUnitHolders().size() == 3 + 1)) {
-            centerPosition = new Point(Constants.MIRAGE_TRIPLE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
-                Constants.MIRAGE_TRIPLE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
-        }
+        Point centerPosition = unitHolder.getHolderCenterPosition(tile);
         List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.remove(null);
         tokenList.sort((o1, o2) -> {
@@ -1486,7 +1512,7 @@ public class TileGenerator {
         });
         UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
         if (unitTokenPosition != null) {
-            Point centerPosition = unitHolder.getHolderCenterPosition();
+            Point centerPosition = unitHolder.getHolderCenterPosition(tile);
             int xDelta = 0;
             for (String tokenID : tokenList) {
                 if (isValidToken(tokenID) || isValidCustodianToken(tokenID)) {
@@ -1530,18 +1556,8 @@ public class TileGenerator {
                     tileGraphics.drawImage(tokenImage, TILE_PADDING + 140, TILE_PADDING + 185, null);
                 } else {
                     Point position = unitTokenPosition.getPosition(tokenID);
-                    boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
-                    if (isMirage) {
-                        if (tile.getPlanetUnitHolders().size() == 3 + 1) {
-                            position.x += Constants.MIRAGE_TRIPLE_POSITION.x;
-                            position.y += Constants.MIRAGE_TRIPLE_POSITION.y;
-                        } else if (position == null) {
-                            position = Constants.MIRAGE_POSITION;
-                        } else {
-                            position.x += Constants.MIRAGE_POSITION.x;
-                            position.y += Constants.MIRAGE_POSITION.y;
-                        }
-                    }
+                    position = offsetTokenPositionForTokenPlanets(position, unitHolder, tile);
+
                     if (position != null) {
                         tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y, null);
                         rectangles.add(new Rectangle(TILE_PADDING + position.x, TILE_PADDING + position.y,
@@ -1620,7 +1636,7 @@ public class TileGenerator {
     ) {
         int deltaY = 0;
         int offSet = 0;
-        Point centerPosition = unitHolder.getHolderCenterPosition();
+        Point centerPosition = unitHolder.getHolderCenterPosition(tile);
         int x = centerPosition.x;
         int y = centerPosition.y - (tokenList.size() > 1 ? 35 : 0);
         for (String tokenID : tokenList) {
@@ -1638,9 +1654,16 @@ public class TileGenerator {
         }
     }
 
-    private static void addToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
-        Set<String> tokenList = unitHolder.getTokenList();
-        Point centerPosition = unitHolder.getHolderCenterPosition();
+    private static Comparator<String> sortTokensForDisplay() {
+        Function<String, Boolean> sortTokenPlanet = tok -> !Constants.TOKEN_PLANETS.contains(Mapper.getTokenKey(tok));
+        return Comparator.comparing(sortTokenPlanet);
+    }
+
+    private static void drawTokensOnTile(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Game game) {
+        List<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
+        Collections.sort(tokenList, sortTokensForDisplay());
+
+        Point centerPosition = unitHolder.getHolderCenterPosition(tile);
         int x = 0;
         int y = 0;
         int deltaX = 80;
@@ -1649,7 +1672,9 @@ public class TileGenerator {
         float mirageDragRatio = 2.0f / 3;
         int mirageDragX = Math.round(((float) 345 / 8 + TILE_PADDING) * (1 - mirageDragRatio));
         int mirageDragY = Math.round(((float) (3 * 300) / 4 + TILE_PADDING) * (1 - mirageDragRatio));
-        boolean hasMirage = tokenList.stream().anyMatch(tok -> tok.contains("mirage")) && (tile.getPlanetUnitHolders().size() != 3 + 1);
+        boolean hasTripleTokenPlanet = tokenList.stream()
+            .anyMatch(tok -> Constants.TOKEN_PLANETS.contains(Mapper.getTokenKey(tok)))
+            && (tile.getPlanetUnitHolders().size() >= 4);
         List<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = centerPosition.x;
@@ -1658,6 +1683,8 @@ public class TileGenerator {
         int index = 0;
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
+            String tokenName = Mapper.getTokenKey(tokenID);
+
             if (tokenPath == null) {
                 BotLogger.warning(new BotLogger.LogMessageOrigin(game), "Could not parse token file for: " + tokenID);
                 continue;
@@ -1670,14 +1697,12 @@ public class TileGenerator {
             if (tokenImage == null)
                 return;
 
-            if (tokenPath.contains(Constants.MIRAGE)) {
-                if (tile.getPlanetUnitHolders().size() == 3 + 1) {
-                    tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_TRIPLE_POSITION.x,
-                        TILE_PADDING + Constants.MIRAGE_TRIPLE_POSITION.y, null);
-                } else {
-                    tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_POSITION.x,
-                        TILE_PADDING + Constants.MIRAGE_POSITION.y, null);
-                }
+            boolean isTokenPlanet = Constants.TOKEN_PLANETS.contains(tokenName);
+            if (isTokenPlanet) {
+                Point tokenCenter = Helper.getTokenPlanetCenterPosition(tile, tokenName);
+                int tokenX = tokenCenter.x - (tokenImage.getWidth() / 2);
+                int tokenY = tokenCenter.y - (tokenImage.getHeight() / 2);
+                tileGraphics.drawImage(tokenImage, TILE_PADDING + tokenX, TILE_PADDING + tokenY, null);
             } else if (tokenPath.contains(Constants.SLEEPER)) {
                 int sleeperX = TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2);
                 int sleeperY = TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2);
@@ -1700,7 +1725,7 @@ public class TileGenerator {
                     deltaX += 30;
                     deltaY += 30;
                 }
-                if (hasMirage) {
+                if (hasTripleTokenPlanet) {
                     drawX += (tokenImage.getWidth() / 2);
                     drawY += (tokenImage.getHeight() / 2);
                     drawX = Math.round(mirageDragRatio * drawX) + mirageDragX;

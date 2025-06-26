@@ -1,5 +1,6 @@
 package ti4.service.combat;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
@@ -183,10 +185,13 @@ public class StartCombatService {
         game.setStoredValue(combatName2, "");
 
         TextChannel textChannel = (TextChannel) channel;
+
         // Use existing thread, if it exists
         for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
             if (threadChannel_.getName().equals(threadName)) {
                 initializeCombatThread(threadChannel_, game, player1, player2, tile, event, spaceOrGround, null, unitHolderName);
+                CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
+                CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
                 return;
             }
         }
@@ -211,6 +216,8 @@ public class StartCombatService {
             threadChannel.queue(tc -> initializeCombatThread(tc, game, player1, player2, tile, event,
                 spaceOrGround, systemWithContext, unitHolderName));
         });
+        CommanderUnlockCheckService.checkPlayer(player1, "redcreuss");
+        CommanderUnlockCheckService.checkPlayer(player2, "redcreuss");
     }
 
     private static void initializeCombatThread(
@@ -358,6 +365,38 @@ public class StartCombatService {
             List<Button> lanefirATSButtons = ButtonHelperFactionSpecific.getLanefirATSButtons(player1, player2);
             MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons to remove commodities from _ATS Armaments_:", lanefirATSButtons);
         }
+
+        for (Player p : game.getRealPlayers()) {
+            // offer buttons for all crimson commander holders
+            offerRedGhostCommanderButtons(p, game, event);
+        }
+
+        if (tile.isHomeSystem() && isGroundCombat && game.getStoredValue("audioSent").isEmpty()) {
+            for (Player p3 : game.getRealPlayers()) {
+                if (p3.getHomeSystemTile() == tile) {
+                    File audioFile = ResourceHelper.getFile("voices/" + p3.getFaction() + "/", "homedefense.mp3");
+                    if (audioFile.exists()) {
+                        MessageHelper.sendFileToChannel(threadChannel, audioFile);
+                        game.setStoredValue("audioSent", "Yes");
+                    }
+                    Player invader = game.getActivePlayer();
+                    File audioFile2 = ResourceHelper.getFile("voices/" + invader.getFaction() + "/", "homeinvasion.mp3");
+                    if (audioFile2.exists() && invader != p3) {
+                        MessageHelper.sendFileToChannel(threadChannel, audioFile2);
+                        game.setStoredValue("audioSent", "Yes");
+                    }
+                }
+            }
+        }
+    }
+
+    public static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
+            String message = player.getRepresentation(true, true) + " Resolve Red Creuss Commander using buttons\n> (note this is not available until the end of combat)";
+            message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
+            List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+        }
     }
 
     private static void createSpectatorThread(Game game, Player player, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround) {
@@ -421,6 +460,10 @@ public class StartCombatService {
                     MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against the ships of "
                         + player.getFactionEmojiOrColor() + " due to the ability of the Quetzecoatl (the Argent flagship).");
                 }
+            }
+            if (game.isOrdinianC1Mode() && (tile.getSpaceUnitHolder().getTokenList().contains("token_custc1.png") || tile.getSpaceUnitHolder().getTokenList().contains("token_custvpc1.png"))) {
+                MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against ships in this system "
+                    + " due to the ability of the Coatl (the Argent flagship represented as the custodians token).");
             }
         }
     }
@@ -493,7 +536,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg,
                     buttons);
             }
-            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, true)[0];
+            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, true, true)[0];
             if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     msg + ", this is a reminder that if you win the combat (or otherwise keep ships in the active system), and you lose "
@@ -569,7 +612,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win a combat during this action " +
                     "you may take an additional action (Qhet Commander Ability)");
             }
-            if (player.getPromissoryNotes().keySet().contains("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
+            if (player.getPromissoryNotes().containsKey("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     player.getRepresentationUnfogged() + " reminder you have the Qhet promissory note.");
             }
@@ -756,13 +799,12 @@ public class StartCombatService {
         ThreadChannel threadChannel, Game game, Player player1,
         Player player2, Tile tile, String spaceOrGround, GenericInteractionCreateEvent event
     ) {
-        List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround,
-            event);
+        List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for combat.", buttons);
     }
 
     // TODO: Break apart into: [all combats, space combat, ground combat] methods
-    public static List<Button> getGeneralCombatButtons(Game game, String pos, Player p1, Player p2, String groundOrSpace, GenericInteractionCreateEvent event) {
+    public static List<Button> getGeneralCombatButtons(Game game, String pos, Player p1, Player p2, String groundOrSpace) {
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
         UnitHolder space = tile.getUnitHolders().get("space");
@@ -788,6 +830,17 @@ public class StartCombatService {
             }
             if (!game.isFowMode() && p2.hasTechReady("sc")) {
                 buttons.add(Buttons.green(p2.getFinsFactionCheckerPrefix() + "applytempcombatmod__" + "tech" + "__" + "sc", "Use Supercharge", FactionEmojis.Naaz));
+            }
+        }
+
+        if (p1.hasTech("nekroc4y") && isSpaceCombat && tile != p1.getHomeSystemTile() && p1.getHomeSystemTile() != null) {
+            if (p1.hasUnit("ghoti_flagship") || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Spacedock).contains(p1.getHomeSystemTile())) {
+                buttons.add(Buttons.green(p1.getFinsFactionCheckerPrefix() + "useNekroNullRef", "Use Null Reference (Upon Each Destroy)", FactionEmojis.Nekro));
+            }
+        }
+        if (p2.hasTech("nekroc4y") && isSpaceCombat && tile != p2.getHomeSystemTile() && p2.getHomeSystemTile() != null && !game.isFowMode()) {
+            if (p2.hasUnit("ghoti_flagship") || ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
+                buttons.add(Buttons.green(p2.getFinsFactionCheckerPrefix() + "useNekroNullRef", "Use Null Reference (Upon Each Destroy)", FactionEmojis.Nekro));
             }
         }
 
@@ -1085,11 +1138,42 @@ public class StartCombatService {
 
         if (p1.hasLeaderUnlocked("kortalihero")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p2.getFaction(), "Purge Kortali Hero", FactionEmojis.dihmohn));
+            buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p2.getFaction(), "Purge Kortali Hero", FactionEmojis.kortali));
         }
         if (p2.hasLeaderUnlocked("kortalihero") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "purgeKortaliHero_" + p1.getFaction(), "Purge Kortali Hero", FactionEmojis.kortali));
+        }
+
+        if (p1.hasLeaderUnlocked("redcreusshero") && isSpaceCombat) {
+            String finChecker = "FFCC_" + p1.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "purgeRedCreussHero_" + tile.getPosition(), "Purge Red Creuss Hero", FactionEmojis.Ghost));
+        }
+        if (p2.hasLeaderUnlocked("redcreusshero") && !game.isFowMode() && isSpaceCombat) {
+            String finChecker = "FFCC_" + p2.getFaction() + "_";
+            buttons.add(Buttons.gray(finChecker + "purgeRedCreussHero_" + tile.getPosition(), "Purge Red Creuss Hero", FactionEmojis.Ghost));
+        }
+
+        if (game.isLiberationC4Mode()) {
+            if (tile.getTileID().equalsIgnoreCase("c41")) {
+                Player sol = game.getPlayerFromColorOrFaction("sol");
+                Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
+                if (sol == p1 || sol == p2 || xxcha == p1 || xxcha == p2) {
+                    if (xxcha.hasLeaderUnlocked("orlandohero")) {
+                        buttons.add(Buttons.gray(xxcha.getFinsFactionCheckerPrefix() + "purgeOrlandoHero_" + tile.getPosition(), "Purge Orlando Hero", FactionEmojis.Xxcha));
+                    }
+                }
+            }
+            if (!game.getCustomPublicVP().keySet().contains("Control Ordinian")) {
+                Player nekro = game.getPlayerFromColorOrFaction("nekro");
+                if (nekro == p1 || nekro == p2) {
+                    String po_name = "Liberate Ordinian";
+                    int value = game.getRevealedPublicObjectives().get(po_name);
+                    if (game.getRevealedPublicObjectives().get(po_name) != null) {
+                        buttons.add(Buttons.gray(Constants.PO_SCORING + value, "Score " + po_name + " (Win against Nekro)"));
+                    }
+                }
+            }
         }
 
         if (ButtonHelper.getTilesOfUnitsWithBombard(p1, game).contains(tile)
@@ -1220,7 +1304,7 @@ public class StartCombatService {
                     if (p2.isDummy()) {
                         buttons.add(Buttons.gray(p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + " for Dummy").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                     }
-                    if (CombatRollService.checkIfUnitsOfType(nonActive, game, event, tile, unitH.getName(),
+                    if (CombatRollService.checkIfUnitsOfType(nonActive, game, null, tile, unitH.getName(),
                         CombatRollType.SpaceCannonDefence)) {
                         buttons.add(Buttons.gray(
                             "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence",

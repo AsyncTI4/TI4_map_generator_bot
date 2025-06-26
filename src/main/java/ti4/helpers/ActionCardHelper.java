@@ -61,14 +61,13 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
         if (player.hasAbility("classified_developments")) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Info on your superweapons are as follows:\n");
-            sb.append(Mapper.getRelic("superweaponavailyn").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponcaled").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponglatison").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweapongrom").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponmors").getSimpleRepresentation()).append("\n");
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
+            String sb = "Info on your superweapons are as follows:\n" +
+                Mapper.getRelic("superweaponavailyn").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponcaled").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponglatison").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweapongrom").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponmors").getSimpleRepresentation() + "\n";
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
         }
     }
 
@@ -105,7 +104,7 @@ public class ActionCardHelper {
             if (representation == null) {
                 representation = planet;
             }
-            sb.append("\n> Planet: ").append(representation).append("");
+            sb.append("\n> Planet: ").append(representation);
         }
         sb.append("\n");
         return sb.toString();
@@ -510,6 +509,11 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
+            if (automationID.equals("professional_archeologists")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveProfessionalArcheologists", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
             if (automationID.equals("special_session")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveVeto", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
@@ -614,7 +618,7 @@ public class ActionCardHelper {
 
             if (automationID.equals("experimental")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(), buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + "\n\nMake sure to declare any graviton laser system usage before pressing this button", codedButtons);
             }
 
             if (automationID.equals("blitz")) {
@@ -883,6 +887,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if (automationID.equals("courageous")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "courageousStarter", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if (automationID.equals("veto")) {
                 codedButtons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "resolveVeto", "Reveal next Agenda"));
                 sendResolveMsgToMainChannel(introMsg, codedButtons, player, game);
@@ -902,7 +910,7 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, player.getRepresentation()
                     + ", a reminder that you should declare how you are distributing the trade goods now, before other players choose whether they will Sabo.", codedButtons);
             }
-            
+
             if (automationID.equals("psionic_hammer")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "psionicHammerStep1", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
@@ -915,16 +923,16 @@ public class ActionCardHelper {
             }
 
             if (automationID.equals("direct_hit") || automationID.equals("courageous")) {
-                MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "ship (if multiple)"), codedButtons);
+                MessageHelper.sendMessageToChannel(channel2, String.format(targetMsg, "ship (if multiple)"));
             }
 
             if (automationID.equals("parley")) {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "planet (if multiple)"), codedButtons);
             }
 
-            if (automationID.equals("reverse_engineer")) {
-                MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "action card (if multiple)"), codedButtons);
-            }
+            // if (automationID.equals("reverse_engineer")) {
+            //     MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "action card (if multiple)"), codedButtons);
+            // }
 
             if (automationID.equals("ghost_squad")) {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "ground forces"), codedButtons);

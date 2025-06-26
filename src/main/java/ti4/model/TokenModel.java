@@ -25,7 +25,8 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean isValid() {
         return id != null
-            && imagePath != null;
+            && imagePath != null
+            && source != null;
     }
 
     @Override
@@ -48,7 +49,8 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     @Override
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getId()).append(" [").append(getSpaceOrPlanet()).append("]");
+        sb.append(getId());
+        if(getSpaceOrPlanet() != null) sb.append(" [").append(getSpaceOrPlanet()).append("]");
         return sb.toString();
     }
 
@@ -61,16 +63,19 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if (getSpaceOrPlanet() != null) sb.append("Location: ").append(getSpaceOrPlanet().toString()).append("\n");
-        if (getTokenPlanetName() != null) sb.append("Planet: ").append(getTokenPlanetName().toString()).append("\n");
-        if (getAttachmentID() != null) sb.append("Attachment: ").append(getAttachmentID().toString()).append("\n");
-        if (getWormholes() != null) sb.append("Wormhole: ").append(getWormholes().toString()).append("\n");
-        if (getIsAnomaly() != null) sb.append("Anomaly");
+        if(getSpaceOrPlanet() != null) sb.append("Location: ").append(getSpaceOrPlanet()).append("\n");
+        if(getTokenPlanetName() != null) sb.append("Planet: ").append(getTokenPlanetName()).append("\n");
+        if(getAttachmentID() != null) sb.append("Attachment: ").append(getAttachmentID()).append("\n");
+        if(getWormholes() != null) sb.append("Wormhole(s): ").append(getWormholes().toString()).append("\n");
+        if(getIsAnomaly() != null) sb.append("Anomaly ");
+        if(getIsRift() != null) sb.append("Rift ");
+        if(getIsNebula() != null) sb.append("Nebula ");
         eb.setDescription(sb.toString());
 
         sb = new StringBuilder();
         sb.append("ID: ").append(getId());
-        if (getSource() != null) sb.append(" Source: ").append(getSource());
+        sb.append(" Source: ").append(getSource());
+        if (getAliasList() != null) sb.append("\nAlias list: ").append(getAliasList().toString());
         eb.setFooter(sb.toString());
 
         eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tokens/" + getImagePath() + "?raw=true");
@@ -80,10 +85,16 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        return getId().contains(searchString)
-            || (getAliasList() != null && getAliasList().toString().contains(searchString))
-            || getSource().toString().contains(searchString)
-            || getAutoCompleteName().contains(searchString);
+        return getId().toLowerCase().contains(searchString.toLowerCase())
+            || (getAliasList() != null && getAliasList().toString().toLowerCase().contains(searchString.toLowerCase()))
+            || (getSpaceOrPlanet() != null && getSpaceOrPlanet().toLowerCase().contains(searchString.toLowerCase()))
+            || (getTokenPlanetName() != null && getTokenPlanetName().toLowerCase().contains(searchString.toLowerCase()))
+            || (getAttachmentID() != null && getAttachmentID().toLowerCase().contains(searchString.toLowerCase()))
+            || (getWormholes() != null && getWormholes().toString().toLowerCase().contains(searchString.toLowerCase()))
+            || (getIsAnomaly() != null && getIsAnomaly() && "anomaly".contains(searchString.toLowerCase()))
+            || (getIsRift() != null && getIsRift() && "gravity rift".contains(searchString.toLowerCase()))
+            || (getIsNebula() != null && getIsNebula() && "nebula".contains(searchString.toLowerCase()))
+            || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
     }
 
 }

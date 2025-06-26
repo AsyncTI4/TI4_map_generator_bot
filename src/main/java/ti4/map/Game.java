@@ -787,6 +787,21 @@ public class Game extends GameProperties {
         checkingForAllReacts.put(key, value);
     }
 
+    public int changeCommsOnPlanet(int change, String planet) {
+        int amountRemaining = 0;
+        if (!getStoredValue("CommsOnPlanet" + planet).isEmpty()) {
+            int thereAlready = Integer.parseInt(getStoredValue("CommsOnPlanet" + planet));
+            change += thereAlready;
+        }
+        if (change > 0) {
+            amountRemaining = change;
+            setStoredValue("CommsOnPlanet" + planet, "" + change);
+        } else {
+            removeStoredValue("CommsOnPlanet" + planet);
+        }
+        return amountRemaining;
+    }
+
     public String getStoredValue(String key) {
         String value = getFactionsThatReactedToThis(key);
         return StringHelper.unescape(value);
@@ -1210,7 +1225,7 @@ public class Game extends GameProperties {
     }
 
     /**
-     * 
+     *
      * @return unrevealed Stage 1 Objectives
      */
     public List<String> getPublicObjectives1Peakable() {
@@ -1222,7 +1237,7 @@ public class Game extends GameProperties {
     }
 
     /**
-     * 
+     *
      * @return unrevealed Stage 2 Objectives
      */
     public List<String> getPublicObjectives2Peakable() {
@@ -1243,6 +1258,22 @@ public class Game extends GameProperties {
         } else {
             return revealObjective(publicObjectives2Peakable);
         }
+    }
+
+    public Map.Entry<String, Integer> revealStage2Random() {
+        Collections.shuffle(publicObjectives2);
+        return revealObjective(publicObjectives2);
+    }
+
+    public Map.Entry<String, Integer> revealStage1Random() {
+        Collections.shuffle(publicObjectives1);
+        return revealObjective(publicObjectives1);
+    }
+
+    public Map.Entry<String, Integer> revealSOAsPO() {
+
+        return revealSecretObjective();
+
     }
 
     public void shuffleInBottomObjective(String cardIdToShuffle, int sizeOfBottom, int type) {
@@ -1435,6 +1466,22 @@ public class Game extends GameProperties {
         return null;
     }
 
+    public Entry<String, Integer> revealSecretObjective() {
+        Collections.shuffle(getSecretObjectives());
+        String id = getSecretObjectives().getFirst();
+        removeSOFromGame(id);
+        addToSoToPoList(id);
+        //addRevealedPublicObjective(id);
+        Integer so = addCustomPO(Mapper.getSecretObjectivesJustNames().get(id), 1);
+        for (Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+            if (entry.getKey().equals(Mapper.getSecretObjectivesJustNames().get(id))) {
+                return entry;
+            }
+        }
+
+        return null;
+    }
+
     public Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
         if (objectiveList.contains(id)) {
             objectiveList.remove(id);
@@ -1495,6 +1542,11 @@ public class Game extends GameProperties {
         return false;
     }
 
+    public void removeRevealedObjective(String id) {
+        revealedPublicObjectives.remove(id);
+        soToPoList.remove(id);
+    }
+
     public String getCustodiansTaker() {
         if (!isCustodiansScored()) {
             return null;
@@ -1523,6 +1575,12 @@ public class Game extends GameProperties {
 
     public boolean isCustodiansScored() {
         boolean custodiansTaken = false;
+        if (isOrdinianC1Mode()) {
+            return ButtonHelper.isCoatlHealed(this);
+        }
+        if (isLiberationC4Mode()) {
+            return true;
+        }
         String idC = "";
         for (Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(0)) {
@@ -3297,13 +3355,10 @@ public class Game extends GameProperties {
     }
 
     public Tile getTile(String tileID) {
-        if ("mirage".equalsIgnoreCase(tileID)) {
-            for (Tile tile : tileMap.values()) {
-                for (UnitHolder uh : tile.getUnitHolders().values()) {
-                    if (uh.getTokenList() != null && (uh.getTokenList().contains("mirage")
-                        || uh.getTokenList().contains("token_mirage.png"))) {
-                        return tile;
-                    }
+        if (Constants.TOKEN_PLANETS.contains(tileID)) {
+            for (Tile t : tileMap.values()) {
+                if (t.getUnitHolderFromPlanet(tileID) != null) {
+                    return t;
                 }
             }
         }
@@ -3639,23 +3694,6 @@ public class Game extends GameProperties {
         if (!leaderID.contains("commander"))
             return false;
 
-        // check if player has any allainces with players that have the commander
-        // unlocked
-        if (player.hasAbility("imperia")) {
-            for (Player otherPlayer : getRealPlayers()) {
-                if (otherPlayer.getFaction().equalsIgnoreCase(player.getFaction()))
-                    continue;
-                if (player.getMahactCC().contains(otherPlayer.getColor())) {
-
-                    if (otherPlayer.hasLeaderUnlocked(leaderID)) {
-                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
-                            return leaderID.contains(otherPlayer.getFaction());
-                        }
-                    }
-                }
-            }
-        }
-
         if (leaderIsFake(leaderID)) {
             return false;
         }
@@ -3663,7 +3701,7 @@ public class Game extends GameProperties {
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
-                if (pnOwner != null && !pnOwner.equals(player) && pnOwner.hasLeaderUnlocked(leaderID)) {
+                if (pnOwner != null && !pnOwner.getFaction().equalsIgnoreCase(player.getFaction()) && pnOwner.hasLeaderUnlocked(leaderID)) {
                     return true;
                 }
             }
@@ -3676,9 +3714,6 @@ public class Game extends GameProperties {
                 if (player_.getFaction().equalsIgnoreCase(player.getFaction()))
                     continue;
                 if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
-                    if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
-                        return leaderID.contains(player_.getFaction());
-                    }
                     return true;
                 }
             }
@@ -3689,13 +3724,12 @@ public class Game extends GameProperties {
 
     public List<Leader> playerUnlockedLeadersOrAlliance(Player player) {
         List<Leader> leaders = new ArrayList<>(player.getLeaders());
-        // check if player has any allainces with players that have the commander
+        // check if player has any alliances with players that have the commander
         // unlocked
         for (String pnID : player.getPromissoryNotesInPlayArea()) {
             if (pnID.contains("_an") || "dspnceld".equals(pnID)) { // dspnceld = Celdauri Trade Alliance
                 Player pnOwner = getPNOwner(pnID);
                 if (pnOwner != null && !pnOwner.equals(player)) {
-
                     for (Leader playerLeader : pnOwner.getLeaders()) {
                         if (leaderIsFake(playerLeader.getId())) {
                             continue;
@@ -3716,7 +3750,6 @@ public class Game extends GameProperties {
                 if (otherPlayer.equals(player))
                     continue;
                 if (player.getMahactCC().contains(otherPlayer.getColor())) {
-
                     for (Leader playerLeader : otherPlayer.getLeaders()) {
                         if (leaderIsFake(playerLeader.getId())) {
                             continue;
@@ -3724,10 +3757,9 @@ public class Game extends GameProperties {
                         if (!playerLeader.getId().contains("commander")) {
                             continue;
                         }
-                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())) {
-                            if (!playerLeader.getId().contains(otherPlayer.getFaction())) {
-                                continue;
-                            }
+                        if (isAllianceMode() && "mahact".equalsIgnoreCase(player.getFaction())
+                            && !playerLeader.getId().contains(otherPlayer.getFaction())) {
+                            continue;
                         }
                         leaders.add(playerLeader);
                     }
@@ -3989,6 +4021,13 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Tile getMecatolTile() {
+
+        if (isOrdinianC1Mode()) {
+            return ButtonHelper.getTileWithCoatl(this);
+        }
+        if (isLiberationC4Mode()) {
+            return getTileFromPlanet("ordinianc4");
+        }
         for (String mr : Constants.MECATOL_SYSTEMS) {
             Tile tile = getTile(mr);
             if (tile != null)
@@ -4168,7 +4207,7 @@ public class Game extends GameProperties {
         sources.add(ComponentSource.codex1);
         sources.add(ComponentSource.codex2);
         sources.add(ComponentSource.codex3);
-
+        sources.add(ComponentSource.codex4);
         if (!isBaseGameMode())
             sources.add(ComponentSource.pok);
         if (isAbsolMode())
@@ -4226,7 +4265,7 @@ public class Game extends GameProperties {
             || getRealAndEliminatedAndDummyPlayers().size() > 8;
     }
 
-    private boolean checkAllDecksAreOfficial() {
+    public boolean checkAllDecksAreOfficial() {
         // needs to check for homebrew tiles still
         // Decks
         List<String> deckIDs = new ArrayList<>();
@@ -4252,7 +4291,7 @@ public class Game extends GameProperties {
         return allDecksOfficial;
     }
 
-    private boolean checkAllTilesAreOfficial() {
+    public boolean checkAllTilesAreOfficial() {
         // Tiles
         return getTileMap().values().stream().allMatch(tile -> {
             if (tile == null || tile.getTileModel() == null) {
@@ -4364,7 +4403,7 @@ public class Game extends GameProperties {
 
     public String getHexSummary() {
         // 18+0+0*b;Bio,71+0+2Rct;Ro;Ri,36+1+1Kcf;Km*I;Ki,76+1-1;;;,72+0-2; ......
-        // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ?? 
+        // CSV of {tileID}{+x+yCoords}??{list;of;tokens} ??
         // See ConvertTTPGtoAsync.ConvertTTPGHexToAsyncTile() and reverse it!
         return getTileMap().values().stream()
             .map(Tile::getHexTileSummary)

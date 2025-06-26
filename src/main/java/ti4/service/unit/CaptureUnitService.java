@@ -22,7 +22,7 @@ public class CaptureUnitService {
     public static List<Player> listCapturingMechPlayers(Game game, List<RemovedUnit> allUnits, RemovedUnit removedUnitType) {
         if (removedUnitType.unitKey().getUnitType() != UnitType.Infantry) return List.of();
         if (!(removedUnitType.uh() instanceof Planet planet)) return List.of();
-        if (!ButtonHelper.isLawInPlay(game, "articles_war")) return List.of();
+        if (ButtonHelper.isLawInPlay(game, "articles_war")) return List.of();
         Player destroyedPlayer = removedUnitType.getPlayer(game);
         if (destroyedPlayer == null) return List.of();
 
@@ -77,6 +77,25 @@ public class CaptureUnitService {
             }
         }
         return playersWithDevour;
+    }
+
+    public static List<Player> listProbableKiller(Game game, RemovedUnit removed) {
+        UnitHolder combatOnHolder = removed.uh();
+        Set<String> counted = new HashSet<>();
+        List<Player> playerOpponents = new ArrayList<>();
+        Player owner = removed.getPlayer(game);
+        for (UnitKey key : combatOnHolder.getUnitKeys()) {
+            if (!counted.add(key.getColorID())) continue;
+
+            Player p2 = game.getPlayerByUnitKey(key).orElse(null);
+            if (p2 != null && p2 != owner && !p2.getAllianceMembers().contains(owner.getFaction())) {
+                playerOpponents.add(p2);
+            }
+        }
+        if (owner != game.getActivePlayer() && game.getActivePlayer() != null && !game.getActivePlayer().getAllianceMembers().contains(owner.getFaction())) {
+            playerOpponents.add(game.getActivePlayer());
+        }
+        return playerOpponents;
     }
 
     public static void executeCapture(GenericInteractionCreateEvent event, Game game, Player cabal, RemovedUnit unit) {

@@ -15,14 +15,12 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
-import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
@@ -118,22 +116,22 @@ class ActionCardDeck2ButtonHandler {
     @ButtonHandler("resolveChainReaction")
     public static void resolveChainReaction(Player player, Game game, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
-        int hits = 1;
-        StringBuilder msg = new StringBuilder("The _Chain Reaction_ rolled: ");
-        int currentRequirement = 7;
-        Die die;
-        while ((die = new Die(currentRequirement)).isSuccess()) {
-            hits++;
-            currentRequirement++;
-            msg.append(die.getResult()).append(" :boom: ");
-        }
-        msg.append(die.getResult());
-        List<Button> buttons = new ArrayList<>();
-        if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
-            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hit" + (hits == 1 ? "" : "s")));
-        }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + "\n " + player.getRepresentation() +
-            " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Effect changed, so old implementation was deprecated. Roll manually.");
+//        StringBuilder msg = new StringBuilder("The _Chain Reaction_ rolled: ");
+//        int currentRequirement = 7;
+//        Die die;
+//        while ((die = new Die(currentRequirement)).isSuccess()) {
+//            hits++;
+//            currentRequirement++;
+//            msg.append(die.getResult()).append(" :boom: ");
+//        }
+//        msg.append(die.getResult());
+//        List<Button> buttons = new ArrayList<>();
+//        if (game.getActiveSystem() != null && !game.getActiveSystem().isEmpty()) {
+//            buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_" + "combat", "Assign Hit" + (hits == 1 ? "" : "s")));
+//        }
+//        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg + "\n " + player.getRepresentation() +
+//            " your opponent needs to assign " + hits + " hit" + (hits == 1 ? "" : "s"), buttons);
     }
 
     @ButtonHandler("resolveFlawlessStrategy")
@@ -232,11 +230,11 @@ class ActionCardDeck2ButtonHandler {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
-        List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
+        List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(p2, game, "cruiser", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() +
             ", please choose where you wish to place the _Arms Deal_ cruiser.", buttons);
-        buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
+        buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(p2, game, "destroyer", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't place"));
         MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() +
             ", please choose where you wish to place the _Arms Deal_ destroyer.", buttons);
@@ -447,7 +445,7 @@ class ActionCardDeck2ButtonHandler {
     ) {
         String planet = buttonID.split("_")[1];
         player.refreshPlanet(planet);
-        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
+        List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
         if (!buttons.isEmpty()) {
             String message = player.getFactionEmoji() + ", please press the button to explore "
                 + Helper.getPlanetRepresentation(planet, game) + ".";

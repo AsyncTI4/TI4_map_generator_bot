@@ -13,10 +13,8 @@ import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.message.BotLogger;
 import ti4.service.emoji.TI4Emoji;
 
@@ -65,7 +63,7 @@ public class ImageHelper {
     @Nullable
     public static BufferedImage readEmojiImageScaled(String emoji, int size) {
         Emoji em = Emoji.fromFormatted(emoji);
-        if (em != null && em instanceof CustomEmoji e)
+        if (em instanceof CustomEmoji e)
             return ImageHelper.readURLScaled(e.getImageUrl(), size, size);
         return null;
     }

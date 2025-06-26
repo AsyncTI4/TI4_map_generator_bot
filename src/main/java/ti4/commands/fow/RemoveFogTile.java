@@ -48,7 +48,7 @@ class RemoveFogTile extends GameStateSubcommand {
                 targetPlayer.removeFogTile(position);
                 sb2.append(" ").append(position);
             }
-            sb.append(targetPlayer.getRepresentation()).append(" removed fog tiles:").append(sb2.toString()).append("\n");
+            sb.append(targetPlayer.getRepresentation()).append(" removed fog tiles:").append(sb2).append("\n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }

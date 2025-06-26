@@ -21,18 +21,18 @@ public class RemoveCommandCounterService {
             BotLogger.warning(new BotLogger.LogMessageOrigin(event), "Player cannot be found for removing command counter");
             return;
         }
-        fromTile(event, player.getColor(), tile, player.getGame());
+        fromTile(player.getColor(), tile, player.getGame());
     }
 
-    public static void fromTile(GenericInteractionCreateEvent event, String color, Tile tile, Game game) {
+    public static void fromTile(String color, Tile tile, Game game) {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (game.isFowMode()) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, event, tile.getPosition(), colorMention + " command token has been removed from the system.");
+            FoWHelper.pingSystem(game, tile.getPosition(), colorMention + " command token has been removed from the system.");
         }
         tile.removeCC(ccID);
     }

@@ -196,7 +196,12 @@ public class AgendaHelper {
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "You have declined to queue an \"after\". You can change your mind with this button.", buttons);
             offerPreVote(player);
-            resolveWhenQueue(event, game);
+            String alreadyResolved = game.getStoredValue("whensResolved");
+            if (alreadyResolved.isEmpty()) {
+                resolveWhenQueue(event, game);
+            } else {
+                resolveAfterQueue(event, game);
+            }
         }
     }
 
@@ -830,6 +835,9 @@ public class AgendaHelper {
         if (player.hasAbility("future_sight")) {
             msg += " Reminder that you have **Future Sight** and may not wish to abstain.";
         }
+
+        msg += CryypterHelper.argentEnvoyReminder(player, game);
+
         Player argent = Helper.getPlayerFromAbility(game, "zeal");
         if (game.isOmegaPhaseMode()) {
             if (argent != null) {
@@ -1867,7 +1875,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
                                     + ", you lost 1 command token from your fleet pool due to voting the same way as a _Sanction_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+                            ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
                     if (winningR != null && specificVote.contains("Corporate Lobbying")) {
@@ -1879,7 +1887,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
                                     + " you gained trade goods due to voting the same way as _Corporate Lobbying_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+                            ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight")
@@ -2585,7 +2593,7 @@ public class AgendaHelper {
             totalPlanetVotes += voteAmount;
         }
         if (!game.getLaws().containsKey("absol_government")) {
-            if (player.hasAbility("zeal")) {
+            if (player.hasAbility("zeal") || (game.isOrdinianC1Mode() && player == ButtonHelper.getPlayerWhoControlsCoatl(game))) {
                 int numPlayers = 0;
                 for (Player player_ : game.getPlayers().values()) {
                     if (player_.isRealPlayer())
@@ -3082,7 +3090,7 @@ public class AgendaHelper {
             return additionalVotesAndSources;
         }
         // Argent Zeal
-        if (player.hasAbility("zeal")) {
+        if (player.hasAbility("zeal") || (game.isOrdinianC1Mode() && player == ButtonHelper.getPlayerWhoControlsCoatl(game))) {
             long playerCount = game.getPlayers().values().stream().filter(Player::isRealPlayer).count();
             additionalVotesAndSources.put(FactionEmojis.Argent + "Zeal", Math.toIntExact(playerCount));
         }
@@ -3750,7 +3758,6 @@ public class AgendaHelper {
         }
         if (!success) {
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "No Agenda ID found");
-            return;
         }
     }
 
@@ -3794,7 +3801,7 @@ public class AgendaHelper {
             }
         }
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+            ButtonHelper.checkFleetInEveryTile(p2, game);
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
             "Removed all ships from systems with alphas or betas wormholes. \nYou may use the button to get your technology.",

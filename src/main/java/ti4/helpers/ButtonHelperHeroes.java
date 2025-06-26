@@ -575,7 +575,7 @@ public class ButtonHelperHeroes {
             if (planet.toLowerCase().contains("custodia") || planet.contains("ghoti")) {
                 continue;
             }
-            Planet p = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet p = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (p != null && (type.equalsIgnoreCase(p.getOriginalPlanetType())
                 || p.getTokenList().contains("attachment_titanspn.png"))) {
                 buttons.add(Buttons.green("attachAttachment_" + planet + "_" + attachment,
@@ -632,8 +632,8 @@ public class ButtonHelperHeroes {
     public static void resolveFlorzenHeroStep1(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String attachment : getAttachmentsForFlorzenHero(game, player)) {
-            String planet = attachment.split("_")[0];
-            String attach = attachment.split("_")[1];
+            String planet = StringUtils.substringBefore(attachment, "_");
+            String attach = StringUtils.substringAfter(attachment, "_");
             buttons.add(Buttons.green("florzenHeroStep2_" + attachment,
                 attach + " on " + Helper.getPlanetRepresentation(planet, game)));
         }
@@ -643,8 +643,10 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("florzenHeroStep2_")
     public static void resolveFlorzenHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.split("_")[1];
-        String attachment = buttonID.split("_")[2];
+        buttonID = buttonID.replace("florzenHeroStep2_", "");
+
+        String planet = StringUtils.substringBefore(buttonID, "_");
+        String attachment = StringUtils.substringAfter(buttonID, "_");
         List<Button> buttons = new ArrayList<>();
         Tile hs = player.getHomeSystemTile();
         for (UnitHolder uh : hs.getPlanetUnitHolders()) {
@@ -1089,11 +1091,11 @@ public class ButtonHelperHeroes {
                 player.getFactionEmoji() + "You don't have the Belkosea hero.");
             return;
         }
-        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" refreshed ")
-            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        String message = player.getRepresentation() + " refreshed " +
+            Helper.getLeaderFullRepresentation(playerLeader);
         playerLeader.setExhausted(false);
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteTheOneButton(event);
 
     }
@@ -1106,11 +1108,11 @@ public class ButtonHelperHeroes {
                 player.getFactionEmoji() + "You don't have the Belkosea hero.");
             return;
         }
-        StringBuilder message = new StringBuilder(player.getRepresentation()).append(" exhausted ")
-            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        String message = player.getRepresentation() + " exhausted " +
+            Helper.getLeaderFullRepresentation(playerLeader);
         playerLeader.setExhausted(true);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
+        MessageHelper.sendMessageToChannel(event.getChannel(), message + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1324,11 +1326,13 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.green("stealRelic_" + victim.getFaction() + "_" + relic,
                 "Steal " + Mapper.getRelic(relic).getName()));
         }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
         String msg = player.getRepresentationUnfogged() + ", please choose the relic you wish to steal.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
 
     }
 
+    @ButtonHandler("stealRelic_")
     public static void stealRelic(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         String faction = buttonID.split("_")[1];

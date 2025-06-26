@@ -15,39 +15,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
 
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
-import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.PlayerStatsHelper;
 import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
-import ti4.helpers.WebHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -65,6 +59,7 @@ import ti4.model.StrategyCardModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
+import ti4.website.WebHelper;
 import ti4.website.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
@@ -76,11 +71,7 @@ public class MapGenerator implements AutoCloseable {
     private static final int EXTRA_X = 300; // padding at left/right of map
     private static final int EXTRA_Y = 200; // padding at top/bottom of map
     private static final int SPACING_BETWEEN_OBJECTIVE_TYPES = 10;
-    private static final int HORIZONTAL_TILE_SPACING = 260;
-    private static final int VERTICAL_TILE_SPACING = 160;
     private static final int SPACE_FOR_TILE_HEIGHT = 300; // space to calculate tile image height with
-    private static final int TILE_HEIGHT = 299; // typical height of a tile image
-    private static final int SPACE_FOR_TILE_WIDTH = 350; // space to calculate tile image width with
     private static final int TILE_WIDTH = 345; // typical width of a tile image
     private static final int MINIMUM_WIDTH_OF_PLAYER_AREA = 1000;
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
@@ -110,6 +101,10 @@ public class MapGenerator implements AutoCloseable {
     private int maxY = -1;
     private boolean isFoWPrivate;
     private Player fowPlayer;
+
+    // Map to aggregate unit coordinates by faction from all tiles with global coordinates
+    private final Map<String, Map<String, List<Point>>> globalUnitCoordinatesByFaction = new HashMap<>();
+
     private StopWatch debugAbsoluteStartTime;
     private StopWatch debugTileTime;
     private StopWatch debugImageGraphicsTime;
@@ -198,7 +193,7 @@ public class MapGenerator implements AutoCloseable {
         graphics = mainImage.getGraphics();
     }
 
-    /** 
+    /**
      * Returns the height for the sections Objectives (above 5) + Laws + Events + Players + idk what EXTRA_Y is for
     */
     private static int getHeightOfPlayerAreasSection(Game game, int playerCountForMap, int objectivesY) {
@@ -400,7 +395,7 @@ public class MapGenerator implements AutoCloseable {
             WebHelper.putMap(game.getName(), mainImageBytes, false, null);
             WebHelper.putData(game.getName(), game);
             WebHelper.putOverlays(game.getID(), websiteOverlays);
-            WebHelper.putPlayerData(game.getID(), game);
+            WebHelper.putPlayerData(game.getID(), game, globalUnitCoordinatesByFaction);
         } else if (isFoWPrivate) {
             Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
             WebHelper.putMap(game.getName(), mainImageBytes, true, player);
@@ -467,6 +462,8 @@ public class MapGenerator implements AutoCloseable {
 
         // GAME FUN NAME
         deltaY = 35;
+        deltaY = 35;
+        y += 40; //needed for ghost HS on br
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(game.getCustomName(), landscapeShift, y);
@@ -837,87 +834,6 @@ public class MapGenerator implements AutoCloseable {
         return x;
     }
 
-    private int tileRing(String pos) {
-        if (pos.replaceAll("\\d", "").isEmpty())
-            return Integer.parseInt(pos) / 100;
-        return 100;
-    }
-
-    private List<String> findThreeNearbyStatTiles(Game game, Player player, Set<String> taken) {
-        boolean fow = isFoWPrivate;
-        boolean randomizeLocation = false;
-        if (fow && player != fowPlayer) {
-            if (FoWHelper.canSeeStatsOfPlayer(game, player, fowPlayer)) {
-                if (!FoWHelper.hasHomeSystemInView(player, fowPlayer)) {
-                    // if we can see a players stats, but we cannot see their home system - move
-                    // their stats somewhere random
-                    randomizeLocation = true;
-                }
-            }
-        }
-
-        String anchor = player.getPlayerStatsAnchorPosition();
-        if (anchor == null) anchor = player.getHomeSystemPosition();
-        if (anchor == null) return null;
-        if (randomizeLocation) anchor = "000"; // just stick them on 000
-
-        Set<String> validPositions = PositionMapper.getTilePositions().stream()
-            .filter(pos -> tileRing(pos) <= (game.getRingCount() + 1))
-            .filter(pos -> game.getTileByPosition(pos) == null)
-            .filter(pos -> taken == null || !taken.contains(pos))
-            .collect(Collectors.toSet());
-
-        Point anchorRaw = PositionMapper.getTilePosition(anchor);
-        if (anchorRaw == null) return null;
-        Point anchorPt = getTilePosition(anchor, anchorRaw.x, anchorRaw.y);
-
-        // BEGIN ALGORITHM
-        // 1. Make a Priority Queue sorting on distance
-        // 2. Take tiles from the PQ until we have a contiguous selection of 3 adj tiles
-        // 3. Use those tiles :)
-
-        // 1.
-        boolean rand = randomizeLocation;
-        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(pos -> {
-            Point positionPoint = PositionMapper.getTilePosition(pos);
-            if (positionPoint == null) return 100000000f;
-            int ring = tileRing(pos);
-            Point realPosition = getTilePosition(pos, positionPoint.x, positionPoint.y);
-            double distance = realPosition.distance(anchorPt);
-            distance = rand ? ThreadLocalRandom.current().nextInt(0, 200) : distance + ring * 75;
-            return distance;
-        }));
-        pq.addAll(validPositions);
-
-        // 2. Take tiles from the PQ until we have 3 adj
-        // - - N*logN * 6
-        List<String> closestTiles = new ArrayList<>();
-        Map<String, Integer> numAdj = new HashMap<>();
-        String next;
-        while ((next = pq.poll()) != null) {
-            if (closestTiles.contains(next)) continue;
-            closestTiles.add(next);
-            numAdj.put(next, 0);
-
-            for (String pos : PositionMapper.getAdjacentTilePositions(next)) {
-                if (numAdj.containsKey(pos)) {
-                    numAdj.put(pos, numAdj.get(pos) + 1);
-                    numAdj.put(next, numAdj.get(next) + 1);
-                }
-            }
-            for (String pos : closestTiles) {
-                if (numAdj.get(pos) == 2) {
-                    List<String> adjOut = PositionMapper.getAdjacentTilePositions(pos);
-                    List<String> output = new ArrayList<>();
-                    output.add(pos);
-                    output.addAll(CollectionUtils.intersection(adjOut, closestTiles));
-                    return output;
-                }
-            }
-        }
-        return null;
-    }
-
     private void playerInfo(Game game) {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
@@ -949,7 +865,7 @@ public class MapGenerator implements AutoCloseable {
             // if we can't see stats anyway, skip this player
             if (fow && !FoWHelper.canSeeStatsOfPlayer(game, p, fowPlayer)) continue;
 
-            List<String> myStatTiles = findThreeNearbyStatTiles(game, p, statTilesInUse);
+            List<String> myStatTiles = PlayerStatsHelper.findThreeNearbyStatTiles(game, p, statTilesInUse, isFoWPrivate, fowPlayer);
             if (myStatTiles == null) {
                 useNewSystem = false;
                 break;
@@ -987,7 +903,7 @@ public class MapGenerator implements AutoCloseable {
         for (String pos : statTiles) {
             Point p = PositionMapper.getTilePosition(pos);
             if (p == null) return;
-            p = getTilePosition(pos, p.x, p.y);
+            p = PositionMapper.getScaledTilePosition(game, pos, p.x, p.y);
             p.translate(EXTRA_X, EXTRA_Y);
             points.put(pos, p);
         }
@@ -1216,9 +1132,9 @@ public class MapGenerator implements AutoCloseable {
                     offBoardHighlighting++;
                 }
             } else if (displayType == DisplayType.empties) {
-                boolean hasStellar = player.hasRelic("stellarconverter") || player.hasRelic("absol_stellarconverter");
+                boolean hasStellar = false; // not working
                 String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
-                boolean hasHero = player.hasLeaderUnlocked("muaathero") || player.hasLeaderUnlocked("zelianhero");
+                boolean hasHero = false; //was not working
                 String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
                 if (player.hasLeaderUnlocked("muaathero")) {
                     heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png");
@@ -1615,7 +1531,8 @@ public class MapGenerator implements AutoCloseable {
             // PositionMapper.getEquivalentPositionAtRing(ringCount, playerStatsAnchor);
             Point anchorProjectedPoint = PositionMapper.getTilePosition(playerStatsAnchor);
             if (anchorProjectedPoint != null) {
-                Point playerStatsAnchorPoint = getTilePosition(
+                Point playerStatsAnchorPoint = PositionMapper.getScaledTilePosition(
+                    game,
                     playerStatsAnchor, anchorProjectedPoint.x,
                     anchorProjectedPoint.y);
                 Integer anchorLocationIndex = PositionMapper
@@ -2135,45 +2052,21 @@ public class MapGenerator implements AutoCloseable {
                 maxY = Math.max(maxY, y);
             }
 
-            positionPoint = getTilePosition(position, x, y);
+            positionPoint = PositionMapper.getScaledTilePosition(game, position, x, y);
             int tileX = positionPoint.x + EXTRA_X - TILE_PADDING;
             int tileY = positionPoint.y + EXTRA_Y - TILE_PADDING;
 
-            BufferedImage tileImage = new TileGenerator(game, event, displayType).draw(tile, step);
+            TileGenerator tileGenerator = new TileGenerator(game, event, displayType);
+            BufferedImage tileImage = tileGenerator.draw(tile, step);
             graphics.drawImage(tileImage, tileX, tileY, null);
+
+            // Aggregate unit coordinates with global translation
+            aggregateGlobalUnitCoordinates(tileGenerator, tileX, tileY);
         } catch (Exception exception) {
             BotLogger.error(
                 "Tile Error, when building map `" + game.getName() + "`, tile: " + tile.getTileID(),
                 exception);
         }
-    }
-
-    private Point getTilePosition(String position, int x, int y) {
-        int ringCount = game.getRingCount();
-        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
-        if (ringCount == RING_MIN_COUNT) {
-            x += HORIZONTAL_TILE_SPACING;
-        }
-        if (ringCount < RING_MAX_COUNT) {
-            int lower = RING_MAX_COUNT - ringCount;
-
-            if ("tl".equalsIgnoreCase(position)) {
-                y -= 150;
-            } else if ("bl".equalsIgnoreCase(position)) {
-                y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
-            } else if ("tr".equalsIgnoreCase(position)) {
-                x -= lower * HORIZONTAL_TILE_SPACING * 2;
-                y -= 150;
-            } else if ("br".equalsIgnoreCase(position)) {
-                x -= lower * HORIZONTAL_TILE_SPACING * 2;
-                y -= lower * SPACE_FOR_TILE_HEIGHT * 2 - 150;
-            } else {
-                x -= lower * HORIZONTAL_TILE_SPACING;
-                y -= lower * SPACE_FOR_TILE_HEIGHT;
-            }
-            return new Point(x, y);
-        }
-        return new Point(x, y);
     }
 
     /**
@@ -2208,7 +2101,7 @@ public class MapGenerator implements AutoCloseable {
 
     /**
      * Gives the width of the map part of the image
-     * TO DO: 
+     * TO DO:
      * - fix the "ringCount == minRingCount" ternary (see comment)
      * - some variables are never used...
      * @param game
@@ -2262,5 +2155,44 @@ public class MapGenerator implements AutoCloseable {
 
     String getGameName() {
         return game.getName();
+    }
+
+    /**
+     * Get the aggregated global unit coordinates by faction from all tiles
+     * @return Map where key is faction/player identifier, secondary key is unit ID, and value is list of global coordinates
+     */
+    public Map<String, Map<String, List<Point>>> getGlobalUnitCoordinatesByFaction() {
+        return new HashMap<>(globalUnitCoordinatesByFaction);
+    }
+
+    /**
+     * Helper method to aggregate unit coordinates from a TileGenerator with global translation
+     * @param tileGenerator The TileGenerator to get coordinates from
+     * @param tileX The global X offset for this tile
+     * @param tileY The global Y offset for this tile
+     */
+    private void aggregateGlobalUnitCoordinates(TileGenerator tileGenerator, int tileX, int tileY) {
+        Map<String, Map<String, List<Point>>> tileCoordinates = tileGenerator.getUnitCoordinatesByFaction();
+        if (tileCoordinates != null) {
+            for (Map.Entry<String, Map<String, List<Point>>> factionEntry : tileCoordinates.entrySet()) {
+                String faction = factionEntry.getKey();
+                Map<String, List<Point>> unitMap = factionEntry.getValue();
+
+                for (Map.Entry<String, List<Point>> unitEntry : unitMap.entrySet()) {
+                    String unitId = unitEntry.getKey();
+                    List<Point> coordinates = unitEntry.getValue();
+
+                    // Apply global translation to each coordinate
+                    List<Point> globalCoordinates = coordinates.stream()
+                        .map(point -> new Point(point.x + tileX, point.y + tileY))
+                        .collect(Collectors.toList());
+
+                    globalUnitCoordinatesByFaction
+                        .computeIfAbsent(faction, k -> new HashMap<>())
+                        .computeIfAbsent(unitId, k -> new ArrayList<>())
+                        .addAll(globalCoordinates);
+                }
+            }
+        }
     }
 }

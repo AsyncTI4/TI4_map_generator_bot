@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -28,6 +29,7 @@ import ti4.model.ActionCardModel;
 import ti4.model.ExploreModel;
 import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
+import ti4.service.combat.CombatRollType;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -318,7 +320,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
-        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
+        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + game.getActiveSystem()
             + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
@@ -328,7 +330,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke_")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
+        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + buttonID.split("_")[1]
             + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
@@ -492,6 +494,123 @@ public class ButtonHelperActionCards {
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, 1);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("courageousStarter")
+    public static void resolveCourageousStarter(Player player, Game game, ButtonInteractionEvent event) {
+        boolean nekro = ButtonHelper.doesPlayerHaveFSHere("nekro_flagship", player, game.getTileByPosition(game.getActiveSystem()));
+        String msg = player.getRepresentationNoPing() + " please select the ship that recently died with which you wish to resolve courageous on.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, getCourageousOptions(player, game, nekro, "courageous"));
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("courageousFire")
+    public static void resolveCourageousFire(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        String baseType = buttonID.split("_")[1];
+        String numHit = buttonID.split("_")[2];
+        String type = buttonID.split("_")[3];
+        String msg = player.getRepresentationNoPing() + " chose to use the ability on the dead " + baseType + " which hits on a " + numHit + ".";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+        String result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
+        Tile tile = game.getTileFromPositionOrAlias(game.getActiveSystem());
+        // Actually roll for each unit
+        int totalHits = 0;
+        UnitModel unit = player.getUnitByBaseType(baseType);
+        int toHit = unit.getCombatDieHitsOnForAbility(CombatRollType.combatround);
+        int modifierToHit = 0;
+        int extraRollsForUnit = 0;
+        int numRollsPerUnit = 1;
+
+        if (type.equalsIgnoreCase("courageous")) {
+            StringBuilder resultBuilder = new StringBuilder(result);
+
+            int numOfUnit = 2;
+
+            int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+            List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+            player.setExpectedHitsTimes10(
+                player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+            int hitRolls = DiceHelper.countSuccesses(resultRolls);
+            totalHits += hitRolls;
+            String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit,
+                numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+            resultBuilder.append(unitRoll);
+
+            result = resultBuilder.toString();
+            result += CombatMessageHelper.displayHitResults(totalHits);
+            player.setActualHits(player.getActualHits() + totalHits);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
+
+            if (hitRolls > 0) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+                        continue;
+                    }
+                    if (FoWHelper.playerHasShipsInSystem(p2, game.getTileFromPositionOrAlias(game.getActiveSystem()))) {
+                        List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(p2, game, tile, "courageouscannoncombat");
+                        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + " you can use the buttons to destroy your ship(s)", buttons);
+                    }
+                }
+            }
+        } else {
+            for (UnitHolder uH : tile.getUnitHolders().values()) {
+                for (UnitKey key : uH.getUnitKeys()) {
+                    Player player_ = game.getPlayerFromColorOrFaction(key.getColor());
+                    if (player_ == player || player.getAllianceMembers().contains(player_.getFaction())) {
+                        continue;
+                    }
+                    int numOfUnit = uH.getUnitCount(key);
+                    totalHits = 0;
+                    result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
+                    StringBuilder resultBuilder = new StringBuilder(result);
+                    resultBuilder.append("Rolling against " + numOfUnit + " " + key.getUnitType().getUnitTypeEmoji() + " owned by " + key.getColor() + "\n");
+                    int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+                    List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
+                    player.setExpectedHitsTimes10(
+                        player.getExpectedHitsTimes10() + (numRolls * (11 - toHit + modifierToHit)));
+                    int hitRolls = DiceHelper.countSuccesses(resultRolls);
+                    totalHits += hitRolls;
+                    String unitRoll = CombatMessageHelper.displayUnitRoll(unit, toHit, modifierToHit, numOfUnit,
+                        numRollsPerUnit, extraRollsForUnit, resultRolls, hitRolls);
+                    resultBuilder.append(unitRoll);
+
+                    result = resultBuilder.toString();
+                    result += CombatMessageHelper.displayHitResults(totalHits);
+                    player.setActualHits(player.getActualHits() + totalHits);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), result);
+                    uH.removeUnit(key, hitRolls);
+
+                }
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static List<Button> getCourageousOptions(Player player, Game game, boolean nekro, String type) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+
+        List<String> allowedUnits = Stream
+            .of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship,
+                UnitType.Warsun, UnitType.Fighter)
+            .map(UnitType::getValue).toList();
+
+        if (nekro) {
+            allowedUnits = Stream
+                .of(UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier, UnitType.Dreadnought, UnitType.Flagship,
+                    UnitType.Warsun, UnitType.Fighter, UnitType.Mech, UnitType.Infantry)
+                .map(UnitType::getValue).toList();
+        }
+        for (String asyncID : allowedUnits) {
+            UnitModel ownedUnit = player.getUnitFromAsyncID(asyncID);
+            if (ownedUnit != null) {
+                String buttonID = finChecker + "courageousFire_" + ownedUnit.getBaseType() + "_" + ownedUnit.getCombatHitsOn() + "_" + type;
+                String buttonText = "Choose " + ownedUnit.getName() + " (Hits On " + ownedUnit.getCombatHitsOn() + ")";
+                buttons.add(Buttons.gray(buttonID, buttonText, ownedUnit.getUnitEmoji()));
+            }
+        }
+
+        return buttons;
     }
 
     @ButtonHandler("forwardSupplyBase")
@@ -946,11 +1065,11 @@ public class ButtonHelperActionCards {
     public static void resolvepPsionicHammerStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         String message = "## " + p2.getRepresentationUnfogged() + ", you have been hammered to show a random unscored secret objective. Please press the button to resolve.";
-        MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), message, 
+        MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), message,
             Buttons.green("psionicHammerStep3_" + player.getFaction(), "Show A Random Unscored Secret Objective"));
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", button to resolve Neural Hammer has been sent to " 
-            + p2.getColorIfCanSeeStats(player) + ".");
+            player.getRepresentationUnfogged() + ", button to resolve Neural Hammer has been sent to "
+                + p2.getColorIfCanSeeStats(player) + ".");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1405,12 +1524,12 @@ public class ButtonHelperActionCards {
                 player.getRepresentationUnfogged() + ", you melted the space dock in " + tile.getRepresentation());
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your space dock in " + tile.getRepresentation() + " was melted.");
-            ButtonHelper.checkFleetAndCapacity(p2, game, tile, event);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has melted the space dock that used to belong to "
                     + p2.getRepresentationUnfogged() + " in " + tile.getRepresentation() + ".");
         }
+        ButtonHelper.checkFleetAndCapacity(p2, game, tile);
         if (p2.hasAbility("data_recovery")) {
             ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
         }
@@ -1594,6 +1713,18 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+    }
+
+    @ButtonHandler("resolveProfessionalArcheologists")
+    public static void resolveProfessionalArcheologists(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        ButtonHelper.deleteMessage(event);
+        buttons.add(Buttons.green("olradinPreserveStep2_industrial_prof", "Explore Industrial"));
+        buttons.add(Buttons.blue("olradinPreserveStep2_cultural_prof", "Explore Cultural"));
+        buttons.add(Buttons.red("olradinPreserveStep2_hazardous_prof", "Explore Hazardous"));
+        buttons.add(Buttons.gray("olradinPreserveStep2_frontier_prof", "Explore Frontier"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to resolve the AC", buttons);
+
     }
 
     public static void checkForAssigningPublicDisgrace(Game game, Player player) {
@@ -2102,6 +2233,20 @@ public class ButtonHelperActionCards {
         return buttons;
     }
 
+    public static List<Button> getCircletButtons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : game.getTileMap().values()) {
+            if (tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER))) {
+                if (!FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
+                    buttons.add(Buttons.green("probeStep2_" + tile.getPosition(),
+                        tile.getRepresentationForButtons(game, player)));
+                }
+
+            }
+        }
+        return buttons;
+    }
+
     @ButtonHandler("resolveReverse_")
     public static void resolveReverse(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         String acName = buttonID.replace("resolveReverse_", "");
@@ -2172,5 +2317,21 @@ public class ButtonHelperActionCards {
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static String getBestResPlanetInHomeSystem(Player player, Game game) {
+        String planetName = "";
+        int count = 0;
+        for (String planet : player.getPlanets()) {
+            Planet p = game.getPlanetsInfo().get(planet);
+            if (p != null && p.getResources() > count) {
+                if (game.getTileFromPlanet(planet) == player.getHomeSystemTile()) {
+
+                    count = p.getResources();
+                    planetName = planet;
+                }
+            }
+        }
+        return planetName;
     }
 }

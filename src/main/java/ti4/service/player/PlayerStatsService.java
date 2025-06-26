@@ -252,7 +252,7 @@ public class PlayerStatsService {
         if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
             MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
         }
-        player.setCommoditiesBase(commoditiesTotalCount);
+        player.setCommoditiesBase(Math.max(0, commoditiesTotalCount));
         String message = ">  set **Base Commodities** to " + commoditiesTotalCount + MiscEmojis.comm;
         MessageHelper.sendMessageToEventChannel(event, message);
     }

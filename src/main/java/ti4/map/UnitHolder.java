@@ -1,7 +1,6 @@
 package ti4.map;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import lombok.Data;
 
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -148,7 +148,8 @@ abstract public class UnitHolder {
         List<Integer> counts = unitsByState.get(unit);
         int totalCount = getTotalUnitCount(counts);
         if (totalCount <= 0) {
-            return new ArrayList<>(unitsByState.remove(unit));
+            unitsByState.remove(unit);
+            return UnitState.emptyList();
         }
 
         List<Integer> unitsRemoved = UnitState.emptyList();
@@ -347,6 +348,13 @@ abstract public class UnitHolder {
 
     public Point getHolderCenterPosition() {
         return new Point(holderCenterPosition);
+    }
+
+    public Point getHolderCenterPosition(Tile tile) {
+        if (Constants.TOKEN_PLANETS.contains(this.getName())) {
+            return Helper.getTokenPlanetCenterPosition(tile, this.getName());
+        }
+        return getHolderCenterPosition();
     }
 
     public Map<UnitKey, List<Integer>> getUnitsByStateForPlayer(Player p) {

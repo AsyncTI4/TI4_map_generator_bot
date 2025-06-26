@@ -218,9 +218,14 @@ class GameLoadService {
                         if (UNITS.equals(data)) {
                             unitHolderName = gameFileLines.next().toLowerCase();
                             if (tile != null) {
-                                if (Constants.MIRAGE.equals(unitHolderName)) {
-                                    Helper.addMirageToTile(tile);
-                                } else if (!tile.isSpaceHolderValid(unitHolderName)) {
+                                boolean found = false;
+                                for (String tp : Constants.TOKEN_PLANETS) {
+                                    if (unitHolderName.equals(tp)) {
+                                        Helper.addTokenPlanetToTile(game, tile, tp);
+                                        found = true;
+                                    }
+                                }
+                                if (!found && !tile.isSpaceHolderValid(unitHolderName)) {
                                     BotLogger.warning(new BotLogger.LogMessageOrigin(game), game.getName() + ": Not valid unitholder detected: " + unitHolderName);
                                 }
                             }
@@ -613,6 +618,7 @@ class GameLoadService {
                 case Constants.HACK_ELECTION_STATUS -> game.setHasHackElectionBeenPlayed(loadBooleanOrDefault(info, false));
                 case Constants.CC_N_PLASTIC_LIMIT -> game.setCcNPlasticLimit(loadBooleanOrDefault(info, false));
                 case Constants.BOT_FACTION_REACTS -> game.setBotFactionReacts(loadBooleanOrDefault(info, false));
+                case Constants.BOT_STRAT_REACTS -> game.setBotStratReacts(loadBooleanOrDefault(info, false));
                 case Constants.HAS_HAD_A_STATUS_PHASE -> game.setHasHadAStatusPhase(loadBooleanOrDefault(info, false));
                 case Constants.BOT_SHUSHING -> game.setBotShushing(loadBooleanOrDefault(info, false));
                 case Constants.COMMUNITY_MODE -> game.setCommunityMode(loadBooleanOrDefault(info, false));
@@ -679,6 +685,11 @@ class GameLoadService {
                 case Constants.FACILITIES_MODE -> game.setFacilitiesMode(loadBooleanOrDefault(info, false));
                 case Constants.MINOR_FACTIONS_MODE -> game.setMinorFactionsMode(loadBooleanOrDefault(info, false));
                 case Constants.HIDDEN_AGENDA_MODE -> game.setHiddenAgendaMode(loadBooleanOrDefault(info, false));
+                case Constants.AGE_OF_COMMERCE_MODE -> game.setAgeOfCommerceMode(loadBooleanOrDefault(info, false));
+                case Constants.TOTAL_WAR_MODE -> game.setTotalWarMode(loadBooleanOrDefault(info, false));
+                case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(loadBooleanOrDefault(info, false));
+                case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(loadBooleanOrDefault(info, false));
+                case Constants.VOTC_MODE -> game.setVotcMode(loadBooleanOrDefault(info, false));
                 case Constants.SHOW_FULL_COMPONENT_TEXT -> game.setShowFullComponentTextEmbeds(loadBooleanOrDefault(info, false));
                 case Constants.GAME_HAS_ENDED -> game.setHasEnded(loadBooleanOrDefault(info, false));
                 case Constants.CREATION_DATE -> game.setCreationDate(info);
@@ -849,8 +860,8 @@ class GameLoadService {
                 }
                 case Constants.STRATEGY_CARD -> player.setSCs(new LinkedHashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
-                case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
-                case Constants.COMMODITIES_BASE -> player.setCommoditiesBase(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Math.max(0, Integer.parseInt(tokenizer.nextToken())));
+                case Constants.COMMODITIES_BASE -> player.setCommoditiesBase(Math.max(0, Integer.parseInt(tokenizer.nextToken())));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.AUTO_SABO_PASS_MEDIAN -> player.setAutoSaboPassMedian(Integer.parseInt(tokenizer.nextToken()));
@@ -1045,6 +1056,7 @@ class GameLoadService {
                 case Constants.PILLAGE_COUNT -> player.setPillageCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PATH_TOKEN_COUNT -> player.setPathTokenCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HONOR_COUNT -> player.setHonorCounter(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DISHONOR_COUNT -> player.setDishonorCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.HARVEST_COUNT -> player.setHarvestCounter(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
                 case Constants.DRAFT_BAG_INFO_THREAD_CHANNEL_ID -> player.setBagInfoThreadID(tokenizer.nextToken());

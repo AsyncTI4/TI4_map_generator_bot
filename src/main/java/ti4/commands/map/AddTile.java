@@ -48,7 +48,7 @@ class AddTile extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
             return;
         }
-        
+
         Game game = getGame();
         Boolean isFowPrivate = null;
         if (game.isFowMode()) {
@@ -62,8 +62,8 @@ class AddTile extends GameStateSubcommand {
 
         for (String position : positions) {
             Tile tile = new Tile(planetTileName, position);
-            if (tile.isMecatol()) {
-                AddTileService.addCustodianToken(tile);
+            if (tile.isMecatol() && !game.isLiberationC4Mode()) {
+                AddTileService.addCustodianToken(tile, game);
             }
 
             AddTileService.addTile(getGame(), tile);

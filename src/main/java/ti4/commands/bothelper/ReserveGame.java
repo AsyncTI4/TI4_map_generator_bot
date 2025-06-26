@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
 import ti4.commands.CommandHelper;
 import ti4.commands.Subcommand;
 import ti4.message.MessageHelper;
@@ -36,7 +35,7 @@ public class ReserveGame extends Subcommand {
         String removeStr = event.getOption(REMOVE, "no", OptionMapping::getAsString);
         // ^^ These can never really be invalid
 
-        String gameName = category.toLowerCase() + Integer.toString(number);
+        String gameName = category.toLowerCase() + number;
         if (removeStr.equalsIgnoreCase("remove")) {
             MessageHelper.sendMessageToEventChannel(event, "Released `" + gameName + "`");
             ReserveGameNumberService.removeReservedGame(gameName);

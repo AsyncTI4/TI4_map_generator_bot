@@ -3,7 +3,7 @@ package ti4.cron;
 import java.time.ZoneId;
 
 import lombok.experimental.UtilityClass;
-import ti4.helpers.WebHelper;
+import ti4.website.WebHelper;
 import ti4.message.BotLogger;
 
 @UtilityClass

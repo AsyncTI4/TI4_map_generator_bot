@@ -28,7 +28,7 @@ public class FileUploadService {
         return createFileUpload(bytes, filenamePrefix, false);
     }
 
-    public static FileUpload createFileUpload(byte[] bytes, String filenamePrefix, boolean saveLocalCopy) {
+    private static FileUpload createFileUpload(byte[] bytes, String filenamePrefix, boolean saveLocalCopy) {
         if (bytes == null || bytes.length == 0) return null;
 
         if (saveLocalCopy)
