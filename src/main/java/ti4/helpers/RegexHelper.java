@@ -15,6 +15,7 @@ import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
+import ti4.service.fow.FOWPlusService;
 
 @UtilityClass
 public class RegexHelper {
@@ -140,7 +141,10 @@ public class RegexHelper {
     /** @return group matching any legal tile position on the map */
     public static String posRegex(Game game, String group) {
         if (game == null) return posRegex(group);
-        Set<String> positions = game.getTileMap().keySet();
+        Set<String> positions = new HashSet<>(game.getTileMap().keySet());
+        if (FOWPlusService.isVoid(game, game.getActiveSystem())) {
+            positions.add(game.getActiveSystem());
+        }
         return regexBuilder(group, positions);
     }
 
