@@ -1671,8 +1671,9 @@ public class PlayerAreaGenerator {
         List<String> fakePlanets = new ArrayList<>();
         for (String planet : planets) {
             PlanetModel model = Mapper.getPlanet(planet);
+
             Set<PlanetType> types = new HashSet<>();
-            if (model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
+            if (model != null && model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
 
             if (types.contains(PlanetType.FAKE)) {
                 fakePlanets.add(planet);

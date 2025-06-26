@@ -301,7 +301,7 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean isLegendary() {
         PlanetModel model = getPlanetModel();
-        if (model.isLegendary()) return true;
+        if (model != null && model.isLegendary()) return true;
 
         for (String token : tokenList) {
             AttachmentModel attachment = Mapper.getAttachmentInfo(token);
