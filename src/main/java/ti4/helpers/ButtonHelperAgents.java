@@ -664,7 +664,7 @@ public class ButtonHelperAgents {
         if ("winnuagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Berekar Berekon, the Winnu" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            player.addSpentThing("Exhausted Winnu Agent, for 2 resources.");
+            player.addSpentThing("winnuagent");
             String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             if (event instanceof ButtonInteractionEvent buttonEvent) {
                 buttonEvent.getMessage().editMessage(exhaustedMessage).queue();

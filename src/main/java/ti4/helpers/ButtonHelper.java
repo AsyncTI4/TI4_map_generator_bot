@@ -1577,6 +1577,9 @@ public class ButtonHelper {
                 && game.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())) {
                 limit = 5;
             }
+            if (game.getStoredValue("controlTokensOnAgendaabsol_sanctions").contains(player.getColor())) {
+                limit = 5;
+            }
         }
 
         if (player.getTechs().contains("absol_nm")) {
@@ -4727,7 +4730,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         game.setStoredValue(player.getFaction() + "latestAssignHits", type);
 
-        boolean spaceCombatish = type.equalsIgnoreCase("spacecombat") || type.equalsIgnoreCase("assaultcannoncombat");
+        boolean spaceCombatish = type.equalsIgnoreCase("courageouscombat") || type.equalsIgnoreCase("spacecombat") || type.equalsIgnoreCase("assaultcannoncombat");
         boolean combat = type.contains("combat");
         boolean oneButtonPerUnit = limitOne || spaceCombatish || type.equalsIgnoreCase("combat"); // space combat or generic unspecified combat
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -4744,12 +4747,15 @@ public class ButtonHelper {
                 if (!player.unitBelongsToPlayer(unitKey)) continue;
                 UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
                 if (unitModel == null) continue;
-                if (type.equalsIgnoreCase("assaultcannoncombat") && List.of(UnitType.Fighter, UnitType.Spacedock).contains(unitKey.getUnitType())) {
+                if (type.equalsIgnoreCase("assaultcannoncombat") && List.of(UnitType.Fighter, UnitType.Spacedock, UnitType.Mech, UnitType.Infantry).contains(unitKey.getUnitType())) {
+                    continue;
+                }
+                if (type.equalsIgnoreCase("courageouscombat") && List.of(UnitType.Spacedock, UnitType.Mech, UnitType.Infantry).contains(unitKey.getUnitType())) {
                     continue;
                 }
 
                 // All sustain damage buttons for all states
-                boolean canDamage = !type.equalsIgnoreCase("assaultcannoncombat") && unitCanSustainDamage(game, player, tile, unitModel);
+                boolean canDamage = !type.equalsIgnoreCase("courageouscombat") && !type.equalsIgnoreCase("assaultcannoncombat") && unitCanSustainDamage(game, player, tile, unitModel);
                 for (UnitState state : UnitState.values()) {
                     if (state.isDamaged() || !canDamage) continue;
                     int max = Math.min(oneButtonPerUnit ? 1 : 2, unitHolder.getUnitCountForState(unitKey, state));

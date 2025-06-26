@@ -14,6 +14,7 @@ class GameOptionButtonHandler {
     @ButtonHandler("enableAidReacts")
     public static void enableAidReact(ButtonInteractionEvent event, Game game) {
         game.setBotFactionReacts(true);
+        game.setBotStratReacts(true);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Faction reaction icons have been enabled. Use `/game options` to change this.");
         ButtonHelper.deleteMessage(event);
     }
@@ -21,6 +22,7 @@ class GameOptionButtonHandler {
     @ButtonHandler("disableAidReacts")
     public static void disableAidReact(ButtonInteractionEvent event, Game game) {
         game.setBotFactionReacts(false);
+        game.setBotStratReacts(false);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Faction reaction icons have been disabled. Use `/game options` to change this.");
         ButtonHelper.deleteMessage(event);
     }
