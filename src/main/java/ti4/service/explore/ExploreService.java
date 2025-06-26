@@ -142,6 +142,16 @@ public class ExploreService {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored.");
                         return;
                     }
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
+                        Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
+                        Tile tileWithPlanet = game.getTileFromPlanet(planetName);
+                        if (tileWithPlanet == null) {
+                            MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing 1 infantry. Resolve manually.");
+                            return;
+                        }
+                        tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
+                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added infantry to " + planetName + " because of Master Halbert, the Lanefir Commander.");
+                    }
                     ExploreModel exploreModel1 = Mapper.getExplore(cardID1);
                     ExploreModel exploreModel2 = Mapper.getExplore(cardID2);
 
