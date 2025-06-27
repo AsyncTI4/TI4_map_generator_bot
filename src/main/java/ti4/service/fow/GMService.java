@@ -43,10 +43,8 @@ public class GMService {
         Buttons.green("gmShowGameAs_", "Show Game As..."),
         Buttons.green("gmCheckPlayerHands_", "Check Player Hands for..."),
         Buttons.green("gmWhoCanSee~MDL", "Who Can See Position..."),
-        Buttons.EDIT_NOTEPAD,
-        Buttons.POST_NOTEPAD,
-        Buttons.green("gmSystemLore", "Edit System Lore"),
         Buttons.EDIT_SUMMARIES,
+        Buttons.green("gmLore", "Manage Lore"),
         Buttons.gray("gmRefresh", "Refresh"));
 
     private static final List<Button> HAND_CHECK_BUTTONS = Arrays.asList(
@@ -259,12 +257,8 @@ public class GMService {
         ThreadGetter.getThreadInChannel(game.getMainGameChannel(), STATUS_SUMMARY_THREAD, true, false,
             threadChannel -> {
                 MessageHelper.sendMessageToChannel(threadChannel, "# Round " + game.getRound() + " Status Summary " + game.getPing());
-                List<String> types = new ArrayList<>();
-                types.add(Constants.CULTURAL);
-                types.add(Constants.INDUSTRIAL);
-                types.add(Constants.HAZARDOUS);
-                types.add(Constants.FRONTIER);
-                ExploreService.secondHalfOfExpInfo(types, threadChannel, null, game, true, false);
+                ExploreService.secondHalfOfExpInfo(Arrays.asList(Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER), 
+                    threadChannel, null, game, true, false);
               
                 RelicHelper.showRemaining(threadChannel, true, game, null);
             });

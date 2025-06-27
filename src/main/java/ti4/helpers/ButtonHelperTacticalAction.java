@@ -86,7 +86,7 @@ public class ButtonHelperTacticalAction {
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
-            LoreService.showSystemLore(player, game);
+            LoreService.showSystemLore(player, game, game.getActiveSystem());
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);

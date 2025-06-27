@@ -20,9 +20,11 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import ti4.buttons.Buttons;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.SortHelper;
+import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
@@ -31,49 +33,76 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.PlanetModel;
 import ti4.model.TileModel.TileBack;
 
 public class LoreService {
                   
-    private static final List<Button> SYSTEM_LORE_BUTTONS = Arrays.asList(
-        Buttons.blue("gmSystemLoreEdit~MDL", "Add New"),
-        Buttons.gray("gmSystemLoreRefresh", "Refresh"),
+    private static final List<Button> LORE_BUTTONS = Arrays.asList(
+        Buttons.blue("gmLoreEdit_System~MDL", "Add New to System"),
+        Buttons.blue("gmLoreEdit_Planet~MDL", "Add New to Planet"),
+        Buttons.gray("gmLoreRefresh", "Refresh"),
         Buttons.DONE_DELETE_BUTTONS
     );
 
     private static final String SYSTEM_LORE_KEY = "fowSystemLore";
 
-    
-    @ButtonHandler("gmSystemLoreRefresh")
-    private static void refreshSystemLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
-        showSystemLoreButtons(event, buttonID, game);
+
+    @ButtonHandler("gmLoreRefresh")
+    private static void refreshLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
+        showLoreButtons(event, buttonID, game);
         event.getMessage().delete().queue();
     }
 
-    @ButtonHandler("gmSystemLore")
-    private static void showSystemLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
+    @ButtonHandler("gmLore")
+    private static void showLoreButtons(ButtonInteractionEvent event, String buttonID, Game game) {
         String page = StringUtils.substringAfter(buttonID, "page");
         int pageNum = StringUtils.isBlank(page) ? 1 : Integer.parseInt(page);
-        List<ActionRow> buttons = Buttons.paginateButtons(getSystemLoreButtons(game), SYSTEM_LORE_BUTTONS, pageNum, "gmSystemLore");
-        
+        List<ActionRow> buttons = Buttons.paginateButtons(getLoreButtons(game), LORE_BUTTONS, pageNum, "gmLore");
+
         if (StringUtils.isBlank(page)) {
-            String msg = "### System Lore\n-# Shown to the first player to conclude an action with units in the system.";
-            GMService.getGMChannel(game).sendMessage(msg).setComponents(buttons).queue();
+            String msg = "### Lore"
+                + "\n-# System Lore is shown to the first player to conclude an action with units in the system."
+                + "\n-# Planet Lore is shown to the first player to gain control of the planet.";
+            event.getChannel().sendMessage(msg).setComponents(buttons).queue();
         } else {
             event.getHook().editOriginalComponents(buttons).queue();
         }
     }
 
-    private static List<Button> getSystemLoreButtons(Game game) {
-        List<Button> systemLoreButtons = new ArrayList<>();
+    private static List<Button> getLoreButtons(Game game) {
+        List<Button> loreButtons = new ArrayList<>();
         for (Map.Entry<String, String> lore : getSavedLore(game).entrySet()) {
-            String position = lore.getKey();
-            Tile tile = game.getTileByPosition(position);
-            systemLoreButtons.add(Buttons.green("gmSystemLoreEdit_" + position + "~MDL", 
-                position + " " + (tile == null ? "null" : tile.getRepresentation())));
+            String target = lore.getKey();
+            String buttonLabel = "";
+            String emoji = null;
+            boolean isValidLore = true;
+
+            if (PositionMapper.isTilePositionValid(target)) {
+                //System Lore
+                Tile tile = game.getTileByPosition(target);
+                if (tile == null) isValidLore = false;
+
+                buttonLabel = target;
+                emoji = tile != null ? tile.getTileModel().getEmoji().toString() : null;
+            } else {
+                //Planet Lore
+                PlanetModel planet = Mapper.getPlanet(target);
+                if (!game.getPlanets().contains(target)) isValidLore = false;
+
+                buttonLabel = planet.getName();
+                emoji = planet.getEmoji().toString();
+            }
+
+            if (isValidLore) {
+                loreButtons.add(Buttons.green("gmLoreEdit_" + target + "~MDL", buttonLabel, emoji));
+            } else {
+                loreButtons.add(Buttons.red("gmLoreEdit_" + target + "~MDL", buttonLabel, emoji));
+            }
+
         }
-        SortHelper.sortButtonsByTitle(systemLoreButtons);
-        return systemLoreButtons;
+        SortHelper.sortButtonsByTitle(loreButtons);
+        return loreButtons;
     }
 
     private static Map<String, String> getSavedLore(Game game) {
@@ -92,25 +121,26 @@ public class LoreService {
         return savedLoreMap;
     }
 
-    @ButtonHandler("gmSystemLoreEdit")
-    public static void editSystemLore(ButtonInteractionEvent event, String buttonID, Game game) {
-        String existingPosition = buttonID.contains("_") ? StringUtils.substringBetween(buttonID, "gmSystemLoreEdit_", "~MDL") : "";
+    @ButtonHandler("gmLoreEdit")
+    public static void editLore(ButtonInteractionEvent event, String buttonID, Game game) {
+        String target = StringUtils.substringBetween(buttonID, "gmLoreEdit_", "~MDL");
+        boolean systemLore = "System".equals(target) || PositionMapper.isTilePositionValid(target);
+        String addingTo = systemLore ? "System" : "Planet";
 
-        TextInput.Builder position = TextInput.create(Constants.POSITION, "Position", TextInputStyle.SHORT)
+        TextInput.Builder position = TextInput.create(Constants.POSITION, addingTo, TextInputStyle.SHORT)
             .setRequired(true)
-            .setPlaceholder("000")
-            .setMaxLength(4);
+            .setPlaceholder(systemLore ? "000" : "Sem-Lore");
         TextInput.Builder lore = TextInput.create(Constants.MESSAGE, "Lore (clear to delete)", TextInputStyle.PARAGRAPH)
             .setRequired(false)
-            .setPlaceholder("There once was Mecatol...")
+            .setPlaceholder("Once upon a time...")
             .setMaxLength(1000);
 
-        if (StringUtils.isNotBlank(existingPosition)) {
-            position.setValue(existingPosition);
-            lore.setValue(getSavedLore(game).get(existingPosition));
+        if (!"System".equals(target) && !"Planet".equals(target)) {
+            position.setValue(target);
+            lore.setValue(getSavedLore(game).get(target));
         }
 
-        Modal editLoreModal = Modal.create("gmSystemLoreSave", "Add Lore to Position")
+        Modal editLoreModal = Modal.create("gmLoreSave" + addingTo, "Add Lore to " + addingTo)
             .addActionRow(position.build())
             .addActionRow(lore.build())
             .build();
@@ -118,41 +148,58 @@ public class LoreService {
         event.replyModal(editLoreModal).queue();
     }
 
-    @ModalHandler("gmSystemLoreSave")
-    public static void saveSystemLore(ModalInteractionEvent event, Player player, Game game) {
-        String position = event.getValue(Constants.POSITION).getAsString();
+    @ModalHandler("gmLoreSave")
+    public static void saveLore(ModalInteractionEvent event, Player player, Game game) {
+        String target = event.getValue(Constants.POSITION).getAsString();
         String loreText = event.getValue(Constants.MESSAGE).getAsString();
+        boolean systemLore = event.getModalId().replace("gmLoreSave", "").equals("System");
+        PlanetModel planet = null;
 
-        if (!PositionMapper.isTilePositionValid(position)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Position " + position + " is invalid to save lore `" + loreText + "`");
-            return;
+        if (systemLore) {
+            if (!PositionMapper.isTilePositionValid(target) || game.getTileByPosition(target) == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Position " + target + " is invalid to save lore `" + loreText + "`");
+                return;
+            }
+        } else {
+            planet = Mapper.getPlanet(AliasHandler.resolvePlanet(target));
+            if (planet == null || !game.getPlanets().contains(planet.getID())) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet " + target + " is invalid to save lore `" + loreText + "`");
+                return;
+            }
+            target = planet.getID();
         }
 
         Map<String, String> savedLoreMap = getSavedLore(game);
         if (StringUtils.isBlank(loreText)) {
-            savedLoreMap.remove(position);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Lore from " + position);
+            savedLoreMap.remove(target);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Lore from " + (planet != null ? planet.getName() : target));
         } else {
-            savedLoreMap.put(position, loreText.replace(";", "").replace("|", ""));
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Saved Lore to " + position);
+            savedLoreMap.put(target, loreText.replace(";", "").replace("|", ""));
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Saved Lore to " + (planet != null ? planet.getName() : target));
         }
 
-        setSystemLore(game, savedLoreMap);
+        setLore(game, savedLoreMap);
     }
 
-    private static void setSystemLore(Game game, Map<String, String> systemLore) {
-        String loreString = systemLore.entrySet().stream()
+    private static void setLore(Game game, Map<String, String> lore) {
+        String loreString = lore.entrySet().stream()
             .map(entry -> entry.getKey() + ";" + entry.getValue())
             .collect(Collectors.joining("|"));
         game.setStoredValue(SYSTEM_LORE_KEY, loreString);
     }
 
-    private static MessageEmbed buildLoreEmbed(Game game, String position, String lore) {
-        Tile tile = game.getTileByPosition(position);
-        String titleTile = position;
+    private static MessageEmbed buildLoreEmbed(Game game, String target, String lore, boolean isSystemLore) {
+        Tile tile = isSystemLore ? game.getTileByPosition(target) : game.getTileFromPlanet(target);
+        PlanetModel planet = isSystemLore ? null : Mapper.getPlanet(target);
+        String titleTile = "";
+        if (isSystemLore && tile != null && tile.getTileModel() != null) {
+            titleTile = target + " - " + tile.getTileModel().getNameNullSafe() + " " + tile.getTileModel().getEmoji();
+        } else if (planet != null) {
+            titleTile = planet.getName() + " " + planet.getEmoji();
+        }
+        
         Color embedColor = Color.black;
         if (tile != null && tile.getTileModel() != null) {
-            titleTile += " - " + tile.getTileModel().getNameNullSafe() + " " + tile.getTileModel().getEmoji();
             switch (tile.getTileModel().getTileBack()) {
                 case TileBack.RED -> embedColor = Color.red;
                 case TileBack.BLUE -> embedColor = Color.blue;
@@ -168,23 +215,38 @@ public class LoreService {
         return eb.build();
     }
 
-    public static void showSystemLore(Player player, Game game) {
-        String pos = game.getActiveSystem();
-        if (!FoWHelper.playerHasUnitsInSystem(player, game.getTileByPosition(pos))) {
+    private static boolean hasLoreToShow(Game game, String target) {
+        return game.isFowMode() && getSavedLore(game).containsKey(target);
+    }
+
+    public static void showSystemLore(Player player, Game game, String position) {
+        if (!hasLoreToShow(game, position)) return;
+
+        if (!FoWHelper.playerHasUnitsInSystem(player, game.getTileByPosition(position))) {
             return;
         }
 
-        Map<String, String> systemLore = getSavedLore(game);
-        if (systemLore.isEmpty() || !systemLore.containsKey(pos)) {
+        showLore(player, game, position, true);
+    }
+
+    public static void showPlanetLore(Player player, Game game, String planet) {
+        if (!hasLoreToShow(game, planet)) return;
+
+        showLore(player, game, planet, false);
+    }
+
+    private static void showLore(Player player, Game game, String target, boolean isSystemLore) {
+        Map<String, String> lore = getSavedLore(game);
+        if (lore.isEmpty() || !lore.containsKey(target)) {
             return;
         }
 
-        MessageEmbed embed = buildLoreEmbed(game, pos, systemLore.get(pos));
+        MessageEmbed embed = buildLoreEmbed(game, target, lore.get(target), isSystemLore);
         MessageHelper.sendMessageToChannelWithEmbed(player.getPrivateChannel(), "You found a Lore Fragment", embed);
         
-        GMService.logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + pos);
+        GMService.logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + target);
 
-        systemLore.remove(pos);
-        setSystemLore(game, systemLore);
+        lore.remove(target);
+        setLore(game, lore);
     }
 }
