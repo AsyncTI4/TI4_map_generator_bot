@@ -101,19 +101,19 @@ jobs:
           echo "Copying generated TypeScript files to target repository..."
 
           # Ensure data directory exists
-          mkdir -p target-repo/data
+          mkdir -p target-repo/src/data
 
           # Copy all generated .ts files
           for file in *.ts; do
             if [ -f "$file" ]; then
-              echo "Copying $file to target-repo/data/"
-              cp "$file" target-repo/data/
+              echo "Copying $file to target-repo/src/data/"
+              cp "$file" target-repo/src/data/
             fi
           done
 
           # List files in target directory
           echo "Files in target repo data directory:"
-          ls -la target-repo/data/
+          ls -la target-repo/src/data/
 
       - name: Create Pull Request
         if: steps.detect-changes.outputs.has_changes == 'true'
