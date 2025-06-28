@@ -87,6 +87,45 @@ jobs:
           echo "Generated files:"
           ls -la *.ts || echo "No .ts files found"
 
+      - name: Set up Node.js
+        if: steps.detect-changes.outputs.has_changes == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install Prettier
+        if: steps.detect-changes.outputs.has_changes == 'true'
+        run: npm install --global prettier
+
+      - name: Format TypeScript files with Prettier
+        if: steps.detect-changes.outputs.has_changes == 'true'
+        run: |
+          echo "Formatting TypeScript files with Prettier..."
+
+          # Create a basic prettier config for consistent formatting
+          cat > .prettierrc << EOF
+          {
+            "semi": true,
+            "trailingComma": "es5",
+            "singleQuote": false,
+            "printWidth": 80,
+            "tabWidth": 2,
+            "useTabs": false
+          }
+          EOF
+
+          # Format all generated .ts files
+          for file in *.ts; do
+            if [ -f "$file" ]; then
+              echo "Formatting $file..."
+              prettier --write "$file"
+            fi
+          done
+
+          # List formatted files
+          echo "Formatted files:"
+          ls -la *.ts || echo "No .ts files found"
+
       - name: Checkout target repository
         if: steps.detect-changes.outputs.has_changes == 'true'
         uses: actions/checkout@v4
