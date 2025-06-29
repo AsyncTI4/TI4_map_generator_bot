@@ -36,8 +36,6 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.FOG_FILTER, "Filter games by if the game is a fog game"));
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.HOMEBREW_FILTER, "Filter games by if the game has any homebrew"));
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.HAS_WINNER_FILTER, "Filter games by if the game has a winner"));
-        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.WINNING_FACTION_FILTER, "Filter games by if the game was won by said faction")
-            .setAutoComplete(true));
         return filters;
     }
 
@@ -93,7 +91,7 @@ public class GameStatisticsFilterer {
         if (gameTypesFilter == null) {
             return true;
         }
-        return Arrays.stream(gameTypesFilter.split(",")).allMatch(gameType -> hasGameType(gameType, game));
+        return Arrays.stream(gameTypesFilter.split(",")).map(String::strip).allMatch(gameType -> hasGameType(gameType, game));
     }
 
     private static boolean hasGameType(String type, Game game) {
@@ -118,7 +116,7 @@ public class GameStatisticsFilterer {
         if (excludedGameTypesFilter == null) {
             return true;
         }
-        return Arrays.stream(excludedGameTypesFilter.split(",")).noneMatch(gameType -> hasGameType(gameType, game));
+        return Arrays.stream(excludedGameTypesFilter.split(",")).map(String::strip).noneMatch(gameType -> hasGameType(gameType, game));
     }
 
     private static boolean filterOnHasWinner(Boolean hasWinnerFilter, Game game) {
