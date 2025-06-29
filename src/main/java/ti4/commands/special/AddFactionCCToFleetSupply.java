@@ -19,7 +19,7 @@ class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet {
     void action(SlashCommandInteractionEvent event, List<String> colors, Game game, Player player) {
         for (String color : colors) {
             player.addMahactCC(color);
-            Helper.isCCCountCorrect(event, game, color);
+            Helper.isCCCountCorrect(game, color);
         }
         CommanderUnlockCheckService.checkPlayer(player, "mahact");
     }

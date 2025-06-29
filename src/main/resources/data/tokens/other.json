@@ -133,16 +133,23 @@
     },
     {
         "id": "whepsilon",
-        "imagePath": "token_whepsilon.png",
+        "imagePath": "token_custom_eronous_whepsilon.png",
         "spaceOrPlanet": "space",
         "wormholes": ["EPSILON"],
         "source": "other"
     },
     {
         "id": "wheta",
-        "imagePath": "token_wheta.png",
+        "imagePath": "token_custom_eronous_wheta.png",
         "spaceOrPlanet": "space",
         "wormholes": ["ETA"],
+        "source": "other"
+    },
+    {
+        "id": "whkappa",
+        "imagePath": "token_custom_eronous_whkappa.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["KAPPA"],
         "source": "other"
     },
     {
@@ -175,7 +182,7 @@
     },
     {
         "id": "whzeta",
-        "imagePath": "token_whzeta.png",
+        "imagePath": "token_custom_eronous_whzeta.png",
         "spaceOrPlanet": "space",
         "wormholes": ["ZETA"],
         "source": "other"

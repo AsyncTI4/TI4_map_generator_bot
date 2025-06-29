@@ -536,7 +536,7 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg,
                     buttons);
             }
-            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, true)[0];
+            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, true, true)[0];
             if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     msg + ", this is a reminder that if you win the combat (or otherwise keep ships in the active system), and you lose "
@@ -799,13 +799,12 @@ public class StartCombatService {
         ThreadChannel threadChannel, Game game, Player player1,
         Player player2, Tile tile, String spaceOrGround, GenericInteractionCreateEvent event
     ) {
-        List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround,
-            event);
+        List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for combat.", buttons);
     }
 
     // TODO: Break apart into: [all combats, space combat, ground combat] methods
-    public static List<Button> getGeneralCombatButtons(Game game, String pos, Player p1, Player p2, String groundOrSpace, GenericInteractionCreateEvent event) {
+    public static List<Button> getGeneralCombatButtons(Game game, String pos, Player p1, Player p2, String groundOrSpace) {
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
         UnitHolder space = tile.getUnitHolders().get("space");
@@ -1305,7 +1304,7 @@ public class StartCombatService {
                     if (p2.isDummy()) {
                         buttons.add(Buttons.gray(p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + " for Dummy").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                     }
-                    if (CombatRollService.checkIfUnitsOfType(nonActive, game, event, tile, unitH.getName(),
+                    if (CombatRollService.checkIfUnitsOfType(nonActive, game, null, tile, unitH.getName(),
                         CombatRollType.SpaceCannonDefence)) {
                         buttons.add(Buttons.gray(
                             "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence",
