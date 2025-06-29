@@ -328,7 +328,7 @@ public class CombatModHelper {
                 if (tile != null) {
                     for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                         if (uH.getTokenList().contains("attachment_arcane_citadel.png")) {
-                            if (player.getPlanets().contains(uH.getName())) {
+                            if (player.getPlanets().contains(uH.getName()) && game.getActivePlayer() != player) {
                                 boolean allThere = true;
                                 for (Entry<UnitModel, Integer> entry : unitsByQuantity.entrySet()) {
                                     if (uH.getUnitCount(entry.getKey().getUnitType(), player) != entry.getValue()) {

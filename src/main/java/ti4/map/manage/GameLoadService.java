@@ -618,6 +618,7 @@ class GameLoadService {
                 case Constants.HACK_ELECTION_STATUS -> game.setHasHackElectionBeenPlayed(loadBooleanOrDefault(info, false));
                 case Constants.CC_N_PLASTIC_LIMIT -> game.setCcNPlasticLimit(loadBooleanOrDefault(info, false));
                 case Constants.BOT_FACTION_REACTS -> game.setBotFactionReacts(loadBooleanOrDefault(info, false));
+                case Constants.BOT_STRAT_REACTS -> game.setBotStratReacts(loadBooleanOrDefault(info, false));
                 case Constants.HAS_HAD_A_STATUS_PHASE -> game.setHasHadAStatusPhase(loadBooleanOrDefault(info, false));
                 case Constants.BOT_SHUSHING -> game.setBotShushing(loadBooleanOrDefault(info, false));
                 case Constants.COMMUNITY_MODE -> game.setCommunityMode(loadBooleanOrDefault(info, false));

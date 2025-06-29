@@ -134,7 +134,7 @@ public class ButtonHelperCommanders {
         }
         // player.setTg(player.getTg() - 2);
         // player.setStrategicCC(player.getStrategicCC() - 1);
-        RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
+        RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " remove the command token from " + tile.getRepresentationForButtons() + " using their hero ability");
     }

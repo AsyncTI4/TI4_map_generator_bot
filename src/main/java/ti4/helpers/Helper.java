@@ -1117,15 +1117,14 @@ public class Helper {
                 }
             }
             if (!found && !thing.contains("tg_") && !thing.contains("boon") && !thing.contains("warmachine")
-                && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")) {
+                && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("agent") && !thing.contains("Agent")) {
                 Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
                 if (planet == null) {
-                    if (thing.contains("reduced commodities")) {
-                        String comms = StringUtils.substringAfter(thing, "by ");
-                        comms = StringUtils.substringBefore(comms, " (");
-                        keleresAgent = Integer.parseInt(comms);
-                        msg.append("Keleres Agent for ").append(comms).append(" comms\n");
+                    if (thing.contains("comms")) {
+                        String comms = StringUtils.substringAfter(thing, "_");
+                        keleresAgent += Integer.parseInt(comms);
+                        msg.append("Keleres Agent for ").append(comms).append(" commoditiess\n");
                     } else {
                         msg.append(thing).append("\n");
                     }
@@ -1190,7 +1189,7 @@ public class Helper {
                     res += 1;
                 }
                 if (thing.contains("aida")) {
-                    msg.append("> Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
+                    msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
                     if (thing.contains("_")) {
                         int upgrades = ButtonHelper.getNumberOfUnitUpgrades(player);
                         res += upgrades;
@@ -1202,8 +1201,8 @@ public class Helper {
                 }
                 if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg.append("> ").append(thing).append("\n");
-                } else if (thing.contains("Winnu Agent")) {
-                    msg.append("> ").append(thing).append("\n");
+                } else if (thing.contains("winnuagent")) {
+                    msg.append("> Used Winnu agent for 2 resources").append("\n");
                     res += 2;
                 } else if (thing.contains("Zealots Agent")) {
                     msg.append("> ").append(thing).append("(Best resources found were ").append(bestRes).append(")\n");
@@ -1925,7 +1924,7 @@ public class Helper {
         informUserCCOverLimit(player.getGame(), player.getColor(), ccCount);
     }
 
-    public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game game, String color) {
+    public static void isCCCountCorrect(Game game, String color) {
         int ccCount = getCCCount(game, color);
         informUserCCOverLimit(game, color, ccCount);
     }
