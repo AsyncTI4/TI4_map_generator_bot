@@ -9,11 +9,12 @@
             "LTP: https://images-cdn.fantasyflightgames.com/filer_public/c4/f0/c4f03c19-f9da-422f-b162-73f393e64a28/ti-k0289_learn_to_play_2020_web.pdf",
             "LRR: https://images-cdn.fantasyflightgames.com/filer_public/da/df/dadf9f07-78f3-43ac-9cce-dd6b55b24ec2/ti4_living_rules_reference_v1_3_web.pdf",
             "GTI: https://images-cdn.fantasyflightgames.com/filer_public/b6/d9/b6d969a2-21c2-4b1e-8d6f-ac6fec456b88/guide_to_the_imperium_10_web.pdf",
-            "Achivements: https://images-cdn.fantasyflightgames.com/filer_public/15/c9/15c9e63c-7b84-4b05-9c5b-e58e3aa768b9/ti25_achievementlist_1.pdf",
+            "Achievements: https://images-cdn.fantasyflightgames.com/filer_public/15/c9/15c9e63c-7b84-4b05-9c5b-e58e3aa768b9/ti25_achievementlist_1.pdf",
             "Errata: https://twilight-imperium.fandom.com/wiki/Errata",
             "FAQ: https://twilight-imperium.fandom.com/wiki/FAQ",
             "FAQ: https://docs.google.com/document/d/1_93kw7KkzvAXoQAxRioxo7iAt-Ar6BMIxdNf4Lv25rI/edit",
             "FAQ: https://docs.google.com/document/d/1Bgl9OpP-162sifCcratI9RtbOSTNXtFGnKEU_-89rZI/edit",
+            "FFG: https://www.fantasyflightgames.com/en/products/twilight-imperium-fourth-edition/",
             "Rules: https://www.tirules.com/",
             "Content: https://www.ti4ultimate.com/",
             "Stats: https://lookerstudio.google.com/u/0/reporting/3b435bf2-2100-488c-a424-130f1d22ebb0/page/pE58B"
@@ -78,13 +79,6 @@
             "Book: https://images-cdn.fantasyflightgames.com/filer_public/f6/be/f6be8343-a4fc-47e4-a722-efe3e01fc5d9/ti_codex_4_rules.pdf",
             "Assets: https://images-cdn.fantasyflightgames.com/filer_public/cb/66/cb665e94-442d-4bd0-b5bc-6553f64321fc/ti_codex_4_cards.pdf"
         ]
-    },
-    {
-        "source":"codex4",
-        "name":"Codex IV",
-        "canal":"official",
-        "credits":"Dane Beltrami, Flight Fantasy Games",
-        "description":"New relics, Galactic Events, Scenario"
     },
     {
         "source":"ds",
