@@ -1,11 +1,6 @@
 name: Generate TypeScript Data Files
 
 on:
-  pull_request:
-    paths:
-      - "src/main/resources/data/**"
-      - "src/main/resources/planets/**"
-      - "src/main/resources/systems/**"
   push:
     branches: [main]
     paths:
