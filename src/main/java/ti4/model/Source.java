@@ -72,7 +72,7 @@ public class Source {
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space -> true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie -> true;
                 default -> false;
             };
         }
