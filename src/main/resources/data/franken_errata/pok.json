@@ -326,11 +326,6 @@
         "AdditionalComponents": [
             "ABILITY:devour"
         ],
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "amalgamation",
         "OptionalSwaps": [
             "HERO:cabalhero"
         ],
@@ -342,11 +337,6 @@
         "AdditionalComponents": [
             "ABILITY:devour"
         ],
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "riftmeld",
         "OptionalSwaps": [
             "TECH:vtx",
             "AGENT:cabalagent"
