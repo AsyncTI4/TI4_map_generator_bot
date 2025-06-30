@@ -524,11 +524,11 @@
         "ItemCategory": "MECH",
         "ItemId": "nivyn_mech",
         "AdditionalComponents": [
-            "ABILITY:singularity_point",
-            "HERO:nivynhero"
+            "ABILITY:singularity_point"
         ],
         "OptionalSwaps": [
-            "TECH:dsnivymf"
+            "TECH:dsnivymf",
+            "HERO:nivynhero"
         ],
         "source": "ds"
     },
