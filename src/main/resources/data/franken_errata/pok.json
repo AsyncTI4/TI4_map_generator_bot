@@ -356,8 +356,7 @@
     {
         "ItemCategory": "ABILITY",
         "ItemId": "riftmeld",
-        "alternateText": "[Franken only] When you research a unit upgrade technology, you may return 1 captured unit of that type to ignore all of the technology's prerequisites.
-You may only have one captured unit of each non-fighter ship type in your play area.",
+        "alternateText": "[Franken only] When you research a unit upgrade technology, you may return 1 captured unit of that type to ignore all of the technology's prerequisites. You may only have one captured unit of each non-fighter ship type in your play area.",
         "source": "pok"
     },
     {
