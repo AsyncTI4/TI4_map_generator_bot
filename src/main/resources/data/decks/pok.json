@@ -410,7 +410,7 @@
     },
     {
         "alias": "techs_pok",
-        "name": "PoK Techs",
+        "name": "[Outdated] PoK Techs",
         "type": "technology",
         "description": "All techs available in PoK + Codexes. This is the old default deck with both x89s.",
         "cardIDs": [
@@ -503,7 +503,7 @@
     },
     {
         "alias": "techs_pok_c4",
-        "name": "PoK Techs With Codex 4 X89 Only",
+        "name": "PoK Techs With Codex 4 Techs",
         "type": "technology",
         "description": "All techs available in PoK + Codexes. This is the default deck.",
         "cardIDs": [
