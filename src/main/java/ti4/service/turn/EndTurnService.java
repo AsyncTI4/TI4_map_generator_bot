@@ -79,6 +79,9 @@ public class EndTurnService {
                 + "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + mainPlayer.getRepresentation());
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
+            if (game.getPhaseOfGame().equalsIgnoreCase("statushomework")) {
+                return;
+            }
         }
 
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();

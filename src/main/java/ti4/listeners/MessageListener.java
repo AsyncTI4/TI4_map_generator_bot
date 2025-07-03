@@ -274,12 +274,17 @@ public class MessageListener extends ListenerAdapter {
                         }
                         if (managedGame.isStratReactMode()) {
                             if (game.getPhaseOfGame().contains("action") && !game.isHomebrewSCMode() && player.getLowestSC() != 100) {
-                                var emoji2 = CardEmojis.getSCFrontFromInteger(player.getLowestSC());
-                                if (game.getPlayedSCs().contains(player.getLowestSC())) {
-                                    emoji2 = CardEmojis.getSCBackFromInteger(player.getLowestSC());
+
+                                for (Integer sc : player.getSCs()) {
+                                    var emoji2 = CardEmojis.getSCFrontFromInteger(sc);
+                                    if (game.getPlayedSCs().contains(sc)) {
+                                        emoji2 = CardEmojis.getSCBackFromInteger(sc);
+                                    }
+                                    if (emoji2 != null && emoji2.asEmoji() != null) {
+                                        var demoji2 = emoji2.asEmoji();
+                                        messages.getFirst().addReaction(demoji2).queue();
+                                    }
                                 }
-                                var demoji2 = emoji2.asEmoji();
-                                messages.getFirst().addReaction(demoji2).queue();
 
                             }
                         }

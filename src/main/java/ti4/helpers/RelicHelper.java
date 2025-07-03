@@ -187,6 +187,9 @@ public class RelicHelper {
         List<Button> buttons = new ArrayList<>();
 
         for (String relic : player.getRelics()) {
+            if (Mapper.getRelic(relic) == null || Mapper.getRelic(relic).isFakeRelic()) {
+                continue;
+            }
             buttons.add(Buttons.gray("neuraloopPart2;" + poID + ";" + type + ";" + relic, Mapper.getRelic(relic).getName()));
         }
         return buttons;
