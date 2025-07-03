@@ -4065,11 +4065,11 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("forceAbstainForPlayer_")
-    public static void forceAbstainForPlayer(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void forceAbstainForPlayer(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String faction = buttonID.replace("forceAbstainForPlayer_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained.");
+            (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained by " + player.getRepresentationNoPing());
         AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
     }
 

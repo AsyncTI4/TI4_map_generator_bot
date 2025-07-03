@@ -2348,7 +2348,7 @@ public class UnfiledButtonHandlers {
         Integer poIndex = game.addCustomPO("Throne of the False Emperor", 1);
         game.scorePublicObjective(player.getUserID(), poIndex);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " scored a secret objective (they'll specify which one)");
+            player.getRepresentation() + " scored a secret objective (they'll specify which one). The bot has already given you a VP for this.");
         Helper.checkEndGame(game, player);
         ButtonHelper.deleteMessage(event);
     }

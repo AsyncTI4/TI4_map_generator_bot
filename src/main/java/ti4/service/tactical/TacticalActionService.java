@@ -274,6 +274,7 @@ public class TacticalActionService {
         }
 
         // Move units and place token and also determine some other heuristics
+        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, player, tile);
         tile = game.getTileByPosition(tile.getPosition());
         spendAndPlaceTokenIfNecessary(event, game, player, tile);
@@ -304,7 +305,6 @@ public class TacticalActionService {
         CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
         if (!game.isL1Hero() && !playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(game, player, playersWithPds2, tile);
         }

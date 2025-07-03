@@ -25,7 +25,10 @@ import ti4.service.leader.HeroUnlockCheckService;
 
 public class SecretObjectiveHelper {
 
-    public static void scoreSO(GenericInteractionCreateEvent event, Game game, Player player, int soID, MessageChannel channel) {
+    public static void scoreSO(
+        GenericInteractionCreateEvent event, Game game, Player player, int soID,
+        MessageChannel channel
+    ) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = game.scoreSecretObjective(player.getUserID(), soID);
         if (!scored) {
@@ -40,7 +43,10 @@ public class SecretObjectiveHelper {
             }
             if (ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game) > 0) {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentationNoNewLine(entry.getKey()));
-                message.append(" (").append(ListPlayerInfoService.getPlayerProgressOnObjective(entry.getKey(), game, player)).append("/").append(ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game)).append(")\n");
+                message.append(" (")
+                    .append(ListPlayerInfoService.getPlayerProgressOnObjective(entry.getKey(), game, player))
+                    .append("/").append(ListPlayerInfoService.getObjectiveThreshold(entry.getKey(), game))
+                    .append(")\n");
             } else {
                 message.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(entry.getKey()));
             }
@@ -51,15 +57,19 @@ public class SecretObjectiveHelper {
                 if (p2.hasLeaderUnlocked("tnelishero")) {
                     List<Button> buttons = new ArrayList<>();
                     String soStringID = entry.getKey();
-                    buttons.add(Buttons.green("tnelisHeroAttach_" + soStringID, "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
+                    buttons.add(Buttons.green("tnelisHeroAttach_" + soStringID,
+                        "Attach to " + Mapper.getSecretObjectivesJustNames().get(soStringID)));
                     buttons.add(Buttons.red("deleteButtons", "Decline"));
-                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored secret objective "
+                    String msg = p2.getRepresentationUnfogged()
+                        + " you have the opportunity to attach Turra Sveyar, the Tnelis hero, to the recently scored secret objective "
                         + Mapper.getSecretObjectivesJustNames().get(soStringID) + ". Use buttons to resolve.";
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
-            if (!game.getPhaseOfGame().equalsIgnoreCase("action") && Mapper.getSecretObjective(entry.getKey()) != null) {
-                game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", Mapper.getSecretObjective(entry.getKey()).getName());
+            if (game.getPhaseOfGame().toLowerCase().contains("status")
+                && Mapper.getSecretObjective(entry.getKey()) != null) {
+                game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO",
+                    Mapper.getSecretObjective(entry.getKey()).getName());
             }
             if (entry.getKey().equalsIgnoreCase("dhw")) { // destroy heretical works
                 if (player.getCrf() + player.getHrf() + player.getIrf() + player.getUrf() == 2) {
@@ -104,7 +114,8 @@ public class SecretObjectiveHelper {
                     Button transact2 = Buttons.green(finChecker + "deleteButtons", "Done Purging");
                     purgeFragButtons.add(transact2);
 
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please purge 2 relic fragments.", purgeFragButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + ", please purge 2 relic fragments.", purgeFragButtons);
                 }
             } else if (entry.getKey().equalsIgnoreCase("fsn")) { // form a spy network
                 String msg = player.getRepresentationUnfogged() + ", please discard 5 action cards.";
@@ -128,9 +139,11 @@ public class SecretObjectiveHelper {
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         if (player.hasAbility("dark_purpose")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " can gain 1 command token due to their dark purpose ability");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentation() + " can gain 1 command token due to their dark purpose ability");
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+            String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
+                + player.getCCRepresentation()
                 + ". Use buttons to gain 1 command token.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
@@ -161,7 +174,8 @@ public class SecretObjectiveHelper {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Buttons.blue(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName, CardEmojis.SecretObjective));
+                    soButtons.add(Buttons.red(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName,
+                        CardEmojis.SecretObjective));
                 }
             }
         }
@@ -194,7 +208,8 @@ public class SecretObjectiveHelper {
                 String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
-                    soButtons.add(Buttons.red("discardSecret_" + idValue + suffix, "(" + idValue + ") " + soName, CardEmojis.SecretObjective));
+                    soButtons.add(Buttons.blue("discardSecret_" + idValue + suffix, "(" + idValue + ") " + soName,
+                        CardEmojis.SecretObjective));
                 }
             }
         }
@@ -224,8 +239,10 @@ public class SecretObjectiveHelper {
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Action Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
-                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
-                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n");
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _")
+                    .append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText())
+                    .append("\n");
             }
         }
         index = 1;
@@ -233,8 +250,10 @@ public class SecretObjectiveHelper {
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Status Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
-                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
-                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n").append(getSecretObjectiveProgress(game, id));
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _")
+                    .append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText())
+                    .append("\n").append(getSecretObjectiveProgress(game, id));
             }
         }
         index = 1;
@@ -242,8 +261,10 @@ public class SecretObjectiveHelper {
         for (String id : currentSecrets) {
             if (SecretObjectiveInfoService.getSecretObjectiveRepresentation(id).contains("Agenda Phase")) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(id);
-                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName())
-                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText()).append("\n").append(getSecretObjectiveProgress(game, id));
+                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _")
+                    .append(soModel.getName())
+                    .append("_ - ").append(soModel.getPhase()).append(" Phase\n> ").append(soModel.getText())
+                    .append("\n").append(getSecretObjectiveProgress(game, id));
             }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
@@ -256,31 +277,38 @@ public class SecretObjectiveHelper {
         }
         StringBuilder sb = new StringBuilder("> ");
         for (Player player : game.getRealPlayers()) {
-            sb.append(player.getFactionEmoji()).append(": ").append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
+            sb.append(player.getFactionEmoji()).append(": ")
+                .append(ListPlayerInfoService.getPlayerProgressOnObjective(id, game, player))
                 .append("/").append(threshold).append(" ");
         }
         sb.append("\n");
         return sb.toString();
     }
 
-    public static void resolveShowRandomSecretObjective(Game game, Player player, Player otherPlayer, GenericInteractionCreateEvent event) {
+    public static void resolveShowRandomSecretObjective(
+        Game game, Player player, Player otherPlayer,
+        GenericInteractionCreateEvent event
+    ) {
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
         if (secrets.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No secret objectives to reveal");
-            MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, otherPlayer.getRepresentationUnfogged() + ", target had no secret objectives to reveal");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer,
+                otherPlayer.getRepresentationUnfogged() + ", target had no secret objectives to reveal");
             return;
         }
 
         Collections.shuffle(secrets);
         String soID = secrets.getFirst();
 
-        String sb = otherPlayer.getRepresentationUnfogged() + " you were shown the following random Secret Objective:\n" +
+        String sb = otherPlayer.getRepresentationUnfogged() + " you were shown the following random Secret Objective:\n"
+            +
             "> Player: " + player.getColorIfCanSeeStats(otherPlayer) + "\n" +
             "> " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID) + "\n";
 
         player.setSecret(soID);
 
-        MessageHelper.sendMessageToEventChannel(event, "## Random secret objective shown to " + otherPlayer.getColorIfCanSeeStats(player));
+        MessageHelper.sendMessageToEventChannel(event,
+            "## Random secret objective shown to " + otherPlayer.getColorIfCanSeeStats(player));
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, sb);
     }
