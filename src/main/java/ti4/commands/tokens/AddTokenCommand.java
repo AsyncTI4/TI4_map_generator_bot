@@ -115,6 +115,7 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                         spaceUnitHolder.addUnitsWithStates(key, removed);
                     }
                 }
+
             }
             if (tokenID.contains("facility")) {
                 String facility = tokenID;

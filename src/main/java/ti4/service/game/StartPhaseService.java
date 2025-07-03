@@ -77,6 +77,7 @@ public class StartPhaseService {
             // case "P1Special" -> MigrationHelper.fixBlaheo(); // manual migration code to convert blaheo to biaheo - comment after 2025-03
             case "shuffleDecks" -> game.shuffleDecks();
             case "agenda" -> {
+                game.setPhaseOfGame("agenda");
                 Button flipAgenda = Buttons.blue("flip_agenda", "Flip Agenda");
                 List<Button> buttons = List.of(flipAgenda);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please flip agenda now",
@@ -474,14 +475,14 @@ public class StartPhaseService {
                 }
             }
         }
-        
+
         // Pulsar destruction logic
         game.getTileMap().values().stream().filter(tile -> tile.getTileID().equals("sig02")).forEach(pulsar -> {
             pulsar.getSpaceUnitHolder().getUnitColorsOnHolder().forEach(playerColor -> {
                 pulsar.removeAllUnits(playerColor);
                 Player p = game.getPlayerFromColorOrFaction(playerColor);
                 if (p.isRealPlayer()) {
-                    MessageHelper.sendMessageToChannel(p.getCorrectChannel(), 
+                    MessageHelper.sendMessageToChannel(p.getCorrectChannel(),
                         p.getRepresentationUnfogged() + ", units in Pulsar (" + pulsar.getPosition() + ") were destroyed.");
                 }
             });

@@ -743,8 +743,8 @@ public class ButtonHelperModifyUnits {
     }
 
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
-        if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) ||
-            (tile.isSupernova() && !player.getTechs().contains("mr")) ||
+        if ((tile.isAsteroidField() && !player.getTechs().contains("amd") && !player.getRelics().contains("circletofthevoid")) ||
+            (tile.isSupernova() && !player.getTechs().contains("mr") && !player.getRelics().contains("circletofthevoid")) ||
             FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }

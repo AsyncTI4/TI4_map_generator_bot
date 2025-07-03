@@ -306,6 +306,9 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean isLegendary() {
         PlanetModel model = getPlanetModel();
+        if (getName().equalsIgnoreCase("ghoti")) {
+            return false;
+        }
         if (model != null && model.isLegendary()) return true;
 
         for (String token : tokenList) {
