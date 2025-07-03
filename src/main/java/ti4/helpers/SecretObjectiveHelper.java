@@ -66,7 +66,7 @@ public class SecretObjectiveHelper {
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), msg, buttons);
                 }
             }
-            if (!game.getPhaseOfGame().equalsIgnoreCase("action")
+            if (game.getPhaseOfGame().toLowerCase().contains("status")
                 && Mapper.getSecretObjective(entry.getKey()) != null) {
                 game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO",
                     Mapper.getSecretObjective(entry.getKey()).getName());
