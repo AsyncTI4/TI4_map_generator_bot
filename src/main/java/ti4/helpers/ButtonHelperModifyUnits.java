@@ -200,7 +200,7 @@ public class ButtonHelperModifyUnits {
         String pos = tile.getPosition();
         FileUpload systemWithContext = new TileGenerator(game, event, null, 0, tile.getPosition()).createFileUpload();
         MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-        List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, "ground", event);
+        List<Button> buttons = StartCombatService.getGeneralCombatButtons(game, pos, p1, p2, "ground");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
     }
 
@@ -271,7 +271,7 @@ public class ButtonHelperModifyUnits {
                         ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);
                     }
 
-                    if (player.hasUnit("sardakk_mech") && unitModel.getUnitType() == UnitType.Mech) {
+                    if (player.hasUnit("sardakk_mech") && unitModel.getUnitType() == UnitType.Mech && !ButtonHelper.isLawInPlay(game, "articles_war")) {
                         msg.append("> Valkyrie Exoskeleton mech generated ").append(min).append(" hit").append(min == 1 ? "" : "s").append(" \n");
                         sardakkMechHits = min;
                     }
@@ -743,8 +743,8 @@ public class ButtonHelperModifyUnits {
     }
 
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
-        if ((tile.isAsteroidField() && !player.getTechs().contains("amd")) ||
-            (tile.isSupernova() && !player.getTechs().contains("mr")) ||
+        if ((tile.isAsteroidField() && !player.getTechs().contains("amd") && !player.getRelics().contains("circletofthevoid")) ||
+            (tile.isSupernova() && !player.getTechs().contains("mr") && !player.getRelics().contains("circletofthevoid")) ||
             FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
@@ -1489,7 +1489,7 @@ public class ButtonHelperModifyUnits {
                     Tile tile2 = game.getTileByPosition(planetName);
                     if (player.hasAbility("cloaked_fleets")) {
                         List<Button> shroadedFleets = new ArrayList<>();
-                        shroadedFleets.add(Buttons.green("cloakedFleets_" + tile2.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnit(unitID).getName()));
+                        shroadedFleets.add(Buttons.green("cloakedFleets_" + tile2.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                             "You may use your **Cloaked Fleets** ability to capture this produced ship.",
@@ -1497,7 +1497,7 @@ public class ButtonHelperModifyUnits {
                     }
                     if (player.hasLeaderUnlocked("redcreusshero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
-                        shroadedFleets.add(Buttons.green("cloakedFleets_" + tile2.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnit(unitID).getName()));
+                        shroadedFleets.add(Buttons.green("cloakedFleets_" + tile2.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                             "You may place this produced ship on the Red Creuss Hero.",

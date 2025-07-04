@@ -112,7 +112,7 @@ public class WebHelper {
             }
 
             Map<String, Object> webData = new HashMap<>();
-            webData.put("versionSchema", 2);
+            webData.put("versionSchema", 4);
             webData.put("objectives", webObjectives);
             webData.put("playerData", playerDataList);
             webData.put("lawsInPlay", lawsInPlay);
@@ -123,6 +123,9 @@ public class WebHelper {
             webData.put("statTilePositions", webStatTilePositions.getStatTilePositions());
             webData.put("ringCount", game.getRingCount());
             webData.put("vpsToWin", game.getVp());
+            webData.put("gameRound", game.getRound());
+            webData.put("gameName", game.getName());
+            webData.put("gameCustomName", game.getCustomName());
 
             String json = objectMapper.writeValueAsString(webData);
             PutObjectRequest request = PutObjectRequest.builder()

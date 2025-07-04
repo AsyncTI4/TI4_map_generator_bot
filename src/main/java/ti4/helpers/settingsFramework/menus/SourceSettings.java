@@ -44,7 +44,7 @@ public class SourceSettings extends SettingsMenu {
         // Initialize Settings to default values
         base = new BooleanSetting("BaseGame", "Base Game", true);
         pok = new BooleanSetting("PoK", "Prophecy of Kings", true);
-        codexes = new BooleanSetting("Codexes", "Codex 1-3", true);
+        codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
@@ -124,7 +124,7 @@ public class SourceSettings extends SettingsMenu {
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
         if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
-        if (unchartedSpace.isVal()) sources.add(ComponentSource.uncharted_space);
+        if (unchartedSpace.isVal() || discoStars.isVal()) sources.add(ComponentSource.uncharted_space);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         //if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
@@ -174,7 +174,7 @@ public class SourceSettings extends SettingsMenu {
 
                 // Decks with both
                 String relic = ignis ? "relics_baldrick" : "relics_pok";
-                String techs = ignis ? "techs_baldrick" : "techs_pok";
+                String techs = ignis ? "techs_baldrick" : "techs_pok_c4";
 
                 // Decks for ABSOL
                 String agenda = ignis ? "agendas_baldrick" : "agendas_pok";
@@ -199,7 +199,7 @@ public class SourceSettings extends SettingsMenu {
 
                 // Decks with both
                 String relic = both ? "relics_absol_ds" : (abs ? "relics_absol" : (ds ? "relics_ds" : "relics_pok"));
-                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (ds ? "techs_ds" : "techs_pok"));
+                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (ds ? "techs_ds" : "techs_pok_c4"));
 
                 // Decks for ABSOL
                 String agenda = abs ? "agendas_absol" : "agendas_pok";

@@ -7,8 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.DiceHelper.Die;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -32,7 +33,9 @@ public class CombatMessageHelper {
         // Gracefully fail when units don't exist
         String error = "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n" +
             "> Duplicate units: " + dupes;
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+        if (event != null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+        }
     }
 
     public static void displayMissingUnits(GenericInteractionCreateEvent event, List<String> missing) {
@@ -41,7 +44,9 @@ public class CombatMessageHelper {
         String error = "You do not seem to own any of the following unit types, so they will be skipped." +
             " Ping bothelper if this seems to be in error.\n" +
             "> Unowned units: " + missing + "\n";
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+        if (event != null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+        }
     }
 
     public static String displayUnitRoll(UnitModel unitModel, int toHit, int modifier, int unitQuantity, int numRollsPerUnit, int extraRolls, List<Die> resultRolls, int numHit) {

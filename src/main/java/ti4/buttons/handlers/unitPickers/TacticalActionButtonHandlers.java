@@ -20,6 +20,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.regex.RegexService;
 import ti4.service.tactical.TacticalActionOutputService;
 import ti4.service.tactical.TacticalActionService;
@@ -141,6 +142,9 @@ public class TacticalActionButtonHandlers {
         String rx = "concludeMove_" + RegexHelper.posRegex(game);
         RegexService.runMatcher(rx, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            if (tile == null && FOWPlusService.isVoid(game, matcher.group("pos"))) {
+                tile = FOWPlusService.voidTile(matcher.group("pos"));
+            }
             TacticalActionService.finishMovement(event, game, player, tile);
         });
     }

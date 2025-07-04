@@ -10,6 +10,7 @@ import lombok.Data;
 public class WebTilePlanet {
     private String controlledBy;
     private Map<String, List<WebEntityData>> entities;
+    private Integer commodities; // Number of commodities on this planet (Discordant Stars feature)
 
     public WebTilePlanet() {
         this.entities = new HashMap<>();

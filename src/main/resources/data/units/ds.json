@@ -1344,7 +1344,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "If a unit in this system would be destroyed, you may remove it from the game board instead.",
+        "ability": "When a unit in this system would be destroyed, you may remove it from the game board instead.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/units/ds/flagships/eradica.jpg?raw=true"
     },
     {

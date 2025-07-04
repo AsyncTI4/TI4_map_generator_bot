@@ -25,8 +25,7 @@ public final class ExecutionHistoryManager {
                 var elapsedMinutes = elapsedDuration.toMinutes();
                 var elapsedSeconds = elapsedDuration.toSeconds() % 60;
                 if (elapsedMinutes >= 2) {
-                    BotLogger.error("A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds + " seconds. " +
-                        "Task name: " + execution.name);
+                    BotLogger.error("A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds + " seconds: " + execution.name);
                 } else if (elapsedMinutes == 1 && CircuitBreaker.incrementThresholdCount()) {
                     BotLogger.warning("Incremented circuit breaker threshold. Task name: " + execution.name);
                 }

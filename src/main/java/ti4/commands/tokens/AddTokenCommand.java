@@ -115,6 +115,7 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                         spaceUnitHolder.addUnitsWithStates(key, removed);
                     }
                 }
+
             }
             if (tokenID.contains("facility")) {
                 String facility = tokenID;
@@ -134,8 +135,10 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
             } else {
                 tile.addToken(tokenID, planet);
             }
-            if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)) {
-                Helper.addMirageToTile(tile);
+            for (String tp : Constants.TOKEN_PLANETS) {
+                if (tokenID.equals(Mapper.getTokenID(tp))) {
+                    Helper.addTokenPlanetToTile(game, tile, tp);
+                }
             }
         }
     }

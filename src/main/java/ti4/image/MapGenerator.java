@@ -15,18 +15,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -36,11 +32,16 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
-import ti4.helpers.*;
-import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.Constants;
+import ti4.helpers.DateTimeHelper;
+import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
+import ti4.helpers.PlayerStatsHelper;
+import ti4.helpers.Storage;
 import ti4.helpers.TIGLHelper.TIGLRank;
 import ti4.helpers.Units.UnitKey;
-import ti4.website.WebHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.map.Game;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -58,6 +59,7 @@ import ti4.model.StrategyCardModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
+import ti4.website.WebHelper;
 import ti4.website.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
@@ -127,10 +129,12 @@ public class MapGenerator implements AutoCloseable {
             scoreTokenSpacing = 30;
 
         // Height of objectives section (=0 when there is 5 or less objectives in the column with most objectives)
-        int stage1PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
-            .filter(Mapper.getPublicObjectivesStage1()::containsKey).toList().size();
-        int stage2PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
-            .filter(Mapper.getPublicObjectivesStage2()::containsKey).toList().size();
+        int stage1PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
+            .filter(Mapper.getPublicObjectivesStage1()::containsKey)
+            .count();
+        int stage2PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
+            .filter(Mapper.getPublicObjectivesStage2()::containsKey)
+            .count();
         int otherObjCount = game.getRevealedPublicObjectives().size() - stage1PublicObjCount - stage2PublicObjCount;
         stage1PublicObjCount = game.getPublicObjectives1Peakable().size() + stage1PublicObjCount;
         stage2PublicObjCount = game.getPublicObjectives2Peakable().size() + stage2PublicObjCount;
@@ -1130,9 +1134,9 @@ public class MapGenerator implements AutoCloseable {
                     offBoardHighlighting++;
                 }
             } else if (displayType == DisplayType.empties) {
-                boolean hasStellar = player.hasRelic("stellarconverter") || player.hasRelic("absol_stellarconverter");
+                boolean hasStellar = false; // not working
                 String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
-                boolean hasHero = player.hasLeaderUnlocked("muaathero") || player.hasLeaderUnlocked("zelianhero");
+                boolean hasHero = false; //was not working
                 String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
                 if (player.hasLeaderUnlocked("muaathero")) {
                     heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png");

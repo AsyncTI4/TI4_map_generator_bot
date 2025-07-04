@@ -155,7 +155,7 @@ public abstract class BagDraft {
 
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!owner.isCommunityMode() && !owner.isFowMode());
+        boolean isPrivateChannel = (!owner.isFowMode());
         if (owner.getName().contains("pbd100") || owner.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
@@ -258,7 +258,11 @@ public abstract class BagDraft {
             } else {
                 sb.append("❌");
             }
-            sb.append(player.getRepresentationNoPing());
+            if (owner.getRealPlayers().size() > 10) {
+                sb.append(player.getFactionEmoji());
+            } else {
+                sb.append(player.getRepresentationNoPing());
+            }
             sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
             sb.append("\n");
         }

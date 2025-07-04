@@ -113,6 +113,9 @@ public class TransactionHelper {
                         }
                         case "Technology" -> {
                             receiver.addTech(furtherDetail);
+
+                            ButtonHelperCommanders.resolveNekroCommanderCheck(receiver, furtherDetail, game);
+                            CommanderUnlockCheckService.checkPlayer(receiver, "nekro");
                         }
                         case "dmz" -> ButtonHelper.resolveDMZTrade(sender, game, event, "send_" + furtherDetail + "_" + receiver.getFaction());
                         default -> resolveSpecificTransButtonPress(game, sender, spoofedButtonID, event, false);

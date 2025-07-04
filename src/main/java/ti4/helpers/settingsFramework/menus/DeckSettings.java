@@ -56,7 +56,7 @@ public class DeckSettings extends SettingsMenu {
         String defaultSecret = game.map(Game::getSoDeckID).orElse("secret_objectives_pok");
         String defaultACdeck = game.map(Game::getAcDeckID).orElse("action_cards_pok");
         String defaultAgendas = game.map(Game::getAgendaDeckID).orElse("agendas_pok");
-        String defaultTechs = game.map(Game::getTechnologyDeckID).orElse("techs_pok");
+        String defaultTechs = game.map(Game::getTechnologyDeckID).orElse("techs_pok_c4");
         String defaultRelics = game.map(Game::getRelicDeckID).orElse("relics_pok");
         String defaultExplores = game.map(Game::getExplorationDeckID).orElse("explores_pok");
         String defaultSCs = game.map(Game::getScSetID).orElse("pok");

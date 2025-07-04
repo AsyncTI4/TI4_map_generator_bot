@@ -17,8 +17,7 @@ public class GameStatisticsService {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not determine stat type.");
             return;
         }
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent(getEventName(statType), event, () -> getGameStatistics(event, statType)));
+        StatisticsPipeline.queue(event, () -> getGameStatistics(event, statType));
     }
 
     private void getGameStatistics(SlashCommandInteractionEvent event, GameStatTypes statType) {
@@ -40,10 +39,6 @@ public class GameStatisticsService {
             case SUPPORT_WIN_COUNT -> WinningPathsStatisticsService.showWinsWithSupport(event);
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
         }
-    }
-
-    private String getEventName(GameStatTypes statType) {
-        return GameStatisticsService.class.getSimpleName() + ":" + statType;
     }
 
     // WARNING: This iterates over each game and is very slow.

@@ -447,7 +447,7 @@ public class ComponentActionHelper {
                         + " Click a button below to discard an Action Card";
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
-                        p1.getRepresentation() + " is doing nothing with their **Stall Tactics** ability.");
+                        p1.getRepresentation() + " is stalling with their **Stall Tactics** ability.");
                     if (!acButtons.isEmpty()) {
                         List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg,
                             acButtons);

@@ -564,13 +564,16 @@ public class PlayerAreaGenerator {
     }
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.getHonorCounter() < 1 && player.getPathTokenCounter() < 1) {
+        if (player.getDishonorCounter() < 1 && player.getHonorCounter() < 1 && player.getPathTokenCounter() < 1) {
             return xDeltaFromRightSide;
         }
         if (player.getHonorCounter() > 0) {
             DrawingUtil.superDrawStringCenteredDefault(graphics, "Honor Count: " + player.getHonorCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
         } else {
             DrawingUtil.superDrawStringCenteredDefault(graphics, "Path Token Count: " + player.getPathTokenCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
+        }
+        if (player.getDishonorCounter() > 0) {
+            DrawingUtil.superDrawStringCenteredDefault(graphics, "Dishonor Count: " + player.getHonorCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 100);
         }
         return xDeltaFromRightSide + 200;
     }
@@ -1668,8 +1671,9 @@ public class PlayerAreaGenerator {
         List<String> fakePlanets = new ArrayList<>();
         for (String planet : planets) {
             PlanetModel model = Mapper.getPlanet(planet);
+
             Set<PlanetType> types = new HashSet<>();
-            if (model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
+            if (model != null && model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
 
             if (types.contains(PlanetType.FAKE)) {
                 fakePlanets.add(planet);
@@ -1750,7 +1754,8 @@ public class PlayerAreaGenerator {
         try {
             Planet planet = planetsInfo.get(planetName);
             if (planet == null) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Planet " + planetName + " not found in game " + game.getName());
+                player.removePlanet(planetName);
+                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Planet " + planetName + " not found in game " + game.getName() + ". Removing planet from player.");
                 return deltaX;
             }
             PlanetModel planetModel = planet.getPlanetModel();

@@ -90,7 +90,8 @@
     {
         "id": "customwinnu",
         "imagePath": "token_winnu.png",
-        "source": "other" },
+        "source": "other"
+    },
     {
         "id": "speaker",
         "imagePath": "token_speaker.png",
@@ -132,16 +133,23 @@
     },
     {
         "id": "whepsilon",
-        "imagePath": "token_whepsilon.png",
+        "imagePath": "token_custom_eronous_whepsilon.png",
         "spaceOrPlanet": "space",
         "wormholes": ["EPSILON"],
         "source": "other"
     },
     {
         "id": "wheta",
-        "imagePath": "token_wheta.png",
+        "imagePath": "token_custom_eronous_wheta.png",
         "spaceOrPlanet": "space",
         "wormholes": ["ETA"],
+        "source": "other"
+    },
+    {
+        "id": "whkappa",
+        "imagePath": "token_custom_eronous_whkappa.png",
+        "spaceOrPlanet": "space",
+        "wormholes": ["KAPPA"],
         "source": "other"
     },
     {
@@ -174,7 +182,7 @@
     },
     {
         "id": "whzeta",
-        "imagePath": "token_whzeta.png",
+        "imagePath": "token_custom_eronous_whzeta.png",
         "spaceOrPlanet": "space",
         "wormholes": ["ZETA"],
         "source": "other"
@@ -185,5 +193,21 @@
         "spaceOrPlanet": "space",
         "wormholes": ["VORTEX"],
         "source": "eronous"
+    },
+    {
+        "id": "illusion",
+        "imagePath": "token_illusion.png",
+        "spaceOrPlanet": "space",
+        "tokenPlanetName": "illusion",
+        "aliasList": ["illusion", "token_illusion"],
+        "source": "other"
+    },
+    {
+        "id": "phantasm",
+        "imagePath": "token_phantasm.png",
+        "spaceOrPlanet": "space",
+        "tokenPlanetName": "phantasm",
+        "aliasList": ["phantasm", "token_phantasm"],
+        "source": "other"
     }
 ]
