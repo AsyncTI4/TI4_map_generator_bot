@@ -16,6 +16,8 @@ class PlayerStatistics extends Subcommand {
         super("players", "Player Statistics");
         addOptions(new OptionData(OptionType.STRING, Constants.PLAYER_STATISTIC, "Choose a stat to show").setRequired(true).setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
+        addOptions(new OptionData(OptionType.STRING, GameStatisticsFilterer.WINNING_FACTION_FILTER, "Filter games by if the game was won by said faction")
+            .setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, MINIMUM_GAME_COUNT_FILTER, "Filter by the minimum number of games player has played, default 10"));
         addOptions(new OptionData(OptionType.INTEGER, MAX_LIST_SIZE, "The maximum number of players listed, default 50"));
     }

@@ -152,13 +152,13 @@ class AgendaResolveButtonHandler {
                         for (Player playerB : game.getRealPlayers()) {
                             if (playerB.getFleetCC() > 4) {
                                 playerB.setFleetCC(4);
-                                ButtonHelper.checkFleetInEveryTile(playerB, game, event);
+                                ButtonHelper.checkFleetInEveryTile(playerB, game);
                             }
                             if (playerB.hasAbility("imperia")) {
                                 if (playerB.getFleetCC() + playerB.getMahactCC().size() > 4) {
                                     int min = Math.max(0, 4 - playerB.getMahactCC().size());
                                     playerB.setFleetCC(min);
-                                    ButtonHelper.checkFleetInEveryTile(playerB, game, event);
+                                    ButtonHelper.checkFleetInEveryTile(playerB, game);
                                 }
                             }
                         }
@@ -375,7 +375,7 @@ class AgendaResolveButtonHandler {
                     player2.setFleetCC(amount);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/" + player2.getFleetCC() + "/2.");
-                    ButtonHelper.checkFleetInEveryTile(player2, game, event);
+                    ButtonHelper.checkFleetInEveryTile(player2, game);
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {
                     RelicHelper.drawRelicAndNotify(player2, event, game);
@@ -510,7 +510,7 @@ class AgendaResolveButtonHandler {
                         String message = player.getRepresentation() + ", you've lost a command token from your fleet pool.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                         player.setFleetCC(player.getFleetCC() - 1);
-                        ButtonHelper.checkFleetInEveryTile(player, game, event);
+                        ButtonHelper.checkFleetInEveryTile(player, game);
                     }
                 }
             }
@@ -857,7 +857,12 @@ class AgendaResolveButtonHandler {
                         }
                         case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
                         case "6" -> scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
-                        case "7" -> scButtons.add(Buttons.GET_A_TECH);
+                        case "7" -> {
+                            scButtons.add(Buttons.GET_A_TECH);
+                            if (Helper.getPlayerFromAbility(game, "propogation") != null) {
+                                scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Gain 3 Command Tokens (for Nekro)"));
+                            }
+                        }
                         case "8" -> {
                             PlayStrategyCardService.handleSOQueueing(game, false);
                             scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));

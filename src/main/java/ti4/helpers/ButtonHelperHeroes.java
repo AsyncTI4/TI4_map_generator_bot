@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,12 +9,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.Units.UnitKey;
@@ -51,8 +54,6 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperHeroes {
 
@@ -631,8 +632,8 @@ public class ButtonHelperHeroes {
     public static void resolveFlorzenHeroStep1(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String attachment : getAttachmentsForFlorzenHero(game, player)) {
-            String planet = attachment.split("_")[0];
-            String attach = attachment.split("_")[1];
+            String planet = StringUtils.substringBefore(attachment, "_");
+            String attach = StringUtils.substringAfter(attachment, "_");
             buttons.add(Buttons.green("florzenHeroStep2_" + attachment,
                 attach + " on " + Helper.getPlanetRepresentation(planet, game)));
         }
@@ -642,8 +643,10 @@ public class ButtonHelperHeroes {
 
     @ButtonHandler("florzenHeroStep2_")
     public static void resolveFlorzenHeroStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        String planet = buttonID.split("_")[1];
-        String attachment = buttonID.split("_")[2];
+        buttonID = buttonID.replace("florzenHeroStep2_", "");
+
+        String planet = StringUtils.substringBefore(buttonID, "_");
+        String attachment = StringUtils.substringAfter(buttonID, "_");
         List<Button> buttons = new ArrayList<>();
         Tile hs = player.getHomeSystemTile();
         for (UnitHolder uh : hs.getPlanetUnitHolders()) {
@@ -1323,11 +1326,13 @@ public class ButtonHelperHeroes {
             buttons.add(Buttons.green("stealRelic_" + victim.getFaction() + "_" + relic,
                 "Steal " + Mapper.getRelic(relic).getName()));
         }
+        buttons.add(Buttons.red("deleteButtons", "Decline"));
         String msg = player.getRepresentationUnfogged() + ", please choose the relic you wish to steal.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
 
     }
 
+    @ButtonHandler("stealRelic_")
     public static void stealRelic(Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         ButtonHelper.deleteMessage(event);
         String faction = buttonID.split("_")[1];

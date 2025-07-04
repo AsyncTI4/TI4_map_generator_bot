@@ -26,7 +26,7 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
-import ti4.service.fow.GMService;
+import ti4.service.fow.LoreService;
 import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.tactical.TacticalActionService;
@@ -86,7 +86,7 @@ public class ButtonHelperTacticalAction {
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
         if (game.isFowMode()) {
-            GMService.showSystemLore(player, game);
+            LoreService.showSystemLore(player, game, game.getActiveSystem());
             channel = player.getPrivateChannel();
         }
         MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);

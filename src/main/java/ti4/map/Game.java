@@ -432,6 +432,23 @@ public class Game extends GameProperties {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
             if (player.getTotalVictoryPoints() >= getVp()) {
+                if (isLiberationC4Mode()) {
+                    if (!player.getAllianceMembers().isEmpty()) {
+                        Player ally = null;
+                        for (Player p2 : getRealPlayersNDummies()) {
+                            if (p2 != player && p2.getAllianceMembers().contains(player.getFaction())) {
+                                ally = p2;
+                            }
+                        }
+                        boolean allyGood = false;
+                        if (ally != null && ally.getTotalVictoryPoints() >= getVp() && (player.getTotalVictoryPoints() > 11 || ally.getTotalVictoryPoints() > 11)) {
+                            allyGood = true;
+                        }
+                        if (!allyGood) {
+                            continue;
+                        }
+                    }
+                }
                 if (winner == null) {
                     winner = player;
                 } else if (hasFullPriorityTrackMode()) {
@@ -3355,13 +3372,10 @@ public class Game extends GameProperties {
     }
 
     public Tile getTile(String tileID) {
-        if ("mirage".equalsIgnoreCase(tileID)) {
-            for (Tile tile : tileMap.values()) {
-                for (UnitHolder uh : tile.getUnitHolders().values()) {
-                    if (uh.getTokenList() != null && (uh.getTokenList().contains("mirage")
-                        || uh.getTokenList().contains("token_mirage.png"))) {
-                        return tile;
-                    }
+        if (Constants.TOKEN_PLANETS.contains(tileID)) {
+            for (Tile t : tileMap.values()) {
+                if (t.getUnitHolderFromPlanet(tileID) != null) {
+                    return t;
                 }
             }
         }

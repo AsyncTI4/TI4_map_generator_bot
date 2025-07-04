@@ -139,7 +139,6 @@ public class FrankenDraftBagService {
         List<DraftItem> undraftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
         draftables.removeIf(draftItem -> !draftItem.isDraftable(player));
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
-
         Set<String> bagStringLines = getCurrentBagRepresentation(draftables, undraftables);
         for (String line : bagStringLines) {
             MessageHelper.sendMessageToChannel(bagChannel, line);
@@ -326,8 +325,8 @@ public class FrankenDraftBagService {
                 skipped = true;
                 continue;
             }
-            String faction = "franken" + (index <= 16 ? emojiNum.get(index - 1) : index);
-            String tempHomeSystemLocation = String.valueOf(300 + index);
+            String faction = "franken" + (index <= 24 ? emojiNum.get(index - 1) : index);
+            String tempHomeSystemLocation = String.valueOf(500 + index);
             if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }

@@ -75,7 +75,7 @@ public class CommanderDraftItem extends DraftItem {
     }
 
     public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
-        List<DraftItem> allItems = buildAllItems(factions);
+        List<DraftItem> allItems = buildAllItems(factions, game);
         DraftErrataModel.filterUndraftablesAndShuffle(allItems, DraftItem.Category.COMMANDER);
         return allItems;
     }

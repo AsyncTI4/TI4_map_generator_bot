@@ -19,7 +19,7 @@
     "wormholes": [
         null
     ],
-    "isNebula": true,
+    "isAsteroidField": true,
     "tileBack": "red",
     "source": "eronous"
 }

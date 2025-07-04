@@ -37,7 +37,7 @@ public class GameProperties {
     private @ExportableField String relicDeckID = "relics_pok";
     private @ExportableField String agendaDeckID = "agendas_pok";
     private @ExportableField String explorationDeckID = "explores_pok";
-    private @ExportableField String technologyDeckID = "techs_pok";
+    private @ExportableField String technologyDeckID = "techs_pok_c4";
     private @ExportableField String scSetID = "pok";
     private @ExportableField String eventDeckID = "";
 
@@ -68,6 +68,7 @@ public class GameProperties {
 
     // Customization Flags/Settings
     private boolean botFactionReacts;
+    private boolean botStratReacts;
     private boolean botShushing;
     private boolean ccNPlasticLimit = true;
     private boolean injectRulesLinks = true;

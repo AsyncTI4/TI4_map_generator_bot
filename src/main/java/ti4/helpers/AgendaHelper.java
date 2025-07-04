@@ -1885,7 +1885,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
                                     + ", you lost 1 command token from your fleet pool due to voting the same way as a _Sanction_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+                            ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
                     if (winningR != null && specificVote.contains("Corporate Lobbying")) {
@@ -1897,7 +1897,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
                                     + " you gained trade goods due to voting the same way as _Corporate Lobbying_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+                            ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight")
@@ -2635,7 +2635,9 @@ public class AgendaHelper {
 
             if (CollectionUtils.containsAny(player.getRelics(),
                 List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
-                int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size();
+                int count = (int) player.getRelics().stream()
+                    .filter(s -> s.contains("absol_shardofthethrone"))
+                    .count();
                 int shardVotes = 2 * count; // +2 votes per Absol shard
                 Button button = Buttons.gray("exhaustForVotes_absolShard_" + shardVotes,
                     "Use Shard of the Throne Votes (" + shardVotes + ")", SourceEmojis.Absol);
@@ -3135,7 +3137,9 @@ public class AgendaHelper {
         }
 
         // Absol Shard of the Throne
-        int shardCount = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size();
+        int shardCount = (int) player.getRelics().stream()
+            .filter(s -> s.contains("absol_shardofthethrone"))
+            .count();
         if (shardCount > 0) { // +2 votes per Absol shard
             int shardVotes = 2 * shardCount;
             additionalVotesAndSources.put(
@@ -3814,7 +3818,7 @@ public class AgendaHelper {
             }
         }
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+            ButtonHelper.checkFleetInEveryTile(p2, game);
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
             "Removed all ships from systems with alphas or betas wormholes. \nYou may use the button to get your technology.",
@@ -4074,11 +4078,11 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("forceAbstainForPlayer_")
-    public static void forceAbstainForPlayer(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void forceAbstainForPlayer(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String faction = buttonID.replace("forceAbstainForPlayer_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained.");
+            (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained by " + player.getRepresentationNoPing());
         AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
     }
 

@@ -74,6 +74,7 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -325,7 +326,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean hasInf2Tech() {// "dszeliinf"
         return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2")
-            || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2")
+            || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2") || getTechs().contains("dsqhetinf")
             || getTechs().contains("dszeliinf") || getUnitsOwned().contains("pharadn_infantry") || getUnitsOwned().contains("pharadn_infantry2");
     }
 
@@ -2052,6 +2053,7 @@ public class Player extends PlayerProperties {
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);
+            LoreService.showPlanetLore(this, getGame(), planet);
         }
     }
 

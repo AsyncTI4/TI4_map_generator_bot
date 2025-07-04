@@ -269,10 +269,12 @@ public class TacticalActionService {
             FOWPlusService.resolveVoidActivation(player, game);
             Button conclude = Buttons.red(player.finChecker() + "doneWithTacticalAction", "Conclude Tactical Action");
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "All units were lost to the void.", conclude);
+            ButtonHelper.deleteAllButtons(event);
             return;
         }
 
         // Move units and place token and also determine some other heuristics
+        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, player, tile);
         tile = game.getTileByPosition(tile.getPosition());
         spendAndPlaceTokenIfNecessary(event, game, player, tile);
@@ -303,7 +305,6 @@ public class TacticalActionService {
         CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
         if (!game.isL1Hero() && !playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(game, player, playersWithPds2, tile);
         }
