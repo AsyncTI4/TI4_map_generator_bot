@@ -258,7 +258,11 @@ public abstract class BagDraft {
             } else {
                 sb.append("❌");
             }
-            sb.append(player.getRepresentationNoPing());
+            if (owner.getRealPlayers().size() > 10) {
+                sb.append(player.getFactionEmoji());
+            } else {
+                sb.append(player.getRepresentationNoPing());
+            }
             sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
             sb.append("\n");
         }
