@@ -432,6 +432,23 @@ public class Game extends GameProperties {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
             if (player.getTotalVictoryPoints() >= getVp()) {
+                if (isLiberationC4Mode()) {
+                    if (!player.getAllianceMembers().isEmpty()) {
+                        Player ally = null;
+                        for (Player p2 : getRealPlayersNDummies()) {
+                            if (p2 != player && p2.getAllianceMembers().contains(player.getFaction())) {
+                                ally = p2;
+                            }
+                        }
+                        boolean allyGood = false;
+                        if (ally != null && ally.getTotalVictoryPoints() >= getVp() && (player.getTotalVictoryPoints() > 11 || ally.getTotalVictoryPoints() > 11)) {
+                            allyGood = true;
+                        }
+                        if (!allyGood) {
+                            continue;
+                        }
+                    }
+                }
                 if (winner == null) {
                     winner = player;
                 } else if (hasFullPriorityTrackMode()) {

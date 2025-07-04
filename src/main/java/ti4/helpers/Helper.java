@@ -855,6 +855,20 @@ public class Helper {
         player.resetOlradinPolicyFlags();
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
+        //Helper.getPlanetInfluence(planet, game);
+        if (whatIsItFor.equalsIgnoreCase("inf")) {
+            planets = planets.stream()
+                .sorted((p1, p2) -> Integer.compare(
+                    Helper.getPlanetInfluence(p2, game),
+                    Helper.getPlanetInfluence(p1, game)))
+                .collect(Collectors.toList());
+        } else {
+            planets = planets.stream()
+                .sorted((p1, p2) -> Integer.compare(
+                    Helper.getPlanetResources(p2, game),
+                    Helper.getPlanetResources(p1, game)))
+                .collect(Collectors.toList());
+        }
         for (String planet : planets) {
 
             if (planet.contains("custodia") || planet.contains("ghoti")) {
