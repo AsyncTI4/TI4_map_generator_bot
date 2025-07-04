@@ -398,6 +398,7 @@ public class AgendaHelper {
         // if (ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
         //     buttons.add(Buttons.red("queueAfter_agenda_committee", "Committee Formation"));
         // }
+        CryypterHelper.addVotCRiderQueueButtons(player, buttons);
 
         return buttons;
     }
@@ -570,6 +571,7 @@ public class AgendaHelper {
                             case "leader" -> {
                                 if (after.toLowerCase().contains("keleres")) {
                                     Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                                    playerLeader = CryypterHelper.keleresHeroCheck(player, playerLeader);
                                     if (playerLeader != null) {
                                         String message = player.getRepresentation() + " played " +
                                             Helper.getLeaderFullRepresentation(playerLeader);
@@ -579,6 +581,8 @@ public class AgendaHelper {
                                     }
                                     riderButtons = getAgendaButtons("Keleres Xxcha Hero", game,
                                         player.getFinsFactionCheckerPrefix());
+                                } else if (after.toLowerCase().contains("envoy")) {
+                                    riderButtons = getAgendaButtons(after, game, player.getFinsFactionCheckerPrefix());
                                 } else {
                                     riderButtons = getAgendaButtons("Atokera Commander Ability", game,
                                         player.getFinsFactionCheckerPrefix());
@@ -1655,6 +1659,8 @@ public class AgendaHelper {
             }
         }
 
+        CryypterHelper.addVotCAfterButtons(game, afterButtons);
+
         afterButtons.add(Buttons.blue("no_after", "No Afters (for now)", MiscEmojis.NoAfters));
         afterButtons.add(Buttons.blue("no_after_persistent", "No Afters (for this agenda)", MiscEmojis.NoAfters));
         return afterButtons;
@@ -2112,8 +2118,8 @@ public class AgendaHelper {
                         }
 
                     }
-
                 }
+                CryypterHelper.handleWinningRiders(game, winner);
             }
         }
         return winningRs;
@@ -3367,6 +3373,7 @@ public class AgendaHelper {
                     game, player, riderButtons);
                 if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
                     Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                    playerLeader = CryypterHelper.keleresHeroCheck(player, playerLeader);
                     if (playerLeader != null) {
                         String message = player.getRepresentation() + " played " +
                             Helper.getLeaderFullRepresentation(playerLeader);
@@ -3647,6 +3654,7 @@ public class AgendaHelper {
             checkForPoliticalSecret(game);
         }
         if (cov) {
+            agendaTarget = CryypterHelper.handleCovert(agendaTarget);
             MessageHelper.sendMessageToChannel(channel,
                 "# " + game.getPing() + " the agenda target is " + agendaTarget
                     + ". Sent the agenda to the speaker's `#cards-info` thread.");
