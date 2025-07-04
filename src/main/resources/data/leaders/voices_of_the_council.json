@@ -171,7 +171,7 @@
         "name": "Nekro Incisul",
         "title": "Network Infiltrator",
         "abilityWindow": "After an agenda is revealed:",
-        "abilityText": "Choose an outcome and a player. If that player votes for that outcome, they cast additional votes equal to the number of technologies that player owns that you also own. If that outcome is resolved, you count as having cast 5 votes for that outcome.",
+        "abilityText": "Choose an outcome and a player. If that player votes for that outcome, they cast additional votes equal to the number of technologies that player owns that you also own, and if that outcome is resolved, you count as having cast 5 votes for that outcome.",
         "unlockCondition": "At the start of the agenda phase",
         "source": "voices_of_the_council"
     },
