@@ -51,7 +51,7 @@ public class DateTimeHelper {
 
         long nanoSeconds = totalNanoSeconds % 1000;
         long microSeconds = totalMicroSeconds % 1000;
-        long milleSeconds = totalMilliSeconds % 1000;
+        long milliSeconds = totalMilliSeconds % 1000;
         // long minutes = totalMinutes % 60;
         // long hours = totalHours % 24;
         // long days = totalDays;
@@ -61,7 +61,7 @@ public class DateTimeHelper {
         // sb.append(String.format("%02dm:", minutes));
 
         return String.format("%02ds:", totalSeconds) +
-            String.format("%03d:", milleSeconds) +
+            String.format("%03d:", milliSeconds) +
             String.format("%03d:", microSeconds) +
             String.format("%03d", nanoSeconds);
     }

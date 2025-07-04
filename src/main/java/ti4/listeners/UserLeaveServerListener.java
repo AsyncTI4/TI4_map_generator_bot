@@ -63,9 +63,9 @@ public class UserLeaveServerListener extends ListenerAdapter {
     }
 
     private static int userTotalGames(ManagedPlayer user) {
-        return user.getGames().stream()
+        return (int) user.getGames().stream()
             .filter(mg -> !mg.isHasEnded() && !mg.isHasWinner() && !mg.isVpGoalReached())
-            .toList().size();
+            .count();
     }
 
     private static Game gameWasReallyLeft(Guild guild, ManagedPlayer mPlayer, ManagedGame mGame) {
