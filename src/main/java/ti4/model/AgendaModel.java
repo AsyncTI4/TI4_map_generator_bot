@@ -136,7 +136,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean displayElectedFaction() {
-        return "Elect Player".equalsIgnoreCase(target);
+        return target.contains("Elect Player");
     }
 
     public MessageEmbed getRepresentationEmbed() {
