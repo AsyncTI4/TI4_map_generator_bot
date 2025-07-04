@@ -311,7 +311,7 @@ public class ExploreService {
             return;
         }
 
-        MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed();
+        MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed(false, true);
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), messageText, exploreEmbed);
 
         String message = null;

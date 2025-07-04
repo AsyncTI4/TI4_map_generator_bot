@@ -1,6 +1,7 @@
 package ti4.commands.statistics;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -18,23 +19,23 @@ public class GameStatisticsFilterer {
     public static final String PLAYER_COUNT_FILTER = "player_count";
     public static final String MIN_PLAYER_COUNT_FILTER = "min_player_count";
     public static final String VICTORY_POINT_GOAL_FILTER = "victory_point_goal";
-    public static final String GAME_TYPE_FILTER = "game_type";
+    public static final String GAME_TYPES_FILTER = "game_type";
     public static final String FOG_FILTER = "is_fog";
     public static final String HOMEBREW_FILTER = "has_homebrew";
     public static final String HAS_WINNER_FILTER = "has_winner";
     public static final String WINNING_FACTION_FILTER = "winning_faction";
+    public static final String EXCLUDED_GAME_TYPES_FILTER = "exclude_game_types";
 
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();
         filters.add(new OptionData(OptionType.INTEGER, GameStatisticsFilterer.PLAYER_COUNT_FILTER, "Filter games by player count, e.g. 3-8"));
         filters.add(new OptionData(OptionType.INTEGER, GameStatisticsFilterer.MIN_PLAYER_COUNT_FILTER, "Filter games by minimum player count, e.g. 3-8"));
         filters.add(new OptionData(OptionType.INTEGER, GameStatisticsFilterer.VICTORY_POINT_GOAL_FILTER, "Filter games by victory point goal, e.g. 10-14"));
-        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.GAME_TYPE_FILTER, "Filter games by game type, e.g. base, pok, absol, ds, action_deck_2, little_omega"));
+        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.GAME_TYPES_FILTER, "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2"));
+        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER, "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2"));
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.FOG_FILTER, "Filter games by if the game is a fog game"));
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.HOMEBREW_FILTER, "Filter games by if the game has any homebrew"));
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.HAS_WINNER_FILTER, "Filter games by if the game has a winner"));
-        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.WINNING_FACTION_FILTER, "Filter games by if the game was won by said faction")
-            .setAutoComplete(true));
         return filters;
     }
 
@@ -44,7 +45,8 @@ public class GameStatisticsFilterer {
         Integer victoryPointGoalFilter = event.getOption(VICTORY_POINT_GOAL_FILTER, null, OptionMapping::getAsInt);
         Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
         Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, true, OptionMapping::getAsBoolean);
-        String gameTypeFilter = event.getOption(GAME_TYPE_FILTER, null, OptionMapping::getAsString);
+        String gameTypesFilter = event.getOption(GAME_TYPES_FILTER, null, OptionMapping::getAsString);
+        String excludedGameTypesFilter = event.getOption(EXCLUDED_GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
         String winningFactionFilter = event.getOption(WINNING_FACTION_FILTER, null, OptionMapping::getAsString);
 
@@ -52,7 +54,8 @@ public class GameStatisticsFilterer {
         return playerCountPredicate
             .and(game -> filterOnMinPlayerCount(minPlayerCountFilter, game))
             .and(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
-            .and(game -> filterOnGameType(gameTypeFilter, game))
+            .and(game -> filterOnGameTypes(gameTypesFilter, game))
+            .and(game -> filterOnExcludedGameTypes(excludedGameTypesFilter, game))
             .and(game -> filterOnFogType(fogFilter, game))
             .and(game -> filterOnHomebrew(homebrewFilter, game))
             .and(game -> filterOnHasWinner(hasWinnerFilter, game))
@@ -84,11 +87,15 @@ public class GameStatisticsFilterer {
         return fogFilter == isFogMode;
     }
 
-    private static boolean filterOnGameType(String gameTypeFilter, Game game) {
-        if (gameTypeFilter == null) {
+    private static boolean filterOnGameTypes(String gameTypesFilter, Game game) {
+        if (gameTypesFilter == null) {
             return true;
         }
-        return switch (gameTypeFilter) {
+        return Arrays.stream(gameTypesFilter.split(",")).map(String::strip).allMatch(gameType -> hasGameType(gameType, game));
+    }
+
+    private static boolean hasGameType(String type, Game game) {
+        return switch (type) {
             case "base" -> game.isBaseGameMode();
             case "absol" -> game.isAbsolMode();
             case "ds" -> isDiscordantStarsGame(game);
@@ -103,6 +110,13 @@ public class GameStatisticsFilterer {
             case "alliance" -> game.isAllianceMode();
             default -> false;
         };
+    }
+
+    private static boolean filterOnExcludedGameTypes(String excludedGameTypesFilter, Game game) {
+        if (excludedGameTypesFilter == null) {
+            return true;
+        }
+        return Arrays.stream(excludedGameTypesFilter.split(",")).map(String::strip).noneMatch(gameType -> hasGameType(gameType, game));
     }
 
     private static boolean filterOnHasWinner(Boolean hasWinnerFilter, Game game) {

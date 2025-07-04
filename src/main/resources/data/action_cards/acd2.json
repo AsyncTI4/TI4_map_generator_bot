@@ -157,7 +157,7 @@
         "name": "Covert Operation",
         "phase": "Action",
         "window": "After you move ships into the active system",
-        "text": "Remove 1 of your ships or ground forces from the game board and place that unit in the space area of the active system.",
+        "text": "Remove 1 of your ships or ground forces from the game board and place that unit in the space area of that system.",
         "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
         "source": "action_deck_2"
     },
@@ -874,7 +874,7 @@
         "name": "Shrapnel Turrets",
         "phase": "Action",
         "window": "At the start of a space combat",
-        "text": "Choose any number of your ships in the active system that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8(x2) during this combat.",
+        "text": "Choose any number of your ships that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8(x2) during this combat.",
         "flavorText": "Mendosa grinned widely as he eyed the cargo. \"Ye say we're out of munitions, yet look at all this junk lyin' around. It'll shred 'em fine!\"",
         "source": "action_deck_2"
     },
