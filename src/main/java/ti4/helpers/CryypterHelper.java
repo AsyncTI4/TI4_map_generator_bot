@@ -772,6 +772,7 @@ public class CryypterHelper
         {
             return target.substring(0, target.indexOf("("));
         }
+        return target;
     }
 
 
