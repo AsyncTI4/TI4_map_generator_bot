@@ -17,6 +17,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
@@ -99,13 +100,19 @@ public class CombatMessageHelper {
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_9.toString(), DiceEmojis.d10blue_9.toString());
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_0.toString(), DiceEmojis.d10blue_0.toString());
         }
+        
+        String nice = "";
+        if (resultRolls.size() == 2 && resultRolls.get(0).getResult() == 6 && resultRolls.get(1).getResult() == 9)
+        {
+            nice = " (nice)";
+        }
 
         String winnu_sigma = "";
         if ("sigma_winnu_flagship_2".equals(unitModel.getId())) {
             winnu_sigma = "-# The number of dice may not be correct; if so, you will need to manually roll the extra.\n";
         }
 
-        return String.format("> `%sx`%s %s %s - %s hit%s\n%s", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix, winnu_sigma);
+        return String.format("> `%sx`%s %s %s - %s hit%s%s\n%s", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix, nice, winnu_sigma);
     }
 
     public static String displayModifiers(
