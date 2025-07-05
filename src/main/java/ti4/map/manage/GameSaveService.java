@@ -433,6 +433,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_FACTION_REACTS + " " + game.isBotFactionReacts());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BOT_COLOR_REACTS + " " + game.isBotColorReacts());
+        writer.write(System.lineSeparator());
         writer.write(Constants.BOT_STRAT_REACTS + " " + game.isBotStratReacts());
         writer.write(System.lineSeparator());
         writer.write(Constants.HAS_HAD_A_STATUS_PHASE + " " + game.isHasHadAStatusPhase());
