@@ -27,6 +27,7 @@ import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.WhisperService;
 import ti4.service.game.CreateGameService;
@@ -255,7 +256,7 @@ public class MessageListener extends ListenerAdapter {
                     });
             }
         }
-        if (managedGame == null || (!managedGame.isFactionReactMode() && !managedGame.isStratReactMode()) || managedGame.isFowMode()) {
+        if (managedGame == null || (!managedGame.isFactionReactMode() && !managedGame.isColorReactMode() && !managedGame.isStratReactMode()) || managedGame.isFowMode()) {
             return false;
         }
         Game game = managedGame.getGame();
@@ -268,8 +269,12 @@ public class MessageListener extends ListenerAdapter {
                 .retrievePast(2)
                 .queue(messages -> {
                     if (messages.size() == 2 && !event.getMessage().getAuthor().getId().equalsIgnoreCase(messages.get(1).getAuthor().getId())) {
-                        var emoji = Emoji.fromFormatted(player.getFactionEmoji());
                         if (managedGame.isFactionReactMode()) {
+                            var emoji = Emoji.fromFormatted(player.getFactionEmoji());
+                            messages.getFirst().addReaction(emoji).queue();
+                        }
+                        if (managedGame.isColorReactMode()) {
+                            var emoji = ColorEmojis.getColorEmoji(player.getColor()).asEmoji();
                             messages.getFirst().addReaction(emoji).queue();
                         }
                         if (managedGame.isStratReactMode()) {
