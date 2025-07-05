@@ -271,7 +271,7 @@ public class OtherHeroButtonHandler {
         ButtonHelperHeroes.offerStealRelicButtons(game, player, buttonID, event);
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
-            + ". Use buttons to gain command tokens equal to your tech skip and legendart planets.";
+            + ". Use buttons to gain command tokens equal to your technology specialty and legendary planet count.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
     }
 

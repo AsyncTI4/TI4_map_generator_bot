@@ -169,7 +169,8 @@ public class PlayStrategyCardService {
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), assignSpeakerMessage, assignSpeakerActionRow);
             if (ButtonHelper.isLawInPlay(game, "sanctions") && !game.isAbsolMode()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Friendly reminder that executive sanctions is in play, so the AC limit is 3 instead of 7");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                    "## Friendly reminder that _Executive Sanctions_ is a law in play, and so the action card hand limit is 3 instead of 7.");
             }
         }
 
@@ -289,8 +290,8 @@ public class PlayStrategyCardService {
         }
         if (scModel.usesAutomationForSCID("anarchy8")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " to resolve the 3rd primary effect, " +
-                "a tactical action, we advise you just click the do another action button, and when you do the primary of warfare, gain an extra CC " +
-                "into tactics, to account for the tactical action spending from reinforcements");
+                "a tactical action, we advise you just click the \"Do Another Action\" button, and when you do the primary of **Warfare**, gain an extra command token " +
+                "into your tactic pool, to account for the tactical action spending from reinforcements.");
         }
         if (player.ownsPromissoryNote("acq") && !scModel.usesAutomationForSCID("pok1leadership") && !winnuHero) {
             for (Player player2 : playersToFollow) {

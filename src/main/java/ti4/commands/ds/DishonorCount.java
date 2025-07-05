@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 class DishonorCount extends GameStateSubcommand {
 
     public DishonorCount() {
-        super(Constants.DISHONOR_COUNT, "Set dishonor amount", true, true);
+        super(Constants.DISHONOR_COUNT, "Set Dishonor amount", true, true);
         addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
 
     }
@@ -23,7 +23,7 @@ class DishonorCount extends GameStateSubcommand {
         Player player = getPlayer();
         player.setDishonorCounter(count);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set dishonor count to " + count + ".");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Set Dishonor count to " + count + ".");
         ButtonHelperFactionSpecific.correctHonorAbilities(player, getGame());
     }
 }

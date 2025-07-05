@@ -174,7 +174,7 @@ public class UnfiledButtonHandlers {
             game.setMinorFactionsMode(enable);
             message += "Minor Factions Mode. ";
             if (enable) {
-                message += "You will need to decide how you want to draft the minor factions. This site has a decent setup for it, "
+                message += "You will need to decide how you wish to draft the minor factions. This site has a decent setup for it, "
                     + "and you can important the map using buttons above: https://tidraft.com/draft/prechoice. Note that you need to set up a neutral player "
                     + "after the draft finishes with /special2 setup_neutral_player, and you can add 3 infantry to the minor faction planets pretty easily with /add_units.";
 
@@ -1118,9 +1118,9 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("toldarPN")
     public static void toldarPN(ButtonInteractionEvent event, Player player, Game game) {
         player.setCommodities(player.getCommodities() + 3);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " used the toldar promissory note to gain " +
-            "3 commodities after winning a combat against someone with more VP than them. They can do this once per action. Their currently hold "
-            + player.getCommodities() + " commodities");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " used _Concordat Allegiant_ (the Toldar promissory note)" +
+            " to gain 3 commodities after winning a combat against someone with more victory points than them. They can do this once per action. Their currently hold "
+            + player.getCommodities() + " commodit" + (player.getCommodities() == 1 ? "y" : "ies") + ".");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -1155,13 +1155,14 @@ public class UnfiledButtonHandlers {
                 }
                 if (missingPeople.length() > 0) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), missingPeople
-                        + " need to indicate if they are scoring a secret objective before the next PO can be flipped");
+                        + " need to indicate if they are scoring a secret objective before the next public objective can be flipped.");
                     return;
                 }
             }
         }
         if (!game.getStoredValue("revealedPOInRound" + game.getRound()).isEmpty()) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "The bot thinks that a PO was already revealed this round. Try doing /status reveal if this was a mistake");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(),
+                "The bot thinks that a public objective was already revealed this round. Try doing `/status reveal` if this was a mistake.");
             return;
         } else {
             game.setStoredValue("revealedPOInRound" + game.getRound(), "Yes");
@@ -2295,7 +2296,7 @@ public class UnfiledButtonHandlers {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Refinery"));
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + " choose the facility you want to replace the core facility", facilities);
+            player.getRepresentation() + ", please choose the facility you wish to replace the Core Factory.", facilities);
 
         doAnotherAction(event, player, game);
     }
@@ -2310,7 +2311,7 @@ public class UnfiledButtonHandlers {
     public static void neuraloopPart1(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String poID = buttonID.split(";")[1];
         String type = buttonID.split(";")[2];
-        String msg = player.getRepresentation() + " choose the relic you want to purge in order to replace the objective with a " + type;
+        String msg = player.getRepresentation() + ", please choose the relic you wish to purge in order to replace the objective with a " + type + ".";
         List<Button> buttons = RelicHelper.getNeuraLoopButton(player, poID, type, game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         ButtonHelper.deleteMessage(event);
@@ -2324,7 +2325,8 @@ public class UnfiledButtonHandlers {
         player.removeRelic(relic);
         player.removeExhaustedRelic(relic);
         game.removeRevealedObjective(poID);
-        String msg = player.getRepresentation() + " choose to use the Neuraloop relic and purge their " + Mapper.getRelic(relic).getName() + " relic in order to replace the recently revealed objective with a random " + type + ".";
+        String msg = player.getRepresentation() + " chose to use the _Neuraloop_ relic and purge their " + Mapper.getRelic(relic).getName() 
+            + " relic in order to replace the recently revealed objective with a random " + type + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (type.equalsIgnoreCase("stage1")) {
             RevealPublicObjectiveService.revealS1(game, event, game.getActionsChannel(), true);
@@ -2348,7 +2350,7 @@ public class UnfiledButtonHandlers {
         Integer poIndex = game.addCustomPO("Throne of the False Emperor", 1);
         game.scorePublicObjective(player.getUserID(), poIndex);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " scored a secret objective (they'll specify which one). The bot has already given you a VP for this.");
+            player.getRepresentation() + " scored a secret objective (they'll specify which one). The bot has already given you a victory point for this.");
         Helper.checkEndGame(game, player);
         ButtonHelper.deleteMessage(event);
     }
@@ -2405,7 +2407,9 @@ public class UnfiledButtonHandlers {
         FOWCombatThreadMirroring.mirrorMessage(event, game, msg.replace("## ", ""));
 
         if (Helper.getCCCount(game, player.getColor()) > 15) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " reminder that you are at the CC limit right now, so may need to pull a command counter off your sheet in order to retreat (unless you retreat to a system that has one)");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                player.getRepresentation() + " reminder that you are at the command token limit right now,"
+                + " so may need to pull a command token off your command sheet in order to retreat (unless you retreat to a system that already has one).");
         }
     }
 
@@ -2987,7 +2991,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("diploSystem")
     public static void diploSystem(ButtonInteractionEvent event, Player player, Game game) {
-        String message = player.getRepresentationUnfogged() + " Choose the system you wish to diplo";
+        String message = player.getRepresentationUnfogged() + ", please choose the system you wish to Diplo.";
         List<Button> buttons = Helper.getPlanetSystemDiploButtons(player, game, false, null);
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
     }
@@ -2995,7 +2999,8 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("placeCCBack_")
     public static void placeCCBack(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String position = buttonID.split("_")[1];
-        String message = player.getRepresentationUnfogged() + " has chosen to not pay the 1 CC required to remove a CC from the toldar flagship system, and so their CC has been placed back in tile " + position;
+        String message = player.getRepresentationUnfogged() + " has chosen to not pay the 1 command token required to remove a command token from the Errant (Toldar flagship) system,"
+            + " and so their command token has been placed back in tile " + position + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
         CommandCounterHelper.addCC(event, player, game.getTileByPosition(position));
@@ -3011,12 +3016,12 @@ public class UnfiledButtonHandlers {
         Button loseTactic = Buttons.red(finChecker + "decrease_tactic_cc", "Lose 1 Tactic Token");
         Button loseFleet = Buttons.red(finChecker + "decrease_fleet_cc", "Lose 1 Fleet Token");
         Button loseStrat = Buttons.red(finChecker + "decrease_strategy_cc", "Lose 1 Strategy Token");
-        Button doneGainingCC = Buttons.blue(finChecker + "deleteButtons_spitItOut", "Done Losing 1 CC Tokens");
+        Button doneGainingCC = Buttons.blue(finChecker + "deleteButtons_spitItOut", "Done Losing 1 Command Token");
         Button resetCC = Buttons.gray(finChecker + "resetCCs", "Reset Command Tokens");
 
         List<Button> buttons = Arrays.asList(loseTactic, loseFleet, loseStrat,
             doneGainingCC, resetCC);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has chosen to lose 1 CC");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has chosen to lose 1 command token.");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
@@ -3441,7 +3446,7 @@ public class UnfiledButtonHandlers {
             PriorityTrackHelper.PrintPriorityTrack(game);
         }
         if (!game.getStoredValue("revealedFlop" + game.getRound()).isEmpty()) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "The bot thinks that POs were already revealed. Try doing /status reveal if this was a mistake");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "The bot thinks that public objectives were already revealed. Try doing `/status reveal` if this was a mistake.");
             return;
         } else {
             game.setStoredValue("revealedFlop" + game.getRound(), "Yes");
