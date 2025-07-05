@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import ti4.message.BotLogger;
 import ti4.service.emoji.DiceEmojis;
 
 public class DiceHelper {
@@ -67,6 +68,10 @@ public class DiceHelper {
 
     public static String formatDiceResults(List<Die> dice) {
         List<String> resultStrings = dice.stream().map(Die::printResult).toList();
+        if (dice.size() == 2 && dice.get(0).getResult() == 6 && dice.get(1).getResult() == 9)
+        {
+            return String.format("[%s] = %d hits (nice)", String.join(", ", resultStrings), countSuccesses(dice));
+        }
         return String.format("[%s] = %d hits", String.join(", ", resultStrings), countSuccesses(dice));
     }
 
