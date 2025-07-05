@@ -16,7 +16,7 @@ class DraftLimits extends GameStateSubcommand {
     public DraftLimits() {
         super(Constants.DRAFT_LIMITS, "Set limits for franken draft", true, false);
         addOptions(new OptionData(OptionType.INTEGER, Constants.ABILITY_LIMIT, "Ability Limit"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.TECH_LIMIT, "Tech Limit"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.TECH_LIMIT, "Technology Limit"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENT_LIMIT, "Agent Limit"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.COMMANDER_LIMIT, "Commander Limit"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.HERO_LIMIT, "Hero Limit"));
@@ -25,7 +25,7 @@ class DraftLimits extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_LIMIT, "Commodities Limit"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.PN_LIMIT, "PN Limit"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.HOMESYSTEM_LIMIT, "Homesystem Limit"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STARTINGTECH_LIMIT, "Starting tech Limit"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STARTINGTECH_LIMIT, "Starting technology Limit"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.STARTINGFLEET_LIMIT, "Starting fleet Limit"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.BLUETILE_LIMIT, "Blue Tile Limit"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.REDTILE_LIMIT, "Red tile Limit"));
