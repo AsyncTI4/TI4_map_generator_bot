@@ -271,8 +271,8 @@ public class AgendaHelper {
     public static void explainQueue(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         String msg = """
             This queue system is basically asking you "If no-one who was in front of you in speaker order played anything, would you play anything?". \
-            If your answer is yes, then it will play your chosen ability/AC when everyone in front of you officially declines on playing anything. If they do decide to play\
-             something, then your answer will be tossed out and you will be asked to reconsider if you want to play something, now that you have more information. If your answer was no \
+            If your answer is yes, then it will play your chosen ability/action card when everyone in front of you officially declines on playing anything. If they do decide to play\
+             something, then your answer will be tossed out and you will be asked to reconsider if you wish to play something, now that you have more information. If your answer was no \
              then by default the system will assume that your answer will remain no, but after saying no you can tell the system to ask you again if someone else plays something.
 
             I would like to emphasize at this time that there is little benefit in stalling your decision here. You have as much information as you need to answer the bots queuestion, and if others provide more \
@@ -294,7 +294,7 @@ public class AgendaHelper {
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On Afters"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
 
-        msg = "By default, your queued \"after\" will be cancelled if someone before you plays an \"after\". If you want it to play regardless of others actions, press this button.";
+        msg = "By default, your queued \"after\" will be cancelled if someone before you plays an \"after\". If you wish it to play regardless of others actions, press this button.";
         buttons = new ArrayList<>();
         buttons.add(Buttons.blue("lockAftersIn", "Play Regardless of Others"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);

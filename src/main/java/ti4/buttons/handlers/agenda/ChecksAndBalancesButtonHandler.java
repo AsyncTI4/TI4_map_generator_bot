@@ -30,11 +30,11 @@ class ChecksAndBalancesButtonHandler {
         PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
-            + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "");
+            + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "") + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scpick, game));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scpick, game) + ".");
         }
         event.getMessage().delete().queue();
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);

@@ -65,7 +65,7 @@ public class ComponentActionHelper {
         }
 
         if (game.isTotalWarMode() && game.changeCommsOnPlanet(0, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game)) > 9) {
-            Button tButton = Buttons.gray(finChecker + prefix + "doTotalWarPoint_", "Gain 1 VP (Total War)");
+            Button tButton = Buttons.gray(finChecker + prefix + "doTotalWarPoint_", "Gain 1 Victory Point (Total War)");
             compButtons.add(tButton);
         }
 
@@ -267,7 +267,7 @@ public class ComponentActionHelper {
 
         // ACs
         List<Button> acButtons = ActionCardHelper.getActionPlayActionCardButtons(p1);
-        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play AC with Component Action (" + acButtons.size() + ")");
+        Button acButton = Buttons.gray(finChecker + prefix + "actionCards_", "Play an Action Card with Component Action (" + acButtons.size() + ")");
         compButtons.add(acButton);
         compButtons.addAll(acButtons);
 
@@ -346,7 +346,7 @@ public class ComponentActionHelper {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
                         + "**Orbital Drop** (" + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.Sol + "Orbital Drop");
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.Sol + " **Orbital Drop**'d");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Select the planet you would like to place 2 infantry on.";
                     List<Button> buttons = new ArrayList<>(
@@ -357,7 +357,7 @@ public class ComponentActionHelper {
                         + UnitEmojis.flagship + "The Inferno (" + (p1.getStrategicCC()) + "->"
                         + (p1.getStrategicCC() - 1) + ") \n";
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.Muaat + " " + UnitEmojis.flagship + "The Inferno");
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, "built with " + FactionEmojis.Muaat + " " + UnitEmojis.flagship + "The Inferno");
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Flagship);
                     Tile tile = tiles.getFirst();
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
@@ -373,7 +373,7 @@ public class ComponentActionHelper {
                         + UnitEmojis.flagship + "The Inferno (" + (p1.getStrategicCC()) + "->"
                         + (p1.getStrategicCC() - 1) + ") \n";
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
-                    ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.Muaat + " " + UnitEmojis.flagship + "The Inferno");
+                    ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, "built with " + FactionEmojis.Muaat + " " + UnitEmojis.flagship + "The Inferno");
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     successMessage += "Please add units manually.";
                     MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
@@ -465,7 +465,7 @@ public class ComponentActionHelper {
                         String successMessage = p1.getRepresentationUnfogged() + " spent 1 command token from their strategy pool ("
                             + (p1.getStrategicCC()) + "->" + (p1.getStrategicCC() - 1) + ")";
                         p1.setStrategicCC(p1.getStrategicCC() - 1);
-                        ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.kolume + "Meditation");
+                        ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, "used " + FactionEmojis.kolume + " **Meditation**");
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     } else {
                         String successMessage = p1.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
@@ -565,7 +565,8 @@ public class ComponentActionHelper {
             case "doTotalWarPoint" -> {
                 int remaining = game.changeCommsOnPlanet(-10, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
-                    + " spent 10 commodities on their home planets to score 1 point (total war ability). They have " + remaining + " comms remaining.");
+                    + " has used to the Total War ability to spend 10 commodities from their home planets to score 1 victory point."
+                    + " They have " + remaining + " commodit" + (remaining == 1 ? "y" : "ies") + " remaining.");
                 String customPOName = "Total War VPs (" + p1.getFaction() + ")";
                 int vp = 1;
                 if (game.getCustomPublicVP().keySet().contains(customPOName)) {
@@ -597,7 +598,7 @@ public class ComponentActionHelper {
             player.addExhaustedRelic(relicID);
             purgeOrExhaust = "exhausted";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "Use buttons to decide who to use JR-XS455-O on.", buttons2);
+                "Use buttons to choose who to use JR-XS455-O on.", buttons2);
 
             // OFFER TCS
             for (Player p2 : game.getRealPlayers()) {
@@ -617,7 +618,7 @@ public class ComponentActionHelper {
             purgeOrExhaust = "exhausted";
             List<Button> buttons2 = ButtonHelperActionCards.getCircletButtons(game, player);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                "Use buttons to decide which system you want to explore the frontier in.", buttons2);
+                "Use buttons to choose which system contains the frontier token you wish to explore.", buttons2);
         } else { // PURGE THE RELIC
             player.removeRelic(relicID);
             player.removeExhaustedRelic(relicID);

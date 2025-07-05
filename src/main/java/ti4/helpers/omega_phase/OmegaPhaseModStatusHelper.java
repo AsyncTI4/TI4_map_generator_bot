@@ -15,7 +15,7 @@ public class OmegaPhaseModStatusHelper {
             "- During every agenda, everyone MUST vote if they have any unexhausted voting planets left.\n" +
             "- Everyone but the Speaker votes simultaneously, without knowing how others will vote. Use the pre-vote buttons to do this.\n" +
             "- Scoring happens at the end of each round, after the other Status and Agenda steps\n" +
-            "- Objectives have been revamped, and are all worth 1 VP. The Speaker peeks at the next Objective when a new one is revealed after scoring.";
+            "- Objectives have been revamped, and are all worth 1 victory point. The Speaker peeks at the next Objective when a new one is revealed after scoring.";
         MessageHelper.sendMessageToChannelAndPin(game.getActionsChannel(), greeting);
     }
 }

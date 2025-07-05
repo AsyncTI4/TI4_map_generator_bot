@@ -33,7 +33,7 @@ public class PickStrategyCardButtonHandler {
     public static void queueScPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         event.getMessage().delete().queue();
         if (game.getActivePlayer() == player) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are currently up to pick SC and should just do that instead of queueing.");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You are currently up to pick a strategy card, and should just do that instead of queueing.");
         }
         String num = buttonID.split("_")[1];
         game.setStoredValue(player.getFaction() + "scpickqueue", game.getStoredValue(player.getFaction() + "scpickqueue") + num + "_");
@@ -49,7 +49,7 @@ public class PickStrategyCardButtonHandler {
         List<Button> buttons = StartPhaseService.getQueueSCPickButtons(game, player);
         String msg = StartPhaseService.getQueueSCMessage(game, player);
         if (number <= numQueued) {
-            msg += "You can use this button to restart if some mistake was made. Otherwise one of these cards should be selected for you when it is your turn to pick SC.";
+            msg += "You can use this button to restart if some mistake was made. Otherwise one of these cards should be selected for you when it is your turn to pick a strategy card.";
             buttons = new ArrayList<>();
             buttons.add(Buttons.gray("restartSCQueue", "Restart Queue"));
         } else {
@@ -64,7 +64,7 @@ public class PickStrategyCardButtonHandler {
         game.setStoredValue(player.getFaction() + "scpickqueue", "");
         List<Button> buttons = StartPhaseService.getQueueSCPickButtons(game, player);
         String msg = StartPhaseService.getQueueSCMessage(game, player);
-        msg += "You can use these buttons to queue your SC picks.";
+        msg += "You can use these buttons to queue your strategy card picks.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 

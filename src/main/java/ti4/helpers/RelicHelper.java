@@ -119,7 +119,7 @@ public class RelicHelper {
                 if (player.hasAbility("propagation")) {
                     List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                     String message2 = player.getRepresentation()
-                        + ", you would research two techs technology, but because of **Propagation**, you instead gain 6 command tokens."
+                        + ", you would research two technologies, but because of **Propagation**, you instead gain 6 command tokens."
                         + " Your current command tokens are " + player.getCCRepresentation()
                         + ". Use buttons to gain command tokens.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -141,7 +141,7 @@ public class RelicHelper {
                     }
 
                     List<Button> buttons = ListTechService.getTechButtons(techs, player, "free");
-                    String msg = player.getRepresentationUnfogged() + " use the buttons to research a tech with no pre-reqs:";
+                    String msg = player.getRepresentationUnfogged() + ", please use the buttons to research a technology with no prerequisites:";
                     if (techs.isEmpty()) {
                         buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);

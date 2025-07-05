@@ -41,12 +41,12 @@ public class StatusCleanupService {
                             continue;
                         }
                         if (CommandCounterHelper.hasCC(player, tile)) {
-                            String msg = player.getRepresentation() + " in order to remove your CC from tile " + tile.getRepresentationForButtons() +
-                                " you need to first pay 1 CC from your sheet (due to toldar flagship ability). If you don't want to pay this CC," +
-                                " then your CC will stay in the system. Use buttons to decide.";
+                            String msg = player.getRepresentation() + ", in order to remove your command token from tile " + tile.getRepresentationForButtons()
+                                + " you need to first spend 1 command token from your command sheet, due to the ability of the Errant, the Toldar flagship."
+                                + " If you don't wish to spend this command token, then your token will stay in the system. Use buttons to decide.";
                             List<Button> buttons = new ArrayList<>();
-                            buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't pay"));
-                            buttons.add(Buttons.red("lose1CC", "Pay 1 CC"));
+                            buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't Spend"));
+                            buttons.add(Buttons.red("lose1CC", "Spend 1 Command Token"));
                             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
                         }
                     }

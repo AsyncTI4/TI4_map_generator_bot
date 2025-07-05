@@ -880,7 +880,7 @@ public class ButtonHelper {
         } else {
             if (ButtonHelper.isLawInPlay(game, "absol_minspolicy")) {
                 amount -= 1;
-                message = " Absol Minister of policy has been accounted for, causing everyone to draw 1 less AC.";
+                message = " _Minister of Policy_ has been accounted for, causing everyone to draw 1 fewer action card.";
             } else {
                 game.drawActionCard(player.getUserID());
             }
@@ -2317,14 +2317,13 @@ public class ButtonHelper {
                 if (player == toldar) {
                     continue;
                 }
-                String msg2 = player.getRepresentation() + " in order to remove your CC from tile "
+                String msg2 = player.getRepresentation() + ", in order to remove your command token from tile "
                     + tile.getRepresentationForButtons() +
-                    " you need to first pay 1 CC from your sheet (due to toldar flagship ability). If you don't want to pay this CC,"
-                    +
-                    " then your CC will stay in the system. Use buttons to decide.";
+                    " you need to first spend 1 command token from your command sheet, due to the ability of the Errant, the Toldar flagship."
+                    + " If you don't wish to spend this command token, then your token will stay in the system. Use buttons to decide.";
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't pay"));
-                buttons.add(Buttons.red("lose1CC", "Pay 1 CC"));
+                buttons.add(Buttons.gray("placeCCBack_" + tile.getPosition(), "Don't Spend"));
+                buttons.add(Buttons.red("lose1CC", "Spend 1 Command Token"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
             }
         }
@@ -3743,26 +3742,26 @@ public class ButtonHelper {
                 if (p2.getHomeSystemTile() == cTile) {
                     scored = game.scorePublicObjective(p2.getUserID(), coatlHSID);
                     if (scored) {
-                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " scored 1 VP for having the Coatl in their home system");
+                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " has gained 1 victory point for having the Coatl in their home system.");
                         Helper.checkEndGame(game, p2);
                     }
                 } else {
                     scored = game.unscorePublicObjective(p2.getUserID(), coatlHSID);
                     if (scored) {
-                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " lost 1 VP for no longer having the Coatl in their home system");
+                        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " has lost 1 victory point for no longer having the Coatl in their home system.");
                     }
                 }
                 if (isCoatlHealed(game)) {
                     if (p2.getFaction().equalsIgnoreCase(cControler.getFaction())) {
                         scored = game.scorePublicObjective(p2.getUserID(), coatlControlID);
                         if (scored) {
-                            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " scored 1 VP for controlling the healed Coatl");
+                            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " has gained 1 victory point for controlling the healed Coatl.");
                             Helper.checkEndGame(game, p2);
                         }
                     } else {
                         scored = game.unscorePublicObjective(p2.getUserID(), coatlControlID);
                         if (scored) {
-                            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " lost 1 VP for no longer controlling the healed Coatl");
+                            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " has lost 1 victory point for no longer controlling the healed Coatl.");
                         }
                     }
 
