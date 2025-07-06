@@ -670,7 +670,23 @@ public class TransactionHelper {
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
                     .setPlaceholder("Edit your deals details here.")
-                    .setValue("The deal is that")
+                    .setValue("The deal is that I...")
+                    .build();
+                Modal modal = Modal.create(modalId, "Deal Details").addActionRow(summary).build();
+                event.replyModal(modal).queue();
+                return;
+            }
+            case "DetailsInvert" -> {
+                String other = p2.getFaction();
+                if (player == p2) {
+                    other = p1.getFaction();
+                }
+                event.getMessage().delete().queue();
+                String modalId = "finishDealDetailsInvert_" + other;
+                String fieldID = "details";
+                TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
+                    .setPlaceholder("Edit your deals details here.")
+                    .setValue("The deal is that you...")
                     .build();
                 Modal modal = Modal.create(modalId, "Deal Details").addActionRow(summary).build();
                 event.replyModal(modal).queue();
@@ -702,6 +718,17 @@ public class TransactionHelper {
         String thoughts = mapping.getAsString();
         Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
         player.addTransactionItem("sending" + player.getFaction() + "_receiving" + modalID.split("_")[1] + "_details_" + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
+        String message = "Current transaction offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
+            + "### Click something that you wish to __request from__ " + opposing.getRepresentation(false, false);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, player, opposing));
+    }
+
+    @ModalHandler("finishDealDetailsInvert_")
+    public static void finishDealDetailsInvert(ModalInteractionEvent event, Game game, Player player, String modalID) {
+        ModalMapping mapping = event.getValue("details");
+        String thoughts = mapping.getAsString();
+        Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
+        player.addTransactionItem("sending" + modalID.split("_")[1] + "_receiving" + player.getFaction() + "_details_" + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
         String message = "Current transaction offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
             + "### Click something that you wish to __request from__ " + opposing.getRepresentation(false, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, player, opposing));
@@ -1340,6 +1367,9 @@ public class TransactionHelper {
         }
         if (p1 == player) {
             stuffToTransButtons.add(Buttons.blue("newTransact_Details_" + p1.getFaction() + "_" + p2.getFaction() + "_~MDL", "Specify Deal"));
+        }
+        if (p2 == player) {
+            stuffToTransButtons.add(Buttons.blue("newTransact_DetailsInvert_" + p1.getFaction() + "_" + p2.getFaction() + "_~MDL", "Specify Deal"));
         }
         if (!ButtonHelperFactionSpecific.getTradePlanetsWithHacanMechButtons(p1, p2, game).isEmpty()) {
             stuffToTransButtons.add(Buttons.green("newTransact_Planets_" + p1.getFaction() + "_" + p2.getFaction(), "Planets", FactionEmojis.Hacan));
