@@ -480,7 +480,7 @@ public class CombatRollService {
         UnitHolder space = activeSystem.getUnitHolders().get("space");
         StringBuilder extra = new StringBuilder();
         boolean usesX89c4 = false;
-        if (totalHits > 0 && player.hasTech("x89c4")
+        if (player.hasTech("x89c4")
             && (rollType == CombatRollType.combatround || rollType == CombatRollType.bombardment)
             && (!unitHolder.getName().equalsIgnoreCase("space") || rollType == CombatRollType.bombardment)) {
             usesX89c4 = true;
@@ -721,8 +721,11 @@ public class CombatRollService {
         if (usesX89c4) {
             totalHits *= 2;
         }
-
-        result += CombatMessageHelper.displayHitResults(totalHits, usesX89c4 && totalHits > 0);
+        boolean x89applies = usesX89c4;
+        if (totalHits < 1) {
+            x89applies = false;
+        }
+        result += CombatMessageHelper.displayHitResults(totalHits, x89applies);
         player.setActualHits(player.getActualHits() + totalHits);
         if (totalHits > 0 && usesX89c4) {
             result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hits using "
