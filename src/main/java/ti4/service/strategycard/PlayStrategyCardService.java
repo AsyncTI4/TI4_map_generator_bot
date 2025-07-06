@@ -374,6 +374,25 @@ public class PlayStrategyCardService {
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
                             + stratCardName + "** because you told the bot earlier that you wished to pass on it.");
                     }
+                } else {
+                    if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount()) {
+                        Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                        if (reactionEmoji2 != null) {
+                            message.addReaction(reactionEmoji2).queue();
+                            p2.addFollowedSC(scToPlay, event);
+                            if (scToPlay == 8) {
+                                String key3 = "potentialBlockers";
+                                if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                    game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                                }
+
+                                String key = "factionsThatAreNotDiscardingSOs";
+                                game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                            }
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
+                                + stratCardName + "** because the bot believes you have already scored all of your possible Secret Objectives.");
+                        }
+                    }
                 }
             }
         }
