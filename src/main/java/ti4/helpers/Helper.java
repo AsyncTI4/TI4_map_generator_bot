@@ -1135,10 +1135,10 @@ public class Helper {
                 Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
                 if (planet == null) {
-                    if (thing.contains("comms")) {
+                    if (thing.contains("comm")) {
                         String comms = StringUtils.substringAfter(thing, "_");
                         keleresAgent += Integer.parseInt(comms);
-                        msg.append("Keleres Agent for ").append(comms).append(" commoditiess\n");
+                        msg.append("Keleres Agent for ").append(comms).append(" commodities\n");
                     } else {
                         msg.append(thing).append("\n");
                     }
