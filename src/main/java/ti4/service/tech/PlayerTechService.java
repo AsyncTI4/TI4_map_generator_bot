@@ -101,7 +101,7 @@ public class PlayerTechService {
                 }
             }
             if (!hasSub) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " does not have the tech known as " + techModel.getName());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " does not have the technology known as " + techModel.getName());
                 return;
             }
         }
@@ -256,7 +256,7 @@ public class PlayerTechService {
             }
             case "nekroc4r" -> {
                 List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
-                String message = player.getRepresentation() + " choose one of the options for this tech:";
+                String message = player.getRepresentation() + " choose one of the options for this technology:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }

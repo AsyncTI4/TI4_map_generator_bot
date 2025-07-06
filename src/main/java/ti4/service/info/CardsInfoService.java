@@ -141,7 +141,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("getAgentSelection_ghostagent", "Use Ghost Agent", FactionEmojis.Ghost));
         }
         if (player.getPathTokenCounter() > 0) {
-            buttons.add(Buttons.gray("redistributePath", "Redistribute 1 CC With Path", FactionEmojis.uydai));
+            buttons.add(Buttons.gray("redistributePath", "Redistribute 1 Command Token With Path", FactionEmojis.uydai));
         }
         if (player.hasAbility("prescience")) {
             buttons.add(Buttons.gray("listPath", "List How Many Path Tokens You Have", FactionEmojis.uydai));

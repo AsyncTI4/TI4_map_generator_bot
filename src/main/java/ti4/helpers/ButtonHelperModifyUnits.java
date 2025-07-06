@@ -1580,10 +1580,11 @@ public class ButtonHelperModifyUnits {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player.getTg() < 1) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + ", you only have "
-                + player.getTg() + " trade goods and thus can't use this tech.");
+                + player.getTg() + " trade good" + (player.getTg() == 1 ? "" : "s") + " and thus cannot use _Krovoz Strike Teams_.");
             return;
         }
-        String msg = player.getFactionEmoji() + " spent 1 trade good " + player.gainTG(-1) + " to generate 1 additional hit using Krovoz Strike Teams. " + p2.getRepresentation() + " Please assign it with the assign hits button.";
+        String msg = player.getFactionEmoji() + " spent 1 trade good " + player.gainTG(-1) + " to generate 1 additional hit using _Krovoz Strike Teams_. "
+            + p2.getRepresentation() + ", please assign it with the \"Asign Hits\" button.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 

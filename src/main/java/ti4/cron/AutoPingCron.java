@@ -253,14 +253,14 @@ public class AutoPingCron {
             for (Player player : game.getRealPlayers()) {
                 if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " please draw ACs and allocate command tokens");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw action cards and allocate command tokens.");
                     }
-                    msg.append(player.getRepresentation()).append(" ");
+                    msg.append(player.getRepresentation()).append(", ");
                 }
 
             }
             if (!game.isFowMode() && (msg.length() > 0)) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please draw ACs and allocate command tokens\n");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please draw action cards and allocate command tokens.\n");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }

@@ -1425,7 +1425,7 @@
         "name": "Reveal Prototype",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the tech before you can research it. Nekro just gets CCs from this card, no tech.]",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it. Nekro just gets command tokens from this card, no technology.]",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
         "source": "pok"
@@ -1435,7 +1435,7 @@
         "name": "Reveal Prototype",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the tech before you can research it.]",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
         "source": "pok"
@@ -1445,7 +1445,7 @@
         "name": "Reveal Prototype",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the tech before you can research it.]",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
         "source": "pok"
@@ -1455,7 +1455,7 @@
         "name": "Reveal Prototype",
         "phase": "Action",
         "window": "At the start of a combat",
-        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the tech before you can research it.]",
+        "text": "Spend 4 resources to research a unit upgrade technology of the same type as 1 of your units that is participating in this combat. [Note: Unless you are Nekro, you still need to meet the prerequisites of the technology before you can research it.]",
         "automationID": "reveal_prototype",
         "flavorText": "Varish and Cole completed the final linkages, activating the field harvester. The cruiser's beams roared with renewed power, cutting through the enemy ship.",
         "source": "pok"

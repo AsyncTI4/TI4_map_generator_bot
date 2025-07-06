@@ -167,7 +167,7 @@ public class SourceSettings extends SettingsMenu {
                 .sendMessage("This setting doesn't really do much. It only disables Keleres.")
                 .setEphemeral(true).queue();
             case "DiscoStars" -> event.getHook()
-                .sendMessage("This setting only controls factions. If you want techs, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
+                .sendMessage("This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                 .setEphemeral(true).queue();
             case "Ignis" -> {
                 boolean ignis = getIgnis().isVal();

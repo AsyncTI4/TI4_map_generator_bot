@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 class HonorCount extends GameStateSubcommand {
 
     public HonorCount() {
-        super(Constants.HONOR_COUNT, "Set honor amount", true, true);
+        super(Constants.HONOR_COUNT, "Set Honor amount", true, true);
         addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
 
     }
@@ -23,7 +23,7 @@ class HonorCount extends GameStateSubcommand {
         Player player = getPlayer();
         player.setHonorCounter(count);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set honor count to " + count + ".");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Set Honor count to " + count + ".");
         ButtonHelperFactionSpecific.correctHonorAbilities(player, getGame());
     }
 }
