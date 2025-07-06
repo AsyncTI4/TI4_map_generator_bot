@@ -1,0 +1,19 @@
+{
+    "id": "as04",
+    "name": "Akredrite/Meccna - Mechi",
+    "aliases": [
+        "as04",
+        "akredrite",
+        "meccna",
+        "mechi"
+    ],
+    "imagePath": "as04.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "akredrite",
+        "meccna"
+    ],
+    "source": "eronous",
+    "tileBack": "green"
+}
