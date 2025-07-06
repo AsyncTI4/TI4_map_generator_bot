@@ -694,6 +694,10 @@ public class StartPhaseService {
         }
         GMService.createFOWStatusSummary(game);
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Status Homework for round #" + game.getRound() + ".");
+
+        }
     }
 
     public static void startActionPhase(GenericInteractionCreateEvent event, Game game) {

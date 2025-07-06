@@ -1562,6 +1562,8 @@ public class Game extends GameProperties {
     public void removeRevealedObjective(String id) {
         revealedPublicObjectives.remove(id);
         soToPoList.remove(id);
+        customPublicVP.remove(id);
+        scoredPublicObjectives.remove(id);
     }
 
     public String getCustodiansTaker() {
