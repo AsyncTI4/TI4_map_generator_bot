@@ -2031,17 +2031,16 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void cabalEatsUnit(Player player, Game game, Player cabal, int amount, String unit, GenericInteractionCreateEvent event, boolean cabalAgent) {
-        String msg = cabal.getRepresentationUnfogged() + " has failed to eat " + amount + " of the " + unit
-            + "s owned by "
-            + player.getRepresentationNoPing() + " because they were blockaded. Womp Womp.";
+        String msg = cabal.getRepresentationUnfogged() + " has failed to eat " + amount + " of the " + unit + (amount == 1 ? "" : "s")
+            + " owned by " + player.getRepresentationNoPing() + " because they were blockaded. Womp Womp.";
         String unitP = AliasHandler.resolveUnit(unit);
         if (unitP.contains("sd") || unitP.contains("pd")
             || (cabal.getAllianceMembers().contains(player.getFaction()) && !cabalAgent)) {
             return;
         }
         if (!isCabalBlockadedByPlayer(player, game, cabal)) {
-            msg = cabal.getFactionEmoji() + " has **Devour**'d " + amount + " of the " + unit + "s owned by "
-                + player.getRepresentationNoPing() + ". Chomp chomp.";
+            msg = cabal.getFactionEmoji() + " has **Devour**'d " + amount + " of the " + unit + (amount == 1 ? "" : "s")
+                + " owned by " + player.getRepresentationNoPing() + ". Chomp chomp.";
             String color = player.getColor();
 
             if (unitP.contains("ff") || unitP.contains("gf")) {
@@ -2065,8 +2064,10 @@ public class ButtonHelperFactionSpecific {
         String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(killer, game);
         int newAmount = game.changeCommsOnPlanet(winnings, planet);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(killer.getCorrectChannel(), killer.getRepresentationNoPing() + " added " + winnings +
-            " commodities to the planet of " + Helper.getPlanetRepresentation(planet, game) + " (which has " + newAmount + " commodities on it now) by destroying units owned by " + player.getRepresentationNoPing());
+        MessageHelper.sendMessageToChannel(killer.getCorrectChannel(), 
+            killer.getRepresentationNoPing() + " added " + winnings + " commodit" + (winnings == 1 ? "y" : "ies") + " to the planet of " 
+            + Helper.getPlanetRepresentation(planet, game) + " (which now has " + newAmount + " commodit" + (newAmount == 1 ? "y" : "ies") 
+            + " on it) by destroying units owned by " + player.getRepresentationNoPing());
     }
 
     @ButtonHandler("letnevMechRes_")
@@ -2082,7 +2083,7 @@ public class ButtonHelperFactionSpecific {
                 + Helper.getPlanetRepresentation(planet, game) + " using the mech's DEPLOY ability.");
         options.add(Buttons.red("deleteButtons", "Done Exhausting Planets"));
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentationUnfogged() + " pay 2r for it please", options);
+            player.getRepresentationUnfogged() + ", please pay two resources for your mech.", options);
         ButtonHelper.deleteTheOneButton(event);
     }
 
