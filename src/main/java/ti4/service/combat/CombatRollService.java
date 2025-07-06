@@ -200,13 +200,17 @@ public class CombatRollService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        if (game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence
-            && isFoWPrivateChannelRoll(player, event)) {
-            // If roll was from pds button in private channel, send the result to the target
-            MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " "
-                + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Roll result was sent to " + opponent.getRepresentationNoPing());
+        if (game.isFowMode() && isFoWPrivateChannelRoll(player, event)) {
+            if (rollType == CombatRollType.SpaceCannonOffence) {
+                // If roll was from pds button in private channel, send the result to the target
+                MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " "
+                    + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Roll result was sent to " + opponent.getRepresentationNoPing());
+            } else if (rollType == CombatRollType.bombardment) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+                    + " This roll result is not automatically relayed. Please communicate the hits to the opponent manually.");
+            }
         }
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName,
