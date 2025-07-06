@@ -4056,7 +4056,7 @@ public class ButtonHelper {
                 PlanetService.refreshPlanet(player, planetName);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     "Planet has been readied because of Quaxdol Junitas, the Florzen Commander.");
-                AgendaHelper.listVoteCount(game, game.getMainGameChannel());
+                if (!game.isFowMode()) AgendaHelper.listVoteCount(game, game.getMainGameChannel());
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                 UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
