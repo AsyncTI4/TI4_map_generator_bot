@@ -64,7 +64,8 @@ public class PromissoryNoteHelper {
                     sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
                     Player pnOwner = game.getPNOwner(pn.getKey());
                     if (pnOwner == null) {
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " one of your PNs has no owner. PN id is " + pn.getKey() + " and number is " + pn.getValue());
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                            player.getRepresentation() + " one of your promissory notes has no owner. The promissory note id is " + pn.getKey() + " and number is " + pn.getValue() + ".");
                         continue;
                     }
                     if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
@@ -526,7 +527,7 @@ public class PromissoryNoteHelper {
         }
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All PNs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All promissory notes shown to player.");
     }
 
     public void sendRandom(GenericInteractionCreateEvent event, Game game, Player sourcePlayer, Player targetPlayer) {

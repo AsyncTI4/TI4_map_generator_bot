@@ -34,7 +34,7 @@ class Ban extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_FLEET, "Starting Fleet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_COMMODITIES, "Commodities").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.BAN_HS, "Home System").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.BAN_STARTING_TECH, "Starting Tech").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.BAN_STARTING_TECH, "Starting Technology").setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -191,7 +191,7 @@ class Ban extends GameStateSubcommand {
 
         for (String fleet : startingTech) {
             game.setStoredValue("bannedStartingTechs", game.getStoredValue("bannedStartingTechs") + "finSep" + fleet);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting tech");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting technology");
         }
     }
 
