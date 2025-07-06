@@ -1400,13 +1400,16 @@ public class ButtonHelperActionCards {
             player.getFactionEmojiOrColor()
                 + " successfully assassinated all the representatives of "
                 + p2.getFactionEmojiOrColor() + ".");
-        String message = switch (ThreadLocalRandom.current().nextInt(7)) {
+        String message = switch (ThreadLocalRandom.current().nextInt(10)) {
             case 1 -> ", your representatives (all of them) fell out of some windows.";
             case 2 -> ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.";
             case 3 -> ", your representatives were \"invited\" to \"experience\" the \"sight-seeing\" Sea of Desolation \"tour\".";
             case 4 -> ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).";
             case 5 -> ", your representatives have followed in a great tradition, and so have been stabbed 23 times.";
             case 6 -> ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.";
+            case 7 -> ", your representatives has discovered that the phrase \"cut-throat politics\" is quite literal on Mecatol Rex.";
+            case 8 -> ", your representatives have met with some fellow ambassadors. Sorry, I meant to say \"met with some grisly ends\".";
+            case 9 -> ", your representatives were up to date on their vaccinations, which is very prudent on an ecumenopolis such as Mecatol Rex. However, they were not up to date on their antidotes, which is very imprudent on an ecumenopolis such as Mecatol Rex.";
             default -> ", your representatives got sent to the headsman.";
         };
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
@@ -1723,7 +1726,7 @@ public class ButtonHelperActionCards {
         buttons.add(Buttons.blue("olradinPreserveStep2_cultural_prof", "Explore Cultural"));
         buttons.add(Buttons.red("olradinPreserveStep2_hazardous_prof", "Explore Hazardous"));
         buttons.add(Buttons.gray("olradinPreserveStep2_frontier_prof", "Explore Frontier"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to resolve the AC", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please use buttons to resolve the action card.", buttons);
 
     }
 

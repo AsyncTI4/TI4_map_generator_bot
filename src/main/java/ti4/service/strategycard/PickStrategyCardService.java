@@ -106,9 +106,9 @@ public class PickStrategyCardService {
 
     public static void checkForForcePickLastStratCard(GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra) {
         List<Button> scButtons = Helper.getRemainingSCButtons(game, privatePlayer);
-        if (scButtons.size() == 1) { // if there is only one SC left to pick (4p/8p games), force pick last SC
+        if (scButtons.size() == 1) { // if there is only one strategy card left to pick (4p/8p games), force pick last strategy card
             MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation() +
-                ", you have only one available Strategy Card to pick. Bot will force pick for you.");
+                ", you have only one available strategy card to pick. Bot will force pick for you.");
             int unpickedStrategyCard = 0;
             for (Integer sc : game.getSCList()) {
                 if (sc <= 0)
@@ -155,11 +155,11 @@ public class PickStrategyCardService {
                 break;
             }
             if (unpickedStrategyCard == 0) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tried to pick your queued SCs, but they were all already taken");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tried to pick your queued strategy card, but they were all already taken.");
                 return false;
             } else {
                 MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation(false, false) +
-                    " had queued an SC pick.");
+                    " had queued an strategy card pick.");
                 return PickStrategyCardButtonHandler.scPick(event, game, player, "scPick_" + unpickedStrategyCard);
             }
 

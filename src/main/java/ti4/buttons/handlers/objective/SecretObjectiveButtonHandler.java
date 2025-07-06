@@ -83,7 +83,7 @@ class SecretObjectiveButtonHandler {
             }
         }
         boolean allPlayersSetup = true;
-        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting tech. If you wish to proceed anyways, just press the button again";
+        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting technologies. If you wish to proceed anyways, just press the button again.";
         for (Player p : game.getRealPlayers()) {
             if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
                 message += "\n> " + p.getRepresentation();

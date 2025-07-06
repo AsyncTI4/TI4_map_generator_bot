@@ -306,7 +306,10 @@ public class FOWPlusService {
             + " Units ejected to " + targetPos + " due to Gravity Wave."
             + (infs > 0 ? " " + infs + " " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs) + " was left behind." : ""));
 
-        AddTokenCommand.addToken(event, currentTile, "gravityrift", game);
+        if (!currentTile.isGravityRift()) {
+            AddTokenCommand.addToken(event, currentTile, "gravityrift", game);
+        }
+        
         FoWHelper.pingSystem(game, currentPos, "Gravity phenomenon detected.");
         event.getMessage().delete().queue();
     }

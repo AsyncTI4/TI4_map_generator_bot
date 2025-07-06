@@ -192,9 +192,9 @@ public class AddPlanetService {
         if ((alreadyOwned || player.hasAbility("contagion_blex") || player.hasAbility("plague_reservoir"))
             && player.hasTech("dsvaylr") && !doubleCheck) {
             String msg10 = player.getRepresentationUnfogged()
-                + " you may have an opportunity to use Scavenger Exos on "
+                + " you may have an opportunity to use your _Scavenger Exos_ technology on "
                 + Helper.getPlanetRepresentation(planet, game)
-                + ". Click to confirm a combat occurred and to draw 1 AC or delete these buttons. (Note: this tech is max once per action)";
+                + ". Click to confirm a valid combat occurred and to draw 1 action card or delete these buttons (note: this technology is max once per action).";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
                 ButtonHelper.getScavengerExosButtons(player));
         }
