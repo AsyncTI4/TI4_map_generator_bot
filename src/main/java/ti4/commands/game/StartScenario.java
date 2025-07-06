@@ -117,8 +117,26 @@ public class StartScenario extends GameStateSubcommand {
                     speaker = true;
                 }
                 String color = players.get(face).getNextAvailableColour();
-                if (faction.equalsIgnoreCase("ghost")) {
-                    color = "red";
+                switch (faction.toLowerCase())
+                {
+                    case "ghost":
+                        color = "ruby";
+                        break;
+                    case "xxcha":
+                        color = "sunset";
+                        break;
+                    case "sol":
+                        color = "dawn";
+                        break;
+                    case "naaz":
+                        color = "lime";
+                        break;
+                    case "nekro":
+                        color = "black";
+                        break;
+                    case "nomad":
+                        color = "navy";
+                        break;
                 }
                 if (tile != null) {
                     MiltyService.secondHalfOfPlayerSetup(players.get(face), game, color, faction, tile.getPosition(), event, speaker);
