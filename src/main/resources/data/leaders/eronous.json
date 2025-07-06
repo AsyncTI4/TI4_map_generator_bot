@@ -107,6 +107,7 @@
         "type": "agent",
         "name": "Volakanite",
         "title": "Infokite of the VI Legion",
+        "abilityWindow": "",
         "abilityText": "This card has the Tier 1 text ability of each active protocol.",
         "unlockCondition": "Always Unlocked",
         "source": "eronous"
@@ -117,6 +118,7 @@
         "type": "commander",
         "name": "That Which Tolls",
         "title": "Shadow of Tyria Prime",
+        "abilityWindow": "",
         "abilityText": "This card has the Tier 2 ability of each active protocol.",
         "unlockCondition": "Have units with a combined PRODUCTION value of at least 10 in a single system.",
         "source": "eronous"
@@ -128,6 +130,7 @@
         "name": "Maelothope",
         "title": "Commander of Legion I ",
         "abilityName": "Deliverance Protocols - The Will Made Manifest",
+        "abilityWindow": "",
         "abilityText": "This card has the Tier 3 text ability of each active protocol. When you use this ability, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "eronous"
@@ -138,6 +141,7 @@
         "type": "agent",
         "name": "Kane'Ikala",
         "title": "Angel of Prosperity",
+        "abilityWindow": "",
         "abilityText": "You may exhaust this card to allow any player to spend influence as if it were resources.",
         "unlockCondition": "Always Unlocked",
         "source": "eronous"
