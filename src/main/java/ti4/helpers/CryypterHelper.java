@@ -191,28 +191,20 @@ public class CryypterHelper
                         msg = voter.getRepresentation(false, true) +
                             " has the option to give 1 promissory note or 2 trade goods to ignore the effect of Mentak Envoy.";
                         List<Button> conclusionButtons = new ArrayList<>();
-                        String finChecker = "FFCC_" + voter.getFaction() + "_";
-                        Button accept = Buttons.blue(finChecker
-                            + "mentakEnvoy_"
-                            + p2.getUserID() + "_"
-                            + "accept", "Vote For Chosen Outcome");
+                        String buttonID = voter.getFinsFactionCheckerPrefix() + "resolveMentakEnvoy_" + p2.getFaction() + "_";
+                        Button accept = Buttons.blue(buttonID + "accept", "Vote For Chosen Outcome");
                         conclusionButtons.add(accept);
                         if(hasPNs)
                         {
-                            Button PNdecline = Buttons.red(finChecker
-                            + "mentakEnvoy_"
-                            + p2.getUserID() + "_"
-                            + "PNdecline", "Send 1 promissory note");
+                            Button PNdecline = Buttons.red(buttonID + "PNdecline", "Send 1 promissory note");
                             conclusionButtons.add(PNdecline);
                         }
-                        else
+                        if(hasEnoughTGs)
                         {
-                            Button TGdecline = Buttons.red(finChecker
-                            + "mentakEnvoy_"
-                            + p2.getUserID() + "_"
-                            + "TGdecline", "Send 2 trade goods");
+                            Button TGdecline = Buttons.red(buttonID + "TGdecline", "Send 2 trade goods");
                             conclusionButtons.add(TGdecline);
                         }
+
                         MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), msg,
                         conclusionButtons);
                     }
@@ -221,10 +213,10 @@ public class CryypterHelper
         }
     }
 
-    @ButtonHandler("mentakEnvoy_")
+    @ButtonHandler("resolveMentakEnvoy_")
     public static void resolveMentakEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String[] fields = buttonID.split("_");
-        Player mentakPlayer = game.getPlayer(fields[1]);
+        Player mentakPlayer = game.getPlayerFromColorOrFaction(fields[1]);
         String choice = fields[2];
         if (choice.equals("accept")) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
@@ -266,7 +258,7 @@ public class CryypterHelper
                     if (p2 == player) {
                         continue;
                     }
-                    String buttonText = "offerYssarilEnvoy_Yssaril Envoy " + player.getFaction() + "_"
+                    String buttonText = "offerYssarilEnvoy_" + player.getFaction() + "_"
                                 + p2.getFaction() + "_"
                                 + acID;
                     if (!game.isFowMode()) {
@@ -284,8 +276,8 @@ public class CryypterHelper
     public static void offerYssarilEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) 
     {
         String[] fields = buttonID.split("_");
-        Player yssarilPlayer = game.getPlayer(fields[1]);
-        Player targetPlayer = game.getPlayer(fields[2]);
+        Player yssarilPlayer = game.getPlayerFromColorOrFaction(fields[1]);
+        Player targetPlayer = game.getPlayerFromColorOrFaction(fields[2]);
 
         String msg = yssarilPlayer.getRepresentation(false, true) + " is using the Yssaril Envoy to allow "
                         + targetPlayer.getRepresentation(false, true)
@@ -295,16 +287,15 @@ public class CryypterHelper
         msg = targetPlayer.getRepresentation(false, true) +
             " has the option to accept or ignore the effect of the Yssaril Envoy.";
         List<Button> conclusionButtons = new ArrayList<>();
-        String finChecker = "FFCC_" + targetPlayer.getFaction() + "_";
-        Button accept = Buttons.blue(finChecker
-            + "yssarilEnvoy_"
+        Button accept = Buttons.blue(targetPlayer.getFinsFactionCheckerPrefix()
+            + "resolveYssarilEnvoy_"
             + yssarilPlayer.getUserID() + "_"
             + "accept" + "_"               
             + fields[2], "Copy the AC");
         conclusionButtons.add(accept);
         
-        Button decline = Buttons.red(finChecker
-            + "yssarilEnvoy_"
+        Button decline = Buttons.red(targetPlayer.getFinsFactionCheckerPrefix()
+            + "resolveYssarilEnvoy_"
             + yssarilPlayer.getUserID() + "_"
             + "decline", "Decline");
         conclusionButtons.add(decline);
@@ -314,7 +305,7 @@ public class CryypterHelper
         //event.getMessage().delete().queue();
     }
 
-    @ButtonHandler("yssarilEnvoy_")
+    @ButtonHandler("resolveYssarilEnvoy_")
     public static void resolveYssarilEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player) 
     {
         String[] fields = buttonID.split("_");
@@ -382,8 +373,7 @@ public class CryypterHelper
                 String buttonLabel = leaderModel.getName() + " (" + factionModel.getShortName() + " " + leaderModel.getType() + ")";
                 if(play)
                 {
-                    String finChecker = "FFCC_" + player.getFaction() + "_";
-                    buttons.add(Buttons.gray(finChecker + "play_after_" + buttonID, "Play " + buttonLabel, factionModel.getFactionEmoji()));
+                    buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "play_after_" + buttonID, "Play " + buttonLabel, factionModel.getFactionEmoji()));
                 }
                 else
                 {
@@ -486,7 +476,7 @@ public class CryypterHelper
                     {
                         if(eligiblePlanets.get(planet) > 1 && !planet.getTokenList().stream().anyMatch(token -> token.contains("dmz")))
                         {
-                            Button button = Buttons.green("FFCC_" + envoyPlayer.getFaction() + "_placeOneNDone_skipbuild_infantry_" + planet.getName(), Helper.getPlanetRepresentation(planet.getName(), game));
+                            Button button = Buttons.green(envoyPlayer.getFinsFactionCheckerPrefix() + "placeOneNDone_skipbuild_infantry_" + planet.getName(), Helper.getPlanetRepresentation(planet.getName(), game));
                             
                             planetButtons.add(button);
                         }
@@ -581,8 +571,8 @@ public class CryypterHelper
                     MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
 
                     List<Button> buttons2 = new ArrayList<>();
-                    buttons2.add(Buttons.green("naazEnvoy_Gain", "Purge 2 fragments to gain relic", ExploreEmojis.Relic));
-                    buttons2.add(Buttons.gray("naazEnvoy_Bottom", "Put relic on the bottom of the deck").withEmoji(Emoji.fromUnicode("🔽")));
+                    buttons2.add(Buttons.green("handleNaazEnvoy_Gain", "Purge 2 fragments to gain relic", ExploreEmojis.Relic));
+                    buttons2.add(Buttons.gray("handleNaazEnvoy_Bottom", "Put relic on the bottom of the deck").withEmoji(Emoji.fromUnicode("🔽")));
                     buttons2.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons2);
                 }
@@ -653,7 +643,7 @@ public class CryypterHelper
         }
     }
 
-    @ButtonHandler("naazEnvoy_")
+    @ButtonHandler("handleNaazEnvoy_")
     public static void handleNaazEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player)
     {
         envoyExhaustCheck(game, player, "naazenvoy");
@@ -732,20 +722,20 @@ public class CryypterHelper
     }
 
     @ButtonHandler("creussEnvoyType_")
-    public static void handleArborecEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player)
+    public static void creussEnvoyType(String buttonID, ButtonInteractionEvent event, Game game, Player player)
     {    
         List<Button> buttons = new ArrayList<>();
         String tilePos = buttonID.split("_")[1];
         String message = " choose which type of Creuss wormhole token to place in " + tilePos + ".";
-        buttons.add(Buttons.red("creussEnvoy_" + tilePos + "_alpha", "Alpha", MiscEmojis.CreussAlpha));
-        buttons.add(Buttons.green("creussEnvoy_" + tilePos + "_beta", "Beta", MiscEmojis.CreussBeta));
-        buttons.add(Buttons.blue("creussEnvoy_" + tilePos + "_gamma", "Gamma", MiscEmojis.CreussGamma));
+        buttons.add(Buttons.red("handleCreussEnvoy_" + tilePos + "_alpha", "Alpha", MiscEmojis.CreussAlpha));
+        buttons.add(Buttons.green("handleCreussEnvoy_" + tilePos + "_beta", "Beta", MiscEmojis.CreussBeta));
+        buttons.add(Buttons.blue("handleCreussEnvoy_" + tilePos + "_gamma", "Gamma", MiscEmojis.CreussGamma));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + message,
             buttons);
         event.getMessage().delete().queue();
     }
-    @ButtonHandler("creussEnvoy_")
+    @ButtonHandler("handleCreussEnvoy_")
     public static void handleCreussEnvoy(String buttonID, ButtonInteractionEvent event, Game game, Player player)
     {
         String tilePos = buttonID.split("_")[1];
