@@ -27,7 +27,7 @@ public class CardsInfoService {
     public static void sendCardsInfo(Game game, Player player, GenericInteractionCreateEvent event) {
         if (player == null)
             return;
-        String headerText = player.getRepresentationUnfogged() + CommandHelper.getHeaderText(event);
+        String headerText = "Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendCardsInfo(game, player);
     }

@@ -447,6 +447,9 @@ public class ButtonHelperTacticalAction {
         game.removeStoredValue("flankspeedBoost");
         game.removeStoredValue("baldrickGDboost");
         ButtonHelper.deleteMessage(event);
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Post Movement For " + player.getFactionEmoji());
+        }
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {

@@ -175,7 +175,7 @@ public class CommandHelper {
         return false;
     }
 
-   public static boolean hasRole(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
+    public static boolean hasRole(SlashCommandInteractionEvent event, List<Role> acceptedRoles) {
         Member member = event.getMember();
         if (member == null) {
             return false;
