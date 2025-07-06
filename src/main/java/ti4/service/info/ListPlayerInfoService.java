@@ -423,7 +423,7 @@ public class ListPlayerInfoService {
             }
             case "infrastructure", "protect_border" -> {
                 int counter = 0;
-                for (String planet : player.getPlanets()) {
+                for (String planet : player.getPlanetsAllianceMode()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()
                         && (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0

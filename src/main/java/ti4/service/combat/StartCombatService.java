@@ -1122,7 +1122,7 @@ public class StartCombatService {
             buttons.add(Buttons.gray(finChecker + "purgeKeleresAHero", "Purge Keleres (Argent) Hero", FactionEmojis.Keleres));
         }
         if (p2.hasLeaderUnlocked("keleresherokuuasi") && !game.isFowMode() && isSpaceCombat
-            && ButtonHelper.doesPlayerOwnAPlanetInThisSystem(tile, p1, game)) {
+            && ButtonHelper.doesPlayerOwnAPlanetInThisSystem(tile, p2, game)) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
             buttons.add(Buttons.gray(finChecker + "purgeKeleresAHero", "Purge Keleres (Argent) Hero", FactionEmojis.Keleres));
         }
