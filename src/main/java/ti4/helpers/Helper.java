@@ -302,7 +302,7 @@ public class Helper {
         }
         StringBuilder rep = new StringBuilder("# __Scoring Summary__\n");
         if (game.getRealPlayers().size() > 10) {
-            return "This game is too large to display a scoring summary";
+            return "This game is too large to display a scoring summary. Shame.";
         }
         var playersInScoringOrder = game.hasFullPriorityTrackMode() ? PriorityTrackHelper.GetPriorityTrack(game) : game.getActionPhaseTurnOrder();
         for (Player player : playersInScoringOrder) {

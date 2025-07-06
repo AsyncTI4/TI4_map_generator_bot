@@ -85,8 +85,8 @@ public class AddPlanetService {
                 if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored custodians!");
-                String message2 = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust to spend " + MiscEmojis.Influence_6;
+                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored Custodians!");
+                String message2 = player.getRepresentationUnfogged() + ", choose the planets you wish to exhaust to spend " + MiscEmojis.Influence_6 + ".";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
                 buttons.add(doneExhausting);
