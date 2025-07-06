@@ -72,26 +72,32 @@ public class PickStrategyCardButtonHandler {
     public static boolean scPick(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String num = buttonID.replace("scPick_", "");
         int scpick = Integer.parseInt(num);
-        if (game.getStoredValue("Public Disgrace") != null
-            && game.getStoredValue("Public Disgrace").contains("_" + scpick)
-            && (game.getStoredValue("Public Disgrace Only").isEmpty() || game.getStoredValue("Public Disgrace Only").contains(player.getFaction()))) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) {
-                    continue;
-                }
-                if (game.getStoredValue("Public Disgrace").contains(p2.getFaction())
-                    && p2.getActionCards().containsKey("disgrace")) {
-                    ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
-                    game.setStoredValue("Public Disgrace", "");
-                    String msg = player.getRepresentationUnfogged() +
-                        " picked " + Helper.getSCRepresentation(game, scpick) + ".";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                        player.getRepresentation()
-                            + " you have been _Public Disgrace_'d because someone preset it to occur when the number " + scpick
-                            + " was chosen. If this is a mistake or the _Public Disgrace_ is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
-                    return false;
+        String pdValue = game.getStoredValue("Public Disgrace");
+        String pdOnly = game.getStoredValue("Public Disgrace Only");
+
+        if (pdValue != null && pdValue.contains("_" + scpick)) {
+            // If the player who picked is the one who set the preset, remove the preset and skip triggering
+            if (pdValue.contains(player.getFaction())) {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " preset for _Public Disgrace_ was removed due to you picking " + scpick + " yourself.");
+                game.setStoredValue("Public Disgrace", "");
+            } else if (pdOnly.isEmpty() || pdOnly.contains(player.getFaction())) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player) continue;
+                    if (pdValue.contains(p2.getFaction()) && p2.getActionCards().containsKey("disgrace")) {
+                        ActionCardHelper.playAC(event, game, p2, "disgrace", game.getMainGameChannel());
+                        game.setStoredValue("Public Disgrace", "");
+                        String msg = player.getRepresentationUnfogged() +
+                            " picked " + Helper.getSCRepresentation(game, scpick) + ".";
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                            player.getRepresentation()
+                                + " you have been _Public Disgrace_'d because someone preset it to occur when the number " + scpick
+                                + " was chosen. If this is a mistake or the _Public Disgrace_ is Sabo'd, feel free to pick the strategy card again. Otherwise, pick a different strategy card.");
+                        return false;
+                    }
                 }
             }
         }
