@@ -2898,10 +2898,10 @@ public class AgendaHelper {
                         if (NumberUtils.isDigits(vote) && !game.isFowMode() && p2.hasTech("dskyrog")) {
                             outcomeSummaryBuilder.append(" (Impressment Teams)");
                         }
-                        if (!game.isFowMode() && p2.hasAbility("future_sight")) {
+                        if (!game.isFowMode() && p2 != null && p2.hasAbility("future_sight")) {
                             outcomeSummaryBuilder.append(" (Future Sight)");
                         }
-                        if (!game.isFowMode() && p2.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
+                        if (!game.isFowMode() && p2 != null && p2.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
                             outcomeSummaryBuilder.append(" (Mirrorshard Deploy)");
                         }
                         outcomeSummaryBuilder.append(", ");
