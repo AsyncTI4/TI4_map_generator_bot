@@ -1,0 +1,190 @@
+[
+    {
+        "id": "cantoagent",
+        "faction": "canto",
+        "type": "agent",
+        "name": "The Lyogslate",
+        "title": "Corrupted Shell",
+        "abilityWindow": "After a player gains control of a planet:",
+        "abilityText": "You may exhaust this card to ready that planet.",
+        "unlockCondition": "Always Unlocked",
+        "source": "eronous"
+    },
+    {
+        "id": "cantocommander",
+        "faction": "canto",
+        "type": "commander",
+        "name": "The Yehiga",
+        "title": "The Learning Algorithm",
+        "abilityWindow": "During combat:",
+        "abilityText": "After you gain control of a planet: You may produce 1 unit in that planet's system.",
+        "unlockCondition": "Gain control of a planet that was owned by another player.",
+        "source": "eronous"
+    },
+    {
+        "id": "cantohero",
+        "faction": "canto",
+        "type": "hero",
+        "name": "The Cantokylegance ",
+        "title": "Psyo-Machine",
+        "abilityName": "Psionic Rejection - Deny Fate",
+        "abilityWindow": "When another player would purge their hero",
+        "abilityText": "You may purge this card instead, their hero has no effect, is not purged, and is treated as blank until the end of this game round.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "eronous"
+    },
+    {
+        "id": "eidolonagent",
+        "faction": "eidolon",
+        "type": "agent",
+        "name": "Xeyhotph",
+        "title": "Hand of the Void",
+        "abilityWindow": "After a player activates a system:",
+        "abilityText": "You may exhaust this card to allow that player to treat 1 of their units as adjacent to the active system.",
+        "unlockCondition": "Always Unlocked",
+        "source": "eronous"
+    },
+    {
+        "id": "eidoloncommander",
+        "faction": "eidolon",
+        "type": "commander",
+        "name": "Oilinephophete",
+        "title": "Eyes of the Void",
+        "abilityWindow": "At the start of the status phase",
+        "abilityText": "Gain a number of commodities equal to the number of systems that contain 1 or more of your units and no planets.",
+        "unlockCondition": "Have units in 3 systems that do not contain planets.",
+        "source": "eronous"
+    },
+    {
+        "id": "eidolonhero",
+        "faction": "eidolon",
+        "type": "hero",
+        "name": "Quolocin",
+        "title": "Voice of the Void",
+        "abilityName": "Void Caller - Maw of the Abysse",
+        "abilityWindow": "After you move your flagship into a non-home system other than Mecatol Rex: ",
+        "abilityText": "You may destroy all other players' units in that system and replace that system tile with the Eidolon gravity rift tile. If you do, purge this card and each planet card that corresponds to the replaced system tile.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "eronous"
+    },
+    {
+        "id": "shadowsagent",
+        "faction": "shadows",
+        "type": "agent",
+        "name": "That Which Gives",
+        "title": "Shadow of Eccon V",
+        "abilityWindow": "At the start of a space combat",
+        "abilityText": "You may exhaust this card to allow the defender to choose 1 of their opponent’s ships to place 1 ship of that type from their reinforcements in the active system.",
+        "unlockCondition": "Always Unlocked",
+        "source": "eronous"
+    },
+    {
+        "id": "shadowscommander",
+        "faction": "shadows",
+        "type": "commander",
+        "name": "That Which Tolls",
+        "title": "Shadow of Tyria Prime",
+        "abilityWindow": "At the start of space combat",
+        "abilityText": "You may place 1 ship from your reinforcements with a cost of no more than 4 matching the type of 1 of your opponents’ ship in that system. (you may use influence to build if you want)",
+        "unlockCondition": "Have 3 “Silenced” tokens on planets",
+        "source": "eronous"
+    },
+    {
+        "id": "shadowshero",
+        "faction": "shadows",
+        "type": "hero",
+        "name": "That Which Reaps",
+        "title": "Second Shadow",
+        "abilityName": "Silence - Hunting Shade",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Choose a non-home planet other than Mecatol Rex controlled by another player in a system that contains at least 1 or more of your units. Destroy all of that player's units on that planet. Place the “Grave World” token on that planet. Gain that planets' card and attach this card to that planet, you cannot lose this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "eronous"
+    },
+    {
+        "id": "mechiagent",
+        "faction": "mechi",
+        "type": "agent",
+        "name": "Volakanite",
+        "title": "Infokite of the VI Legion",
+        "abilityText": "This card has the Tier 1 text ability of each active protocol.",
+        "unlockCondition": "Always Unlocked",
+        "source": "eronous"
+    },
+    {
+        "id": "mechicommander",
+        "faction": "mechi",
+        "type": "commander",
+        "name": "That Which Tolls",
+        "title": "Shadow of Tyria Prime",
+        "abilityText": "This card has the Tier 2 ability of each active protocol.",
+        "unlockCondition": "Have units with a combined PRODUCTION value of at least 10 in a single system.",
+        "source": "eronous"
+    },
+    {
+        "id": "mechihero",
+        "faction": "mechi",
+        "type": "hero",
+        "name": "Maelothope",
+        "title": "Commander of Legion I ",
+        "abilityName": "Deliverance Protocols - The Will Made Manifest",
+        "abilityText": "This card has the Tier 3 text ability of each active protocol. When you use this ability, purge this card.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "eronous"
+    },
+    {
+        "id": "saeraagentprosperity",
+        "faction": "saera",
+        "type": "agent",
+        "name": "Kane'Ikala",
+        "title": "Angel of Prosperity",
+        "abilityText": "You may exhaust this card to allow any player to spend influence as if it were resources.",
+        "unlockCondition": "Always Unlocked",
+        "source": "eronous"
+    },
+    {
+        "id": "saeraagentwarning",
+        "faction": "saera",
+        "type": "agent",
+        "name": "Zyrial'Ayri",
+        "title": "Angel of Warning",
+        "abilityWindow": "After a player exhausts at least 1 planet to cast any number of votes:",
+        "abilityText": "That player casts 5 additional votes. Then, exhaust this card.",
+        "unlockCondition": "Always Unlocked",
+        "source": "eronous"
+    },
+    {
+        "id": "saeraagentprotection",
+        "faction": "saera",
+        "type": "agent",
+        "name": "Ells'Arish",
+        "title": "Angel of Protection",
+        "abilityWindow": "When a player's unit would be destroyed:",
+        "abilityText": "Exhaust this card, that unit is not destroyed.",
+        "unlockCondition": "Always Unlocked",
+        "source": "eronous"
+    },
+    {
+        "id": "saeracommander",
+        "faction": "saera",
+        "type": "commander",
+        "name": "Asyhil'Sim",
+        "title": "Angel of Order",
+        "abilityWindow": "At the start of each round of space combat: ",
+        "abilityText": "Your opponent must destroy one of their fighters if able.",
+        "unlockCondition": "Have at least 1 cruiser in 4 systems.",
+        "source": "eronous"
+    },
+    {
+        "id": "saerahero",
+        "faction": "saera",
+        "type": "hero",
+        "name": "Elishen'Rine",
+        "title": "Angel of Deliverance",
+        "abilityName": "With Blinding Light - Divine Judgement",
+        "abilityWindow": "After you move your flagship into a non-home system other than Mecatol Rex:",
+        "abilityText": "You may destroy all other players' units in that system and replace that system tile with the Saeraphyme nebula tile. If you do, purge this card and each planet card that corresponds to the replaced system tile. Then, move any number of your ships into this system.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "eronous"
+    }
+]
