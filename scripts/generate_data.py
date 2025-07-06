@@ -13,9 +13,9 @@ import argparse
 CONFIGS = {
     'tech': {
         'input_folder': 'src/main/resources/data/technologies',
-        'output_file': 'tech.ts',
-        'type_import': 'Technology',
-        'export_name': 'tech',
+        'output_file': 'techs.ts',
+        'type_import': 'Tech',
+        'export_name': 'techs',
         'sort_key': 'alias',
         'is_array_data': True,
         'blacklist': [],
@@ -86,7 +86,7 @@ CONFIGS = {
     'leaders': {
         'input_folder': 'src/main/resources/data/leaders',
         'output_file': 'leaders.ts',
-        'type_import': 'Leader',
+        'type_import': 'LeaderData',
         'export_name': 'leaders',
         'sort_key': 'alias',
         'is_array_data': True,
