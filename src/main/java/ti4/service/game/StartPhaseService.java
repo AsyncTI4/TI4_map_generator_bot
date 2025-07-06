@@ -157,14 +157,14 @@ public class StartPhaseService {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        String msg = player.getRepresentation() + " you are #" + number + " pick in this strategy phase and so can queue " + number + " strategy cards (SCs). So " +
-            "far you have queued " + numQueued + " cards. ";
+        String msg = player.getRepresentation() + " you are #" + number + " pick in this strategy phase and so can queue " + number + " strategy cards." +
+            " So far you have queued " + numQueued + " cards. ";
         if (game.isFowMode()) {
-            msg = player.getRepresentation() + " you can queue up to 8 cards. So " +
-                "far you have queued " + numQueued + " cards. ";
+            msg = player.getRepresentation() + " you can queue up to 8 cards." +
+                " So far you have queued " + numQueued + " cards. ";
         }
         if (numQueued > 0) {
-            msg += "The queued SCs are as follows (in the order the bot will attempt to select them for you):\n";
+            msg += "The queued strategy cards are as follows (in the order the bot will attempt to select them for you):\n";
             int count = 1;
             for (String num : alreadyQueued.split("_")) {
                 if (num.isEmpty()) {
@@ -421,7 +421,8 @@ public class StartPhaseService {
                 .filter(p -> p.getSCs().size() < game.getStrategyCardsPerPlayer())
                 .findFirst();
             if (!firstInPriorityOrder.isPresent()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No player found on the Priority Track with fewer than the max SC cards. Can't offer anyone Strategy Cards.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    "No player found on the Priority Track with fewer than the max strategy cards. Can't offer anyone Strategy Cards.");
                 return;
             }
             firstSCPicker = firstInPriorityOrder.get();
@@ -442,7 +443,7 @@ public class StartPhaseService {
                         continue;
                     }
                     String msg = player2.getRepresentationUnfogged() + " in order to speed up the strategy phase, you can now offer the bot a ranked list of your desired" +
-                        " strategy cards, which it will pick for you when it's your turn to pick. If you do not want to, that is fine, just decline.";
+                        " strategy cards, which it will pick for you when it's your turn to pick. If you do not wish to, that is fine, just decline.";
                     MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(), msg);
                     MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), getQueueSCMessage(game, player2), getQueueSCPickButtons(game, player2));
                 }
@@ -684,11 +685,13 @@ public class StartPhaseService {
         game.getMainGameChannel().sendMessage(messageObject).queue(message -> GameMessageManager.replace(game.getName(), message.getId(), GameMessageType.STATUS_END, game.getLastModifiedDate()));
         for (Player player : game.getRealPlayers()) {
             if (!player.getAllianceMembers().isEmpty()) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Note that now is the time that alliance members can exchange planets, and you may want to wait for everyone to confirm they are done doing that before moving on.");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                    "## Note that now is the time that alliance members may exchange planets, and you may wish to wait for everyone to confirm they are done doing that before moving on.");
                 break;
             }
             if (player.hasTech("dsrohdy") && custodiansTaken) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "## Note that now is the time that a player needs to resolve Contractual Obligations tech and you may want to wait until thats done before proceeding.");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                    "## Note that now is the time for the _Contractual Obligations_ technology to resolve, and you may wish to wait until thats done before proceeding.");
                 break;
             }
         }
@@ -741,7 +744,7 @@ public class StartPhaseService {
             scPickedList.addAll(player_.getSCs());
         }
 
-        //ADD A TG TO UNPICKED SC
+        //ADD A TRADE GOOD TO UNPICKED STRATEGY CARDS
         if (incrementTgs) {
             game.incrementScTradeGoods();
 
@@ -802,16 +805,17 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_", buttons);
             }
             if (!game.isFowMode()) {
-                String preDeclineMsg = p2.getRepresentationUnfogged() + " in order to resolve SCs faster, you have the opportunity now to pre-decline various SCs if you know you will not follow them. Feel free to not do this. Trade is never available for this feature due to trade sometimes being mandatory.";
+                String preDeclineMsg = p2.getRepresentationUnfogged() + ", in order to resolve strategy cards faster, you have the opportunity now to pre-decline various strategy cards if you know you will not follow them."
+                    + " Feel free to not do this. **Trade** is never available for this feature due to **Trade** sometimes being mandatory.";
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), preDeclineMsg);
                 for (Integer sc : game.getSCList()) {
                     if (p2.getSCs().contains(sc) || game.getStrategyCardModelByInitiative(sc).get().usesAutomationForSCID("pok5trade") || !scPickedList.contains(sc)) {
                         continue;
                     }
                     List<Button> scButtons = new ArrayList<>();
-                    scButtons.add(Buttons.red("preDeclineSC_" + sc + "_yes", "Don't follow " + game.getStrategyCardModelByInitiative(sc).get().getName()));
+                    scButtons.add(Buttons.red("preDeclineSC_" + sc + "_yes", "Don't Follow " + game.getStrategyCardModelByInitiative(sc).get().getName()));
                     scButtons.add(Buttons.gray("preDeclineSC_" + sc + "_no", "Decide Later"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), "Use this to decide on " + game.getStrategyCardModelByInitiative(sc).get().getName(), scButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), "Use this to decide on " + game.getStrategyCardModelByInitiative(sc).get().getName() + ".", scButtons);
                 }
             }
 

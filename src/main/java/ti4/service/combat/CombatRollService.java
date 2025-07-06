@@ -569,8 +569,7 @@ public class CombatRollService {
                     player.setCommodities(player.getCommodities() + hitRolls);
                     ButtonHelperAgents.toldarAgentInitiation(game, player, hitRolls);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-                        + " gained " + hitRolls
-                        + " commodities due to the Belkosea Mech ability (gain comms when producing hits).");
+                        + " gained " + hitRolls + " commodities due to their Uzean Wardog mech ability.");
                 }
             }
             int misses = numRolls - hitRolls;

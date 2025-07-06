@@ -312,7 +312,8 @@ public class FrankenDraftBagService {
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         if (game.isFowMode()) {
-            players.removeAll(game.getPlayersWithGMRole());
+            players.removeAll(game.getPlayers().values().stream()
+                .filter(player -> player.getPrivateChannel() == null).toList());
         }
         int index = 1;
         StringBuilder sb = new StringBuilder("Automatically setting players up as Franken factions:");

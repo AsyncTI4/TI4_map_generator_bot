@@ -403,7 +403,7 @@ class ActionCardDeck2ButtonHandler {
         if (player.getStrategicCC() > 0) {
             successMessage = player.getRepresentationNoPing() + ", 1 command token has been removed from your strategy pool (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
             player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, CardEmojis.ActionCard + "Side Project");
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, CardEmojis.ActionCard + "played _Side Project_");
         } else {
             successMessage = player.getRepresentationNoPing() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
             player.addExhaustedRelic("emelpar");

@@ -406,7 +406,8 @@ public class TransactionHelper {
         "A Jubba Cloak",
         "The Pretence That Your Secrets Are Unscorable",
         "Double Nothing",
-        "The opportunity to be your own boss");
+        "The Opportunity To Be Your Own Boss",
+        "Artisanal, Hand-Crafted Nothing");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
@@ -526,7 +527,7 @@ public class TransactionHelper {
 
             }
             case "Technology" -> {
-                message += " Click the tech you wish to " + requestOrOffer + ".";
+                message += " Click the technology you wish to " + requestOrOffer + ".";
                 for (String tech : p1.getTechs()) {
                     if (resolveAgeOfCommerceTechCheck(p1, p2, tech, game)) {
                         stuffToTransButtons.add(Buttons.gray(
@@ -964,7 +965,7 @@ public class TransactionHelper {
                     + " you may only send a player 1 promissory note in each transaction (and you may only perform one transaction with each other player on a turn).");
             }
             case "Technology" -> {
-                String message = "Click the tech you wish to send";
+                String message = "Click the technology you wish to send";
                 for (String tech : p1.getTechs()) {
                     if (resolveAgeOfCommerceTechCheck(p1, p2, tech, game)) {
                         Button transact = Buttons.gray(finChecker + "send_Technology_" + p2.getFaction() + "_" + tech,
@@ -1212,7 +1213,7 @@ public class TransactionHelper {
             }
             case "Technology" -> {
                 p2.addTech(amountToTrans);
-                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " you received the tech " + Mapper.getTech(amountToTrans) + " from a transaction");
+                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " you received the technology " + Mapper.getTech(amountToTrans) + " from a transaction");
             }
         }
         Button button = Buttons.gray(finChecker + "transactWith_" + p2.getColor(),
