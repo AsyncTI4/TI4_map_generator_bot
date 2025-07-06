@@ -1012,7 +1012,7 @@ public class ButtonHelper {
             }
         }
         if (!game.isFowMode() && activeSystem.isAsteroidField() && !player.getTechs().contains("amd")
-            && !player.getTechs().contains("absol_amd") && !player.getRelics().contains("circletofthevoid")) {
+            && !player.getTechs().contains("absol_amd") && !player.getRelics().contains("circletofthevoid") && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + player.getRepresentation()
                 + " this is a __friendly__ reminder that you do not have antimass deflectors");
         }
@@ -1083,6 +1083,15 @@ public class ButtonHelper {
             Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
             String magenMsg = magenPlayer.getRepresentation() + " you can use **Magen Defense Grid** to place an infantry with each of your structures in the active system.";
             MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
+        }
+        if (player.hasAbility("void_tap") && (activeSystem.getPlanetUnitHolders().isEmpty() || ButtonHelper.doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {
+            int cTG = player.getTg();
+            player.setTg(cTG + 1);
+            MessageHelper.sendMessageToChannel(channel,
+                player.getRepresentation() + " gained 1 trade good (" + cTG + "->" + player.getTg()
+                    + ") for the Void Tap Ability.");
+            ButtonHelperAgents.resolveArtunoCheck(player, 1);
+            ButtonHelperAbilities.pillageCheck(player, game);
         }
 
         for (Player nonActivePlayer : game.getPlayers().values()) {
@@ -3900,7 +3909,7 @@ public class ButtonHelper {
     }
 
     public static void resolveFullFrontierExplore(Game game, Player player, Tile tile, GenericInteractionCreateEvent event) {
-        if (player.hasAbility("voidsailors")) {
+        if (player.hasAbility("voidsailors") || player.hasAbility("dark_weaver")) {
             String cardID1 = game.drawExplore(Constants.FRONTIER);
             String cardID2 = game.drawExplore(Constants.FRONTIER);
             ExploreModel card1 = Mapper.getExplore(cardID1);

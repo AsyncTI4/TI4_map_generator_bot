@@ -32,6 +32,7 @@ public enum FactionEmojis implements TI4Emoji {
     franken_zel_tharr_dominion, franken_zircon_ascendancy, franken_zor_thul_matriarchate, //
 
     // Other (random homebrew)
+    canto, eidolon, mechi, saera, shadows, //Eronous
     Lazax, Neutral, RandomFaction, AdminsFaction, netharii, Drahn, //misc
     Qulane, echoes, enclave, raven, syndicate, terminator; // baldrick
 
@@ -122,6 +123,11 @@ public enum FactionEmojis implements TI4Emoji {
             case "belkosea" -> belkosea;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
+            case "canto" -> canto;
+            case "eidolon" -> eidolon;
+            case "mechi" -> mechi;
+            case "saera" -> saera;
+            case "shadows" -> shadows;
 
             case "franken1" -> Franken1;
             case "franken2" -> Franken2;
