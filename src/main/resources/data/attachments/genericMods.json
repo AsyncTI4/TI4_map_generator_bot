@@ -29,6 +29,18 @@
         "source": "other"
     },
     {
+        "id": "positiveinf",
+        "imagePath": "attachment_positiveinf.png",
+        "influenceModifier": 1,
+        "source": "other"
+    },
+    {
+        "id": "positiveinf2",
+        "imagePath": "attachment_positiveinf2.png",
+        "influenceModifier": 2,
+        "source": "other"
+    },
+    {
         "id": "positiveinf3",
         "imagePath": "attachment_positiveinf3.png",
         "influenceModifier": 3,
@@ -50,6 +62,18 @@
         "id": "negativeres3",
         "imagePath": "attachment_negativeres3.png",
         "resourcesModifier": -3,
+        "source": "other"
+    },
+    {
+        "id": "positiveres",
+        "imagePath": "attachment_positiveres.png",
+        "resourcesModifier": 1,
+        "source": "other"
+    },
+    {
+        "id": "positiveres2",
+        "imagePath": "attachment_positiveres2.png",
+        "resourcesModifier": 2,
         "source": "other"
     },
     {
