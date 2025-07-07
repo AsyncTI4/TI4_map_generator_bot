@@ -75,6 +75,13 @@ public class FrankenAbilityService {
                     "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                         + " due to the **Teeming** ability.");
             }
+            if (abilityID.equalsIgnoreCase("machine_cult")) {
+                String unitID = AliasHandler.resolveUnit("mech");
+                player.setUnitCap(unitID, 6);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Set mech unit max to 6 for " + player.getRepresentation()
+                        + " due to the **Machine Cult** ability.");
+            }
             if (abilityID.equalsIgnoreCase("diplomats")) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

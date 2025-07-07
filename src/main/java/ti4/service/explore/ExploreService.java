@@ -245,7 +245,7 @@ public class ExploreService {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "florzencommander") && game.getPhaseOfGame().contains("agenda")) {
             PlanetService.refreshPlanet(player, planetName);
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), planetName + " has been readied because of Quaxdol Junitas, the Florzen Commander.");
-            AgendaHelper.listVoteCount(game, game.getMainGameChannel());
+            if (!game.isFowMode()) AgendaHelper.listVoteCount(game, game.getMainGameChannel());
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
             Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());

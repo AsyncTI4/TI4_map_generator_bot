@@ -200,13 +200,17 @@ public class CombatRollService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        if (game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence
-            && isFoWPrivateChannelRoll(player, event)) {
-            // If roll was from pds button in private channel, send the result to the target
-            MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " "
-                + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Roll result was sent to " + opponent.getRepresentationNoPing());
+        if (game.isFowMode() && isFoWPrivateChannelRoll(player, event)) {
+            if (rollType == CombatRollType.SpaceCannonOffence) {
+                // If roll was from pds button in private channel, send the result to the target
+                MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " "
+                    + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Roll result was sent to " + opponent.getRepresentationNoPing());
+            } else if (rollType == CombatRollType.bombardment) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+                    + " This roll result is not automatically relayed. Please communicate the hits to the opponent manually.");
+            }
         }
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName,
@@ -480,7 +484,7 @@ public class CombatRollService {
         UnitHolder space = activeSystem.getUnitHolders().get("space");
         StringBuilder extra = new StringBuilder();
         boolean usesX89c4 = false;
-        if (totalHits > 0 && player.hasTech("x89c4")
+        if (player.hasTech("x89c4")
             && (rollType == CombatRollType.combatround || rollType == CombatRollType.bombardment)
             && (!unitHolder.getName().equalsIgnoreCase("space") || rollType == CombatRollType.bombardment)) {
             usesX89c4 = true;
@@ -721,8 +725,11 @@ public class CombatRollService {
         if (usesX89c4) {
             totalHits *= 2;
         }
-
-        result += CombatMessageHelper.displayHitResults(totalHits, usesX89c4 && totalHits > 0);
+        boolean x89applies = usesX89c4;
+        if (totalHits < 1) {
+            x89applies = false;
+        }
+        result += CombatMessageHelper.displayHitResults(totalHits, x89applies);
         player.setActualHits(player.getActualHits() + totalHits);
         if (totalHits > 0 && usesX89c4) {
             result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hits using "

@@ -714,7 +714,7 @@ public class ButtonHelperSCs {
             String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
                 + unitKey.unitName() + " on for **Construction**.";
             if (!player.getSCs().contains(4)) {
-                message += "\n## __It will place a command token in the system as well.__ ";
+                message += "\n## It will place a command token in the system as well.";
             }
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
@@ -963,10 +963,12 @@ public class ButtonHelperSCs {
             limit = Integer.parseInt(game.getStoredValue("ccLimit"));
         }
         if (!game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "You have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                "You have " + (limit - ccCount) + " command token" + (limit - ccCount == 1 ? "" : "s") + " in your reinforcements that you could gain.");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
         } else {
-            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), "You have " + (limit - ccCount) + " command tokens in your reinforcements that you could gain.");
+            MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
+                "You have " + (limit - ccCount) + " command token" + (limit - ccCount == 1 ? "" : "s") + " in your reinforcements that you could gain.");
             MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
         }
         //MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);

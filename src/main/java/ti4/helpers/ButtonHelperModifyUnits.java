@@ -743,8 +743,8 @@ public class ButtonHelperModifyUnits {
     }
 
     private static boolean canRetreatTo(Game game, Player player, Tile tile, boolean skilledRetreat) {
-        if ((tile.isAsteroidField() && !player.getTechs().contains("amd") && !player.getRelics().contains("circletofthevoid")) ||
-            (tile.isSupernova() && !player.getTechs().contains("mr") && !player.getRelics().contains("circletofthevoid")) ||
+        if ((tile.isAsteroidField() && !player.getTechs().contains("amd") && !player.getRelics().contains("circletofthevoid") && !player.hasAbility("celestial_being")) ||
+            (tile.isSupernova() && !player.getTechs().contains("mr") && !player.getRelics().contains("circletofthevoid") && !player.hasAbility("celestial_being")) ||
             FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
             return false;
         }
@@ -1291,7 +1291,7 @@ public class ButtonHelperModifyUnits {
                 Button placeConstructionCCInSystem = Buttons.gray(player.getFinsFactionCheckerPrefix() + "placeHolderOfConInSystem_" + planetName, "Place 1 Token of the Active Player");
                 Button NoDontWantTo = Buttons.blue(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Don't Place A Command Token");
                 List<Button> buttons = List.of(placeCCInSystem, placeConstructionCCInSystem, NoDontWantTo);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(game.isFowMode() ? player.getCorrectChannel() : event.getChannel(), message, buttons);
             } else {
                 boolean hasConstruction = false;
                 for (Integer sc : player.getSCs()) {

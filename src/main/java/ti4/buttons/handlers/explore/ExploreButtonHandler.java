@@ -71,7 +71,7 @@ class ExploreButtonHandler {
         }
 
         String message = player.getRepresentation() + " is using a mech to resolve _Volatile Fuel Source_.";
-        message += " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation();
+        message += " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -97,7 +97,7 @@ class ExploreButtonHandler {
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Volatile Fuel Source_.";
-        message += " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation();
+        message += " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
