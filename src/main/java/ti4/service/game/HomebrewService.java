@@ -184,7 +184,7 @@ public class HomebrewService {
             }
             case HBREDTAPE -> {
                 game.setRedTapeMode(true);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to red tape mode.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Set game to Red Tape mode.");
             }
             case HBOMEGAPHASE -> {
                 if (game.getRevealedPublicObjectives().size() > 1) {

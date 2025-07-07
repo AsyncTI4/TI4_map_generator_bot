@@ -74,7 +74,7 @@ public class ButtonHelperSCs {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scModel.getInitiative(), game, event);
         }
         ReactionService.addReaction(event, game, player);
-        String message = player.getRepresentationUnfogged() + " Click the names of the planets you wish to ready";
+        String message = player.getRepresentationUnfogged() + ", please choose the planets you wish to ready.";
 
         List<Button> buttons = Helper.getPlanetRefreshButtons(player, game);
         Button doneRefreshing = Buttons.red("deleteButtons_diplomacy", "Done Readying Planets"); // spitItOut
@@ -91,7 +91,7 @@ public class ButtonHelperSCs {
             if (!buttons2.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(
                     player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " use buttons to resolve **Peace Accords**.", buttons2);
+                    player.getRepresentationUnfogged() + ", please resolve **Peace Accords**.", buttons2);
             }
         }
 
@@ -541,7 +541,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = ButtonHelperSCs.getAnarchy2ReadyComponentButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " use the buttons to ready something",
+                + ", use the buttons to ready something.",
             buttons);
     }
 
@@ -586,7 +586,7 @@ public class ButtonHelperSCs {
     @ButtonHandler("reverseSpeakerOrder")
     public static void reverseSpeakerOrder(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         Helper.reverseSpeakerOrder(game);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " has reversed speaker order");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " has reversed speaker order.");
     }
 
     @ButtonHandler("primaryOfAnarchy1")
@@ -594,7 +594,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = ButtonHelperSCs.getAnarchy1PrimaryButtons(game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " use the buttons to resolve the secondary (remember to spend a strategy token).",
+                + ", use the buttons to resolve the secondary (remember to spend a strategy token).",
             buttons);
     }
 
@@ -603,7 +603,7 @@ public class ButtonHelperSCs {
         List<Button> buttons = ButtonHelperSCs.getAnarchy3SecondaryButtons(game);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " use the buttons to resolve the secondary",
+                + ", use the buttons to resolve the secondary.",
             buttons);
     }
 
@@ -612,14 +612,14 @@ public class ButtonHelperSCs {
         List<Button> buttons = ButtonHelperSCs.getAnarchy7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
-                + " use the buttons to build in the desired system",
+                + ", use the buttons to build in the desired system.",
             buttons);
     }
 
     @ButtonHandler("resolveAnarchy8Secondary")
     public static void resolveUnexpectedAction(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "unexpected");
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Use buttons to remove token.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", use buttons to remove token.", buttons);
     }
 
     @ButtonHandler("warfareBuild")
@@ -749,7 +749,7 @@ public class ButtonHelperSCs {
         for (String planet : planets) {
             buttons.add(Buttons.green("addFacility_" + planet + "_" + facility, Helper.getPlanetRepresentation(planet, game)));
         }
-        String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your facility on";
+        String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your facility on.";
         MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
     }
 
@@ -870,7 +870,7 @@ public class ButtonHelperSCs {
         String planet = buttonID.split("_")[1];
         String facility = buttonID.split("_")[2];
         Planet plan = game.getUnitHolderFromPlanet(planet);
-        String message = player.getRepresentation() + " added a facility of type " + facility.replace("facility", "");
+        String message = player.getRepresentation() + " added a " + facility.replace("facility", "") + " facility";
         if (plan != null) {
             if (!facility.contains("embassy")) {
                 plan.addToken("attachment_" + facility + ".png");
@@ -879,11 +879,12 @@ public class ButtonHelperSCs {
                 plan.addToken("attachment_" + facility + (embassy + 1) + ".png");
                 updateEmbassies(game, player, game.getTileFromPlanet(planet));
             }
-            message += " to " + Helper.getPlanetRepresentation(planet, game);
+            message += " to " + Helper.getPlanetRepresentation(planet, game) + ".";
             if (facility.contains("logistics")) {
-                message += " Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect. Players will have to monitor this)";
+                message += " Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect; players will have to monitor this)";
             }
         }
+        message += "."
 
         if (event instanceof ButtonInteractionEvent bEvent) {
             bEvent.getMessage().delete().queue();
@@ -909,8 +910,8 @@ public class ButtonHelperSCs {
         for (int x = 0; x < game.getPublicObjectives2Peakable().size(); x++) {
             buttons.add(Buttons.blue("anarchy10PeekAt_" + game.getPublicObjectives2Peakable().get(x), "Stage 2 Position " + (x + 1)));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " choose which objective you wish to peek at. "
-            + "They are listed in the order that they would normally be revealed", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + ", please choose which objective you wish to peek at. "
+            + "They are listed in the order that they would normally be revealed.", buttons);
     }
 
     @ButtonHandler("anarchy10PeekAt")
@@ -918,12 +919,12 @@ public class ButtonHelperSCs {
         List<Button> buttons = new ArrayList<>();
         String objID = buttonID.replace("anarchy10PeekAt_", "");
         event.getMessage().delete().queue();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " peeked at a public objective");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " peeked at a public objective.");
         PublicObjectiveModel po = Mapper.getPublicObjective(objID);
         player.getCardsInfoThread().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
         buttons.add(Buttons.green("cutTape_" + objID, "Reveal Objective"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " choose whether to reveal the objective or not", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + ", please choose whether to reveal the objective or not.", buttons);
     }
 
     @ButtonHandler("leadershipGenerateCCButtons")
@@ -948,7 +949,7 @@ public class ButtonHelperSCs {
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, leadershipInitiative, game, event);
         }
         player.addFollowedSC(leadershipInitiative, event);
-        String message = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust.";
+        String message = player.getRepresentationUnfogged() + ", please choose the planets you wish to exhaust.";
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         if (unfinished) {
             message = Helper.buildSpentThingsMessage(player, game, "inf");

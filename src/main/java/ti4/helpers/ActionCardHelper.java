@@ -800,7 +800,7 @@ public class ActionCardHelper {
 
             if (automationID.equals("diplo_pressure")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, "Please resolve Diplomatic Pressure now. If any sabo occurs, they will be able to ignore the buttons they are offered.", codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, "Please resolve _Diplomatic Pressure_ now. If any Sabo occurs, they will be able to ignore the buttons they are offered.", codedButtons);
             }
 
             if (automationID.equals("renegotiation")) {
@@ -953,7 +953,7 @@ public class ActionCardHelper {
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, (game.isFowMode() ? "" : player.getRepresentation(false, true))
-                        + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
+                        + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other \"after\"s now.", game, player, riderButtons);
                     for (Player p2 : game.getRealPlayers()) {
                         if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
                             VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);

@@ -120,7 +120,7 @@ public class FOWPlusService {
         List<Button> chooseTileButtons = new ArrayList<>();
         chooseTileButtons.add(Buttons.green(finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("ChooseDifferentDestination", "Get a Different Ring"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Click the tile that you wish to activate.", chooseTileButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
 
         event.getMessageChannel().deleteMessageById(origMessageId).queue();
     }
@@ -223,7 +223,7 @@ public class FOWPlusService {
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " Choose a system to eject your non-infantry units", waveButtons);
+                    player.getRepresentationUnfogged() + ", please choose a system to eject your non-infantry units.", waveButtons);
                 break;
 
             case FOWPLUS_EXPLORE_VORTEX:
@@ -253,7 +253,7 @@ public class FOWPlusService {
             case FOWPLUS_EXPLORE_SPOOR:
                 List<Button> buttons = ButtonHelperActionCards.getPlagiarizeButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
-                    !buttons.isEmpty() ? "Select the technology you wish to gain." : "No valid technologies to gain.", buttons);
+                    !buttons.isEmpty() ? "Please choose the technology you wish to gain." : "No valid technologies to gain.", buttons);
                 break;
 
             case FOWPLUS_EXPLORE_SACRIFICE:

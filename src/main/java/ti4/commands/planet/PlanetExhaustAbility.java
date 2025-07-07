@@ -112,11 +112,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 String riderName = "Tarrock Ability";
                 List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, game, player.getFinsFactionCheckerPrefix());
                 //List<Button> afterButtons = AgendaHelper.getAfterButtons(game);
-                MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() + ", please select your target.", game, player, riderButtons);
+                MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(), player.getRepresentation() + ", please choose your target.", game, player, riderButtons);
                 //MessageHelper.sendMessageToChannelWithPersistentReacts(game.getActionsChannel(), "Please indicate \"no afters\" again.", game, afterButtons, GameMessageType.AGENDA_AFTER);
             }
             case "prism" -> {
-                output = player.getFactionEmoji() + " choose a technology to return.";
+                output = player.getFactionEmoji() + ", please choose a technology to return.";
                 buttons.addAll(getNewPrismLoseTechOptions(player));
             }
             case "echo" -> {
@@ -124,7 +124,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 buttons.addAll(ButtonHelper.getEchoAvailableSystems(game, player));
             }
             case "domna" -> {
-                output = "Use buttons to select the system that the ship you wish to move is in.";
+                output = "Please choose the system that the ship you wish to move is in.";
                 buttons.addAll(ButtonHelper.getDomnaStepOneTiles(player, game));
             }
             case "eko" -> output = "blank";
