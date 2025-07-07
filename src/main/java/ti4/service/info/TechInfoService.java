@@ -19,7 +19,7 @@ import ti4.model.TechnologyModel;
 public class TechInfoService {
 
     public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = "Somebody" + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendTechInfo(player);
     }
