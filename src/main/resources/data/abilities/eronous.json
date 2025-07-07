@@ -1,0 +1,114 @@
+[
+    {
+        "id": "enslave",
+        "name": "Enslave",
+        "faction": "canto",
+        "window": "When you gain control of a planet",
+        "windowEffect": "Place 1 infantry from your reinforcements on that planet.",
+        "source": "eronous"
+    },
+    
+    {
+        "id": "dominate",
+        "name": "Dominate",
+        "faction": "canto",
+        "window": "After you commit ground forces to a planet controlled by another player",
+        "windowEffect": "That player must destroy 1 of their ground forces on that planet.",
+        "source": "eronous"
+    },
+    {
+        "id": "seamless_integration",
+        "name": "Seamless Integration",
+        "faction": "canto",
+        "window": "At the start of the Status phase",
+        "windowEffect": "you may place 1 infantry from your reinforcements on a non-home planet other than Mecatol Rex that contains no other player's units, resolve invasion on that planet.",
+        "source": "eronous"
+    },
+    {
+        "id": "void_tap",
+        "name": "Void Tap",
+        "faction": "eidolon",
+        "window": "After you activate a system that contains no planets",
+        "windowEffect": "You may gain 1 trade good.",
+        "source": "eronous"
+    },
+    
+    {
+        "id": "dark_weaver",
+        "name": "Dark Weaver",
+        "faction": "eidolon",
+        "window": "When you explore a frontier token",
+        "windowEffect": "You may draw 1 additional card; choose 1 to resolve and discard the rest",
+        "source": "eronous"
+    },
+    {
+        "id": "abyssal_propagation",
+        "name": "Abyssal Propagation",
+        "faction": "eidolon",
+        "window": "After you perform a tactical action,",
+        "windowEffect": "you may place 1 fighter from your reinforcements in a system that contains no other players units.",
+        "source": "eronous"
+    },
+    {
+        "id": "creeping_shades",
+        "name": "Creeping Shades",
+        "faction": "shadows",
+        "window": "At the start of space combat",
+        "windowEffect": "if your opponent has a control token on one of your ships, you may return any number of control tokens from your faction sheet to replace one of their matching ship types with one from your reinforcements.",
+        "source": "eronous"
+    },
+    {
+        "id": "silent_growth",
+        "name": "Silent Growth",
+        "faction": "shadows",
+        "window": "At the start of the agenda phase,",
+        "windowEffect": "For each other player you may spend influence equal to the cost of one non-fighter ship type with a cost of 4 or less to place one of their control tokens onto that ship type on your faction sheet.",
+        "source": "eronous"
+    },
+    {
+        "id": "tomb_worlds",
+        "name": "Tomb Worlds",
+        "faction": "shadows",
+        "permanentEffect":"For each planet that contains one of your space docks, increase its influence value by 2.",
+        "source": "eronous"
+    },
+    {
+        "id": "protocols",
+        "name": "Protocols",
+        "faction": "mechi",
+        "window": "At the start of the Strategy phase, ",
+        "windowEffect": "Exhaust all Active Protocols, and remove them from your faction sheet. Then, choose two unexhausted Protocols, and set them Active by placing them face up on your faction sheet.",
+        "source": "eronous"
+    },
+    {
+        "id": "machine_cult",
+        "name": "Machine Cult",
+        "faction": "mechi",
+        "permanentEffect":"During setup place the 2 Mechikide mech tokens in your reinforcements. The Mechikide unit tokens are additional units of their type.",
+        "source": "eronous"
+    },
+    {
+        "id": "angelic_hosts",
+        "name": "Angelic Hosts",
+        "faction": "saera",
+        "permanentEffect":"During setup, take the 2 additional Saeraphyme faction agents and place them next to your faction sheet; you have 3 agents.",
+        "source": "eronous"
+    },
+    {
+        "id": "guidance",
+        "name": "Guidance",
+        "faction": "saera",
+        "window": "After an agenda is revealed",
+        "windowEffect": "Ready one planet you control",
+        "source": "eronous"
+    },
+    {
+        "id": "celestial_being",
+        "name": "Celestial Being",
+        "faction": "saera",
+        "permanentEffect":"Your units ignore the effects of anomalies.",
+        "source": "eronous"
+    }
+    
+    
+]

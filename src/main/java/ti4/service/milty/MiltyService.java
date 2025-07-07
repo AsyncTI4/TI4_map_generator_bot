@@ -521,6 +521,13 @@ public class MiltyService {
                 "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                     + " due to the **Teeming** ability.");
         }
+        if (player.hasAbility("machine_cult")) {
+            String unitID = AliasHandler.resolveUnit("mech");
+            player.setUnitCap(unitID, 6);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                "Set mech unit max to 6 for " + player.getRepresentation()
+                    + " due to the **Machine Cult** ability.");
+        }
         if (player.hasAbility("policies")) {
             player.removeAbility("policies");
             player.addAbility("policy_the_people_connect");

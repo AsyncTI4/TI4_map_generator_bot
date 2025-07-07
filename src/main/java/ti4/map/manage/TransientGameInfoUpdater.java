@@ -10,8 +10,10 @@ class TransientGameInfoUpdater {
     public static void update(Game game) {
         try {
             ButtonHelperFactionSpecific.checkIihqAttachment(game);
+            DiscordantStarsHelper.checkTombWorlds(game);
             DiscordantStarsHelper.checkGardenWorlds(game);
             DiscordantStarsHelper.checkSigil(game);
+            DiscordantStarsHelper.checkSaeraMech(game);
             DiscordantStarsHelper.checkOlradinMech(game);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Error adding transient attachment tokens for game " + game.getName(), e);
