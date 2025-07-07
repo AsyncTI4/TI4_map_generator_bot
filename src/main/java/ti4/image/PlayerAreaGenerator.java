@@ -1150,8 +1150,16 @@ public class PlayerAreaGenerator {
                     drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
                 } else {
                     drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
-                    g2.setFont(Storage.getFont16());
-                    DrawingUtil.drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
+                    if (abilityModel.getShrinkName())
+                    {
+                        g2.setFont(Storage.getFont16());
+                        DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 9, y + 144, 130);
+                    }
+                    else
+                    {
+                        g2.setFont(Storage.getFont18());
+                        DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 7, y + 144, 130);
+                    }
                     drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
                 }
 

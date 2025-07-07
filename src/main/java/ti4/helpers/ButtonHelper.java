@@ -1014,7 +1014,7 @@ public class ButtonHelper {
         if (!game.isFowMode() && activeSystem.isAsteroidField() && !player.getTechs().contains("amd")
             && !player.getTechs().contains("absol_amd") && !player.getRelics().contains("circletofthevoid") && !player.hasAbility("celestial_being")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## " + player.getRepresentation()
-                + " this is a __friendly__ reminder that you do not have antimass deflectors");
+                + ", this is a __friendly__ reminder that you do not own _Antimass Deflectors_.");
         }
         if (game.isL1Hero()) {
             return 0;
@@ -1042,7 +1042,7 @@ public class ButtonHelper {
                             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
                                 "Reminder that you may use _Minister of Peace_.", buttons2);
                             event.getHook().sendMessage(player.getRepresentation()
-                                + " Reminder you should really check in with the _Minister of Peace_ if this activation has the possibility of being relevant."
+                                + ", a reminder you should really check in with the _Minister of Peace_ if this activation has the possibility of being relevant."
                                 + " If you proceed over their window, a rollback may be required.")
                                 .setEphemeral(true).queue();
                         }
@@ -1057,8 +1057,8 @@ public class ButtonHelper {
                     List<Button> aetherButtons = new ArrayList<>();
                     aetherButtons.add(
                         Buttons.gray("declareUse_Aetherstream", "Declare Aetherstream", FactionEmojis.Empyrean));
-                    MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(), "You can use Aetherstream on this movement by "
-                        + player.getRepresentationNoPing() + " to " + game.getActiveSystem(),
+                    MessageHelper.sendMessageToChannelWithButtons(empy.getCardsInfoThread(), "You may use _Aetherstream_ on this movement by "
+                        + player.getRepresentationNoPing() + ", moving to " + game.getActiveSystem() + ".",
                         aetherButtons);
                 }
             }
@@ -1075,13 +1075,14 @@ public class ButtonHelper {
                 buttons);
         }
         // All players get to use Magen 
+        // this is mandatory, so should probably be refactored to happen automatically
         for (Player magenPlayer : game.getPlayers().values()) {
             boolean has = activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
             if (!has || !magenPlayer.hasTech("md")) continue;
 
             String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
             Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
-            String magenMsg = magenPlayer.getRepresentation() + " you can use **Magen Defense Grid** to place an infantry with each of your structures in the active system.";
+            String magenMsg = magenPlayer.getRepresentation() + " you can, and must, use __Magen Defense Grid__ to place an infantry with each of your structures in the active system.";
             MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
         }
         if (player.hasAbility("void_tap") && (activeSystem.getPlanetUnitHolders().isEmpty() || ButtonHelper.doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {

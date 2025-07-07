@@ -407,7 +407,9 @@ public class TransactionHelper {
         "The Pretence That Your Secrets Are Unscorable",
         "Double Nothing",
         "The Opportunity To Be Your Own Boss",
-        "Artisanal, Hand-Crafted Nothing");
+        "Artisanal, Hand-Crafted Nothing",
+        "Reticulating Splines",
+        "ADDITIONAL PYLONS");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
