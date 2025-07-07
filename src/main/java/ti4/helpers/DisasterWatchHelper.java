@@ -27,4 +27,12 @@ public class DisasterWatchHelper {
             BotLogger.error(new BotLogger.LogMessageOrigin(event, game), "Exception while closing FileUpload", e);
         }
     }
+
+    public static void sendMessageInDisasterWatch(Game game, String message) {
+        if (AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).isEmpty() || game.isFowMode()) {
+            return;
+        }
+        TextChannel watchParty = AsyncTI4DiscordBot.guildPrimary.getTextChannelsByName("disaster-watch-party", true).getFirst();
+        MessageHelper.sendMessageToChannel(watchParty, message);
+    }
 }
