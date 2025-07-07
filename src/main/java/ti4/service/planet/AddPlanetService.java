@@ -20,6 +20,7 @@ import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
+import ti4.helpers.Units.UnitKey;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -85,8 +86,8 @@ public class AddPlanetService {
                 if (game.isFowMode()) {
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored custodians!");
-                String message2 = player.getRepresentationUnfogged() + " Click the names of the planets you wish to exhaust to spend " + MiscEmojis.Influence_6;
+                MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored Custodians!");
+                String message2 = player.getRepresentationUnfogged() + ", choose the planets you wish to exhaust to spend " + MiscEmojis.Influence_6 + ".";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
                 buttons.add(doneExhausting);
@@ -305,6 +306,13 @@ public class AddPlanetService {
                 + "Yvin Korduul, the Vaylerian" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                 + " agent, to draw 1 action card.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
+        }
+        if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
+            && player.hasAbility("enslave") && !setup) {
+            UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
+            tile.getUnitHolders().get(planet).addUnit(infKey, 1);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                "Added 1 infantry to " + planet + " because of the Enslave Ability.");
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))

@@ -1,0 +1,19 @@
+{
+    "id": "as03",
+    "name": "Eccon V/Tyria Prime - Shadows",
+    "aliases": [
+        "as03",
+        "ecconv",
+        "tyriaprime",
+        "shadows"
+    ],
+    "imagePath": "as03.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "ecconv",
+        "tyriaprime"
+    ],
+    "source": "eronous",
+    "tileBack": "green"
+}

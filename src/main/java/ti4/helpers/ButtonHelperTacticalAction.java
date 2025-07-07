@@ -184,9 +184,11 @@ public class ButtonHelperTacticalAction {
     public static void tacticalActionSpaceCannonOffenceStep(Game game, Player player, List<Player> playersWithPds2, Tile tile) {
         if (game.isFowMode()) {
             String title = "### Space Cannon Offence " + UnitEmojis.pds + "\n";
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), title
-                + "There are players with Space Cannon Offence coverage in this system.\n"
-                + "Please resolve those before continuing or float the window if unrelevant.");
+            if (playersWithPds2.size() > 1 || !playersWithPds2.contains(player)) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), title
+                    + "There are players with Space Cannon Offence coverage in this system.\n"
+                    + "Please resolve those before continuing or float the window if unrelevant.");
+            }
             List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
             spaceCannonButtons.add(Buttons.red("declinePDS_" + tile.getTileID() + "_" + player.getFaction(), "Decline PDS"));
             for (Player playerWithPds : playersWithPds2) {
@@ -447,6 +449,9 @@ public class ButtonHelperTacticalAction {
         game.removeStoredValue("flankspeedBoost");
         game.removeStoredValue("baldrickGDboost");
         ButtonHelper.deleteMessage(event);
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Post Movement For " + player.getFactionEmoji());
+        }
     }
 
     public static List<Button> getButtonsForAllUnitsInSystem(Player player, Game game, Tile tile, String moveOrRemove) {
