@@ -26,8 +26,9 @@ public class EndTurnService {
         if (turnOrder.isEmpty()) {
             return null;
         }
-        while (!turnOrder.getLast().equals(currentPlayer))
+        while (!turnOrder.getLast().equals(currentPlayer) && turnOrder.contains(currentPlayer)) {
             Collections.rotate(turnOrder, 1);
+        }
         for (Player p : turnOrder) {
             if (!p.isPassed() && !p.isEliminated()) {
                 return p;
@@ -78,6 +79,9 @@ public class EndTurnService {
                 + "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + mainPlayer.getRepresentation());
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
+            if (game.getPhaseOfGame().equalsIgnoreCase("statushomework")) {
+                return;
+            }
         }
 
         MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
@@ -100,7 +104,6 @@ public class EndTurnService {
             ButtonHelperAgents.checkForEdynAgentActive(game, event);
             return;
         }
-
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
             GameMessageManager
@@ -112,7 +115,7 @@ public class EndTurnService {
             game.removeStoredValue("ghostagent_active");
             FoWHelper.pingAllPlayersWithFullStats(game, event, mainPlayer, "ended turn");
         }
-        ButtonHelper.checkFleetInEveryTile(mainPlayer, game, event);
+        ButtonHelper.checkFleetInEveryTile(mainPlayer, game);
         if (mainPlayer != nextPlayer) {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }

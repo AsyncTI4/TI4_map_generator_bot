@@ -29,13 +29,15 @@ class CustomizationOptions extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").addChoices(verbChoices));
         addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Turn ON or OFF pings for exceeding component limits").addChoices(onOff));
         addOptions(new OptionData(OptionType.STRING, Constants.BOT_FACTION_REACTS, "Turn ON or OFF the bot leaving your faction react on msgs").addChoices(onOff));
+        addOptions(new OptionData(OptionType.STRING, Constants.BOT_COLOR_REACTS, "Turn ON or OFF the bot leaving your color react on msgs").addChoices(onOff));
+        addOptions(new OptionData(OptionType.STRING, Constants.BOT_STRAT_REACTS, "Turn ON or OFF the bot leaving your strategy card react on msgs").addChoices(onOff));
         addOptions(new OptionData(OptionType.STRING, Constants.SPIN_MODE, "Automatically spin rings at status cleanup. ON for Fin logic, insert custom logic, OFF to turn off"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_UNIT_TAGS, "Show faction unit tags on map images"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIGHT_FOG_MODE, "Retain sight on formerly seen tiles"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.RED_TAPE_MODE, "Reveal all objectives and diplo gets the power to pre-reveal"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
+        //addOptions(new OptionData(OptionType.BOOLEAN, Constants.NOMAD_COIN, "Replace TG emojis with nomad coin emojis"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.QUEUE_SO, "Queue secret objective discards"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
+        //addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BUBBLES, "Show the bubbles around anti-bombardment planets"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_GEARS, "Show the production capacity in a system"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TRANSACTION_METHOD, "Use the new transaction method"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.SHOW_BANNERS, "Show faction banner at start of turn"));
@@ -76,6 +78,25 @@ class CustomizationOptions extends GameStateSubcommand {
                 game.setBotFactionReacts(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)) {
                 game.setBotFactionReacts(false);
+            }
+        }
+        OptionMapping colorReacts = event.getOption(Constants.BOT_COLOR_REACTS);
+        if (colorReacts != null) {
+            String ccNP = colorReacts.getAsString();
+            if ("ON".equalsIgnoreCase(ccNP)) {
+                game.setBotColorReacts(true);
+            } else if ("OFF".equalsIgnoreCase(ccNP)) {
+                game.setBotColorReacts(false);
+            }
+        }
+
+        OptionMapping stratReacts = event.getOption(Constants.BOT_STRAT_REACTS);
+        if (stratReacts != null) {
+            String ccNP = stratReacts.getAsString();
+            if ("ON".equalsIgnoreCase(ccNP)) {
+                game.setBotStratReacts(true);
+            } else if ("OFF".equalsIgnoreCase(ccNP)) {
+                game.setBotStratReacts(false);
             }
         }
         OptionMapping shushing = event.getOption(Constants.SPIN_MODE);

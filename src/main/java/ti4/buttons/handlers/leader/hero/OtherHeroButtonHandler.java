@@ -269,6 +269,10 @@ public class OtherHeroButtonHandler {
                 "Queen Nadalia, the Kortali hero, was not purged - something went wrong.");
         }
         ButtonHelperHeroes.offerStealRelicButtons(game, player, buttonID, event);
+        List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+            + ". Use buttons to gain command tokens equal to your technology specialty and legendary planet count.";
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
     }
 
     @ButtonHandler("purgeOrlandoHero_")

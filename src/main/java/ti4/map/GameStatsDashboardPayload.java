@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -236,7 +237,7 @@ public class GameStatsDashboardPayload {
     public long getTimestamp() {
         try {
             return Instant.ofEpochMilli(game.getLastModifiedDate()).getEpochSecond();
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeException e) {
             return Instant.now().getEpochSecond();
         }
     }

@@ -320,7 +320,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event) {
-        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
+        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(game.getActiveSystem()), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + game.getActiveSystem()
             + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
@@ -330,7 +330,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveCounterStroke_")
     public static void resolveCounterStroke(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        RemoveCommandCounterService.fromTile(event, player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
+        RemoveCommandCounterService.fromTile(player.getColor(), game.getTileByPosition(buttonID.split("_")[1]), game);
         String message = player.getFactionEmoji() + " removed their command token from tile " + buttonID.split("_")[1]
             + " using _Counterstroke_ and gained it to their tactic pool.";
         player.setTacticalCC(player.getTacticalCC() + 1);
@@ -547,7 +547,7 @@ public class ButtonHelperActionCards {
                         continue;
                     }
                     if (FoWHelper.playerHasShipsInSystem(p2, game.getTileFromPositionOrAlias(game.getActiveSystem()))) {
-                        List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(p2, game, tile, "assaultcannoncombat");
+                        List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(p2, game, tile, "courageouscannoncombat");
                         MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + " you can use the buttons to destroy your ship(s)", buttons);
                     }
                 }
@@ -1400,13 +1400,16 @@ public class ButtonHelperActionCards {
             player.getFactionEmojiOrColor()
                 + " successfully assassinated all the representatives of "
                 + p2.getFactionEmojiOrColor() + ".");
-        String message = switch (ThreadLocalRandom.current().nextInt(7)) {
+        String message = switch (ThreadLocalRandom.current().nextInt(10)) {
             case 1 -> ", your representatives (all of them) fell out of some windows.";
             case 2 -> ", your representatives got the Rasputin treatment. Unfortunately, they were not Rasputin.";
             case 3 -> ", your representatives were \"invited\" to \"experience\" the \"sight-seeing\" Sea of Desolation \"tour\".";
             case 4 -> ", your representatives have died of natural causes (assassination is considered a perfectly natural cause of death on Mecatol Rex).";
             case 5 -> ", your representatives have followed in a great tradition, and so have been stabbed 23 times.";
             case 6 -> ", your representatives weren't paying their bodyguards enough, judging by empirical evidence.";
+            case 7 -> ", your representatives has discovered that the phrase \"cut-throat politics\" is quite literal on Mecatol Rex.";
+            case 8 -> ", your representatives have met with some fellow ambassadors. Sorry, I meant to say \"met with some grisly ends\".";
+            case 9 -> ", your representatives were up to date on their vaccinations, which is very prudent on an ecumenopolis such as Mecatol Rex. However, they were not up to date on their antidotes, which is very imprudent on an ecumenopolis such as Mecatol Rex.";
             default -> ", your representatives got sent to the headsman.";
         };
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
@@ -1524,12 +1527,12 @@ public class ButtonHelperActionCards {
                 player.getRepresentationUnfogged() + ", you melted the space dock in " + tile.getRepresentation());
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your space dock in " + tile.getRepresentation() + " was melted.");
-            ButtonHelper.checkFleetAndCapacity(p2, game, tile, event);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has melted the space dock that used to belong to "
                     + p2.getRepresentationUnfogged() + " in " + tile.getRepresentation() + ".");
         }
+        ButtonHelper.checkFleetAndCapacity(p2, game, tile);
         if (p2.hasAbility("data_recovery")) {
             ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
         }
@@ -1713,6 +1716,18 @@ public class ButtonHelperActionCards {
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
         }
+    }
+
+    @ButtonHandler("resolveProfessionalArcheologists")
+    public static void resolveProfessionalArcheologists(Game game, Player player, ButtonInteractionEvent event) {
+        List<Button> buttons = new ArrayList<>();
+        ButtonHelper.deleteMessage(event);
+        buttons.add(Buttons.green("olradinPreserveStep2_industrial_prof", "Explore Industrial"));
+        buttons.add(Buttons.blue("olradinPreserveStep2_cultural_prof", "Explore Cultural"));
+        buttons.add(Buttons.red("olradinPreserveStep2_hazardous_prof", "Explore Hazardous"));
+        buttons.add(Buttons.gray("olradinPreserveStep2_frontier_prof", "Explore Frontier"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please use buttons to resolve the action card.", buttons);
+
     }
 
     public static void checkForAssigningPublicDisgrace(Game game, Player player) {

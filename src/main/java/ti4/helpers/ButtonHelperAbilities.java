@@ -71,15 +71,15 @@ public class ButtonHelperAbilities {
         player.clearDebt(p2, amount);
         String msg = player.getRepresentation() + " spent " + amount + " of " + p2.getRepresentation() + " control tokens on their sheet via their black ops ability to ";
         if (amount == 2) {
-            msg += "draw 1 SO";
+            msg += "draw 1 secret objective.";
             game.drawSecretObjective(player.getUserID());
             if (player.hasAbility("plausible_deniability")) {
                 game.drawSecretObjective(player.getUserID());
-                msg += ". Drew a second secret objective due to **Plausible Deniability**.";
+                msg += " Drew a second secret objective due to **Plausible Deniability**.";
             }
             SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player, event);
         } else {
-            msg += "gain 1 command token and steal 1 of their opponents unscored SOs";
+            msg += "gain 1 command token and steal 1 of their opponents unscored secret objectives.";
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
                 + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
             game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -95,7 +95,7 @@ public class ButtonHelperAbilities {
                 SecretObjectiveInfoService.sendSecretObjectiveInfo(game, p2, event);
                 game.checkSOLimit(player);
             } else {
-                msg += ". Their opponent did not have an unscored SO";
+                msg += " Alas, their opponent did not have an unscored secret objectives.";
             }
         }
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), msg);
@@ -173,11 +173,11 @@ public class ButtonHelperAbilities {
     public static void startBestow(Game game, Player player, ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.green("bestowPart2_" + player.getFaction(), "Gain 2 Comms"));
+        buttons.add(Buttons.green("bestowPart2_" + player.getFaction(), "Gain 2 Commodities"));
         buttons.add(Buttons.red("deleteButtons", "Decline"));
         for (Player p2 : player.getNeighbouringPlayers(true)) {
             MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + " your neighbor " + player.getRepresentationNoPing() +
-                " has chosen to allow you to gain 2 commodities (they would gain 1). Use buttons to decide if you want to accept this offer.",
+                " has chosen to allow you to gain 2 commodities (they would gain 1). Use buttons to decide if you wish to accept this offer.",
                 buttons);
         }
     }
@@ -199,12 +199,12 @@ public class ButtonHelperAbilities {
     public static void deployFreesystemsMech(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         if (player.getTg() < 1) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "You dont have 1tg to pay for the mech");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have a trade good to pay for the mech.");
             return;
         }
         player.setTg(player.getTg() - 1);
         List<Button> buttons = new ArrayList<>();
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " paid 1 tg to DEPLOY a mech to a planet adjacent the system they are rallying to the cause in");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " paid 1 trade good to DEPLOY a mech to a planet adjacent the system they are resolving **Rally to the Cause** in.");
         buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to deploy a mech to a system adjacent to the rallied system.", buttons);
         ButtonHelper.deleteMessage(event);
@@ -234,8 +234,8 @@ public class ButtonHelperAbilities {
                 }
             }
             if (adj) {
-                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deployFreesystemsMech_" + pos, "Pay 1 tg to deploy mech"));
-                message = player.getRepresentation() + " you can pay 1 tg to deploy a mech to a planet adjacent to the system you're rallying to the cause. ";
+                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "deployFreesystemsMech_" + pos, "Pay 1 Trade Good to Deploy a Mech"));
+                message = player.getRepresentation() + " you may pay 1 trade good to DEPLOY a mech to a planet adjacent to the system you're resolving **Rally to the Cause** in. ";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
         }
@@ -365,7 +365,7 @@ public class ButtonHelperAbilities {
         trapNames.add("Feint");
         trapNames.add("Gravitic Inhibitor");
         trapNames.add("Account Siphon");
-        trapNames.add("Saboteurs");
+        //trapNames.add("Saboteurs");
         return trapNames;
     }
 
@@ -1197,7 +1197,8 @@ public class ButtonHelperAbilities {
             "Mors" + extra));
 
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " Please pick what superweapon you would like on your planet. Note that you can only have one of each superweapon but can remove superweapons from unlocked systems if you want to rebuild them somewhere else.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + ", please pick what superweapon you would like on your planet."
+            + "\n-# Note that you can only have one of each superweapon but can remove superweapons from unlocked systems if you wish to rebuild them somewhere else.", buttons);
 
     }
 
@@ -1439,12 +1440,22 @@ public class ButtonHelperAbilities {
             sb.append(player.getRepresentationUnfogged()).append(" Gained relic fragment\n");
             player.addFragment(cardID);
             game.purgeExplore(cardID);
+        } else {
+            if (buttonID.contains("prof")) {
+                sb.append(player.getRepresentationUnfogged()).append(" Gained 1 commodity\n");
+                player.setCommodities(player.getCommodities() + 1);
+            }
+        }
+        if (!buttonID.contains("prof")) {
+            event.getMessage().delete().queue();
+        } else {
+            ButtonHelper.deleteTheOneButton(event);
         }
 
         CommanderUnlockCheckService.checkPlayer(player, "kollecc");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannel(channel, sb.toString());
-        event.getMessage().delete().queue();
+
     }
 
     public static List<Button> getOlradinPreserveButtons(Game game, Player player, String planet) {
@@ -1694,7 +1705,7 @@ public class ButtonHelperAbilities {
         if (player.getStrategicCC() > 0) {
             successMessage = player.getRepresentationUnfogged() + " spent 1 strategy token (" + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ")";
             player.setStrategicCC(player.getStrategicCC() - 1);
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, FactionEmojis.Muaat + "Starforge");
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, FactionEmojis.Muaat + " **Starforge**'d");
         } else {
             player.addExhaustedRelic("emelpar");
             successMessage = player.getRepresentationUnfogged() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
@@ -1829,8 +1840,8 @@ public class ButtonHelperAbilities {
 
     @ButtonHandler("virTraining")
     public static void virTraining(ButtonInteractionEvent event, Game game, Player player) {
-        String msg = player.getFactionEmoji() + " is using their tech V.I.R. training to cancel one hit they produced in order to cancel up to 1 hit their opponent produced. " +
-            "They can do this once per round of combat. Both sides should just manually assign one less hit.";
+        String msg = player.getFactionEmoji() + " is using their _V.I.R. Training_ technology to cancel one hit they produced in order to cancel up to 1 hit their opponent produced. " +
+            "They can do this once per round of combat. Both sides should just manually assign one fewer hits.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 

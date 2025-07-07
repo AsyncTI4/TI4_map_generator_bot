@@ -271,8 +271,8 @@ public class AgendaHelper {
     public static void explainQueue(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         String msg = """
             This queue system is basically asking you "If no-one who was in front of you in speaker order played anything, would you play anything?". \
-            If your answer is yes, then it will play your chosen ability/AC when everyone in front of you officially declines on playing anything. If they do decide to play\
-             something, then your answer will be tossed out and you will be asked to reconsider if you want to play something, now that you have more information. If your answer was no \
+            If your answer is yes, then it will play your chosen ability/action card when everyone in front of you officially declines on playing anything. If they do decide to play\
+             something, then your answer will be tossed out and you will be asked to reconsider if you wish to play something, now that you have more information. If your answer was no \
              then by default the system will assume that your answer will remain no, but after saying no you can tell the system to ask you again if someone else plays something.
 
             I would like to emphasize at this time that there is little benefit in stalling your decision here. You have as much information as you need to answer the bots queuestion, and if others provide more \
@@ -294,7 +294,7 @@ public class AgendaHelper {
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On Afters"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
 
-        msg = "By default, your queued \"after\" will be cancelled if someone before you plays an \"after\". If you want it to play regardless of others actions, press this button.";
+        msg = "By default, your queued \"after\" will be cancelled if someone before you plays an \"after\". If you wish it to play regardless of others actions, press this button.";
         buttons = new ArrayList<>();
         buttons.add(Buttons.blue("lockAftersIn", "Play Regardless of Others"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -1885,7 +1885,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
                                     + ", you lost 1 command token from your fleet pool due to voting the same way as a _Sanction_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+                            ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
                     if (winningR != null && specificVote.contains("Corporate Lobbying")) {
@@ -1897,7 +1897,7 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                                 p2.getRepresentation()
                                     + " you gained trade goods due to voting the same way as _Corporate Lobbying_.");
-                            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+                            ButtonHelper.checkFleetInEveryTile(p2, game);
                         }
                     }
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight")
@@ -2635,7 +2635,9 @@ public class AgendaHelper {
 
             if (CollectionUtils.containsAny(player.getRelics(),
                 List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
-                int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size();
+                int count = (int) player.getRelics().stream()
+                    .filter(s -> s.contains("absol_shardofthethrone"))
+                    .count();
                 int shardVotes = 2 * count; // +2 votes per Absol shard
                 Button button = Buttons.gray("exhaustForVotes_absolShard_" + shardVotes,
                     "Use Shard of the Throne Votes (" + shardVotes + ")", SourceEmojis.Absol);
@@ -3135,7 +3137,9 @@ public class AgendaHelper {
         }
 
         // Absol Shard of the Throne
-        int shardCount = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size();
+        int shardCount = (int) player.getRelics().stream()
+            .filter(s -> s.contains("absol_shardofthethrone"))
+            .count();
         if (shardCount > 0) { // +2 votes per Absol shard
             int shardVotes = 2 * shardCount;
             additionalVotesAndSources.put(
@@ -3814,7 +3818,7 @@ public class AgendaHelper {
             }
         }
         for (Player p2 : game.getRealPlayers()) {
-            ButtonHelper.checkFleetInEveryTile(p2, game, event);
+            ButtonHelper.checkFleetInEveryTile(p2, game);
         }
         MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
             "Removed all ships from systems with alphas or betas wormholes. \nYou may use the button to get your technology.",
@@ -4074,11 +4078,11 @@ public class AgendaHelper {
     }
 
     @ButtonHandler("forceAbstainForPlayer_")
-    public static void forceAbstainForPlayer(ButtonInteractionEvent event, String buttonID, Game game) {
+    public static void forceAbstainForPlayer(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String faction = buttonID.replace("forceAbstainForPlayer_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained.");
+            (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained by " + player.getRepresentationNoPing());
         AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
     }
 

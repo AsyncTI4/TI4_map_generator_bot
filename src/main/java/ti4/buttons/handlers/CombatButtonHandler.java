@@ -46,7 +46,7 @@ class CombatButtonHandler {
     @ButtonHandler("declinePDS_")
     public static void declinePDS(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTile(buttonID.split("_")[1]);
-        String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON" + (tile != null ? " at " + tile.getRepresentation() : "");
+        String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON" + (tile != null ? " at " + tile.getRepresentation() : "") + ".";
         if (game.isFowMode()) {
             String targetFaction = buttonID.split("_")[2];
             Player target = game.getPlayerFromColorOrFaction(targetFaction);

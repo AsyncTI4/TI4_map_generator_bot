@@ -77,6 +77,6 @@ public class GameOptionService {
             buttons.add(showOwnedPNs_OFF);
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
-        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "Show Owned PNs in Player Area?", buttons);
+        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "Show Owned Promissory Notes in Player Area?", buttons);
     }
 }

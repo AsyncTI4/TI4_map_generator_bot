@@ -433,6 +433,10 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_FACTION_REACTS + " " + game.isBotFactionReacts());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BOT_COLOR_REACTS + " " + game.isBotColorReacts());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.BOT_STRAT_REACTS + " " + game.isBotStratReacts());
+        writer.write(System.lineSeparator());
         writer.write(Constants.HAS_HAD_A_STATUS_PHASE + " " + game.isHasHadAStatusPhase());
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_SHUSHING + " " + game.isBotShushing());
@@ -621,6 +625,9 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.HONOR_COUNT + " " + player.getHonorCounter());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.DISHONOR_COUNT + " " + player.getDishonorCounter());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.HARVEST_COUNT + " " + player.getHarvestCounter());

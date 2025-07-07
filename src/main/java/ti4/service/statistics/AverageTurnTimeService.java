@@ -30,8 +30,7 @@ import ti4.message.MessageHelper;
 public class AverageTurnTimeService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getAverageTurnTime", event, () -> getAverageTurnTime(event)));
+        StatisticsPipeline.queue(event, () -> getAverageTurnTime(event));
     }
 
     private void getAverageTurnTime(SlashCommandInteractionEvent event) {

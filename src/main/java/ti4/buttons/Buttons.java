@@ -115,14 +115,7 @@ public class Buttons {
             return false; // If we can't verify, assume not standard
         }
 
-        // SECOND: Now check if it's either completely standard OR just 4/4/4
-        boolean isStandard10VP = game.getVp() == 10 &&
-                                game.getMaxSOCountPerPlayer() == 3;
-
-        boolean is444Mode = game.getVp() == 12 &&
-                           game.getMaxSOCountPerPlayer() == 4;
-
-        return isStandard10VP || is444Mode;
+        return true;
     }
 
     public static List<Button> mapImageButtons(Game game) {

@@ -216,8 +216,8 @@ public class Game extends GameProperties {
 
     public void fixScrewedSOs() {
         MessageHelper.sendMessageToChannel(getActionsChannel(),
-            "The number of SOs in the deck before this operation is " + getNumberOfSOsInTheDeck()
-                + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
+            "The number of secret objectives in the deck before this operation is " + getNumberOfSOsInTheDeck()
+                + ". The number in players hands is " + getNumberOfSOsInPlayersHands() + ".");
 
         List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getNewShuffledDeck();
         List<String> currentSecrets = new ArrayList<>(getSecretObjectives());
@@ -240,7 +240,7 @@ public class Game extends GameProperties {
             }
         }
         MessageHelper.sendMessageToChannel(getActionsChannel(),
-            "Fixed the SOs, the total amount of SOs in deck is " + getNumberOfSOsInTheDeck()
+            "Fixed the secret objectives. The total amount of secret objectives in deck is " + getNumberOfSOsInTheDeck()
                 + ". The number in players hands is " + getNumberOfSOsInPlayersHands());
     }
 
@@ -432,6 +432,23 @@ public class Game extends GameProperties {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
             if (player.getTotalVictoryPoints() >= getVp()) {
+                if (isLiberationC4Mode()) {
+                    if (!player.getAllianceMembers().isEmpty()) {
+                        Player ally = null;
+                        for (Player p2 : getRealPlayersNDummies()) {
+                            if (p2 != player && p2.getAllianceMembers().contains(player.getFaction())) {
+                                ally = p2;
+                            }
+                        }
+                        boolean allyGood = false;
+                        if (ally != null && ally.getTotalVictoryPoints() >= getVp() && (player.getTotalVictoryPoints() > 11 || ally.getTotalVictoryPoints() > 11)) {
+                            allyGood = true;
+                        }
+                        if (!allyGood) {
+                            continue;
+                        }
+                    }
+                }
                 if (winner == null) {
                     winner = player;
                 } else if (hasFullPriorityTrackMode()) {
@@ -3132,14 +3149,14 @@ public class Game extends GameProperties {
         setUpPeakableObjectives(miltySettings.getGameSettings().getStage2s().getVal(), 2);
 
         if (isAbsolMode() && !deckSettings.getAgendas().getChosenKey().contains("absol")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the agenda deck you chose will be overridden.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using Absol mode, so the agenda deck you chose will be overridden.");
             success &= validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_absol"));
         } else {
             success &= validateAndSetAgendaDeck(event, deckSettings.getAgendas().getValue());
         }
 
         if (isAbsolMode() && !deckSettings.getRelics().getChosenKey().contains("absol")) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using absol mode, so the relic deck you chose will be overridden.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This game seems to be using Absol mode, so the relic deck you chose will be overridden.");
             success &= validateAndSetRelicDeck(Mapper.getDeck("relics_absol"));
         } else {
             success &= validateAndSetRelicDeck(deckSettings.getRelics().getValue());
@@ -3355,13 +3372,10 @@ public class Game extends GameProperties {
     }
 
     public Tile getTile(String tileID) {
-        if ("mirage".equalsIgnoreCase(tileID)) {
-            for (Tile tile : tileMap.values()) {
-                for (UnitHolder uh : tile.getUnitHolders().values()) {
-                    if (uh.getTokenList() != null && (uh.getTokenList().contains("mirage")
-                        || uh.getTokenList().contains("token_mirage.png"))) {
-                        return tile;
-                    }
+        if (Constants.TOKEN_PLANETS.contains(tileID)) {
+            for (Tile t : tileMap.values()) {
+                if (t.getUnitHolderFromPlanet(tileID) != null) {
+                    return t;
                 }
             }
         }

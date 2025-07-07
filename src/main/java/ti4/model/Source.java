@@ -29,7 +29,10 @@ public class Source {
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, voices_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, riftset, omega_phase,
+        somno, ignis_aurora, asteroid, cryypter, voices_of_the_council, cpti, oath_of_kings, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, omega_phase, fowplus,
+
+        // eronous' stuff
+        eronous, riftset, ascendant_sun,
 
         // catchall
         other;
@@ -69,7 +72,7 @@ public class Source {
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space -> true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie -> true;
                 default -> false;
             };
         }

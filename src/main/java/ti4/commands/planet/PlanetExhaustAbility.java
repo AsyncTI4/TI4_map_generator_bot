@@ -84,7 +84,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             case "ordinianc4" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);
-                String msg = "Your current CCs are " + player.getCCRepresentation() + ". Use buttons to gain 1 CC:";
+                String msg = "Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain 1 command token.:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
             }
 
@@ -93,9 +93,9 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 player.setHarvestCounter(0);
                 player.setCommodities(player.getCommodities() + comms);
                 ButtonHelperAgents.toldarAgentInitiation(game, player, comms);
-                MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " + player.getCommodities() + " commodities (from the " + comms + " that were on the card)");
+                MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " + player.getCommodities() + " commodities (from the " + comms + " that were on the card).");
             }
-            case "mirage" -> {
+            case "mirage", "illusion", "phantasm" -> {
                 output = "Use buttons to put 2 fighters with your ships.";
                 buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "2ff", "placeOneNDone_skipbuild"));
             }

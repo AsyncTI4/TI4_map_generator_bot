@@ -139,7 +139,6 @@ public class FrankenDraftBagService {
         List<DraftItem> undraftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
         draftables.removeIf(draftItem -> !draftItem.isDraftable(player));
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
-
         Set<String> bagStringLines = getCurrentBagRepresentation(draftables, undraftables);
         for (String line : bagStringLines) {
             MessageHelper.sendMessageToChannel(bagChannel, line);
@@ -313,7 +312,8 @@ public class FrankenDraftBagService {
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         if (game.isFowMode()) {
-            players.removeAll(game.getPlayersWithGMRole());
+            players.removeAll(game.getPlayers().values().stream()
+                .filter(player -> player.getPrivateChannel() == null).toList());
         }
         int index = 1;
         StringBuilder sb = new StringBuilder("Automatically setting players up as Franken factions:");
@@ -326,8 +326,8 @@ public class FrankenDraftBagService {
                 skipped = true;
                 continue;
             }
-            String faction = "franken" + (index <= 16 ? emojiNum.get(index - 1) : index);
-            String tempHomeSystemLocation = String.valueOf(300 + index);
+            String faction = "franken" + (index <= 24 ? emojiNum.get(index - 1) : index);
+            String tempHomeSystemLocation = String.valueOf(500 + index);
             if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }

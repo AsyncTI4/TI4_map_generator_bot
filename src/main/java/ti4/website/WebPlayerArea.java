@@ -132,6 +132,9 @@ public class WebPlayerArea {
     // Debt tokens: debt that this player is OWED by other players (faction/color -> count)
     private Map<String, Integer> debtTokens;
 
+    // Faction abilities
+    private List<String> abilities;
+
     public static WebPlayerArea fromPlayer(Player player, Game game) {
         WebPlayerArea webPlayerArea = new WebPlayerArea();
 
@@ -247,6 +250,9 @@ public class WebPlayerArea {
 
         // secret objectives
         webPlayerArea.setNumScoreableSecrets(player.getMaxSOCount());
+
+        // Faction abilities
+        webPlayerArea.setAbilities(new ArrayList<>(player.getAbilities()));
 
         // Special token reinforcements
         // Sleeper tokens (Titans faction only)

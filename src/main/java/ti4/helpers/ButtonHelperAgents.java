@@ -362,7 +362,9 @@ public class ButtonHelperAgents {
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int amountToKill = uH.getUnitCount(UnitType.Infantry, player.getColor());
         ButtonHelper.resolveInfantryDestroy(player, amountToKill);
-        message += ". " + amountToKill + " infantry were destroyed. " + Math.min(player.getCommoditiesTotal(), amountToKill) + " comms were gained and then converted to tgs";
+        int comms = Math.min(player.getCommoditiesTotal(), amountToKill);
+        message += ". " + amountToKill + " infantry were destroyed. " + comms + " commodit" + (comms == 1 ? "y" : "ies") 
+            + " were gained and then converted into" + (comms == 1 ? " a" : "") + " trade good" + (comms == 1 ? "" : "s") + ".";
         player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), amountToKill));
         player.setCommodities(Math.max(0, player.getCommodities() - amountToKill));
         RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
@@ -664,7 +666,7 @@ public class ButtonHelperAgents {
         if ("winnuagent".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Berekar Berekon, the Winnu" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            player.addSpentThing("Exhausted Winnu Agent, for 2 resources.");
+            player.addSpentThing("winnuagent");
             String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             if (event instanceof ButtonInteractionEvent buttonEvent) {
                 buttonEvent.getMessage().editMessage(exhaustedMessage).queue();
@@ -1074,7 +1076,7 @@ public class ButtonHelperAgents {
             buttons.add(Buttons.red("deleteButtons", "Delete This"));
             p2.setStrategicCC(p2.getStrategicCC() - 1);
             channel = p2.getCorrectChannel();
-            ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, game, event, FactionEmojis.mirveda + " Agent");
+            ButtonHelperCommanders.resolveMuaatCommanderCheck(p2, game, event, "used " + FactionEmojis.mirveda + " Logic Machina");
             String message0 = p2.getRepresentationUnfogged()
                 + ", 1 command token has been removed from your strategy pool due to use of " + ssruuClever + "Logic Machina, the Mirveda"
                 + ssruuSlash + " agent. You may add it back if you didn't agree to the agent.";
@@ -1608,7 +1610,7 @@ public class ButtonHelperAgents {
     public static void resolveCheiranAgentStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         Tile origTile = game.getTileByPosition(pos);
-        RemoveCommandCounterService.fromTile(event, player.getColor(), origTile, game);
+        RemoveCommandCounterService.fromTile(player.getColor(), origTile, game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getFactionEmoji() + " removed 1 command token from "
                 + origTile.getRepresentationForButtons(game, player) + " using " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Operator Kkavras, the Cheiran"

@@ -19,6 +19,7 @@ import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.fow.GMService;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -64,6 +65,9 @@ public class ReactionService {
 
         if (game.isFowMode() && !sendPublic) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, text);
+            if (text.contains("ready for")) {
+                GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
+            }
             return;
         }
 

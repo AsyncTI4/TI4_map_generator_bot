@@ -288,33 +288,51 @@ public class StartCombatService {
         sendGeneralCombatButtonsToThread(threadChannel, game, player1, player2, tile, spaceOrGround, event);
         if (!game.isFowMode()) {
             if (player1.getAc() == 0) {
-                MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() + " your opponent has 0 ACs in hand, so if they have no applicable techs/abilities/retreats you can roll");
+                MessageHelper.sendMessageToChannel(threadChannel, 
+                    player2.getRepresentation() + ", your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
             } else if (ButtonHelper.isPlayerElected(game, player1, "censure") || ButtonHelper.isPlayerElected(game, player1, "absol_censure")) {
-                MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() + " your opponent is politically censured and cannot play ACs, so if they have no applicable techs/abilities/retreats you can roll");
+                MessageHelper.sendMessageToChannel(threadChannel, 
+                    player2.getRepresentation() + ", your opponent is _Politically Censure_'d and cannot play action cards, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
             if (player2.getAc() == 0) {
-                MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() + " your opponent has 0 ACs in hand, so if they have no applicable techs/abilities/retreats you can roll");
+                MessageHelper.sendMessageToChannel(threadChannel, 
+                    player1.getRepresentation() + " your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
             } else if (ButtonHelper.isPlayerElected(game, player2, "censure") || ButtonHelper.isPlayerElected(game, player2, "absol_censure")) {
-                MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() + " your opponent is politically censured and cannot play ACs, so if they have no applicable techs/abilities/retreats you can roll");
+                MessageHelper.sendMessageToChannel(threadChannel, 
+                    player1.getRepresentation() + ", your opponent is _Politically Censure_'d and cannot play action cards, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
             if (isSpaceCombat) {
                 if (ButtonHelper.doesPlayerHaveFSHere("l1z1x_flagship", player2, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() + " reminder that your opponent has L1Z1X flagship here and their hits (and dread hits) must be assigned to non-fighter ships if possible. The bot will not enforce this. ");
+                    UnitHolder space = tile.getUnitHolders().get("space");
+                    int dreadCount = space.getUnitCount(UnitType.Dreadnought, player2.getColor());
+                    MessageHelper.sendMessageToChannel(threadChannel, 
+                        player1.getRepresentation() + ", a reminder that your opponent has the [0.0.1] here, and so their flagship" 
+                        + (dreadCount > 0 ? " and dreadnought" : "") + " hits must be assigned to non-fighter ships if possible."
+                        + " The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("l1z1x_flagship", player1, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() + " reminder that your opponent has L1Z1X flagship here and their hits (and dread hits) must be assigned to non-fighter ships if possible. The bot will not enforce this. ");
+                    UnitHolder space = tile.getUnitHolders().get("space");
+                    int dreadCount = space.getUnitCount(UnitType.Dreadnought, player1.getColor());
+                    MessageHelper.sendMessageToChannel(threadChannel, 
+                        player2.getRepresentation() + ", a reminder that your opponent has the [0.0.1] here, and so their flagship" 
+                        + (dreadCount > 0 ? " and dreadnought" : "") + " hits must be assigned to non-fighter ships if possible."
+                        + " The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("qhet_flagship", player2, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() + " reminder that your opponent has Qhet flagship here and their hits cannot be sustained/cancelled. The bot will not enforce this. ");
+                    MessageHelper.sendMessageToChannel(threadChannel, 
+                        player1.getRepresentation() + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("qhet_flagship", player1, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() + " reminder that your opponent has Qhet flagship here and their hits cannot be sustained/cancelled. The bot will not enforce this. ");
+                    MessageHelper.sendMessageToChannel(threadChannel,
+                        player2.getRepresentation() + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("florzen_flagship", player2, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() + " reminder that your opponent has Florzen flagship here and other players cannot play action cards during this space combat. ");
+                    MessageHelper.sendMessageToChannel(threadChannel,
+                        player1.getRepresentation() + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("florzen_flagship", player1, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() + " reminder that your opponent has Florzen flagship here and other players cannot play action cards during this space combat. ");
+                    MessageHelper.sendMessageToChannel(threadChannel,
+                        player2.getRepresentation() + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
             }
 
@@ -345,7 +363,8 @@ public class StartCombatService {
                         Player pharadn = game.getPNOwner("dspnphar");
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(Buttons.green(pharadn.getFinsFactionCheckerPrefix() + "capture1Pharad", "Capture 1 Infantry", FactionEmojis.pharadn));
-                        MessageHelper.sendMessageToChannelWithButtons(threadChannel, pharadn.getRepresentation() + " you can use this button when/if " + player.getFactionEmoji() + " uses your PN power.", buttons);
+                        MessageHelper.sendMessageToChannelWithButtons(threadChannel, 
+                            pharadn.getRepresentation() + " you may use this button when/if " + player.getFactionEmoji() + " uses _Death Binding_.", buttons);
                     }
                 }
             }
@@ -502,30 +521,30 @@ public class StartCombatService {
             if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().containsKey("uf")
                 && tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, player.getColor()) > 0) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, and your flagship survives, you could score _Unveil Flagship_.");
+                    msg + ", a reminder that if you win the combat, and your flagship survives, you could score _Unveil Flagship_.");
             }
             if (type.equalsIgnoreCase("space") && player.getSecretsUnscored().containsKey("dtgs")
                 && (tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Flagship, otherPlayer.getColor()) > 0
                     || tile.getUnitHolders().get("space").getUnitCount(Units.UnitType.Warsun,
                         otherPlayer.getColor()) > 0)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg
-                    + " this is a reminder that you could potentially score _Destroy Their Greatest Ship_ in this combat.");
+                    + ", a reminder that you could potentially score _Destroy Their Greatest Ship_ in this combat.");
             }
             if (player.getSecretsUnscored().containsKey("sar")
                 && otherPlayer.getTotalVictoryPoints() == game.getHighestScore()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, you could score _Spark a Rebellion_.");
+                    msg + ", a reminder that if you win the combat, you could score _Spark a Rebellion_.");
             }
             if (player.getSecretsUnscored().containsKey("btv") && tile.isAnomaly(game)) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, you could score _Brave the Void_.");
+                    msg + ", a reminder that if you win the combat, you could score _Brave the Void_.");
             }
             if (player.getSecretsUnscored().containsKey("dts") && tile.isHomeSystem() && tile != player.getHomeSystemTile()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat, you could score _Darken the Skies_.");
+                    msg + ", a reminder that if you win the combat, you could score _Darken the Skies_.");
             }
             if (player.hasAbility("war_stories")) {
-                msg = msg + ", this is a reminder that if you win the combat, and you have not already done so this action, you may use **War Stories** to explore any planet you control.";
+                msg = msg + ", a reminder that if you win the combat, and you have not already done so this action, you may use **War Stories** to explore any planet you control.";
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("warStoriesPlanetExplore", "Explore A Planet You Control"));
                 if (tile.getPlanetUnitHolders().isEmpty()) {
@@ -536,10 +555,10 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg,
                     buttons);
             }
-            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, null, true)[0];
+            int capitalShips = ButtonHelper.checkFleetAndCapacity(player, game, tile, true, true)[0];
             if (player.getSecretsUnscored().containsKey("dyp") && capitalShips >= 3) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    msg + ", this is a reminder that if you win the combat (or otherwise keep ships in the active system), and you lose "
+                    msg + ", a reminder that if you win the combat (or otherwise keep ships in the active system), and you lose "
                         + (capitalShips == 3 ? "no" : "at most " + (capitalShips - 3)) + " non-fighter ship"
                         + (capitalShips == 4 ? "" : "s") + ", you could score _Demonstrate Your Power_.");
             }
@@ -550,24 +569,24 @@ public class StartCombatService {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 buttons.add(Buttons.gray(finChecker + "mahactStealCC_" + otherPlayer.getColor(), "Add " + otherPlayer.getColor() + " Token to Fleet", FactionEmojis.Mahact));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win this combat, you may add the opponents (" + otherPlayer.getColor() + ") command token to your fleet pool.",
+                    + ", a reminder that if you win this combat, you may add the opponents (" + otherPlayer.getColor() + ") command token to your fleet pool.",
                     buttons);
             }
             if (player.hasTechReady("dskortg") && CommandCounterHelper.hasCC(player, tile)) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("exhaustTech_dskortg_" + tile.getPosition(), "Tempest Drive", FactionEmojis.kortali));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win the combat, you may use this button to remove a command token from the system.",
+                    + ", a reminder that if you win the combat, you may use this button to remove a command token from the system.",
                     buttons);
             }
             if (player.hasAbility("technological_singularity")) {
                 Button steal = Buttons.gray(player.finChecker() + "nekroStealTech_" + otherPlayer.getFaction(), "Copy a Technology", FactionEmojis.Nekro);
-                String message = msg + " this is a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology.";
+                String message = msg + ", a reminder that when you first kill an opponent's unit this combat, you may use the button to copy a technology.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, steal);
             }
             if (player.hasUnit("ghemina_mech") && type.equalsIgnoreCase("ground") && ButtonHelper.getUnitHolderFromPlanetName(unitHolderName, game).getUnitCount(Units.UnitType.Mech, player) == 2) {
                 Button explore = Buttons.gray(player.finChecker() + "gheminaMechStart_" + unitHolderName, "Mech Explores", FactionEmojis.ghemina);
-                String message = msg + " this is a reminder that if you win the combat, you may use the button to resolve your mech ability.";
+                String message = msg + ", a reminder that if you win the combat, you may use the button to resolve your mech ability.";
                 MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), message, explore);
             }
 
@@ -575,7 +594,7 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("salvageOps_" + tile.getPosition(), "Salvage Operations", FactionEmojis.Mentak));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if the combat does not end in a draw, you may use the button to resolve _Salvage Operations_.",
+                    + ", a reminder that if the combat does not end in a draw, you may use the button to resolve _Salvage Operations_.",
                     buttons);
             }
             if (type.equalsIgnoreCase("space")
@@ -584,7 +603,7 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "mentakCommander_" + otherPlayer.getColor(), "Resolve Mentak Commander on " +
                     otherPlayer.getColor(), FactionEmojis.Mentak));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + ", a reminder that if you win the combat, " +
                     "you may use the button to resolve S'ula Mentarion, the Mentak commander.", buttons);
             }
             if (player.getLeader("qhethero").map(Leader::isActive).orElse(false)) {
@@ -592,24 +611,25 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "qhetHero_" + tile.getPosition(), "Unlock " + tile.getRepresentationForButtons(), FactionEmojis.qhet));
                 buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card", FactionEmojis.qhet));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
-                    "you may use the button unlock the system or draw 1 AC (Qhet Hero Ability).", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + ", a reminder that if you win the combat, " +
+                    "you may use the button unlock the system or draw 1 action card (Qhet Hero Ability).", buttons);
             }
             if (player.hasAbility("black_ops") && player == game.getActivePlayer()) {
                 int debt = player.getDebtTokenCount(otherPlayer.getColor());
                 if (debt > 1) {
                     String finChecker = "FFCC_" + player.getFaction() + "_";
                     buttons = new ArrayList<>();
-                    buttons.add(Buttons.gray(finChecker + "blackOps_" + otherPlayer.getColor() + "_2", "Get 1 SO", FactionEmojis.qhet));
+                    buttons.add(Buttons.gray(finChecker + "blackOps_" + otherPlayer.getColor() + "_2", "Draw 1 Secret Objective", FactionEmojis.qhet));
                     if (debt > 4) {
-                        buttons.add(Buttons.gray(finChecker + "blackOps_" + otherPlayer.getColor() + "_5", "Get 1 CC and one of opponents SOs", FactionEmojis.qhet));
+                        buttons.add(Buttons.gray(finChecker + "blackOps_" + otherPlayer.getColor() + "_5", "Gain 1 Command Token and Steal 1 Secret Objective", FactionEmojis.qhet));
                     }
-                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + " this is a reminder that if you win the combat, " +
-                        "you may use the button to cash in 2 of the control tokens you hold in order to draw an SO. Or turn in 5 control tokens to get a CC and an opponent SO.", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + ", a reminder that if you win the combat, you may use the button to"
+                        + " cash in 2 of the control tokens you hold in order to draw an secret objective,"
+                        + " or turn in 5 control tokens to grain a command token and steal an unscored secret objective from your opponent.", buttons);
                 }
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "qhetcommander") && player == game.getActivePlayer()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + " this is a reminder that if you win a combat during this action " +
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + ", a reminder that if you win a combat during this action " +
                     "you may take an additional action (Qhet Commander Ability)");
             }
             if (player.getPromissoryNotes().containsKey("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
@@ -622,7 +642,7 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "moult_" + tile.getPosition(), "Moult", FactionEmojis.cheiran));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win the combat, you will be given buttons to resolve **Moult**, allowing you to produce 1 ship, reducing the cost " +
+                    + ", a reminder that if you win the combat, you will be given buttons to resolve **Moult**, allowing you to produce 1 ship, reducing the cost " +
                     "by 1 for each non-fighter ship you will have lost in the combat.",
                     buttons);
             }
@@ -633,7 +653,7 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "startFacsimile_" + tile.getPosition(), "Play Secrets of the Weave", FactionEmojis.mortheus));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that you may play _Secrets of the Weave_ here to spend influence equal to the cost of 1 of the opponent ships to " +
+                    + ", a reminder that you may play _Secrets of the Weave_ here to spend influence equal to the cost of 1 of the opponent ships to " +
                     "place 1 of that type of ship in the system.",
                     buttons);
             }
@@ -649,7 +669,7 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("unlockCommander_augers", "Unlock Ilyxum Commander", FactionEmojis.augers));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win the combat here, you may use the button to unlock Lachis, the Ilyxum commander.",
+                    + ", a reminder that if you win the combat here, you may use the button to unlock Lachis, the Ilyxum commander.",
                     buttons);
             }
             if (player.getLeaderIDs().contains("qhetcommander")
@@ -657,15 +677,15 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("unlockCommander_qhet", "Unlock Qhet Commander", FactionEmojis.qhet));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you win two combats this turn, you may use the button to unlock the Qhet commander.",
+                    + ", a reminder that if you win two combats this turn, you may use the button to unlock Ghaist Asmora, the Qhet commander.",
                     buttons);
             }
             if (player.getLeaderIDs().contains("belkoseahero")
                 && player.hasLeaderUnlocked("belkoseahero") && !player.hasUnexhaustedLeader("belkoseahero")) {
                 buttons = new ArrayList<>();
-                buttons.add(Buttons.green("refreshBelkoseaHero", "Refresh Belkosea Hero", FactionEmojis.belkosea));
+                buttons.add(Buttons.green("refreshBelkoseaHero", "Ready Belkosea Hero", FactionEmojis.belkosea));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you lose this combat, you can refresh the Belkosea Hero.",
+                    + ", a reminder that if you lose this combat, you can ready Mobius Spike, Belkosea Hero.",
                     buttons);
             }
             if (player.getLeaderIDs().contains("kortalicommander")
@@ -673,9 +693,8 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("unlockCommander_kortali", "Unlock Kortali commander", FactionEmojis.kortali));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + " this is a reminder that if you destroy all of the opponent's units in this system, you may use the button to unlock Queen Lorena, " +
-                    "the Kortali commander.",
-                    buttons);
+                    + ", a reminder that if you destroy all of the opponent's units in this system, you may use the button to unlock Queen Lorena, " +
+                    "the Kortali commander.", buttons);
             }
         }
 
@@ -799,13 +818,12 @@ public class StartCombatService {
         ThreadChannel threadChannel, Game game, Player player1,
         Player player2, Tile tile, String spaceOrGround, GenericInteractionCreateEvent event
     ) {
-        List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround,
-            event);
+        List<Button> buttons = getGeneralCombatButtons(game, tile.getPosition(), player1, player2, spaceOrGround);
         MessageHelper.sendMessageToChannelWithButtons(threadChannel, "Buttons for combat.", buttons);
     }
 
     // TODO: Break apart into: [all combats, space combat, ground combat] methods
-    public static List<Button> getGeneralCombatButtons(Game game, String pos, Player p1, Player p2, String groundOrSpace, GenericInteractionCreateEvent event) {
+    public static List<Button> getGeneralCombatButtons(Game game, String pos, Player p1, Player p2, String groundOrSpace) {
         Tile tile = game.getTileByPosition(pos);
         List<Button> buttons = new ArrayList<>();
         UnitHolder space = tile.getUnitHolders().get("space");
@@ -819,7 +837,7 @@ public class StartCombatService {
             return buttons;
         }
         buttons.add(Buttons.red("getDamageButtons_" + pos + "_" + groundOrSpace + "combat", "Assign Hits"));
-        buttons.add(Buttons.gray("checkCombatACs", "Check Combat ACs", CardEmojis.ActionCard));
+        buttons.add(Buttons.gray("checkCombatACs", "Check Combat Action Cards", CardEmojis.ActionCard));
         buttons.add(Buttons.green("getRepairButtons_" + pos, "Repair Damage"));
         buttons.add(Buttons.blue(
             "refreshViewOfSystem_" + pos + "_" + p1.getFaction() + "_" + p2.getFaction() + "_" + groundOrSpace,
@@ -885,7 +903,7 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged To Produce Hit (Belkosea FS)", FactionEmojis.belkosea));
             }
             if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("kortali_flagship", agentHolder, tile) && isSpaceCombat) {
-                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged Upon Win To Gain CC (Kortali FS)", FactionEmojis.kortali));
+                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged Upon Win To Gain Command Token (Kortali FS)", FactionEmojis.kortali));
             }
         }
 
@@ -967,20 +985,20 @@ public class StartCombatService {
 
         if (p2.getPromissoryNotesInPlayArea().contains("dspntold") && !game.isFowMode() && p2.getTotalVictoryPoints() < p1.getTotalVictoryPoints()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Comms (Upon Win)", FactionEmojis.toldar));
+            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Commodities (Upon Win)", FactionEmojis.toldar));
         }
         if (p1.getPromissoryNotesInPlayArea().contains("dspntold") && p1.getTotalVictoryPoints() < p2.getTotalVictoryPoints()) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Comms (Upon Win)", FactionEmojis.toldar));
+            buttons.add(Buttons.gray(finChecker + "toldarPN", "Gain 3 Commodities (Upon Win)", FactionEmojis.toldar));
         }
 
         if (p2.hasRelicReady("superweaponcaled") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 Ship With Caled", FactionEmojis.belkosea));
         }
         if (p1.hasRelicReady("superweaponcaled")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 ship With Caled", FactionEmojis.belkosea));
+            buttons.add(Buttons.gray(finChecker + "exhaustSuperweapon_caled_" + tile.getPosition(), "Destroy 1 Ship With Caled", FactionEmojis.belkosea));
         }
         if (p2.hasRelicReady("superweaponavailyn") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
@@ -1305,7 +1323,7 @@ public class StartCombatService {
                     if (p2.isDummy()) {
                         buttons.add(Buttons.gray(p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + " for Dummy").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                     }
-                    if (CombatRollService.checkIfUnitsOfType(nonActive, game, event, tile, unitH.getName(),
+                    if (CombatRollService.checkIfUnitsOfType(nonActive, game, null, tile, unitH.getName(),
                         CombatRollType.SpaceCannonDefence)) {
                         buttons.add(Buttons.gray(
                             "combatRoll_" + tile.getPosition() + "_" + unitH.getName() + "_spacecannondefence",

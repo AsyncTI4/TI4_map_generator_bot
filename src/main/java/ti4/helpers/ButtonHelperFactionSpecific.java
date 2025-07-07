@@ -78,7 +78,7 @@ public class ButtonHelperFactionSpecific {
         String prefix = player.getFinsFactionCheckerPrefix() + "c4redtech_";
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red(prefix + "pds", "Place a PDS", UnitEmojis.pds));
-        buttons.add(Buttons.red(prefix + "actionCard", "Discard/draw 1 AC", CardEmojis.ActionCard));
+        buttons.add(Buttons.red(prefix + "actionCard", "Discard/Draw 1 Action Card", CardEmojis.ActionCard));
         buttons.add(Buttons.red(prefix + "repair", "Repair units", "💥"));
         return buttons;
     }
@@ -87,9 +87,10 @@ public class ButtonHelperFactionSpecific {
     public static void useNekroNullRef(Game game, Player player, ButtonInteractionEvent event) {
         List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, player.getHomeSystemTile(), "sling",
             "placeOneNDone_dontskip");
-        String message = player.getRepresentation() + " Use the buttons to produce 1 ship that was just destroyed in your home system (you still need to pay, and each ship is a seperate payment)\n> "
+        String message = player.getRepresentation() + ", please use these buttons to produce 1 ship that was just destroyed in your home system (you still need to pay, and each ship is a separate payment).\n> "
             + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " is using their faction tech to produce 1 recently destroyed ship in their home system (they can do this upon each death of a ship, and each payment is seperate). ");
+        MessageHelper.sendMessageToChannel(event.getChannel(), 
+            player.getFactionEmoji() + " is using _???\\_NULL\\_REFERENCE\\_???_ to produce 1 recently destroyed ship in their home system (they can do this upon each death of a ship, but each payment is separate).");
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
 
@@ -140,7 +141,7 @@ public class ButtonHelperFactionSpecific {
         buttons.add(Buttons.red("deleteButtons", "Delete This"));
         player.setStrategicCC(player.getStrategicCC() - 1);
         MessageChannel channel = player.getCorrectChannel();
-        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Glory");
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "used **Glory**");
         String message0 = player.getRepresentationUnfogged()
             + "1 command token has been subtracted from your strategy pool due to use of **Glory** to acquire the unit upgrade technology of one of the participating units.";
         String message = player.getRepresentationUnfogged()
@@ -217,7 +218,8 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void resolveDeceive(Player player, Game game) {
-        String msg = player.getRepresentation() + " choose the neighbor who you want to steal a random action card from. Please ensure that everyone's AC amounts are correct before resolving this (async often floats AC draws)";
+        String msg = player.getRepresentation() + ", please choose which neighbor who you wish to steal a random action card from."
+            + " Please ensure that everyone's action card counts are accurate before resolving this (async often floats action card draws).";
         List<Button> buttons = new ArrayList<>();
         for (Player neighbor : player.getNeighbouringPlayers(true)) {
             String rep = neighbor.getFaction();
@@ -234,24 +236,24 @@ public class ButtonHelperFactionSpecific {
         if (player.getHonorCounter() > 1) {
             if (!player.hasAbility("bestow")) {
                 player.addAbility("bestow");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the bestow honor card\n" + Mapper.getAbility("bestow").getRepresentation());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has gained the _Bestow_ Honor card.\n" + Mapper.getAbility("bestow").getRepresentation());
             }
         } else {
             if (player.hasAbility("bestow")) {
                 player.removeAbility("bestow");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the bestow honor card");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has lost the _Bestow_ Honor card.");
             }
         }
         if (player.getHonorCounter() > 4) {
             if (!player.hasAbility("reflect")) {
                 player.addAbility("reflect");
                 CommanderUnlockCheckService.checkPlayer(player, "toldar");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the reflect honor card\n" + Mapper.getAbility("reflect").getRepresentation());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has gained the _Reflect_ Honor card.\n" + Mapper.getAbility("reflect").getRepresentation());
             }
         } else {
             if (player.hasAbility("reflect")) {
                 player.removeAbility("reflect");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the reflect honor card");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + "has lost the _Reflect_ Honor card.");
             }
         }
         if (player.getHonorCounter() > 7) {
@@ -259,44 +261,47 @@ public class ButtonHelperFactionSpecific {
                 player.addAbility("ascend");
                 Integer poIndex = game.addCustomPO("Ascend", 1);
                 game.scorePublicObjective(player.getUserID(), poIndex);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the ascend honor card and 1 VP.\n" + Mapper.getAbility("ascend").getRepresentation());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+                    player.getRepresentation() + " gained the _Ascend_ Honor card, and with it, one victory point.\n" + Mapper.getAbility("ascend").getRepresentation());
             }
         } else {
             if (player.hasAbility("ascend")) {
                 player.removeAbility("ascend");
                 int ascendPublicObjectiveID = game.getRevealedPublicObjectives().get("Ascend");
                 game.unscorePublicObjective(player.getUserID(), ascendPublicObjectiveID);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the ascend honor card and 1 VP");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has lost the _Ascend_ Honor card, and with it, one victory point.");
             }
         }
 
-        if (player.getHonorCounter() < -1) {
+        if (player.getDishonorCounter() > 1) {
             if (!player.hasAbility("thwart")) {
                 player.addAbility("thwart");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the thwart honor card\n" + Mapper.getAbility("thwart").getRepresentation());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has gained the _Thwart_ Dishonor card.\n" + Mapper.getAbility("thwart").getRepresentation());
             }
         } else {
             if (player.hasAbility("thwart")) {
                 player.removeAbility("thwart");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the thwart honor card");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has lost the _Thwart_ Dishonor card.");
             }
         }
-        if (player.getHonorCounter() < -4) {
+        if (player.getDishonorCounter() > 4) {
             if (!player.hasAbility("deceive")) {
                 player.addAbility("deceive");
                 CommanderUnlockCheckService.checkPlayer(player, "toldar");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the deceive honor card\n" + Mapper.getAbility("deceive").getRepresentation());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has gained the _Deceive_ Dishonor card.\n" + Mapper.getAbility("deceive").getRepresentation());
             }
         } else {
             if (player.hasAbility("deceive")) {
                 player.removeAbility("deceive");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost the deceive honor card");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has lost the _Deceive_ Dishonor card.");
             }
         }
-        if (player.getHonorCounter() < -7) {
+        if (player.getDishonorCounter() > 7) {
             if (!player.hasAbility("scourge")) {
                 player.addAbility("scourge");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the scourge honor card. Every one of their PNs has been purged. In order to score SOs as POs, use /status po_add_custom and /status po_score\n" + Mapper.getAbility("scourge").getRepresentation());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " has gained the _Scourge_ Dishonor card."
+                    + " All of their promissory notes have been purged."
+                    + " In order to score secret objectives as public objectives, please use `/status po_add_custom` and `/status po_score`.\n" + Mapper.getAbility("scourge").getRepresentation());
                 for (Player p3 : game.getRealPlayers()) {
                     Set<String> pns = new HashSet<>(p3.getPromissoryNotes().keySet());
                     Map<String, PromissoryNoteModel> promissoryNotes = Mapper.getPromissoryNotes();
@@ -318,15 +323,22 @@ public class ButtonHelperFactionSpecific {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         ButtonHelper.deleteTheOneButton(event);
         if (p2.getTotalVictoryPoints() == player.getTotalVictoryPoints()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you do not gain or lose honor when beating someone with the same amount of VPs as yourself.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentation() + ", you do not gain or lose Honor when beating someone who has the same number of victory points as yourself.");
         }
         if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {
             player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained 1 honor by beating someone with more VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+            player.setDishonorCounter(Math.min(8 - player.getHonorCounter(), player.getDishonorCounter()));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+                player.getRepresentation() + " has gained an Honor by beating someone with more victory points than them in combat."
+                + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter() + " Dishonor.");
         }
         if (p2.getTotalVictoryPoints() < player.getTotalVictoryPoints()) {
-            player.setHonorCounter(Math.max(-8, player.getHonorCounter() - 1));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " lost 1 honor by beating someone with less VPs than them in combat. You now have " + player.getHonorCounter() + " honor");
+            player.setDishonorCounter(Math.min(8, player.getDishonorCounter() + 1));
+            player.setHonorCounter(Math.min(8 - player.getDishonorCounter(), player.getHonorCounter()));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+                player.getRepresentation() + " has gained 1 Dishonor by beating someone with fewer victory points than them in combat."
+                + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter() + " Dishonor.");
         }
         correctHonorAbilities(player, game);
 
@@ -561,7 +573,7 @@ public class ButtonHelperFactionSpecific {
             player.addFollowedSC(scNum, event);
             ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
             if (player.getStrategicCC() > 0) {
-                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed construction");
+                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Construction**");
             }
             String message = ButtonHelperSCs.deductCC(game, player, scNum);
             ReactionService.addReaction(event, game, player, message);
@@ -587,7 +599,7 @@ public class ButtonHelperFactionSpecific {
         String ident = player.getRepresentation(true, false);
         if (!player.getMahactCC().contains(color)) {
             player.addMahactCC(color);
-            Helper.isCCCountCorrect(event, game, color);
+            Helper.isCCCountCorrect(game, color);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 ident + " added a " + color + " command token to their fleet pool.");
         } else {
@@ -978,7 +990,7 @@ public class ButtonHelperFactionSpecific {
     }
 
     public static void rollForBelkoseaPN(Player player) {
-        String result = player.getFactionEmojiOrColor() + " rolling for belkosea PN:\n";
+        String result = player.getFactionEmojiOrColor() + " rolling for _Mercenary Sortie_:\n";
         // Actually roll for each unit
         int totalHits = 0;
         StringBuilder resultBuilder = new StringBuilder(result);
@@ -1000,7 +1012,8 @@ public class ButtonHelperFactionSpecific {
         result = resultBuilder.toString();
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result + "\nPlease assign any hits using the assign hits button in the combat thread. Remember these hits only apply against infantry or fighters.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            result + "\nPlease assign any hits using the \"Assign Hits\" button in the combat thread. Remember these hits only apply against infantry or fighters.");
 
     }
 
@@ -1495,7 +1508,7 @@ public class ButtonHelperFactionSpecific {
         RemoveUnitService.removeUnits(event, player.getNomboxTile(), game, player.getColor(), "infantry");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentationUnfogged() + " put 1 captured infantry on the planet of "
-                + Mapper.getPlanet(planet).getAutoCompleteName() + " using the Pharadn Infantry 2 ability.");
+                + Mapper.getPlanet(planet).getAutoCompleteName() + " using the Immortal II ability.");
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 inf " + planet);
         ButtonHelper.deleteMessage(event);
     }
@@ -1503,7 +1516,7 @@ public class ButtonHelperFactionSpecific {
     @ButtonHandler("capture1Pharad")
     public static void capture1Pharad(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getRepresentationUnfogged() + " captured 1 destroyed infantry via their PN");
+            player.getRepresentationUnfogged() + " captured 1 destroyed infantry via _Death Binding_.");
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "1 inf");
         ButtonHelper.deleteMessage(event);
     }
@@ -1568,7 +1581,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getRepresentation()
                     + " has removed a command token from their fleet pool and may vote in any manner that they wish.");
-            ButtonHelper.checkFleetInEveryTile(player, game, event);
+            ButtonHelper.checkFleetInEveryTile(player, game);
         }
         event.getMessage().delete().queue();
     }
@@ -1668,9 +1681,9 @@ public class ButtonHelperFactionSpecific {
         for (String planet : ButtonHelper.getPlanetsWithUnits(player, game)) {
             infButtons.add(Buttons.green("qhetInfRevival_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use this button to put down an infantry on a planet with your units.", infButtons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", use this button to put down an infantry on a planet with your units.", infButtons);
         if (player.getStasisInfantry() > 1) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use these buttons to put a second infantry down if you want on the same planet.", infButtons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", use these buttons to put a second infantry down on the same planet if you so wish.", infButtons);
         }
 
     }
@@ -3000,7 +3013,7 @@ public class ButtonHelperFactionSpecific {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             "The agenda has been **Quash**'d. " + player.getRepresentationUnfogged()
                 + " has spent a command token from their strategy pool (" + stratCC + " -> " + (stratCC - 1) + ").");
-        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "Quash");
+        ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "**Quash**'d");
         String agendaCount = game.getStoredValue("agendaCount");
         int aCount;
         if (agendaCount.isEmpty()) {

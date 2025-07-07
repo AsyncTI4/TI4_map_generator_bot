@@ -142,6 +142,16 @@ public class ExploreService {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored.");
                         return;
                     }
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
+                        Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
+                        Tile tileWithPlanet = game.getTileFromPlanet(planetName);
+                        if (tileWithPlanet == null) {
+                            MessageHelper.sendMessageToEventChannel(event, "An error occurred while placing 1 infantry. Resolve manually.");
+                            return;
+                        }
+                        tileWithPlanet.getUnitHolders().get(planetName).addUnit(infKey, 1);
+                        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Added infantry to " + planetName + " because of Master Halbert, the Lanefir Commander.");
+                    }
                     ExploreModel exploreModel1 = Mapper.getExplore(cardID1);
                     ExploreModel exploreModel2 = Mapper.getExplore(cardID2);
 
@@ -301,7 +311,7 @@ public class ExploreService {
             return;
         }
 
-        MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed();
+        MessageEmbed exploreEmbed = exploreModel.getRepresentationEmbed(false, true);
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), messageText, exploreEmbed);
 
         String message = null;
@@ -368,11 +378,13 @@ public class ExploreService {
                             }
                         }
                     }
+
                     tile.addToken(attachmentFilename, planetID);
                     game.purgeExplore(ogID);
                     AttachmentModel aModel = Mapper.getAttachmentInfo(attachment);
                     message = "Attachment _" + aModel.getName() + "_ added to " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetID, game) + ".";
                     CommanderUnlockCheckService.checkPlayer(player, "sol", "xxcha");
+                    ButtonHelper.checkFleetAndCapacity(player, game, tile);
                 }
             }
             case Constants.TOKEN -> {
@@ -393,7 +405,7 @@ public class ExploreService {
                     }
 
                     if (Constants.MIRAGE.equalsIgnoreCase(token)) {
-                        Helper.addMirageToTile(tile);
+                        Helper.addTokenPlanetToTile(game, tile, Constants.MIRAGE);
                         game.clearPlanetsCache();
                         message = "Mirage added to map, added to your play area, readied, and explored!";
                     }
@@ -809,6 +821,7 @@ public class ExploreService {
             }
         }
         RiftSetModeService.resolveExplore(ogID, player, game);
+        FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
         if (player.hasAbility("fortune_seekers") && game.getStoredValue("fortuneSeekers").isEmpty()) {
@@ -840,13 +853,17 @@ public class ExploreService {
     }
 
     public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force) {
+        expFront(event, tile, game, player, force, null);
+    }
+
+    public static void expFront(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, boolean force, String cardID) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename) || force) {
             if (space.getTokenList().contains(frontierFilename)) {
                 space.removeToken(frontierFilename);
             }
-            String cardID = game.drawExplore(Constants.FRONTIER);
+            cardID = cardID == null ? game.drawExplore(Constants.FRONTIER) : cardID;
             String messageText = player.getRepresentation() + (force ? " force" : "") + " explored the " + ExploreEmojis.Frontier + "frontier token in tile " + tile.getPosition() + ":";
             ExploreService.resolveExplore(event, cardID, tile, null, messageText, player, game);
 
@@ -946,6 +963,11 @@ public class ExploreService {
                 sb.append("\n> ").append(entry.getValue().getFirst().getText().replace("\n", "\n> "));
             } else {
                 sb.append("1. ").append(emoji).append(" _").append(exploreName).append("_ (`").append(String.join("`, `", ids)).append("`)");
+                if (!entry.getValue().getFirst().getAttachmentId().orElse("nothin").equalsIgnoreCase("nothin")) {
+                    if (!entry.getValue().getFirst().getAlias().equalsIgnoreCase("gw") && !entry.getValue().getFirst().getType().equalsIgnoreCase("frontier")) {
+                        sb.append(" [ATTACHMENT]");
+                    }
+                }
                 if (showPercents && ids.size() > 1) {
                     sb.append(" - ").append(formatPercent.format(deckDrawChance * ids.size()));
                 }

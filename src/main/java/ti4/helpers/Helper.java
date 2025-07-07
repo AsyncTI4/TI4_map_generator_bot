@@ -83,6 +83,7 @@ import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
+import ti4.service.map.TokenPlanetService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.milty.MiltyDraftTile;
 import ti4.service.objectives.ScorePublicObjectiveService;
@@ -368,7 +369,7 @@ public class Helper {
         String key3 = "potentialScorePOBlockers";
         String key2b = "queueToScoreSOs";
         String key3b = "potentialScoreSOBlockers";
-        if (game.getStoredValue(key2).length() < 2
+        if ((game.getStoredValue(key2).length() < 2 && game.getStoredValue(key2b).length() < 2)
             || game.getHighestScore() + 1 > game.getVp()) {
             return;
         }
@@ -398,6 +399,9 @@ public class Helper {
                         game.getStoredValue(key2b).replace(player.getFaction() + "*", ""));
                     game.setStoredValue(key3b,
                         game.getStoredValue(key3b).replace(player.getFaction() + "*", ""));
+                }
+                if (game.getHighestScore() + 1 > game.getVp()) {
+                    return;
                 }
             } else {
                 if (game.getStoredValue(key3).contains(player.getFaction() + "*")
@@ -539,13 +543,23 @@ public class Helper {
         return tokenPath;
     }
 
-    public static void addMirageToTile(Tile tile) {
-        Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        if (unitHolders.get(Constants.MIRAGE) == null) {
-            Point mirageCenter = new Point(Constants.MIRAGE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x,
-                Constants.MIRAGE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
-            Planet planetObject = new Planet(Constants.MIRAGE, mirageCenter);
-            unitHolders.put(Constants.MIRAGE, planetObject);
+    public static Point getTokenPlanetCenterPosition(Tile tile, String tokenID) {
+        Point tokenPlanetPos = Constants.TOKEN_PLANET_POSITION;
+        Point offset = Constants.TOKEN_PLANET_CENTER_OFFSET;
+
+        Point position = new Point(tokenPlanetPos);
+        if (tile.getTileModel().getNumPlanets() == 3)
+            position = new Point(Constants.MIRAGE_TRIPLE_POSITION);
+        position.translate(offset.x, offset.y);
+        return position;
+    }
+
+    public static void addTokenPlanetToTile(Game game, Tile tile, String planetName) {
+        Tile existingTile = game.getTileFromPlanet(planetName);
+        if (existingTile != null) {
+            TokenPlanetService.moveTokenPlanet(game, null, tile, planetName);
+        } else {
+            TokenPlanetService.addTokenPlanetToTile(game, tile, planetName);
         }
     }
 
@@ -841,6 +855,20 @@ public class Helper {
         player.resetOlradinPolicyFlags();
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getReadiedPlanets());
+        //Helper.getPlanetInfluence(planet, game);
+        if (whatIsItFor.equalsIgnoreCase("inf")) {
+            planets = planets.stream()
+                .sorted((p1, p2) -> Integer.compare(
+                    Helper.getPlanetInfluence(p2, game),
+                    Helper.getPlanetInfluence(p1, game)))
+                .collect(Collectors.toList());
+        } else {
+            planets = planets.stream()
+                .sorted((p1, p2) -> Integer.compare(
+                    Helper.getPlanetResources(p2, game),
+                    Helper.getPlanetResources(p1, game)))
+                .collect(Collectors.toList());
+        }
         for (String planet : planets) {
 
             if (planet.contains("custodia") || planet.contains("ghoti")) {
@@ -1103,15 +1131,14 @@ public class Helper {
                 }
             }
             if (!found && !thing.contains("tg_") && !thing.contains("boon") && !thing.contains("warmachine")
-                && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("Agent")) {
+                && !thing.contains("aida") && !thing.contains("commander") && !thing.contains("agent") && !thing.contains("Agent")) {
                 Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
                 if (planet == null) {
-                    if (thing.contains("reduced commodities")) {
-                        String comms = StringUtils.substringAfter(thing, "by ");
-                        comms = StringUtils.substringBefore(comms, " (");
-                        keleresAgent = Integer.parseInt(comms);
-                        msg.append("Keleres Agent for ").append(comms).append(" comms\n");
+                    if (thing.contains("comms")) {
+                        String comms = StringUtils.substringAfter(thing, "_");
+                        keleresAgent += Integer.parseInt(comms);
+                        msg.append("Keleres Agent for ").append(comms).append(" commoditiess\n");
                     } else {
                         msg.append(thing).append("\n");
                     }
@@ -1176,7 +1203,7 @@ public class Helper {
                     res += 1;
                 }
                 if (thing.contains("aida")) {
-                    msg.append("> Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
+                    msg.append("Exhausted ").append(TechEmojis.WarfareTech).append("_AI Development Algorithm_ ");
                     if (thing.contains("_")) {
                         int upgrades = ButtonHelper.getNumberOfUnitUpgrades(player);
                         res += upgrades;
@@ -1188,8 +1215,8 @@ public class Helper {
                 }
                 if (thing.contains("commander") || thing.contains("Gledge Agent")) {
                     msg.append("> ").append(thing).append("\n");
-                } else if (thing.contains("Winnu Agent")) {
-                    msg.append("> ").append(thing).append("\n");
+                } else if (thing.contains("winnuagent")) {
+                    msg.append("> Used Winnu agent for 2 resources").append("\n");
                     res += 2;
                 } else if (thing.contains("Zealots Agent")) {
                     msg.append("> ").append(thing).append("(Best resources found were ").append(bestRes).append(")\n");
@@ -1911,7 +1938,7 @@ public class Helper {
         informUserCCOverLimit(player.getGame(), player.getColor(), ccCount);
     }
 
-    public static void isCCCountCorrect(GenericInteractionCreateEvent event, Game game, String color) {
+    public static void isCCCountCorrect(Game game, String color) {
         int ccCount = getCCCount(game, color);
         informUserCCOverLimit(game, color, ccCount);
     }

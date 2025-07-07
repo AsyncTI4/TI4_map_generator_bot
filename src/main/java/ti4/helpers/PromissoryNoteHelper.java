@@ -64,7 +64,8 @@ public class PromissoryNoteHelper {
                     sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
                     Player pnOwner = game.getPNOwner(pn.getKey());
                     if (pnOwner == null) {
-                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " one of your PNs has no owner. PN id is " + pn.getKey() + " and number is " + pn.getValue());
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                            player.getRepresentation() + " one of your promissory notes has no owner. The promissory note id is " + pn.getKey() + " and number is " + pn.getValue() + ".");
                         continue;
                     }
                     if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
@@ -315,18 +316,18 @@ public class PromissoryNoteHelper {
         if ("fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
             owner.setFleetCC(owner.getFleetCC() - 1);
             String reducedMsg = owner.getRepresentationUnfogged()
                 + ", 1 command token has been removed from your fleet pool because _Fires of the Gashlai_ was played.";
-            ButtonHelper.checkFleetInEveryTile(owner, game, event);
+            ButtonHelper.checkFleetInEveryTile(owner, game);
             MessageHelper.sendMessageToChannel(owner.getCorrectChannel(), reducedMsg);
         }
         if ("sigma_fires".equalsIgnoreCase(id)) {
             player.addTech("ws");
             CommanderUnlockCheckService.checkPlayer(player, "mirveda");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
-            ButtonHelper.checkFleetInEveryTile(owner, game, event);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " acquired the War Sun technology.");
+            ButtonHelper.checkFleetInEveryTile(owner, game);
             String reducedMsg = owner.getRepresentationUnfogged() + ", you must spend 1 command token due to _Fires of the Gashlai_ being played.";
             MessageHelper.sendMessageToChannelWithButtons(owner.getCorrectChannel(), reducedMsg, ButtonHelper.getLoseCCButtons(owner));
 
@@ -526,7 +527,7 @@ public class PromissoryNoteHelper {
         }
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All PNs shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All promissory notes shown to player.");
     }
 
     public void sendRandom(GenericInteractionCreateEvent event, Game game, Player sourcePlayer, Player targetPlayer) {

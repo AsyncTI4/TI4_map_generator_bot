@@ -351,15 +351,22 @@ public class Constants {
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172, 150);
-    public static final Point MIRAGE_POSITION = new Point(172, 33); // 55, 5
+    public static final Point TOKEN_PLANET_POSITION = new Point(172, 33); // 55, 5
+    public static final Point TOKEN_PLANET_CENTER_OFFSET = new Point(71, 59);
     public static final Point MIRAGE_TRIPLE_POSITION = new Point(38, 178);
-    public static final Point MIRAGE_CENTER_POSITION = new Point(71, 59);
-    public static final String MIRAGE = "mirage";
     public static final String SLEEPER = "sleeper";
     public static final String DMZ = "dmz";
     public static final String DMZ_LARGE = "dmz_large";
     public static final String WORLD_DESTROYED = "worlddestroyed";
     public static final String GLEDGE_CORE = "gledgecore";
+
+    // Token planets: planets which are tokens placed on the tile
+    public static final String MIRAGE = "mirage";
+    public static final String OASIS = "oasis";
+    public static final String CRADLE = "cradle";
+    public static final String ILLUSION = "illusion";
+    public static final String PHANTASM = "phantasm";
+    public static final List<String> TOKEN_PLANETS = List.of(MIRAGE, OASIS, CRADLE, ILLUSION, PHANTASM);
 
     public static final String FRONTIER = "frontier";
 
@@ -861,6 +868,7 @@ public class Constants {
     public static final String PLANET_EXHAUST_ABILITY = "legendary_exhaust_ability";
     public static final String PLANET_REFRESH_ABILITY = "legendary_ready_ability";
     public static final String PLANET_INFO = "info";
+    public static final String PLANET_MOVE_TOKEN_PLANET = "move_token_planet";
 
     public static final String EXPLORE = "explore";
     public static final String CULTURAL = "cultural";
@@ -1024,6 +1032,8 @@ public class Constants {
     public static final String CC_N_PLASTIC_LIMIT = "cc_n_plastic_limit";
     public static final String DRAFT_MODE = "draft_mode";
     public static final String BOT_FACTION_REACTS = "bot_faction_reacts";
+    public static final String BOT_COLOR_REACTS = "bot_color_reacts";
+    public static final String BOT_STRAT_REACTS = "bot_strat_reacts";
     public static final String HAS_HAD_A_STATUS_PHASE = "has_had_a_status_phase";
     public static final String BOT_SHUSHING = "bot_shushing";
     public static final String RELIC_SEND = "send";
@@ -1088,6 +1098,7 @@ public class Constants {
     public static final String SARWEEN_COUNT = "sarween_count";
     public static final String PATH_TOKEN_COUNT = "path_token_count";
     public static final String HONOR_COUNT = "honor_count";
+    public static final String DISHONOR_COUNT = "dishonor_count";
     public static final String HARVEST_COUNT = "harvest_count";
     public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
     public static final String DS_COMMAND = "ds";

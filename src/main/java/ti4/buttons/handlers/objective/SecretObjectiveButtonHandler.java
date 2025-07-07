@@ -30,8 +30,10 @@ class SecretObjectiveButtonHandler {
 
         try {
             int soIndex = Integer.parseInt(soID);
-            DiscardSecretService.discardSO(player, soIndex, game);
+
             String msg = player.getRepresentation() + " discarded a secret objective.";
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            DiscardSecretService.discardSO(player, soIndex, game);
             if (game.getRound() == 1 && !game.isFowMode()) {
                 int amountLeftToDiscard = 0;
                 for (Player p2 : game.getRealPlayers()) {
@@ -41,7 +43,6 @@ class SecretObjectiveButtonHandler {
                 }
                 msg += " (" + amountLeftToDiscard + " players still to discard)";
             }
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
 
             if (drawReplacement) {
                 DrawSecretService.drawSO(event, game, player);
@@ -82,7 +83,7 @@ class SecretObjectiveButtonHandler {
             }
         }
         boolean allPlayersSetup = true;
-        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting tech. If you wish to proceed anyways, just press the button again";
+        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting technologies. If you wish to proceed anyways, just press the button again.";
         for (Player p : game.getRealPlayers()) {
             if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
                 message += "\n> " + p.getRepresentation();

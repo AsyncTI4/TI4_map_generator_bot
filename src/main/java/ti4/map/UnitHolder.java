@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import lombok.Data;
 
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -347,6 +348,13 @@ abstract public class UnitHolder {
 
     public Point getHolderCenterPosition() {
         return new Point(holderCenterPosition);
+    }
+
+    public Point getHolderCenterPosition(Tile tile) {
+        if (Constants.TOKEN_PLANETS.contains(this.getName())) {
+            return Helper.getTokenPlanetCenterPosition(tile, this.getName());
+        }
+        return getHolderCenterPosition();
     }
 
     public Map<UnitKey, List<Integer>> getUnitsByStateForPlayer(Player p) {

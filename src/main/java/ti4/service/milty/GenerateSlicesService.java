@@ -39,7 +39,9 @@ public class GenerateSlicesService {
 
         List<MiltyDraftTile> allTiles = draftManager.getBlue();
         allTiles.addAll(draftManager.getRed());
-        int totalWHs = allTiles.stream().filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH()).toList().size();
+        int totalWHs = (int) allTiles.stream()
+            .filter(tile -> tile.isHasAlphaWH() || tile.isHasBetaWH() || tile.isHasOtherWH())
+            .count();
         int extraWHs = Math.min(totalWHs - 1, (int) (sliceCount * 1.5));
         if (specs.playerIDs.size() == 1) extraWHs = 0; //disable the behavior if there's only 1 player
         if (specs.playerIDs.size() == 2) extraWHs = 3; //lessen the behavior if there's 2 players

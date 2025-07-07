@@ -121,22 +121,23 @@ public class ButtonHelperCommanders {
         String systemPos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(systemPos);
         // if (player.getTg() < 2) {
-        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required 2tgs");
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you don't have the required two trade goods");
         //     return;
         // }
         // if (player.getStrategicCC() < 1) {
-        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required strategy CC");
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you don't have the required strategy token");
         //     return;
         // }
         if (!CommandCounterHelper.hasCC(player, tile)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " the system does not have your CC in it");
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " the system does not have your command token in it.");
             return;
         }
         // player.setTg(player.getTg() - 2);
         // player.setStrategicCC(player.getStrategicCC() - 1);
-        RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
+        RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " remove the command token from " + tile.getRepresentationForButtons() + " using their hero ability");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+            player.getRepresentation() + " remove the command token from " + tile.getRepresentationForButtons() + " using their hero ability.");
     }
 
     @ButtonHandler("arboCommanderBuild_")
@@ -477,15 +478,15 @@ public class ButtonHelperCommanders {
     @ButtonHandler("uydaiCommander")
     public static void uydaiCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         if (player.getTg() < 1) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " you need at least 1 tg to use this ability");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + ", you need at least 1 trade good to use this ability.");
             return;
         }
         if (game.getActivePlayer() != player) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " you need to be the active player to use this ability");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + ", you need to be the active player to use this ability.");
             return;
         }
         player.setTg(player.getTg() - 1);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is paying 1tg to look at the top card of a deck");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is paying 1 trade good to look at the top card of a deck.");
         List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, false, player);
         String message = player.getRepresentationUnfogged() + " select which deck you wish to look at the top of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -495,7 +496,7 @@ public class ButtonHelperCommanders {
     public static void uydaiCommanderLook(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String target = buttonID.split("_")[1];
         String ableToBot = buttonID.split("_")[2];
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is choosing to look at the top of the " + event.getButton().getLabel() + " deck");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is choosing to look at the top of the " + event.getButton().getLabel() + " deck.");
         event.getMessage().delete().queue();
         switch (target) {
             case "industrial", "hazardous", "frontier", "cultural" -> {
@@ -573,7 +574,7 @@ public class ButtonHelperCommanders {
     }
 
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event) {
-        resolveMuaatCommanderCheck(player, game, event, "unknown trigger");
+        resolveMuaatCommanderCheck(player, game, event, "some unknown trigger");
     }
 
     public static List<Button> getPharadnCommanderUnlockButtons(Player player, Game game) {
@@ -594,13 +595,13 @@ public class ButtonHelperCommanders {
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event, String reason) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                String message = player.getRepresentationUnfogged() + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1) + " (" + reason + ")";
+                String message = player.getRepresentationUnfogged() + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1) + ", when you " + reason + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
             } else {
                 String mMessage = player.getRepresentationUnfogged() + ", you have Magmus, the Muaat Commander, unlocked,"
-                    + " so you __may__ gain 1 trade good, but since you are in **Pillage** range, this has not been done automatically.";
+                    + " so you __may__ gain 1 trade good when you " + reason + ", but since you are in **Pillage** range, this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
