@@ -177,7 +177,8 @@ public class UserLeaveServerListener extends ListenerAdapter {
                     gs.append(game.getActionsChannel().getJumpUrl()).append("\n");
                 }
                 final String gss = gs.toString();
-                MessageHelper.sendMessageToChannel(moderationLogChannel, player.getName() + " left some games, but the games were ruled to be duds. Games were as follows: " + gss);
+                MessageHelper.sendMessageToChannel(moderationLogChannel,
+                    player.getName() + " left some games, but the games were ruled to be duds. Games were as follows: " + gss);
             }
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(moderationLogChannel, "reportUserLeftServer method hit the following error: " + e.getMessage());

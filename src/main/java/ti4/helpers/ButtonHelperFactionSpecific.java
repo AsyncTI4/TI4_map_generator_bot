@@ -635,10 +635,10 @@ public class ButtonHelperFactionSpecific {
                 trueIdentity + " the other player has _Antivirus_, so you cannot gain a technology from this combat.");
         } else if (!buttons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                trueIdentity + " copy a technology from your opponent using the buttons.", buttons);
+                trueIdentity + ", please choose which of your opponent's technologies you wish to copy.", buttons);
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                trueIdentity + " there are no technologies available to copy <sad Nekro noises>.");
+                trueIdentity + ", there are no technologies left for you to copy <sad Nekro noises>.");
         }
         ButtonHelper.deleteTheOneButton(event);
     }

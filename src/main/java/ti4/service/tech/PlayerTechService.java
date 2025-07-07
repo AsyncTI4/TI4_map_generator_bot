@@ -101,7 +101,8 @@ public class PlayerTechService {
                 }
             }
             if (!hasSub) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " does not have the technology known as " + techModel.getName());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    player.getRepresentation() + " does not own the _" + techModel.getName() + "_ (`" + techModel.getAlias() + "`) technology.");
                 return;
             }
         }

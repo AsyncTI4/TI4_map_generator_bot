@@ -1381,7 +1381,7 @@ public class AgendaHelper {
                     if (!tiedWinners.isEmpty()) {
                         channel = speaker.getCorrectChannel();
                         MessageHelper.sendMessageToChannelWithButtons(channel,
-                            speaker.getRepresentationUnfogged() + " please decide the winner.", tiedWinners);
+                            speaker.getRepresentationUnfogged() + ", there are tied outcomes. As Speaker, please decide a winner.", tiedWinners);
                     }
                 }
             }
