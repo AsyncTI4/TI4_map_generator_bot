@@ -50,8 +50,8 @@ public class GMService {
     private static final List<Button> HAND_CHECK_BUTTONS = Arrays.asList(
         Buttons.gray("gmCheckPlayerHands_sabotage", "Sabotages", CardEmojis.ActionCard),
         Buttons.gray("gmCheckPlayerHands_whens", "Whens/Afters", CardEmojis.ActionCard),
-        Buttons.gray("gmCheckPlayerHands_deadly", "Deadly Plots/Briberies", CardEmojis.ActionCard),
-        Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_deadly", "Deadlies Plots/Briberies", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding Legal Texts", CardEmojis.ActionCard),
         Buttons.DONE_DELETE_BUTTONS);
 
     private static final String ACTIVITY_LOG_THREAD = "-activity-log";
@@ -185,8 +185,8 @@ public class GMService {
                 checkWhoHas("confounding", game, event);
             }
             case "whens" -> {
-                  StringBuilder sbWhens = new StringBuilder("Following players have **whens** in hand:\n");
-                  StringBuilder sbAfters = new StringBuilder("Following players have **afters** in hand:\n");
+                  StringBuilder sbWhens = new StringBuilder("Following players have \"when\"s in hand:\n");
+                  StringBuilder sbAfters = new StringBuilder("Following players have \"after\"s in hand:\n");
 
                   for (Player player : game.getRealPlayers()) {
                       List<String> whens = AgendaHelper.getPossibleWhenNames(player);

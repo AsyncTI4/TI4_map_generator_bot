@@ -636,7 +636,7 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveReparationsStep1")
     public static void resolveReparationsStep1(Player player, Game game, ButtonInteractionEvent event) {
-        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to ready.";
+        String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to ready.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
             buttons.add(Buttons.gray("khraskHeroStep4Ready_" + player.getFaction() + "_" + planet,
@@ -658,12 +658,14 @@ public class ButtonHelperActionCards {
             }
         }
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentationUnfogged() + " tell the bot who took the planet from you.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + ", please tell the bot who took the planet from you.", buttons);
     }
 
     @ButtonHandler("resolveParleyStep1")
     public static void resolveParleyStep1(Player player, Game game, ButtonInteractionEvent event) {
-        String message = player.getRepresentationUnfogged() + " Click the name of the planet you wish to resolve parley on. If it's not present (because the opponent took it already), try pressing UNDO, then /planet add it back to yourself, then try again";
+        String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to resolve _Parley_ on."
+            + " If it's not present (because the opponent took it already), try pressing UNDO, then `/planet add` it back to yourself, then try again.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getPlanets()) {
             buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "resolveParleyStep2_" + planet,
@@ -676,7 +678,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveParleyStep2")
     public static void resolveParleyStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
-        String message = player.getRepresentationUnfogged() + " parleyed the planet of " + Helper.getPlanetRepresentationNoResInf(planet, game);
+        String message = player.getRepresentationUnfogged() + " has _Parley_'d the planet of " + Helper.getPlanetRepresentationNoResInf(planet, game);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         Tile tile = game.getTileFromPlanet(planet);
         if (tile != null) {
@@ -717,7 +719,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", tell the bot who you wish to force to give you a promissory note.",
+            player.getRepresentationUnfogged() + ", please tell the bot who you wish to force to give you a promissory note.",
             buttons);
     }
 
@@ -739,7 +741,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot who you wish to play _Reactor Meltdown_ on.",
+            player.getRepresentationUnfogged() + ", please tell the bot who you wish to play _Reactor Meltdown_ on.",
             buttons);
     }
 
@@ -783,7 +785,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", tell the bot whose planet you wish to _Uprise_ against their oppressors.",
+            player.getRepresentationUnfogged() + ", please tell the bot whose planet you wish to _Uprise_ against their oppressors.",
             buttons);
     }
 
@@ -805,7 +807,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", tell the bot who you wish to be assassinated.", buttons);
+            player.getRepresentationUnfogged() + ", please tell the bot who you wish to be assassinated.", buttons);
     }
 
     @ButtonHandler("resolveSignalJammingStep1")
@@ -826,7 +828,7 @@ public class ButtonHelperActionCards {
         }
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " tell the bot which player you wish to have a command token placed.",
+            player.getRepresentationUnfogged() + ", please tell the bot which player you wish to have a command token placed.",
             buttons);
     }
 

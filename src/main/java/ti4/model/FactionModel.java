@@ -261,7 +261,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
         }
         if (getFactionName().toLowerCase().contains("keleres")) {
             sb = new StringBuilder();
-            sb.append("Choose 2 tech owned by other players.");
+            sb.append("Choose 2 non-faction technologies owned by other players.");
         }
         eb.addField("__Starting Tech__", sb.toString(), false);
 
