@@ -25,6 +25,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
@@ -835,7 +836,19 @@ class AgendaResolveButtonHandler {
             }
             if ("economic_equality".equalsIgnoreCase(agID)) {
                 int finalTG = "for".equalsIgnoreCase(winner) ? 5 : 0;
+                int maxLoss = 12;
+                List<Player> comrades = new ArrayList<>();
                 for (Player playerB : game.getRealPlayers()) {
+                    if (playerB.getTg() > maxLoss)
+                    {
+                        maxLoss = playerB.getTg();
+                        comrades = new ArrayList<>();
+                        comrades.add(playerB);
+                    }
+                    else if (playerB.getTg() == maxLoss)
+                    {
+                        comrades.add(playerB);
+                    }
                     playerB.setTg(finalTG);
                     if (finalTG > 0) {
                         ButtonHelperAgents.resolveArtunoCheck(playerB, finalTG);
@@ -843,6 +856,16 @@ class AgendaResolveButtonHandler {
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " Set all players' trade goods to " + finalTG + ".");
+                if (!comrades.isEmpty())
+                {
+                    for (Player playerB : comrades)
+                    {
+                        DisasterWatchHelper.sendMessageInDisasterWatch(game,
+                            "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate "
+                            + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
+                    }
+                    DisasterWatchHelper.sendMessageInDisasterWatch(game, MiscEmojis.tg(maxLoss));
+                }
             }
             if ("crisis".equalsIgnoreCase(agID)) {
                 if (!game.isHomebrewSCMode()) {
