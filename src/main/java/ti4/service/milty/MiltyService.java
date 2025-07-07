@@ -291,6 +291,10 @@ public class MiltyService {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
+                if (faction.equalsIgnoreCase("franken1") || faction.equalsIgnoreCase("franken2")) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setup Failed - Franken1 and Franken2 have issues and should not be used by anyone going forward. Try a different franken number");
+                    return;
+                }
             }
         }
 
