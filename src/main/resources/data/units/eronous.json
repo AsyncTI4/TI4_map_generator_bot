@@ -191,8 +191,8 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "productionValue": 2,
-        "ability": "Production 2"
+        "productionValue": 1,
+        "ability": "Production 1"
     },
     {
         "id": "saera_flagship",

@@ -1665,10 +1665,66 @@ public class ButtonHelperAbilities {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("addProtocol_")
+    public static void addProtocol(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+        String protocol = buttonID.split("_")[1];
+        if (!player.hasAbility("protocol_" + protocol)) {
+            player.addAbility("protocol_" + protocol);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the " + StringUtils.capitalize(protocol) + " protocol");
+            event.getMessage().delete().queue();
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you already had the " + StringUtils.capitalize(protocol) + " protocol");
+        }
+    }
+
+    public static List<Button> getAvailableProtocols(Player player) {
+        List<Button> buttons = new ArrayList<>();
+        String protocol = "distribution";
+        if (!player.hasAbility("protocol_" + protocol)) {
+            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+        } else {
+            player.removeAbility("protocol_" + protocol);
+        }
+        protocol = "command";
+        if (!player.hasAbility("protocol_" + protocol)) {
+            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+        } else {
+            player.removeAbility("protocol_" + protocol);
+        }
+        protocol = "excavation";
+        if (!player.hasAbility("protocol_" + protocol)) {
+            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+        } else {
+            player.removeAbility("protocol_" + protocol);
+        }
+        protocol = "espionage";
+        if (!player.hasAbility("protocol_" + protocol)) {
+            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+        } else {
+            player.removeAbility("protocol_" + protocol);
+        }
+        protocol = "conflict";
+        if (!player.hasAbility("protocol_" + protocol)) {
+            buttons.add(Buttons.gray("addProtocol_" + protocol, StringUtils.capitalize(protocol)));
+        } else {
+            player.removeAbility("protocol_" + protocol);
+        }
+
+        return buttons;
+    }
+
     public static void giveKeleresCommsNTg(Game game, GenericInteractionCreateEvent event) {
         for (Player player : game.getRealPlayers()) {
             if (player.hasAbility("divination")) {
                 rollOmenDiceAtStartOfStrat(game, player);
+            }
+            if (player.hasAbility("protocols")) {
+                List<Button> buttons = getAvailableProtocols(player);
+                String sb = player.getRepresentationUnfogged() + " your **Protocols** ability was triggered. You can now select two protocols that you did not select last round to be your active protocols and give your leaders abilities.";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " choose first protocol", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " choose second protocol", buttons);
+
             }
             if (!player.hasAbility("council_patronage"))
                 continue;
