@@ -161,7 +161,7 @@ public class AutoPingCron {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 != player && playersInCombat.contains(p2.getFaction())) {
                     MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                        p2.getRepresentationUnfogged() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
+                        p2.getRepresentationUnfogged() + ", the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant.");
                 }
             }
         }
@@ -186,7 +186,7 @@ public class AutoPingCron {
         if (game.isFowMode()) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, pingMessage);
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "Active player has been pinged. This is ping #" + pingNumber);
+                "Active player has been pinged. This is ping #" + pingNumber + ".");
             return;
         }
         MessageChannel gameChannel = player.getCorrectChannel();
@@ -198,7 +198,7 @@ public class AutoPingCron {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("temporaryPingDisable", "Disable Pings For Turn"));
             buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
-            MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + " if the game is not waiting on you, you may disable the" +
+            MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + ", if the game is not waiting on you, you may disable the" +
                 " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                 buttons);
         }

@@ -62,6 +62,7 @@ public class ReactionService {
         if (isNotBlank(additionalMessage)) {
             text += " " + game.getPing() + " " + additionalMessage;
         }
+        text = text.replace("  ", " ");
 
         if (game.isFowMode() && !sendPublic) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, text);

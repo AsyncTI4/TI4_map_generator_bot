@@ -103,7 +103,7 @@ public class TacticalActionButtonHandlers {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         }
 
-        String message = "Choose a system to move from, or finalize movement.";
+        String message = "Please choose a system to move from, or finalize movement.";
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
         MessageHelper.sendMessageToEventChannelWithButtons(event, message, systemButtons);
         ButtonHelper.deleteMessage(event);
@@ -116,7 +116,7 @@ public class TacticalActionButtonHandlers {
             TacticalActionService.reverseAllUnitMovement(event, game, player);
         }
 
-        String message = "Choosing a different system to activate. Please select the ring of the map that the system you wish to activate is located in.";
+        String message = "Choosing a different system to activate. Please choose the ring of the map that the system you wish to activate is located in.";
         if (!game.isFowMode()) {
             message += " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
         }

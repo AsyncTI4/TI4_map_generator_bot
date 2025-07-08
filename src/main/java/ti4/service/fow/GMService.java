@@ -165,7 +165,7 @@ public class GMService {
             }
             factionButtons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
-                "Select player who to view the game as:", factionButtons);
+                "Please choose the player who to view the game as:", factionButtons);
         }
     }
 
@@ -204,7 +204,7 @@ public class GMService {
                   MessageHelper.sendMessageToChannel(event.getChannel(), sbAfters.toString());
             }
             default -> {
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Select what to look for:", HAND_CHECK_BUTTONS);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please choose what to look for:", HAND_CHECK_BUTTONS);
             }
         }
     }
