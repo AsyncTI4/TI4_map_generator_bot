@@ -1307,7 +1307,7 @@ public class UnfiledButtonHandlers {
                 message = " has been queued to score a public objective. ";
                 if (!game.isFowMode()) {
                     message += player2.getRepresentationUnfogged()
-                        + " is the one the game is currently waiting on";
+                        + " is the one the game is currently waiting on.";
                 }
                 String poID = buttonID.replace(Constants.PO_SCORING, "");
                 try {
@@ -1479,10 +1479,10 @@ public class UnfiledButtonHandlers {
                     }
                     if (game.getStoredValue(key3).contains(player2.getFaction() + "*")) {
                         message = player.getRepresentation()
-                            + "  has been queued to score a secret objective. ";
+                            + " has been queued to score a secret objective. ";
                         if (!game.isFowMode()) {
                             message += player2.getRepresentationUnfogged()
-                                + " is the one the game is currently waiting on";
+                                + " is the one the game is currently waiting on.";
                         }
                         if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
                             game.setStoredValue(player.getFaction() + "round" + game.getRound() + "SO", "Queued");

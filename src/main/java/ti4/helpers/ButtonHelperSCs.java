@@ -884,7 +884,7 @@ public class ButtonHelperSCs {
                 message += " Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect; players will have to monitor this)";
             }
         }
-        message += "."
+        message += ".";
 
         if (event instanceof ButtonInteractionEvent bEvent) {
             bEvent.getMessage().delete().queue();
