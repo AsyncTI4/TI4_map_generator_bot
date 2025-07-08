@@ -93,7 +93,8 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
                 player.setHarvestCounter(0);
                 player.setCommodities(player.getCommodities() + comms);
                 ButtonHelperAgents.toldarAgentInitiation(game, player, comms);
-                MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " + player.getCommodities() + " commodities (from the " + comms + " that were on the card).");
+                MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " now has " 
+                    + player.getCommodities() + " commodit" + (player.getCommodities() == 1 ? "y" : "ies") + " (from the " + comms + " that were on the card).");
             }
             case "mirage", "illusion", "phantasm" -> {
                 output = "Use buttons to put 2 fighters with your ships.";
