@@ -91,6 +91,7 @@ public class WebPlayerArea {
     private List<Leader> leaders;
     private List<String> leaderIDs;
     private Map<String, Integer> secretsScored;
+    private Map<String, Integer> knownUnscoredSecrets;
     private Integer numUnscoredSecrets;
 
     // Additional properties
@@ -230,6 +231,14 @@ public class WebPlayerArea {
         webPlayerArea.setLeaders(player.getLeaders());
         webPlayerArea.setLeaderIDs(player.getLeaderIDs());
         webPlayerArea.setSecretsScored(player.getSecretsScored());
+
+        // Known unscored secrets (populated if search warrant is in play)
+        if (player.isSearchWarrant()) {
+            webPlayerArea.setKnownUnscoredSecrets(player.getSecretsUnscored());
+        } else {
+            webPlayerArea.setKnownUnscoredSecrets(new HashMap<>());
+        }
+
         webPlayerArea.setNumUnscoredSecrets(player.getSecretsUnscored() != null ? player.getSecretsUnscored().size() : 0);
 
         // Additional properties
