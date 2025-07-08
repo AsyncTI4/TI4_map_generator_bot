@@ -30,18 +30,18 @@ class ExploreFrontier extends GameStateSubcommand {
         String cardID = event.getOption(Constants.EXPLORE_CARD_ID, null, OptionMapping::getAsString);
         Game game = getGame();
 
-        if (!Mapper.isValidExplore(cardID)) {
+        if (cardID != null && !Mapper.isValidExplore(cardID)) {
             MessageHelper.sendMessageToEventChannel(event, "Invalid ID specified: " + cardID);
             return;
         }
 
-        if (!force && game.pickExplore(cardID) == null) {
+        if (!force && cardID != null && game.pickExplore(cardID) == null) {
             MessageHelper.sendMessageToEventChannel(event, "Exploration Card ID: `" + cardID + "` is not in the deck or discard pile.");
             return;
         }
 
         Tile tile = TileHelper.getTile(event, tileName, game);
-        if (cardID != null) {
+        if (cardID != null || force) {
             ExploreService.expFront(event, tile, game, getPlayer(), force, cardID);
         } else {
             ButtonHelper.resolveFullFrontierExplore(game, getPlayer(), tile, event);
