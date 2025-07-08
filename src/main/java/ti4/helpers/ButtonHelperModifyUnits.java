@@ -1557,7 +1557,7 @@ public class ButtonHelperModifyUnits {
                 }
                 orbFollowUp.add(Buttons.red("finishComponentAction_spitItOut", "Finish Orbital Drop"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() +
-                    ", you may pay 3 resources to drop a mech on the planet too (if applicable)", orbFollowUp);
+                    ", you may pay 3 resources to DEPLOY a mech on the planet too (if applicable).", orbFollowUp);
             }
         }
 

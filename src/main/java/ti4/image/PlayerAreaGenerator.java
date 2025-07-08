@@ -1149,7 +1149,13 @@ public class PlayerAreaGenerator {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                     drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
                 } else {
-                    drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
+                    if (game.isLiberationC4Mode() && "ghost".equals(abilityModel.getFaction())) {
+                        drawFactionIconImage(g2, "redcreuss", x + deltaX - 1, y, 42, 42);
+                    }
+                    else
+                    {
+                        drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
+                    }
                     if (abilityModel.getShrinkName())
                     {
                         g2.setFont(Storage.getFont16());
@@ -1783,8 +1789,12 @@ public class PlayerAreaGenerator {
             }
             if (originalPlanetTypes != null && originalPlanetTypes.contains(PlanetType.FACTION)) {
                 planetDisplayIcon = Mapper.getPlanet(planetName).getFactionHomeworld();
-                if (planetDisplayIcon == null) // fallback to current player's faction
+                if (planetDisplayIcon == null) { // fallback to current player's faction
                     planetDisplayIcon = player.getFaction();
+                }
+                if (game.isLiberationC4Mode() && "ghost".equals(planetDisplayIcon)) {
+                    planetDisplayIcon = "redcreuss";
+                }
             }
 
             Set<String> planetTypes = planet.getPlanetTypes();
@@ -1800,7 +1810,7 @@ public class PlayerAreaGenerator {
                     planetDisplayIcon = "keleres";
                 }
 
-                if (Mapper.isValidFaction(planetDisplayIcon)) {
+                if (Mapper.isValidFaction(planetDisplayIcon) || "redcreuss".equals(planetDisplayIcon)) {
                     drawFactionIconImage(graphics, planetDisplayIcon, x + deltaX - 2, y - 2, 52, 52);
                 } else {
                     String planetTypeName = "pc_attribute_" + planetDisplayIcon + ".png";
@@ -2021,7 +2031,13 @@ public class PlayerAreaGenerator {
 
             // Draw Faction Tech Icon
             if (techModel.getFaction().isPresent()) {
-                drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
+                if (game.isLiberationC4Mode() && "ghost".equals(techModel.getFaction().get())) {
+                    drawFactionIconImage(graphics, "redcreuss", x + deltaX - 1, y + 108, 42, 42);
+                }
+                else
+                {
+                    drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
+                }
             } else {
                 Color foreground = switch (techModel.getFirstType()) {
                     case PROPULSION -> ColorUtil.PropulsionTech;
@@ -2166,8 +2182,14 @@ public class PlayerAreaGenerator {
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (techModel.getFaction().isPresent()) {
-                drawFactionIconImageOpaque(graphics, techModel.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
+            if (techModel.getFaction().isPresent()) {                
+                if (game.isLiberationC4Mode() && "ghost".equals(techModel.getFaction().get())) {
+                    drawFactionIconImageOpaque(graphics, "redcreuss", x + deltaX + 1, y + 108, 42, 42, 0.5f);
+                }
+                else
+                {
+                    drawFactionIconImageOpaque(graphics, techModel.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
+                }
             }
 
             if (techModel.getShrinkName()) {

@@ -2896,13 +2896,13 @@ public class AgendaHelper {
                         }
                         outcomeSummaryBuilder.append(faction).append("-").append(vote);
                         if (NumberUtils.isDigits(vote) && !game.isFowMode() && p2.hasTech("dskyrog")) {
-                            outcomeSummaryBuilder.append(" (Impressment Teams)");
+                            outcomeSummaryBuilder.append(" (_Indoctrination Teams_)");
                         }
                         if (!game.isFowMode() && p2 != null && p2.hasAbility("future_sight")) {
-                            outcomeSummaryBuilder.append(" (Future Sight)");
+                            outcomeSummaryBuilder.append(" (**Future Sight**)");
                         }
                         if (!game.isFowMode() && p2 != null && p2.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, p2, "cruiser", true) < 8) {
-                            outcomeSummaryBuilder.append(" (Mirrorshard Deploy)");
+                            outcomeSummaryBuilder.append(" (Mirrorshard DEPLOY)");
                         }
                         outcomeSummaryBuilder.append(", ");
                     } else {

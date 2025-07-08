@@ -29,6 +29,7 @@ public enum LeaderEmojis implements TI4Emoji {
     XxchaAgent, XxchaCommander, XxchaHero, //
     YinAgent, YinCommander, YinHero, //
     YssarilAgent, YssarilCommander, YssarilHero, //
+    RedCreussAgent, RedCreussCommander, RedCreussHero, //
 
     // Discordant Stars
     AugersAgent, AugersCommander, AugersHero, //
@@ -101,6 +102,7 @@ public enum LeaderEmojis implements TI4Emoji {
             case "xxchaagent" -> XxchaAgent;
             case "yinagent" -> YinAgent;
             case "yssarilagent" -> YssarilAgent;
+            case "redghostagent", "redcreussagent" -> RedCreussAgent;
 
             // LEADERS - COMMANDERS
             case "arboreccommander" -> ArborecCommander;
@@ -127,6 +129,7 @@ public enum LeaderEmojis implements TI4Emoji {
             case "xxchacommander" -> XxchaCommander;
             case "yincommander" -> YinCommander;
             case "yssarilcommander" -> YssarilCommander;
+            case "redghostcommander", "redcreusscommander" -> RedCreussCommander;
 
             // LEADERS - HEROES
             case "arborechero" -> ArborecHero;
@@ -156,6 +159,7 @@ public enum LeaderEmojis implements TI4Emoji {
             case "xxchahero" -> XxchaHero;
             case "yinhero" -> YinHero;
             case "yssarilhero" -> YssarilHero;
+            case "redghosthero", "redcreusshero" -> RedCreussHero;
 
             // DS LEADERS
             case "augersagent" -> AugersAgent;

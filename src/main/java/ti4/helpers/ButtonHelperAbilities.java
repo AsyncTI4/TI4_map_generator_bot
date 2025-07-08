@@ -856,10 +856,10 @@ public class ButtonHelperAbilities {
     @ButtonHandler("addTombToken_")
     public static void addTombToken(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];
-        String message = player.getFactionEmoji() + " added a tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".";
+        String message = player.getFactionEmoji() + " added a Tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".";
         UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         if (unitHolder.getTokenList().contains("token_tomb.png")) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getFactionEmoji() + " had already added a tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getFactionEmoji() + " had already added a Tomb token to " + Helper.getPlanetRepresentation(planet, game) + ".");
 
             return;
         }
@@ -870,7 +870,7 @@ public class ButtonHelperAbilities {
 
     @ButtonHandler("startAncientEmpire")
     public static void startAncientEmpire(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String message = player.getRepresentation() + " chose a planet to add a tomb token to.";
+        String message = player.getRepresentation() + ", please choose a planet to add a Tomb token to.";
         List<Button> buttons = new ArrayList<>();
         for (String planet : game.getPlanets()) {
             UnitHolder unitHolder = ButtonHelper.getUnitHolderFromPlanetName(planet, game);

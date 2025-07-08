@@ -140,7 +140,7 @@ public class SecretObjectiveHelper {
         HeroUnlockCheckService.checkIfHeroUnlocked(game, player);
         if (player.hasAbility("dark_purpose")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " can gain 1 command token due to their dark purpose ability");
+                player.getRepresentation() + " gains 1 command token due to **Dark Purpose**.");
             List<Button> buttons = ButtonHelper.getGainCCButtons(player);
             String message2 = player.getRepresentationUnfogged() + ", your current command tokens are "
                 + player.getCCRepresentation()
@@ -162,7 +162,8 @@ public class SecretObjectiveHelper {
             sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id)).append("\n");
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, "All secret objectives shown to player");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, 
+            "All secret objectives in your hand have been shown to " + (game.isFowMode() ? "someone" : player_.getRepresentationNoPing()) + ".");
     }
 
     public static List<Button> getUnscoredSecretObjectiveButtons(Player player) {

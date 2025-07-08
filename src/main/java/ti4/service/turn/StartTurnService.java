@@ -156,7 +156,8 @@ public class StartTurnService {
         
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander") && player.getCommodities() > 0) {
             for (Player p2 : game.getRealPlayers()) {
-                if (!p2.equals(player) && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander") && p2.getCommodities() > 0)
+                if (!p2.equals(player) && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander") && p2.getCommodities() > 0 
+                        && player.getNeighbouringPlayers(true).contains(p2))
                 {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
                     buttonsRedCreuss.add(Buttons.green("redCreussWash_" + p2.getUserID(), "Wash", MiscEmojis.Wash));
