@@ -41,7 +41,7 @@ class ExploreFrontier extends GameStateSubcommand {
         }
 
         Tile tile = TileHelper.getTile(event, tileName, game);
-        if (cardID != null) {
+        if (cardID != null || force) {
             ExploreService.expFront(event, tile, game, getPlayer(), force, cardID);
         } else {
             ButtonHelper.resolveFullFrontierExplore(game, getPlayer(), tile, event);
