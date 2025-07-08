@@ -1138,7 +1138,7 @@ public class Helper {
                     if (thing.contains("comm")) {
                         String comms = StringUtils.substringAfter(thing, "_");
                         keleresAgent += Integer.parseInt(comms);
-                        msg.append("Xander Alexin Victori III, the Keleres agent, for ").append(comms).append(" commodit").append(comms == 1 ? "y" : "ies").append("\n");
+                        msg.append("Xander Alexin Victori III, the Keleres agent, for ").append(comms).append(" commodit").append(comms.equals("1") ? "y" : "ies").append("\n");
                     } else {
                         msg.append(thing).append("\n");
                     }
