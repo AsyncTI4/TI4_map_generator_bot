@@ -254,7 +254,7 @@
         "requirements": "GG",
         "faction": "mechi",
         "source": "eronous",
-        "text": "After another player moves units into a system that contains one of your units with PRODUCTION. You may produce one unit in that system. Then, exhaust this card."
+        "text": "After another player activates a system that contains one of your units with PRODUCTION. You may produce one unit in that system."
     },
     {
         "alias": "mechiy",
