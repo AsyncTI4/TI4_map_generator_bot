@@ -708,9 +708,9 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }
         if ("pharadnagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Avhkan, The Crow, the Pharadn" + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Avhkan, the Pharadn" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
-            message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever + "Avhkan, The Crow, the Pharadn" + ssruuSlash + " agent.";
+            message = trueIdentity + ", please choose the faction on which you wish to use " + ssruuClever + "Avhkan, the Pharadn" + ssruuSlash + " agent.";
             List<Button> buttons = VoteButtonHandler.getPlayerOutcomeButtons(game, null, "pharadnAgentSelect", null);
             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
         }

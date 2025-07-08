@@ -352,7 +352,7 @@ public class PlayStrategyCardService {
                             message.addReaction(reactionEmoji2).queue();
                             p2.addFollowedSC(scToPlay, event);
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), "You were automatically marked as not following **"
-                                + stratCardName + "** because the bot does not believe you have a space dock in your home system");
+                                + stratCardName + "** because the bot does not believe you have a space dock in your home system.");
                         }
                     }
                 }

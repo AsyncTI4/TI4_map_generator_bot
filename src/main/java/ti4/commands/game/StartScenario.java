@@ -106,6 +106,11 @@ public class StartScenario extends GameStateSubcommand {
             }
         }
         for (String faction : factions) {
+            if (players.size() == 0)
+            {
+                MessageHelper.sendMessageToEventChannel(event, "You don't have six players, but I'll try my best anyway.");
+                break;
+            }
             if (game.getPlayerFromColorOrFaction(faction) == null) {
                 int face = ThreadLocalRandom.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
@@ -165,6 +170,7 @@ public class StartScenario extends GameStateSubcommand {
             ghost.addLeader("redcreussagent");
             ghost.addLeader("redcreusscommander");
             ghost.addLeader("redcreusshero");
+            ghost.setFactionEmoji("redcreuss");
         }
         List<String> allRelics = game.getAllRelics();
 
