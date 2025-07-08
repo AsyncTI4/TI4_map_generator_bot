@@ -1784,6 +1784,11 @@ public class ButtonHelperFactionSpecific {
             {
                 continue;
             }
+            if (!player.getNeighbouringPlayers(true).contains(p2))
+            {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you are not neighbours with " + p2.getRepresentationNoPing() + ".");
+                return;
+            }
             if (p2.getCommodities() == 0)
             {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - " + p2.getRepresentationNoPing() + " doesn't have any commodities.");

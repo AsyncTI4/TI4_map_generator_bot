@@ -947,7 +947,7 @@ public class ButtonHelper {
                 buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation()
                     + ", at the start of the game you indicated a willingness to auto-pass on \"when\"s and \"after\"s if you had none, and so you have been auto-passed."
-                    + " You can undo this during the agenda if necessary, or with this button",
+                    + " You can undo this during the agenda if necessary, or with this button.",
                     buttons);
                 game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
             } else {
