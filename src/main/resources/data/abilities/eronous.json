@@ -88,6 +88,41 @@
         "source": "eronous"
     },
     {
+        "id": "protocol_distribution",
+        "name": "(Protocol) Distribution",
+        "faction": "mechi",
+        "permanentEffect":"Tier 1 - After a player activates a system, you may exhaust this card to increase the movement value of one of their ships by 1. \n\nTier 2 - Your ships may ignore the effects of asteroid fields, gravity rifts and nebulas. \n\nTier 3 - At the start of a round of space combat: Apply a bonus to each of your non-fighter ships combat rolls equal to their movement value until the end of the combat.",
+        "source": "eronous"
+    },
+    {
+        "id": "protocol_command",
+        "name": "(Protocol) Command",
+        "faction": "mechi",
+        "permanentEffect":"Tier 1 - At the end of a player’s turn: You may exhaust this card to allow them to perform the secondary ability of the Leadership strategy card. \n\nTier 2 - Planets that contain your mechs have their influence value increased by +1 \n\nTier 3 - ACTION: Perform the primary ability of the leadership card. Then, refresh all planets you spent during that action.",
+        "source": "eronous"
+    },
+    {
+        "id": "protocol_excavation",
+        "name": "(Protocol) Excavation",
+        "faction": "mechi",
+        "permanentEffect":"Tier 1 - At the end of a player’s turn: You may exhaust this card to allow that player to explore a planet that contains one of their mechs. \n\nTier 2 - When you explore a planet: Gain 1tg. \n\nTier 3 - ACTION: Explore each planet that contains one of your mechs. Then, ready each of those planets.",
+        "source": "eronous"
+    },
+    {
+        "id": "protocol_espionage",
+        "name": "(Protocol) Espionage",
+        "faction": "mechi",
+        "permanentEffect":"Tier 1 - At the end of a player’s turn: You may exhaust this card to allow a player to discard one unscored secret objective. If they do so, they draw a new one. Then, shuffle the discarded secret objective into the deck. \n\nTier 2 - When you win a combat against another player: That player must show you one of their unscored secret objectives at random, if able. \n\nTier 3 - ACTION: Each of your neighbors must give you one of their unscored secret objectives. Then, give one unscored secret objective you are holding back to each of those players.",
+        "source": "eronous"
+    },
+    {
+        "id": "protocol_conflict",
+        "name": "(Protocol) Conflict",
+        "faction": "mechi",
+        "permanentEffect":"Tier 1 - At the end of a round of combat: You may exhaust this card to repair one unit in the active system. \n\nTier 2 - Your space docks and mechs increase their PRODUCTION values by 1. \n\nTier 3 - ACTION: You may use the PRODUCTION values of each of your mechs.",
+        "source": "eronous"
+    },
+    {
         "id": "angelic_hosts",
         "name": "Angelic Hosts",
         "faction": "saera",

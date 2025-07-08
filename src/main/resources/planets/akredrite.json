@@ -9,8 +9,8 @@
         "x": 134.0,
         "y": 86.0
     },
-    "resources": 2,
-    "influence": 1,
+    "resources": 1,
+    "influence": 2,
     "factionHomeworld": "mechi",
     "planetType": "FACTION",
     "cardImagePath": null,
