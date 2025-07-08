@@ -79,7 +79,7 @@ public class ButtonHelperRelics {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
-            if (!exhaustedMessage.contains("Click the names")) {
+            if (!exhaustedMessage.contains("Please choose the")) {
                 exhaustedMessage += ", " + msg;
             } else {
                 exhaustedMessage = player.getRepresentation() + msg;

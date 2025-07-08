@@ -159,7 +159,7 @@ public class FrankenDraftBagService {
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " you cannot legally draft anything from this bag right now.");
         } else if (!isQueueFull) {
-            MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentationUnfogged() + " please select an item to draft:", getSelectionButtons(draftables, player));
+            MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentationUnfogged() + ", please choose an item to draft:", getSelectionButtons(draftables, player));
         }
 
         if (draftQueueCount > 0) {
@@ -171,7 +171,7 @@ public class FrankenDraftBagService {
             MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Queue:__\n> You are drafting the following from this bag:\n" + getDraftQueueRepresentation(player), queueButtons);
 
             if (isQueueFull || draftables.isEmpty()) {
-                MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " please confirm or reset your draft picks.");
+                MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + ", please confirm or reset your draft picks.");
             }
         }
 

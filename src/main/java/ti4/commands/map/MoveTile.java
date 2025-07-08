@@ -26,7 +26,7 @@ public class MoveTile extends GameStateSubcommand {
 
         Tile movingTile = CommandHelper.getTile(event, game);
         if (movingTile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're trying to move.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the system you're trying to move.");
             return;
         }
 

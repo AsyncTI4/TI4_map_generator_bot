@@ -107,7 +107,7 @@ public class ButtonHelperCommanders {
             String message = p2.getRepresentationUnfogged()
                 + " You've been hit by"
                 + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
-                + " S'ula Mentarion, the Mentak commander. Please select the promissory note you would most like to send and/or least like to keep.";
+                + " S'ula Mentarion, the Mentak commander. Please choose the promissory note you would most like to send and/or least like to keep.";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Sent " + color + " the buttons for resolving S'ula Mentarion, the Mentak commander.");
@@ -301,7 +301,7 @@ public class ButtonHelperCommanders {
         String newMessage = null;
         List<Button> newButtons = new ArrayList<>();
         if (Pattern.compile(part1).matcher(buttonID).matches()) {
-            String message = player.getRepresentation() + " Choose a tile to migrate from:";
+            String message = player.getRepresentation() + ", please choose a system to migrate from:";
             Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> !um.getIsStructure());
             List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -309,7 +309,7 @@ public class ButtonHelperCommanders {
 
         } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
-            newMessage = player.getRepresentation() + " You are migrating from " + from.getRepresentationForButtons(game, player) + ". Choose a unit you'd like to move:";
+            newMessage = player.getRepresentation() + " You are migrating from " + from.getRepresentationForButtons(game, player) + ". Please choose the unit you wish to move:";
             for (UnitHolder uh : from.getUnitHolders().values()) {
                 PlanetModel planet = Mapper.getPlanet(uh.getName());
                 String planetName = planet == null ? uh.getName() : planet.getName();
@@ -488,7 +488,7 @@ public class ButtonHelperCommanders {
         player.setTg(player.getTg() - 1);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is paying 1 trade good to look at the top card of a deck.");
         List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, false, player);
-        String message = player.getRepresentationUnfogged() + " select which deck you wish to look at the top of.";
+        String message = player.getRepresentationUnfogged() + ", please choose which deck you wish to look at the top of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 

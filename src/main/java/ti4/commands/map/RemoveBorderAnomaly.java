@@ -18,7 +18,7 @@ class RemoveBorderAnomaly extends GameStateSubcommand {
     public RemoveBorderAnomaly() {
         super(Constants.REMOVE_BORDER_ANOMALY, "Remove border anomalies", true, false);
         addOption(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border is linked to or ALL to remove all border anomalies from the map", true, true);
-        addOption(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the tile the anomaly is on", false, true);
+        addOption(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the system the anomaly is on", false, true);
     }
 
     @Override

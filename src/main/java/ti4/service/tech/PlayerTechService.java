@@ -257,7 +257,7 @@ public class PlayerTechService {
             }
             case "nekroc4r" -> {
                 List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
-                String message = player.getRepresentation() + " choose one of the options for this technology:";
+                String message = player.getRepresentation() + ", please choose one of the options for this technology:";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -267,13 +267,14 @@ public class PlayerTechService {
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
                 buttons.add(doneExhausting);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Click the names of the planets you wish to exhaust to pay the required " + player.getPlanetsAllianceMode().size() + " influence.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    "Please choose the planets you wish to exhaust to pay the required " + player.getPlanetsAllianceMode().size() + " influence.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsuydab" -> {
                 game.setDominusOrb(true);
                 ButtonHelper.deleteMessage(event);
-                String message = "Choose a system to move from.";
+                String message = "Please choose a system to move from.";
                 List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
             }
@@ -282,7 +283,7 @@ public class PlayerTechService {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "sd",
                     "placeOneNDone_skipbuild");
                 String message = player.getRepresentationUnfogged()
-                    + " select the planet you would like to place or move a space dock to.";
+                    + ", please choose the planet you wish to place or move a space dock to.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -302,21 +303,21 @@ public class PlayerTechService {
             case "vtx", "absol_vtx" -> { // Vortex
                 deleteIfButtonEvent(event);
                 List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, game, event);
-                String message = player.getRepresentationUnfogged() + ", please select which unit you would like to capture.";
+                String message = player.getRepresentationUnfogged() + ", please choose which unit you wish to capture.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "wg" -> { // Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentationUnfogged() + " select the type of wormhole you wish to drop.";
+                String message = player.getRepresentationUnfogged() + ", please choose the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "absol_wg" -> { // Absol's Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentationUnfogged() + " select the type of wormhole you wish to drop.";
+                String message = player.getRepresentationUnfogged() + ", please choose the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -375,12 +376,12 @@ public class PlayerTechService {
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    "Select which tile you would like to produce a ship in ", buttons);
+                    "Please choose which system you wish to produce a ship in.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsdihmy" -> { // Impressment Programs
                 List<Button> buttons = ButtonHelper.getButtonsToExploreReadiedPlanets(player, game);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select a planet to explore",
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please choose a planet to explore.",
                     buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -570,7 +571,7 @@ public class PlayerTechService {
 
     public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech, final String payWith) {
         String trueIdentity = player.getRepresentationUnfogged();
-        String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
+        String message2 = trueIdentity + ", please choose the planets you wish to exhaust. ";
         String payType = payWith != null ? payWith : "res";
         if (!payType.equals("res") && !payType.equals("inf") && !payType.equals("tgsonly")) {
             payType = "res";

@@ -554,7 +554,7 @@ public class AgendaHelper {
                                             player.getFinsFactionCheckerPrefix());
                                     }
                                     MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),
-                                        player.getRepresentation() + ", please select your target.", game, player,
+                                        player.getRepresentation() + ", please choose your target.", game, player,
                                         riderButtons);
                                 }
                             }
@@ -569,7 +569,7 @@ public class AgendaHelper {
                                 riderButtons = getAgendaButtons("Edyn Unity Algorithm", game,
                                     player.getFinsFactionCheckerPrefix());
                                 MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),
-                                    player.getRepresentation() + ", please select your target.", game, player,
+                                    player.getRepresentation() + ", please choose your target.", game, player,
                                     riderButtons);
                             }
                             case "leader" -> {
@@ -589,7 +589,7 @@ public class AgendaHelper {
                                         player.getFinsFactionCheckerPrefix());
                                 }
                                 MessageHelper.sendMessageToChannelWithFactionReact(player.getCorrectChannel(),
-                                    player.getRepresentation() + ", please select your target.", game, player,
+                                    player.getRepresentation() + ", please choose your target.", game, player,
                                     riderButtons);
                             }
                             case "ac" -> {
@@ -2021,20 +2021,20 @@ public class AgendaHelper {
                         }
                         if (specificVote.contains("Construction Rider")) {
                             String message = identity
-                                + ", you have a _Construction Rider_ to resolve. Click the name of the planet you wish to place your space dock on.";
+                                + ", you have a _Construction Rider_ to resolve. Please choose the planet you wish to place your space dock on.";
                             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(winningR, game, "sd", "place");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
                         if (specificVote.contains("Warfare Rider")) {
                             String message = identity
-                                + ", you have a _Warfare Rider_ to resolve. Select the system where you wish to place the dreadnought.";
+                                + ", you have a _Warfare Rider_ to resolve. Please choose the system where you wish to place the dreadnought.";
                             List<Button> buttons = Helper.getTileWithShipsPlaceUnitButtons(winningR, game,
                                 "dreadnought", "placeOneNDone_skipbuild");
                             MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                         }
                         if (specificVote.contains("Armament Rider")) {
                             String message = identity
-                                + ", you have an _Armament Rider_ to resolve. Select the system in which you wish to produce 2 units each with cost 4 or less.";
+                                + ", you have an _Armament Rider_ to resolve. Please choose the system in which you wish to produce 2 units each with cost 4 or less.";
 
                             List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, winningR, UnitType.Spacedock);
                             List<Button> buttons = new ArrayList<>();
@@ -3189,7 +3189,7 @@ public class AgendaHelper {
         String factionOrColor = buttonID.substring(0, buttonID.indexOf("_"));
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Chose to Rider for one of " + factionOrColor
-            + "'s planets. Use buttons to select which one.";
+            + "'s planets. Please choose which one.";
         List<Button> outcomeActionRow;
         buttonID = buttonID.replace(factionOrColor + "_", "");
         outcomeActionRow = getPlanetOutcomeButtons(event, planetOwner, game, player.getFinsFactionCheckerPrefix(),
@@ -3200,7 +3200,7 @@ public class AgendaHelper {
 
     @ButtonHandler("distinguishedReverse_")
     public static void distinguishedReverse(ButtonInteractionEvent event, String buttonID) {
-        String voteMessage = "Please select from the available buttons your total vote amount."
+        String voteMessage = "Please choose from the available buttons your total vote amount."
             + " If your desired amount is not available, you may use the buttons to increase or decrease by multiples of 5 until you arrive at it.";
         String vote = buttonID.substring(buttonID.indexOf("_") + 1);
         int votes = Integer.parseInt(vote);
@@ -3212,7 +3212,7 @@ public class AgendaHelper {
 
     @ButtonHandler("distinguished_")
     public static void distinguished(ButtonInteractionEvent event, String buttonID) {
-        String voteMessage = "Please select from the available buttons your total vote amount."
+        String voteMessage = "Please choose from the available buttons your total vote amount."
             + " If your desired amount is not available, you may use the buttons to increase or decrease by multiples of 5 until you arrive at it.";
         String vote = buttonID.substring(buttonID.indexOf("_") + 1);
         int votes = Integer.parseInt(vote);
@@ -3304,7 +3304,7 @@ public class AgendaHelper {
                     }
                 }
             }
-            String resMessage3 = "Please select the winner.";
+            String resMessage3 = "Please choose the winner.";
             List<Button> deadlyActionRow3 = getAgendaButtons(null, game, "agendaResolution");
             deadlyActionRow3.add(Buttons.red("resolveWithNoEffect", "Resolve With No Result"));
             MessageHelper.sendMessageToChannelWithButtons(game.getActionsChannel(), resMessage3, deadlyActionRow3);
@@ -3378,7 +3378,7 @@ public class AgendaHelper {
                     listVoteCount(game, game.getMainGameChannel());
                 }
             } else {
-                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target.",
+                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please choose your rider target.",
                     game, player, riderButtons);
                 if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
                     Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);

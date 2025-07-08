@@ -32,7 +32,7 @@ public class PlayerPreferenceHelper {
             buttons.add(Buttons.gray("playerPref_hideTransactables", "Stop showing player areas start of transaction"));
         else
             buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " Choose the thing you wish to change", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + ", please choose the thing you wish to change.", buttons);
     }
 
     @ButtonHandler(value = "playerPref_", save = false)
@@ -53,7 +53,7 @@ public class PlayerPreferenceHelper {
             case "autoNoWhensAfters" -> {
                 List<Button> buttons = new ArrayList<>();
                 String msg = player.getRepresentation()
-                    + " Choose whether you wish for the bot to auto react \"no whens\"/\"no afters\" after a random amount of time for you when you have no \"when\"s and no \"after\"s."
+                    + ", please choose whether you wish for the bot to auto react \"no whens\"/\"no afters\" after a random amount of time for you when you have no \"when\"s and no \"after\"s."
                     + " Default is off. This will only apply to this game. If you have any \"when\"s or \"afters\", or related \"when\"/\"after\" abilities, the bot will do nothing. ";
                 buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
                 buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
@@ -139,7 +139,8 @@ public class PlayerPreferenceHelper {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-            + " your afk times (if any) have been reset. Use buttons to select the hours (note they are in UTC) in which you're afk. If you select 8 for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
+            + ", your AFK times (if any) have been reset. Please choose the hours (note they are in UTC) in which you're AFK."
+            + " If you choose `8` for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
             buttons);
     }
 
@@ -155,7 +156,7 @@ public class PlayerPreferenceHelper {
     public static void offerDirectHitManagementOptions(Game game, Player player) {
         List<Button> buttons = getDirectHitManagementButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-            + " select the units you would like to either risk or not risk _Direct Hit_. Upgraded dreadnoughts will automatically \"risk\" _Direct Hits_.  ",
+            + ", please choose the units you wish to either risk or not risk _Direct Hit_. Upgraded dreadnoughts will automatically \"risk\" _Direct Hits_.  ",
             buttons);
     }
 

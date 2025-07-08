@@ -539,7 +539,8 @@ public class MiltyService {
             player.addAbility("policy_the_economy_empower");
             player.removeOwnedUnitByID("olradin_mech");
             player.addOwnedUnitByID("olradin_mech_positive");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " automatically set all of your policies to the positive side, but you can flip any of them now with these buttons");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);

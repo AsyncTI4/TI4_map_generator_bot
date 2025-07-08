@@ -187,7 +187,7 @@ public class PlayerTitleHelper {
     @ButtonHandler(value = "bestowTitleStep1_", save = false)
     public static void resolveBestowTitleStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String title = buttonID.split("_")[1];
-        String msg = player.getRepresentation() + " choose the player you wish to give the title of " + title;
+        String msg = player.getRepresentation() + ", please choose the player you wish to give the title of " + title + ".";
         List<Button> buttons = new ArrayList<>();
         for (Player player2 : game.getRealPlayersNDummies()) {
             if (player2 == player) {
