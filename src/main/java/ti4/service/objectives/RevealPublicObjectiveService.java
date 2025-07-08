@@ -6,6 +6,8 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.RelicHelper;
@@ -16,6 +18,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
+import ti4.service.emoji.SourceEmojis;
 import ti4.service.StatusCleanupService;
 import ti4.service.info.ListPlayerInfoService;
 
@@ -37,14 +40,28 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
         MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Stage 2 Public Objective Revealed**");
-        channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
         if (game.isLiberationC4Mode()) {
-            if (game.getRevealedPublicObjectives().get("Control Ordinian") == null || game.getRevealedPublicObjectives().get("Control Ordinian") == 0) {
-
+            if (game.getRevealedPublicObjectives().get("Control Ordinian") == null || game.getRevealedPublicObjectives().get("Control Ordinian") == 0)
+            {
                 game.addCustomPO("Control Ordinian", 2);
-                MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Liberate Ordinian is no longer scorable. Control Ordinian is now available to be scored (status phase to control ordinian, 2 VP)**");
+                MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " _Liberate Ordinian_ is no longer scorable. _Control Ordinian_ is now available to be scored.");
+                EmbedBuilder control = new EmbedBuilder();
+                control.setTitle(SourceEmojis.Codex + "__**Control Ordinian**__");
+                control.setDescription("Control Ordinian.");
+                control.setColor(0xFFFFFF);
+                channel.sendMessageEmbeds(List.of(po.getRepresentationEmbed(), control.build()))
+                                .queue(m -> m.pin().queue());
+            }
+            else
+            {
+                channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
             }
         }
+        else
+        {
+            channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
+        }
+
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
             if (!game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(channel,
@@ -178,8 +195,20 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
         var channel = game.getMainGameChannel();
         MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 1 Public Objectives Revealed**");
-        channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
-            .queue(m -> m.pin().queue());
+        if (game.isLiberationC4Mode())
+        {
+            EmbedBuilder liberate = new EmbedBuilder();
+            liberate.setTitle(SourceEmojis.Codex + "__**Liberate Ordinian**__");
+            liberate.setDescription("Win a combat against the Nekro Virus.");
+            liberate.setColor(0xFFFFFF);
+            channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed(), liberate.build()))
+                .queue(m -> m.pin().queue());
+        }
+        else
+        {
+            channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
+                .queue(m -> m.pin().queue());
+        }
 
         int maxSCsPerPlayer;
         if (game.getRealPlayers().isEmpty()) {

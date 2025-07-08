@@ -291,6 +291,10 @@ public class MiltyService {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
+                if (faction.equalsIgnoreCase("franken1") || faction.equalsIgnoreCase("franken2")) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setup Failed - Franken1 and Franken2 have issues and should not be used by anyone going forward. Try a different franken number");
+                    return;
+                }
             }
         }
 
@@ -520,6 +524,13 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                     + " due to the **Teeming** ability.");
+        }
+        if (player.hasAbility("machine_cult")) {
+            String unitID = AliasHandler.resolveUnit("mech");
+            player.setUnitCap(unitID, 6);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                "Set mech unit max to 6 for " + player.getRepresentation()
+                    + " due to the **Machine Cult** ability.");
         }
         if (player.hasAbility("policies")) {
             player.removeAbility("policies");
