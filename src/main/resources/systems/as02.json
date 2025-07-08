@@ -1,0 +1,19 @@
+{
+    "id": "as02",
+    "name": "Voyd/Etyr - Eidolon",
+    "aliases": [
+        "as02",
+        "voyd",
+        "etyr",
+        "eidolon"
+    ],
+    "imagePath": "as02.png",
+    "shipPositionsType": "TYPE02",
+    "wormholes": [],
+    "planets": [
+        "voyd",
+        "etyr"
+    ],
+    "source": "eronous",
+    "tileBack": "green"
+}

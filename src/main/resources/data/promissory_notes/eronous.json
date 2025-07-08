@@ -1,0 +1,49 @@
+[
+    {
+        "alias": "cantopn",
+        "name": "Awaken the Spirit",
+        "faction": "canto",
+        "color": "",
+        "playArea": true,
+        "playImmediately": true,
+        "source": "eronous",
+        "text": "When you gain this card, place it face up in your play area: The Cantokylegance player cannot use their Seamless Integration faction ability against planets you control.  If you activate a system that contains 1 or more of the Cantokylegance player's units, return this card to the Cantokylegance player"
+    },
+    {
+        "alias": "eidolonpn",
+        "name": "Hidden Pathways",
+        "faction": "eidolon",
+        "color": "",
+        "playArea": false,
+        "source": "eronous",
+        "text": "After you activate a system:Choose 1 of your units, that unit can move through other players’ ships during this movement. Then, return this card to the Eidolon player"
+    },
+    {
+        "alias": "shadowspn",
+        "name": "Grave Robber",
+        "faction": "shadows",
+        "color": "",
+        "playArea": false,
+        "source": "eronous",
+        "text": "After an agenda is revealed:You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 unit that costs no more than 4 resources from your reinforcements into your home system, if it contains no other players’ ships.Then, return this card to the Skalidur player."
+    },
+    {
+        "alias": "mechipn",
+        "name": "Mechanical Vigor",
+        "faction": "mechi",
+        "color": "",
+        "playArea": false,
+        "source": "eronous",
+        "text": "At the start of a round of ground combat that involves one or more of your mechs, against a player other than the Mechikide: Apply +2 to the result of each of your mechs combat rolls for this round.  Then, return this card to the Mechikide player."
+    },
+    {
+        "alias": "saerapn",
+        "name": "Angelic Favor",
+        "faction": "saera",
+        "color": "",
+        "playArea": false,
+        "source": "eronous",
+        "text": "After you activate a system: Your units ignore the effects of anomalies. Then, return this card to the Saeraphyme player."
+    }
+    
+]

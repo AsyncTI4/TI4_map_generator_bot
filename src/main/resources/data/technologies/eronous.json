@@ -1,0 +1,294 @@
+[
+    {
+        "alias": "dsaxisb",
+        "name": "Rift Engines",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "B",
+        "faction": "axis",
+        "source": "ds",
+        "text": "After you activate a system, you may exhaust this card to choose 1 ship you control and roll a die. On a result of 1-3, remove that ship from the game board; on a result of 4-10, apply +2 to that ship's move value during this tactical action.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/rift_engines.png?raw=true"
+    },
+    {
+        "alias": "dsaxisy",
+        "name": "Emergency Deployment",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "axis",
+        "source": "ds",
+        "text": "ACTION: Exhaust this card to place or move 1 of your space docks onto a planet you control.",
+        "shrinkName": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/emergency_deployment.jpg?raw=true"
+    },
+    {
+        "alias": "dsbentg",
+        "name": "Broker Network",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "G",
+        "faction": "bentor",
+        "source": "ds",
+        "text": "Each planet you control that has a technology specialty or an attachment gains the PRODUCTION 1 ability as if it were a unit.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/broker_network.png?raw=true"
+    },
+    {
+        "alias": "dsbenty",
+        "name": "Merged Replicators",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "bentor",
+        "source": "ds",
+        "text": "When 1 or more of your units use PRODUCTION, you may exhaust this card to increase the PRODUCTION value of 1 of those units to match the PRODUCTION value of the unit on the game board with the highest PRODUCTION value, or apply +2 to the total PRODUCTION value of those units.",
+        "shrinkName": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/merged_replicators.png?raw=true"
+    },
+    {
+        "alias": "dsceldr",
+        "name": "Emergency Mobilization",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "celdauri",
+        "source": "ds",
+        "text": "At the end of your turn, you may exhaust this card and spend 1 token from your strategy pool to remove a command token from a system that contains 1 or more of your space docks.",
+        "shortName": "Emergency Mobilization",
+        "shrinkName": true,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/emergency_mobilization.png?raw=true"
+    },
+    {
+        "alias": "dsceldsd",
+        "name": "Trade Port II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "faction": "celdauri",
+        "baseUpgrade": "sd2",
+        "source": "ds",
+        "text": "PRODUCTION X, ANTI-FIGHTER BARRAGE 6(x2).\nThis unit's PRODUCTION value is equal to 4 more than the resource or influence value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity.\nThis unit may use its ANTI-FIGHTER BARRAGE during each round of space combat.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/trade_port_2.jpg?raw=true"
+    },
+    {
+        "alias": "dscheidn",
+        "name": "Chitin Hulk II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BBY",
+        "faction": "cheiran",
+        "baseUpgrade": "dn2",
+        "source": "ds",
+        "text": "Cost 4, Combat 5, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5\nThis unit cannot be destroyed by “Direct Hit” action cards.\nWhen this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/chitin_hulk_2.png?raw=true"
+    },
+    {
+        "alias": "dscheir",
+        "name": "Brood Pod",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "cheiran",
+        "source": "ds",
+        "text": "After another player activates a system that contains 1 of your structures, you may exhaust this card to produce 1 ship in the active system. For each of your structures in the active system, you may remove that unit from the game board to reduce the cost of the produced ship by 3.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/brood_pod.png?raw=true"
+    },
+    {
+        "alias": "dscymiinf",
+        "name": "Unholy Abomination II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GG",
+        "faction": "cymiae",
+        "baseUpgrade": "inf2",
+        "source": "ds",
+        "text": "Cost 1, Combat 4\nAfter this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit on this card. At the start of your turn, place each unit that is on this card on a planet you control, if able.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/unholy_abomination_2.jpg?raw=true"
+    },
+    {
+        "alias": "dscymiy",
+        "name": "Recursive Worm",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "cymiae",
+        "source": "ds",
+        "text": "At the start of your turn, you may exhaust this card to choose 1 non-home system other than Mecatol Rex that contains 1 or more of your units; place 1 other player's command token from their reinforcements in that system.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/recursive_worm.png?raw=true"
+    },
+    {
+        "alias": "dsdihmdn",
+        "name": "Aegis II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BBY",
+        "faction": "dihmohn",
+        "baseUpgrade": "dn2",
+        "source": "ds",
+        "text": "Cost 4, Combat 4, Move 2, Capacity 1\nSUSTAIN DAMAGE, BOMBARDMENT 5\nWhen another ship in this system would be destroyed by a game effect, you may have this ship become damaged instead.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/aegis_2.jpg?raw=true"
+    },
+    {
+        "alias": "dsdihmy",
+        "name": "Impressment Programs",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "dihmohn",
+        "source": "ds",
+        "text": "When you explore a planet, you may produce 1 ship in that planet's system.\nACTION: Exhaust this card and 1 planet you control to explore that planet.\n[Note: this cannot produce ships if enemy ships are present]",
+        "shortName": "Impress.\nPrograms",
+        "shrinkName": false,
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/impressment_programs.jpg?raw=true"
+    },
+    {
+        "alias": "dsedyng",
+        "name": "Unity Algorithm",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "faction": "edyn",
+        "source": "ds",
+        "text": "Once per agenda phase, after an agenda is revealed, you may predict aloud an outcome of that agenda. If your prediction is correct, you may score 1 public objective if you fulfill its requirements; each other player who voted for that outcome draws 1 secret objective.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/unity_algorithm.png?raw=true"
+    },
+    {
+        "alias": "dsedyny",
+        "name": "Encrypted Trade Hub",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "edyn",
+        "source": "ds",
+        "text": "You may exhaust this card to allow a player to exchange 1 of their relics or agendas as part of a transaction.\nYou always vote last during the agenda phase.\nWhen an outcome you voted for or predicted is resolved, each player who voted for that outcome gains 1 commodity.",
+        "imageURL": "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/hover_images/techs/ds/encrypted_trade_hub.png?raw=true"
+    },
+    {
+        "alias": "cantoy",
+        "name": "Integrated Systems",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "canto",
+        "source": "eronous",
+        "text": "After 1 of your opponents units is destroyed, you may exhaust this card to gain the unit upgrade technology of that unit type. During a space combat, after 1 of your opponents units are destroyed. Exhaust this card to gain the unit upgrade technology of that unit type."
+    },
+    {
+        "alias": "cantor",
+        "name": "Syoblade",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "RR",
+        "faction": "canto",
+        "source": "eronous",
+        "text": "During the first round of ground combat, apply +2 to the result of each of your unit's combat rolls."
+    },
+    {
+        "alias": "eidolonff",
+        "name": "Wurm’s Eye II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "BG",
+        "baseUpgrade": "ff2",
+        "faction": "eidolon",
+        "source": "eronous",
+        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. 1(x2), 7, 2, -;"
+    },
+    {
+        "alias": "eidolonb",
+        "name": "Daetalin Engine",
+        "types": [
+            "PROPULSION"
+        ],
+        "requirements": "BBB",
+        "faction": "eidolon",
+        "source": "eronous",
+        "text": "During your tactical actions, you may treat each system that contains no planets as adjacent to each other."
+    },
+    {
+        "alias": "shadowssd",
+        "name": "Umbrae Ring II",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "YY",
+        "baseUpgrade": "sd2",
+        "faction": "shadows",
+        "source": "eronous",
+        "text": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool. 1(x2), 7, 2, -;"
+    },
+    {
+        "alias": "shadowsy",
+        "name": "Byophysma",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "shadows",
+        "source": "eronous",
+        "text": "When you produce units in a system, you may exhaust this card to place up to 1 non-fighter ship you produce in an adjacent system that does not contain another player's ships."
+    },
+    {
+        "alias": "mechig",
+        "name": "Overdrive",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GG",
+        "faction": "mechi",
+        "source": "eronous",
+        "text": "After another player activates a system that contains one of your units with PRODUCTION. You may produce one unit in that system."
+    },
+    {
+        "alias": "mechiy",
+        "name": "Ikanium Shielding",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YYY",
+        "faction": "mechi",
+        "source": "eronous",
+        "text": "Each of your units with PRODUCTION gains PLANETARY SHIELD. Planets that contain one of your Space Docks cannot be bombarded."
+    },
+    {
+        "alias": "saeracr",
+        "name": "Avenger II ",
+        "types": [
+            "UNITUPGRADE"
+        ],
+        "requirements": "GRY",
+        "baseUpgrade": "cr2",
+        "faction": "saera",
+        "source": "eronous",
+        "text": "After this unit is destroyed, roll 1 die. If the result is 6 or greater, place the unit in your home system if able. 2, 6, 3, 1; Abilities: ANTI-FIGHTER BARRAGE 6"
+    },
+    {
+        "alias": "saeray",
+        "name": "Hielas Array",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "YY",
+        "faction": "saera",
+        "source": "eronous",
+        "text": "After a player activates a system that contains 1 or more of another player’s units, you may exhaust this card and spend 1 token from your strategy pool; immediately end that player's turn."
+    }
+    
+]

@@ -363,7 +363,7 @@ public class ButtonHelperAgents {
         int amountToKill = uH.getUnitCount(UnitType.Infantry, player.getColor());
         ButtonHelper.resolveInfantryDestroy(player, amountToKill);
         int comms = Math.min(player.getCommoditiesTotal(), amountToKill);
-        message += ". " + amountToKill + " infantry were destroyed. " + comms + " commodit" + (comms == 1 ? "y" : "ies") 
+        message += ". " + amountToKill + " infantry were destroyed. " + comms + " commodit" + (comms == 1 ? "y" : "ies")
             + " were gained and then converted into" + (comms == 1 ? " a" : "") + " trade good" + (comms == 1 ? "" : "s") + ".";
         player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), amountToKill));
         player.setCommodities(Math.max(0, player.getCommodities() - amountToKill));
@@ -1582,7 +1582,7 @@ public class ButtonHelperAgents {
     public static void resolveFlorzenAgentStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planet = buttonID.split("_")[1];
         String planet2 = buttonID.split("_")[2];
-        String attachment = buttonID.split("_")[3];
+        String attachment = buttonID.replace("florzenAgentStep3_" + planet + "_" + planet2 + "_", "");
         attachment = attachment.replace(";", "_");
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         UnitHolder uH2 = ButtonHelper.getUnitHolderFromPlanetName(planet2, game);

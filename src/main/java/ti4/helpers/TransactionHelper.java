@@ -407,7 +407,9 @@ public class TransactionHelper {
         "The Pretence That Your Secrets Are Unscorable",
         "Double Nothing",
         "The Opportunity To Be Your Own Boss",
-        "Artisanal, Hand-Crafted Nothing");
+        "Artisanal, Hand-Crafted Nothing",
+        "Reticulating Splines",
+        "ADDITIONAL PYLONS");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {
@@ -719,7 +721,7 @@ public class TransactionHelper {
         Player opposing = game.getPlayerFromColorOrFaction(modalID.split("_")[1]);
         player.addTransactionItem("sending" + player.getFaction() + "_receiving" + modalID.split("_")[1] + "_details_" + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
         String message = "Current transaction offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
-            + "### Click something that you wish to __request from__ " + opposing.getRepresentation(false, false);
+            + "### Click something that you wish to __offer to__ " + opposing.getRepresentation(false, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, player, opposing));
     }
 
@@ -731,7 +733,7 @@ public class TransactionHelper {
         player.addTransactionItem("sending" + modalID.split("_")[1] + "_receiving" + player.getFaction() + "_details_" + thoughts.replace("_", "").replace(",", "").replace("\n", "").replace(" ", "fin777"));
         String message = "Current transaction offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
             + "### Click something that you wish to __request from__ " + opposing.getRepresentation(false, false);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, player, opposing));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, opposing, player));
     }
 
     @ButtonHandler("offerToTransact_")
