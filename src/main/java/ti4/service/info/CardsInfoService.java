@@ -57,7 +57,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("naaluCommander", "Do Naalu Commander", FactionEmojis.Naalu));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "uydaicommander")) {
-            buttons.add(Buttons.gray("uydaiCommander", "Pay 1tg to Use Uydai Commander", FactionEmojis.uydai));
+            buttons.add(Buttons.gray("uydaiCommander", "Pay 1 Trade Good to Use Uydai Commander", FactionEmojis.uydai));
         }
         if (player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
             buttons.add(Buttons.gray("initialPeak", "Peek At Next Objective", FactionEmojis.augers));

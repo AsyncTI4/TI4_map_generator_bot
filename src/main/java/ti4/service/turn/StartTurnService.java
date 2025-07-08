@@ -30,6 +30,7 @@ import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -150,6 +151,20 @@ public class StartTurnService {
                     p2.getRepresentationUnfogged() + " your future message got delivered");
                 WhisperService.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
                 game.setStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
+            }
+        }
+        
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander") && player.getCommodities() > 0) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (!p2.equals(player) && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander") && p2.getCommodities() > 0)
+                {
+                    List<Button> buttonsRedCreuss = new ArrayList<>();
+                    buttonsRedCreuss.add(Buttons.green("redCreussWash_" + p2.getUserID(), "Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+                        player.getRepresentationUnfogged() + ", both you and " + p2.getRepresentationNoPing() + " have commodities."
+                            + " You may use these buttons to wash them, should you both agree.", buttonsRedCreuss);
+                }
             }
         }
 

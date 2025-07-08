@@ -40,7 +40,7 @@ public class PromissoryNoteHelper {
     public static void sendPromissoryNoteInfo(Game game, Player player, boolean longFormat, GenericInteractionCreateEvent event) {
         checkAndAddPNs(game, player);
         game.checkPromissoryNotes();
-        String headerText = player.getRepresentationUnfogged() + " Heads up, someone refreshed your Promissory Notes.";
+        String headerText = player.getRepresentationUnfogged() + ", heads up, someone refreshed your promissory notes.";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendPromissoryNoteInfo(game, player, longFormat);
     }
@@ -65,7 +65,7 @@ public class PromissoryNoteHelper {
                     Player pnOwner = game.getPNOwner(pn.getKey());
                     if (pnOwner == null) {
                         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                            player.getRepresentation() + " one of your promissory notes has no owner. The promissory note id is " + pn.getKey() + " and number is " + pn.getValue() + ".");
+                            player.getRepresentation() + ", one of your promissory notes has no owner. The promissory note id is " + pn.getKey() + " and number is " + pn.getValue() + ".");
                         continue;
                     }
                     if (!game.isFowMode()) sb.append(pnOwner.getFactionEmoji());
@@ -168,7 +168,7 @@ public class PromissoryNoteHelper {
                 id = "dspnflor";
             } else {
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, player.getRepresentationUnfogged()
-                    + " this promissory note will be applied automatically the next time you draw a relic."
+                    + ", this promissory note will be applied automatically the next time you draw a relic."
                     + " It will not work if you play it before then, so I am stopping you here.");
                 return;
             }

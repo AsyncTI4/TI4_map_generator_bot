@@ -1771,6 +1771,60 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
+    @ButtonHandler("redCreussWash")
+    public static void redCreussWash(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (player.getCommodities() == 0)
+        {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you don't have any commodities.");
+            return;
+        }
+        String other = buttonID.split("_")[1];
+        for (Player p2 : game.getRealPlayers()) {
+            if (!other.equals(p2.getUserID()))
+            {
+                continue;
+            }
+            if (p2.getCommodities() == 0)
+            {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - " + p2.getRepresentationNoPing() + " doesn't have any commodities.");
+                return;
+            }
+            int wash = Math.min(player.getCommodities(), p2.getCommodities());
+            player.setCommodities(player.getCommodities() - wash);
+            p2.setCommodities(p2.getCommodities() - wash);
+            String message = "";
+            if (player.getCommodities() == 0)
+            {
+                message += player.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit" + (wash == 1 ? "y" : "ies") + " " + player.gainTG(wash) 
+                    + " with " + p2.getFactionEmojiOrColor() + ".";
+            }
+            else
+            {
+                int remain = player.getCommodities();
+                int orig = remain + wash;
+                message += player.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + player.gainTG(wash) 
+                    + " with " + p2.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
+            }
+            message += "\n";
+            if (p2.getCommodities() == 0)
+            {
+                message += p2.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit" + (wash == 1 ? "y" : "ies") + " " + p2.gainTG(wash) 
+                    + " with " + player.getFactionEmojiOrColor() + ".";
+            }
+            else
+            {
+                int remain = p2.getCommodities();
+                int orig = remain + wash;
+                message += p2.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + p2.gainTG(wash) 
+                    + " with " + player.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
+            }
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - couldn't find the other player.");
+    }
+
     public static void checkIihqAttachment(Game game) {
         Tile tile = game.getMecatolTile();
         if (tile == null) return; // no mecatol tile
