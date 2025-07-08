@@ -411,8 +411,9 @@ public class StartCombatService {
 
     public static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
-            String message = player.getRepresentation(true, true) + " Resolve Red Creuss Commander using buttons\n> (note this is not available until the end of combat)";
-            message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
+            String message = player.getRepresentation(true, true) + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"
+                + " with \"Total Mystery\", the Red Creuss commander."
+                + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         }
