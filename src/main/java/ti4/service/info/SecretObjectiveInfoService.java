@@ -60,7 +60,7 @@ public class SecretObjectiveInfoService {
         MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
     }
 
-    private static String getSecretObjectiveCardInfo(Game game, Player player) {
+    public static String getSecretObjectiveCardInfo(Game game, Player player) {
         Map<String, Integer> secretObjective = player.getSecrets();
         Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {

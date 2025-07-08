@@ -33,6 +33,7 @@ import ti4.message.MessageHelper;
 import ti4.service.ShowGameService;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.explore.ExploreService;
+import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 public class GMService {
@@ -50,8 +51,9 @@ public class GMService {
     private static final List<Button> HAND_CHECK_BUTTONS = Arrays.asList(
         Buttons.gray("gmCheckPlayerHands_sabotage", "Sabotages", CardEmojis.ActionCard),
         Buttons.gray("gmCheckPlayerHands_whens", "Whens/Afters", CardEmojis.ActionCard),
-        Buttons.gray("gmCheckPlayerHands_deadly", "Deadlies Plots/Briberies", CardEmojis.ActionCard),
-        Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding Legal Texts", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_deadly", "Deadlies/Briberies", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_confusing", "Confusing/Confounding", CardEmojis.ActionCard),
+        Buttons.gray("gmCheckPlayerHands_secret", "Unscored SOs", CardEmojis.SecretObjective),
         Buttons.DONE_DELETE_BUTTONS);
 
     private static final String ACTIVITY_LOG_THREAD = "-activity-log";
@@ -185,23 +187,36 @@ public class GMService {
                 checkWhoHas("confounding", game, event);
             }
             case "whens" -> {
-                  StringBuilder sbWhens = new StringBuilder("Following players have \"when\"s in hand:\n");
-                  StringBuilder sbAfters = new StringBuilder("Following players have \"after\"s in hand:\n");
+                StringBuilder sbWhens = new StringBuilder("Following players have \"when\"s in hand:\n");
+                StringBuilder sbAfters = new StringBuilder("Following players have \"after\"s in hand:\n");
 
-                  for (Player player : game.getRealPlayers()) {
-                      List<String> whens = AgendaHelper.getPossibleWhenNames(player);
-                      if (!whens.isEmpty()) {
-                          sbWhens.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ");
-                          sbWhens.append(String.join(", ", whens)).append("\n");
-                      }
-                      List<String> afters = AgendaHelper.getPossibleAfterNames(player);
-                      if (!afters.isEmpty()) {
-                          sbAfters.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ");
-                          sbAfters.append(String.join(", ", afters)).append("\n");
-                      }
-                  }
-                  MessageHelper.sendMessageToChannel(event.getChannel(), sbWhens.toString());
-                  MessageHelper.sendMessageToChannel(event.getChannel(), sbAfters.toString());
+                for (Player player : game.getRealPlayers()) {
+                    List<String> whens = AgendaHelper.getPossibleWhenNames(player);
+                    if (!whens.isEmpty()) {
+                        sbWhens.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ");
+                        sbWhens.append(String.join(", ", whens)).append("\n");
+                    }
+                    List<String> afters = AgendaHelper.getPossibleAfterNames(player);
+                    if (!afters.isEmpty()) {
+                        sbAfters.append("> ").append(player.getRepresentationUnfoggedNoPing()).append(": ");
+                        sbAfters.append(String.join(", ", afters)).append("\n");
+                    }
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), sbWhens.toString());
+                MessageHelper.sendMessageToChannel(event.getChannel(), sbAfters.toString());
+            }
+            case "secret" -> {
+                StringBuilder sos = new StringBuilder();
+                for (Player player : game.getRealPlayers()) {
+                    String allSecrets = SecretObjectiveInfoService.getSecretObjectiveCardInfo(game, player);
+                    String unscored = StringUtils.substringAfter(allSecrets, "Unscored");
+                    sos.append("__")
+                        .append(player.getRepresentationUnfoggedNoPing())
+                        .append(" Unscored")
+                        .append(unscored)
+                        .append("\n");
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), sos.toString());
             }
             default -> {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please choose what to look for:", HAND_CHECK_BUTTONS);
