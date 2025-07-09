@@ -1012,8 +1012,8 @@ public class ButtonHelperFactionSpecific {
         result = resultBuilder.toString();
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            result + "\nPlease assign any hits using the \"Assign Hits\" button in the combat thread. Remember these hits only apply against infantry or fighters.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result 
+            + "\nPlease assign any hits using the \"Assign Hits\" button in the combat thread. Remember these hits only apply against infantry or fighters.");
 
     }
 
@@ -2609,7 +2609,7 @@ public class ButtonHelperFactionSpecific {
             }
             if (player.ownsUnit("kortali_flagship")) {
                 sb.append(" to gain 1 command counter.");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " can gain 1 command token due to self-damaging the Kortali Flagship");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gains 1 command token due to self-damaging the Magistrate.");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
                 String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
                     + ". Use buttons to gain 1 command token.";
