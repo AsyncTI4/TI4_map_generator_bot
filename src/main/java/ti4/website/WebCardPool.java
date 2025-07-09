@@ -50,40 +50,54 @@ public class WebCardPool {
         WebCardPool cardPool = new WebCardPool();
 
         // Secret Objectives
-        cardPool.setSecretObjectiveDeck(new ArrayList<>(game.getSecretObjectives()));
+        List<String> allSecretObjectives = new ArrayList<>(game.getSecretObjectives());
+        allSecretObjectives.addAll(getPlayerSecrets(game));
+        allSecretObjectives.sort(new AlphanumericComparator());
+        cardPool.setSecretObjectiveDeck(allSecretObjectives);
         cardPool.setSecretObjectiveFullDeckSize(game.getSecretObjectiveFullDeckSize());
 
         // Action Cards
-        cardPool.setActionCardDeck(new ArrayList<>(game.getActionCards()));
+        cardPool.setActionCardDeck(getDeckCopySorted(game.getActionCards()));
         cardPool.setActionCardDiscard(new ArrayList<>(game.getDiscardActionCards().keySet()));
         cardPool.setActionCardFullDeckSize(game.getActionCardFullDeckSize());
 
         // Exploration Cards
-        cardPool.setCulturalExploreDeck(new ArrayList<>(game.getExploreDeck(Constants.CULTURAL)));
+        cardPool.setCulturalExploreDeck(getDeckCopySorted(game.getExploreDeck(Constants.CULTURAL)));
         cardPool.setCulturalExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.CULTURAL)));
         cardPool.setCulturalExploreFullDeckSize(game.getCulturalExploreFullDeckSize());
 
-        cardPool.setIndustrialExploreDeck(new ArrayList<>(game.getExploreDeck(Constants.INDUSTRIAL)));
+        cardPool.setIndustrialExploreDeck(getDeckCopySorted(game.getExploreDeck(Constants.INDUSTRIAL)));
         cardPool.setIndustrialExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.INDUSTRIAL)));
         cardPool.setIndustrialExploreFullDeckSize(game.getIndustrialExploreFullDeckSize());
 
-        cardPool.setHazardousExploreDeck(new ArrayList<>(game.getExploreDeck(Constants.HAZARDOUS)));
+        cardPool.setHazardousExploreDeck(getDeckCopySorted(game.getExploreDeck(Constants.HAZARDOUS)));
         cardPool.setHazardousExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.HAZARDOUS)));
         cardPool.setHazardousExploreFullDeckSize(game.getHazardousExploreFullDeckSize());
 
-        cardPool.setFrontierExploreDeck(new ArrayList<>(game.getExploreDeck(Constants.FRONTIER)));
+        cardPool.setFrontierExploreDeck(getDeckCopySorted(game.getExploreDeck(Constants.FRONTIER)));
         cardPool.setFrontierExploreDiscard(new ArrayList<>(game.getExploreDiscard(Constants.FRONTIER)));
         cardPool.setFrontierExploreFullDeckSize(game.getFrontierExploreFullDeckSize());
 
         // Relics
-        cardPool.setRelicDeck(new ArrayList<>(game.getAllRelics()));
+        cardPool.setRelicDeck(getDeckCopySorted(game.getAllRelics()));
         cardPool.setRelicFullDeckSize(game.getRelicFullDeckSize());
 
         // Agendas
-        cardPool.setAgendaDeck(new ArrayList<>(game.getAgendas()));
+        cardPool.setAgendaDeck(getDeckCopySorted(game.getAgendas()));
         cardPool.setAgendaDiscard(new ArrayList<>(game.getDiscardAgendas().keySet()));
         cardPool.setAgendaFullDeckSize(game.getAgendaFullDeckSize());
 
         return cardPool;
+    }
+
+    private static List<String> getDeckCopySorted(List<String> deck) {
+        List<String> deckCopy = new ArrayList<>(deck);
+        deckCopy.sort(new AlphanumericComparator());
+        return deckCopy;
+    }
+
+    private static List<String> getPlayerSecrets(Game game) {
+        return game.getPlayers().values().stream()
+            .flatMap(player -> player.getSecrets().keySet().stream()).toList();
     }
 }
