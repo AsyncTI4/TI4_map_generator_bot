@@ -1009,7 +1009,7 @@ public class ButtonHelper {
                     String msg = p2.getRepresentationNoPing() + ", you may participate in a simultaneous tactical action  of "
                         + activeSystem.getRepresentationForButtons() + " with your alliance partner by pressing this button."
                         + " Please do not press this button until your alliance partner finishes moving, or else there could be a mess."
-                        + " Do announce that you intend to press it asap though so that others know.";
+                        + " Do announce that you intend to press it ASAP though so that others know.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.gray("startSimultaneousTacticalAction",
                         "Do Simultaneous Action in " + activeSystem.getRepresentationForButtons()));
@@ -3810,7 +3810,8 @@ public class ButtonHelper {
                         AddUnitService.addUnits(event, tile, game, player.getColor(), amt + " " + key.asyncID());
                     }
                 }
-                String msg = player.getRepresentationUnfogged() + ", all of the units sold to you by " + nokar.getFactionEmoji() + " that remained in the active system were converted into your ships.";
+                String msg = player.getRepresentationUnfogged() + ", all of the units sold to you by " 
+                    + nokar.getFactionEmoji() + " that remained in the active system were converted into your ships.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
@@ -3876,7 +3877,7 @@ public class ButtonHelper {
                             UnitEmojis.infantry));
                         buttons.add(Buttons.red("deleteButtons", "Delete Buttons"));
                         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                            player.getRepresentationUnfogged() + ", please choose if you wish to produce 2 infantry (Qhet mech ability).",
+                            player.getRepresentationUnfogged() + ", please choose if you wish to produce 2 infantry following the death of a Basilisk.",
                             buttons);
                     }
                 }

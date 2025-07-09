@@ -81,7 +81,8 @@ public class OtherHeroButtonHandler {
                 " the Atokera hero, was not purged - something went wrong.");
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " Unfortunately at this time the addition of ships to the ground is not automated. /move units can place them on the planet however, and they will roll dice as normal once there.");
+            player.getRepresentationUnfogged() + ", unfortunately at this time the addition of ships to the ground is not automated."
+                + " `/move units` can place them on the planet however, and they will roll dice as normal once there.");
         ButtonHelper.deleteTheOneButton(event);
     }
 
