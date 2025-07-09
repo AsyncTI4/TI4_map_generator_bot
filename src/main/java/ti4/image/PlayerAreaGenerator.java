@@ -602,6 +602,10 @@ public class PlayerAreaGenerator {
 
         if (!gammaOnMap) {
             String tokenFile = Mapper.getTokenPath(gammaID);
+            if (game.isLiberationC4Mode())
+            {
+                tokenFile = tokenFile.replace("token_creuss", "token_crimsoncreuss");
+            }
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, mapWidth - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             xDeltaSecondRowFromRightSide += 40;
@@ -610,6 +614,10 @@ public class PlayerAreaGenerator {
 
         if (!betaOnMap) {
             String tokenFile = Mapper.getTokenPath(betaID);
+            if (game.isLiberationC4Mode())
+            {
+                tokenFile = tokenFile.replace("token_creuss", "token_crimsoncreuss");
+            }
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, mapWidth - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             if (travelBan) {
@@ -626,6 +634,10 @@ public class PlayerAreaGenerator {
 
         if (!alphaOnMap) {
             String tokenFile = Mapper.getTokenPath(alphaID);
+            if (game.isLiberationC4Mode())
+            {
+                tokenFile = tokenFile.replace("token_creuss", "token_crimsoncreuss");
+            }
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, mapWidth - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             if (travelBan) {
