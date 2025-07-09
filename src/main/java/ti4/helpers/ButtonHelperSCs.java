@@ -714,7 +714,7 @@ public class ButtonHelperSCs {
             String message = player.getRepresentationUnfogged() + ", please choose the planet you wish to put your "
                 + unitKey.unitName() + " on for **Construction**.";
             if (!player.getSCs().contains(4)) {
-                message += "\n## It will place a command token in the system as well.";
+                message += "\n-# It will place a command token in the system as well.";
             }
             List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, unit, "place");
             MessageHelper.sendMessageToEventChannelWithEphemeralButtons(event, message, buttons);
@@ -879,9 +879,9 @@ public class ButtonHelperSCs {
                 plan.addToken("attachment_" + facility + (embassy + 1) + ".png");
                 updateEmbassies(game, player, game.getTileFromPlanet(planet));
             }
-            message += " to " + Helper.getPlanetRepresentation(planet, game) + ".";
+            message += " to " + Helper.getPlanetRepresentation(planet, game);
             if (facility.contains("logistics")) {
-                message += " Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect; players will have to monitor this)";
+                message += ". Their commodity value has been increased by 1 (note, the bot does not keep track of nearby structures for the purposes of this effect; players will have to monitor this)";
             }
         }
         message += ".";

@@ -429,7 +429,7 @@ public class TransactionHelper {
         List<Button> buttons = TransactionHelper.getPlayersToTransact(game, player);
         String message = player.getRepresentation() + ", please choose which player you wish to transact with.";
         if (game.isHiddenAgendaMode() && !game.getPhaseOfGame().toLowerCase().contains("action")) {
-            message = player.getRepresentation() + ", this game is in Hidden Agenda mode, which does not allow transactions outside of the action phase. ";
+            message = player.getRepresentation() + ", this game is in Hidden Agenda mode, which does not allow transactions outside of the Action Phase. ";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
             return;
         }
@@ -1288,17 +1288,17 @@ public class TransactionHelper {
 
     public static void checkTransactionLegality(Game game, Player player, Player player2) {
         StringBuilder sb = new StringBuilder();
-        sb.append(player.getRepresentationUnfogged()).append(" this is a friendly reminder that you ");
+        sb.append(player.getRepresentationUnfogged()).append(", this is a friendly reminder that ");
         if (!canTheseTwoTransact(game, player, player2)) {
-            sb.append("are not neighbors with ").append(player2.getRepresentation(false, false));
+            sb.append("you are not neighbors with ").append(player2.getRepresentation(false, false)).append(".");
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
         }
         if (player.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            sb.append("cannot transact during the agenda phase due to the ").append(FactionEmojis.olradin).append("Control policy");
+            sb.append("you cannot transact during the Agenda Phase due to your ").append(FactionEmojis.olradin).append(" _Policy - The People: Control ➖_.");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
         if (player2.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            sb.append(player2.getRepresentation(false, false)).append(" cannot transact during the agenda phase due to their ").append(FactionEmojis.olradin).append("Control policy");
+            sb.append(player2.getRepresentation(false, false)).append(" cannot transact during the Agenda Phase due to their ").append(FactionEmojis.olradin).append(" _Policy - The People: Control ➖_.");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
     }

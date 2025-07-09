@@ -2084,7 +2084,7 @@ public class UnfiledButtonHandlers {
                         buttons);
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), game.getPing()
-                        + ", all players have indicated completion of status phase. Proceeding to strategy phase.");
+                        + ", all players have indicated completion of Status Phase. Proceeding to Strategy Phase.");
                     StartPhaseService.startPhase(event, game, "strategy");
                 }
             }
@@ -2095,15 +2095,15 @@ public class UnfiledButtonHandlers {
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                         "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
-                            + " Please press the \"Flip Agenda\" button after they have finished redistributing tokens and you have fully resolved all other status phase effects.",
+                            + " Please press the \"Flip Agenda\" button after they have finished redistributing tokens and you have fully resolved all other Status Phase effects.",
                         buttons);
                 } else {
                     Button flipAgenda = Buttons.blue("startStrategyPhase", "Start Strategy Phase");
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                         "This message was triggered by the last player pressing \"Redistribute Command Tokens\"."
-                            + " As the Custodians token is still on Mecatol Rex, there will be no agenda phase this round."
-                            + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens and you have fully resolved all other status phase effects.",
+                            + " As the Custodians token is still on Mecatol Rex, there will be no Agenda Phase this round."
+                            + " Please press the \"Start Strategy Phase\" button after they have finished redistributing tokens and you have fully resolved all other Status Phase effects.",
                         buttons);
                 }
             }
@@ -2917,13 +2917,13 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("proceed_to_strategy")
     public static void proceedToStrategy(ButtonInteractionEvent event, Game game) {
-        String readiedCardsString = "All planets have been readied at the end of the agenda phase.";
+        String readiedCardsString = "All planets have been readied at the end of the Agenda Phase.";
         if (game.isOmegaPhaseMode()) {
-            readiedCardsString = "All cards have been readied at the end of the omega phase.";
+            readiedCardsString = "All cards have been readied at the end of the Omega Phase.";
         }
         if (game.hasAnyPriorityTrackMode()) {
             if (PriorityTrackHelper.GetPriorityTrack(game).stream().anyMatch(Objects::isNull)) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the strategy phase.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please fill the priority track before starting the Strategy Phase.");
                 PriorityTrackHelper.PrintPriorityTrack(game);
                 return;
             }

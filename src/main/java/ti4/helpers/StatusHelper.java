@@ -116,7 +116,7 @@ public class StatusHelper {
             }
             if (player.getPromissoryNotes().containsKey("dspnuyda") && !player.getPromissoryNotesOwned().contains("dspnuyda")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + " reminder this is the window to use the Uydai promissory note");
+                    player.getRepresentationUnfogged() + ", a reminder this is the window to use the _Eerie Predictions_.");
             }
         }
         String key2 = "queueToScorePOs";
@@ -131,7 +131,7 @@ public class StatusHelper {
         if (game.getHighestScore() + 4 > game.getVp()) {
             game.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.red("turnOffForcedScoring", "Turn off forced scoring order"));
+            buttons.add(Buttons.red("turnOffForcedScoring", "Turn Off Forced Scoring Order"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
                 "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
             for (Player player : GetPlayersInScoringOrder(game)) {
@@ -186,7 +186,7 @@ public class StatusHelper {
             }
 
             int count = 0;
-            StringBuilder message3a = new StringBuilder(player.getRepresentation() + " as a reminder, the bot believes you are capable of scoring the following secret objectives:");
+            StringBuilder message3a = new StringBuilder(player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following secret objectives:");
             for (String soID : player.getSecretsUnscored().keySet()) {
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0 &&
                     ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1) &&
@@ -232,7 +232,7 @@ public class StatusHelper {
         if (vaden != null) {
             for (Player p2 : vaden.getNeighbouringPlayers(true)) {
                 if (p2.getTg() > 0 && vaden.getDebtTokenCount(p2.getColor()) > 0) {
-                    String msg = p2.getRepresentationUnfogged() + " you have the opportunity to pay off **Binding Debts** here."
+                    String msg = p2.getRepresentationUnfogged() + ", you have the opportunity to pay off **Binding Debts** here."
                         + " You may pay 1 trade good to get 2 debt tokens forgiven.";
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("bindingDebtsRes_" + vaden.getFaction(), "Pay 1 Trade Good"));
@@ -261,7 +261,7 @@ public class StatusHelper {
             }
             if (player.hasTech("dsauguy") && player.getTg() > 2) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " you may use the button to pay 3 trade goods and get a technology, using _Sentient Datapool_.", List.of(Buttons.GET_A_TECH));
+                    player.getRepresentationUnfogged() + ", you may use the button to pay 3 trade goods and get a technology, using _Sentient Datapool_.", List.of(Buttons.GET_A_TECH));
             }
             Leader playerLeader = player.getLeader("kyrohero").orElse(null);
             if (player.hasLeader("kyrohero") && player.getLeaderByID("kyrohero").isPresent()
@@ -271,7 +271,7 @@ public class StatusHelper {
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                     player.getRepresentation()
-                        + " Reminder this is the window to play Speygh, the Kyro hero. You may use the buttons to start the process.",
+                        + ", a reminder this is the window to play Speygh, the Kyro hero. You may use the buttons to start the process.",
                     buttons);
             }
 
@@ -285,13 +285,13 @@ public class StatusHelper {
                     if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
                         if (player.hasRelic("emphidia")) {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + "Reminder this is __not__ the window to use _The Crown of Emphidia_."
+                                player.getRepresentation() + ", a reminder this is __not__ the window to use _The Crown of Emphidia_."
                                     + " You may purge _The Crown of Emphidia_ in the status homework phase, which is when buttons will appear.");
                         } else {
                             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                                player.getRepresentation() + "Reminder this is the window to use _The Crown of Emphidia_.");
+                                player.getRepresentation() + ", a reminder this is the window to use _The Crown of Emphidia_.");
                             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                                player.getRepresentation() + " You may use these buttons to resolve _The Crown of Emphidia_.", ButtonHelper.getCrownButtons());
+                                player.getRepresentation() + ", you may use these buttons to resolve _The Crown of Emphidia_.", ButtonHelper.getCrownButtons());
                         }
                     }
                 }
@@ -306,7 +306,7 @@ public class StatusHelper {
 
             Button editSummary = RoundSummaryHelper.editSummaryButton(game, p2, game.getRound());
             String endOfRoundMessage = p2.getRepresentation();
-            endOfRoundMessage += " you may write down your end of round thoughts, to be shared at the end of the game.";
+            endOfRoundMessage += ", you may write down your end of round thoughts, to be shared at the end of the game.";
             endOfRoundMessage += " Good things to share are highlights, plots, current relations with neighbors, or really anything you want (or nothing).";
             MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), endOfRoundMessage, editSummary);
         }
@@ -345,7 +345,7 @@ public class StatusHelper {
                     if (!unitHolder.hasUnits()) continue;
                     if (unitHolder.getUnitCount(UnitType.Flagship, colorID) > 0) {
                         unitHolder.addUnit(infKey, 1);
-                        String genesisMessage = player.getRepresentationUnfogged() + " 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
+                        String genesisMessage = player.getRepresentationUnfogged() + ", 1 infantry was added to the space area of the Genesis (the Sol flagship) automatically.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), genesisMessage);
                     }
                 }

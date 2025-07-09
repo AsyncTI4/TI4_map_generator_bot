@@ -129,7 +129,7 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                     tile.addToken(tokenID, planet);
                 } else {
                     int embassy = ButtonHelperSCs.getNearbyEmbassyCount(game, tile, player);
-                    tile.addToken("attachment_facilityembassy" + +(embassy + 1) + ".png", planet);
+                    tile.addToken("attachment_facilityembassy" + (embassy + 1) + ".png", planet);
                     ButtonHelperSCs.updateEmbassies(game, player, tile);
                 }
             } else {

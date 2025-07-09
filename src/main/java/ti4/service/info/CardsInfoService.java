@@ -246,7 +246,7 @@ public class CardsInfoService {
                 hasSummary = true;
         }
         if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getPhaseOfGame()) || hasSummary) {
-            // after the action phase round 1, show the edit summary button by default
+            // after the Action Phase round 1, show the edit summary button by default
             buttons.add(Buttons.EDIT_SUMMARIES);
         }
         buttons.add(Buttons.POST_NOTEPAD);

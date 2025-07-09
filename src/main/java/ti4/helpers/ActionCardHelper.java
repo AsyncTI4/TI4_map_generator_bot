@@ -363,13 +363,13 @@ public class ActionCardHelper {
         if (actionCard.getPhase().equalsIgnoreCase("agenda") && game.getPhaseOfGame() != null && game.getPhaseOfGame().equalsIgnoreCase("action")) {
             if (!player.getFaction().equalsIgnoreCase("edyn") && !player.getFaction().contains("franken")) {
                 return player.getRepresentationUnfogged()
-                    + " The bot thinks it is the action phase and this is an agenda card. If this is a mistake, ping bothelper in the actions channel";
+                    + ", the bot thinks it is the Action Phase and this is an Agenda Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
         if (actionCard.getPhase().equalsIgnoreCase("action") && game.getPhaseOfGame() != null && game.getPhaseOfGame().contains("agenda")) {
             if (!actionCard.getName().toLowerCase().contains("war machine")) {
                 return player.getRepresentationUnfogged()
-                    + " The bot thinks it is the agenda phase and this is an action phase card. If this is a mistake, ping bothelper in the actions channel";
+                    + ", the bot thinks it is the Agenda Phase and this is an Action Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
 

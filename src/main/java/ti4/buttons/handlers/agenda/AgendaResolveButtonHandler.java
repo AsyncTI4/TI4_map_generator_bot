@@ -269,7 +269,7 @@ class AgendaResolveButtonHandler {
                                 game.getStoredValue("agendaRepGov") + playerWL.getFaction());
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Will exhaust cultural planets of all players who voted \"Against\" at start of next strategy phase.");
+                            "Will exhaust cultural planets of all players who voted \"Against\" at start of next Strategy Phase.");
                     }
                 }
                 if ("articles_war".equalsIgnoreCase(agID)) {
@@ -534,7 +534,7 @@ class AgendaResolveButtonHandler {
                 } else {
                     game.setStoredValue("agendaArmsReduction", "true");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "# Will exhaust all planets with a technology specialty  at the start of next strategy phase.");
+                        "# Will exhaust all planets with a technology specialty  at the start of next Strategy Phase.");
 
                 }
             }
@@ -622,7 +622,7 @@ class AgendaResolveButtonHandler {
                     }
                     game.setStoredValue("agendaConstitution", "true");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
+                        "# Removed all laws, will exhaust all home planets at the start of next Strategy Phase.");
                 }
             }
             if ("absol_constitution".equalsIgnoreCase(agID)) {
@@ -988,23 +988,33 @@ class AgendaResolveButtonHandler {
             } else {
                 electVoiceOfTheCouncil = Buttons.green("elect_voice_of_the_council", electVoiceText);
                 if (mustElectVoice) {
-                    proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to scoring objectives");
+                    proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to Scoring Objectives");
                 } else {
                     String speakerUserID = game.getSpeakerUserID();
                     Player speaker = game.getPlayer(speakerUserID);
                     if (speaker != null) {
                         MessageChannel speakerCardsInfoThread = speaker.getCardsInfoThread();
-                        MessageHelper.sendMessageToChannel(speakerCardsInfoThread, "These are the current votes available for the Voice of the Council vote.");
+                        MessageHelper.sendMessageToChannel(speakerCardsInfoThread, "These are the current votes available for the _Voice of the Council_ vote.");
                         AgendaHelper.listVoteCount(game, speakerCardsInfoThread);
                     }
-                    proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to scoring objectives");
+                    proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to Scoring Objectives");
                 }
             }
             if (aCount == 3) {
-                voteMessage += " The bot believes this is the 3rd agenda, which in Omega Phase means you might vote on the Voice of the Council.";
-                voteMessage += "\n- If a player currently has the Voice of the Council, the Speaker chooses whether to vote on it this round or not.";
-                voteMessage += "\n- If no player currently has the Voice of the Council, it must be voted on once before proceeding to scoring.";
-                voteMessage += "\nIf this is not actually the third agenda yet, please remember this when that agenda is reached.";
+                String previousElectee = game.getLawsInfo().get(Constants.VOICE_OF_THE_COUNCIL_ID);
+                voteMessage += " The bot believes this is the third agenda, which in Omega Phase means you" 
+                    + (previousElectee == null ? "'ll" : " might") + " vote on the _Voice of the Council_.";
+                if (previousElectee == null)
+                {
+                    voteMessage += " Since no player currently has the _Voice of the Council_, it must be voted on once before proceeding to scoring.";
+                }
+                else
+                {
+                    Player previousPlayer = game.getPlayerFromColorOrFaction(previousElectee);
+                    voteMessage += " Since somebody (specifically, " + previousPlayer.getRepresentationNoPing() 
+                        + ") currently has the _Voice of the Council_, the Speaker chooses whether to vote on it this round or not.";
+                }
+                voteMessage += " If this is not actually the third agenda yet, please remember this when that agenda is reached.";
             }
             buttons.add(electVoiceOfTheCouncil);
             buttons.add(proceedToScoring);

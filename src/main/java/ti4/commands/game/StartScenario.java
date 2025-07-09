@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.commands.player.AddAllianceMember;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -127,22 +128,22 @@ public class StartScenario extends GameStateSubcommand {
                 switch (faction.toLowerCase())
                 {
                     case "ghost":
-                        color = "ruby";
+                        color = RandomHelper.isOneInX(2) ? "ruby" : "bloodred";
                         break;
                     case "xxcha":
-                        color = "sunset";
+                        color = RandomHelper.isOneInX(2) ? "sunset" : "tropical";
                         break;
                     case "sol":
-                        color = "dawn";
+                        color = RandomHelper.isOneInX(2) ? "dawn" : "wasp";
                         break;
                     case "naaz":
-                        color = "lime";
+                        color = RandomHelper.isOneInX(2) ? "lime" : "sherbet";
                         break;
                     case "nekro":
-                        color = "black";
+                        color = RandomHelper.isOneInX(2) ? "black" : "poison";
                         break;
                     case "nomad":
-                        color = "navy";
+                        color = RandomHelper.isOneInX(2) ? "navy" : "glacier";
                         break;
                 }
                 if (tile != null) {
