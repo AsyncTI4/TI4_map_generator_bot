@@ -50,7 +50,7 @@ public class WebCardPool {
         WebCardPool cardPool = new WebCardPool();
 
         // Secret Objectives
-        cardPool.setSecretObjectiveDeck(new ArrayList<>(game.getSecretObjectives()));
+        cardPool.setSecretObjectiveDeck(new ArrayList<>());
         cardPool.setSecretObjectiveFullDeckSize(game.getSecretObjectiveFullDeckSize());
 
         // Action Cards
