@@ -403,6 +403,7 @@ public class AgendaHelper {
         // if (ButtonHelper.isPlayerElected(player.getGame(), player, "committee")) {
         //     buttons.add(Buttons.red("queueAfter_agenda_committee", "Committee Formation"));
         // }
+        CryypterHelper.addVotCRiderQueueButtons(player, buttons);
 
         return buttons;
     }
@@ -575,6 +576,7 @@ public class AgendaHelper {
                             case "leader" -> {
                                 if (after.toLowerCase().contains("keleres")) {
                                     Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                                    playerLeader = CryypterHelper.keleresHeroCheck(player, playerLeader);
                                     if (playerLeader != null) {
                                         String message = player.getRepresentation() + " played " +
                                             Helper.getLeaderFullRepresentation(playerLeader);
@@ -584,6 +586,8 @@ public class AgendaHelper {
                                     }
                                     riderButtons = getAgendaButtons("Keleres Xxcha Hero", game,
                                         player.getFinsFactionCheckerPrefix());
+                                } else if (after.toLowerCase().contains("envoy")) {
+                                    riderButtons = getAgendaButtons(after, game, player.getFinsFactionCheckerPrefix());
                                 } else {
                                     riderButtons = getAgendaButtons("Atokera Commander Ability", game,
                                         player.getFinsFactionCheckerPrefix());
@@ -1285,6 +1289,7 @@ public class AgendaHelper {
                     + ", you are being skipped because you cannot vote.";
                 if (game.getStoredValue("Abstain On Agenda").contains(nextInLine.getFaction())) {
                     ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                    CryypterHelper.checkForMentakEnvoy(nextInLine, game);
                     skippedMessage = realIdentity2
                         + ", you are being skipped because you told the bot you wanted to preset an abstention.";
                     game.setStoredValue("Abstain On Agenda", game
@@ -1307,6 +1312,7 @@ public class AgendaHelper {
                             getSummaryOfVotes(game, true) + "\n ");
                     }
                     ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                    CryypterHelper.checkForMentakEnvoy(nextInLine, game);
                     MessageHelper.sendMessageToChannel(nextInLine.getCorrectChannel(), skippedMessage);
                     resolvingAnAgendaVote("resolveAgendaVote_" + votes, event, game, nextInLine);
                     return;
@@ -1356,6 +1362,7 @@ public class AgendaHelper {
                     MessageHelper.sendMessageToChannelWithButtons(nextInLine.getCorrectChannel(), message, buttons);
                 }
                 ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+                CryypterHelper.checkForMentakEnvoy(nextInLine, game);
             } else {
                 winner = getWinner(game);
                 if (!"".equalsIgnoreCase(winner) && !winner.contains("*")) {
@@ -1664,7 +1671,7 @@ public class AgendaHelper {
                 afterButtons.add(Buttons.gray(finChecker + "autoresolve_manualcommittee", "Use Committee Formation", CardEmojis.Agenda));
             }
         }
-
+        CryypterHelper.addVotCAfterButtons(game, afterButtons);
         afterButtons.add(Buttons.blue("no_after", "No \"After\"s (for now)", MiscEmojis.NoAfters));
         afterButtons.add(Buttons.blue("no_after_persistent", "No \"After\"s (for this agenda)", MiscEmojis.NoAfters));
         return afterButtons;
@@ -1789,6 +1796,7 @@ public class AgendaHelper {
                 MessageHelper.sendMessageToChannelWithButtons(nextInLine.getCorrectChannel(), message, buttons);
             }
             ButtonHelperFactionSpecific.checkForGeneticRecombination(nextInLine, game);
+            CryypterHelper.checkForMentakEnvoy(nextInLine, game);
         } else {
             game.getMainGameChannel().sendMessage("Cannot find voting info, sorry. Please resolve automatically.")
                 .queue();
@@ -2121,8 +2129,8 @@ public class AgendaHelper {
                         }
 
                     }
-
                 }
+                CryypterHelper.handleWinningRiders(game, winner);
             }
         }
         return winningRs;
@@ -3383,6 +3391,7 @@ public class AgendaHelper {
                     game, player, riderButtons);
                 if ("Keleres Xxcha Hero".equalsIgnoreCase(riderName)) {
                     Leader playerLeader = player.getLeader("keleresheroodlynn").orElse(null);
+                    playerLeader = CryypterHelper.keleresHeroCheck(player, playerLeader);
                     if (playerLeader != null) {
                         String message = player.getRepresentation() + " played " +
                             Helper.getLeaderFullRepresentation(playerLeader);
@@ -3659,9 +3668,11 @@ public class AgendaHelper {
             // offerEveryonePreAbstain(game);
             offerEveryoneWhensQueue(game);
             checkForAssigningGeneticRecombination(game);
+            CryypterHelper.checkForAssigningMentakEnvoy(game);
             checkForPoliticalSecret(game);
         }
         if (cov) {
+            agendaTarget = CryypterHelper.handleCovert(agendaTarget);
             MessageHelper.sendMessageToChannel(channel,
                 "# " + game.getPing() + " the agenda target is " + agendaTarget
                     + ". Sent the agenda to the speaker's `#cards-info` thread.");
