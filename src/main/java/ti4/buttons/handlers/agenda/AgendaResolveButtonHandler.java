@@ -930,9 +930,9 @@ class AgendaResolveButtonHandler {
 
             }
             if (rid.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "cruiser", true) < 8) {
-                MessageHelper.sendMessageToChannel(rid.getCorrectChannel(), rid.getFactionEmoji() + " gets deploy 1 cruiser to a system that contains their ships.");
+                MessageHelper.sendMessageToChannel(rid.getCorrectChannel(), rid.getFactionEmoji() + " may DEPLOY 1 cruiser to a system that contains their ships.");
                 List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(rid, game, "cruiser", "placeOneNDone_skipbuild"));
-                MessageHelper.sendMessageToChannelWithButtons(rid.getCorrectChannel(), "Use buttons to deploy 1 cruiser to a system that contains your ships.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(rid.getCorrectChannel(), "Use buttons to DEPLOY 1 cruiser to a system that contains your ships.", buttons);
             }
             if (game.isFowMode()) {
                 MessageHelper.sendPrivateMessageToPlayer(rid, game, message);

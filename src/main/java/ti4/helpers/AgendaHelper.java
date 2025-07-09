@@ -2081,7 +2081,7 @@ public class AgendaHelper {
                                 game.setStoredValue("originalCCsFor" + winningR.getFaction(),
                                     winningR.getCCRepresentation());
                                 MessageHelper.sendMessageToChannel(channel,
-                                    identity + " resolve Atokera Commander by using the button to gain 1 command token.");
+                                    identity + ", please resolve Ordagka, the Atokera commander, by using the button to gain 1 command token.");
                                 MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
                             }
                         }
