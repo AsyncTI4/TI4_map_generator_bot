@@ -1298,7 +1298,7 @@ public class TransactionHelper {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
         if (player2.hasAbility("policy_the_people_control") && !"action".equalsIgnoreCase(game.getPhaseOfGame())) {
-            sb.append(player2.getRepresentation(false, false)).append(" cannot transact during the Agenda Phase due to their ").append(FactionEmojis.olradin).append(" _Policy - The People: Control ➖_".);
+            sb.append(player2.getRepresentation(false, false)).append(" cannot transact during the Agenda Phase due to their ").append(FactionEmojis.olradin).append(" _Policy - The People: Control ➖_.");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb.toString());
         }
     }
