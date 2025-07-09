@@ -1057,7 +1057,7 @@ public class ButtonHelperAbilities {
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getFactionEmoji() + " repaired all their damaged units everywhere by exhausting the _Glatison_ Superweapon ability."
-                        + (RandomHelper.isOneInX(20) ? " It kinda stretches the definition of \"Super__weapon__\", hey.");
+                        + (RandomHelper.isOneInX(20) ? " It kinda stretches the definition of \"Super__weapon__\", hey."));
                 return;
             }
             case "caled" -> {
