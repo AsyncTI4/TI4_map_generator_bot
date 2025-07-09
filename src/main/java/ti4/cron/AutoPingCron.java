@@ -254,9 +254,14 @@ public class AutoPingCron {
             for (Player player : game.getRealPlayers()) {
                 if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please draw action cards and allocate command tokens.");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+                            + ", please draw action cards and allocate command tokens.");
                     }
                     msg.append(player.getRepresentation()).append(", ");
+                } else if (game.isFowMode() && game.getStoredValue("fowStatusDone") != null 
+                    && !game.getStoredValue("fowStatusDone").contains(player.getFaction())) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+                        + ", please click **Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase.**");
                 }
 
             }
