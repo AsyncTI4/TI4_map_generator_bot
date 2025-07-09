@@ -53,7 +53,8 @@ public class ButtonHelperAbilities {
     public static void dataRecovery(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         SendDebtService.sendDebt(p2, player, 1);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), player.getRepresentation() + " placed 1 of " + p2.getRepresentation() + " control tokens on their sheet via their data recovery ability");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+            player.getRepresentation() + " placed 1 of " + p2.getRepresentation() + " control tokens on their sheet via their **Data Recovery** ability.");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -61,7 +62,8 @@ public class ButtonHelperAbilities {
     public static void mirvedaFS(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), "ff");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " placed 1 fighter in the active system after using the Mirveda flagship ability at the end of a round of space combat.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+            player.getRepresentation() + " placed 1 fighter in the active system after using the Mirveda flagship ability at the end of a round of space combat.");
     }
 
     @ButtonHandler("blackOps_")
@@ -69,7 +71,7 @@ public class ButtonHelperAbilities {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         int amount = Integer.parseInt(buttonID.split("_")[2]);
         player.clearDebt(p2, amount);
-        String msg = player.getRepresentation() + " spent " + amount + " of " + p2.getRepresentation() + " control tokens on their sheet via their black ops ability to ";
+        String msg = player.getRepresentation() + " spent " + amount + " of " + p2.getRepresentation() + " control tokens on their sheet via their **Black Ops** ability to ";
         if (amount == 2) {
             msg += "draw 1 secret objective.";
             game.drawSecretObjective(player.getUserID());
@@ -108,7 +110,7 @@ public class ButtonHelperAbilities {
         buttons.add(Buttons.green("autoneticMemoryStep2_" + count, "Use Autonetic Memory"));
         buttons.add(Buttons.red("autoneticMemoryDecline_" + count, "Decline"));
         String msg = player.getRepresentationUnfogged()
-            + ", you may draw 1 less action card and utilize your **Autonetic Memory** ability. Please use or decline to use.";
+            + ", you may draw 1 fewer action card and utilize your **Autonetic Memory** ability. Please use or decline to use.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
@@ -1545,24 +1547,25 @@ public class ButtonHelperAbilities {
         CommanderUnlockCheckService.checkPlayer(player, "nokar");
         ButtonHelper.deleteTheOneButton(event);
         game.setStoredValue("hiredGunsInPlay", player.getFaction() + "_" + game.getActivePlayer().getFaction());
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationNoPing() + " is using their **Hired Guns** ability to send up to three ships to the active system to fight under the command of " + game.getActivePlayer().getRepresentation() +
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() 
+            + " is using their **Hired Guns** ability to send up to three ships to the active system to fight under the command of " + game.getActivePlayer().getRepresentation() +
             ".\nWhen the tactical action concludes, any of the sold ships in the active system will be converted into the active players ships.");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + ", please choose up to three ships", TacticalActionService.getTilesToMoveFrom(player, game, event));
+            player.getRepresentation() + ", please choose up to three ships.", TacticalActionService.getTilesToMoveFrom(player, game, event));
     }
 
     @ButtonHandler("startSimultaneousTacticalAction")
     public static void startSimultaneousTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         ButtonHelper.deleteTheOneButton(event);
         if (game.getActivePlayer() == null || game.getActivePlayer() == player || !player.getAllianceMembers().contains(game.getActivePlayer().getFaction())) {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find a correct active player, please resolve manually");
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find a correct active player, please resolve manually.");
             return;
         }
         game.setStoredValue("allianceModeSimultaneousAction", player.getFaction() + "_" + game.getActivePlayer().getFaction());
         ButtonHelperTacticalAction.selectActiveSystem(player, game, event, "ringTile_" + game.getActiveSystem());
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is doing a simultaenous tactical action with " + game.getActivePlayer().getRepresentation());
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+            player.getRepresentationNoPing() + " is doing a simultaneous tactical action with " + game.getActivePlayer().getRepresentation() + ".");
         //MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to move ships", TacticalActionService.getTilesToMoveFrom(player, game, event));
     }
 

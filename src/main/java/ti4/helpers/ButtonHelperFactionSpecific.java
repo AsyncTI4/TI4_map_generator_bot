@@ -131,7 +131,7 @@ public class ButtonHelperFactionSpecific {
         player.exhaustPlanet(planet);
         unitHolder.removeAllUnitDamage(player.getColor());
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " repaired all of their units on " + Helper.getPlanetRepresentation(planet, game) + " by exhausting the planet (using the Atokera Mech Ability).");
+            player.getFactionEmoji() + " repaired all of their units on " + Helper.getPlanetRepresentation(planet, game) + " by exhausting the planet with their Obelisk mech.");
     }
 
     @ButtonHandler("gloryTech")

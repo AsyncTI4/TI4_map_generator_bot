@@ -150,9 +150,9 @@ public class ButtonHelperSCs {
         scButtons.add(Buttons.gray("getPreDeclineSCButtons_" + sc, "Undo Decision"));
         String msg = "";
         if (decision.equalsIgnoreCase("no")) {
-            msg = "Decided not to decide yet on " + game.getStrategyCardModelByInitiative(Integer.parseInt(sc)).get().getName();
+            msg = "Deciding later for **" + game.getStrategyCardModelByInitiative(Integer.parseInt(sc)).get().getName() + "**.";
         } else {
-            msg = "Decided to pre-pass on following " + game.getStrategyCardModelByInitiative(Integer.parseInt(sc)).get().getName();
+            msg = "Pre-passing on following **" + game.getStrategyCardModelByInitiative(Integer.parseInt(sc)).get().getName() + "**.";
             game.setStoredValue("prePassOnSC" + sc + "Round" + game.getRound() + player.getFaction(), "yes");
         }
         event.getMessage().editMessage(msg).setComponents(ButtonHelper.turnButtonListIntoActionRowList(scButtons)).queue();
@@ -162,7 +162,7 @@ public class ButtonHelperSCs {
     public static void getPreDeclineSCButtons(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         int sc = Integer.parseInt(buttonID.split("_")[1]);
         game.removeStoredValue("prePassOnSC" + sc + "Round" + game.getRound() + player.getFaction());
-        String msg = "Use these to decide again";
+        String msg = "Use these to decide again.";
         List<Button> scButtons = new ArrayList<>();
         scButtons.add(Buttons.red("preDeclineSC_" + sc + "_yes", "Don't Follow " + game.getStrategyCardModelByInitiative(sc).get().getName()));
         scButtons.add(Buttons.gray("preDeclineSC_" + sc + "_no", "Decide Later"));

@@ -1579,12 +1579,12 @@ public class ButtonHelperModifyUnits {
     public static void munitionsReserves(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player.getTg() < 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + ", you only have "
-                + player.getTg() + " trade good" + (player.getTg() == 1 ? "" : "s") + " and thus cannot use _Krovoz Strike Teams_.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+                player.getRepresentation() + ", you have no trade goods, and thus cannot use _Krovoz Strike Teams_.");
             return;
         }
         String msg = player.getFactionEmoji() + " spent 1 trade good " + player.gainTG(-1) + " to generate 1 additional hit using _Krovoz Strike Teams_. "
-            + p2.getRepresentation() + ", please assign it with the \"Asign Hits\" button.";
+            + p2.getRepresentation() + ", please assign it with the \"Assign Hits\" button.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 

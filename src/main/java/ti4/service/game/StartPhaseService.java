@@ -804,7 +804,8 @@ public class StartPhaseService {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_", buttons);
             }
             if (!game.isFowMode()) {
-                String preDeclineMsg = p2.getRepresentationUnfogged() + ", in order to resolve strategy cards faster, you have the opportunity now to pre-decline various strategy cards if you know you will not follow them."
+                String preDeclineMsg = p2.getRepresentationUnfogged() + ", in order to resolve strategy cards faster,"
+                    + " you have the opportunity now to pre-decline various strategy cards if you know you will not follow them."
                     + " Feel free to not do this. **Trade** is never available for this feature due to **Trade** sometimes being mandatory.";
                 MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), preDeclineMsg);
                 for (Integer sc : game.getSCList()) {
@@ -814,7 +815,8 @@ public class StartPhaseService {
                     List<Button> scButtons = new ArrayList<>();
                     scButtons.add(Buttons.red("preDeclineSC_" + sc + "_yes", "Don't Follow " + game.getStrategyCardModelByInitiative(sc).get().getName()));
                     scButtons.add(Buttons.gray("preDeclineSC_" + sc + "_no", "Decide Later"));
-                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), "Use this to decide on " + game.getStrategyCardModelByInitiative(sc).get().getName() + ".", scButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(),
+                        "Use this to decide for **" + game.getStrategyCardModelByInitiative(sc).get().getName() + "**.", scButtons);
                 }
             }
 

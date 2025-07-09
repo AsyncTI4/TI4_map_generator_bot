@@ -409,7 +409,8 @@ public class TransactionHelper {
         "The Opportunity To Be Your Own Boss",
         "Artisanal, Hand-Crafted Nothing",
         "Reticulating Splines",
-        "ADDITIONAL PYLONS");
+        "ADDITIONAL PYLONS",
+        "A State-of-the-Art Turbo Encabulator");
 
     public static String getNothingMessage() {
         if (RandomHelper.isOneInX(1000000)) {

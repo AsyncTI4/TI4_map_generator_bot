@@ -2453,7 +2453,7 @@ public class UnfiledButtonHandlers {
         Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(doneExhausting);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            "Please choose the planets you wish to exhaust to pay the 1 influence", buttons);
+            "Please choose the planets you wish to exhaust to pay the 1 influence.", buttons);
         ButtonHelper.deleteTheOneButton(event);
         game.setStoredValue("lawsDisabled", "yes");
     }

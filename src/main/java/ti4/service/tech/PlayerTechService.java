@@ -173,8 +173,8 @@ public class PlayerTechService {
             }
             case "dsvadey" -> {
                 deleteTheOneButtonIfButtonEvent(event);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getFactionEmoji() + " is destroying a unit that sustained damage by using Krovoz Strike Teams. The owner should destroy the unit with the assign hits button.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() 
+                    + " is destroying a unit that sustained damage by using _Krovoz Strike Teams_. The owner should destroy the unit with the assign hits button.");
             }
             case "absol_nm" -> { // Absol's Neural Motivator
                 deleteIfButtonEvent(event);

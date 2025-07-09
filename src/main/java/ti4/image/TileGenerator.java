@@ -1697,6 +1697,11 @@ public class TileGenerator {
         int index = 0;
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
+            if (game.isLiberationC4Mode())
+            {
+                tokenPath = tokenPath.replace("token_creuss", "token_crimsoncreuss");
+                tokenPath = tokenPath.replace("token_crimsoncreussepsilon", "token_creussepsilon");
+            }
             String tokenName = Mapper.getTokenKey(tokenID);
 
             if (tokenPath == null) {
