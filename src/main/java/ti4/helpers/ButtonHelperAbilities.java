@@ -63,7 +63,7 @@ public class ButtonHelperAbilities {
         String pos = buttonID.split("_")[1];
         AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), "ff");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
-            player.getRepresentation() + " placed 1 fighter in the active system after using the Mirveda flagship ability at the end of a round of space combat.");
+            player.getRepresentation() + " has placed 1 fighter in the active system using the ability of the Nexus.");
     }
 
     @ButtonHandler("blackOps_")
@@ -1056,7 +1056,8 @@ public class ButtonHelperAbilities {
                     loc.removeAllUnitDamage(player.getColor());
                 }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getFactionEmoji() + " repaired all their damaged units everywhere by exhausting the Glatison superweapon ability.");
+                    player.getFactionEmoji() + " repaired all their damaged units everywhere by exhausting the _Glatison_ Superweapon ability."
+                        + (RandomHelper.isOneInX(20) ? " It kinda stretches the definition of \"Super__weapon__\", hey." : ""));
                 return;
             }
             case "caled" -> {
@@ -1097,7 +1098,7 @@ public class ButtonHelperAbilities {
             }
         }
         MessageHelper.sendMessageToChannel(belk.getCorrectChannel(),
-            belk.getFactionEmoji() + " damaged all units in the system " + tile.getRepresentation() + " by exhausting the Mors superweapon ability.");
+            belk.getFactionEmoji() + " damaged all units in the system " + tile.getRepresentation() + " by exhausting the _Mors_ Superweapon ability.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1111,7 +1112,7 @@ public class ButtonHelperAbilities {
         for (Player victim : game.getRealPlayers()) {
             UnitHolder uH = tile.getSpaceUnitHolder();
             if (uH.getUnitCount(UnitType.Fighter, victim) > 0) {
-                String result = player.getFactionEmojiOrColor() + " rolling for the superweapon grom against fighters owned by " + victim.getRepresentation() + ":\n";
+                String result = player.getFactionEmojiOrColor() + " rolling for the _Grom_ Superweapon against fighters owned by " + victim.getRepresentation() + ":\n";
                 int totalHits = 0;
                 StringBuilder resultBuilder = new StringBuilder(result);
                 int toHit = 4;
@@ -1133,15 +1134,16 @@ public class ButtonHelperAbilities {
                 player.setActualHits(player.getActualHits() + totalHits);
 
                 if (totalHits > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(victim.getCorrectChannel(), result + "\n" + victim.getRepresentation() + " Please assign any hits using this assign hits button.", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(victim.getCorrectChannel(), 
+                        result + "\n" + victim.getRepresentation() + ", please assign any hits using this \"Assign Hits\" button.", buttons);
                 } else {
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result + "\n" + victim.getRepresentation() + " none of your fighters were hit.");
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result + "\n" + victim.getRepresentation() + ", none of your fighters were hit.");
                 }
 
             }
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " fired AFB 4 against each fighter in the system " + tile.getRepresentation() + " by exhausting the Grom superweapon ability.");
+            player.getFactionEmoji() + " fired ANTI-FIGHTER BARRAGE 4 against each fighter in the system " + tile.getRepresentation() + " by exhausting the _Grom_ superweapon ability.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1192,8 +1194,8 @@ public class ButtonHelperAbilities {
             "Mors" + extra));
 
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + ", please pick what superweapon you wish to place on your planet."
-            + "\n-# Note that you can only have one of each superweapon but can remove superweapons from unlocked systems if you wish to rebuild them somewhere else.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + ", please pick which Superweapon you wish to place on your planet."
+            + "\n-# Note that you can only have one of each Superweapon, but may remove Superweapons from unlocked systems if you wish to rebuild them somewhere else.", buttons);
 
     }
 
@@ -1203,7 +1205,9 @@ public class ButtonHelperAbilities {
         String superweaponName = buttonID.split("_")[1];
 
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " put the superweapon " + StringUtils.capitalize(superweaponName) + " on the planet " + Helper.getPlanetName(planetName) + " for a cost of 5 resources or influence.\n\n" + Mapper.getRelic("superweapon" + superweaponName).getSimpleRepresentation());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing()
+            + " put the _" + StringUtils.capitalize(superweaponName) + "_ Superweapon on the planet "
+            + Helper.getPlanetName(planetName) + " for a cost of 5 resources or influence." + Mapper.getRelic("superweapon" + superweaponName).getSimpleRepresentation());
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "both");
         Button DoneExhausting = Buttons.red("finishComponentAction_spitItOut", "Done Exhausting Planets");
         buttons.add(DoneExhausting);
@@ -1211,7 +1215,7 @@ public class ButtonHelperAbilities {
         CommanderUnlockCheckService.checkPlayer(player, "belkosea");
         Tile tile = game.getTileFromPlanet(planetName);
         tile.addToken("attachment_superweapon_" + superweaponName + ".png", planetName);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " Use buttons to pay 5 influence or resources for the superweapon", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please pay 5 influence or resources for the Superweapon.", buttons);
     }
 
     @ButtonHandler("resolveShipOrder_")
@@ -2087,9 +2091,9 @@ public class ButtonHelperAbilities {
 
         RemoveUnitService.removeUnits(event, tile2, game, player.getColor(), fighters + " fighters");
         AddUnitService.addUnits(event, tile, game, player.getColor(), fighters + " fighters");
-        String msg = player.getRepresentation() + " used the superweapon Availyn ability and transferred " + fighters
+        String msg = player.getRepresentation() + " used the _Availyn_ Superweapon ability and transferred " + fighters
             + " fighter" + (fighters.equals("1") ? "" : "s") + " from " + tile2.getRepresentationForButtons(game, player) + " to "
-            + tile.getRepresentationForButtons(game, player);
+            + tile.getRepresentationForButtons(game, player) + ".";
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }

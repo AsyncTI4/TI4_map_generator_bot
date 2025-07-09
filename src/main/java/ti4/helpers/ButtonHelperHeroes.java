@@ -1092,7 +1092,7 @@ public class ButtonHelperHeroes {
             return;
         }
         String message = player.getRepresentation() + " refreshed " +
-            Helper.getLeaderFullRepresentation(playerLeader);
+            Helper.getLeaderFullRepresentation(playerLeader) + ".";
         playerLeader.setExhausted(false);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
@@ -1109,10 +1109,11 @@ public class ButtonHelperHeroes {
             return;
         }
         String message = player.getRepresentation() + " exhausted " +
-            Helper.getLeaderFullRepresentation(playerLeader);
+            Helper.getLeaderFullRepresentation(playerLeader) + ".";
         playerLeader.setExhausted(true);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message + "\nYou will have to use the assign hits button when AFB is rolled, since the bot will not know how to auto assign hits from AFB");
+        MessageHelper.sendMessageToChannel(event.getChannel(), message 
+            + "\nYou will have to use the \"Assign Hits\" button when ANTI-FIGHTER BARRAGE is rolled, since the bot will not know how to auto-assign the produced hits.");
         ButtonHelper.deleteTheOneButton(event);
     }
 

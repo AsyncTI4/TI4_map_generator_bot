@@ -357,7 +357,7 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6r)", FactionEmojis.Argent));
             }
             if (player.getTechs().contains("dspharinf") && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game).isEmpty()) {
-                startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Inf", FactionEmojis.pharadn));
+                startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
             }
             if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
