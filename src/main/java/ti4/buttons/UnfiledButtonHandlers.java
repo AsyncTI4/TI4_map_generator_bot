@@ -2087,6 +2087,9 @@ public class UnfiledButtonHandlers {
                         + ", all players have indicated completion of Status Phase. Proceeding to Strategy Phase.");
                     StartPhaseService.startPhase(event, game, "strategy");
                 }
+                if (game.isFowMode()) {
+                    game.setStoredValue("fowStatusDone", "");
+                }
             }
             case "redistributeCCButtons" -> {
                 if (game.isCustodiansScored() || game.isOmegaPhaseMode()) {
