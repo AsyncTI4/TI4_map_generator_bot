@@ -1619,20 +1619,20 @@ public class ButtonHelperModifyUnits {
             buttons = getOpposingUnitsToHit(player, game, event, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
-                player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to choose 2 opposing ships to destroy."
+                player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to destroy 2 opposing ships of their choice."
                     + " This occurs after any retreats. The dread has been removed.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         } else if (cause.contains("caled")) {
             buttons = getOpposingUnitsToHit(player, game, event, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                player.getRepresentation(false, false) + " has chosen to destroy one of opposing ships using the Superweapon Caled ability."
-                    + " Note that the bot did not check if a straight line unimpeded by anomalies existed between the Caled system and the active system.");
+                player.getRepresentation(false, false) + " has chosen to destroy one of opposing ships using the _Caled_ Superweapon ability."
+                    + " Note that the bot did not check if a straight line unimpeded by anomalies existed between the _Caled_ system and the active system.");
         } else if (cause.contains("belkosea")) {
-            msg = opponent.getRepresentationUnfogged() + " your opponent used the Belkosea flagship to produce a hit against your non-fighter ships. Please assign it with buttons.";
+            msg = opponent.getRepresentationUnfogged() + ", your opponent used the Ascendancy to produce a hit against your non-fighter ships. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "combat");
         } else {
-            msg = opponent.getRepresentationUnfogged() + " your opponent used _Assault Cannon_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
+            msg = opponent.getRepresentationUnfogged() + ", your opponent used _Assault Cannon_, forcing you to destroy a non-fighter ship. Please assign it with buttons.";
             buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(opponent, game, tile, "assaultcannoncombat");
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);

@@ -145,7 +145,7 @@ public class PlayStrategyCardService {
         }
 
         if (scModel.usesAutomationForSCID("pok4construction") && !game.isFowMode() && Helper.getPlayerFromUnit(game, "titans_mech") != null) {
-            scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Inf", FactionEmojis.Titans));
+            scButtons.add(Buttons.gray("titansConstructionMechDeployStep1", "Deploy Titan Mech + Infantry", FactionEmojis.Titans));
         }
         scButtons.add(Buttons.gray("requestAllFollow_" + scToPlay, "Request All Resolve Now"));
 
@@ -420,7 +420,7 @@ public class PlayStrategyCardService {
                     MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
                     if (ShouldPrintFollowOrder(game, scModel)) {
                         List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
-                        StringBuilder playerOrder = new StringBuilder("__Order for performing the Secondary ability:__\n");
+                        StringBuilder playerOrder = new StringBuilder("__Order for performing the secondary ability:__\n");
                         for (int i = 0; i < playersInOrder.size(); i++) {
                             playerOrder.append("`").append(i + 1).append(".` ");
                             if (game.hasFullPriorityTrackMode() && game.getPhaseOfGame().equals("action")) {

@@ -5213,7 +5213,7 @@ public class ButtonHelper {
                 Map.Entry<String, Integer> objective = game.revealStage1();
                 PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    game.getPing() + " **Stage 1 Public Objective Now Scorable**");
+                    game.getPing() + ", this stage 1 public objective is now scorable.");
                 game.getMainGameChannel().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
                 return;
             }
@@ -5227,7 +5227,7 @@ public class ButtonHelper {
                 Map.Entry<String, Integer> objective = game.revealStage2();
                 PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                    game.getPing() + " **Stage 2 Public Objective Now Scorable**");
+                    game.getPing() + ", this stage 2 public objective is now scorable.");
                 game.getMainGameChannel().sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
                 return;
             }
@@ -5986,7 +5986,7 @@ public class ButtonHelper {
         }
         if (players.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
-                player.getRepresentation() + " everyone has already reacted. ");
+                player.getRepresentation() + ", everyone has already reacted.");
             return;
         }
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),

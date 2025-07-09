@@ -340,7 +340,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("classifiedDevelopments".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getSuperWeaponButtonsPart1(p1, game);
-                    String message = p1.getRepresentation() + ", please choose the planet you wish to put a superweapon on.";
+                    String message = p1.getRepresentation() + ", please choose the planet you wish to put a Superweapon on.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol

@@ -39,12 +39,12 @@ public class RevealPublicObjectiveService {
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
-        MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Stage 2 Public Objective Revealed**");
         if (game.isLiberationC4Mode()) {
             if (game.getRevealedPublicObjectives().get("Control Ordinian") == null || game.getRevealedPublicObjectives().get("Control Ordinian") == 0)
             {
                 game.addCustomPO("Control Ordinian", 2);
-                MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " _Liberate Ordinian_ is no longer scorable. _Control Ordinian_ is now available to be scored.");
+                MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + ", a stage 2 public objective has been revealed."
+                    + "\n### " + game.getPing() + " _Liberate Ordinian_ is no longer scorable. _Control Ordinian_ is now available to be scored.");
                 EmbedBuilder control = new EmbedBuilder();
                 control.setTitle(SourceEmojis.Codex + "__**Control Ordinian**__");
                 control.setDescription("Control Ordinian.");
@@ -54,6 +54,7 @@ public class RevealPublicObjectiveService {
             }
             else
             {
+                MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + ", a stage 2 public objective has been revealed.");
                 channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
             }
         }
@@ -100,7 +101,7 @@ public class RevealPublicObjectiveService {
 
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
-        MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 2 Public Objectives Revealed**");
+        MessageHelper.sendMessageToChannel(channel, game.getPing() + ", two stage 2 public objectives has been revealed.");
         channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
             .queue(m -> m.pin().queue());
 
@@ -133,7 +134,7 @@ public class RevealPublicObjectiveService {
                 }
             }
         }
-        MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Secret Objective Turned Public Objective Revealed**");
+        MessageHelper.sendMessageToChannel(channel, game.getPing() + ", a secret objective has been converted to a public objective.");
         if (po != null) {
             channel.sendMessageEmbeds(List.of(po.getRepresentationEmbed()))
                 .queue(m -> m.pin().queue());
@@ -154,7 +155,7 @@ public class RevealPublicObjectiveService {
             objective = game.revealStage1();
         }
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + " **Stage 1 Public Objective Revealed**");
+        MessageHelper.sendMessageToChannel(channel, "### " + game.getPing() + ", a stage 1 public objective has been revealed.");
         channel.sendMessageEmbeds(po.getRepresentationEmbed()).queue(m -> m.pin().queue());
         RelicHelper.offerInitialNeuraLoopChoice(game, objective.getKey());
         if (!"status".equalsIgnoreCase(game.getPhaseOfGame())) {
@@ -177,7 +178,7 @@ public class RevealPublicObjectiveService {
                 MessageHelper.sendMessageToChannel(channel, ListPlayerInfoService.representScoring(game, objective.getKey(), 0));
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "### " + game.getPing() + " **Status Cleanup Run!**");
+                "### " + game.getPing() + ", it's time for the Status Cleanup Run!");
             if (!game.isFowMode()) {
                 MapRenderPipeline.queue(game, event, DisplayType.map,
                     fileUpload -> MessageHelper.sendFileUploadToChannel(game.getActionsChannel(), fileUpload));
@@ -194,9 +195,10 @@ public class RevealPublicObjectiveService {
         PublicObjectiveModel po1 = Mapper.getPublicObjective(objective1.getKey());
         PublicObjectiveModel po2 = Mapper.getPublicObjective(objective2.getKey());
         var channel = game.getMainGameChannel();
-        MessageHelper.sendMessageToChannel(channel, game.getPing() + " **Stage 1 Public Objectives Revealed**");
         if (game.isLiberationC4Mode())
         {
+            MessageHelper.sendMessageToChannel(channel, game.getPing() 
+                + ", two regular stage 1 public objectives, along with the __Liberate Ordinian__ scenario public objective, have been revealed.");
             EmbedBuilder liberate = new EmbedBuilder();
             liberate.setTitle(SourceEmojis.Codex + "__**Liberate Ordinian**__");
             liberate.setDescription("Win a combat against the Nekro Virus.");
@@ -206,6 +208,7 @@ public class RevealPublicObjectiveService {
         }
         else
         {
+            MessageHelper.sendMessageToChannel(channel, game.getPing() + ", two stage 1 public objectives have been revealed.");
             channel.sendMessageEmbeds(List.of(po1.getRepresentationEmbed(), po2.getRepresentationEmbed()))
                 .queue(m -> m.pin().queue());
         }

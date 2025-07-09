@@ -686,7 +686,7 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("refreshBelkoseaHero", "Ready Belkosea Hero", FactionEmojis.belkosea));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + ", a reminder that if you lose this combat, you can ready Mobius Spike, Belkosea Hero.",
+                    + ", a reminder that if you lose this combat, you ready Mobius Spike, Belkosea Hero.",
                     buttons);
             }
             if (player.getLeaderIDs().contains("kortalicommander")
@@ -898,13 +898,13 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(finChecker + "yinagent_" + pos, "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yin Agent", FactionEmojis.Yin));
             }
             if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("mirveda_flagship", agentHolder, tile) && isSpaceCombat) {
-                buttons.add(Buttons.gray(finChecker + "mirvedaFS_" + pos, "Place Fighter (Mirveda FS)", FactionEmojis.mirveda));
+                buttons.add(Buttons.gray(finChecker + "mirvedaFS_" + pos, "Place Fighter (Mirveda Flagship)", FactionEmojis.mirveda));
             }
             if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("belkosea_flagship", agentHolder, tile) && isSpaceCombat) {
-                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged To Produce Hit (Belkosea FS)", FactionEmojis.belkosea));
+                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged To Produce Hit (Belkosea Flagship)", FactionEmojis.belkosea));
             }
             if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("kortali_flagship", agentHolder, tile) && isSpaceCombat) {
-                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged Upon Win To Gain Command Token (Kortali FS)", FactionEmojis.kortali));
+                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged Upon Win To Gain Command Token (Kortali Flagship)", FactionEmojis.kortali));
             }
         }
 

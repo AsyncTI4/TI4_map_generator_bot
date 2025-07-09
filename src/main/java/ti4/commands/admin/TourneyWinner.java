@@ -32,13 +32,13 @@ public class TourneyWinner extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         User selectedUser = event.getOption("user", null, OptionMapping::getAsUser);
         if (selectedUser == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not resolve user, try again");
+            MessageHelper.sendMessageToEventChannel(event, "Could not resolve user, please try again.");
             return;
         }
 
         String tourneyName = event.getOption("tournament_name", null, OptionMapping::getAsString);
         if (tourneyName == null || tourneyName.isBlank()) {
-            MessageHelper.sendMessageToEventChannel(event, "Tournament name cannot be blank");
+            MessageHelper.sendMessageToEventChannel(event, "Tournament name cannot be blank.");
         }
 
         String removeStr = event.getOption("remove", "no", OptionMapping::getAsString);
@@ -47,10 +47,10 @@ public class TourneyWinner extends Subcommand {
         String output;
         if (remove) {
             TourneyWinnersService.removeTourneyWinner(selectedUser, tourneyName);
-            output = "Removed " + selectedUser.getAsMention() + " as a winner of `" + tourneyName + "`";
+            output = "Removed " + selectedUser.getAsMention() + " as a winner of `" + tourneyName + "`.";
         } else {
             TourneyWinnersService.addTourneyWinner(selectedUser, tourneyName);
-            output = "Added " + selectedUser.getEffectiveName() + " as a winner of `" + tourneyName + "`";
+            output = "Added " + selectedUser.getEffectiveName() + " as a winner of `" + tourneyName + "`.";
         }
         MessageHelper.sendMessageToEventChannel(event, output);
         MessageHelper.sendMessageToEventChannel(event, TourneyWinnersService.tournamentWinnersOutputString());

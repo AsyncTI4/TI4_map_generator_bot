@@ -573,7 +573,7 @@ public class CombatRollService {
                     player.setCommodities(player.getCommodities() + hitRolls);
                     ButtonHelperAgents.toldarAgentInitiation(game, player, hitRolls);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-                        + " gained " + hitRolls + " commodities due to their Uzean Wardog mech ability.");
+                        + " gained " + hitRolls + " commodit" + (hitRolls == 1 ? "y" : "ies") + " due to their Uzean Wardog mech ability.");
                 }
             }
             int misses = numRolls - hitRolls;
@@ -582,7 +582,7 @@ public class CombatRollService {
             if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                 extra.append(player.getFactionEmoji()).append(" destroyed ").append(misses).append(" of their own ")
                     .append(unitModel.getName()).append(misses == 1 ? "" : "s").append(" due to ")
-                    .append(misses == 1 ? "a Thalnos miss" : "Thalnos misses");
+                    .append(misses == 1 ? "a Thalnos miss" : "Thalnos misses").append(".");
                 for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
