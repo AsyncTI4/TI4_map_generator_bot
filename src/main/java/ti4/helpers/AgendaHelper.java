@@ -704,7 +704,7 @@ public class AgendaHelper {
     }
 
     private static String pluralPerson(int num) {
-        return "player" + (num == 1 ? " " : " s");
+        return num + " player" + (num == 1 ? "" : "s");
     }
 
     @ButtonHandler("queueAWhen")
