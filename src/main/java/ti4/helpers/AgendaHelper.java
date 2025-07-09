@@ -156,7 +156,7 @@ public class AgendaHelper {
         List<String> whens = getPossibleWhenNames(player);
         List<String> afters = getPossibleAfterNames(player);
         StringBuilder msg = new StringBuilder(player.getRepresentation()
-            + " if you wish, to speed up the agenda phase, you can choose now to secretly pass on all \"whens\" and \"afters\" for both agendas in the upcoming agenda phase. "
+            + " if you wish, to speed up the Agenda Phase, you can choose now to secretly pass on all \"whens\" and \"afters\" for both agendas in the upcoming Agenda Phase. "
             + "You may currently play " + whens.size() + " \"when\"" + (whens.size() == 1 ? "" : "s") + " and " + afters.size() + " \"after\"" + (afters.size() == 1 ? "" : "s")
             + ". You will be able to change your mind during the agendas themselves if something unexpected occurs.");
         if (!whens.isEmpty()) {
@@ -182,7 +182,7 @@ public class AgendaHelper {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentation() + ", you have successfully passed on all \"when\"s and \"after\"s for the entire agenda phase."
+            player.getRepresentation() + ", you have successfully passed on all \"when\"s and \"after\"s for the entire Agenda Phase."
             + " You can undo this during the agenda if necessary, or with this button", buttons);
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
 
@@ -212,7 +212,7 @@ public class AgendaHelper {
     public static void undoPassOnEverythingWhensNAfters(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-            player.getRepresentation() + ", you have successfully undone passing on all \"when\"s and \"after\"s for the agenda phase."
+            player.getRepresentation() + ", you have successfully undone passing on all \"when\"s and \"after\"s for the Agenda Phase."
             + " You may still need to handle \"when\"s and \"after\"s for any currently ongoing agenda.");
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "");
 
@@ -540,7 +540,7 @@ public class AgendaHelper {
                                     game.setStoredValue("conspiratorsFaction", player.getFaction());
                                     game.setStoredValue("conspiratorsUsed", player.getFaction());
                                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
-                                        + " The **Conspirators** ability has been used, which means the player will vote after the speaker. This ability may be used once per agenda phase.");
+                                        + " The **Conspirators** ability has been used, which means the player will vote after the speaker. This ability may be used once per Agenda Phase.");
                                     if (!game.isFowMode()) {
                                         listVoteCount(game, game.getMainGameChannel());
                                     }
@@ -1575,7 +1575,8 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
 
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " don't forget you now have to decide on whether you will play any more \"after\"s.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+            player.getRepresentation() + ", don't forget you now have to decide on whether you will play any more \"after\"s.");
     }
 
     public static List<Button> getWhenButtons(Game game) {
@@ -3373,7 +3374,7 @@ public class AgendaHelper {
             if ("conspirators".equalsIgnoreCase(riderName)) {
                 game.setStoredValue("conspiratorsFaction", player.getFaction());
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing()
-                    + " The **Conspirators** ability has been used, which means the player will vote after the speaker. This ability may be used once per agenda phase.");
+                    + " The **Conspirators** ability has been used, which means the player will vote after the speaker. This ability may be used once per Agenda Phase.");
                 if (!game.isFowMode()) {
                     listVoteCount(game, game.getMainGameChannel());
                 }
@@ -3522,7 +3523,7 @@ public class AgendaHelper {
 
         if ("Emergency Session".equalsIgnoreCase(agendaName)) {
             MessageHelper.sendMessageToChannel(channel, game.getPing()
-                + " _Emergency Session_ revealed. This agenda phase will have an additional agenda compared to normal. Flipping next agenda.");
+                + " _Emergency Session_ revealed. This Agenda Phase will have an additional agenda compared to normal. Flipping next agenda.");
             aCount -= 1;
             game.setStoredValue("agendaCount", aCount + "");
             revealAgenda(event, revealFromBottom, game, channel);
@@ -3642,7 +3643,7 @@ public class AgendaHelper {
             proceedButtons.add(Buttons.red("autoresolve_manual", "Skip Straight To Resolution"));
         } else {
             listVoteCount(game, channel);
-            msg = "These buttons can help with bugs/issues that occur during the agenda phase";
+            msg = "These buttons can help with bugs/issues that occur during the Agenda Phase";
             proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
             proceedButtons.add(Buttons.blue("transaction", "Transaction"));
             if (!game.isHiddenAgendaMode())

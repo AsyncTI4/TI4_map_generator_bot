@@ -139,7 +139,7 @@ public class FowCommunicationThreadService {
                 //Allow talking
                 threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
                     .queue(nameUpdated -> threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda
-                        ? " __may__ communicate in Agenda phase."
+                        ? " __may__ communicate in Agenda Phase."
                         : " are neighbors again and __may__ communicate.")).queue()));
 
             } else if (!areNeighbors && !threadLocked) {
