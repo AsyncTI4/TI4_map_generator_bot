@@ -12,6 +12,7 @@ import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FOWPlusService;
 
 @UtilityClass
 public class FOWOptionService {
@@ -102,7 +103,13 @@ public class FOWOptionService {
         String value = parts[0];
         String option = parts[1];
 
-        game.setFowOption(FOWOption.fromString(option), Boolean.parseBoolean(value));
+        FOWOption fowOption = FOWOption.fromString(option);
+        boolean newValue = Boolean.parseBoolean(value);
+        if (FOWOption.FOW_PLUS.equals(fowOption)) {
+            FOWPlusService.toggleTag(game, newValue);
+        }
+
+        game.setFowOption(fowOption, newValue);
         offerFOWOptionButtons(game, event.getChannel(), event);
     }
 
