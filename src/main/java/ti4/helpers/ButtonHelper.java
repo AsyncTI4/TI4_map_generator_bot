@@ -869,7 +869,7 @@ public class ButtonHelper {
     public static void drawStatusACs(Game game, Player player, ButtonInteractionEvent event) {
         if (game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
             ReactionService.addReaction(event, game, player, true, false,
-                "It seems you already drew your action cards for this status phase, so I will not deal you more. Please draw manually if this is a mistake.");
+                "It seems you already drew your action cards for this Status Phase, so I will not deal you more. Please draw manually if this is a mistake.");
             return;
         }
         String message = "";
@@ -5794,7 +5794,7 @@ public class ButtonHelper {
                 + StringHelper.ordinal(player.getInRoundTurnCount()) + " turn of round " + game.getRound() + ").";
             Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
             if (nextPlayer == player) {
-                msgExtra += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+                msgExtra += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
             } else if (nextPlayer != null) {
                 String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
                     ? nextPlayer.getRepresentationUnfogged()
@@ -6075,7 +6075,7 @@ public class ButtonHelper {
         if (game.isHiddenAgendaMode() && msg.toLowerCase().contains("abstain on")) {
             if (player.hasAbility("zeal")) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "## The player with the zeal ability has decided to abstain.");
+                    "## The player with the **Zeal** ability is abstaining." + (RandomHelper.isOneInX(20) ? " Not very zealous." : ""));
             }
             if (game.getStoredValue("aftersResolved").equalsIgnoreCase("Yes")) {
                 if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).isEmpty()) {
@@ -6083,7 +6083,7 @@ public class ButtonHelper {
                 } else {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                         "Game needs " + AgendaHelper.getPlayersWhoNeedToPreVoted(game).size()
-                            + " more people to pre-vote before voting will start");
+                            + " more people to pre-vote before voting will start.");
                 }
             }
         }

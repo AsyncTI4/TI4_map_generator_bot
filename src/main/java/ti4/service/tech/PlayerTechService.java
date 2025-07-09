@@ -524,7 +524,7 @@ public class PlayerTechService {
             Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
             if (nextPlayer != null && !game.isFowMode()) {
                 if (nextPlayer == player) {
-                    text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+                    text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
                 } else {
                     String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
                     text += "\n-# " + ping + " will start their turn once you've ended yours.";

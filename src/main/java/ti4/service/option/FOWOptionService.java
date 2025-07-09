@@ -18,7 +18,7 @@ public class FOWOptionService {
   
     public enum FOWOption {
         MANAGED_COMMS("Managed comms", "Use managed player-to-player communication threads"),
-        ALLOW_AGENDA_COMMS("Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in agenda phase"),
+        ALLOW_AGENDA_COMMS("Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
         HIDE_TOTAL_VOTES("Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER("Hide voting order", "Hide player colors from vote order"),
         HIDE_PLAYER_NAMES("Hide real names", "Completely hide player Discord names on the map"),

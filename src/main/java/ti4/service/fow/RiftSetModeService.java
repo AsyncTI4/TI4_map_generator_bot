@@ -52,7 +52,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
  * - When any unit fails rift throw, Cabal eats it
  * - One additional Custom Strategy Card, 9. Sacrifice
  * - One additional agenda, Crucible Reallocation
- *   - Removed from the deck at setup. Can be flipped with a button in every agenda phase.
+ *   - Removed from the deck at setup. Can be flipped with a button in every Agenda Phase.
  * - Custom frontier explore Unstable Rifts (tells player to ping GM to resolve)
  * - /special swap_systems to support RANDOM options
  * - A way to see what _own_ units Cabal has captured (button in Cards Thread)
