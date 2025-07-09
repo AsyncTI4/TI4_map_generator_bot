@@ -56,6 +56,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
   * Prevents looking at explore/relic decks
  */
 public class FOWPlusService {
+    public static final String FOWPLUS_TAG = "FoW+";
     public static final String VOID_TILEID = "-1";
 
     private static final String FOWPLUS_EXPLORE_WAVE = "fowplus_wave";
@@ -67,6 +68,14 @@ public class FOWPlusService {
 
     public static boolean isActive(Game game) {
         return game.getFowOption(FOWOption.FOW_PLUS);
+    }
+
+    public static void toggleTag(Game game, boolean active) {
+        if (active) {
+            game.addTag(FOWPLUS_TAG);
+        } else {
+            game.removeTag(FOWPLUS_TAG);
+        }
     }
 
     //Only allow activating positions player can see
