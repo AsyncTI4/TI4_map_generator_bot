@@ -128,7 +128,7 @@ public class Leader {
 
         if (isActive()) {
             eb.setColor(Color.BLUE);
-            eb.setAuthor("🔒 ACTIVE - Leader will be purged during status phase cleanup");
+            eb.setAuthor("🔒 ACTIVE - Leader will be purged during Status Phase cleanup");
         }
 
         return eb.build();

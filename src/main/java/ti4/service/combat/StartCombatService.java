@@ -319,20 +319,20 @@ public class StartCombatService {
                         + " The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("qhet_flagship", player2, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, 
-                        player1.getRepresentation() + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
+                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() 
+                        + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("qhet_flagship", player1, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel,
-                        player2.getRepresentation() + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
+                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() 
+                        + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("florzen_flagship", player2, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel,
-                        player1.getRepresentation() + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
+                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() 
+                        + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("florzen_flagship", player1, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel,
-                        player2.getRepresentation() + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
+                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() 
+                        + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
             }
 
@@ -411,8 +411,9 @@ public class StartCombatService {
 
     public static void offerRedGhostCommanderButtons(Player player, Game game, GenericInteractionCreateEvent event) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander")) {
-            String message = player.getRepresentation(true, true) + " Resolve Red Creuss Commander using buttons\n> (note this is not available until the end of combat)";
-            message += "\n-# You have (" + player.getCommoditiesRepresentation() + ") commodities.";
+            String message = player.getRepresentation(true, true) + ", you may, at the __end__ of combat, gain 1 commodity or convert 1 of your commodities to a trade good,"
+                + " with \"Total Mystery\", the Red Creuss commander."
+                + "\n-# You have " + player.getCommoditiesRepresentation() + " commodities.";
             List<Button> buttons = ButtonHelperFactionSpecific.gainOrConvertCommButtons(player, true);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
         }
@@ -612,7 +613,7 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(finChecker + "qhetHero_" + tile.getPosition(), "Unlock " + tile.getRepresentationForButtons(), FactionEmojis.qhet));
                 buttons.add(Buttons.green("draw_1_ACDelete", "Draw 1 Action Card", FactionEmojis.qhet));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg + ", a reminder that if you win the combat, " +
-                    "you may use the button unlock the system or draw 1 action card (Qhet Hero Ability).", buttons);
+                    "you may use the button unlock the system or draw 1 action card, due to Tvor Khage, the Qhet hero.", buttons);
             }
             if (player.hasAbility("black_ops") && player == game.getActivePlayer()) {
                 int debt = player.getDebtTokenCount(otherPlayer.getColor());
@@ -630,11 +631,11 @@ public class StartCombatService {
             }
             if (game.playerHasLeaderUnlockedOrAlliance(player, "qhetcommander") && player == game.getActivePlayer()) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg + ", a reminder that if you win a combat during this action " +
-                    "you may take an additional action (Qhet Commander Ability)");
+                    "you may take an additional action due to Ghaist Asmora, the Qhet commander.");
             }
             if (player.getPromissoryNotes().containsKey("dspnqhet") && !player.getPromissoryNotesOwned().contains("dspnqhet")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + " reminder you have the Qhet promissory note.");
+                    player.getRepresentationUnfogged() + ", a reminder you have _Alloy Shipment_.");
             }
             if (player.hasAbility("moult") && player != game.getActivePlayer()
                 && "space".equalsIgnoreCase(type)) {
@@ -642,8 +643,8 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.gray(finChecker + "moult_" + tile.getPosition(), "Moult", FactionEmojis.cheiran));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + ", a reminder that if you win the combat, you will be given buttons to resolve **Moult**, allowing you to produce 1 ship, reducing the cost " +
-                    "by 1 for each non-fighter ship you will have lost in the combat.",
+                    + ", a reminder that if you win the combat, you will be given buttons to resolve **Moult**, allowing you to produce 1 ship, reducing the cost"
+                    + " by 1 for each non-fighter ship you will have lost in the combat.",
                     buttons);
             }
             if (player.getPromissoryNotes().containsKey("dspnmort")
@@ -685,7 +686,7 @@ public class StartCombatService {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("refreshBelkoseaHero", "Ready Belkosea Hero", FactionEmojis.belkosea));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg
-                    + ", a reminder that if you lose this combat, you can ready Mobius Spike, Belkosea Hero.",
+                    + ", a reminder that if you lose this combat, you ready Mobius Spike, Belkosea Hero.",
                     buttons);
             }
             if (player.getLeaderIDs().contains("kortalicommander")
@@ -897,13 +898,13 @@ public class StartCombatService {
                 buttons.add(Buttons.gray(finChecker + "yinagent_" + pos, "Use " + (agentHolder.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Yin Agent", FactionEmojis.Yin));
             }
             if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("mirveda_flagship", agentHolder, tile) && isSpaceCombat) {
-                buttons.add(Buttons.gray(finChecker + "mirvedaFS_" + pos, "Place Fighter (Mirveda FS)", FactionEmojis.mirveda));
+                buttons.add(Buttons.gray(finChecker + "mirvedaFS_" + pos, "Place Fighter (Mirveda Flagship)", FactionEmojis.mirveda));
             }
             if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("belkosea_flagship", agentHolder, tile) && isSpaceCombat) {
-                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged To Produce Hit (Belkosea FS)", FactionEmojis.belkosea));
+                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged To Produce Hit (Belkosea Flagship)", FactionEmojis.belkosea));
             }
             if ((!game.isFowMode() || agentHolder == p1) && ButtonHelper.doesPlayerHaveFSHere("kortali_flagship", agentHolder, tile) && isSpaceCombat) {
-                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged Upon Win To Gain Command Token (Kortali FS)", FactionEmojis.kortali));
+                buttons.add(Buttons.gray(finChecker + "becomeDamaged_" + pos + "_flagship", "Become Damaged Upon Win To Gain Command Token (Kortali Flagship)", FactionEmojis.kortali));
             }
         }
 
@@ -1049,11 +1050,11 @@ public class StartCombatService {
         }
         if (p2.hasTech("dsvadey") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "vadenYellowTechUse_" + p1.getColor(), "Pay 1 TG For Additional Hit", FactionEmojis.vaden));
+            buttons.add(Buttons.gray(finChecker + "vadenYellowTechUse_" + p1.getColor(), "Produce Additional Hit for 1 Trade Good", FactionEmojis.vaden));
         }
         if (p1.hasTech("dsvadey")) {
             String finChecker = "FFCC_" + p1.getFaction() + "_";
-            buttons.add(Buttons.gray(finChecker + "vadenYellowTechUse_" + p2.getColor(), "Pay 1 TG For Additional Hit", FactionEmojis.vaden));
+            buttons.add(Buttons.gray(finChecker + "vadenYellowTechUse_" + p2.getColor(), "Produce Additional Hit for 1 Trade Good", FactionEmojis.vaden));
         }
         if (p2.hasTechReady("dsvadey") && !game.isFowMode()) {
             String finChecker = "FFCC_" + p2.getFaction() + "_";

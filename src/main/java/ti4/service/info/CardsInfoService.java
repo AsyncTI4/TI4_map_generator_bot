@@ -57,7 +57,7 @@ public class CardsInfoService {
             buttons.add(Buttons.gray("naaluCommander", "Do Naalu Commander", FactionEmojis.Naalu));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "uydaicommander")) {
-            buttons.add(Buttons.gray("uydaiCommander", "Pay 1tg to Use Uydai Commander", FactionEmojis.uydai));
+            buttons.add(Buttons.gray("uydaiCommander", "Pay 1 Trade Good to Use Uydai Commander", FactionEmojis.uydai));
         }
         if (player.hasAbility("oracle_ai") || player.getPromissoryNotesInPlayArea().contains("dspnauge")) {
             buttons.add(Buttons.gray("initialPeak", "Peek At Next Objective", FactionEmojis.augers));
@@ -246,7 +246,7 @@ public class CardsInfoService {
                 hasSummary = true;
         }
         if (game.getRound() > 1 || !phasesBeforeAction.contains(game.getPhaseOfGame()) || hasSummary) {
-            // after the action phase round 1, show the edit summary button by default
+            // after the Action Phase round 1, show the edit summary button by default
             buttons.add(Buttons.EDIT_SUMMARIES);
         }
         buttons.add(Buttons.POST_NOTEPAD);
