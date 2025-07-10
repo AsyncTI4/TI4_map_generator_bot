@@ -183,7 +183,8 @@ public class AgendaHelper {
         buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentation() + ", you have successfully passed on all \"when\"s and \"after\"s for the entire Agenda Phase."
-            + " You can undo this during the agenda if necessary, or with this button", buttons);
+                + " You can undo this during the agenda if necessary, or with this button",
+            buttons);
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
 
         if (game.getPhaseOfGame().equalsIgnoreCase("agendawaiting")) {
@@ -213,7 +214,7 @@ public class AgendaHelper {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
             player.getRepresentation() + ", you have successfully undone passing on all \"when\"s and \"after\"s for the Agenda Phase."
-            + " You may still need to handle \"when\"s and \"after\"s for any currently ongoing agenda.");
+                + " You may still need to handle \"when\"s and \"after\"s for any currently ongoing agenda.");
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "");
 
     }
@@ -713,7 +714,7 @@ public class AgendaHelper {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 "The bot knows of no \"when\"s that you can play." +
-                " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
+                    " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
             return;
         }
         buttons.add(Buttons.blue("declineToQueueAWhen", "Pass On \"When\"s"));
@@ -759,7 +760,7 @@ public class AgendaHelper {
         if (buttons.isEmpty()) {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                 "The bot knows of no \"after\" that you can play." +
-                " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
+                    " If this is a bug or unimplemented ability, please report it in the `#bot-bugs-and-feature-requests` channel.");
             return;
         }
         buttons.add(Buttons.blue("declineToQueueAnAfter", "Pass On \"After\"s"));
@@ -793,7 +794,7 @@ public class AgendaHelper {
             buttons.add(Buttons.red("unlockQueuedAfters", "Be Asked Again"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 "You will not be asked again by default if someone else plays an \"after\". You can change that " +
-                " and be asked to decide on \"after\"s again when someone else plays an \"after\" by pressing this button.",
+                    " and be asked to decide on \"after\"s again when someone else plays an \"after\" by pressing this button.",
                 buttons);
         }
         event.getMessage().delete().queue();
@@ -1581,7 +1582,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), summary2 + "\n \n");
 
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + ", don't forget you now have to decide on whether you will play any more \"after\"s.");
     }
 
@@ -2002,14 +2003,17 @@ public class AgendaHelper {
                                 game.drawActionCard(winningR.getUserID());
                                 game.drawActionCard(winningR.getUserID());
                                 ButtonHelper.checkACLimit(game, winningR);
-                                ActionCardHelper.sendActionCardInfo(game, winningR, event);
-                            }
-                            if (winningR.hasAbility("scheming")) {
-                                amount = 4;
-                                game.drawActionCard(winningR.getUserID());
-                                MessageHelper.sendMessageToChannelWithButtons(winningR.getCardsInfoThread(),
-                                    winningR.getRepresentationUnfogged() + " use buttons to discard.",
-                                    ActionCardHelper.getDiscardActionCardButtons(winningR, false));
+                                if (winningR.hasAbility("scheming")) {
+                                    amount = 4;
+                                    game.drawActionCard(winningR.getUserID());
+                                    ActionCardHelper.sendActionCardInfo(game, winningR, event);
+                                    MessageHelper.sendMessageToChannelWithButtons(winningR.getCardsInfoThread(),
+                                        winningR.getRepresentationUnfogged() + " use buttons to discard.",
+                                        ActionCardHelper.getDiscardActionCardButtons(winningR, false));
+
+                                } else {
+                                    ActionCardHelper.sendActionCardInfo(game, winningR, event);
+                                }
                             }
 
                             game.setSpeakerUserID(winningR.getUserID());
@@ -2432,7 +2436,7 @@ public class AgendaHelper {
             if (!player.getPromissoryNotes().containsKey(player.getColor() + "_ps")
                 && player.getPromissoryNotesOwned().contains(player.getColor() + "_ps")) {
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + ", this is a reminder that you don't currently hold your _Political Secret_."
-                     + " Any \"when\"s or \"after\"s that you queue will be automatically cancelled if it is played by another player.");
+                    + " Any \"when\"s or \"after\"s that you queue will be automatically cancelled if it is played by another player.");
             }
             if (game.getCurrentAgendaInfo().contains("Player") && ButtonHelper.isPlayerElected(game, player, "committee")) {
                 List<Button> buttons = new ArrayList();
