@@ -21,17 +21,30 @@
         "id": "luminous3",
         "initiative": 3,
         "name": "Leadership",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Gain 3 command tokens",
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+        ],
+        "secondaryTexts": [
+            "Spend any amount of influence to gain 1 command token for every 3 influence spent"
+        ],
         "imageFileName": "luminous_3",
+        "botSCAutomationID": "pok1leadership",
         "source": "other"
     },
     {
         "id": "luminous4",
         "initiative": 4,
         "name": "Politics",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Choose a player other than the speaker.  That player gains the speaker token.",
+            "Draw 2 action cards",
+            "Look at the top 2 cards of the agenda deck. Place each card on the top or bottom of the deck in any order."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 2 action cards."
+        ],
+        "botSCAutomationID": "pok3politics",
         "imageFileName": "luminous_4",
         "source": "other"
     },
@@ -41,6 +54,7 @@
         "name": "Construction",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok4construction",
         "imageFileName": "luminous_5",
         "source": "other"
     },
@@ -48,8 +62,15 @@
         "id": "luminous6",
         "initiative": 6,
         "name": "Trade",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Gain 3 trade goods.",
+            "Replenish commodities.",
+            "Choose any number of other players. Those players use the secondary ability of this strategy card without spending a command token."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to replenish your commodities."
+        ],
+        "botSCAutomationID": "pok5trade",
         "imageFileName": "luminous_6",
         "source": "other"
     },
@@ -59,6 +80,7 @@
         "name": "Warfare",
         "primaryTexts": [],
         "secondaryTexts": [],
+        "botSCAutomationID": "pok6warfare",
         "imageFileName": "luminous_7",
         "source": "other"
     },
@@ -66,8 +88,14 @@
         "id": "luminous8",
         "initiative": 8,
         "name": "Technology",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Research 1 technology.",
+            "Spend 6 resources to research 1 technology."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool and 4 resources to research 1 technology."
+        ],
+        "botSCAutomationID": "pok7technology",
         "imageFileName": "luminous_8",
         "source": "other"
     },
@@ -84,8 +112,14 @@
         "id": "luminous10",
         "initiative": 10,
         "name": "Imperial",
-        "primaryTexts": [],
-        "secondaryTexts": [],
+        "primaryTexts": [
+            "Immediately score 1 public objective if you fulfill its requirements.",
+            "Gain 1 victory point if you control Mecatol Rex; otherwise, draw 1 secret objective."
+        ],
+        "secondaryTexts": [
+            "Spend 1 token from your strategy pool to draw 1 secret objective."
+        ],
+        "botSCAutomationID": "pok8imperial",
         "imageFileName": "luminous_10",
         "source": "other"
     }

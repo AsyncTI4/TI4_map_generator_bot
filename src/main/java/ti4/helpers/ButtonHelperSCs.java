@@ -1235,4 +1235,56 @@ public class ButtonHelperSCs {
             }
         }
     }
+
+    @ButtonHandler("lumiACdraw")
+    public static void lumiACDraw(Game game, Player player, ButtonInteractionEvent event) {
+        String messageID = event.getMessageId();
+        boolean used2 = addUsedSCPlayer(messageID + "ac", game, player);
+        if (used2) {
+            return;
+        }
+        boolean used = addUsedSCPlayer(messageID, game, player);
+        StrategyCardModel scModel = null;
+        for (int scNum : player.getUnfollowedSCs()) {
+            if (game.getStrategyCardModelByInitiative(scNum).get().usesAutomationForSCID("luminous2")) {
+                scModel = game.getStrategyCardModelByInitiative(scNum).get();
+            }
+        }
+        if (!used && scModel != null && scModel.usesAutomationForSCID("luminous2")
+            && !player.getFollowedSCs().contains(scModel.getInitiative())
+            && game.getPlayedSCs().contains(scModel.getInitiative())) {
+            int scNum = scModel.getInitiative();
+            player.addFollowedSC(scNum, event);
+            ButtonHelperFactionSpecific.resolveVadenSCDebt(player, scNum, game, event);
+            if (player.getStrategicCC() > 0) {
+                ButtonHelperCommanders.resolveMuaatCommanderCheck(player, game, event, "followed **Diplomacy**");
+            }
+            String message = deductCC(game, player, scNum);
+            ReactionService.addReaction(event, game, player, message);
+        }
+        boolean hasSchemingAbility = player.hasAbility("scheming");
+        String message = hasSchemingAbility
+            ? "drew 2 action cards (**Scheming**) - please discard 1 action card from your hand."
+            : "drew 1 action card.";
+        int count = hasSchemingAbility ? 2 : 1;
+        if (player.hasAbility("autonetic_memory")) {
+            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
+
+        } else {
+            for (int i = 0; i < count; i++) {
+                game.drawActionCard(player.getUserID());
+            }
+            ActionCardHelper.sendActionCardInfo(game, player, event);
+            ButtonHelper.checkACLimit(game, player);
+        }
+
+        ReactionService.addReaction(event, game, player, message);
+        if (hasSchemingAbility) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " use buttons to discard",
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
+        }
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+    }
 }

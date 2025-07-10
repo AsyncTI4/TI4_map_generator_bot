@@ -513,6 +513,9 @@ public class PlayStrategyCardService {
             case "pok6warfare" -> getWarfareButtons(sc);
             case "anarchy1" -> getAnarchy1Buttons(sc);
             case "anarchy2" -> getAnarchy2Buttons(sc);
+            case "luminous1" -> getLuminous1Buttons(sc);
+            case "luminous9" -> getLuminous9Buttons(sc, player);
+            case "luminous2" -> getLuminous2Buttons(sc, player);
             case "anarchy3" -> getAnarchy3Buttons(sc, player);
             case "anarchy7" -> getAnarchy7Buttons(sc);
             case "anarchy8" -> getAnarchy8Buttons(sc);
@@ -630,6 +633,15 @@ public class PlayStrategyCardService {
         return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
     }
 
+    private static List<Button> getLuminous1Buttons(int sc) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button diploSystemButton = Buttons.gray("anarchy2secondary", "Ready a relic, tech, or agent.");
+        Button refreshButton = Buttons.green("diploRefresh2", "Ready Planets");
+        Button redi = Buttons.green("redistributeCCButtons", "Redistribute Command Tokens");
+        Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
+        return List.of(followButton, redi, diploSystemButton, refreshButton, noFollowButton);
+    }
+
     private static List<Button> getAnarchy3Buttons(int sc, Player player) {
         Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
         Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo a System");
@@ -637,6 +649,24 @@ public class PlayStrategyCardService {
 
         Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
         return List.of(followButton, diploSystemButton, refreshButton, noFollowButton);
+    }
+
+    private static List<Button> getLuminous2Buttons(int sc, Player player) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button diploSystemButton = Buttons.blue(player.getFinsFactionCheckerPrefix() + "diploSystem", "Diplo a System");
+        Button draw1AC = Buttons.gray("lumiacdraw", "Draw 1 Action Card", CardEmojis.ActionCard);
+        Button refreshButton = Buttons.gray("exploreAPlanet", "Explore a planet");
+        Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
+        return List.of(followButton, diploSystemButton, draw1AC, refreshButton, noFollowButton);
+    }
+
+    private static List<Button> getLuminous9Buttons(int sc, Player player) {
+        Button followButton = Buttons.green("sc_follow_" + sc, "Spend A Strategy Token");
+        Button scoreAnObjective = Buttons.gray(player.getFinsFactionCheckerPrefix() + "scoreAnObjective", "Score A Public", CardEmojis.Public1);
+        Button refreshButton = Buttons.gray("anarchy3secondary", "Perform Exhausted Secondary");
+
+        Button noFollowButton = Buttons.red("sc_no_follow_" + sc, "Not Following");
+        return List.of(followButton, scoreAnObjective, refreshButton, noFollowButton);
     }
 
     private static List<Button> getPoliticsButtons(int sc) {
