@@ -52,7 +52,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
  * - When any unit fails rift throw, Cabal eats it
  * - One additional Custom Strategy Card, 9. Sacrifice
  * - One additional agenda, Crucible Reallocation
- *   - Removed from the deck at setup. Can be flipped with a button in every agenda phase.
+ *   - Removed from the deck at setup. Can be flipped with a button in every Agenda Phase.
  * - Custom frontier explore Unstable Rifts (tells player to ping GM to resolve)
  * - /special swap_systems to support RANDOM options
  * - A way to see what _own_ units Cabal has captured (button in Cards Thread)
@@ -146,7 +146,7 @@ public class RiftSetModeService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, winner, false);
 
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(CRUCIBLE_PN);
-        MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you received " + CardEmojis.PN + pnModel.getName());
+        MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you received " + CardEmojis.PN + pnModel.getName() + ".");
     }
 
     public static void resolveExplore(String exploreCardId, Player player, Game game) {
@@ -271,7 +271,7 @@ public class RiftSetModeService {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), player.getRepresentation(true, true) 
-            + " choose a system to Sacrifice.", buttonsWithTilesWithShips);
+            + " choose a system to **Sacrifice**.", buttonsWithTilesWithShips);
     }
 
     @ButtonHandler("rollSacrifice_")
@@ -325,7 +325,7 @@ public class RiftSetModeService {
             }
         }
         
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Sacrifice was performed. "
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "**Sacrifice** was performed. "
             + player.getRepresentation() + " gained " + (totalTGsGained == 0 ? "0" : MiscEmojis.tg(totalTGsGained) + " " + player.gainTG(totalTGsGained)) + " trade goods.");
         ButtonHelper.deleteMessage(event);
     }
@@ -335,7 +335,7 @@ public class RiftSetModeService {
 
         Player cabal = getCabalPlayer(game);
         UnitHolder nombox = cabal.getNomboxTile().getSpaceUnitHolder();
-        String sb = player.getRepresentation(true, true) + " is resolving Sacrifce.\n\n" +
+        String sb = player.getRepresentation(true, true) + " is resolving **Sacrifice**.\n\n" +
             "Following units are currently captured: " + nombox.getPlayersUnitListEmojisOnHolder(player) +
             "\nAfter releasing, use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
@@ -347,7 +347,7 @@ public class RiftSetModeService {
         }
         buttonsToReleaseUnits.add(Buttons.red("deleteButtons", "Done"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
-            "Use buttons to release up to 3 of your non-fighter units from the Cabal", buttonsToReleaseUnits);
+            "Use buttons to release up to 3 of your non-fighter units from the Cabal.", buttonsToReleaseUnits);
     }
 
     @ButtonHandler("riftsetCabalRelease")

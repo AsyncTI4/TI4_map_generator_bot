@@ -225,7 +225,7 @@ public class Helper {
 
     public static void giveMeBackMyAgendaButtons(Game game) {
         List<Button> proceedButtons = new ArrayList<>();
-        String msg = "These buttons can help with bugs/issues that occur during the agenda phase";
+        String msg = "These buttons can help with bugs/issues that occur during the Agenda Phase.";
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
         proceedButtons.add(Buttons.red("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
@@ -1138,7 +1138,7 @@ public class Helper {
                     if (thing.contains("comm")) {
                         String comms = StringUtils.substringAfter(thing, "_");
                         keleresAgent += Integer.parseInt(comms);
-                        msg.append("Keleres Agent for ").append(comms).append(" commodities\n");
+                        msg.append("Xander Alexin Victori III, the Keleres agent, for ").append(comms).append(" commodit").append(comms.equals("1") ? "y" : "ies").append("\n");
                     } else {
                         msg.append(thing).append("\n");
                     }

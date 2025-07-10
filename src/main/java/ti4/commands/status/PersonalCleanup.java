@@ -23,7 +23,7 @@ import ti4.service.leader.RefreshLeaderService;
 class PersonalCleanup extends GameStateSubcommand {
 
     public PersonalCleanup() {
-        super(Constants.PERSONAL_CLEANUP, "Status phase cleanup", true, true);
+        super(Constants.PERSONAL_CLEANUP, "Status Phase cleanup", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
@@ -36,7 +36,7 @@ class PersonalCleanup extends GameStateSubcommand {
         }
         Game game = getGame();
         runStatusCleanup(game);
-        MessageHelper.replyToMessage(event, "Player has completed status phase.");
+        MessageHelper.replyToMessage(event, "Player has completed Status Phase.");
     }
 
     private void runStatusCleanup(Game game) {

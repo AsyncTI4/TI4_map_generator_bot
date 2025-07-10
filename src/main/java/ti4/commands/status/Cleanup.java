@@ -13,7 +13,7 @@ import ti4.service.StatusCleanupService;
 class Cleanup extends GameStateSubcommand {
 
     public Cleanup() {
-        super(Constants.CLEANUP, "Status phase cleanup", true, false);
+        super(Constants.CLEANUP, "Status Phase cleanup", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 

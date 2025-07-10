@@ -29,7 +29,8 @@ public class VoiceOfTheCouncilHelper {
         var lawID = game.getLaws().get(Constants.VOICE_OF_THE_COUNCIL_ID);
         var poID = game.getRevealedPublicObjectives().get(Constants.VOICE_OF_THE_COUNCIL_PO);
         if (lawID == null || poID == null) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Cannot elect Voice of the Council; missing Agenda or custom Public Ojbective. Consider running \"/omegaphase reset_voice_of_the_council\".");
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(),
+                "Cannot elect _Voice of the Council_; missing agenda or custom public objective. Consider running `/omegaphase reset_voice_of_the_council`.");
             return;
         }
 
@@ -42,9 +43,9 @@ public class VoiceOfTheCouncilHelper {
         sb.append("**Voice of the Council**\n");
         if (previousElectee != null && !previousElectee.equalsIgnoreCase(player.getFaction())) {
             var previousPlayer = game.getPlayerFromColorOrFaction(previousElectee);
-            sb.append(previousPlayer.getRepresentation()).append(" is no longer Voice of the Council.\n");
+            sb.append(previousPlayer.getRepresentation()).append(" is no longer _Voice of the Council_.\n");
         }
-        sb.append(player.getRepresentation()).append(" has been elected as Voice of the Council.");
+        sb.append(player.getRepresentation()).append(" has been elected as _Voice of the Council_.");
         MessageHelper.sendMessageToChannel(game.getActionsChannel(), sb.toString());
         Helper.checkEndGame(game, player);
     }

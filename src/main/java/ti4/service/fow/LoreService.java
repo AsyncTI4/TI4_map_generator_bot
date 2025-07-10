@@ -249,6 +249,8 @@ public class LoreService {
     }
 
     private static void showLore(Player player, Game game, String target, boolean isSystemLore) {
+        if (!player.isRealPlayer()) return;
+
         Map<String, String[]> lore = getSavedLore(game);
         if (lore.isEmpty() || !lore.containsKey(target)) {
             return;

@@ -256,9 +256,23 @@ public class TileGenerator {
             case Setup -> {
             } // do nothing
             case Tile -> {
-                BufferedImage image = CustomHyperlaneService.isCustomHyperlaneTile(tile)
-                    ? HyperlaneTileGenerator.generateHyperlaneTile(tile, game)
-                    : ImageHelper.read(tile.getTilePath());
+                BufferedImage image;
+                if (CustomHyperlaneService.isCustomHyperlaneTile(tile))
+                {
+                    image = HyperlaneTileGenerator.generateHyperlaneTile(tile, game);
+                }
+                else if (game.isLiberationC4Mode() && "51".equals(tile.getTileID()))
+                {
+                    image = ImageHelper.read(ResourceHelper.getInstance().getTileFile("51r_Creuss.png"));
+                }
+                else if (game.isLiberationC4Mode() && "17".equals(tile.getTileID()))
+                {
+                    image = ImageHelper.read(ResourceHelper.getInstance().getTileFile("17r_DeltaWH.png"));
+                }
+                else
+                {
+                    image = ImageHelper.read(tile.getTilePath());
+                }
                 tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 // ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
@@ -1683,6 +1697,11 @@ public class TileGenerator {
         int index = 0;
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
+            if (game.isLiberationC4Mode())
+            {
+                tokenPath = tokenPath.replace("token_creuss", "token_crimsoncreuss");
+                tokenPath = tokenPath.replace("token_crimsoncreussepsilon", "token_creussepsilon");
+            }
             String tokenName = Mapper.getTokenKey(tokenID);
 
             if (tokenPath == null) {

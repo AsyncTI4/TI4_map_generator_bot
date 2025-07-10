@@ -46,7 +46,7 @@ class ZelianHero extends GameStateSubcommand {
         String message1 = "Moments before disaster in game " + game.getName() + ".";
         DisasterWatchHelper.postTileInDisasterWatch(game, event, tile, 1, message1);
 
-        //Remove all other players ground force units from the tile in question
+        //Remove all other players ground force units from the system in question
         for (Player player_ : game.getPlayers().values()) {
             if (player_ != player) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {

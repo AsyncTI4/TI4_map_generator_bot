@@ -12,13 +12,14 @@ import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FOWPlusService;
 
 @UtilityClass
 public class FOWOptionService {
   
     public enum FOWOption {
         MANAGED_COMMS("Managed comms", "Use managed player-to-player communication threads"),
-        ALLOW_AGENDA_COMMS("Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in agenda phase"),
+        ALLOW_AGENDA_COMMS("Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
         HIDE_TOTAL_VOTES("Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER("Hide voting order", "Hide player colors from vote order"),
         HIDE_PLAYER_NAMES("Hide real names", "Completely hide player Discord names on the map"),
@@ -102,7 +103,13 @@ public class FOWOptionService {
         String value = parts[0];
         String option = parts[1];
 
-        game.setFowOption(FOWOption.fromString(option), Boolean.parseBoolean(value));
+        FOWOption fowOption = FOWOption.fromString(option);
+        boolean newValue = Boolean.parseBoolean(value);
+        if (FOWOption.FOW_PLUS.equals(fowOption)) {
+            FOWPlusService.toggleTag(game, newValue);
+        }
+
+        game.setFowOption(fowOption, newValue);
         offerFOWOptionButtons(game, event.getChannel(), event);
     }
 

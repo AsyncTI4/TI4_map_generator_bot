@@ -78,7 +78,8 @@ class SecretObjectiveButtonHandler {
                 if (manager.getPlayerDraft(playerID).getFaction().equals("keleresm"))
                     keleres = game.getPlayer(playerID);
             if (keleres != null) {
-                MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), "Keleres is not set up yet!!! " + keleres.getPing() + " the game is waiting for you to set up :)");
+                MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(),
+                    "Keleres is not set up yet!!! " + keleres.getPing() + ", the game is waiting for you to set up :).");
                 return;
             }
         }

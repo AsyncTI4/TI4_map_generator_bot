@@ -130,7 +130,7 @@ public class UnitRenderGenerator {
 
             Player player = game.getPlayerFromColorOrFaction(unitKey.getColor());
             if (player == null) {
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation());
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Could not find owner for " + unitKey + " in tile " + tile.getRepresentation() + ".");
                 continue;
             }
             Integer unitCount = unitHolder.getUnitCount(unitKey);
@@ -155,7 +155,8 @@ public class UnitRenderGenerator {
             BufferedImage spoopy = getSpoopyImage(unitKey, player);
             UnitModel unitModel = player.getUnitFromUnitKey(unitKey);
             if (unitModel == null) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " a unit model could not be found for the unit with an async ID of " + unitKey.asyncID());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    player.getRepresentation() + ", a unit model could not be found for the unit with an async ID of " + unitKey.asyncID() + ".");
                 continue;
             }
 

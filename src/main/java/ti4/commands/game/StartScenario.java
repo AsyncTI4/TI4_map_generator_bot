@@ -11,12 +11,15 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.commands.player.AddAllianceMember;
 import ti4.helpers.Constants;
+import ti4.helpers.RandomHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
+import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.map.AddTileListService;
 import ti4.service.milty.MiltyService;
@@ -41,7 +44,7 @@ public class StartScenario extends GameStateSubcommand {
         if (scenario != null && scenario.contains("liberation")) {
             startLiberationCodex4(game, event);
         }
-        MessageHelper.replyToMessage(event, "Successfully started the scenario");
+        MessageHelper.replyToMessage(event, "Successfully started the scenario.");
     }
 
     public static void startOrdinianCodex1(Game game, GenericInteractionCreateEvent event) {
@@ -106,6 +109,11 @@ public class StartScenario extends GameStateSubcommand {
             }
         }
         for (String faction : factions) {
+            if (players.size() == 0)
+            {
+                MessageHelper.sendMessageToEventChannel(event, "You don't have six players, but I'll try my best anyway.");
+                break;
+            }
             if (game.getPlayerFromColorOrFaction(faction) == null) {
                 int face = ThreadLocalRandom.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
@@ -120,22 +128,22 @@ public class StartScenario extends GameStateSubcommand {
                 switch (faction.toLowerCase())
                 {
                     case "ghost":
-                        color = "ruby";
+                        color = RandomHelper.isOneInX(2) ? "ruby" : "bloodred";
                         break;
                     case "xxcha":
-                        color = "sunset";
+                        color = RandomHelper.isOneInX(2) ? "sunset" : "tropical";
                         break;
                     case "sol":
-                        color = "dawn";
+                        color = RandomHelper.isOneInX(2) ? "dawn" : "wasp";
                         break;
                     case "naaz":
-                        color = "lime";
+                        color = RandomHelper.isOneInX(2) ? "lime" : "sherbet";
                         break;
                     case "nekro":
-                        color = "black";
+                        color = RandomHelper.isOneInX(2) ? "black" : "poison";
                         break;
                     case "nomad":
-                        color = "navy";
+                        color = RandomHelper.isOneInX(2) ? "navy" : "glacier";
                         break;
                 }
                 if (tile != null) {
@@ -165,6 +173,7 @@ public class StartScenario extends GameStateSubcommand {
             ghost.addLeader("redcreussagent");
             ghost.addLeader("redcreusscommander");
             ghost.addLeader("redcreusshero");
+            ghost.setFactionEmoji(FactionEmojis.RedCreuss.asEmoji().getFormatted());
         }
         List<String> allRelics = game.getAllRelics();
 

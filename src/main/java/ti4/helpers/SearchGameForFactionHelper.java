@@ -68,7 +68,7 @@ public class SearchGameForFactionHelper {
                 if (winner.getUserID().equals(player.getUserID())) sb.append(" **👑WINNER👑**");
             }
         }
-        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
+        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded()) sb.append(" - __It is your turn__)");
         if (showSecondaries && !game.isHasEnded()) {
             List<String> secondaries = new ArrayList<>();
             for (int sc : game.getPlayedSCs()) {

@@ -12,7 +12,7 @@ public enum FactionEmojis implements TI4Emoji {
     Arborec, Ghost, Hacan, Jolnar, L1Z1X, Letnev, Mentak, Muaat, Naalu, Nekro, Saar, Sardakk, Sol, Winnu, Xxcha, Yin, Yssaril,
 
     // Prophecy of Kings
-    Argent, Cabal, Empyrean, Mahact, Naaz, Nomad, Titans, Keleres,
+    Argent, Cabal, Empyrean, Mahact, Naaz, Nomad, Titans, Keleres, RedCreuss,
 
     // Discordant Stars
     augers, axis, bentor, celdauri, cheiran, cymiae, dihmohn, edyn, florzen, freesystems, ghemina, //
@@ -80,6 +80,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "neutral" -> Neutral;
 
             case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
+            case "redcreuss", "redghost" -> RedCreuss;
 
             case "augers" -> augers;
             case "axis" -> axis;

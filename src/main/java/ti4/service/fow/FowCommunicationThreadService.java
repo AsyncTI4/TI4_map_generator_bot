@@ -134,18 +134,18 @@ public class FowCommunicationThreadService {
             if (!threadLocked && isHiddenAgenda(game)) {
                 //Reminder of Hidden Agenda mode
                 threadChannel.getManager().setArchived(false).queue(success -> 
-                    threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda **only** speaker is allowed to speak.").queue());
+                    threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda __only__ speaker is allowed to speak.").queue());
             } else if (areNeighbors && threadLocked) {
                 //Allow talking
                 threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
                     .queue(nameUpdated -> threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda
-                        ? " **may** communicate in Agenda phase."
-                        : " are neighbors again and **may** communicate.")).queue()));
+                        ? " __may__ communicate in Agenda Phase."
+                        : " are neighbors again and __may__ communicate.")).queue()));
 
             } else if (!areNeighbors && !threadLocked) {
                 //Deny talking
                 threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR))
-                    .queue(nameUpdated -> threadChannel.sendMessage(notice + " are no longer neighbors and should **not** communicate.").queue()));
+                    .queue(nameUpdated -> threadChannel.sendMessage(notice + " are no longer neighbors and should __not__ communicate.").queue()));
             }
         }
     }

@@ -19,6 +19,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     private String id;
     private String name;
     private String shortName;
+    private Boolean shrinkName;
     private String faction;
     private String permanentEffect;
     private String window;
@@ -45,6 +46,13 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
             return Optional.ofNullable(shortName).orElse(getName());
         }
         return Optional.ofNullable(shortName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
+    }
+
+    public boolean getShrinkName() {
+        if (getHomebrewReplacesID().isEmpty()) {
+            return Optional.ofNullable(shrinkName).orElse(false);
+        }
+        return Optional.ofNullable(shrinkName).orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getPermanentEffect() {

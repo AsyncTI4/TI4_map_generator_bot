@@ -81,7 +81,8 @@ public class OtherHeroButtonHandler {
                 " the Atokera hero, was not purged - something went wrong.");
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " Unfortunately at this time the addition of ships to the ground is not automated. /move units can place them on the planet however, and they will roll dice as normal once there.");
+            player.getRepresentationUnfogged() + ", unfortunately at this time the addition of ships to the ground is not automated."
+                + " `/move units` can place them on the planet however, and they will roll dice as normal once there.");
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -283,12 +284,12 @@ public class OtherHeroButtonHandler {
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                message + "  the Orlando hero, has been purged.");
+                message + ", the Orlando hero, has been purged.");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                " the Orlando was not purged - something went wrong.");
+                message + ". The Orlando hero was not purged - something went wrong.");
         }
-        String msg = player.getRepresentationNoPing() + " please select the unit that recently died with which you wish to resolve the orlando hero on.";
+        String msg = player.getRepresentationNoPing() + ", please choose the unit that recently died, with which you wish to resolve Apollo Protocol.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
         ButtonHelper.deleteTheOneButton(event);
 
@@ -338,7 +339,7 @@ public class OtherHeroButtonHandler {
     public static void glimmersHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.substring(buttonID.indexOf("_") + 1);
         List<Button> buttons = ButtonHelperHeroes.getUnitsToGlimmersHero(player, game, event, game.getTileByPosition(pos));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + " select which unit you'd like to duplicate", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + ", please choose which unit you wish to duplicate.", buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 
@@ -346,7 +347,7 @@ public class OtherHeroButtonHandler {
     public static void ghotiHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos = buttonID.substring(buttonID.indexOf("_") + 1);
         List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + " select which unit you'd like to replace", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + ", please choose which unit you wish to replace.", buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 }

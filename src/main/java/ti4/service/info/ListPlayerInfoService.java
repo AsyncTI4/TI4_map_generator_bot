@@ -63,7 +63,7 @@ public class ListPlayerInfoService {
             case "protect_border" -> 5;
             case "distant_lands" -> 2;
 
-            //status phase secrets
+            //Status Phase secrets
             case "pem" -> 8; // 8 production
             case "sai" -> 1; //legendary
             case "syc" -> 1; // control a planet in same system someone else does
@@ -92,7 +92,7 @@ public class ListPlayerInfoService {
             case "faa" -> 4; // 4 cultural
             case "fc" -> (game.getRealPlayers().size() - 1); // neighbors
 
-            // Omega phase objectives
+            // Omega Phase objectives
             case "corner_omegaphase" -> 4;
             case "galvanize_omegaphase" -> 6;
             case "manipulate_law_omegaphase", "golden_age_omegaphase" -> 16;
@@ -645,7 +645,7 @@ public class ListPlayerInfoService {
                 // This number may be inaccurate when it's greater than 3, but it is always accurate for 2
                 return Math.min(planetsAdjToHomes.size(), homesAdjTo.size());
             }
-            //status phase secrets
+            //Status Phase secrets
             case "pem" -> {
                 return ButtonHelper.checkHighestProductionSystem(player, game); // 8 production
             }
