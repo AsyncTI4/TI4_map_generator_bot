@@ -234,8 +234,7 @@ public class ButtonHelper {
                 player.setStasisInfantry(player.getStasisInfantry() + 1);
             } else {
                 message += " Failure.";
-                if (RandomHelper.isOneInX(20))
-                {
+                if (RandomHelper.isOneInX(20)) {
                     message += " That infantry is now permanently dead, destined to be forgotten as just one more amongst untold billions who will die in this war.";
                     message += " Already, you can't even remember " + (RandomHelper.isOneInX(2) ? "his" : "her") + " " + (RandomHelper.isOneInX(2) ? "face" : "name") + ".";
                 }
@@ -392,6 +391,12 @@ public class ButtonHelper {
         }
         List<ThreadChannel> threadChannels = game.getMainGameChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
+                return threadChannel_;
+            }
+        }
+        List<ThreadChannel> hiddenThreadChannels = game.getActionsChannel().retrieveArchivedPublicThreadChannels().complete();
+        for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
             if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                 return threadChannel_;
             }
@@ -3810,7 +3815,7 @@ public class ButtonHelper {
                         AddUnitService.addUnits(event, tile, game, player.getColor(), amt + " " + key.asyncID());
                     }
                 }
-                String msg = player.getRepresentationUnfogged() + ", all of the units sold to you by " 
+                String msg = player.getRepresentationUnfogged() + ", all of the units sold to you by "
                     + nokar.getFactionEmoji() + " that remained in the active system were converted into your ships.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
@@ -5196,7 +5201,7 @@ public class ButtonHelper {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + ", please choose an objective to make scorable."+
+            player.getRepresentation() + ", please choose an objective to make scorable." +
                 " A reminder that in a normal game, you can't choose a stage 2 to make scorable until after round 3 is over.",
             buttons);
     }

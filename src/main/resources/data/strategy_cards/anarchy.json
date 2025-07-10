@@ -6,7 +6,6 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "botSCAutomationID": "anarchy1",
-        "botSCAutomationID": "anarchy1",
         "imageFileName": "anarchy_1",
         "colourHexCode": "#FFFFFF",
         "source": "asteroid"
@@ -18,7 +17,6 @@
         "primaryTexts": [],
         "secondaryTexts": [],
         "botSCAutomationID": "anarchy2",
-        "botSCAutomationID": "anarchy2",
         "imageFileName": "anarchy_2",
         "source": "asteroid"
     },
@@ -28,7 +26,6 @@
         "name": "Diplomacy",
         "primaryTexts": [],
         "secondaryTexts": [],
-        "botSCAutomationID": "anarchy3",
         "botSCAutomationID": "anarchy3",
         "imageFileName": "anarchy_3",
         "source": "asteroid"
