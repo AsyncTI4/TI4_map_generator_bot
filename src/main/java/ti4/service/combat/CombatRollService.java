@@ -208,7 +208,7 @@ public class CombatRollService {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     "Roll result was sent to " + opponent.getRepresentationNoPing());
             } else if (rollType == CombatRollType.bombardment) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
                     + " This roll result is not automatically relayed. Please communicate the hits to the opponent manually.");
             }
         }
@@ -545,7 +545,8 @@ public class CombatRollService {
                     resultRolls.addAll(additionalResultRolls);
                 }
             }
-            if (rollType == CombatRollType.combatround && (player.hasAbility("valor") || opponent.hasAbility("valor"))
+            Player gloryHolder = Helper.getPlayerFromAbility(game, "valor");
+            if (rollType == CombatRollType.combatround && gloryHolder != null
                 && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                 for (DiceHelper.Die die : resultRolls) {
                     if (die.getResult() > 9) {
@@ -688,6 +689,16 @@ public class CombatRollService {
                 player.setExpectedHitsTimes10(
                     player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                if (rollType == CombatRollType.combatround && gloryHolder != null
+                    && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+                    for (DiceHelper.Die die : resultRolls2) {
+                        if (die.getResult() > 9) {
+                            hitRolls2 += 1;
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                                + " got an extra hit due to the **Valor** ability (it has been accounted for in the hit count).");
+                        }
+                    }
+                }
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unitModel, toHit, modifierToHit, numOfUnit,
                     numRollsPerUnit, 0, resultRolls2, hitRolls2);

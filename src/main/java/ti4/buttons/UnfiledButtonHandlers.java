@@ -536,7 +536,7 @@ public class UnfiledButtonHandlers {
                         "Your faction's stockholders are so far unimpressed.",
                         "Perhaps _AI Development Algorithm_ or _Scanlink Drone Network_ might have been more useful?");
                     msg += lameMessages.get(result);
-                } else  if (player.getSarweenCounter() < 11) {
+                } else if (player.getSarweenCounter() < 11) {
                     List<String> lameMessages = Arrays.asList(
                         "Not too shabby.",
                         "The technology is finally starting to justify its existence.",
@@ -2407,7 +2407,7 @@ public class UnfiledButtonHandlers {
         if (Helper.getCCCount(game, player.getColor()) > 15) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation() + ", a reminder that you are at the command token limit right now,"
-                + " so may need to pull a command token off your command sheet in order to retreat (unless you retreat to a system that already has one).");
+                    + " so may need to pull a command token off your command sheet in order to retreat (unless you retreat to a system that already has one).");
         }
     }
 
@@ -2419,6 +2419,12 @@ public class UnfiledButtonHandlers {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("exploreAPlanet")
+    public static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " Use buttons to explore", buttons);
     }
 
     @ButtonHandler("doAnotherAction")
