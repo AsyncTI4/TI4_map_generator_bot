@@ -845,7 +845,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "data_recovery",
         "AdditionalComponents": [
-            "ABILITY:black_ops",
+            "ABILITY:black_ops"
         ],
         "source": "ds"
     },
