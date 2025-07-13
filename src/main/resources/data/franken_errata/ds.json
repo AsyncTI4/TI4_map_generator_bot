@@ -939,7 +939,7 @@
         "ItemCategory": "ABILITY",
         "ItemId": "synthesis",
         "AdditionalComponents": [
-            "ABILITY:Living Metals"
+            "ABILITY:living_metals"
         ],
         "source": "ds"
     },
