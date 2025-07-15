@@ -144,6 +144,9 @@ public class TransactionHelper {
         players.add(p1);
         players.add(p2);
         for (Player player : players) {
+            if (!trans.isEmpty()) {
+                trans.append("\n");
+            }
             trans.append("> ").append(player.getRepresentation(false, false, true)).append(" gives:\n");
             boolean sendingNothing = true;
             for (String item : transactionItems) {
@@ -406,6 +409,7 @@ public class TransactionHelper {
         "A Jubba Cloak",
         "The Pretence That Your Secrets Are Unscorable",
         "Double Nothing",
+        "A First-Born Child",
         "The Opportunity To Be Your Own Boss",
         "Artisanal, Hand-Crafted Nothing",
         "Reticulating Splines",

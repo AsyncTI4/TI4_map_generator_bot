@@ -36,7 +36,7 @@ public class StandardBagDraft extends BagDraft {
         return "standard_bag_draft";
     }
 
-    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral", "qhet", "toldar", "atokera", "belkosea" };
+    private static final String[] excludedFactions = { "lazax", "admins", "franken", "keleresm", "keleresx", "miltymod", "qulane", "neutral" };
 
     public static List<FactionModel> getDraftableFactionsForGame(Game game) {
         List<FactionModel> factionSet = getAllLegalFactions();

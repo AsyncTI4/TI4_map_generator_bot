@@ -24,6 +24,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -98,6 +99,7 @@ import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.milty.MiltyDraftTile;
 import ti4.service.milty.MiltyService;
 import ti4.service.planet.AddPlanetService;
 import ti4.service.regex.RegexService;
@@ -1089,6 +1091,13 @@ public class ButtonHelper {
         // this is mandatory, so should probably be refactored to happen automatically
         for (Player magenPlayer : game.getPlayers().values()) {
             boolean has = activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);
+            if (magenPlayer.hasAbility("byssus")) {
+                for (UnitHolder planet : activeSystem.getPlanetUnitHolders()) {
+                    if (planet.getUnitCount(UnitType.Mech, magenPlayer) > 0) {
+                        has = true;
+                    }
+                }
+            }
             if (!has || !magenPlayer.hasTech("md")) continue;
 
             String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
@@ -3491,6 +3500,99 @@ public class ButtonHelper {
         for (String pos3 : directlyAdjacentTiles) {
             if (directlyAdjacentTiles2.contains(pos3) && game.getTileByPosition(pos3) == null) {
                 inBoth = pos3;
+            }
+        }
+
+        if (newTileID.equalsIgnoreCase("unknown")) {
+            DiceHelper.Die d1 = new DiceHelper.Die(5);
+
+            String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
+            if (d1.getResult() > 4) {
+                message += "blue backed tile";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
+                    .filter(tile -> tile.getTierList().isBlue())
+                    .toList());
+
+                List<MiltyDraftTile> tileToPullFromUnshuffled = new ArrayList<>(unusedBlueTiles);
+                Collections.shuffle(unusedBlueTiles);
+
+                if (unusedBlueTiles.size() < 1) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from");
+                    return;
+                }
+
+                List<MessageEmbed> tileEmbeds = new ArrayList<>();
+                List<String> ids = new ArrayList<>();
+
+                Tile tile = unusedBlueTiles.get(0).getTile();
+                TileModel tileModel = tile.getTileModel();
+                tileEmbeds.add(tileModel.getRepresentationEmbed(false));
+                ids.add(tile.getTileID());
+
+                String tileString = String.join(",", tileToPullFromUnshuffled.stream().map(t -> t.getTile().getTileID()).toList());
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew 1 blue back tile from this list:\n> " + tileString);
+                event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+                newTileID = ids.getFirst();
+            } else {
+                message += "red backed tile";
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                List<String> tilesToPullFrom = new ArrayList<>(List.of(
+                    //Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
+                    //         https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx
+
+                    "39",
+                    "40",
+                    "41",
+                    "42",
+                    "43",
+                    "44",
+                    "45",
+                    "46",
+                    "47",
+                    "48",
+                    "49",
+                    "67",
+                    "68",
+                    "77",
+                    "78",
+                    "79",
+                    "80",
+                    "d117",
+                    "d118",
+                    "d119",
+                    "d120",
+                    "d121",
+                    "d122",
+                    "d123"));
+
+                // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile -> !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
+                tilesToPullFrom.removeAll(game.getTileMap().values().stream().map(Tile::getTileID).toList());
+                if (!game.isDiscordantStarsMode() && !game.isUnchartedSpaceStuff()) {
+                    tilesToPullFrom.removeAll(tilesToPullFrom.stream().filter(tileID -> tileID.contains("d")).toList());
+                }
+                List<String> tileToPullFromUnshuffled = new ArrayList<>(tilesToPullFrom);
+                Collections.shuffle(tilesToPullFrom);
+
+                if (tilesToPullFrom.size() < 1) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from");
+                    return;
+                }
+
+                List<MessageEmbed> tileEmbeds = new ArrayList<>();
+                List<String> ids = new ArrayList<>();
+
+                String tileID = tilesToPullFrom.get(0);
+                ids.add(tileID);
+                TileModel tile = TileHelper.getTileById(tileID);
+                tileEmbeds.add(tile.getRepresentationEmbed(false));
+
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + " drew 1 red back tile from this list:\n> " + tileToPullFromUnshuffled);
+
+                event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
+
+                newTileID = ids.getFirst();
+
             }
         }
         if (inBoth.isEmpty()) {

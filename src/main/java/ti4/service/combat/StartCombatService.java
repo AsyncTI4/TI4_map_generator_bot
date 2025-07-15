@@ -288,50 +288,50 @@ public class StartCombatService {
         sendGeneralCombatButtonsToThread(threadChannel, game, player1, player2, tile, spaceOrGround, event);
         if (!game.isFowMode()) {
             if (player1.getAc() == 0) {
-                MessageHelper.sendMessageToChannel(threadChannel, 
+                MessageHelper.sendMessageToChannel(threadChannel,
                     player2.getRepresentation() + ", your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
             } else if (ButtonHelper.isPlayerElected(game, player1, "censure") || ButtonHelper.isPlayerElected(game, player1, "absol_censure")) {
-                MessageHelper.sendMessageToChannel(threadChannel, 
+                MessageHelper.sendMessageToChannel(threadChannel,
                     player2.getRepresentation() + ", your opponent is _Politically Censure_'d and cannot play action cards, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
             if (player2.getAc() == 0) {
-                MessageHelper.sendMessageToChannel(threadChannel, 
+                MessageHelper.sendMessageToChannel(threadChannel,
                     player1.getRepresentation() + " your opponent has zero action cards in hand, so if they have no applicable technologies/abilities/retreats you can roll.");
             } else if (ButtonHelper.isPlayerElected(game, player2, "censure") || ButtonHelper.isPlayerElected(game, player2, "absol_censure")) {
-                MessageHelper.sendMessageToChannel(threadChannel, 
+                MessageHelper.sendMessageToChannel(threadChannel,
                     player1.getRepresentation() + ", your opponent is _Politically Censure_'d and cannot play action cards, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
             if (isSpaceCombat) {
                 if (ButtonHelper.doesPlayerHaveFSHere("l1z1x_flagship", player2, tile)) {
                     UnitHolder space = tile.getUnitHolders().get("space");
                     int dreadCount = space.getUnitCount(UnitType.Dreadnought, player2.getColor());
-                    MessageHelper.sendMessageToChannel(threadChannel, 
-                        player1.getRepresentation() + ", a reminder that your opponent has the [0.0.1] here, and so their flagship" 
-                        + (dreadCount > 0 ? " and dreadnought" : "") + " hits must be assigned to non-fighter ships if possible."
-                        + " The bot will not enforce this.");
+                    MessageHelper.sendMessageToChannel(threadChannel,
+                        player1.getRepresentation() + ", a reminder that your opponent has the [0.0.1] here, and so their flagship"
+                            + (dreadCount > 0 ? " and dreadnought" : "") + " hits must be assigned to non-fighter ships if possible."
+                            + " The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("l1z1x_flagship", player1, tile)) {
                     UnitHolder space = tile.getUnitHolders().get("space");
                     int dreadCount = space.getUnitCount(UnitType.Dreadnought, player1.getColor());
-                    MessageHelper.sendMessageToChannel(threadChannel, 
-                        player2.getRepresentation() + ", a reminder that your opponent has the [0.0.1] here, and so their flagship" 
-                        + (dreadCount > 0 ? " and dreadnought" : "") + " hits must be assigned to non-fighter ships if possible."
-                        + " The bot will not enforce this.");
+                    MessageHelper.sendMessageToChannel(threadChannel,
+                        player2.getRepresentation() + ", a reminder that your opponent has the [0.0.1] here, and so their flagship"
+                            + (dreadCount > 0 ? " and dreadnought" : "") + " hits must be assigned to non-fighter ships if possible."
+                            + " The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("qhet_flagship", player2, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() 
+                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation()
                         + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("qhet_flagship", player1, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() 
+                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation()
                         + ", a reminder that your opponent has the Khage here, and their flagship hits cannot be cancelled (including by SUSTAIN DAMAGE). The bot will not enforce this.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("florzen_flagship", player2, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation() 
+                    MessageHelper.sendMessageToChannel(threadChannel, player1.getRepresentation()
                         + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
                 if (ButtonHelper.doesPlayerHaveFSHere("florzen_flagship", player1, tile)) {
-                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation() 
+                    MessageHelper.sendMessageToChannel(threadChannel, player2.getRepresentation()
                         + ", a reminder that your opponent has the Man O’ War here, and so you (and all other players) cannot play action cards during this space combat.");
                 }
             }
@@ -363,7 +363,7 @@ public class StartCombatService {
                         Player pharadn = game.getPNOwner("dspnphar");
                         List<Button> buttons = new ArrayList<>();
                         buttons.add(Buttons.green(pharadn.getFinsFactionCheckerPrefix() + "capture1Pharad", "Capture 1 Infantry", FactionEmojis.pharadn));
-                        MessageHelper.sendMessageToChannelWithButtons(threadChannel, 
+                        MessageHelper.sendMessageToChannelWithButtons(threadChannel,
                             pharadn.getRepresentation() + " you may use this button when/if " + player.getFactionEmoji() + " uses _Death Binding_.", buttons);
                     }
                 }
@@ -1273,6 +1273,13 @@ public class StartCombatService {
                         String id = p.finChecker() + "initialIndoctrination_" + unitH.getName();
                         String label = "Indoctrinate on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, FactionEmojis.Yin));
+                    }
+
+                    // Magen
+                    if (p.hasTech("md") && isGroundCombat && (unitH.getUnitCount(Units.UnitType.Spacedock, p.getColor()) > 0 || unitH.getUnitCount(Units.UnitType.Pds, p.getColor()) > 0)) {
+                        String id = p.finChecker() + "magenHit_" + unitH.getName();
+                        String label = "Use Magen Defence Grid on " + nameOfHolder;
+                        buttons.add(Buttons.gray(id, label, TechEmojis.WarfareTech));
                     }
                     // Letnev Mech
                     if (p.hasUnit("letnev_mech") && !ButtonHelper.isLawInPlay(game, "articles_war") && isGroundCombat && unitH.getUnitCount(Units.UnitType.Infantry, p.getColor()) > 0
