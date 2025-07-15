@@ -42,6 +42,7 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 @UtilityClass
 public class StartCombatService {
@@ -301,6 +302,14 @@ public class StartCombatService {
                 MessageHelper.sendMessageToChannel(threadChannel,
                     player1.getRepresentation() + ", your opponent is _Politically Censure_'d and cannot play action cards, so if they have no applicable technologies/abilities/retreats you can roll.");
             }
+            String ms2 = StartTurnService.getMissedSCFollowsText(game, player1);
+            if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
+                MessageHelper.sendMessageToChannel(threadChannel, ms2);
+            }
+            ms2 = StartTurnService.getMissedSCFollowsText(game, player2);
+            if (ms2 != null && !"".equalsIgnoreCase(ms2)) {
+                MessageHelper.sendMessageToChannel(threadChannel, ms2);
+            }
             if (isSpaceCombat) {
                 if (ButtonHelper.doesPlayerHaveFSHere("l1z1x_flagship", player2, tile)) {
                     UnitHolder space = tile.getUnitHolders().get("space");
@@ -366,7 +375,14 @@ public class StartCombatService {
                         MessageHelper.sendMessageToChannelWithButtons(threadChannel,
                             pharadn.getRepresentation() + " you may use this button when/if " + player.getFactionEmoji() + " uses _Death Binding_.", buttons);
                     }
+                    if (player.hasTech("md") && player.getPlanetsAllianceMode().contains(unitHolderName)) {
+                        if (uH.getUnitCount(UnitType.Pds, player) > 0 || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
+                            MessageHelper.sendMessageToChannel(threadChannel,
+                                player.getRepresentation() + " reminder to use magen defence grid (button should be above, but it and pds fire are not part of automated ground combat)");
+                        }
+                    }
                 }
+
             }
             if (!autoButtons.isEmpty()) {
                 String automMessage = "You may automate the entire combat if neither side has action cards or fancy tricks."

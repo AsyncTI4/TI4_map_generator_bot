@@ -417,10 +417,31 @@ public class ButtonHelperSCs {
         event.getMessage().delete().queue();
     }
 
+    @ButtonHandler("lumi7Build_")
+    public static void lumi7Build(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        String pos = buttonID.split("_")[1];
+        game.setStoredValue("lumi7System", pos);
+        List<Button> buttons;
+        buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos),
+            "lumi7Build", "place");
+        String message = player.getRepresentation() + " Use the buttons to produce units. ";
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        event.getMessage().delete().queue();
+    }
+
     public static List<Button> getAnarchy7Buttons(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : ButtonHelper.getTilesOfUnitsWithProduction(player, game)) {
             buttons.add(Buttons.green("anarchy7Build_" + tile.getPosition(),
+                tile.getRepresentationForButtons(game, player)));
+        }
+        return buttons;
+    }
+
+    public static List<Button> getLumi7Buttons(Game game, Player player) {
+        List<Button> buttons = new ArrayList<>();
+        for (Tile tile : ButtonHelper.getTilesOfUnitsWithProduction(player, game)) {
+            buttons.add(Buttons.green("lumi7Build_" + tile.getPosition(),
                 tile.getRepresentationForButtons(game, player)));
         }
         return buttons;
@@ -610,6 +631,15 @@ public class ButtonHelperSCs {
     @ButtonHandler("primaryOfAnarchy7")
     public static void primaryOfAnarchy7(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         List<Button> buttons = ButtonHelperSCs.getAnarchy7Buttons(game, player);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentation(true, true)
+                + ", use the buttons to build in the desired system.",
+            buttons);
+    }
+
+    @ButtonHandler("primaryOfLumi7")
+    public static void primaryOfLumi7(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        List<Button> buttons = ButtonHelperSCs.getLumi7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation(true, true)
                 + ", use the buttons to build in the desired system.",

@@ -1860,10 +1860,19 @@ public class UnfiledButtonHandlers {
         }
         if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)) {
             if (player.hasTech("asn") && (buttonID.contains("tacticalAction") || buttonID.contains("warfare")
-                || buttonID.contains("anarchy7Build"))) {
+                || buttonID.contains("anarchy7Build") || buttonID.contains("lumi7Build"))) {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             player.resetSpentThings();
+            if (buttonID.contains("lumi7Build")) {
+                if (!game.getStoredValue("lumi7System").isEmpty()) {
+                    Tile tile = game.getTileByPosition(game.getStoredValue("lumi7System"));
+                    CommandCounterHelper.addCC(event, player, tile);
+                    String message = player.getFactionEmojiOrColor() + " placed 1 command token from reinforcements in the "
+                        + tile.getRepresentation() + " system.";
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+                }
+            }
             if (buttonID.contains("tacticalAction")) {
                 ButtonHelper.exploreDET(player, game, event);
                 ButtonHelperFactionSpecific.cleanCavUp(game, event);
