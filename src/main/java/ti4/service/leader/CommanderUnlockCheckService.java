@@ -173,7 +173,14 @@ public class CommanderUnlockCheckService {
                 }
             }
             case "sardakk" -> {
-                if (player.getPlanets().size() > 6) {
+                int count = 0;
+                for (String p : player.getPlanets()) {
+                    Tile tile = game.getTileFromPlanet(p);
+                    if (tile != null && !tile.isHomeSystem(game)) {
+                        count++;
+                    }
+                }
+                if (count > 4) {
                     shouldBeUnlocked = true;
                 }
             }
