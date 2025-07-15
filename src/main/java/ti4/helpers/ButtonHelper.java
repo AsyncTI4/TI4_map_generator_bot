@@ -2923,6 +2923,7 @@ public class ButtonHelper {
         Player player, Game game, Tile tile,
         boolean ignoreFighters, boolean issuePing
     ) {
+        CommanderUnlockCheckService.checkPlayer(player, "naalu", "cabal");
         String tileRepresentation = tile.getRepresentation();
         int[] values = { 0, 0, 0, 0 };
         if (tileRepresentation == null || "null".equalsIgnoreCase(tileRepresentation)) {
