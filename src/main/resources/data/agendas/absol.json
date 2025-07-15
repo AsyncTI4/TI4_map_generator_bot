@@ -513,7 +513,7 @@
         "target": "For/Against",
         "text1": "For: The speaker places 1 of their control tokens on this card. When a player takes or receives the speaker token, they place 1 of their control tokens on this card. A player whose control token is on this card may not take or receive the speaker token. If a control token from every player is on this card, remove them.",
         "text2": "Against: The player who cast the most votes \"Against\" draws 2 action cards. Exhaust the Politics strategy card. Players who voted \"Against\" or abstained must give 1 promissory note from their hand to a player who voted \"For,\" if able.",
-        "mapText": "When resolving an agenda, if the agenda resolves in the way the speaker voted or predicted, or if the speaker broke a tie to choose the resolution, the other player who cast the most votes for an outcome that was not resolved takes the speaker token.",
+        "mapText": "Players cant be made speaker again until all have been speaker. Place control tokens here to keep track of who cant be made speaker. Clear them off when all have been placed. ",
         "source": "absol"
     },
     {
