@@ -2278,7 +2278,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Your other units in this system may also have the unit abilities and text abilities of another player’s units of the same type in or adjacent to this system. [Note: not currently implemented by the bot]"
+        "ability": "Your other units in this system also have the unit and text abilities of other players’ units of the same type in this system. [Note: not currently implemented by the bot]"
     },
     {
         "id": "belkosea_fighter",

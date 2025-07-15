@@ -361,13 +361,16 @@ public class ButtonHelperAgents {
         String message = player.getRepresentation() + " chose to destroy all infantry on " + Helper.getPlanetRepresentation(planet, game);
         UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
         int amountToKill = uH.getUnitCount(UnitType.Infantry, player.getColor());
-        ButtonHelper.resolveInfantryDestroy(player, amountToKill);
+
         int comms = Math.min(player.getCommoditiesTotal(), amountToKill);
         message += ". " + amountToKill + " infantry were destroyed. " + comms + " commodit" + (comms == 1 ? "y" : "ies")
-            + " were gained and then converted into" + (comms == 1 ? " a" : "") + " trade good" + (comms == 1 ? "" : "s") + ".";
-        player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), amountToKill));
-        player.setCommodities(Math.max(0, player.getCommodities() - amountToKill));
-        RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
+            + " were gained and then all commodities were converted into trade goods.";
+        player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), player.getCommodities() + amountToKill));
+        player.setCommodities(0);
+        if (amountToKill > 0) {
+            ButtonHelper.resolveInfantryDestroy(player, amountToKill);
+            RemoveUnitService.removeUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet);
+        }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.deleteMessage(event);
     }
@@ -1173,7 +1176,7 @@ public class ButtonHelperAgents {
                 }
             }
             if (!actionRow2.isEmpty() && !exhaustedMessage.contains("select the user of the agent")
-                && !exhaustedMessage.contains("choose the target of your agent")) {
+                && !exhaustedMessage.contains("choose the target of the agent")) {
                 if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
                     buttonEvent.getMessage().delete().queue();
                 } else {
@@ -1195,6 +1198,7 @@ public class ButtonHelperAgents {
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg, buttons2);
             }
         }
+
     }
 
     @ButtonHandler("presetEdynAgentStep1")

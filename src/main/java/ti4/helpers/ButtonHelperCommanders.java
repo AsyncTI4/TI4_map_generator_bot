@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -44,8 +46,6 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperCommanders {
 
@@ -136,7 +136,7 @@ public class ButtonHelperCommanders {
         // player.setStrategicCC(player.getStrategicCC() - 1);
         RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentation() + " remove the command token from " + tile.getRepresentationForButtons() + " using their hero ability.");
     }
 
@@ -613,7 +613,7 @@ public class ButtonHelperCommanders {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
                     if (uH.getDamagedUnitCount(UnitType.Mech, player.getColorID()) > 0) {
                         uH.removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getDamagedUnitCount(UnitType.Mech, player.getColorID()));
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                             player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token.");
                     }
                 }
@@ -673,12 +673,12 @@ public class ButtonHelperCommanders {
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getRepresentation() + ", use buttons to destroy infantry on 5 planets in order to unlock Avhkan, your commander.", getPharadnCommanderUnlockButtons(player, game));
     }
 
     @ButtonHandler("pharadnCommanderUnlockKill_")
-    public static void pharadnAgentKill(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void pharadnCommanderUnlockKill(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];
         String message = player.getRepresentation() + " chose to destroy 2 infantry on " + Helper.getPlanetRepresentation(planet, game) + " in the process of unlocking Avhkan, the Pharad’n commander.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);

@@ -23,8 +23,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DiceHelper;
-import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
@@ -173,7 +171,7 @@ public class PlayerTechService {
             }
             case "dsvadey" -> {
                 deleteTheOneButtonIfButtonEvent(event);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() 
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
                     + " is destroying a unit that sustained damage by using _Krovoz Strike Teams_. The owner should destroy the unit with the assign hits button.");
             }
             case "absol_nm" -> { // Absol's Neural Motivator
@@ -344,18 +342,7 @@ public class PlayerTechService {
             }
             case "det", "absol_det" -> {
                 deleteIfButtonEvent(event);
-                DiceHelper.Die d1 = new DiceHelper.Die(5);
-
-                String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
-                if (d1.getResult() > 4) {
-                    message += "blue backed tile";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 1);
-                } else {
-                    message += "red backed tile";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    DiscordantStarsHelper.drawRedBackTiles(event, game, player, 1);
-                }
+                ButtonHelper.starChartStep1(game, player, "unknown");
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
