@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
@@ -963,6 +964,89 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
 
+    @ButtonHandler("magenHit_")
+    public static void magenHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        ButtonHelper.deleteTheOneButton(event);
+        String planet = buttonID.split("_")[1];
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving magen defense grid");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " choose the opposing unit to hit", getOpposingUnitsToHitOnGround(player, game, event, game.getTileFromPlanet(planet), planet));
+    }
+
+    public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String planet) {
+        String finChecker = "FFCC_" + player.getFaction() + "_";
+
+        List<Button> buttons = new ArrayList<>();
+
+        UnitHolder unitHolder = game.getUnitHolderFromPlanet(planet);
+        Map<UnitKey, Integer> units = unitHolder.getUnits();
+
+        Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
+        for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
+            UnitKey unitKey = unitEntry.getKey();
+            if (player.unitBelongsToPlayer(unitKey))
+                continue;
+            Player p2 = game.getPlayerFromColorOrFaction(unitKey.getColor());
+            if (p2 == null) {
+                continue;
+            }
+            UnitModel unitModel = p2.getUnitFromUnitKey(unitKey);
+
+            String prettyName = unitModel.getName();
+            String unitName = unitKey.unitName();
+            int totalUnits = unitEntry.getValue();
+            int damagedUnits = 0;
+
+            if (unitHolder.getUnitDamage() != null) {
+                damagedUnits = unitHolder.getUnitDamage().getOrDefault(unitKey, 0);
+            }
+
+            for (int x = 1; x < damagedUnits + 1 && x < 2; x++) {
+                String buttonID = finChecker + "hitOpponentGround_" + planet + "_" + unitName + "damaged"
+                    + "_" + unitKey.getColor();
+                Button validTile2 = Buttons.red(buttonID, "Damaged " + prettyName, unitKey.unitEmoji());
+                buttons.add(validTile2);
+            }
+            totalUnits -= damagedUnits;
+            for (int x = 1; x < totalUnits + 1 && x < 2; x++) {
+                Button validTile2 = Buttons.red(finChecker + "hitOpponentGround_" + planet + "_" + unitName
+                    + "_" + unitKey.getColor(), prettyName, unitKey.unitEmoji());
+                buttons.add(validTile2);
+            }
+        }
+
+        return buttons;
+    }
+
+    @ButtonHandler("hitOpponentGround_")
+    public static void hitOpponentGround(Game game, ButtonInteractionEvent event, String buttonID) {
+        String planet = buttonID.split("_")[1];
+        String unit = buttonID.split("_")[2];
+        boolean damaged = false;
+        if (unit.contains("damaged")) {
+            damaged = true;
+            unit = unit.replace("damaged", "");
+        }
+        String playerColor = buttonID.split("_")[3];
+        Player player = game.getPlayerFromColorOrFaction(playerColor);
+        MessageChannel channel = event.getChannel();
+        if (game.isFowMode()) {
+            channel = player.getPrivateChannel();
+        }
+        String msg = player.getRepresentation() + " you have had one of your units assigned a hit via magen defense grid, please cancel the hit somehow (Titans Agent, SUSTAIN DAMAGE, etc.), or accept the loss of the unit.";
+        List<Button> buttons = new ArrayList<>();
+        UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
+        UnitModel unitModel = player.getUnitFromUnitKey(key);
+        UnitState state = UnitState.none;
+        if (damaged) {
+            state = UnitState.dmg;
+        }
+        buttons.add(ButtonHelper.buildAssignHitButton(player, game.getTileFromPlanet(planet), game.getUnitHolderFromPlanet(planet), state, key, 1, !damaged && unitModel.getSustainDamage()));
+
+        buttons.add(Buttons.gray("deleteButtons", "Cancel The Hit"));
+        MessageHelper.sendMessageToChannelWithButtons(channel, msg, buttons);
+        event.getMessage().delete().queue();
+    }
+
     @ButtonHandler("hitOpponent_")
     public static void resolveGettingHit(Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
@@ -1579,7 +1663,7 @@ public class ButtonHelperModifyUnits {
     public static void munitionsReserves(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         if (player.getTg() < 1) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation() + ", you have no trade goods, and thus cannot use _Krovoz Strike Teams_.");
             return;
         }
@@ -1618,7 +1702,7 @@ public class ButtonHelperModifyUnits {
             DestroyUnitService.destroyUnits(event, tile, game, player.getColor(), "1 dread", true);
             buttons = getOpposingUnitsToHit(player, game, event, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to destroy 2 opposing ships of their choice."
                     + " This occurs after any retreats. The dread has been removed.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
