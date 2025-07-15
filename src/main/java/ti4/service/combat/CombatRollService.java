@@ -658,7 +658,7 @@ public class CombatRollService {
                     String msg = player.getRepresentation()
                         + " use the buttons to explore a planet with the PDS that got the hit.";
                     for (DiceHelper.Die die : resultRolls) {
-                        if (die.getResult() < 8) {
+                        if (die.getResult() < 9) {
                             continue;
                         }
                         List<Button> buttons = new ArrayList<>();

@@ -81,7 +81,7 @@ public class AddUnitService {
         Player player = game.getPlayerFromColorOrFaction(color);
         if (player != null) {
             ButtonHelper.checkFleetAndCapacity(player, game, tile);
-            CommanderUnlockCheckService.checkPlayer(player, "naalu", "cabal", "obsidian");
+
         }
     }
 
