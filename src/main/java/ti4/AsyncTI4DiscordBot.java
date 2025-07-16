@@ -89,6 +89,7 @@ public class AsyncTI4DiscordBot {
     public static Guild guildOctonary;
     public static Guild guildFogOfWar;
     public static Guild guildCommunityPlays;
+    public static Guild guildMegagame;
     public static final Set<Guild> guilds = new HashSet<>();
     public static final List<Guild> serversToCreateNewGamesOn = new ArrayList<>();
     public static final List<Guild> fowServers = new LinkedList<>();
@@ -206,6 +207,13 @@ public class AsyncTI4DiscordBot {
             guildOctonary = jda.getGuildById(args[11]);
             success &= startBot(guildOctonary);
             serversToCreateNewGamesOn.add(guildOctonary);
+        }
+
+        // Async: Megagame server
+        if (args.length >= 13) {
+            guildMegagame = jda.getGuildById(args[12]);
+            success &= startBot(guildMegagame);
+            serversToCreateNewGamesOn.add(guildMegagame);
         }
 
         // Async: FOW Chapter Secondary
@@ -373,6 +381,7 @@ public class AsyncTI4DiscordBot {
         adminRoles.add(jda.getRoleById("1378702133297414170")); // Async Octonary (What's up Dock)
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("951230650680225863")); // Community Server
+        adminRoles.add(jda.getRoleById("1218342096474341396")); // Megagame Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
         adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
@@ -404,6 +413,7 @@ public class AsyncTI4DiscordBot {
         developerRoles.add(jda.getRoleById("1312882116597518421")); // Async Septenary (Duder's Domain)
         developerRoles.add(jda.getRoleById("1378702133297414169")); // Async Octonary (What's up Dock)
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
+        developerRoles.add(jda.getRoleById("1395072365389680711")); // Megagame Server
         developerRoles.add(jda.getRoleById("1215453013154734130")); // Sigma's Server
         developerRoles.add(jda.getRoleById("1225597362186223746")); // ForlornGeas's Server
         developerRoles.add(jda.getRoleById("1226068105071956058")); // Rintsi's Server
@@ -428,6 +438,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354")); // FoW Server Game Admin
         bothelperRoles.add(jda.getRoleById("1248693989193023519")); // Community Server
+        bothelperRoles.add(jda.getRoleById("1395072619417436183")); // Megagame Server
         bothelperRoles.add(jda.getRoleById("1225597399385374781")); // ForlornGeas's Server
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
