@@ -213,7 +213,7 @@ public class AsyncTI4DiscordBot {
         if (args.length >= 13) {
             guildMegagame = jda.getGuildById(args[12]);
             success &= startBot(guildMegagame);
-            serversToCreateNewGamesOn.add(guildMegagame);
+            // serversToCreateNewGamesOn.add(guildMegagame);  // Don't create random games on this server
         }
 
         // Async: FOW Chapter Secondary
