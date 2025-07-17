@@ -260,7 +260,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         game.setAbsolMode(absolMode);
 
         // JUST PoK
-        if (!absolMode && !discordantStarsMode) {
+        if (!absolMode && !discordantStarsMode && !votcMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
