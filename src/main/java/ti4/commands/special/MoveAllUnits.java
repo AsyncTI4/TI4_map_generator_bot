@@ -33,13 +33,13 @@ class MoveAllUnits extends GameStateSubcommand {
 
         Tile tileFrom = CommandHelper.getTile(event, game);
         if (tileFrom == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving from.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the system you're moving from.");
             return;
         }
 
         Tile tileTo = CommandHelper.getTile(event, game, event.getOption(Constants.TILE_NAME_TO).getAsString());
         if (tileTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the tile you're moving to.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find the system you're moving to.");
             return;
         }
 

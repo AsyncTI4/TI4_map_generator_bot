@@ -62,11 +62,16 @@ public class ReactionService {
         if (isNotBlank(additionalMessage)) {
             text += " " + game.getPing() + " " + additionalMessage;
         }
+        text = text.replace("  ", " ");
 
         if (game.isFowMode() && !sendPublic) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, text);
             if (text.contains("ready for")) {
-                GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
+                String factionReady = game.getStoredValue("fowStatusDone");
+                if (factionReady == null || !factionReady.contains(player.getFaction())) {
+                    GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
+                    game.setStoredValue("fowStatusDone", (factionReady == null ? "" : factionReady) + player.getFaction());
+                }
             }
             return;
         }

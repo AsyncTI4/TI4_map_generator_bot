@@ -363,13 +363,13 @@ public class ActionCardHelper {
         if (actionCard.getPhase().equalsIgnoreCase("agenda") && game.getPhaseOfGame() != null && game.getPhaseOfGame().equalsIgnoreCase("action")) {
             if (!player.getFaction().equalsIgnoreCase("edyn") && !player.getFaction().contains("franken")) {
                 return player.getRepresentationUnfogged()
-                    + " The bot thinks it is the action phase and this is an agenda card. If this is a mistake, ping bothelper in the actions channel";
+                    + ", the bot thinks it is the Action Phase and this is an Agenda Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
         if (actionCard.getPhase().equalsIgnoreCase("action") && game.getPhaseOfGame() != null && game.getPhaseOfGame().contains("agenda")) {
             if (!actionCard.getName().toLowerCase().contains("war machine")) {
                 return player.getRepresentationUnfogged()
-                    + " The bot thinks it is the agenda phase and this is an action phase card. If this is a mistake, ping bothelper in the actions channel";
+                    + ", the bot thinks it is the Agenda Phase and this is an Action Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
 
@@ -429,11 +429,11 @@ public class ActionCardHelper {
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
                     if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
-                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Xxcha + "**Instinct Training**, watch out");
+                        noSabosMessage.append("\n> A player may have access to **Instinct Training**, so watch out.");
                         it = true;
                     }
                     if (!watcher && (game.isFowMode() || Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
-                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Empyrean + UnitEmojis.mech + "**Watcher**, 𝓌𝒶𝓉𝒸𝒽 out");
+                        noSabosMessage.append("\n> A player may have access to a **Watcher**, so 𝓌𝒶𝓉𝒸𝒽 out.");
                         watcher = true;
                     }
                 }
@@ -802,7 +802,7 @@ public class ActionCardHelper {
 
             if (automationID.equals("diplo_pressure")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, "Please resolve Diplomatic Pressure now. If any sabo occurs, they will be able to ignore the buttons they are offered.", codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, "Please resolve _Diplomatic Pressure_ now. If any Sabo occurs, they will be able to ignore the buttons they are offered.", codedButtons);
             }
 
             if (automationID.equals("renegotiation")) {
@@ -954,8 +954,8 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, (game.isFowMode() ? "" : player.getRepresentation(false, true))
-                        + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, (game.isFowMode() ? "P" : player.getRepresentation(false, true) + ", p")
+                        + "lease decide now which outcome you are predicting. If a Sabo occurs, it will automatically erase it. Reminder to also decide on other \"after\"s now.", game, player, riderButtons);
                     for (Player p2 : game.getRealPlayers()) {
                         if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
                             VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);

@@ -56,6 +56,7 @@ import ti4.service.unit.RemoveUnitService.RemovedUnit;
   * Prevents looking at explore/relic decks
  */
 public class FOWPlusService {
+    public static final String FOWPLUS_TAG = "FoW+";
     public static final String VOID_TILEID = "-1";
 
     private static final String FOWPLUS_EXPLORE_WAVE = "fowplus_wave";
@@ -67,6 +68,14 @@ public class FOWPlusService {
 
     public static boolean isActive(Game game) {
         return game.getFowOption(FOWOption.FOW_PLUS);
+    }
+
+    public static void toggleTag(Game game, boolean active) {
+        if (active) {
+            game.addTag(FOWPLUS_TAG);
+        } else {
+            game.removeTag(FOWPLUS_TAG);
+        }
     }
 
     //Only allow activating positions player can see
@@ -120,7 +129,7 @@ public class FOWPlusService {
         List<Button> chooseTileButtons = new ArrayList<>();
         chooseTileButtons.add(Buttons.green(finChecker + "ringTile_" + targetPosition, tile.getRepresentationForButtons(game, player)));
         chooseTileButtons.add(Buttons.red("ChooseDifferentDestination", "Get a Different Ring"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Click the tile that you wish to activate.", chooseTileButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please choose the system that you wish to activate.", chooseTileButtons);
 
         event.getMessageChannel().deleteMessageById(origMessageId).queue();
     }
@@ -204,7 +213,7 @@ public class FOWPlusService {
     public static boolean deckInfoAvailable(Player player, Game game) {
         if (!isActive(game) || game.getPlayersWithGMRole().contains(player)) return true;
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available in FoW+ mode");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available in FoW+ mode.");
         return false;
     }
 
@@ -223,7 +232,7 @@ public class FOWPlusService {
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " Choose a system to eject your non-infantry units", waveButtons);
+                    player.getRepresentationUnfogged() + ", please choose a system to eject your non-infantry units.", waveButtons);
                 break;
 
             case FOWPLUS_EXPLORE_VORTEX:
@@ -253,7 +262,7 @@ public class FOWPlusService {
             case FOWPLUS_EXPLORE_SPOOR:
                 List<Button> buttons = ButtonHelperActionCards.getPlagiarizeButtons(game, player);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
-                    !buttons.isEmpty() ? "Select the technology you wish to gain." : "No valid technologies to gain.", buttons);
+                    !buttons.isEmpty() ? "Please choose the technology you wish to gain." : "No valid technologies to gain.", buttons);
                 break;
 
             case FOWPLUS_EXPLORE_SACRIFICE:

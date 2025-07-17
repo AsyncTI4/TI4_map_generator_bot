@@ -310,7 +310,7 @@ public class ComponentActionHelper {
                         "axisagent", "bentoragent", "kolumeagent", "redcreussagent");
                     if (leadersThatNeedSpecialSelection.contains(buttonID)) {
                         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
-                        String message = p1.getRepresentationUnfogged() + " Use buttons to select the user of the agent";
+                        String message = p1.getRepresentationUnfogged() + ", please choose the user of the agent.";
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     } else {
                         if ("fogallianceagent".equalsIgnoreCase(buttonID)) {
@@ -331,7 +331,7 @@ public class ComponentActionHelper {
 
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun);
                     List<Button> buttons = new ArrayList<>();
-                    String message = p1.getRepresentationNoPing() + " is using their **Star Forge** ability.\n Please choose the tile you would like to **Star Forge** in.";
+                    String message = p1.getRepresentationNoPing() + " is using their **Star Forge** ability.\n Please choose the system you wish to **Star Forge** in.";
                     for (Tile tile : tiles) {
                         Button starTile = Buttons.green("starforgeTile_" + tile.getPosition(),
                             tile.getRepresentationForButtons(game, p1));
@@ -340,7 +340,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("classifiedDevelopments".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getSuperWeaponButtonsPart1(p1, game);
-                    String message = p1.getRepresentation() + " Select the planet you wish to put a superweapon on.";
+                    String message = p1.getRepresentation() + ", please choose the planet you wish to put a Superweapon on.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("orbitalDrop".equalsIgnoreCase(buttonID)) {
                     String successMessage = p1.getFactionEmoji() + " spent 1 strategy token using " + FactionEmojis.Sol
@@ -348,7 +348,7 @@ public class ComponentActionHelper {
                     p1.setStrategicCC(p1.getStrategicCC() - 1);
                     ButtonHelperCommanders.resolveMuaatCommanderCheck(p1, game, event, FactionEmojis.Sol + " **Orbital Drop**'d");
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
-                    String message = "Select the planet you would like to place 2 infantry on.";
+                    String message = "Please choose the planet you wish to place 2 infantry on.";
                     List<Button> buttons = new ArrayList<>(
                         Helper.getPlanetPlaceUnitButtons(p1, game, "2gf", "placeOneNDone_skipbuildorbital"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
@@ -385,7 +385,7 @@ public class ComponentActionHelper {
                     List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(p1, game,
                         "mech", "placeOneNDone_skipbuild"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message3, buttons);
-                    String message2 = "Click the fragment you'd like to purge. ";
+                    String message2 = "Please choose the fragment you wish to purge. ";
                     List<Button> purgeFragButtons = new ArrayList<>();
                     if (p1.getCrf() > 0) {
                         Button transact = Buttons.blue(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
@@ -415,7 +415,7 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, systemButtons);
 
                 } else if ("fabrication".equalsIgnoreCase(buttonID)) {
-                    String message = "Click the fragment you'd like to purge. ";
+                    String message = "Please choose the fragment you wish to purge. ";
                     List<Button> purgeFragButtons = new ArrayList<>();
                     if (p1.getCrf() > 0) {
                         Button transact = Buttons.blue(finChecker + "purge_Frags_CRF_1", "Purge 1 Cultural Fragment");
@@ -458,7 +458,7 @@ public class ComponentActionHelper {
                     }
                 } else if ("mantlecracking".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getMantleCrackingButtons(p1, game);
-                    String message = "Select the planet you wish to Mantle Crack.";
+                    String message = "Please choose the planet you wish to Mantle Crack.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 } else if ("meditation".equalsIgnoreCase(buttonID)) {
                     if (p1.getStrategicCC() > 0) {
@@ -472,7 +472,7 @@ public class ComponentActionHelper {
                         p1.addExhaustedRelic("emelpar");
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     }
-                    String message = "Select the technology you wish to ready.";
+                    String message = "Please choose the technology you wish to ready.";
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelper.getAllTechsToReady(p1));
                     List<Button> buttons = StartTurnService.getStartOfTurnButtons(p1, game, true, event);
                     String message2 = "Use buttons to end turn or do another action.";
@@ -480,7 +480,7 @@ public class ComponentActionHelper {
                 }
             }
             case "getRelic" -> {
-                String message = "Click the fragments you'd like to purge. ";
+                String message = "Please choose the fragments you wish to purge. ";
                 List<Button> purgeFragButtons = new ArrayList<>();
                 int numToBeat = 2 - p1.getUrf();
                 if (game.isAgeOfExplorationMode()) {
@@ -640,7 +640,7 @@ public class ComponentActionHelper {
                 buttons.add(Buttons.blue("thronePoint", "Score a Secret Objective Another Player Has Scored"));
                 buttons.add(Buttons.red("deleteButtons", "Score 1 of Your Unscored Secret Objectives"));
                 message = player.getRepresentation()
-                    + " choose one of the options. Reminder than you can't score more secret objectives than normal with this relic (even if they're someone else's), and you can't score the same secret objective twice."
+                    + ", please choose one of the options. Reminder than you can't score more secret objectives than normal with this relic (even if they're someone else's), and you can't score the same secret objective twice."
                     + " If scoring one of your unscored secret objectives, just score it via the normal process after pressing the button.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
@@ -658,7 +658,7 @@ public class ComponentActionHelper {
                 ButtonHelperAgents.resolveArtunoCheck(player, player.getTg() - oldTg);
             }
             case "stellarconverter" -> {
-                message = player.getRepresentationUnfogged() + " Select the planet you wish to annihilate.";
+                message = player.getRepresentationUnfogged() + ", please choose the planet you wish to annihilate.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
                     ButtonHelper.getButtonsForStellar(player, game));
             }

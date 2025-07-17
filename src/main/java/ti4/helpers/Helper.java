@@ -225,7 +225,7 @@ public class Helper {
 
     public static void giveMeBackMyAgendaButtons(Game game) {
         List<Button> proceedButtons = new ArrayList<>();
-        String msg = "These buttons can help with bugs/issues that occur during the agenda phase";
+        String msg = "These buttons can help with bugs/issues that occur during the Agenda Phase.";
         proceedButtons.add(Buttons.red("proceedToVoting", "Skip Waiting"));
         proceedButtons.add(Buttons.blue("transaction", "Transaction"));
         proceedButtons.add(Buttons.red("eraseMyVote", "Erase My Vote And Have Me Vote Again"));
@@ -302,7 +302,7 @@ public class Helper {
         }
         StringBuilder rep = new StringBuilder("# __Scoring Summary__\n");
         if (game.getRealPlayers().size() > 10) {
-            return "This game is too large to display a scoring summary";
+            return "This game is too large to display a scoring summary. Shame.";
         }
         var playersInScoringOrder = game.hasFullPriorityTrackMode() ? PriorityTrackHelper.GetPriorityTrack(game) : game.getActionPhaseTurnOrder();
         for (Player player : playersInScoringOrder) {
@@ -1135,10 +1135,10 @@ public class Helper {
                 Planet planet = game.getPlanetsInfo().get(AliasHandler.resolvePlanet(thing));
                 msg.append("> ");
                 if (planet == null) {
-                    if (thing.contains("comms")) {
+                    if (thing.contains("comm")) {
                         String comms = StringUtils.substringAfter(thing, "_");
                         keleresAgent += Integer.parseInt(comms);
-                        msg.append("Keleres Agent for ").append(comms).append(" commoditiess\n");
+                        msg.append("Xander Alexin Victori III, the Keleres agent, for ").append(comms).append(" commodit").append(comms.equals("1") ? "y" : "ies").append("\n");
                     } else {
                         msg.append(thing).append("\n");
                     }

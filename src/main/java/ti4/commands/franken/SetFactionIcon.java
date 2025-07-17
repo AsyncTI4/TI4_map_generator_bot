@@ -12,6 +12,7 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 class SetFactionIcon extends GameStateSubcommand {
@@ -20,14 +21,16 @@ class SetFactionIcon extends GameStateSubcommand {
         super(Constants.SET_FACTION_ICON, "Set franken faction icon to use", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_EMOJI, "Custom emoji to use. Enter jibberish to reset.").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "YES to override Franken-only setting").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
+        OptionMapping confirmOption = event.getOption(Constants.CONFIRM);
 
-        if (!game.isFrankenGame()) {
+        if (!game.isFrankenGame() && !"YES".equals(confirmOption == null ? "" : confirmOption.getAsString())) {
             MessageHelper.sendMessageToEventChannel(event, "This can only be run in Franken games.");
             player.setFactionEmoji(null);
             return;
@@ -41,11 +44,18 @@ class SetFactionIcon extends GameStateSubcommand {
             player.setFactionEmoji(null);
             return;
         }
-        if (!(factionEmoji instanceof UnicodeEmoji) && AsyncTI4DiscordBot.jda.getEmojiById(((CustomEmoji) factionEmoji).getId()) == null) {
-            MessageHelper.sendMessageToEventChannel(event, "The bot cannot load " + factionEmojiString + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
-            player.setFactionEmoji(null);
+        if ((factionEmoji instanceof UnicodeEmoji))
+        {
+            MessageHelper.sendMessageToEventChannel(event, player.getRepresentationUnfogged() + " is setting their faction icon to " + factionEmojiString + ".");
+            player.setFactionEmoji(factionEmojiString);
             return;
         }
-        player.setFactionEmoji(factionEmojiString);
+        if ((factionEmoji instanceof CustomEmoji)) {
+            MessageHelper.sendMessageToEventChannel(event, player.getRepresentationUnfogged() + " is setting their faction icon to " + factionEmojiString + ".");
+            player.setFactionEmoji(factionEmojiString);
+            return;
+        }
+        MessageHelper.sendMessageToEventChannel(event, "The bot cannot load " + factionEmojiString + ". Please use a custom emoji from one of the bot servers. Resetting to default.");
+        player.setFactionEmoji(null);
     }
 }

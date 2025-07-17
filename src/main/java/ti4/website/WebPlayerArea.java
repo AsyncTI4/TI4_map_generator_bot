@@ -6,6 +6,7 @@ import lombok.Data;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
+
 import ti4.map.*;
 
 @Data
@@ -29,6 +30,7 @@ public class WebPlayerArea {
     private int tacticalCC;
     private int fleetCC;
     private int strategicCC;
+    private int ccReinf;
 
     // Resources
     private int tg;
@@ -89,6 +91,7 @@ public class WebPlayerArea {
     private List<Leader> leaders;
     private List<String> leaderIDs;
     private Map<String, Integer> secretsScored;
+    private Map<String, Integer> knownUnscoredSecrets;
     private Integer numUnscoredSecrets;
 
     // Additional properties
@@ -151,6 +154,10 @@ public class WebPlayerArea {
         webPlayerArea.setTacticalCC(player.getTacticalCC());
         webPlayerArea.setFleetCC(player.getFleetCC());
         webPlayerArea.setStrategicCC(player.getStrategicCC());
+
+        // Calculate CC reinforcements
+        int ccReinf = calculateCCReinforcements(player, game);
+        webPlayerArea.setCcReinf(ccReinf);
 
         // Resources
         webPlayerArea.setTg(player.getTg());
@@ -224,6 +231,14 @@ public class WebPlayerArea {
         webPlayerArea.setLeaders(player.getLeaders());
         webPlayerArea.setLeaderIDs(player.getLeaderIDs());
         webPlayerArea.setSecretsScored(player.getSecretsScored());
+
+        // Known unscored secrets (populated if search warrant is in play)
+        if (player.isSearchWarrant()) {
+            webPlayerArea.setKnownUnscoredSecrets(player.getSecretsUnscored());
+        } else {
+            webPlayerArea.setKnownUnscoredSecrets(new HashMap<>());
+        }
+
         webPlayerArea.setNumUnscoredSecrets(player.getSecretsUnscored() != null ? player.getSecretsUnscored().size() : 0);
 
         // Additional properties
@@ -384,6 +399,24 @@ public class WebPlayerArea {
             count += unitHolder.getUnitCount(uk);
             unitCount.put(uk, count);
         }
+    }
+
+    private static int calculateCCReinforcements(Player player, Game game) {
+        String playerColor = player.getColor();
+        if (playerColor == null) {
+            return 0;
+        }
+        // Default CC limit is 16 in TI4
+        int ccLimit = 16;
+        if (!game.getStoredValue("ccLimit").isEmpty()) {
+            ccLimit = Integer.parseInt(game.getStoredValue("ccLimit"));
+        }
+        if (!game.getStoredValue("ccLimit" + playerColor).isEmpty()) {
+            ccLimit = Integer.parseInt(game.getStoredValue("ccLimit" + playerColor));
+        }
+        int ccCount = Helper.getCCCount(game, playerColor);
+        int remainingReinforcements = ccLimit - ccCount;
+        return Math.max(0, remainingReinforcements);
     }
 
 }

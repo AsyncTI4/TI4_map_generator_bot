@@ -63,8 +63,8 @@ public class PickStrategyCardService {
 
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
-            String fail = "User for next faction not found. Report to ADMIN";
-            String success = "The next player has been notified";
+            String fail = "User for next faction not found. Report to ADMIN.";
+            String success = "The next player has been notified.";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, game, event, msgExtra, fail, success);
             game.updateActivePlayer(privatePlayer);
             if (!allPicked) {

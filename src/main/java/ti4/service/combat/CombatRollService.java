@@ -200,13 +200,17 @@ public class CombatRollService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb);
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
-        if (game.isFowMode() && rollType == CombatRollType.SpaceCannonOffence
-            && isFoWPrivateChannelRoll(player, event)) {
-            // If roll was from pds button in private channel, send the result to the target
-            MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " "
-                + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Roll result was sent to " + opponent.getRepresentationNoPing());
+        if (game.isFowMode() && isFoWPrivateChannelRoll(player, event)) {
+            if (rollType == CombatRollType.SpaceCannonOffence) {
+                // If roll was from pds button in private channel, send the result to the target
+                MessageHelper.sendMessageToChannel(opponent.getCorrectChannel(), opponent.getRepresentationUnfogged() + " "
+                    + FOWCombatThreadMirroring.parseCombatRollMessage(message, player));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Roll result was sent to " + opponent.getRepresentationNoPing());
+            } else if (rollType == CombatRollType.bombardment) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
+                    + " This roll result is not automatically relayed. Please communicate the hits to the opponent manually.");
+            }
         }
         if (message.contains("adding +1, at the risk of your")) {
             Button thalnosButton = Buttons.green("startThalnos_" + tile.getPosition() + "_" + unitHolderName,
@@ -480,7 +484,7 @@ public class CombatRollService {
         UnitHolder space = activeSystem.getUnitHolders().get("space");
         StringBuilder extra = new StringBuilder();
         boolean usesX89c4 = false;
-        if (totalHits > 0 && player.hasTech("x89c4")
+        if (player.hasTech("x89c4")
             && (rollType == CombatRollType.combatround || rollType == CombatRollType.bombardment)
             && (!unitHolder.getName().equalsIgnoreCase("space") || rollType == CombatRollType.bombardment)) {
             usesX89c4 = true;
@@ -541,7 +545,8 @@ public class CombatRollService {
                     resultRolls.addAll(additionalResultRolls);
                 }
             }
-            if (rollType == CombatRollType.combatround && (player.hasAbility("valor") || opponent.hasAbility("valor"))
+            Player gloryHolder = Helper.getPlayerFromAbility(game, "valor");
+            if (rollType == CombatRollType.combatround && gloryHolder != null
                 && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
                 for (DiceHelper.Die die : resultRolls) {
                     if (die.getResult() > 9) {
@@ -569,7 +574,7 @@ public class CombatRollService {
                     player.setCommodities(player.getCommodities() + hitRolls);
                     ButtonHelperAgents.toldarAgentInitiation(game, player, hitRolls);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
-                        + " gained " + hitRolls + " commodities due to their Uzean Wardog mech ability.");
+                        + " gained " + hitRolls + " commodit" + (hitRolls == 1 ? "y" : "ies") + " due to their Uzean Wardog mech ability.");
                 }
             }
             int misses = numRolls - hitRolls;
@@ -578,7 +583,7 @@ public class CombatRollService {
             if (misses > 0 && !extraRollsCount && game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
                 extra.append(player.getFactionEmoji()).append(" destroyed ").append(misses).append(" of their own ")
                     .append(unitModel.getName()).append(misses == 1 ? "" : "s").append(" due to ")
-                    .append(misses == 1 ? "a Thalnos miss" : "Thalnos misses");
+                    .append(misses == 1 ? "a Thalnos miss" : "Thalnos misses").append(".");
                 for (String thalnosUnit : game.getThalnosUnits().keySet()) {
                     String pos = thalnosUnit.split("_")[0];
                     String unitHolderName = thalnosUnit.split("_")[1];
@@ -653,7 +658,7 @@ public class CombatRollService {
                     String msg = player.getRepresentation()
                         + " use the buttons to explore a planet with the PDS that got the hit.";
                     for (DiceHelper.Die die : resultRolls) {
-                        if (die.getResult() < 8) {
+                        if (die.getResult() < 9) {
                             continue;
                         }
                         List<Button> buttons = new ArrayList<>();
@@ -684,6 +689,16 @@ public class CombatRollService {
                 player.setExpectedHitsTimes10(
                     player.getExpectedHitsTimes10() + (numMisses * (11 - toHit + modifierToHit)));
                 int hitRolls2 = DiceHelper.countSuccesses(resultRolls2);
+                if (rollType == CombatRollType.combatround && gloryHolder != null
+                    && ButtonHelperAgents.getGloryTokenTiles(game).contains(activeSystem)) {
+                    for (DiceHelper.Die die : resultRolls2) {
+                        if (die.getResult() > 9) {
+                            hitRolls2 += 1;
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation()
+                                + " got an extra hit due to the **Valor** ability (it has been accounted for in the hit count).");
+                        }
+                    }
+                }
                 totalHits += hitRolls2;
                 String unitRoll2 = CombatMessageHelper.displayUnitRoll(unitModel, toHit, modifierToHit, numOfUnit,
                     numRollsPerUnit, 0, resultRolls2, hitRolls2);
@@ -721,8 +736,11 @@ public class CombatRollService {
         if (usesX89c4) {
             totalHits *= 2;
         }
-
-        result += CombatMessageHelper.displayHitResults(totalHits, usesX89c4 && totalHits > 0);
+        boolean x89applies = usesX89c4;
+        if (totalHits < 1) {
+            x89applies = false;
+        }
+        result += CombatMessageHelper.displayHitResults(totalHits, x89applies);
         player.setActualHits(player.getActualHits() + totalHits);
         if (totalHits > 0 && usesX89c4) {
             result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hits using "

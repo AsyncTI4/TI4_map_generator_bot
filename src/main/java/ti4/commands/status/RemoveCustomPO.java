@@ -22,7 +22,7 @@ class RemoveCustomPO extends GameStateSubcommand {
 
         OptionMapping option = event.getOption(Constants.PO_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Public Objective to shuffle back in");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please choose which public objective to shuffle back in");
             return;
         }
         boolean removedCustomPO = game.removeCustomPO(option.getAsInt());

@@ -52,7 +52,29 @@ public class DiscordantStarsHelper {
                 }
             }
         }
+    }
 
+    public static void checkTombWorlds(Game game) {
+        Player player = Helper.getPlayerFromAbility(game, "tomb_worlds");
+        if (player == null) {
+            return;
+        }
+
+        for (Tile tile : game.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                if (unitHolder instanceof Planet planet) {
+                    if (player.getPlanets().contains(planet.getName())) {
+                        if (planet.getUnitCount(UnitType.Spacedock, player) < 1 && planet.getTokenList().contains("attachment_positiveinf2.png")) {
+                            planet.removeToken("attachment_positiveinf2.png");
+                        } else if (planet.getUnitCount(UnitType.Spacedock, player) > 0) {
+                            planet.addToken("attachment_positiveinf2.png");
+                        }
+                    } else if (planet.getTokenList().contains("attachment_positiveinf2.png")) {
+                        planet.removeToken("attachment_positiveinf2.png");
+                    }
+                }
+            }
+        }
     }
 
     public static void checkSigil(Game game) { //Edyn Mech adds Sigil tokens under them
@@ -96,6 +118,31 @@ public class DiscordantStarsHelper {
                             } else if (oneMechCheck(planet.getName(), activeMap, player)) {
                                 planet.addToken(tokenToAdd);
                                 planet.removeToken(tokenToRemove);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void checkSaeraMech(Game activeMap) {
+        for (Player player : activeMap.getPlayers().values()) {
+            String tokenToAdd = Constants.OLRADIN_MECH_INF_PNG;
+
+            if (!player.ownsUnit("saera_mech")) {
+                continue;
+            }
+
+            for (Tile tile : activeMap.getTileMap().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder instanceof Planet planet) {
+                        if (player.getPlanets().contains(planet.getName())) {
+                            if (planet.getUnitCount(UnitType.Mech, player) < 1
+                                && planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) {
+                                planet.removeToken(Constants.OLRADIN_MECH_INF_PNG);
+                            } else if (planet.getUnitCount(UnitType.Mech, player) > 0 && !planet.getTokenList().contains(Constants.OLRADIN_MECH_INF_PNG)) {
+                                planet.addToken(tokenToAdd);
                             }
                         }
                     }
@@ -175,7 +222,7 @@ public class DiscordantStarsHelper {
         if (!player.isHasUsedPeopleConnectAbility() && player.hasAbility("policy_the_people_connect") && uh != null && uh.getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
             String msg = player.getRepresentation() + ", due to your exhausting of " + planetModel.getAutoCompleteName()
                 + ", you may resolve your _Policy - The People: Connect ➕_ ability."
-                + " You may move 1 Infantry on " + planetModel.getName() + " to another planet you control.";
+                + " You may move 1 infantry on " + planetModel.getName() + " to another planet you control.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = ButtonHelperAbilities.offerOlradinConnectButtons(player, game, planetModel.getId());
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Resolve Ability", buttons);

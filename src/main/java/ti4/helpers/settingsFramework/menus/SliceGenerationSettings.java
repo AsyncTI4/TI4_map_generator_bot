@@ -219,7 +219,7 @@ public class SliceGenerationSettings extends SettingsMenu {
         String ttsString = String.join("|", slices);
         if (game != null) {
             String msg = "Howdy " + game.getPing() + ",\nThis map is WEIRD!!!\nPlease note that the map template was updated to `2025scptFinals`, ";
-            msg += "and the faction list was set to a default of: Sol, Xxcha, Jol Nar, Keleres, Creuss, and Naalu";
+            msg += "and the faction list was set to a default of: Sol, Xxcha, Jol Nar, Keleres, Creuss, and Naalu.";
             msg += "\nIf you wish to play instead on a normal map, or with different factions, feel free to edit those settings accordingly.";
             msg += "\nHave fun :)";
             MessageHelper.sendMessageToEventChannel(event, msg);

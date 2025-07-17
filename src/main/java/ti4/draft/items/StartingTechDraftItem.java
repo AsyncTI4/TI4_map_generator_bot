@@ -49,6 +49,7 @@ public class StartingTechDraftItem extends DraftItem {
         Map.entry("kjalengard", "Choose 1 non-faction unit upgrade."),
         Map.entry("kolume", "Choose 1 of the following: :Cybernetictech: Graviton Laser System, :Cybernetictech: Predictive Intelligence."),
         Map.entry("kyro", "Choose 1 of the following: :Biotictech: Dacxive Animators, :Biotictech: Bio-Stims."),
+        Map.entry("toldar", "Choose 1 of the following: Antimass Deflectors, Dark Energy Trap, Neural Motivator, Psychoarcheology."),
         Map.entry("lanefir", "Choose 2 of the following: :Propulsiontech: Dark Energy Tap, :Cybernetictech: Scanlink Drone Network, :Warfaretech: AI Development Algorithm."),
         Map.entry("nokar", "Choose 2 of the following: :Biotictech: Psychoarchaeology, :Propulsiontech: Dark Energy Tap, :Warfaretech: AI Development Algorithm."),
         Map.entry("tnelis", "Choose 2 of the following: :Biotictech: Neural Motivator, :Propulsiontech: Antimass Deflectors, :Warfaretech: Plasma Scoring."),

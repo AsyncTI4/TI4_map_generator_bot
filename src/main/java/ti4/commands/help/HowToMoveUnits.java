@@ -30,10 +30,10 @@ class HowToMoveUnits extends Subcommand {
             " - /move_units is simply equivalent to `/remove_units` followed by `/add_units` - it will remove units from one system, and add them to another. In that regard, the below logic can also be applied to `/remove_units` and `/add_units`\n" +
             "> - Typical /move_units command: `/move_units tile_name: meer unit_names: ws, 4 ff, 2 mech m tile_name_to: torkan unit_names_to: ws, 4 ff, 2 mech to`\n" +
             "## You'll need to input four things after /move_units:\n" +
-            "### 1. __tile_name__\n> This is the name of the tile the units are in right now. It might be the same tile the units should end up in, but usually it won't be.\n" +
-            "> - Examples include **310** (the tile number), **hacan** (the Hacan home tile), **meer** (the Arinam/Meer tile; **arinam** would work too), or you can pick from the suggestions as you start typing too.\n" +
+            "### 1. __tile_name__\n> This is the name of the system the units are in right now. It might be the same tile the units should end up in, but usually it won't be.\n" +
+            "> - Examples include **310** (the system number), **hacan** (the Hacan home system), **meer** (the Arinam/Meer system; **arinam** would work too), or you can pick from the suggestions as you start typing too.\n" +
 
-            "### 2. __unit_names__\n> The units you want to move in the tile you just named.\n" +
+            "### 2. __unit_names__\n> The units you want to move in the system you just named.\n" +
             "> - Examples include **carrier, flagship, pds, spacedock, infantry,** etc. They are always one word, no spaces.\n" +
             ">  - All of these have aliases/abbreviations that you can use. Some common examples:\n" +
             ">   - Carrier = **cv**\n" +
@@ -49,12 +49,12 @@ class HowToMoveUnits extends Subcommand {
             "> - If you want to move units that are on **planets**, you must specify which planet the unit is on!\n" +
             ">  - E.g., `/move_units tile_name: meer unit_names: 2 cv, 4 ff, 2 inf` will move 2 carriers, 4 fighters, and 2 infantry *from the space area*.\n" +
             ">  - To move the 2 infantry from Arinam, you'll use /move_units tile_name: meer unit_names: 2 cv, 4 ff, 2 inf arinam to specify the planet the infantry are on.\n" +
-            ">  - The bot just needs to know which planet it is within the tile; so for Arinam/Meer, **2 inf a** will be clear enough to specify arinam. For the Vegas you can either do **2 inf vegamajor** or can shorten to **2 inf vegama**; but **2 inf v** will be ambiguous.\n" +
+            ">  - The bot just needs to know which planet it is within the system; so for Arinam/Meer, **2 inf a** will be clear enough to specify arinam. For the Vegas you can either do **2 inf vegamajor** or can shorten to **2 inf vegama**; but **2 inf v** will be ambiguous.\n" +
 
-            "### 3. __tile_name_to__\n> This is the name of the tile you want the units to end up in.\n" +
+            "### 3. __tile_name_to__\n> This is the name of the system you want the units to end up in.\n" +
 
-            "### 4. __unit_names_to__\n> The units you want to have end up in the tile you just named.\n" +
-            "> - By default, units will end up in the space area of the tile. To place them on a planet, you'll need to specify the planet after the units.\n" +
+            "### 4. __unit_names_to__\n> The units you want to have end up in the system you just named.\n" +
+            "> - By default, units will end up in the space area of the system. To place them on a planet, you'll need to specify the planet after the units.\n" +
             ">  - E.g., to move a war sun, 4 fighters, and 2 mechs from meer to torkan, you'd do:\n" +
             ">   - `/move_units tile_name: meer unit_names: ws, 4 ff, 2 mech m tile_name_to: torkan unit_names_to: ws, 4 ff, 2 mech to`\n" +
             ">    - Note that I had to put “to” for torkan instead of just “t”, since Tequ'ran is in the same tile.\n" +
