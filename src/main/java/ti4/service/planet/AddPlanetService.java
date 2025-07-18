@@ -247,7 +247,7 @@ public class AddPlanetService {
             game.changeCommsOnPlanet(comms, planet2);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 comms + " commodit" + (comms == 1 ? "y" : "ies") + " were moved from the planet of " + Helper.getPlanetRepresentation(planet, game)
-                + " to the planet of " + Helper.getPlanetRepresentation(planet2, game) + ".");
+                    + " to the planet of " + Helper.getPlanetRepresentation(planet2, game) + ".");
 
         }
 
@@ -266,6 +266,7 @@ public class AddPlanetService {
                 game.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
 
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Established control of " + Helper.getPlanetRepresentation(planet, game) + ".");
         if ((game.getPhaseOfGame().contains("agenda")
             || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
             && player.hasAbility("scavenge") && !doubleCheck && !setup) {

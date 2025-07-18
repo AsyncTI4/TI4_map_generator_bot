@@ -82,6 +82,7 @@ public class ButtonHelperTacticalAction {
             player = game.getPlayer(game.getActivePlayerID());
         }
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+        game.removeStoredValue("producedUnitCostFor" + player.getFaction());
         String message = player.getRepresentationUnfogged() + ", use buttons to end turn, or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageChannel channel = event.getMessageChannel();
@@ -230,6 +231,7 @@ public class ButtonHelperTacticalAction {
         game.removeStoredValue("absolLux");
         game.removeStoredValue("mentakHero");
         game.removeStoredValue("ghostagent_active");
+
         game.resetCurrentMovedUnitsFrom1TacticalAction();
         game.getTacticalActionDisplacement().clear();
     }
@@ -337,6 +339,7 @@ public class ButtonHelperTacticalAction {
             }
             ButtonHelper.resolveOnActivationEnemyAbilities(game, tile, player, false, event);
         }
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Activated " + tile.getRepresentationForButtons(game, player) + ".");
         if (game.playerHasLeaderUnlockedOrAlliance(player, "celdauricommander")
             && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Spacedock).contains(tile)) {
             List<Button> buttons = new ArrayList<>();
