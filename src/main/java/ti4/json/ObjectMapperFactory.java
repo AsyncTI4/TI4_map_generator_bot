@@ -11,7 +11,7 @@ final public class ObjectMapperFactory {
 
     /**
      * Builds the standard Jackson ObjectMapper to be used by the entire application.
-     * 
+     *
      * TODO(Aaron): All instances of ObjectMapper must come from this factory.
      */
     public static ObjectMapper build() {

@@ -29,7 +29,7 @@ public abstract class ListenerContext {
     protected Player player;
     protected MessageChannel privateChannel, mainGameChannel, actionsChannel;
     protected final GenericInteractionCreateEvent event;
-    
+
     @Setter
     protected boolean shouldSave = true;
 

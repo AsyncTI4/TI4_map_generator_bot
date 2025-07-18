@@ -100,7 +100,7 @@ public class CombatMessageHelper {
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_9.toString(), DiceEmojis.d10blue_9.toString());
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_0.toString(), DiceEmojis.d10blue_0.toString());
         }
-        
+
         String nice = "";
         if (resultRolls.size() == 2 && resultRolls.get(0).getResult() == 6 && resultRolls.get(1).getResult() == 9)
         {

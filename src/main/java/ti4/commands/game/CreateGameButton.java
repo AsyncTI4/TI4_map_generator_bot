@@ -79,7 +79,7 @@ class CreateGameButton extends Subcommand {
                     int completedAndOngoingAmount = SearchGameHelper.searchGames(member.getUser(), event, false, true, false, true, false, true, true, true);
                     int completedGames = completedAndOngoingAmount - ongoingAmount;
                     if(ongoingAmount > completedGames + 2){
-                        MessageHelper.sendMessageToChannel(event.getChannel(), 
+                        MessageHelper.sendMessageToChannel(event.getChannel(),
                             member.getUser().getAsMention() + " is at their game limit (# of ongoing games must be equal or less than # of completed games + 3) and so cannot join more games at the moment."
                             + " Their number of ongoing games is " + ongoingAmount + " and their number of completed games is " + completedGames + ".");
                         return;

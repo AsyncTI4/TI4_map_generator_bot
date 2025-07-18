@@ -95,7 +95,7 @@ public class CryypterHelper {
 
     //Envoys
     public static void checkEnvoyUnlocks(Game game) {
-        //if (!game.isVotcMode()) 
+        //if (!game.isVotcMode())
         //{
         //    return;
         //}
@@ -686,6 +686,6 @@ public class CryypterHelper {
     //AgendaHelper.getWinningRiders(), currently line 1832
     //public static void handleVotCRiders()
     //{
-    //    
+    //
     //}
 }
