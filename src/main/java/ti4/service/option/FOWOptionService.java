@@ -16,7 +16,7 @@ import ti4.service.fow.FOWPlusService;
 
 @UtilityClass
 public class FOWOptionService {
-  
+
     public enum FOWOption {
         MANAGED_COMMS("Managed comms", "Use managed player-to-player communication threads"),
         ALLOW_AGENDA_COMMS("Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
@@ -73,7 +73,7 @@ public class FOWOptionService {
     public static void offerFOWOptionButtons(Game game, MessageChannel channel) {
         offerFOWOptionButtons(game, channel, null);
     }
-    
+
     private static void offerFOWOptionButtons(Game game, MessageChannel channel, ButtonInteractionEvent event) {
         List<Button> optionButtons = new ArrayList<>();
         StringBuilder sb = new StringBuilder();

@@ -30,7 +30,7 @@ class AddFogTile extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         List<String> positions = Helper.getListFromCSV(event.getOption(Constants.POSITION).getAsString());
-        
+
         List<Player> targetPlayers = CommandHelper.getTargetPlayersFromOption(getGame(), event);
         if (targetPlayers.isEmpty()) {
             targetPlayers.add(getPlayer());

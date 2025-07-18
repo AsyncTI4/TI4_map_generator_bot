@@ -42,7 +42,7 @@ class PoSetDeck extends GameStateSubcommand {
             }
             getGame().setPublicObjectives1(stage1IdList);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective stage 1 deck created.");
-        } 
+        }
 
         if (!stage2IdList.isEmpty()) {
             if (shuffle) {
@@ -50,18 +50,18 @@ class PoSetDeck extends GameStateSubcommand {
             }
             getGame().setPublicObjectives2(stage2IdList);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Public objective stage 2 deck created.");
-        } 
+        }
 
         if (stage1IdList.isEmpty() && stage2IdList.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), 
+            MessageHelper.sendMessageToChannel(event.getChannel(),
                 "Public objective stage 1 deck: " + getGame().getPublicObjectives1() + "\n"
-              + "Public objective stage 2 deck: " + getGame().getPublicObjectives2());  
+              + "Public objective stage 2 deck: " + getGame().getPublicObjectives2());
         }
     }
 
     private List<String> parseIds(String idList) {
-        return idList == null ? 
-            Collections.emptyList() : 
+        return idList == null ?
+            Collections.emptyList() :
             Arrays.stream(idList.split(","))
                   .map(String::trim)
                   .collect(Collectors.toList());

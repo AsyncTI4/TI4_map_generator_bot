@@ -42,12 +42,12 @@ import ti4.service.option.FOWOptionService.FOWOption;
 
 /*
  * For Eronous to run fow300
- * 
+ *
  * HOW TO RUN
  * 1. Have Eronous in a FoW game
  * 2. Run /game weird_game_setup riftset_mode: true
  * 3. Setup any player as Cabal
- * 
+ *
  * SPECS:
  * - When any unit fails rift throw, Cabal eats it
  * - One additional Custom Strategy Card, 9. Sacrifice
@@ -60,7 +60,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
  * - When concluding tactical action, tile has a 1/10 chance of placing a gravity rift
  * - When concluding tactical action, tile has a 1/25 chance of placing Vortex (gravity rift wormhole)
  * - Exploring a planet has chance of Stellar Converting it (with a custom token)
- * 
+ *
  */
 public class RiftSetModeService {
     private static final String CRUCIBLE_PN = "crucible";

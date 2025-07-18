@@ -241,9 +241,9 @@ public class FOWPlusService {
                 int nonCarriedFF = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[4];
                 if (nonCarriedFF > 0) {
                     RemoveUnitService.removeUnit(event, tile, game, player, tile.getSpaceUnitHolder(), UnitType.Fighter, nonCarriedFF);
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() 
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
                         + " You lost " + nonCarriedFF + " " + UnitEmojis.fighter + " Fighters to the Vortex.");
-                } 
+                }
                 break;
 
             case FOWPLUS_EXPLORE_CLARITY:
@@ -254,20 +254,20 @@ public class FOWPlusService {
                 break;
 
             case FOWPLUS_EXPLORE_FRACTURE:
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Use `/move_units tile_name:" 
-                    + tile.getPosition() + " unit_names:cv tile_name_to:" 
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Use `/move_units tile_name:"
+                    + tile.getPosition() + " unit_names:cv tile_name_to:"
                     + tile.getPosition() + " unit_names_to:2 cr` to fracture a Carrier into 2 Cruisers for example.");
                 break;
 
             case FOWPLUS_EXPLORE_SPOOR:
                 List<Button> buttons = ButtonHelperActionCards.getPlagiarizeButtons(game, player);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     !buttons.isEmpty() ? "Please choose the technology you wish to gain." : "No valid technologies to gain.", buttons);
                 break;
 
             case FOWPLUS_EXPLORE_SACRIFICE:
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + " Use buttons to resolve Founder's Sacrifice", 
+                    player.getRepresentationUnfogged() + " Use buttons to resolve Founder's Sacrifice",
                     Arrays.asList(
                         Buttons.green("winnuStructure_sd_" + planetID,
                             "Place 1 space dock on " + Helper.getPlanetRepresentation(planetID, game), UnitEmojis.spacedock),
@@ -285,12 +285,12 @@ public class FOWPlusService {
         UnitHolder unitHolder = game.getUnitHolderFromPlanet(planetID);
         int mechs = unitHolder.getUnitCount(UnitType.Mech, player.getColor());
         int infs = unitHolder.getUnitCount(UnitType.Infantry, player.getColor());
-        
+
         if (mechs > 0) RemoveUnitService.removeUnit(event, tile, game, player, unitHolder, UnitType.Mech, mechs);
         if (infs > 0) RemoveUnitService.removeUnit(event, tile, game, player, unitHolder, UnitType.Infantry, infs);
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            "Destroyed all ground forces " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs) + StringUtils.repeat(UnitEmojis.mech.toString(), mechs) 
+            "Destroyed all ground forces " + StringUtils.repeat(UnitEmojis.infantry.toString(), infs) + StringUtils.repeat(UnitEmojis.mech.toString(), mechs)
             + " on " + Helper.getPlanetRepresentation(planetID, game));
     }
 
@@ -318,7 +318,7 @@ public class FOWPlusService {
         if (!currentTile.isGravityRift()) {
             AddTokenCommand.addToken(event, currentTile, "gravityrift", game);
         }
-        
+
         FoWHelper.pingSystem(game, currentPos, "Gravity phenomenon detected.");
         event.getMessage().delete().queue();
     }

@@ -613,7 +613,7 @@
         "name": "Outmaneuver",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
-        "text": "Cancel 1 hit.",
+        "text": "Cancel that hit.",
         "flavorText": "T'esla reflexively flinched away from the danger she sensed. \"All ships commence evasive maneuvers. Zere's flak comin'.\"",
         "source": "action_deck_2"
     },
@@ -622,7 +622,7 @@
         "name": "Outmaneuver",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
-        "text": "Cancel 1 hit.",
+        "text": "Cancel that hit.",
         "flavorText": "Fortunately, T'esla's warning gave the cruiser's helmsman just enough time to roll the ship to port. \"Zat would've cut us in half,\" he muttered.",
         "source": "action_deck_2"
     },
@@ -631,7 +631,7 @@
         "name": "Outmaneuver",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
-        "text": "Cancel 1 hit.",
+        "text": "Cancel that hit.",
         "flavorText": "T'esla checked her wingman, relieved to see that he had managed to dodge the flak as well. \"Close in and open fire!\"",
         "source": "action_deck_2"
     },
@@ -640,7 +640,7 @@
         "name": "Outmaneuver",
         "phase": "Action",
         "window": "Before a hit is assigned to 1 of your units",
-        "text": "Cancel 1 hit.",
+        "text": "Cancel that hit.",
         "flavorText": "The capital ship's massive cannons were unable to track the brigades of fighters swarming it like insects.",
         "source": "action_deck_2"
     },

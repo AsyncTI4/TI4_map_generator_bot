@@ -49,7 +49,7 @@ public class ShipPositionModel {
                 case TYPE08 -> new Point(132, 110); // empty and wormhole
                 case TYPE13 -> new Point(139, 186); // Eko
                 case TYPE14 -> new Point(152, 124); // Horace
-                
+
                 default -> null;
             };
         }

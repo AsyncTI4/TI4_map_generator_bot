@@ -25,7 +25,7 @@ public class LeaderTest extends BaseTi4Test {
 
     @Test
     public void testLeaderHasNoUnexpectedProperties() throws Exception {
-        // Given        
+        // Given
         Leader leader = buildLeader();
         Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
             "id",
@@ -46,7 +46,7 @@ public class LeaderTest extends BaseTi4Test {
 
     @Test
     public void testLeaderJsonSaveAndRestore() throws JsonProcessingException {
-        // Given        
+        // Given
         Leader leader = buildLeader();
 
         // When

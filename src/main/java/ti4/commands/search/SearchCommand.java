@@ -14,7 +14,7 @@ public class SearchCommand implements ParentCommand {
         // TO DO:
         // - keep in this command /search commands, sources, emojis, games, forgames, mygames, mytitles
         // - create a new command /search_comps for all the rest
-    
+
         new SearchCommandsSubcommand(),
 
         /* From \data\ */

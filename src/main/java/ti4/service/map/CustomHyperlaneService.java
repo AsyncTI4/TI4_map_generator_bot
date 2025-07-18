@@ -69,7 +69,7 @@ public class CustomHyperlaneService {
         String page = StringUtils.substringAfter(buttonID, "page");
         int pageNum = StringUtils.isBlank(page) ? 1 : Integer.parseInt(page);
         List<Button> hyperlaneTileButtons = getHyperlaneButtons(game);
-        List<ActionRow> buttons = Buttons.paginateButtons(hyperlaneTileButtons, HYPERLANE_BUTTONS, pageNum, "customHyperlanePagination");  
+        List<ActionRow> buttons = Buttons.paginateButtons(hyperlaneTileButtons, HYPERLANE_BUTTONS, pageNum, "customHyperlanePagination");
 
         if (StringUtils.isBlank(page)) {
             StringBuffer sb = new StringBuffer("### Manage Custom Hyperlanes");
@@ -100,7 +100,7 @@ public class CustomHyperlaneService {
         SortHelper.sortButtonsByTitle(hyperlaneTileButtons);
         return hyperlaneTileButtons;
     }
-  
+
     @ButtonHandler("customHyperlaneRefresh")
     public static void refreshHyperlaneButtons(ButtonInteractionEvent event, Game game) {
         offerManageHyperlaneButtons(game, event, null);
@@ -149,7 +149,7 @@ public class CustomHyperlaneService {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: `" + position + "`");
                 return;
             }
-            
+
             String matrix = decodeMatrix(data[1].trim());
             if (!isValidConnectionMatrix(matrix)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid connection matrix: `" + matrix + "`");
@@ -238,10 +238,10 @@ public class CustomHyperlaneService {
 
         //From Static to Custom
         if (!StringUtils.isBlank(staticToCustom)) {
-            List<String> targets = Constants.ALL.equals(staticToCustom) 
+            List<String> targets = Constants.ALL.equals(staticToCustom)
                 ? getStaticHyperlanePositions(game)
                 : Helper.getListFromCSV(staticToCustom);
-            
+
             for (String position : targets) {
                 Tile tile = game.getTileByPosition(position);
                 if (isStaticHyperlane(tile)) {
@@ -257,14 +257,14 @@ public class CustomHyperlaneService {
                     failed.append(position).append(" ");
                 }
             }
-        } 
+        }
 
         //From Custom to Static
         if (!StringUtils.isBlank(customToStatic)) {
-            List<String> targets = Constants.ALL.equals(customToStatic) 
+            List<String> targets = Constants.ALL.equals(customToStatic)
                 ? new ArrayList<>(game.getCustomHyperlaneData().keySet())
                 : Helper.getListFromCSV(customToStatic);
-            
+
             for (String position : targets) {
                 String customData = game.getCustomHyperlaneData().get(position);
                 String staticHyperlaneTileId = customData != null ? Mapper.getHyperlaneTileId(customData) : null;
@@ -278,7 +278,7 @@ public class CustomHyperlaneService {
             }
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), 
+        MessageHelper.sendMessageToChannel(event.getChannel(),
             "Transformed: " + success + "\nCould not transform: " + failed);
     }
 
@@ -290,9 +290,9 @@ public class CustomHyperlaneService {
     }
 
     private boolean isStaticHyperlane(Tile tile) {
-        return tile != null 
-            && tile.getTileModel() != null 
-            && tile.getTileModel().isHyperlane() 
+        return tile != null
+            && tile.getTileModel() != null
+            && tile.getTileModel().isHyperlane()
             && !isCustomHyperlaneTile(tile);
     }
 
@@ -313,7 +313,7 @@ public class CustomHyperlaneService {
         String binaryString = hex; //to support old binary import
         if (hex.length() == 9) {
             BigInteger bigInt = new BigInteger(hex, 16);
-            binaryString = String.format("%36s", 
+            binaryString = String.format("%36s",
                 bigInt.toString(2)).replace(' ', '0'); // pad to 36 bits
         }
 
@@ -331,17 +331,17 @@ public class CustomHyperlaneService {
     public static boolean isValidConnectionMatrix(String input) {
         String[] rows = input.split(";");
         if (rows.length != 6) return false;
-    
+
         for (String row : rows) {
             String[] cells = row.split(",");
             if (cells.length != 6) return false;
-    
+
             for (String cell : cells) {
                 String trimmed = cell.trim();
                 if (!trimmed.equals("0") && !trimmed.equals("1")) return false;
             }
         }
-    
+
         return true;
     }
 
@@ -349,14 +349,14 @@ public class CustomHyperlaneService {
     public static String normalizeMatrix(String matrix) {
         String[] rows = matrix.split(";");
         int[][] grid = new int[6][6];
-    
+
         for (int i = 0; i < 6; i++) {
             String[] cols = rows[i].split(",");
             for (int j = 0; j < 6; j++) {
                 grid[i][j] = Integer.parseInt(cols[j].trim());
             }
         }
-    
+
         // Make symmetric: if grid[i][j] == 1, then grid[j][i] = 1
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 6; j++) {
@@ -366,7 +366,7 @@ public class CustomHyperlaneService {
                 }
             }
         }
-    
+
         // Rebuild string format
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < 6; i++) {
@@ -376,7 +376,7 @@ public class CustomHyperlaneService {
                 builder.append(grid[i][j]);
             }
         }
-    
+
         return builder.toString();
     }
 
@@ -386,11 +386,11 @@ public class CustomHyperlaneService {
 
         String[] rows = matrix.split(";");
         if (rows.length != 6) return false;
-    
+
         for (int i = 0; i < 6; i++) {
             String[] cols = rows[i].split(",");
             if (cols.length != 6) continue;
-    
+
             if (cols[i].trim().equals("1")) {
                 return true;
             }
