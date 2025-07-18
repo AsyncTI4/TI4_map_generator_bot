@@ -197,7 +197,7 @@ public class RevealPublicObjectiveService {
         var channel = game.getMainGameChannel();
         if (game.isLiberationC4Mode())
         {
-            MessageHelper.sendMessageToChannel(channel, game.getPing() 
+            MessageHelper.sendMessageToChannel(channel, game.getPing()
                 + ", two regular stage 1 public objectives, along with the __Liberate Ordinian__ scenario public objective, have been revealed.");
             EmbedBuilder liberate = new EmbedBuilder();
             liberate.setTitle(SourceEmojis.Codex + "__**Liberate Ordinian**__");

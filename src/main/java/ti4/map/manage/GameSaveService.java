@@ -51,7 +51,7 @@ class GameSaveService {
     private static boolean save(Game game) {
         TransientGameInfoUpdater.update(game);
 
-        //Ugly fix to update seen tiles data for fog since doing it in 
+        //Ugly fix to update seen tiles data for fog since doing it in
         //MapGenerator/TileGenerator won't save changes anymore
         if (game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {

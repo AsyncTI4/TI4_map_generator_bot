@@ -70,7 +70,7 @@ class SwapTwoSystems extends GameStateSubcommand {
                 .collect(Collectors.toList());
 
         if (availableTiles.isEmpty()) {
-            return null; 
+            return null;
         }
 
         return availableTiles.get(new Random().nextInt(availableTiles.size()));

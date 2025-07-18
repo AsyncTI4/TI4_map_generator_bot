@@ -425,7 +425,7 @@ public class ButtonHelperTacticalAction {
         }
 
         // Send buttons to move
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation() + ", please choose the first system you wish to move from.", systemButtons);
 
         // Resolve other abilities

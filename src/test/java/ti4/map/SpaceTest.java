@@ -43,7 +43,7 @@ public class SpaceTest extends BaseTi4Test {
 
     @Test
     public void testSpaceHasNoUnexpectedProperties() throws Exception {
-        // Given        
+        // Given
         Space space = buildSpace();
         Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
             "name",
@@ -65,7 +65,7 @@ public class SpaceTest extends BaseTi4Test {
 
     @Test
     public void testSpaceJsonSaveAndRestore() throws JsonProcessingException {
-        // Given        
+        // Given
         Space space = buildSpace();
 
         // When

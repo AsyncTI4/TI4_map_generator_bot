@@ -1112,7 +1112,7 @@ public class ButtonHelperHeroes {
             Helper.getLeaderFullRepresentation(playerLeader) + ".";
         playerLeader.setExhausted(true);
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), message 
+        MessageHelper.sendMessageToChannel(event.getChannel(), message
             + "\nYou will have to use the \"Assign Hits\" button when ANTI-FIGHTER BARRAGE is rolled, since the bot will not know how to auto-assign the produced hits.");
         ButtonHelper.deleteTheOneButton(event);
     }

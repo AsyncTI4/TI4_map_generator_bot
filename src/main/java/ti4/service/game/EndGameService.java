@@ -116,8 +116,8 @@ public class EndGameService {
                 // Delete channels with delay to avoid race condition and rate limits
                 for (int i = 0; i < channels.size(); i++) {
                     TextChannel channel = channels.get(i);
-                    channel.delete().queueAfter(2 + i, TimeUnit.SECONDS, 
-                        success -> {}, 
+                    channel.delete().queueAfter(2 + i, TimeUnit.SECONDS,
+                        success -> {},
                         error -> BotLogger.warning("Failed to delete channel: " + channel.getName() + " - " + error.getMessage())
                     );
                 }

@@ -24,7 +24,7 @@ public class ColourHelper {
         newcolours.sort((c1, c2) -> colourValue(factionId, c2) - colourValue(factionId, c1));
         return newcolours;
     }
-    
+
     private static int colourValue(String factionId, ColorModel colour) {
         return colourValue(factionId, colour.getAlias());
     }

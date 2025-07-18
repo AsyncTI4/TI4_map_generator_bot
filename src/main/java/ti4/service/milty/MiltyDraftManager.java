@@ -562,7 +562,7 @@ public class MiltyDraftManager {
 
         if (!ignoreMessageIDs) {
             // DEPRECATED
-            //StringTokenizer messageIds = 
+            //StringTokenizer messageIds =
             new StringTokenizer(bigTokenizer.nextToken(), ",");
         }
 

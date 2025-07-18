@@ -1087,7 +1087,7 @@ public class ButtonHelper {
                     + " use buttons to resolve a build for the Duha Menaimon (the Arborec flagship).",
                 buttons);
         }
-        // All players get to use Magen 
+        // All players get to use Magen
         // this is mandatory, so should probably be refactored to happen automatically
         for (Player magenPlayer : game.getPlayers().values()) {
             boolean has = activeSystem.containsPlayersUnitsWithModelCondition(magenPlayer, UnitModel::getIsStructure);

@@ -13,7 +13,6 @@ import ti4.map.Tile;
 import ti4.service.unit.ParseUnitService;
 import ti4.service.unit.ParsedUnit;
 
-//TODO: DELETE THIS AFTER DONE
 class FixRemoveCaptureUnits extends GameStateSubcommand {
 
     public FixRemoveCaptureUnits() {

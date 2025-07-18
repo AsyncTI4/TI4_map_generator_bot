@@ -10,7 +10,7 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 
 class AddCustomPO extends GameStateSubcommand {
-    
+
     public AddCustomPO() {
         super(Constants.ADD_CUSTOM, "Add a custom public objective (as a arbitrary source of victory points)", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.PO_NAME, "Public objective name").setRequired(true));

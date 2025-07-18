@@ -443,7 +443,7 @@ public class AsyncTI4DiscordBot {
         bothelperRoles.add(jda.getRoleById("1131925041219653714")); // Jonjo's Server
         bothelperRoles.add(jda.getRoleById("1215450829096624129")); // Sigma's Server
         bothelperRoles.add(jda.getRoleById("1226068245010710558")); // Rintsi's Server
-        bothelperRoles.add(jda.getRoleById("1226805674046914560")); // Solax's Server 
+        bothelperRoles.add(jda.getRoleById("1226805674046914560")); // Solax's Server
         bothelperRoles.add(jda.getRoleById("1313965956338417784")); // ppups's Server
         bothelperRoles.add(jda.getRoleById("1311112004089548860")); // TSI's Server
         bothelperRoles.add(jda.getRoleById("1368345023745097898")); // gozer's server (marshmallow manosphere)

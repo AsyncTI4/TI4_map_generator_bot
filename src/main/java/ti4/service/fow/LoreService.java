@@ -37,7 +37,7 @@ import ti4.model.PlanetModel;
 import ti4.model.TileModel.TileBack;
 
 public class LoreService {
-                  
+
     private static final List<Button> LORE_BUTTONS = Arrays.asList(
         Buttons.blue("gmLoreEdit_System~MDL", "Add to System"),
         Buttons.blue("gmLoreEdit_Planet~MDL", "Add to Planet"),
@@ -182,9 +182,9 @@ public class LoreService {
             savedLoreMap.remove(target);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Lore from " + (planet != null ? planet.getName() : target));
         } else {
-            savedLoreMap.put(target, 
+            savedLoreMap.put(target,
                 new String[]{
-                  loreText.replace(";", "").replace("|", ""), 
+                  loreText.replace(";", "").replace("|", ""),
                   footerText.replace(";", "").replace("|", "")
                 });
             MessageHelper.sendMessageToChannel(event.getChannel(), "Saved Lore to " + (planet != null ? planet.getName() : target));
@@ -209,7 +209,7 @@ public class LoreService {
         } else if (planet != null) {
             titleTile = planet.getName() + " " + planet.getEmoji();
         }
-        
+
         Color embedColor = Color.black;
         if (tile != null && tile.getTileModel() != null) {
             switch (tile.getTileModel().getTileBack()) {
@@ -258,7 +258,7 @@ public class LoreService {
 
         MessageEmbed embed = buildLoreEmbed(game, target, lore.get(target), isSystemLore);
         MessageHelper.sendMessageToChannelWithEmbed(player.getPrivateChannel(), "You found a Lore Fragment", embed);
-        
+
         GMService.logPlayerActivity(game, player, player.getRepresentationUnfoggedNoPing() + " was shown the lore of " + target);
 
         lore.remove(target);

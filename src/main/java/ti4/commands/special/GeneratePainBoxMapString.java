@@ -22,7 +22,7 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
 
   /*
     Generates a map string for Eronous PainBox type map where no tiles are adjacent to each other.
-  */  
+  */
   public GeneratePainBoxMapString() {
         super(Constants.GENERATE_PAINBOX_MAP, "Generate random map string for Eronous Pain Box", false, false);
         addOption(OptionType.INTEGER, Constants.BLUE_TILES, "How many random Blue tiles", true);
@@ -51,7 +51,7 @@ class GeneratePainBoxMapString extends GameStateSubcommand {
         tileList.addAll(fixedTilesList);
 
         if (supernovas > 0) {
-            List<TileModel> allSupernovas = 
+            List<TileModel> allSupernovas =
                 AddTileService.availableTiles(AddTileService.getSources(game, true), RandomOption.R, new HashSet<>(), new ArrayList<>())
                     .stream().filter(TileModel::isSupernova).collect(Collectors.toList());
             for (int i = 0; i < supernovas; i++) {

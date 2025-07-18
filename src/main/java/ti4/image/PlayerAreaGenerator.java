@@ -397,7 +397,7 @@ public class PlayerAreaGenerator {
         // Row 2
         xDeltaBottom = reinforcements(player, xDeltaBottom, yPlayAreaSecondRow, unitCount);
 
-        // EQUALIZE AND CONTINUE 
+        // EQUALIZE AND CONTINUE
         xDeltaTop = xDeltaBottom = Math.max(xDeltaTop, xDeltaBottom);
 
         // Row 1
@@ -2194,7 +2194,7 @@ public class PlayerAreaGenerator {
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (techModel.getFaction().isPresent()) {                
+            if (techModel.getFaction().isPresent()) {
                 if (game.isLiberationC4Mode() && "ghost".equals(techModel.getFaction().get())) {
                     drawFactionIconImageOpaque(graphics, "redcreuss", x + deltaX + 1, y + 108, 42, 42, 0.5f);
                 }

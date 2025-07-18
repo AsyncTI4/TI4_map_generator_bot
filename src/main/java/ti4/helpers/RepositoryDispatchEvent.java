@@ -18,7 +18,7 @@ public class RepositoryDispatchEvent {
 
     /**
      * https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-dispatch-event
-     * 
+     *
      * @param eventType - can be anything, as long as it's caught on github actions side
      */
     public RepositoryDispatchEvent(String eventType, Map<String, String> payloadMap) {

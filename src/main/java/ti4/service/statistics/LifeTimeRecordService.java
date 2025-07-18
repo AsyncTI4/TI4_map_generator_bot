@@ -29,7 +29,7 @@ public class LifeTimeRecordService {
         }
         String records = DiceLuckService.getDiceLuck(members) + AverageTurnTimeService.getAverageTurnTime(members) + SearchGameHelper.getTotalCompletedNOngoingGames(members, event);
 
-        
+
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), records);
     }
 }

@@ -66,7 +66,7 @@ public class ListTechService {
                 String message = ButtonHelperSCs.deductCC(game, player, scNum);
                 ReactionService.addReaction(event, game, player, message);
             }
-        
+
             if (first) {
                 ButtonHelperCommanders.yinCommanderSummary(player, game);
                 ButtonHelperCommanders.veldyrCommanderSummary(player, game);
