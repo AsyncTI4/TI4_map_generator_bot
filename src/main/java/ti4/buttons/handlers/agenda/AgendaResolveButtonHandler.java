@@ -839,14 +839,11 @@ class AgendaResolveButtonHandler {
                 int maxLoss = 12;
                 List<Player> comrades = new ArrayList<>();
                 for (Player playerB : game.getRealPlayers()) {
-                    if (playerB.getTg() > maxLoss)
-                    {
+                    if (playerB.getTg() > maxLoss) {
                         maxLoss = playerB.getTg();
                         comrades = new ArrayList<>();
                         comrades.add(playerB);
-                    }
-                    else if (playerB.getTg() == maxLoss)
-                    {
+                    } else if (playerB.getTg() == maxLoss) {
                         comrades.add(playerB);
                     }
                     playerB.setTg(finalTG);
@@ -856,13 +853,11 @@ class AgendaResolveButtonHandler {
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " Set all players' trade goods to " + finalTG + ".");
-                if (!comrades.isEmpty())
-                {
-                    for (Player playerB : comrades)
-                    {
+                if (!comrades.isEmpty()) {
+                    for (Player playerB : comrades) {
                         DisasterWatchHelper.sendMessageInDisasterWatch(game,
                             "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate "
-                            + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
+                                + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
                     }
                     DisasterWatchHelper.sendMessageInDisasterWatch(game, MiscEmojis.tg(maxLoss));
                 }
@@ -882,7 +877,7 @@ class AgendaResolveButtonHandler {
                         case "6" -> scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
                         case "7" -> {
                             scButtons.add(Buttons.GET_A_TECH);
-                            if (Helper.getPlayerFromAbility(game, "propogation") != null) {
+                            if (Helper.getPlayerFromAbility(game, "propagation") != null) {
                                 scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Gain 3 Command Tokens (for Nekro)"));
                             }
                         }
@@ -1002,16 +997,13 @@ class AgendaResolveButtonHandler {
             }
             if (aCount == 3) {
                 String previousElectee = game.getLawsInfo().get(Constants.VOICE_OF_THE_COUNCIL_ID);
-                voteMessage += " The bot believes this is the third agenda, which in Omega Phase means you" 
+                voteMessage += " The bot believes this is the third agenda, which in Omega Phase means you"
                     + (previousElectee == null ? "'ll" : " might") + " vote on the _Voice of the Council_.";
-                if (previousElectee == null)
-                {
+                if (previousElectee == null) {
                     voteMessage += " Since no player currently has the _Voice of the Council_, it must be voted on once before proceeding to scoring.";
-                }
-                else
-                {
+                } else {
                     Player previousPlayer = game.getPlayerFromColorOrFaction(previousElectee);
-                    voteMessage += " Since somebody (specifically, " + previousPlayer.getRepresentationNoPing() 
+                    voteMessage += " Since somebody (specifically, " + previousPlayer.getRepresentationNoPing()
                         + ") currently has the _Voice of the Council_, the Speaker chooses whether to vote on it this round or not.";
                 }
                 voteMessage += " If this is not actually the third agenda yet, please remember this when that agenda is reached.";

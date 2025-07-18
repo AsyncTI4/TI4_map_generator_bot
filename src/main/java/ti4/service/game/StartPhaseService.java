@@ -822,5 +822,8 @@ public class StartPhaseService {
 
         }
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
+        if (!game.isFowMode()) {
+            ButtonHelper.updateMap(game, event, "Start of action phase for round #" + game.getRound() + ".");
+        }
     }
 }
