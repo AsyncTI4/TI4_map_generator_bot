@@ -410,7 +410,6 @@ public class ActionCardHelper {
                     + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.", xxchaButtons);
             }
         }
-        // Include flavor text when showing the action card that was played
         MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true);
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
