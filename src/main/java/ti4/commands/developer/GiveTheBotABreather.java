@@ -30,5 +30,5 @@ class GiveTheBotABreather extends Subcommand {
     }
 
 
-    
+
 }

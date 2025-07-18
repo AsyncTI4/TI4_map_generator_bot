@@ -104,7 +104,7 @@ public class TIGLHelper {
 
         /**
          * Converts a string identifier to the corresponding SimpleStatistics enum value.
-         * 
+         *
          * @param id the string identifier
          * @return the SimpleStatistics enum value, or null if not found
          */

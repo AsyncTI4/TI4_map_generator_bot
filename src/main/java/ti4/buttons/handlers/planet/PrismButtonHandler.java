@@ -31,5 +31,5 @@ class PrismButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, systemButtons);
     }
 
-    
+
 }

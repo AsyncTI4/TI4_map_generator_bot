@@ -1294,7 +1294,7 @@ public class ButtonHelperActionCards {
                     player.getRepresentationUnfogged() + " has somehow managed to use _Salvage_ to steal "
                         + comm + " commodit" + (comm == 1 ? "y" : "ies") + " from " + p2.getRepresentationUnfogged() + ".");
             }
-            DisasterWatchHelper.sendMessageInDisasterWatch(game, 
+            DisasterWatchHelper.sendMessageInDisasterWatch(game,
                 player.getRepresentationUnfogged() + " has stolen " + comm + " commodit" + (comm == 1 ? "y" : "ies")
                     + " from " + p2.getRepresentationUnfogged() + " in " + game.getName() + " with _Salvage_. "
                     + switch(ThreadLocalRandom.current().nextInt(0, 5)) {case 0 -> "Amazing"; case 1 -> "Incredible"; case 2 -> "Unbelievable"; case 3 -> "Remarkable"; default -> "Phenomenal";} + "!");
@@ -2168,7 +2168,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("getPlagiarizeButtons")
     public static void getPlagiarizeButtons(ButtonInteractionEvent event, Player player, Game game) {
         game.setComponentAction(true);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             "Please choose the technology you wish to acquire by violating intellectual property law.", ButtonHelperActionCards.getPlagiarizeButtons(game, player));
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");

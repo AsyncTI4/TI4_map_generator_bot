@@ -62,7 +62,7 @@ public class ButtonHelperAbilities {
     public static void mirvedaFS(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String pos = buttonID.split("_")[1];
         AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), "ff");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             player.getRepresentation() + " has placed 1 fighter in the active system using the ability of the Nexus.");
     }
 
@@ -1134,7 +1134,7 @@ public class ButtonHelperAbilities {
                 player.setActualHits(player.getActualHits() + totalHits);
 
                 if (totalHits > 0) {
-                    MessageHelper.sendMessageToChannelWithButtons(victim.getCorrectChannel(), 
+                    MessageHelper.sendMessageToChannelWithButtons(victim.getCorrectChannel(),
                         result + "\n" + victim.getRepresentation() + ", please assign any hits using this \"Assign Hits\" button.", buttons);
                 } else {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result + "\n" + victim.getRepresentation() + ", none of your fighters were hit.");
@@ -1551,7 +1551,7 @@ public class ButtonHelperAbilities {
         CommanderUnlockCheckService.checkPlayer(player, "nokar");
         ButtonHelper.deleteTheOneButton(event);
         game.setStoredValue("hiredGunsInPlay", player.getFaction() + "_" + game.getActivePlayer().getFaction());
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() 
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing()
             + " is using their **Hired Guns** ability to send up to three ships to the active system to fight under the command of " + game.getActivePlayer().getRepresentation() +
             ".\nWhen the tactical action concludes, any of the sold ships in the active system will be converted into the active players ships.");
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -1568,7 +1568,7 @@ public class ButtonHelperAbilities {
         game.setStoredValue("allianceModeSimultaneousAction", player.getFaction() + "_" + game.getActivePlayer().getFaction());
         ButtonHelperTacticalAction.selectActiveSystem(player, game, event, "ringTile_" + game.getActiveSystem());
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationNoPing() + " is doing a simultaneous tactical action with " + game.getActivePlayer().getRepresentation() + ".");
         //MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " use buttons to move ships", TacticalActionService.getTilesToMoveFrom(player, game, event));
     }

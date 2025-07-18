@@ -31,7 +31,7 @@ public class FOWCombatThreadMirroring {
   /*
     Checks that event occured in a valid thread and is a message from a player
     participating in the combat
-  */  
+  */
   public static void mirrorEvent(MessageReceivedEvent event) {
         if (!isFowCombatThread(event.getChannel()) || event.getAuthor().isBot()) {
             return;
@@ -52,7 +52,7 @@ public class FOWCombatThreadMirroring {
         }
 
         String messageText = event.getMessage().getContentRaw();
-        String newMessageText = player.getRepresentationNoPing() + " said: " + messageText;  
+        String newMessageText = player.getRepresentationNoPing() + " said: " + messageText;
 
         boolean messageMirrored = mirrorMessage((ThreadChannel) event.getChannel(), player, game, newMessageText);
         if (messageMirrored) {
@@ -60,12 +60,12 @@ public class FOWCombatThreadMirroring {
             event.getMessage().delete().queue();
         }
     }
-    
+
     public static String parseCombatRollMessage(String messageText, Player player) {
         String combat = matchPattern(messageText, "rolls for\\s+([^>]+>)");
         String hits = matchPattern(messageText, "Total hits (\\d+)");
-        
-        return player.getRepresentationNoPing() + " rolled for " + combat + ": " 
+
+        return player.getRepresentationNoPing() + " rolled for " + combat + ": "
             + CombatMessageHelper.displayHitResults(Integer.valueOf(hits)).replace("\n", "");
     }
 

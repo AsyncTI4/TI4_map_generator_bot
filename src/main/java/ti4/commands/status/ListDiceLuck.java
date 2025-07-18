@@ -32,7 +32,7 @@ class ListDiceLuck extends GameStateSubcommand {
             message.append(" - ").append(game.getCustomName());
         }
         message.append("__");
-        
+
         HashMap<String, Double> record = new HashMap<>();
         for (Player player : game.getPlayers().values()) {
             if (!player.isRealPlayer()) continue;

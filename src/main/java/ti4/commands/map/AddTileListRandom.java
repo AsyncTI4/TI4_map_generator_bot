@@ -33,7 +33,7 @@ public class AddTileListRandom extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Modal modal = AddTileListService.buildMapStringModal(game, "addMapStringRandom");
-        
+
         //Inject a new action row to the modal
         Modal.Builder newModalBuilder = Modal.create(modal.getId(), modal.getTitle());
         modal.getComponents().forEach(newModalBuilder::addComponents);
@@ -69,7 +69,7 @@ public class AddTileListRandom extends GameStateSubcommand {
                 isCenter = true;
                 tileToken = tileToken.replace("{", "").replace("}", "").trim();
             }
-            
+
             if (RandomOption.isValid(tileToken)) {
                 //Ignoring existing tiles from the map as those will be cleared by addTileListToMap
                 List<TileModel> availableTiles = AddTileService.availableTiles(sources, RandomOption.valueOf(tileToken), new HashSet<>(), tilesToAdd);
@@ -80,7 +80,7 @@ public class AddTileListRandom extends GameStateSubcommand {
 
                 Collections.shuffle(availableTiles);
                 tileToken = availableTiles.getFirst().getId();
-            } 
+            }
             tilesToAdd.add((isCenter ? "{" : "") + tileToken + (isCenter ? "}" : ""));
         }
 

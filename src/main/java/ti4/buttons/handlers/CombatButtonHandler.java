@@ -54,7 +54,7 @@ class CombatButtonHandler {
                 MessageHelper.sendMessageToChannel(target.getCorrectChannel(), target.getRepresentationUnfogged() + " " + msg);
             }
         }
-        MessageHelper.sendMessageToChannel(game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg); 
+        MessageHelper.sendMessageToChannel(game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg);
     }
 
 }
