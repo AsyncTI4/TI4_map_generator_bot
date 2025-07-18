@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.ButtonHelper;
@@ -120,6 +121,14 @@ public class EndTurnService {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
         CommanderUnlockCheckService.checkPlayer(nextPlayer, "sol");
+        if (!game.isFowMode() && !game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()).isEmpty()) {
+            for (ThreadChannel summary : game.getActionsChannel().getThreadChannels()) {
+                if (summary.getName().equalsIgnoreCase("Turn Summary")) {
+                    MessageHelper.sendMessageToChannel(summary, mainPlayer.getFactionEmoji() + game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()));
+                    game.removeStoredValue("currentActionSummary" + mainPlayer.getFaction());
+                }
+            }
+        }
         if (justPassed) {
             if (!ButtonHelperAgents.checkForEdynAgentPreset(game, mainPlayer, nextPlayer, event)) {
                 StartTurnService.turnStart(event, game, nextPlayer);
