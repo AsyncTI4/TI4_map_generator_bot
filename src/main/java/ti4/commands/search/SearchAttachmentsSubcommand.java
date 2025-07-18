@@ -31,7 +31,7 @@ public class SearchAttachmentsSubcommand extends SearchComponentModelSubcommand 
             .map(model -> model.getRepresentationEmbed())
             .toList();
         SearchHelper.sendSearchEmbedsToEventChannel(event, messageEmbeds);
-    }    
+    }
 
-    
+
 }

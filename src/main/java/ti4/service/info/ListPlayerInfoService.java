@@ -135,7 +135,7 @@ public class ListPlayerInfoService {
         Game game,
         int closestScore
     ) {
-        // Success condition  
+        // Success condition
         if (currentResources >= goal && currentInfluence >= goal) {
             return new ObjectiveResult(true, goal * 2);
         }
@@ -147,15 +147,15 @@ public class ListPlayerInfoService {
         int newResources2 = currentResources + additionalResources2;
         int newInfluence2 = currentInfluence + additionalInfluence2;
 
-        // Calculate closeness score  
+        // Calculate closeness score
         int resourceShortfall2 = Math.max(0, goal - newResources2);
         int influenceShortfall2 = Math.max(0, goal - newInfluence2);
         int closenessScore2 = goal * 2 - (resourceShortfall2 + influenceShortfall2);
         closestScore = Math.max(closenessScore2, closestScore);
 
-        // Failure condition - run out of options  
+        // Failure condition - run out of options
         if (index >= planets.size() && remainingTradeGoods == 0) {
-            // Calculate closeness score  
+            // Calculate closeness score
             int resourceShortfall = Math.max(0, goal - currentResources);
             int influenceShortfall = Math.max(0, goal - currentInfluence);
             int closenessScore = goal * 2 - (resourceShortfall + influenceShortfall);
@@ -163,9 +163,9 @@ public class ListPlayerInfoService {
             return new ObjectiveResult(false, Math.max(0, closenessScore));
         }
 
-        // If we've run out of planets, try using trade goods  
+        // If we've run out of planets, try using trade goods
         if (index >= planets.size()) {
-            // Try using remaining trade goods for resources  
+            // Try using remaining trade goods for resources
             int additionalResources = Math.min(remainingTradeGoods,
                 Math.max(0, goal - currentResources));
             int additionalInfluence = Math.min(remainingTradeGoods - additionalResources,
@@ -174,7 +174,7 @@ public class ListPlayerInfoService {
             int newResources = currentResources + additionalResources;
             int newInfluence = currentInfluence + additionalInfluence;
 
-            // Calculate closeness score  
+            // Calculate closeness score
             int resourceShortfall = Math.max(0, goal - newResources);
             int influenceShortfall = Math.max(0, goal - newInfluence);
             int closenessScore = goal * 2 - (resourceShortfall + influenceShortfall);
@@ -213,7 +213,7 @@ public class ListPlayerInfoService {
                 return resourceResult;
             }
         }
-        // Try using planet for influence  
+        // Try using planet for influence
         if (influence > 0) {
             ObjectiveResult influenceResult = backtrack(planets,
                 currentResources,
@@ -227,7 +227,7 @@ public class ListPlayerInfoService {
             }
         }
 
-        // Skip this planet  
+        // Skip this planet
         return backtrack(planets,
             currentResources,
             currentInfluence,

@@ -18,7 +18,7 @@ public class WinningPathHelper {
         int secretCount = winner.getSecretVictoryPoints();
         int supportCount = winner.getSupportForTheThroneVictoryPoints();
         String otherPoints = summarizeOtherVictoryPoints(game, winner.getUserID());
-        
+
         if (supportCount >= 2)
         {
             return String.format(

@@ -37,7 +37,7 @@ public class SpinRingsHelper {
         String[] customSpins = customSpinSptring.toLowerCase().split(" ");
         for (String spinString : customSpins) {
 
-            //Needs to have Ring:Direction:Steps  
+            //Needs to have Ring:Direction:Steps
             String[] spinSettings = spinString.toLowerCase().split(":");
             if (spinSettings.length != 3) {
                 return false;
@@ -70,19 +70,19 @@ public class SpinRingsHelper {
 
     /*
      * Custom rotation with random support
-     * 
+     *
      * Ring:Direction:Steps
      * 1:cw:1 2:ccw:2
-     * 
+     *
      * Or with random options
-     * 1,2:rnd:2,3 
+     * 1,2:rnd:2,3
      * to spin ring 1 OR 2 to random direction for 2 OR 3 steps
-     * 
+     *
      */
     public static void spinRingsCustom(Game game, String customSpinString, String flavourMsg) {
         String[] customSpins = customSpinString.toLowerCase().split(" ");
         StringBuffer sb = new StringBuffer(flavourMsg != null ? flavourMsg : "## ⚙️ " + randomStatusMessage());
-        
+
         List<Tile> tilesToSet = new ArrayList<>();
         List<String[]> customHyperlanesToMove = new ArrayList<>();
 
@@ -182,7 +182,7 @@ public class SpinRingsHelper {
                 }
                 if (tile == null) {
                     continue;
-                } 
+                }
 
                 if (y == 2) {
                     if ((x - y) < 1) {

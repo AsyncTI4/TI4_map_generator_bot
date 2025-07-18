@@ -89,7 +89,7 @@ public class ButtonHelperFactionSpecific {
             "placeOneNDone_dontskip");
         String message = player.getRepresentation() + ", please use these buttons to produce 1 ship that was just destroyed in your home system (you still need to pay, and each ship is a separate payment).\n> "
             + ButtonHelper.getListOfStuffAvailableToSpend(player, game);
-        MessageHelper.sendMessageToChannel(event.getChannel(), 
+        MessageHelper.sendMessageToChannel(event.getChannel(),
             player.getFactionEmoji() + " is using _???\\_NULL\\_REFERENCE\\_???_ to produce 1 recently destroyed ship in their home system (they can do this upon each death of a ship, but each payment is separate).");
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
@@ -261,7 +261,7 @@ public class ButtonHelperFactionSpecific {
                 player.addAbility("ascend");
                 Integer poIndex = game.addCustomPO("Ascend", 1);
                 game.scorePublicObjective(player.getUserID(), poIndex);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentation() + " gained the _Ascend_ Honor card, and with it, one victory point.\n" + Mapper.getAbility("ascend").getRepresentation());
             }
         } else {
@@ -329,14 +329,14 @@ public class ButtonHelperFactionSpecific {
         if (p2.getTotalVictoryPoints() > player.getTotalVictoryPoints() && !player.hasAbility("scourge")) {
             player.setHonorCounter(Math.min(8, player.getHonorCounter() + 1));
             player.setDishonorCounter(Math.min(8 - player.getHonorCounter(), player.getDishonorCounter()));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " has gained an Honor by beating someone with more victory points than them in combat."
                 + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter() + " Dishonor.");
         }
         if (p2.getTotalVictoryPoints() < player.getTotalVictoryPoints()) {
             player.setDishonorCounter(Math.min(8, player.getDishonorCounter() + 1));
             player.setHonorCounter(Math.min(8 - player.getDishonorCounter(), player.getHonorCounter()));
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " has gained 1 Dishonor by beating someone with fewer victory points than them in combat."
                 + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter() + " Dishonor.");
         }
@@ -1012,7 +1012,7 @@ public class ButtonHelperFactionSpecific {
         result = resultBuilder.toString();
         result += CombatMessageHelper.displayHitResults(totalHits);
         player.setActualHits(player.getActualHits() + totalHits);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result 
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), result
             + "\nPlease assign any hits using the \"Assign Hits\" button in the combat thread. Remember these hits only apply against infantry or fighters.");
 
     }
@@ -1588,7 +1588,7 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("dihmohnfs_")
     public static void resolveDihmohnFlagship(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() 
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation()
             + " is using the Maximus (the Dih-Mohn flagship) to produce units. They may produce up to 2 units with a combined cost of 4. They cannot produce ships if enemy ships are in the system. ");
         String pos = buttonID.replace("dihmohnfs_", "");
         List<Button> buttons;
@@ -1800,27 +1800,27 @@ public class ButtonHelperFactionSpecific {
             String message = "";
             if (player.getCommodities() == 0)
             {
-                message += player.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit" + (wash == 1 ? "y" : "ies") + " " + player.gainTG(wash) 
+                message += player.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit" + (wash == 1 ? "y" : "ies") + " " + player.gainTG(wash)
                     + " with " + p2.getFactionEmojiOrColor() + ".";
             }
             else
             {
                 int remain = player.getCommodities();
                 int orig = remain + wash;
-                message += player.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + player.gainTG(wash) 
+                message += player.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + player.gainTG(wash)
                     + " with " + p2.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
             }
             message += "\n";
             if (p2.getCommodities() == 0)
             {
-                message += p2.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit" + (wash == 1 ? "y" : "ies") + " " + p2.gainTG(wash) 
+                message += p2.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit" + (wash == 1 ? "y" : "ies") + " " + p2.gainTG(wash)
                     + " with " + player.getFactionEmojiOrColor() + ".";
             }
             else
             {
                 int remain = p2.getCommodities();
                 int orig = remain + wash;
-                message += p2.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + p2.gainTG(wash) 
+                message += p2.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + p2.gainTG(wash)
                     + " with " + player.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -2064,16 +2064,16 @@ public class ButtonHelperFactionSpecific {
         }
         if (cabal == null) {
             for (Player p2 : game.getRealPlayers()) {
-                if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile) 
-                        || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile) 
+                if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)
+                        || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile)
                         || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile)) {
                     cabal = p2;
                 }
             }
         }
         if (cabal != null && (!uH.getPlayersUnitListOnHolder(cabal).isEmpty()
-                || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile) 
-                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", cabal, tile) 
+                || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)
+                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", cabal, tile)
                 || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", cabal, tile))) {
             cabalEatsUnit(player, game, cabal, amount, unit, event, false);
         }
@@ -2128,9 +2128,9 @@ public class ButtonHelperFactionSpecific {
         String planet = ButtonHelperActionCards.getBestResPlanetInHomeSystem(killer, game);
         int newAmount = game.changeCommsOnPlanet(winnings, planet);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(killer.getCorrectChannel(), 
-            killer.getRepresentationNoPing() + " added " + winnings + " commodit" + (winnings == 1 ? "y" : "ies") + " to the planet of " 
-            + Helper.getPlanetRepresentation(planet, game) + " (which now has " + newAmount + " commodit" + (newAmount == 1 ? "y" : "ies") 
+        MessageHelper.sendMessageToChannel(killer.getCorrectChannel(),
+            killer.getRepresentationNoPing() + " added " + winnings + " commodit" + (winnings == 1 ? "y" : "ies") + " to the planet of "
+            + Helper.getPlanetRepresentation(planet, game) + " (which now has " + newAmount + " commodit" + (newAmount == 1 ? "y" : "ies")
             + " on it) by destroying units owned by " + player.getRepresentationNoPing() + ".");
     }
 

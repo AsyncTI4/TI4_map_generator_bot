@@ -1002,7 +1002,7 @@ class AgendaResolveButtonHandler {
             }
             if (aCount == 3) {
                 String previousElectee = game.getLawsInfo().get(Constants.VOICE_OF_THE_COUNCIL_ID);
-                voteMessage += " The bot believes this is the third agenda, which in Omega Phase means you" 
+                voteMessage += " The bot believes this is the third agenda, which in Omega Phase means you"
                     + (previousElectee == null ? "'ll" : " might") + " vote on the _Voice of the Council_.";
                 if (previousElectee == null)
                 {
@@ -1011,7 +1011,7 @@ class AgendaResolveButtonHandler {
                 else
                 {
                     Player previousPlayer = game.getPlayerFromColorOrFaction(previousElectee);
-                    voteMessage += " Since somebody (specifically, " + previousPlayer.getRepresentationNoPing() 
+                    voteMessage += " Since somebody (specifically, " + previousPlayer.getRepresentationNoPing()
                         + ") currently has the _Voice of the Council_, the Speaker chooses whether to vote on it this round or not.";
                 }
                 voteMessage += " If this is not actually the third agenda yet, please remember this when that agenda is reached.";

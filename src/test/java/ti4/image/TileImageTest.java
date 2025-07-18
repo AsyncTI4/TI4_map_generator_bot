@@ -20,7 +20,7 @@ import ti4.service.map.TokenPlanetService;
 import ti4.testUtils.BaseTi4Test;
 
 /**
- * <h1> HOW TO USE THIS TEST FILE: </h1> 
+ * <h1> HOW TO USE THIS TEST FILE: </h1>
  * <p> 1. Change TestMode to "SaveStatic"
  * <p> 2. Run all of the tests
  * <p> 3. Change TestMode back to "Compare"

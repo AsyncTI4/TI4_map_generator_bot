@@ -245,8 +245,8 @@ public class AddPlanetService {
             String planet2 = ButtonHelperActionCards.getBestResPlanetInHomeSystem(player, game);
             game.changeCommsOnPlanet(-comms, planet);
             game.changeCommsOnPlanet(comms, planet2);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
-                comms + " commodit" + (comms == 1 ? "y" : "ies") + " were moved from the planet of " + Helper.getPlanetRepresentation(planet, game) 
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                comms + " commodit" + (comms == 1 ? "y" : "ies") + " were moved from the planet of " + Helper.getPlanetRepresentation(planet, game)
                 + " to the planet of " + Helper.getPlanetRepresentation(planet2, game) + ".");
 
         }

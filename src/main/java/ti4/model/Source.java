@@ -43,7 +43,7 @@ public class Source {
 
         /**
          * Converts a string identifier to the corresponding ComponentSource enum value.
-         * 
+         *
          * @param id the string identifier
          * @return the ComponentSource enum value, or null if not found
          */
