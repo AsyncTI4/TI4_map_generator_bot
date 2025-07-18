@@ -98,7 +98,7 @@ public class ColorModel implements ModelInterface {
     // For the sRGB colorspace, the relative luminance of a color is defined as
     //    L = 0.2126 * R + 0.7152 * G + 0.0722 * B
     // where R, G and B are defined as:
-    //    if XsRGB <= 0.03928 then  X = XsRGB/12.92 
+    //    if XsRGB <= 0.03928 then  X = XsRGB/12.92
     //    else                      X = ((XsRGB+0.055)/1.055) ^ 2.4
     private static double relativeLuminance(Color color) {
         if (color == null) return 0;

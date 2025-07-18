@@ -162,7 +162,7 @@ public class SecretObjectiveHelper {
             sb.append(SecretObjectiveInfoService.getSecretObjectiveRepresentation(id)).append("\n");
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, sb.toString());
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, 
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player,
             "All secret objectives in your hand have been shown to " + (game.isFowMode() ? "someone" : player_.getRepresentationNoPing()) + ".");
     }
 

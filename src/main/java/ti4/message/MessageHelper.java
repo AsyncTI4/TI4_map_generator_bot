@@ -593,7 +593,7 @@ public class MessageHelper {
      *          <p>
      *          </p>
      *          Example of use:
-     * 
+     *
      *          <pre>
     * {@code
         for (MessageCreateData messageData : getMessageObject(message, embeds, buttons)) {

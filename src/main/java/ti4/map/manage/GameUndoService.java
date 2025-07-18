@@ -44,7 +44,7 @@ class GameUndoService {
         try {
             List<Integer> undoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
             if (undoNumbers.isEmpty()) return 0;
-            
+
             int maxUndoNumber = undoNumbers.getLast();
             int maxUndoFilesPerGame = GameManager.getManagedGame(gameName).isHasEnded() ? 10 : 100;
             int oldestUndoNumberThatShouldExist = maxUndoNumber - maxUndoFilesPerGame;

@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -117,8 +116,8 @@ public class EndGameService {
                 // Delete channels with delay to avoid race condition and rate limits
                 for (int i = 0; i < channels.size(); i++) {
                     TextChannel channel = channels.get(i);
-                    channel.delete().queueAfter(2 + i, TimeUnit.SECONDS, 
-                        success -> {}, 
+                    channel.delete().queueAfter(2 + i, TimeUnit.SECONDS,
+                        success -> {},
                         error -> BotLogger.warning("Failed to delete channel: " + channel.getName() + " - " + error.getMessage())
                     );
                 }
@@ -301,7 +300,6 @@ public class EndGameService {
         sb.append("\n");
         sb.append("**Players:**").append("\n");
         int index = 1;
-        Optional<Player> winner = game.getWinner();
         for (Player player : game.getRealAndEliminatedPlayers()) {
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
@@ -341,6 +339,7 @@ public class EndGameService {
             .append(vpCount).append(" victory points")
             .append("\n");
 
+        var winner = game.getWinner();
         if (winner.isPresent() && !game.hasHomebrew()) {
             String winningPath = WinningPathHelper.buildWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");

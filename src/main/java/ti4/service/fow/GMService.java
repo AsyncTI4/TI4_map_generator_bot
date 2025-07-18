@@ -96,7 +96,7 @@ public class GMService {
         }
         MessageHelper.sendMessageToChannel(getGMChannel(game), msg);
     }
-    
+
     public static String gmPing(Game game) {
         if (game.isFowMode()) {
             List<Role> gmRoles = game.getGuild().getRolesByName(game.getName() + " GM", false);
@@ -166,7 +166,7 @@ public class GMService {
                      + ", " + player.getUserName(), player.getFactionEmoji()));
             }
             factionButtons.add(Buttons.DONE_DELETE_BUTTONS);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                 "Please choose the player who to view the game as:", factionButtons);
         }
     }
@@ -272,9 +272,9 @@ public class GMService {
         ThreadGetter.getThreadInChannel(game.getMainGameChannel(), STATUS_SUMMARY_THREAD, true, false,
             threadChannel -> {
                 MessageHelper.sendMessageToChannel(threadChannel, "# Round " + game.getRound() + " Status Summary " + game.getPing());
-                ExploreService.secondHalfOfExpInfo(Arrays.asList(Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER), 
+                ExploreService.secondHalfOfExpInfo(Arrays.asList(Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER),
                     threadChannel, null, game, true, false);
-              
+
                 RelicHelper.showRemaining(threadChannel, true, game, null);
             });
     }

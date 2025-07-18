@@ -43,7 +43,7 @@ class AddTileRandom extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
             return;
         }
-        
+
         if (!RandomOption.isValid(randomType)) {
             MessageHelper.replyToMessage(event, "Invalid type: " + randomType);
             return;

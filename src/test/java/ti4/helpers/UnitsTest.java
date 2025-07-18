@@ -29,7 +29,7 @@ public class UnitsTest extends BaseTi4Test {
 
         @Test
         public void testUnitKeyHasNoUnexpectedProperties() throws Exception {
-            // Given        
+            // Given
             UnitKey unitKey = buildUnitKey();
             // DO NOT ADD NEW JSON KEYS TO THIS OBJECT.
             // This object is being used as a key in maps which causes issues when we
@@ -49,7 +49,7 @@ public class UnitsTest extends BaseTi4Test {
 
         @Test
         public void testUnitKeyJsonSaveAndRestore() throws JsonProcessingException {
-            // Given        
+            // Given
             UnitKey unitKey = buildUnitKey();
 
             // When

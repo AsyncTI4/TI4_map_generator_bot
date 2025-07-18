@@ -12,7 +12,7 @@ class FactionTechRemove extends FactionTechAddRemove {
     public FactionTechRemove() {
         super(Constants.FACTION_TECH_REMOVE, "Remove a faction technology from your faction");
     }
-    
+
     @Override
     public void doAction(Player player, List<String> techIDs, SlashCommandInteractionEvent event) {
         FrankenFactionTechService.removeFactionTechs(event, player, techIDs);

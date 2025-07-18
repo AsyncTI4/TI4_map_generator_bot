@@ -41,7 +41,7 @@ public class MoveTile extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid position: " + tileToPosition);
             return;
         }
-       
+
         movingTile.setPosition(tileToPosition);
         game.setTile(movingTile);
 

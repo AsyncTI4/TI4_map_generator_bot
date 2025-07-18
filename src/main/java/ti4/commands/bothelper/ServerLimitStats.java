@@ -42,8 +42,8 @@ class ServerLimitStats extends Subcommand {
         int threadCount = threadChannels.size(); //1000
         List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream().filter(ThreadChannel::isArchived).toList();
         int threadArchivedCount = threadChannelsArchived.size();
-        long cardsInfoThreadCount = threadChannels.stream().filter(t -> !isFoWGuild 
-            ? t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX) 
+        long cardsInfoThreadCount = threadChannels.stream().filter(t -> !isFoWGuild
+            ? t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX)
             : t.getName().contains("-cards-info")).count();
         long botThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-bot-map-updates")).count();
         long roundThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-round-")).count();

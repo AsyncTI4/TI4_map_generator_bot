@@ -54,9 +54,9 @@ public class FowCommunicationThreadService {
                 if (player != null && player == p) {
                     Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreadsWithPlayer);
                     if (!newNeighbors.isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButton(player.getPrivateChannel(), "New neighbors found", 
-                            Buttons.blue("fowComms_" 
-                                + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")), 
+                        MessageHelper.sendMessageToChannelWithButton(player.getPrivateChannel(), "New neighbors found",
+                            Buttons.blue("fowComms_"
+                                + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")),
                                 "Open Comms"));
                     }
                 }
@@ -65,13 +65,13 @@ public class FowCommunicationThreadService {
     }
 
     private static boolean areAllowedToTalkInAgenda(Game game) {
-        return game.getPhaseOfGame().startsWith("agenda") 
+        return game.getPhaseOfGame().startsWith("agenda")
             && game.getFowOption(FOWOption.ALLOW_AGENDA_COMMS)
             && !game.isHiddenAgendaMode();
     }
 
     private static boolean isHiddenAgenda(Game game) {
-        return game.getPhaseOfGame().startsWith("agenda") 
+        return game.getPhaseOfGame().startsWith("agenda")
             && game.isHiddenAgendaMode();
     }
 
@@ -133,7 +133,7 @@ public class FowCommunicationThreadService {
             String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
             if (!threadLocked && isHiddenAgenda(game)) {
                 //Reminder of Hidden Agenda mode
-                threadChannel.getManager().setArchived(false).queue(success -> 
+                threadChannel.getManager().setArchived(false).queue(success ->
                     threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda __only__ speaker is allowed to speak.").queue());
             } else if (areNeighbors && threadLocked) {
                 //Allow talking
@@ -161,7 +161,7 @@ public class FowCommunicationThreadService {
 
         return newNeighbors;
     }
-    
+
     @ButtonHandler("fowComms_")
     public static void showComms(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         List<Button> buttons = new ArrayList<>();
@@ -187,7 +187,7 @@ public class FowCommunicationThreadService {
                 + " " + player.getRepresentation(true, true, false, true) + "\n"
                 + "GM ping: " + GMService.gmPing(game)));
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() 
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing()
                 + "(You) accepted private communications invitation from " + inviteePlayer.getRepresentationNoPing());
         event.getMessage().delete().queue();
     }
@@ -197,12 +197,12 @@ public class FowCommunicationThreadService {
         String color = buttonID.replace("fowCommsSuggest_", "");
         Player targetPlayer = game.getPlayerFromColorOrFaction(color);
         if (targetPlayer != null) {
-            String msg = targetPlayer.getRepresentationUnfogged() + " " + player.getRepresentationNoPing() + " wishes to open private communications thread with you."; 
+            String msg = targetPlayer.getRepresentationUnfogged() + " " + player.getRepresentationNoPing() + " wishes to open private communications thread with you.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("fowCommsAccept_" + player.getColor(), "Accept"));
             buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), msg, buttons);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() 
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing()
                 + "(You) sent an invitation to open communications with " + targetPlayer.getRepresentationNoPing());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player '" + color + "' was not found.");

@@ -55,7 +55,7 @@ public class FrankenAbilityService {
                 player.addAbility("policy_the_economy_empower");
                 player.removeOwnedUnitByID("olradin_mech");
                 player.addOwnedUnitByID("olradin_mech_positive");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);

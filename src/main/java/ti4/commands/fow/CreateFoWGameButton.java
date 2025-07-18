@@ -19,7 +19,7 @@ import ti4.service.fow.CreateFoWGameService;
 import ti4.service.game.CreateGameService;
 
 class CreateFoWGameButton extends Subcommand {
-  
+
     public CreateFoWGameButton() {
         super(Constants.CREATE_FOW_GAME_BUTTON, "Create FoW Game Creation Button");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Game").setRequired(true));
@@ -39,7 +39,7 @@ class CreateFoWGameButton extends Subcommand {
         Member gm = CreateFoWGameService.getGM(event);
         List<Member> members = CreateFoWGameService.getPlayers(event);
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString();
-        
+
         Guild guild = CreateFoWGameService.findFoWGuildWithSpace(event.getGuild(), members.size() + 1);
         if (guild == null) {
             MessageHelper.sendMessageToEventChannel(event, "All FoW Server are full. Can not host a new game - please contact @Bothelper to resolve.");

@@ -43,7 +43,7 @@ class PingActivePlayer extends GameStateSubcommand {
 
         long milliSinceLastPing = System.currentTimeMillis() - latestPingMilliseconds;
         if (!game.getPlayersWithGMRole().contains(playerThatRanCommand) && milliSinceLastPing < PING_COOLDOWN && !samePlayer) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 "Active player was pinged recently. Command on cooldown for " + formatMillis(PING_COOLDOWN - milliSinceLastPing) + ".");
         } else {
             String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
