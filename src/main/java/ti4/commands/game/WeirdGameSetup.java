@@ -39,7 +39,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXTRA_SECRET_MODE, "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(new OptionData(OptionType.BOOLEAN, FOWOption.RIFTSET_MODE.toString(), "True to enable Eronous RiftSet mode"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Catc Facilities"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
         addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game").setAutoComplete(true));
     }
 
@@ -260,7 +260,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         game.setAbsolMode(absolMode);
 
         // JUST PoK
-        if (!absolMode && !discordantStarsMode) {
+        if (!absolMode && !discordantStarsMode && !votcMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
@@ -268,7 +268,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
             if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
-            game.setTechnologyDeckID("techs_pok");
+            game.setTechnologyDeckID("techs_pok_c4");
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);

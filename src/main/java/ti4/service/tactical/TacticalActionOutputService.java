@@ -25,6 +25,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.GMService;
 
 @UtilityClass
@@ -61,7 +62,7 @@ public class TacticalActionOutputService {
 
     public String buildMessageForTacticalAction(Game game, Player player) {
         StringBuilder sb = new StringBuilder("## Tactical Action in system ");
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        Tile activeSystem = getActiveSystem(game);
         sb.append(activeSystem.getRepresentationForButtons(game, player)).append(":\n\n");
 
         Set<String> positions = positionsMovedFrom(game);
@@ -74,7 +75,7 @@ public class TacticalActionOutputService {
 
     public String buildCondensedMessageForTacticalAction(Game game, Player player) {
         StringBuilder sb = new StringBuilder("## Tactical Action in system ");
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        Tile activeSystem = getActiveSystem(game);
         sb.append(activeSystem.getRepresentationForButtons(game, player)).append(":\n\n");
 
         Set<String> positions = positionsMovedFrom(game);
@@ -238,7 +239,7 @@ public class TacticalActionOutputService {
         // Calculate base move value (pretty easy)
         int baseMoveValue = model.getMoveValue();
         if (baseMoveValue == 0) return 0;
-        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasTech("absol_amd") && !player.getRelics().contains("circletofthevoid")) {
+        if (tile.isNebula() && !player.hasAbility("voidborn") && !player.hasAbility("celestial_being") && !player.hasTech("absol_amd") && !player.getRelics().contains("circletofthevoid")) {
             baseMoveValue = 1;
         }
         if (skipBonus) return baseMoveValue;
@@ -261,7 +262,7 @@ public class TacticalActionOutputService {
             bonusMoveValue += 1;
         }
 
-        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
+        Tile activeSystem = getActiveSystem(game);
         for (UnitHolder uhPlanet : activeSystem.getPlanetUnitHolders()) {
             if (player.getPlanets().contains(uhPlanet.getName())) {
                 continue;
@@ -277,4 +278,9 @@ public class TacticalActionOutputService {
         return baseMoveValue + bonusMoveValue;
     }
 
+    private Tile getActiveSystem(Game game) {
+        return FOWPlusService.isVoid(game, game.getActiveSystem())
+            ? FOWPlusService.voidTile(game.getActiveSystem())
+            : game.getTileByPosition(game.getActiveSystem());
+    }
 }

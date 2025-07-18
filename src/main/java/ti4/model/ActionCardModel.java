@@ -23,6 +23,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String imageURL;
     private String automationID;
     private ComponentSource source;
+    private ComponentSource actual_source;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {

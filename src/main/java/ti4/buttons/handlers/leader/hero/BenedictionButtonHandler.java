@@ -36,7 +36,7 @@ class BenedictionButtonHandler {
     public static void benedictionStep1(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String pos1 = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentationUnfogged() + " choose the tile you wish to send the ships in "
+            player.getRepresentationUnfogged() + " please choose the system you wish to send the ships in "
                 + game.getTileByPosition(pos1).getRepresentationForButtons(game, player) + " to.",
             getBenediction2ndTileOptions(player, game, pos1));
         ButtonHelper.deleteMessage(event);

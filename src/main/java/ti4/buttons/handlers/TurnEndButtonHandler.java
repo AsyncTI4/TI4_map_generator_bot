@@ -20,7 +20,7 @@ class TurnEndButtonHandler {
     public static void turnEnd(ButtonInteractionEvent event, Game game, Player player) {
         if (player.hasAbility("the_starlit_path") && game.getStoredValue("pathOf" + player.getFaction()).isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You cannot end turn until you set your path with the end of turn buttons.");
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use Buttons to choose your next turn's path", ButtonHelper.getPathButtons(game, player));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Please choose your next turn's Path.", ButtonHelper.getPathButtons(game, player));
             return;
         }
         if (game.isFowMode() && !player.isActivePlayer()) {

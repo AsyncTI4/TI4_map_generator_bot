@@ -139,7 +139,6 @@ public class FrankenDraftBagService {
         List<DraftItem> undraftables = new ArrayList<>(player.getCurrentDraftBag().Contents);
         draftables.removeIf(draftItem -> !draftItem.isDraftable(player));
         undraftables.removeIf(draftItem -> draftItem.isDraftable(player));
-
         Set<String> bagStringLines = getCurrentBagRepresentation(draftables, undraftables);
         for (String line : bagStringLines) {
             MessageHelper.sendMessageToChannel(bagChannel, line);
@@ -160,7 +159,7 @@ public class FrankenDraftBagService {
         if (draftables.isEmpty()) {
             MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " you cannot legally draft anything from this bag right now.");
         } else if (!isQueueFull) {
-            MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentationUnfogged() + " please select an item to draft:", getSelectionButtons(draftables, player));
+            MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentationUnfogged() + ", please choose an item to draft:", getSelectionButtons(draftables, player));
         }
 
         if (draftQueueCount > 0) {
@@ -172,7 +171,7 @@ public class FrankenDraftBagService {
             MessageHelper.sendMessageToChannelWithButtons(bagChannel, "# __Queue:__\n> You are drafting the following from this bag:\n" + getDraftQueueRepresentation(player), queueButtons);
 
             if (isQueueFull || draftables.isEmpty()) {
-                MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + " please confirm or reset your draft picks.");
+                MessageHelper.sendMessageToChannel(bagChannel, player.getRepresentationUnfogged() + ", please confirm or reset your draft picks.");
             }
         }
 
@@ -313,7 +312,8 @@ public class FrankenDraftBagService {
     public static void setUpFrankenFactions(Game game, GenericInteractionCreateEvent event, boolean force) {
         List<Player> players = new ArrayList<>(game.getPlayers().values());
         if (game.isFowMode()) {
-            players.removeAll(game.getPlayersWithGMRole());
+            players.removeAll(game.getPlayers().values().stream()
+                .filter(player -> player.getPrivateChannel() == null).toList());
         }
         int index = 1;
         StringBuilder sb = new StringBuilder("Automatically setting players up as Franken factions:");
@@ -326,8 +326,8 @@ public class FrankenDraftBagService {
                 skipped = true;
                 continue;
             }
-            String faction = "franken" + (index <= 16 ? emojiNum.get(index - 1) : index);
-            String tempHomeSystemLocation = String.valueOf(300 + index);
+            String faction = "franken" + (index <= 24 ? emojiNum.get(index - 1) : index);
+            String tempHomeSystemLocation = String.valueOf(500 + index);
             if (!Mapper.isValidFaction(faction) || !PositionMapper.isTilePositionValid(tempHomeSystemLocation)) {
                 continue;
             }

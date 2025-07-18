@@ -30,14 +30,14 @@ public class AllInfoCommand extends GameStateCommand {
 
     @Override
     public String getDescription() {
-        return "Send all available infomation to your #cards-info thread";
+        return "Send all available information to your #cards-info thread";
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
         Player player = getPlayer();
-        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event) + "`";
+        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event) + ".";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         AbilityInfoService.sendAbilityInfo(game, player);
         UnitInfoService.sendUnitInfo(player, false);

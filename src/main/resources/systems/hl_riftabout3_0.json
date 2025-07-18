@@ -23,6 +23,7 @@
     ],
     "wormholes": [],
     "planets": [],
+    "isGravityRift": true,
     "source": "andcat",
     "tileBack": "black"
 }

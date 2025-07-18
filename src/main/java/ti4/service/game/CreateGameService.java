@@ -367,7 +367,9 @@ public class CreateGameService {
             for (Member member : missingMembers) {
                 sb.append("> ").append(member.getAsMention()).append("\n");
             }
-            sb.append("You will be automatically added to the game channels when you join the server. \n\nNote that if for some reason you are not automatically added to the game after joining the server, you can fix this by having one of the other game members run /game ping in the actions channel. ");
+            sb.append("You will be automatically added to the game channels when you join the server."
+                + "\nNote that if for some reason you are not automatically added to the game after joining the server,"
+                + " you can fix this by having one of the other game members run `/game ping` in the actions channel.");
             MessageHelper.sendMessageToChannel(channel, sb.toString());
         }
         return missingMembers;
@@ -555,7 +557,7 @@ public class CreateGameService {
                     return category.getName();
                 }
             } catch (Exception e) {
-                BotLogger.warning("Could not parse integers within category name: " + category.getName(), e);
+                //BotLogger.warning("Could not parse integers within category name: " + category.getName(), e);
             }
         }
 

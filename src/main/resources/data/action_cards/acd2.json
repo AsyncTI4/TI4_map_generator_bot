@@ -120,8 +120,8 @@
         "alias": "chain_reaction",
         "name": "Chain Reaction",
         "phase": "Action",
-        "window": "After you destroy 1 of your opponent's non-fighter ships",
-        "text": "Produce 1 hit against your opponent's ships. Then, roll 1 die. If the result is 8 or greater, produce 1 additional hit and roll again; this ability cannot produce more than 4 hits.",
+        "window": "After you destroy 1 of your opponent's ships",
+        "text": "Roll 2 dice. For each result equal to or greater than that ship's combat value, produce 1 hit that your opponent must assign to 1 of their ships and roll again; this ability cannot produce more than 3 hits.",
         "flavorText": "As Jace tore through the enemy line, his ordnance erupted into a symphony of explosions.",
         "source": "action_deck_2"
     },
@@ -157,7 +157,7 @@
         "name": "Covert Operation",
         "phase": "Action",
         "window": "After you move ships into the active system",
-        "text": "Remove 1 of your ships or ground forces from the game board and place that unit in the space area of the active system.",
+        "text": "Remove 1 of your ships or ground forces from the game board and place that unit in the space area of that system.",
         "flavorText": "Sensors erupted in a cacophony of alerts as an entire fleet of unmarked ships emerged from the void, raining destruction upon the unsuspecting convoy.",
         "source": "action_deck_2"
     },
@@ -612,8 +612,8 @@
         "alias": "outmaneuver1",
         "name": "Outmaneuver",
         "phase": "Action",
-        "window": "When 1 or more hits are produced against your units",
-        "text": "Cancel 1 hit.",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
         "flavorText": "T'esla reflexively flinched away from the danger she sensed. \"All ships commence evasive maneuvers. Zere's flak comin'.\"",
         "source": "action_deck_2"
     },
@@ -621,8 +621,8 @@
         "alias": "outmaneuver2",
         "name": "Outmaneuver",
         "phase": "Action",
-        "window": "When 1 or more hits are produced against your units",
-        "text": "Cancel 1 hit.",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
         "flavorText": "Fortunately, T'esla's warning gave the cruiser's helmsman just enough time to roll the ship to port. \"Zat would've cut us in half,\" he muttered.",
         "source": "action_deck_2"
     },
@@ -630,8 +630,8 @@
         "alias": "outmaneuver3",
         "name": "Outmaneuver",
         "phase": "Action",
-        "window": "When 1 or more hits are produced against your units",
-        "text": "Cancel 1 hit.",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
         "flavorText": "T'esla checked her wingman, relieved to see that he had managed to dodge the flak as well. \"Close in and open fire!\"",
         "source": "action_deck_2"
     },
@@ -639,8 +639,8 @@
         "alias": "outmaneuver4",
         "name": "Outmaneuver",
         "phase": "Action",
-        "window": "When 1 or more hits are produced against your units",
-        "text": "Cancel 1 hit.",
+        "window": "Before a hit is assigned to 1 of your units",
+        "text": "Cancel that hit.",
         "flavorText": "The capital ship's massive cannons were unable to track the brigades of fighters swarming it like insects.",
         "source": "action_deck_2"
     },
@@ -874,7 +874,7 @@
         "name": "Shrapnel Turrets",
         "phase": "Action",
         "window": "At the start of a space combat",
-        "text": "Choose any number of your ships in the active system that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8(x2) during this combat.",
+        "text": "Choose any number of your ships that have a capacity value. Each of those ships gain ANTI-FIGHTER BARRAGE 8(x2) during this combat.",
         "flavorText": "Mendosa grinned widely as he eyed the cargo. \"Ye say we're out of munitions, yet look at all this junk lyin' around. It'll shred 'em fine!\"",
         "source": "action_deck_2"
     },
@@ -1035,7 +1035,7 @@
         "name": "Unexpected Strategy",
         "phase": "Any",
         "window": "When you would place a token from your strategy pool or reinforcements on the game board",
-        "text": "Gain 1 command token instead.",
+        "text": "Gain that token instead.",
         "flavorText": "Jace was perplexed by Ahk-Syl Siven's decision to retreat deeper into Federation territory—until the once-routed fleet rallied into a devastating assault.",
         "source": "action_deck_2"
     },

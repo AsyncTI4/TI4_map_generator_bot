@@ -38,7 +38,7 @@ public class StatusCommand implements ParentCommand {
 
     @Override
     public String getDescription() {
-        return "Status phase";
+        return "Status Phase";
     }
 
     @Override

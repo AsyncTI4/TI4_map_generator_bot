@@ -1,8 +1,9 @@
 package ti4.image;
 
+import javax.imageio.ImageIO;
 import java.io.IOException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -10,6 +11,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.Nullable;
+import ti4.executors.CircuitBreaker;
+import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.DisplayType;
 import ti4.helpers.TimedRunnable;
 import ti4.map.Game;
@@ -18,48 +21,19 @@ import ti4.settings.GlobalSettings;
 
 public class MapRenderPipeline {
 
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
-    private static final MapRenderPipeline instance = new MapRenderPipeline();
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
-    private final BlockingQueue<RenderEvent> gameRenderQueue = new LinkedBlockingQueue<>();
-    private final Thread worker;
-    private boolean running = true;
-
-    private MapRenderPipeline() {
-        worker = new Thread(() -> {
-            while (running || !gameRenderQueue.isEmpty()) {
-                try {
-                    RenderEvent renderEvent = gameRenderQueue.poll(2, TimeUnit.SECONDS);
-                    if (renderEvent != null) {
-                        render(renderEvent);
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                } catch (Exception e) {
-                    BotLogger.error("MapRenderPipeline worker threw an exception.", e);
-                }
-            }
-        });
-    }
-
-    public static void start() {
-        instance.worker.start();
-    }
-
-    public static boolean shutdown() {
-        instance.running = false;
-        try {
-            instance.worker.join(20000);
-            return !instance.worker.isAlive();
-        } catch (InterruptedException e) {
-            BotLogger.error("MapRenderPipeline shutdown interrupted.", e);
-            Thread.currentThread().interrupt();
-            return false;
-        }
+    static {
+        // this seems recommended everywhere I look
+        ImageIO.setUseCache(false);
     }
 
     private static void render(RenderEvent renderEvent) {
+        if (CircuitBreaker.isOpen()) {
+            return;
+        }
         var timedRunnable = new TimedRunnable("Render event task for " + renderEvent.game.getName(),
                 EXECUTION_TIME_SECONDS_WARNING_THRESHOLD,
                 () -> {
@@ -71,11 +45,10 @@ public class MapRenderPipeline {
                         if (renderEvent.uploadToWebsite) {
                             mapGenerator.uploadToWebsite();
                         }
-                    } catch (Exception e) {
-                        BotLogger.error("Render event threw an exception. Game '" + renderEvent.game.getName() + "'", e);
                     }
                 });
-        timedRunnable.run(); // would probably be better to rewrite this with a timeout mechanism
+
+        ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
     private static void uploadToDiscord(MapGenerator mapGenerator, Consumer<FileUpload> callback) {
@@ -108,7 +81,18 @@ public class MapRenderPipeline {
         if (game == null) {
             throw new IllegalArgumentException("game cannot be null in render pipeline");
         }
-        instance.gameRenderQueue.add(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
+        render(new RenderEvent(game, event, displayType, callback, uploadToDiscord, uploadToWebsite));
+    }
+
+    public static boolean shutdown() {
+        EXECUTOR_SERVICE.shutdownNow();
+        try {
+            return EXECUTOR_SERVICE.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            BotLogger.error("MapRenderPipeline shutdown interrupted.", e);
+            Thread.currentThread().interrupt();
+            return false;
+        }
     }
 
     public record RenderEvent(Game game, GenericInteractionCreateEvent event, DisplayType displayType,

@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -16,12 +23,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
@@ -121,10 +129,12 @@ public class MapGenerator implements AutoCloseable {
             scoreTokenSpacing = 30;
 
         // Height of objectives section (=0 when there is 5 or less objectives in the column with most objectives)
-        int stage1PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
-            .filter(Mapper.getPublicObjectivesStage1()::containsKey).toList().size();
-        int stage2PublicObjCount = game.getRevealedPublicObjectives().keySet().stream()
-            .filter(Mapper.getPublicObjectivesStage2()::containsKey).toList().size();
+        int stage1PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
+            .filter(Mapper.getPublicObjectivesStage1()::containsKey)
+            .count();
+        int stage2PublicObjCount = (int) game.getRevealedPublicObjectives().keySet().stream()
+            .filter(Mapper.getPublicObjectivesStage2()::containsKey)
+            .count();
         int otherObjCount = game.getRevealedPublicObjectives().size() - stage1PublicObjCount - stage2PublicObjCount;
         stage1PublicObjCount = game.getPublicObjectives1Peakable().size() + stage1PublicObjCount;
         stage2PublicObjCount = game.getPublicObjectives2Peakable().size() + stage2PublicObjCount;
@@ -404,7 +414,7 @@ public class MapGenerator implements AutoCloseable {
 
         if (debug) debugImageGraphicsTime = StopWatch.createStarted();
         drawImage();
-        mainImageBytes = ImageHelper.writeWebp(mainImage);
+        mainImageBytes = ImageHelper.writeJpg(mainImage);
         if (debug) debugImageGraphicsTime.stop();
     }
 
@@ -1124,9 +1134,9 @@ public class MapGenerator implements AutoCloseable {
                     offBoardHighlighting++;
                 }
             } else if (displayType == DisplayType.empties) {
-                boolean hasStellar = player.hasRelic("stellarconverter") || player.hasRelic("absol_stellarconverter");
+                boolean hasStellar = false; // not working
                 String relicFile = ResourceHelper.getInstance().getGeneralFile("Relic.png");
-                boolean hasHero = player.hasLeaderUnlocked("muaathero") || player.hasLeaderUnlocked("zelianhero");
+                boolean hasHero = false; //was not working
                 String heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/", "Hero.png");
                 if (player.hasLeaderUnlocked("muaathero")) {
                     heroFile = ResourceHelper.getResourceFromFolder("emojis/leaders/pok/Emoji Farm 4/", "MuaatHero.png");

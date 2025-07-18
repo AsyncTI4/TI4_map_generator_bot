@@ -30,10 +30,10 @@ class SecretObjectiveButtonHandler {
 
         try {
             int soIndex = Integer.parseInt(soID);
-            DiscardSecretService.discardSO(player, soIndex, game);
+
             String msg = player.getRepresentation() + " discarded a secret objective.";
             if (game.getRound() == 1 && !game.isFowMode()) {
-                int amountLeftToDiscard = 0;
+                int amountLeftToDiscard = -1;
                 for (Player p2 : game.getRealPlayers()) {
                     if (p2.getSo() > 1) {
                         amountLeftToDiscard++;
@@ -42,6 +42,7 @@ class SecretObjectiveButtonHandler {
                 msg += " (" + amountLeftToDiscard + " players still to discard)";
             }
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
+            DiscardSecretService.discardSO(player, soIndex, game);
 
             if (drawReplacement) {
                 DrawSecretService.drawSO(event, game, player);
@@ -77,12 +78,13 @@ class SecretObjectiveButtonHandler {
                 if (manager.getPlayerDraft(playerID).getFaction().equals("keleresm"))
                     keleres = game.getPlayer(playerID);
             if (keleres != null) {
-                MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), "Keleres is not set up yet!!! " + keleres.getPing() + " the game is waiting for you to set up :)");
+                MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(),
+                    "Keleres is not set up yet!!! " + keleres.getPing() + ", the game is waiting for you to set up :).");
                 return;
             }
         }
         boolean allPlayersSetup = true;
-        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting tech. If you wish to proceed anyways, just press the button again";
+        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting technologies. If you wish to proceed anyways, just press the button again.";
         for (Player p : game.getRealPlayers()) {
             if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
                 message += "\n> " + p.getRepresentation();

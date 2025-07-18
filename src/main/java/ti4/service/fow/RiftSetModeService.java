@@ -52,7 +52,7 @@ import ti4.service.option.FOWOptionService.FOWOption;
  * - When any unit fails rift throw, Cabal eats it
  * - One additional Custom Strategy Card, 9. Sacrifice
  * - One additional agenda, Crucible Reallocation
- *   - Removed from the deck at setup. Can be flipped with a button in every agenda phase.
+ *   - Removed from the deck at setup. Can be flipped with a button in every Agenda Phase.
  * - Custom frontier explore Unstable Rifts (tells player to ping GM to resolve)
  * - /special swap_systems to support RANDOM options
  * - A way to see what _own_ units Cabal has captured (button in Cards Thread)
@@ -146,7 +146,7 @@ public class RiftSetModeService {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, winner, false);
 
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(CRUCIBLE_PN);
-        MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you recieved " + CardEmojis.PN + pnModel.getName());
+        MessageHelper.sendMessageToChannel(winner.getCorrectChannel(), winner.getRepresentation(true, true) + ", you received " + CardEmojis.PN + pnModel.getName() + ".");
     }
 
     public static void resolveExplore(String exploreCardId, Player player, Game game) {
@@ -166,7 +166,7 @@ public class RiftSetModeService {
         if (!isActive(game) || !game.isCustodiansScored()) return;
 
         Tile tile = game.getTileByPosition(game.getActiveSystem());
-        if (tile.getTileModel().isGravityRift() || tile.hasCabalSpaceDockOrGravRiftToken() || tile.isHomeSystem()) {
+        if (tile.getTileModel().isGravityRift() || tile.hasCabalSpaceDockOrGravRiftToken(game) || tile.isHomeSystem()) {
             return;
         }
 
@@ -174,7 +174,7 @@ public class RiftSetModeService {
             AddTokenCommand.addToken(event, tile, "vortex", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A strange Vortex has formed in " + tile.getPosition()
                 + "\n-# " + getGMs(game));
-        } else  if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
+        } else if (RandomHelper.isOneInX(CHANCE_TO_SPAWN_RIFT)) {
             AddTokenCommand.addToken(event, tile, "gravityrift", game);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## A new Gravity Rift has formed in " + tile.getPosition()
                 + "\n-# " + getGMs(game));
@@ -211,7 +211,7 @@ public class RiftSetModeService {
 
         String msg = "T##m% & sp¿c€ ß̶e̷g̷i̵n̸ T0øøø U̴̪̖͒͛͗̏N̸̻̦̜̊͒̈́̄R̵͎̅͆͘Ȧ̵̳̔̚V̴̹̜̽̾̄̓L̶̥̩̎.̷̨͕̻͑̄̓̕.̸̙̏̄̄͜.̷̼̝̲̩̆́̕";
         switch (game.getRound()) {
-            case 1,2 -> {
+            case 1, 2 -> {
                 msg = "Time and space begin to unravel.";
             }
             case 3 -> {
@@ -270,8 +270,8 @@ public class RiftSetModeService {
                 buttonsWithTilesWithShips.add(Buttons.red("rollSacrifice_" + tile.getPosition(), tile.getRepresentationForButtons(), FactionEmojis.Cabal));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), player.getRepresentation(true, true) 
-            + " choose a system to Sacrifice.", buttonsWithTilesWithShips);
+        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), player.getRepresentation(true, true)
+            + " choose a system to **Sacrifice**.", buttonsWithTilesWithShips);
     }
 
     @ButtonHandler("rollSacrifice_")
@@ -308,7 +308,7 @@ public class RiftSetModeService {
                         String msg = RiftUnitsHelper.riftUnit(unitAsyncID + "damaged", tile, game, event, player, null);
                         if (msg.contains("failed")) {
                             sacrificedUnits++;
-                        } 
+                        }
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "A " + ident + msg);
                     }
                     totalUnits -= damagedUnits;
@@ -316,7 +316,7 @@ public class RiftSetModeService {
                         String msg = RiftUnitsHelper.riftUnit(unitAsyncID, tile, game, event, player, null);
                         if (msg.contains("failed")) {
                             sacrificedUnits++;
-                        } 
+                        }
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "A " + ident + msg);
                     }
 
@@ -324,8 +324,8 @@ public class RiftSetModeService {
                 }
             }
         }
-        
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Sacrifice was performed. "
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "**Sacrifice** was performed. "
             + player.getRepresentation() + " gained " + (totalTGsGained == 0 ? "0" : MiscEmojis.tg(totalTGsGained) + " " + player.gainTG(totalTGsGained)) + " trade goods.");
         ButtonHelper.deleteMessage(event);
     }
@@ -335,19 +335,19 @@ public class RiftSetModeService {
 
         Player cabal = getCabalPlayer(game);
         UnitHolder nombox = cabal.getNomboxTile().getSpaceUnitHolder();
-        String sb = player.getRepresentation(true, true) + " is resolving Sacrifce.\n\n" +
+        String sb = player.getRepresentation(true, true) + " is resolving **Sacrifice**.\n\n" +
             "Following units are currently captured: " + nombox.getPlayersUnitListEmojisOnHolder(player) +
             "\nAfter releasing, use Modify Units button or `/add_units` to add up to 2 of those units to systems that contains your space dock.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
 
         List<Button> buttonsToReleaseUnits = new LinkedList<>();
-        for (Map.Entry<String,Integer> unit : nombox.getUnitAsyncIdsOnHolder(player.getColorID()).entrySet()) {
+        for (Map.Entry<String, Integer> unit : nombox.getUnitAsyncIdsOnHolder(player.getColorID()).entrySet()) {
             UnitModel model = player.getUnitFromAsyncID(unit.getKey());
             buttonsToReleaseUnits.add(Buttons.gray("riftsetCabalRelease_" + player.getFaction() + "_" + model.getBaseType(), model.getBaseType(), model.getUnitEmoji()));
         }
         buttonsToReleaseUnits.add(Buttons.red("deleteButtons", "Done"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
-            "Use buttons to release up to 3 of your non-fighter units from the Cabal", buttonsToReleaseUnits);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            "Use buttons to release up to 3 of your non-fighter units from the Cabal.", buttonsToReleaseUnits);
     }
 
     @ButtonHandler("riftsetCabalRelease")

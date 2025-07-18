@@ -74,7 +74,7 @@ public class CustomHyperlaneService {
         if (StringUtils.isBlank(page)) {
             StringBuffer sb = new StringBuffer("### Manage Custom Hyperlanes");
             if (hyperlaneTileButtons.isEmpty()) {
-                sb.append("\nNo HL tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
+                sb.append("\nNo hyperlane tiles found. Use `/map add_tile tile_name:").append(HYPERLANE_TILEID).append("` to add.");
             }
             event.getMessageChannel().sendMessage(sb.toString()).setComponents(buttons).queue();
         } else {
@@ -198,7 +198,7 @@ public class CustomHyperlaneService {
         Map<String, String> customHyperlaneData = game.getCustomHyperlaneData();
         if (StringUtils.isBlank(hyperlaneData)) {
             customHyperlaneData.remove(position);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data removed from " + position);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data removed from " + position + ".");
         } else {
             if (!isValidConnectionMatrix(hyperlaneData)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Data `" + hyperlaneData + "` is invalid.");
@@ -207,7 +207,7 @@ public class CustomHyperlaneService {
 
             hyperlaneData = normalizeMatrix(hyperlaneData); //force two-way connections
             customHyperlaneData.put(position, hyperlaneData);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data `" + hyperlaneData + "` added to " + position);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Hyperlane data `" + hyperlaneData + "` added to " + position + ".");
         }
     }
 

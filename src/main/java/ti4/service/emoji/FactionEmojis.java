@@ -12,7 +12,7 @@ public enum FactionEmojis implements TI4Emoji {
     Arborec, Ghost, Hacan, Jolnar, L1Z1X, Letnev, Mentak, Muaat, Naalu, Nekro, Saar, Sardakk, Sol, Winnu, Xxcha, Yin, Yssaril,
 
     // Prophecy of Kings
-    Argent, Cabal, Empyrean, Mahact, Naaz, Nomad, Titans, Keleres,
+    Argent, Cabal, Empyrean, Mahact, Naaz, Nomad, Titans, Keleres, RedCreuss,
 
     // Discordant Stars
     augers, axis, bentor, celdauri, cheiran, cymiae, dihmohn, edyn, florzen, freesystems, ghemina, //
@@ -32,6 +32,7 @@ public enum FactionEmojis implements TI4Emoji {
     franken_zel_tharr_dominion, franken_zircon_ascendancy, franken_zor_thul_matriarchate, //
 
     // Other (random homebrew)
+    canto, eidolon, mechi, saera, shadows, //Eronous
     Lazax, Neutral, RandomFaction, AdminsFaction, netharii, Drahn, //misc
     Qulane, echoes, enclave, raven, syndicate, terminator; // baldrick
 
@@ -79,6 +80,7 @@ public enum FactionEmojis implements TI4Emoji {
             case "neutral" -> Neutral;
 
             case "keleres", "keleresx", "keleresm", "keleresa" -> Keleres;
+            case "redcreuss", "redghost" -> RedCreuss;
 
             case "augers" -> augers;
             case "axis" -> axis;
@@ -122,6 +124,11 @@ public enum FactionEmojis implements TI4Emoji {
             case "belkosea" -> belkosea;
             case "admins" -> AdminsFaction;
             case "qulane" -> Qulane;
+            case "canto" -> canto;
+            case "eidolon" -> eidolon;
+            case "mechi" -> mechi;
+            case "saera" -> saera;
+            case "shadows" -> shadows;
 
             case "franken1" -> Franken1;
             case "franken2" -> Franken2;

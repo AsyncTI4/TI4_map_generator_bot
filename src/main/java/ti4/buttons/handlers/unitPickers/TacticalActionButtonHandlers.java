@@ -20,6 +20,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.regex.RegexService;
 import ti4.service.tactical.TacticalActionOutputService;
 import ti4.service.tactical.TacticalActionService;
@@ -102,7 +103,7 @@ public class TacticalActionButtonHandlers {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         }
 
-        String message = "Choose a system to move from, or finalize movement.";
+        String message = "Please choose a system to move from, or finalize movement.";
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
         MessageHelper.sendMessageToEventChannelWithButtons(event, message, systemButtons);
         ButtonHelper.deleteMessage(event);
@@ -115,7 +116,7 @@ public class TacticalActionButtonHandlers {
             TacticalActionService.reverseAllUnitMovement(event, game, player);
         }
 
-        String message = "Choosing a different system to activate. Please select the ring of the map that the system you wish to activate is located in.";
+        String message = "Choosing a different system to activate. Please choose the ring of the map that the system you wish to activate is located in.";
         if (!game.isFowMode()) {
             message += " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
         }
@@ -141,6 +142,9 @@ public class TacticalActionButtonHandlers {
         String rx = "concludeMove_" + RegexHelper.posRegex(game);
         RegexService.runMatcher(rx, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            if (tile == null && FOWPlusService.isVoid(game, matcher.group("pos"))) {
+                tile = FOWPlusService.voidTile(matcher.group("pos"));
+            }
             TacticalActionService.finishMovement(event, game, player, tile);
         });
     }

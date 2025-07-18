@@ -24,7 +24,7 @@ import ti4.service.emoji.LeaderEmojis;
 public class LeaderInfoService {
 
     public static void sendLeadersInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendLeadersInfo(game, player);
     }

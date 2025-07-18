@@ -25,6 +25,7 @@ import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperModifyUnits;
 import ti4.helpers.CommandCounterHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
@@ -152,13 +153,13 @@ class AgendaResolveButtonHandler {
                         for (Player playerB : game.getRealPlayers()) {
                             if (playerB.getFleetCC() > 4) {
                                 playerB.setFleetCC(4);
-                                ButtonHelper.checkFleetInEveryTile(playerB, game, event);
+                                ButtonHelper.checkFleetInEveryTile(playerB, game);
                             }
                             if (playerB.hasAbility("imperia")) {
                                 if (playerB.getFleetCC() + playerB.getMahactCC().size() > 4) {
                                     int min = Math.max(0, 4 - playerB.getMahactCC().size());
                                     playerB.setFleetCC(min);
-                                    ButtonHelper.checkFleetInEveryTile(playerB, game, event);
+                                    ButtonHelper.checkFleetInEveryTile(playerB, game);
                                 }
                             }
                         }
@@ -268,7 +269,7 @@ class AgendaResolveButtonHandler {
                                 game.getStoredValue("agendaRepGov") + playerWL.getFaction());
                         }
                         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                            "Will exhaust cultural planets of all players who voted \"Against\" at start of next strategy phase.");
+                            "Will exhaust cultural planets of all players who voted \"Against\" at start of next Strategy Phase.");
                     }
                 }
                 if ("articles_war".equalsIgnoreCase(agID)) {
@@ -375,7 +376,7 @@ class AgendaResolveButtonHandler {
                     player2.setFleetCC(amount);
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                         "Set " + player2.getFactionEmojiOrColor() + " command sheet to 3/" + player2.getFleetCC() + "/2.");
-                    ButtonHelper.checkFleetInEveryTile(player2, game, event);
+                    ButtonHelper.checkFleetInEveryTile(player2, game);
                 }
                 if ("minister_antiquities".equalsIgnoreCase(agID)) {
                     RelicHelper.drawRelicAndNotify(player2, event, game);
@@ -510,7 +511,7 @@ class AgendaResolveButtonHandler {
                         String message = player.getRepresentation() + ", you've lost a command token from your fleet pool.";
                         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                         player.setFleetCC(player.getFleetCC() - 1);
-                        ButtonHelper.checkFleetInEveryTile(player, game, event);
+                        ButtonHelper.checkFleetInEveryTile(player, game);
                     }
                 }
             }
@@ -533,7 +534,7 @@ class AgendaResolveButtonHandler {
                 } else {
                     game.setStoredValue("agendaArmsReduction", "true");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "# Will exhaust all planets with a technology specialty  at the start of next strategy phase.");
+                        "# Will exhaust all planets with a technology specialty  at the start of next Strategy Phase.");
 
                 }
             }
@@ -621,7 +622,7 @@ class AgendaResolveButtonHandler {
                     }
                     game.setStoredValue("agendaConstitution", "true");
                     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                        "# Removed all laws, will exhaust all home planets at the start of next Strategy phase");
+                        "# Removed all laws, will exhaust all home planets at the start of next Strategy Phase.");
                 }
             }
             if ("absol_constitution".equalsIgnoreCase(agID)) {
@@ -835,7 +836,19 @@ class AgendaResolveButtonHandler {
             }
             if ("economic_equality".equalsIgnoreCase(agID)) {
                 int finalTG = "for".equalsIgnoreCase(winner) ? 5 : 0;
+                int maxLoss = 12;
+                List<Player> comrades = new ArrayList<>();
                 for (Player playerB : game.getRealPlayers()) {
+                    if (playerB.getTg() > maxLoss)
+                    {
+                        maxLoss = playerB.getTg();
+                        comrades = new ArrayList<>();
+                        comrades.add(playerB);
+                    }
+                    else if (playerB.getTg() == maxLoss)
+                    {
+                        comrades.add(playerB);
+                    }
                     playerB.setTg(finalTG);
                     if (finalTG > 0) {
                         ButtonHelperAgents.resolveArtunoCheck(playerB, finalTG);
@@ -843,6 +856,16 @@ class AgendaResolveButtonHandler {
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " Set all players' trade goods to " + finalTG + ".");
+                if (!comrades.isEmpty())
+                {
+                    for (Player playerB : comrades)
+                    {
+                        DisasterWatchHelper.sendMessageInDisasterWatch(game,
+                            "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate "
+                            + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
+                    }
+                    DisasterWatchHelper.sendMessageInDisasterWatch(game, MiscEmojis.tg(maxLoss));
+                }
             }
             if ("crisis".equalsIgnoreCase(agID)) {
                 if (!game.isHomebrewSCMode()) {
@@ -857,7 +880,12 @@ class AgendaResolveButtonHandler {
                         }
                         case "5" -> scButtons.add(Buttons.gray("sc_refresh", "Replenish Commodities", MiscEmojis.comm));
                         case "6" -> scButtons.add(Buttons.green("warfareBuild", "Build At Home"));
-                        case "7" -> scButtons.add(Buttons.GET_A_TECH);
+                        case "7" -> {
+                            scButtons.add(Buttons.GET_A_TECH);
+                            if (Helper.getPlayerFromAbility(game, "propogation") != null) {
+                                scButtons.add(Buttons.green("leadershipGenerateCCButtons", "Gain 3 Command Tokens (for Nekro)"));
+                            }
+                        }
                         case "8" -> {
                             PlayStrategyCardService.handleSOQueueing(game, false);
                             scButtons.add(Buttons.gray("sc_draw_so", "Draw Secret Objective", CardEmojis.SecretObjective));
@@ -875,7 +903,7 @@ class AgendaResolveButtonHandler {
             if (voter.hasTech("dskyrog")) {
                 MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to _Indoctrination Team_.");
                 List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
-                MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), "Use buttons to drop 2 infantry on a planet.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), "please use buttons to drop 2 infantry on a planet.", buttons);
             }
         }
         voters.addAll(riders);
@@ -902,9 +930,9 @@ class AgendaResolveButtonHandler {
 
             }
             if (rid.hasTech("dsatokcr") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, rid, "cruiser", true) < 8) {
-                MessageHelper.sendMessageToChannel(rid.getCorrectChannel(), rid.getFactionEmoji() + " gets deploy 1 cruiser to a system that contains their ships.");
+                MessageHelper.sendMessageToChannel(rid.getCorrectChannel(), rid.getFactionEmoji() + " may DEPLOY 1 cruiser to a system that contains their ships.");
                 List<Button> buttons = new ArrayList<>(Helper.getTileWithShipsPlaceUnitButtons(rid, game, "cruiser", "placeOneNDone_skipbuild"));
-                MessageHelper.sendMessageToChannelWithButtons(rid.getCorrectChannel(), "Use buttons to deploy 1 cruiser to a system that contains your ships.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(rid.getCorrectChannel(), "Use buttons to DEPLOY 1 cruiser to a system that contains your ships.", buttons);
             }
             if (game.isFowMode()) {
                 MessageHelper.sendPrivateMessageToPlayer(rid, game, message);
@@ -960,23 +988,33 @@ class AgendaResolveButtonHandler {
             } else {
                 electVoiceOfTheCouncil = Buttons.green("elect_voice_of_the_council", electVoiceText);
                 if (mustElectVoice) {
-                    proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to scoring objectives");
+                    proceedToScoring = Buttons.gray("proceed_to_scoring", "Proceed to Scoring Objectives");
                 } else {
                     String speakerUserID = game.getSpeakerUserID();
                     Player speaker = game.getPlayer(speakerUserID);
                     if (speaker != null) {
                         MessageChannel speakerCardsInfoThread = speaker.getCardsInfoThread();
-                        MessageHelper.sendMessageToChannel(speakerCardsInfoThread, "These are the current votes available for the Voice of the Council vote.");
+                        MessageHelper.sendMessageToChannel(speakerCardsInfoThread, "These are the current votes available for the _Voice of the Council_ vote.");
                         AgendaHelper.listVoteCount(game, speakerCardsInfoThread);
                     }
-                    proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to scoring objectives");
+                    proceedToScoring = Buttons.green("proceed_to_scoring", "Proceed to Scoring Objectives");
                 }
             }
             if (aCount == 3) {
-                voteMessage += " The bot believes this is the 3rd agenda, which in Omega Phase means you might vote on the Voice of the Council.";
-                voteMessage += "\n- If a player currently has the Voice of the Council, the Speaker chooses whether to vote on it this round or not.";
-                voteMessage += "\n- If no player currently has the Voice of the Council, it must be voted on once before proceeding to scoring.";
-                voteMessage += "\nIf this is not actually the third agenda yet, please remember this when that agenda is reached.";
+                String previousElectee = game.getLawsInfo().get(Constants.VOICE_OF_THE_COUNCIL_ID);
+                voteMessage += " The bot believes this is the third agenda, which in Omega Phase means you" 
+                    + (previousElectee == null ? "'ll" : " might") + " vote on the _Voice of the Council_.";
+                if (previousElectee == null)
+                {
+                    voteMessage += " Since no player currently has the _Voice of the Council_, it must be voted on once before proceeding to scoring.";
+                }
+                else
+                {
+                    Player previousPlayer = game.getPlayerFromColorOrFaction(previousElectee);
+                    voteMessage += " Since somebody (specifically, " + previousPlayer.getRepresentationNoPing() 
+                        + ") currently has the _Voice of the Council_, the Speaker chooses whether to vote on it this round or not.";
+                }
+                voteMessage += " If this is not actually the third agenda yet, please remember this when that agenda is reached.";
             }
             buttons.add(electVoiceOfTheCouncil);
             buttons.add(proceedToScoring);

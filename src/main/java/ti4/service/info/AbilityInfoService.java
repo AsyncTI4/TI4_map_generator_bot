@@ -18,7 +18,7 @@ import ti4.model.AbilityModel;
 public class AbilityInfoService {
 
     public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendAbilityInfo(game, player);
     }

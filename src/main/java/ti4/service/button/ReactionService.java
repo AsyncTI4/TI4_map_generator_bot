@@ -19,6 +19,7 @@ import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
+import ti4.service.fow.GMService;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -61,9 +62,17 @@ public class ReactionService {
         if (isNotBlank(additionalMessage)) {
             text += " " + game.getPing() + " " + additionalMessage;
         }
+        text = text.replace("  ", " ");
 
         if (game.isFowMode() && !sendPublic) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, text);
+            if (text.contains("ready for")) {
+                String factionReady = game.getStoredValue("fowStatusDone");
+                if (factionReady == null || !factionReady.contains(player.getFaction())) {
+                    GMService.logPlayerActivity(game, player, player.getRepresentation(true, false) + text);
+                    game.setStoredValue("fowStatusDone", (factionReady == null ? "" : factionReady) + player.getFaction());
+                }
+            }
             return;
         }
 
