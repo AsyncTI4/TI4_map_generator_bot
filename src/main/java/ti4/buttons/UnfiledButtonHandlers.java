@@ -1746,6 +1746,7 @@ public class UnfiledButtonHandlers {
                 String pos = buttonID.split("_")[1];
                 buttonID = buttonID.split("_")[0];
                 tile = game.getTileByPosition(pos);
+                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Produced units in " + tile.getRepresentationForButtons() + ".");
             }
             ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
@@ -1755,10 +1756,13 @@ public class UnfiledButtonHandlers {
                         previousMessage.delete().queue();
                     }
                 });
+
+                int cost = Helper.calculateCostOfProducedUnits(player, game, true);
+                game.setStoredValue("producedUnitCostFor" + player.getFaction(), "" + cost);
                 player.setTotalExpenses(
                     player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, game, true));
                 String message2 = player.getRepresentationUnfogged()
-                    + ", please choose the planets you wish to exhaust.";
+                    + ", please choose the planets you wish to exhaust to pay a cost of " + cost;
                 boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
@@ -1864,6 +1868,7 @@ public class UnfiledButtonHandlers {
                 ButtonHelperFactionSpecific.offerASNButtonsStep1(game, player, buttonID);
             }
             player.resetSpentThings();
+            game.removeStoredValue("producedUnitCostFor" + player.getFaction());
             if (buttonID.contains("lumi7Build")) {
                 if (!game.getStoredValue("lumi7System").isEmpty()) {
                     Tile tile = game.getTileByPosition(game.getStoredValue("lumi7System"));
@@ -1937,6 +1942,7 @@ public class UnfiledButtonHandlers {
                     player = game.getPlayer(game.getActivePlayerID());
                 }
                 ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
+                game.removeStoredValue("producedUnitCostFor" + player.getFaction());
 
                 String message = player.getRepresentationUnfogged()
                     + ", please use the buttons to end turn or do another action.";
@@ -3383,6 +3389,7 @@ public class UnfiledButtonHandlers {
         } else {
             ReactionService.addReaction(event, game, player,
                 "Didn't have any commodities or trade goods to spend, so no action card was drawn.");
+            return;
         }
         String message = hasSchemingAbility
             ? "Spent 1 " + commOrTg + " to draw " + count2

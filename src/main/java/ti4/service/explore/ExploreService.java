@@ -138,9 +138,13 @@ public class ExploreService {
                 } else if (numExplores == 2) {
                     String cardID1 = game.drawExplore(drawColor);
                     String cardID2 = game.drawExplore(drawColor);
+
                     if (cardID1 == null) {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet cannot be explored.");
                         return;
+                    }
+                    if (cardID2.equalsIgnoreCase(cardID1)) {
+                        cardID2 = game.drawExplore(drawColor);
                     }
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "lanefircommander")) {
                         Units.UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
@@ -315,14 +319,14 @@ public class ExploreService {
         MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), messageText, exploreEmbed);
 
         String message = null;
-
+        message = player.getFactionEmoji() + " found a " + exploreModel.getName();
+        if (planetID != null) {
+            message += " on " + Helper.getPlanetRepresentation(planetID, game);
+        }
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-            message = player.getFactionEmoji() + " found a " + exploreModel.getName();
-            if (planetID != null) {
-                message += " on " + Helper.getPlanetRepresentation(planetID, game);
-            }
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " " + message);
 
         if (tile == null) {
             tile = game.getTileFromPlanet(planetID);
