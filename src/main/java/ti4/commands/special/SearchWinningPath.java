@@ -33,9 +33,8 @@ class SearchWinningPath extends Subcommand {
         StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ").append(searchedPath).append("\n");
 
         GamesPage.consumeAllGames(
-            game -> game.getWinner()
-                .map(winner -> hasWinningPath(game, winner, searchedPath))
-                .orElse(false),
+            GameStatisticsFilterer.getGamesFilter(event).and(game ->
+                    game.getWinner().map(winner -> hasWinningPath(game, winner, searchedPath)).orElse(false)),
             game -> {
                 foundGames.add(game.getName());
                 sb.append(formatGame(game)).append("\n");
