@@ -305,6 +305,7 @@ public class AsyncTI4DiscordBot {
                     BotLogger.info("DID NOT FINISH PROCESSING STATISTICS");
                 }
                 CronManager.shutdown(); // will wait for up to an additional 20 seconds
+                GlobalSettings.shutdown();
                 BotLogger.info("SHUTDOWN PROCESS COMPLETE");
                 TimeUnit.SECONDS.sleep(1); // wait for BotLogger
                 jda.shutdown();

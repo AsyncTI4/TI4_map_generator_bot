@@ -6,6 +6,10 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JavaType;
@@ -39,6 +43,10 @@ public class GlobalSettings {
 
     private static Map<String, Object> settings = new HashMap<>();
 
+    private static final ScheduledExecutorService SAVE_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
+    private static final long SAVE_DELAY_SECONDS = 1;
+    private static ScheduledFuture<?> pendingSave;
+
     public static <T> T getSetting(String attr, Class<T> clazz, T def) {
         if (!settings.containsKey(attr))
             return def;
@@ -51,16 +59,44 @@ public class GlobalSettings {
 
     public static <T> void setSetting(String attr, T val) {
         settings.put(attr, val);
-        saveSettings();
+        scheduleSave();
     }
 
-    public static void saveSettings() {
+    private static void saveSettingsSync() {
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
         try {
             writer.writeValue(getFile(), settings);
         } catch (IOException e) {
             BotLogger.error("Error saving Global Settings", e);
+        }
+    }
+
+    public static void saveSettings() {
+        scheduleSave();
+    }
+
+    private static synchronized void scheduleSave() {
+        if (pendingSave != null && !pendingSave.isDone()) {
+            pendingSave.cancel(false);
+        }
+        pendingSave = SAVE_EXECUTOR.schedule(GlobalSettings::saveSettingsSync, SAVE_DELAY_SECONDS, TimeUnit.SECONDS);
+    }
+
+    public static void forceSaveSettings() {
+        saveSettingsSync();
+    }
+
+    public static void shutdown() {
+        forceSaveSettings();
+        SAVE_EXECUTOR.shutdown();
+        try {
+            if (!SAVE_EXECUTOR.awaitTermination(5, TimeUnit.SECONDS)) {
+                SAVE_EXECUTOR.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            SAVE_EXECUTOR.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
