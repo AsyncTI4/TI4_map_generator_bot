@@ -12,7 +12,8 @@ public class Special2Command implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
             new SetupNeutralPlayer(),
-            new GeneratePainBoxMapString()
+            new GeneratePainBoxMapString(),
+            new SearchWinningPath()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
 

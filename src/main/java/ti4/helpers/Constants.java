@@ -231,6 +231,7 @@ public class Constants {
     public static final String STATISTICS_FACTION_GAMES = "faction_games";
     public static final String SEARCH_FOR_GAME = "for_game";
     public static final String SEARCH_MY_TITLES = "my_titles";
+    public static final String SEARCH_WINNING_PATH = "winning_path_games";
 
     public static final String FIX_THE_FRANKENS = "fix_the_frankens";
     public static final String RELOAD_GAME = "reload_game";
@@ -967,6 +968,7 @@ public class Constants {
     public static final String ANON = "anon";
     public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
+    public static final String WINNING_PATH = "winning_path";
     public static final String TEXT_SIZE = "text_size";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
