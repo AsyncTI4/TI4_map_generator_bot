@@ -314,7 +314,23 @@ public class MessageHelper {
         if (message.length() > 2000) {
             message = message.substring(0, 1920) + "\nMessage shortened due to exceeding max char limit. Sorry";
         }
-        event.getHook().editOriginal(message).setComponents(rows).setFiles(files).queue();
+
+        List<ActionRow> primaryRows = rows;
+        if (rows.size() > 5) {
+            primaryRows = rows.subList(0, 5);
+        }
+
+        event.getHook().editOriginal(message).setComponents(primaryRows).setFiles(files).queue();
+
+        if (rows.size() > 5) {
+            List<ActionRow> remaining = rows.subList(5, rows.size());
+            while (!remaining.isEmpty()) {
+                int toIndex = Math.min(5, remaining.size());
+                List<ActionRow> batch = remaining.subList(0, toIndex);
+                event.getHook().sendMessage("").setComponents(batch).queue();
+                remaining = remaining.subList(toIndex, remaining.size());
+            }
+        }
     }
 
     public static void replyToMessage(GenericInteractionCreateEvent event, FileUpload fileUpload, boolean forceShowMap, String messageText, boolean pinMessage) {
