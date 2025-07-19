@@ -52,7 +52,7 @@ class SearchWinningPath extends Subcommand {
     private static boolean hasWinningPath(Game game, Player winner, String searchedPath) {
         return WinningPathHelper.buildWinningPath(game, winner)
             .replaceAll("_", "") // needed due to Support for the Throne being italicized
-            .equalsIgnoreCase(searchedPath);
+            .contains(searchedPath);
     }
 
     private static String formatGame(Game game) {
