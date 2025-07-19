@@ -28,8 +28,4 @@ public class PlayerStatisticsService {
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), "Unknown Statistic: " + statType);
         }
     }
-
-    private String getEventName(PlayerStatTypes statType) {
-        return PlayerStatisticsService.class.getSimpleName() + ":" + statType;
-    }
 }

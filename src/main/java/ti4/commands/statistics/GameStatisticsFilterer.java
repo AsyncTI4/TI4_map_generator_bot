@@ -26,6 +26,8 @@ public class GameStatisticsFilterer {
     public static final String WINNING_FACTION_FILTER = "winning_faction";
     public static final String EXCLUDED_GAME_TYPES_FILTER = "exclude_game_types";
 
+    private static final int MINIMUM_ROUND = 3;
+
     public static List<OptionData> gameStatsFilters() {
         List<OptionData> filters = new ArrayList<>();
         filters.add(new OptionData(OptionType.INTEGER, GameStatisticsFilterer.PLAYER_COUNT_FILTER, "Filter games by player count, e.g. 3-8"));
@@ -60,7 +62,8 @@ public class GameStatisticsFilterer {
             .and(game -> filterOnHomebrew(homebrewFilter, game))
             .and(game -> filterOnHasWinner(hasWinnerFilter, game))
             .and(game -> filterOnWinningFaction(winningFactionFilter, game))
-            .and(GameStatisticsFilterer::filterAbortedGames);
+            .and(GameStatisticsFilterer::filterAbortedGames)
+            .and(GameStatisticsFilterer::filterEarlyRounds);
     }
 
     private static boolean filterOnWinningFaction(String winningFactionFilter, Game game) {
@@ -76,7 +79,8 @@ public class GameStatisticsFilterer {
             .and(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
             .and(game -> filterOnHomebrew(Boolean.FALSE, game))
             .and(game -> filterOnHasWinner(Boolean.TRUE, game))
-            .and(GameStatisticsFilterer::filterAbortedGames);
+            .and(GameStatisticsFilterer::filterAbortedGames)
+            .and(GameStatisticsFilterer::filterEarlyRounds);
     }
 
     private static boolean filterOnFogType(Boolean fogFilter, Game game) {
@@ -125,6 +129,10 @@ public class GameStatisticsFilterer {
 
     private static boolean filterAbortedGames(Game game) {
         return !game.isHasEnded() || game.getWinner().isPresent();
+    }
+
+    private static boolean filterEarlyRounds(Game game) {
+        return game.getRound() >= MINIMUM_ROUND;
     }
 
     private static boolean filterOnHomebrew(Boolean homebrewFilter, Game game) {
