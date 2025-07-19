@@ -172,7 +172,11 @@ class GameUndoService {
     }
 
     public static Game loadUndoForMissingGame(String gameName) {
-        int latestUndoIndex = GameUndoNameService.getSortedUndoNumbers(gameName).getLast();
+        List<Integer> sortedUndoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
+        if (sortedUndoNumbers.isEmpty()) {
+            return null;
+        }
+        int latestUndoIndex = sortedUndoNumbers.getLast();
         File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
         try {
             replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
