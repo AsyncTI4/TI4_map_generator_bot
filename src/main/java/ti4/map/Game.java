@@ -4270,8 +4270,6 @@ public class Game extends GameProperties {
                 .map(Mapper::getLeader)
                 .filter(Objects::nonNull)
                 .anyMatch(leader -> !leader.getSource().isOfficial())
-            || (publicObjectives1 != null && publicObjectives1.size() < 5 && getRound() >= 4)
-            || (publicObjectives2 != null && publicObjectives2.size() < (getRound() - 4))
             || getRealPlayers().stream()
                 .anyMatch(player -> player.getSecretVictoryPoints() > 3
                     && !player.getRelics().contains("obsidian"))
