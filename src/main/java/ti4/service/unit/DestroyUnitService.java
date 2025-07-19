@@ -228,7 +228,7 @@ public class DestroyUnitService {
                     buttons.add(Buttons.red("deleteButtons", "Decline", FactionEmojis.Nekro));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentation()
-                            + " you can produce one of your recently destroyed ships at your home system",
+                            + ", you may produce one of your recently destroyed ships in your home system.",
                         buttons);
                 }
             }
@@ -244,8 +244,8 @@ public class DestroyUnitService {
                         p2.getFactionNameOrColor()));
                 }
                 buttons.add(Buttons.red("deleteButtons", "No one"));
-                String msg = player.getRepresentation() + " tell the bot who killed your " + unit.getTotalRemoved()
-                    + " " + unit.unitKey().getUnitType().getUnitTypeEmoji();
+                String msg = player.getRepresentation() + ", please tell the bot who killed your " + unit.getTotalRemoved()
+                    + " " + unit.unitKey().getUnitType().getUnitTypeEmoji() + ".";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
             } else {
                 Player killer = killers.getFirst();
@@ -258,7 +258,7 @@ public class DestroyUnitService {
                         + unit.getTotalRemoved() +
                         " of " + player.getRepresentationNoPing() + "'s "
                         + unit.unitKey().getUnitType().getUnitTypeEmoji() +
-                        "\nIf this was a mistake, adjust the commodities with /ds set_planet_comms");
+                        "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
             }
         }
     }

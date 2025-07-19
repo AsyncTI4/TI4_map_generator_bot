@@ -1102,7 +1102,7 @@ public class ButtonHelper {
 
             String id = magenPlayer.finChecker() + "useMagenDefense_" + activeSystem.getPosition();
             Button useMagen = Buttons.red(id, "Use Magen Defense Grid", TechEmojis.WarfareTech);
-            String magenMsg = magenPlayer.getRepresentation() + " you can, and must, use __Magen Defense Grid__ to place an infantry with each of your structures in the active system.";
+            String magenMsg = magenPlayer.getRepresentation() + " you can, and must, use _Magen Defense Grid_ to place an infantry with each of your structures in the active system.";
             MessageHelper.sendMessageToChannelWithButton(magenPlayer.getCorrectChannel(), magenMsg, useMagen);
         }
         if (player.hasAbility("void_tap") && (activeSystem.getPlanetUnitHolders().isEmpty() || ButtonHelper.doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {
@@ -2642,7 +2642,7 @@ public class ButtonHelper {
                     String infStr = emoji.repeat(count);
                     if (count > 6) infStr += "(" + count + " total)";
                     if (uh instanceof Space) {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to Space.";
+                        msg += "\n-# > " + emoji.repeat(count) + " added to space.";
                     } else {
                         msg += "\n-# > " + emoji.repeat(count) + " added to " + Helper.getPlanetRepresentation(uh.getName(), game) + ".";
                     }

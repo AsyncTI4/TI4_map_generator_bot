@@ -51,7 +51,7 @@ public class BookOfLatviniaService {
         Player prevSpeaker = game.getSpeaker();
         game.setSpeaker(player);
 
-        String msg = prevSpeaker.getRepresentation() + " the speaker token has been ripped from your grasp by the Book of Latvinia. " + MiscEmojis.SpeakerToken;
+        String msg = prevSpeaker.getRepresentation() + ", the speaker token has been ripped from your grasp by the _Book of Latvinia_. " + MiscEmojis.SpeakerToken;
         MessageHelper.sendMessageToChannel(prevSpeaker.getCorrectChannel(), msg);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you have gained the speaker token. " + MiscEmojis.SpeakerToken);
@@ -65,11 +65,11 @@ public class BookOfLatviniaService {
         String message = null;
         if (id != null) {
             game.scorePublicObjective(player.getUserID(), id);
-            message = player.getRepresentation() + " scored '" + book + "'";
+            message = player.getRepresentation() + " has scored the \"Book of Latvinia\" custom objective.";
         } else {
             id = game.addCustomPO(book, 1);
             game.scorePublicObjective(player.getUserID(), id);
-            message = "Custom PO '" + book + "' has been added.\n" + player.getRepresentation() + " scored '" + book + "'";
+            message = "Custom objective \"Book of Latvinia\" has been added.\n" + player.getRepresentation() + " has scored the \"Book of Latvinia\" custom objective.";
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }

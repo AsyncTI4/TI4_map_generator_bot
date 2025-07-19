@@ -1208,7 +1208,7 @@ public class StartCombatService {
                     String po_name = "Liberate Ordinian";
                     int value = game.getRevealedPublicObjectives().get(po_name);
                     if (game.getRevealedPublicObjectives().get(po_name) != null) {
-                        buttons.add(Buttons.gray(Constants.PO_SCORING + value, "Score " + po_name + " (Win against Nekro)"));
+                        buttons.add(Buttons.gray(Constants.PO_SCORING + value, "Score " + po_name + " (Win Against Nekro)"));
                     }
                 }
             }

@@ -565,7 +565,7 @@ public class ButtonHelperActionCards {
                     totalHits = 0;
                     result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
                     StringBuilder resultBuilder = new StringBuilder(result);
-                    resultBuilder.append("Rolling against " + numOfUnit + " " + key.getUnitType().getUnitTypeEmoji() + " owned by " + key.getColor() + "\n");
+                    resultBuilder.append("Rolling against " + numOfUnit + " " + key.getUnitType().getUnitTypeEmoji() + " owned by " + key.getColor() + ".\n");
                     int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
                     List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                     player.setExpectedHitsTimes10(

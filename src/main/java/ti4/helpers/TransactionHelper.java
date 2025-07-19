@@ -999,7 +999,7 @@ public class TransactionHelper {
                     + " you may only send a player 1 promissory note in each transaction (and you may only perform one transaction with each other player on a turn).");
             }
             case "Technology" -> {
-                String message = "Please choose the technology you wish to send";
+                String message = "Please choose the technology you wish to send.";
                 for (String tech : p1.getTechs()) {
                     if (resolveAgeOfCommerceTechCheck(p1, p2, tech, game)) {
                         Button transact = Buttons.gray(finChecker + "send_Technology_" + p2.getFaction() + "_" + tech,
@@ -1247,7 +1247,8 @@ public class TransactionHelper {
             }
             case "Technology" -> {
                 p2.addTech(amountToTrans);
-                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " you received the technology " + Mapper.getTech(amountToTrans) + " from a transaction");
+                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), 
+                    p2.getRepresentation() + " you received the technology " + Mapper.getTech(amountToTrans) + " from a transaction.");
             }
         }
         Button button = Buttons.gray(finChecker + "transactWith_" + p2.getColor(),

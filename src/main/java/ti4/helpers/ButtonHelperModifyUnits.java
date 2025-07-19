@@ -1323,19 +1323,19 @@ public class ButtonHelperModifyUnits {
                     if (player.hasLeaderUnlocked("redcreusshero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
-                            Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
+                            Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                            "You may place this produced ship on the Red Creuss Hero.",
+                            "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
                             shroadedFleets);
                     }
                     if (player.hasLeaderUnlocked("redcreusshero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
-                            Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
+                            Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                            "You may place this produced ship on the Red Creuss Hero.",
+                            "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
                             shroadedFleets);
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
@@ -1355,7 +1355,7 @@ public class ButtonHelperModifyUnits {
                         List<Button> cloakedFleets = new ArrayList<>();
                         cloakedFleets.add(Buttons.green("cloakedFleets_" + tile.getPosition() + "_" + unitID, "Capture 1 " + StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(unitID))));
                         cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "You may place this produced ship on the Red Creuss Hero.", cloakedFleets);
+                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "You may place this produced ship on the \"A Tall Stranger\", Red Creuss Hero.", cloakedFleets);
                     }
                 }
 
@@ -1467,9 +1467,9 @@ public class ButtonHelperModifyUnits {
                     + " in " + tile.getRepresentationForButtons(game, player) + " using the **Cloaked Fleets** ability (limit of 2 ships may be captured per build).");
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " captured 1 newly produced " + UnitEmojis.getUnitEmoji(name)
-                    + " in " + tile.getRepresentationForButtons(game, player) + " using the Red Creuss Hero ability (note: not strictly a capture)." +
-                    "\nThey will be able to deploy all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
+                player.getRepresentationUnfogged() + " captured\\* 1 newly produced " + UnitEmojis.getUnitEmoji(name)
+                    + " in " + tile.getRepresentationForButtons(game, player) + " using \"A Tall Stranger\", the Red Creuss Hero ability."
+                    + "\nThey will be able to mobilize all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
         }
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unitID);
         event.getMessage().delete().queue();
@@ -1584,7 +1584,7 @@ public class ButtonHelperModifyUnits {
                         shroadedFleets.add(Buttons.green("cloakedFleets_" + tile2.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                            "You may place this produced ship on the Red Creuss Hero.",
+                            "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
                             shroadedFleets);
                     }
                     if (tile2 != null && !willSkipBuild && player.hasAbility("rally_to_the_cause")

@@ -105,7 +105,7 @@ public class ButtonHelperFactionSpecific {
             }
             case "c4redtech_actionCard" -> {
                 List<Button> buttons = ActionCardHelper.getDiscardActionCardButtonsWithSuffix(player, "redraw");
-                String message = "Please choose an action card to discard: (The bot will automatically draw a new one afterwards)";
+                String message = "Please choose an action card to discard (the bot will automatically draw a new one afterwards).";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
             case "c4redtech_repair" -> {
