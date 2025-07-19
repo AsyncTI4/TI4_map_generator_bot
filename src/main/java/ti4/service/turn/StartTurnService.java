@@ -160,11 +160,14 @@ public class StartTurnService {
                 if (!p2.equals(player) && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander") && p2.getCommodities() > 0
                     && player.getNeighbouringPlayers(true).contains(p2)) {
                     List<Button> buttonsRedCreuss = new ArrayList<>();
-                    buttonsRedCreuss.add(Buttons.green("redCreussWash_" + p2.getUserID(), "Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.green("redCreussWashFull_" + p2.getUserID(), "Full Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.blue("redCreussWashPartial_" + p2.getUserID(), "Partial Wash", MiscEmojis.Wash));
                     buttonsRedCreuss.add(Buttons.red("deleteButtons", "Decline"));
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                         player.getRepresentationUnfogged() + ", both you and " + p2.getRepresentationNoPing() + " have commodities."
-                            + " You may use these buttons to wash them, should you both agree.",
+                            + " You may use these buttons to wash them, should you both agree."
+                            + "\n-# \"Partial Wash\" will only swap commodities for an equal number of commodities. \"Full Wash\" will also swap trade goods, to wash as many commodities as possible."
+                            + " If both player have the same number of commodities, the buttons are identical.",
                         buttonsRedCreuss);
                 }
             }
@@ -355,7 +358,7 @@ public class StartTurnService {
                 startButtons.add(Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
             if (game.isOrdinianC1Mode() && !ButtonHelper.isCoatlHealed(game) && player == ButtonHelper.getPlayerWhoControlsCoatl(game)) {
-                startButtons.add(Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6r)", FactionEmojis.Argent));
+                startButtons.add(Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6 Resources)", FactionEmojis.Argent));
             }
             if (player.getTechs().contains("dspharinf") && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game).isEmpty()) {
                 startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
