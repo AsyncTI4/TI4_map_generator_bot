@@ -130,20 +130,20 @@ public class ButtonHelperTacticalAction {
             empyButtons.add(Buttons.gray("exhaustAgent_empyreanagent", "Use Empyrean Agent", FactionEmojis.Empyrean));
             empyButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                player.getRepresentationUnfogged() + " use button to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + "Acamar, the Empyrean" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent",
+                player.getRepresentationUnfogged() + ", use button to exhaust " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "Acamar, the Empyrean" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.",
                 empyButtons);
         }
         if (unitsWereMoved && (tile.getUnitHolders().size() == 1) && player.getPlanets().contains("ghoti")) {
             player.setCommodities(player.getCommodities() + 1);
-            String msg = player.getRepresentation() + " gained 1 commodity due to ghoti planet card. Your commodities are now " + player.getCommodities();
+            String msg = player.getRepresentation() + " gained 1 commodity due to the legendary ability of Ghoti. Your commodities are now " + player.getCommodities() + ".";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         }
         boolean flagshipMoved = game.getTacticalActionDisplacement().values().stream()
             .anyMatch(m -> m.containsKey(Units.getUnitKey(UnitType.Flagship, player.getColor())));
         if (unitsWereMoved && flagshipMoved && player.hasUnit("dihmohn_flagship")) {
-            Button produce = Buttons.blue("dihmohnfs_" + game.getActiveSystem(), "Produce (2) Units");
-            String msg = player.getRepresentation() + " Your Dih-Mohn Flagship moved into the active system, so you can produce 2 units with a combined cost of 4.";
+            Button produce = Buttons.blue("dihmohnfs_" + game.getActiveSystem(), "Produce 2 Units");
+            String msg = player.getRepresentation() + ", the Maximus (Dih-Mohn Flagship) moved into the active system, so you may produce up to 2 units with a combined cost of 4 or less.";
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), msg, produce);
         }
         if (unitsWereMoved) {
@@ -499,16 +499,16 @@ public class ButtonHelperTacticalAction {
         }
 
         if ("Remove".equalsIgnoreCase(moveOrRemove)) {
-            buttons.add(Buttons.gray(finChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAllShips", "Remove all Ships"));
-            buttons.add(Buttons.gray(finChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAll", "Remove all units"));
+            buttons.add(Buttons.gray(finChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAllShips", "Remove All Ships"));
+            buttons.add(Buttons.gray(finChecker + "unitTacticalRemove_" + tile.getPosition() + "_removeAll", "Remove All Units"));
             buttons.add(Buttons.blue(finChecker + "doneRemoving", "Done removing units"));
             return buttons;
         } else {
             if (game.playerHasLeaderUnlockedOrAlliance(player, "tneliscommander") && game.getStoredValue("tnelisCommanderTracker").isEmpty())
                 buttons.add(Buttons.blue("declareUse_Tnelis Commander_" + tile.getPosition(), "Use Tnelis Commander", FactionEmojis.tnelis));
 
-            buttons.add(Buttons.gray(finChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move all units"));
-            buttons.add(Buttons.blue(finChecker + "doneWithOneSystem_" + tile.getPosition(), "Done moving units from this system"));
+            buttons.add(Buttons.gray(finChecker + "unitTacticalMove_" + tile.getPosition() + "_moveAll", "Move All Units"));
+            buttons.add(Buttons.blue(finChecker + "doneWithOneSystem_" + tile.getPosition(), "Done Moving Units From This System"));
         }
 
         Map<String, Map<UnitKey, List<Integer>>> displacedUnits = game.getTacticalActionDisplacement();
@@ -529,7 +529,7 @@ public class ButtonHelperTacticalAction {
             }
         }
         if (!displacedUnits.isEmpty()) {
-            Button validTile2 = Buttons.green(finChecker + "unitTacticalMove_" + tile.getPosition() + "_reverseAll", "Undo all");
+            Button validTile2 = Buttons.green(finChecker + "unitTacticalMove_" + tile.getPosition() + "_reverseAll", "Undo All");
             buttons.add(validTile2);
         }
         return buttons;

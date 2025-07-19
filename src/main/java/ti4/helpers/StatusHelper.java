@@ -132,8 +132,8 @@ public class StatusHelper {
             game.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn Off Forced Scoring Order"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
-                "Players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game   .getPing() +
+                ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
             for (Player player : GetPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
                 game.setStoredValue(key3b, game.getStoredValue(key3b) + player.getFaction() + "*");

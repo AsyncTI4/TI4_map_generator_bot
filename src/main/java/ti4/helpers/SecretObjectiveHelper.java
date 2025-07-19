@@ -292,16 +292,16 @@ public class SecretObjectiveHelper {
     ) {
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
         if (secrets.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No secret objectives to reveal");
+            MessageHelper.sendMessageToEventChannel(event, "No secret objectives to reveal.");
             MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer,
-                otherPlayer.getRepresentationUnfogged() + ", target had no secret objectives to reveal");
+                otherPlayer.getRepresentationUnfogged() + ", target had no secret objectives to reveal.");
             return;
         }
 
         Collections.shuffle(secrets);
         String soID = secrets.getFirst();
 
-        String sb = otherPlayer.getRepresentationUnfogged() + " you were shown the following random Secret Objective:\n"
+        String sb = otherPlayer.getRepresentationUnfogged() + " you have been shown the following random secret objective:\n"
             +
             "> Player: " + player.getColorIfCanSeeStats(otherPlayer) + "\n" +
             "> " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(soID) + "\n";
@@ -309,7 +309,7 @@ public class SecretObjectiveHelper {
         player.setSecret(soID);
 
         MessageHelper.sendMessageToEventChannel(event,
-            "## Random secret objective shown to " + otherPlayer.getColorIfCanSeeStats(player));
+            "Random secret objective shown to " + otherPlayer.getColorIfCanSeeStats(player) + ".");
         SecretObjectiveInfoService.sendSecretObjectiveInfo(game, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(otherPlayer, sb);
     }

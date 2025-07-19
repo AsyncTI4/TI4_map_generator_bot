@@ -249,11 +249,11 @@ public class PlayerStatsService {
     }
 
     public static void setTotalCommodities(GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
+        String message = "> Set base commodity to " + commoditiesTotalCount + MiscEmojis.comm + ".";
         if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
-            MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
+            message = "__Warning__: Total commodity count seems like a wrong value.\n" + message;
         }
         player.setCommoditiesBase(Math.max(0, commoditiesTotalCount));
-        String message = ">  set **Base Commodities** to " + commoditiesTotalCount + MiscEmojis.comm;
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 }

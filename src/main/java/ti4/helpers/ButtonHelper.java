@@ -5989,7 +5989,7 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not have any **Path** tokens.");
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "You have " + player.getPathTokenCounter() + " **Path** tokens.");
+                "You have " + player.getPathTokenCounter() + " **Path** token" + (player.getPathTokenCounter() == 1 ? "" : "s") + ".");
         }
 
     }

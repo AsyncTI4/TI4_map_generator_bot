@@ -2031,7 +2031,7 @@ public class ButtonHelperHeroes {
         game.setStoredValue("toldarHeroObj", obj);
         game.setStoredValue("toldarHeroPlayer", player.getFaction());
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentation() + " successfully attached hero to " + obj);
+            player.getRepresentation() + " successfully attached hero to " + obj + ".");
     }
 
     public static List<Button> getWinnuHeroSCButtons(Game game) {

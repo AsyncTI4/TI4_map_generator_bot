@@ -144,7 +144,7 @@ public class ScorePublicObjectiveService {
             List<String> scoredPlayerList = game.getScoredPublicObjectives().computeIfAbsent(idC, key -> new ArrayList<>());
             if (scoredPlayerList.size() > 1 && Mapper.getPublicObjective(idC) != null) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), 
-                    player.getRepresentation() + " draws 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
+                    player.getRepresentation() + " is drawing 1 action card due to scoring an objective someone else already scored while having the _Reflect_ Honor card.");
                 game.drawActionCard(player.getUserID());
                 ButtonHelper.checkACLimit(game, player);
                 ActionCardHelper.sendActionCardInfo(game, player, event);

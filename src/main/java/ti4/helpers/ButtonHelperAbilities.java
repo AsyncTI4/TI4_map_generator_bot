@@ -193,8 +193,8 @@ public class ButtonHelperAbilities {
         player.setCommodities(player.getCommodities() + 2);
         ButtonHelperAgents.toldarAgentInitiation(game, player, 2);
         ButtonHelperAgents.toldarAgentInitiation(game, p2, 1);
-        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " you gained 1 commodity from " + player.getRepresentationNoPing() + " accepting your bestow ability");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 2 commodities from " + p2.getRepresentationNoPing() + "'s bestow ability");
+        MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " you gained 1 commodity from " + player.getRepresentationNoPing() + " accepting your _Bestow_ Honor ability.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you gained 2 commodities from " + p2.getRepresentationNoPing() + "'s _Bestow_ Honor ability.");
     }
 
     @ButtonHandler("deployFreesystemsMech_")
@@ -208,7 +208,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " paid 1 trade good to DEPLOY a mech to a planet adjacent the system they are resolving **Rally to the Cause** in.");
         buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to deploy a mech to a system adjacent to the rallied system.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to deploy a mech to a system adjacent to the Rally'd system.", buttons);
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1256,8 +1256,8 @@ public class ButtonHelperAbilities {
                 buttons2.add(Buttons.red("deleteButtons", "Decline"));
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2
                     .getRepresentationUnfogged()
-                    + " a player has resolved an _Axis Order_ (" + Mapper.getRelic(order).getName()
-                    + ") and you may use the button to gain the corresponding unit upgrade technology if you pay 6 resources.",
+                    + ", a player has resolved the " + Mapper.getRelic(order).getName()
+                    + " Axis Order, and you may use the button to gain the corresponding unit upgrade technology if you pay 6 resources.",
                     buttons2);
             }
         }
@@ -1354,7 +1354,8 @@ public class ButtonHelperAbilities {
 
     @ButtonHandler("getAxisOrderReturns")
     public static void getAxisOrderReturns(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "You can use these buttons to return an axis order to the deck, normally done because you bought one by mistake", getReturnableAxisOrders(player, game));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+            "You can use these buttons to return an Axis Order to the deck, normally done because you bought one by mistake.", getReturnableAxisOrders(player, game));
     }
 
     @ButtonHandler("buyAxisOrder_")
@@ -1387,12 +1388,11 @@ public class ButtonHelperAbilities {
         p2.removeRelic(relicName);
         if (p2 != player) {
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-                p2.getRepresentationUnfogged() + " your axis order by the name of " + Mapper.getRelic(relicName).getName()
-                    + " was returned to the pile in order to fix a mistake");
+                p2.getRepresentationUnfogged() + ", your " + Mapper.getRelic(relicName).getName() + " Axis Order was returned to the pile (probably to fix some mistake).");
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + " returned " + Mapper.getRelic(relicName).getName()
-                + " in order to fix a mistake");
+            player.getRepresentationUnfogged() + " returned the " + Mapper.getRelic(relicName).getName()
+                + " Axis Order (probably to fix some mistake).");
         ButtonHelper.deleteMessage(event);
     }
 

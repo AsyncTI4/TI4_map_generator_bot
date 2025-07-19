@@ -855,7 +855,7 @@ class AgendaResolveButtonHandler {
                         ButtonHelperAbilities.pillageCheck(playerB, game);
                     }
                 }
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " Set all players' trade goods to " + finalTG + ".");
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + ", all players' trade goods have been set to " + finalTG + ".");
                 if (!comrades.isEmpty())
                 {
                     for (Player playerB : comrades)
