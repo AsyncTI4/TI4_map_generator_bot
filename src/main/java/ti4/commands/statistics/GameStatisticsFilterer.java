@@ -103,7 +103,7 @@ public class GameStatisticsFilterer {
             case "action_deck_2" -> "action_deck_2".equals(game.getAcDeckID());
             case "little_omega" -> game.isLittleOmega();
             case "franken" -> game.isFrankenGame();
-            case "milty_mod" -> game.isMiltyModMode();
+            case "milty_mod" -> isMiltyModGame(game);
             case "red_tape" -> game.isRedTapeMode();
             case "age_of_exploration" -> game.isAgeOfExplorationMode();
             case "minor_factions" -> game.isMinorFactionsMode();
@@ -135,6 +135,13 @@ public class GameStatisticsFilterer {
         return game.isDiscordantStarsMode() ||
             Mapper.getFactionsValues().stream()
                 .filter(faction -> "ds".equals(faction.getSource().name()))
+                .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
+    }
+
+    private static boolean isMiltyModGame(Game game) {
+        return game.isMiltyModMode() ||
+            Mapper.getFactionsValues().stream()
+                .filter(faction -> "miltymod".equals(faction.getSource().name()))
                 .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 
