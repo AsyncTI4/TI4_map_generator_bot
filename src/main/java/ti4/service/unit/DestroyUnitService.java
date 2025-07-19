@@ -266,9 +266,9 @@ public class DestroyUnitService {
     public static void handleSelfAssemblyRoutines(Player player, int min, Game game) {
         if (player.hasTech("sar")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
-                + " you gained " + min + " trade good (" + player.getTg() + "->" + (player.getTg() + min)
+                + " you gained " + min + " trade good" + (min == 1 ? "" : "s") + " (" + player.getTg() + "->" + (player.getTg() + min)
                 + ") from _Self-Assembly Routines_ because of " + min + " of your mechs dying."
-                + " This is not an optional gain" + (min > 1 ? ", and happens 1 trade good at a time" : "") + ".");
+                + " This is a mandatory gain" + (min > 1 ? ", and happens 1 trade good at a time" : "") + ".");
             for (int x = 0; x < min; x++) {
                 player.setTg(player.getTg() + 1);
                 ButtonHelperAbilities.pillageCheck(player, game);

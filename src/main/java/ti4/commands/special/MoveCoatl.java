@@ -19,7 +19,7 @@ import ti4.message.MessageHelper;
 class MoveCoatl extends GameStateSubcommand {
 
     public MoveCoatl() {
-        super(Constants.MOVE_COATL, "Moves the coatl token.", true, true);
+        super(Constants.MOVE_COATL, "Moves the Coatl token.", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name").setRequired(true).setAutoComplete(true));
     }
 
@@ -43,14 +43,14 @@ class MoveCoatl extends GameStateSubcommand {
 
         StringBuilder sb = new StringBuilder(player.getRepresentation());
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        sb.append(" moved the coatl to ").append(tile.getRepresentation());
+        sb.append(" moved the Coatl to ").append(tile.getRepresentation());
         for (Tile tile_ : game.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
                 sb.append(" (from ").append(tile_.getRepresentation()).append(")");
                 break;
             }
         }
-        MessageHelper.sendMessageToEventChannel(event, sb.toString());
+        MessageHelper.sendMessageToEventChannel(event, sb.append(".").toString());
     }
 
 }

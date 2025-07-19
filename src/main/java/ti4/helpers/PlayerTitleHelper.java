@@ -18,7 +18,7 @@ public class PlayerTitleHelper {
 
     public static void offerEveryoneTitlePossibilities(Game game) {
         for (Player player : game.getRealAndEliminatedPlayers()) {
-            String msg = player.getRepresentation() + " you have the opportunity to anonymously bestow one title on someone else in this game."
+            String msg = player.getRepresentation() + ", you have the opportunity to anonymously bestow one title on someone else in this game."
                 + " Titles are just for fun, and have no real significance, but could a nice way to take something away from this game."
                 + " Feel free to not. If you choose to, it's a 2 button process. First select the title, then the player you wish to bestow it upon.";
             List<Button> buttons = new ArrayList<>();
@@ -53,17 +53,19 @@ public class PlayerTitleHelper {
             buttons.add(Buttons.red("bestowTitleStep1_Spice Bringer", "Spice Bringer"));
 
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here (if you don't see them, try exiting discord and reopening it)", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Titles here (if you don't see them, try exiting Discord and reopening it)", buttons);
             var userSettings = UserSettingsManager.get(player.getUserID());
             if (!userSettings.isHasIndicatedStatPreferences()) {
                 buttons = getOptInButtons(game, player);
-                msg = player.getRepresentation() + " congratz on finishing a game of async! Async has a website that collects and displays games and player stats, but we don't want to display your game stats without your permission."
-                    + " You can indicate what you're comfortable with displaying below with the buttons, and once you submit an answer you will not be asked again. However, you can always change"
-                    + " your preferences with the /statisticis opt_in and /statistics opt_out commands.\nIf you want to see what a fully displayed profile looks like, check out this profile: https://www.ti4ultimate.com/community/async/player-profile?playerId=406";
+                msg = player.getRepresentation() + ", congratz on finishing a game of async!"
+                    + " Async has a website that collects and displays games and player stats, but we don't want to display your game stats without your permission."
+                    + " You can indicate what you're comfortable with displaying below with the buttons, and once you submit an answer you will not be asked again."
+                    + " However, you can always change your preferences with the `/statisticis opt_in` and `/statistics opt_out` commands."
+                    + "\nIf you want to see what a fully displayed profile looks like, check out this profile: <https://www.ti4ultimate.com/community/async/player-profile?playerId=406>.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Submit decision with these buttons", buttons);
             } else {
-                msg = "If you have any interest in general or specific player stats in async, feel free to check out this website: https://www.ti4ultimate.com/community/async/";
+                msg = "If you have any interest in general or specific player stats in async, feel free to check out this website: <https://www.ti4ultimate.com/community/async/>.";
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
             }
 
@@ -178,7 +180,7 @@ public class PlayerTitleHelper {
             statisticsOpIn.setShowGames(game.getStoredValue(key).equalsIgnoreCase("yes"));
         }
         WebHelper.sendStatisticsOptIn(statisticsOpIn);
-        String msg = "Successfully logged your decision. Feel free to check out stats at https://www.ti4ultimate.com/community/async/";
+        String msg = "Successfully logged your decision. Feel free to check out stats at <https://www.ti4ultimate.com/community/async/>.";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
         ButtonHelper.deleteMessage(event);
 
@@ -187,7 +189,7 @@ public class PlayerTitleHelper {
     @ButtonHandler(value = "bestowTitleStep1_", save = false)
     public static void resolveBestowTitleStep1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
         String title = buttonID.split("_")[1];
-        String msg = player.getRepresentation() + ", please choose the player you wish to give the title of " + title + ".";
+        String msg = player.getRepresentation() + ", please choose the player you wish to give the title of \"" + title + "\".";
         List<Button> buttons = new ArrayList<>();
         for (Player player2 : game.getRealPlayersNDummies()) {
             if (player2 == player) {
@@ -207,14 +209,14 @@ public class PlayerTitleHelper {
         String title = buttonID.split("_")[1];
         String faction = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
-        String msg = p2.getRepresentation() + " someone has chosen to give you the title of '" + title + "'";
+        String msg = p2.getRepresentation() + ", someone has chosen to give you the title of \"" + title + "\".";
         String titles = game.getStoredValue("TitlesFor" + p2.getUserID());
         if (titles.isEmpty()) {
             game.setStoredValue("TitlesFor" + p2.getUserID(), title);
         } else {
             game.setStoredValue("TitlesFor" + p2.getUserID(), titles + "_" + title);
         }
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Successfully bestowed title");
+        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Successfully bestowed title.");
         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), msg);
         ButtonHelper.deleteMessage(event);
     }

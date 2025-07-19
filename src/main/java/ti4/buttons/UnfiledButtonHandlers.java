@@ -786,10 +786,10 @@ public class UnfiledButtonHandlers {
             if (uH.getTokenList().contains("attachment_facilityresearchlab.png")) {
                 int amountThereNow = game.changeCommsOnPlanet(1, planetName);
 
-                String msg = player.getRepresentation() + " gained 1 trade good on the research lab due to exhausting "
+                String msg = player.getRepresentation() + " gained 1 trade good on the _Research Lab_ due to exhausting "
                     + Helper.getPlanetRepresentation(planetName, game)
-                    + " while it had a _Research Lab_ on it. It now has " + amountThereNow
-                    + " trade goods on it.";
+                    + ". It now has " + amountThereNow
+                    + " trade good" + (amountThereNow == 1 ? "" : "s") + " on it.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }
@@ -3388,13 +3388,13 @@ public class UnfiledButtonHandlers {
             commOrTg = "trade good";
         } else {
             ReactionService.addReaction(event, game, player,
-                "Didn't have any commodities or trade goods to spend, so no action card was drawn.");
+                " didn't have any commodities or trade goods to spend, so no action card was drawn.");
             return;
         }
-        String message = hasSchemingAbility
-            ? "Spent 1 " + commOrTg + " to draw " + count2
+        String message = hasSchemingAbility 
+            ? " spent 1 " + commOrTg + " to draw " + count2
                 + " action card (**Scheming** added 1 action card). Please discard 1 action card from your hand."
-            : "Spent 1 " + commOrTg + " to draw " + count2 + " action card.";
+            : " spent 1 " + commOrTg + " to draw " + count2 + " action card.";
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count2);
             message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";

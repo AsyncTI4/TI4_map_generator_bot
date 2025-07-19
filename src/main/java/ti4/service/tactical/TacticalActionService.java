@@ -246,7 +246,7 @@ public class TacticalActionService {
         if (!game.getTacticalActionDisplacement().isEmpty()) {
             tile = FlipTileService.flipTileIfNeeded(event, tile, game);
             if (tile == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to flip mallice. Please yell at Jazzxhands");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to flip the Wormhole Nexus. Please yell at Jazzxhands");
                 return false;
             }
         }
@@ -268,7 +268,7 @@ public class TacticalActionService {
         if (FOWPlusService.isVoid(game, tile.getPosition())) {
             FOWPlusService.resolveVoidActivation(player, game);
             Button conclude = Buttons.red(player.finChecker() + "doneWithTacticalAction", "Conclude Tactical Action");
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "All units were lost to the void.", conclude);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "All units were lost to The Void.", conclude);
             ButtonHelper.deleteAllButtons(event);
             return;
         }

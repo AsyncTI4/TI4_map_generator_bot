@@ -66,7 +66,7 @@ class Ban extends GameStateSubcommand {
 
         for (String leader : leaderIDs) {
             if (Mapper.getLeader(leader) != null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getLeader(leader).getName());
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getLeader(leader).getName() + ".");
                 game.setStoredValue("bannedLeaders", game.getStoredValue("bannedLeaders") + "finSep" + leader);
             }
         }
@@ -84,7 +84,7 @@ class Ban extends GameStateSubcommand {
         for (String pn : pnIDs) {
             if (Mapper.getPromissoryNote(pn) != null) {
                 game.setStoredValue("bannedPNs", game.getStoredValue("bannedPNs") + "finSep" + pn);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getPromissoryNote(pn).getName());
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getPromissoryNote(pn).getName() + ".");
             }
         }
 
@@ -103,11 +103,11 @@ class Ban extends GameStateSubcommand {
             String type = unit.split("_")[1];
             if (type.equalsIgnoreCase("mech")) {
                 game.setStoredValue("bannedMechs", game.getStoredValue("bannedMechs") + "finSep" + faction);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + faction + " " + type);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + faction + " " + type + ".");
             }
             if (type.equalsIgnoreCase("flagship")) {
                 game.setStoredValue("bannedFSs", game.getStoredValue("bannedFSs") + "finSep" + faction);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + faction + " " + type);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + faction + " " + type + ".");
             }
         }
 
@@ -123,7 +123,7 @@ class Ban extends GameStateSubcommand {
 
         for (String tech : techIDs) {
             game.setStoredValue("bannedTechs", game.getStoredValue("bannedTechs") + "finSep" + tech);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getTech(tech).getName());
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getTech(tech).getName() + ".");
 
         }
 
@@ -138,7 +138,7 @@ class Ban extends GameStateSubcommand {
             Tile tile = new Tile(tileID, "000");
             if (tile.getTileModel() != null) {
                 game.setStoredValue("bannedTiles", game.getStoredValue("bannedTiles") + "finSep" + tile.getTileID());
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + tile.getTileModel().getName());
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + tile.getTileModel().getName() + ".");
             }
         }
 
@@ -152,7 +152,7 @@ class Ban extends GameStateSubcommand {
 
         for (String commodity : commodityIDs) {
             game.setStoredValue("bannedComms", game.getStoredValue("bannedComms") + "finSep" + commodity);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(commodity).getFactionName() + " commodities");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(commodity).getFactionName() + " commodities.");
         }
 
         List<String> fleetIDs = new ArrayList<>();
@@ -165,7 +165,7 @@ class Ban extends GameStateSubcommand {
 
         for (String fleet : fleetIDs) {
             game.setStoredValue("bannedFleets", game.getStoredValue("bannedFleets") + "finSep" + fleet);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting fleet");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting fleet.");
         }
 
         List<String> hsIDs = new ArrayList<>();
@@ -178,7 +178,7 @@ class Ban extends GameStateSubcommand {
 
         for (String hs : hsIDs) {
             game.setStoredValue("bannedHSs", game.getStoredValue("bannedHSs") + "finSep" + hs);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(hs).getFactionName() + " home system");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(hs).getFactionName() + " home system.");
         }
 
         List<String> startingTech = new ArrayList<>();
@@ -191,7 +191,7 @@ class Ban extends GameStateSubcommand {
 
         for (String fleet : startingTech) {
             game.setStoredValue("bannedStartingTechs", game.getStoredValue("bannedStartingTechs") + "finSep" + fleet);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting technology");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully banned " + Mapper.getFaction(fleet).getFactionName() + " starting technology.");
         }
     }
 
