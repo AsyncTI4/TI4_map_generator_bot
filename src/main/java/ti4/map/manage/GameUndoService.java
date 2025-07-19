@@ -174,6 +174,7 @@ class GameUndoService {
     public static Game loadUndoForMissingGame(String gameName) {
         List<Integer> sortedUndoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
         if (sortedUndoNumbers.isEmpty()) {
+            BotLogger.warning("Attempted to load undo for missing game, but one did not exist: " + gameName);
             return null;
         }
         int latestUndoIndex = sortedUndoNumbers.getLast();
