@@ -196,6 +196,13 @@ public class GameStatisticsFilterer {
                 .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 
+    private static boolean isMiltyModGame(Game game) {
+        return game.isMiltyModMode() ||
+            Mapper.getFactionsValues().stream()
+                .filter(faction -> "miltymod".equals(faction.getSource().name()))
+                .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
+    }
+
     private static boolean filterOnVictoryPointGoal(Integer victoryPointGoal, Game game) {
         return victoryPointGoal == null || victoryPointGoal == game.getVp();
     }
