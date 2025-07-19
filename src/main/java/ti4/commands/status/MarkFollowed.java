@@ -22,7 +22,7 @@ class MarkFollowed extends GameStateSubcommand {
         Player player = getPlayer();
         int sc = event.getOption(Constants.SC).getAsInt();
         player.addFollowedSC(sc);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully marked " + 
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully marked " +
             player.getRepresentation() + " as having followed **" + Helper.getSCName(sc, getGame()) + "**.");
     }
 

@@ -507,6 +507,7 @@ public class ButtonHelperAgents {
             ssruuClever = "Clever Clever ";
             ssruuSlash = "/Yssaril";
         }
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Exhausted the " + playerLeader.getLeaderModel().get().getShortName() + " leader.");
 
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";

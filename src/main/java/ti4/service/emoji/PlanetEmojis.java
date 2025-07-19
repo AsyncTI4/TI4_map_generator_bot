@@ -52,7 +52,7 @@ public enum PlanetEmojis implements TI4Emoji {
     Lisis, Velnor, Mellon, Zohbat, //
     Starpoint, NewAlbion, Qucenn, Rarron, //
     Tequran, Torkan, VegaMajor, VegaMinor, //
-    RigelI, RigelII, RigelIII, Abaddon, Ashtroth, Loki, // 
+    RigelI, RigelII, RigelIII, Abaddon, Ashtroth, Loki, //
 
     // DS
     Derbrae, Detic, Domna, Dorvok, Echo, EtirV, Fakrenn, Gwiyun, Inan, Larred, Lliot, Lodran, Mandle, //

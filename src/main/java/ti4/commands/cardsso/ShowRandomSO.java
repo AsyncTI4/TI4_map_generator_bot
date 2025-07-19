@@ -32,7 +32,7 @@ class ShowRandomSO extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "No secret objectives to reveal");
             return;
         }
-        
+
         Player otherPlayer = CommandHelper.getOtherPlayerFromEvent(game, event);
         if (otherPlayer == null) {
             MessageHelper.replyToMessage(event, "Unable to determine who the target player is.");

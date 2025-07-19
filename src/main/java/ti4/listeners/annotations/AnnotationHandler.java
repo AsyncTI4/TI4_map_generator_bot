@@ -196,7 +196,7 @@ public class AnnotationHandler {
      * Find all functions that are tagged with `@handlerClass`, and which take parameters based on `contextClass`.
      * <p>
      * Untagged String parameters are assumed to be `componentID`. Use {@link NamedParam} to tag string parameters for now
-     * 
+     *
      * @param <C> {@link AnnotationHandler#contexts}
      * @param <H> {@link AnnotationHandler#handlers}
      * @param contextClass Which context type to accept parameters based upon

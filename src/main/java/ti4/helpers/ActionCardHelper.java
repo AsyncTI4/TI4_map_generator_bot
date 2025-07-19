@@ -374,7 +374,9 @@ public class ActionCardHelper {
         }
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
-        
+
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played the " + actionCardTitle + " action card.");
+
         if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);
         } else {
@@ -410,7 +412,7 @@ public class ActionCardHelper {
                     + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.", xxchaButtons);
             }
         }
-        MessageEmbed acEmbed = actionCard.getRepresentationEmbed();
+        MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true);
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
         } else {

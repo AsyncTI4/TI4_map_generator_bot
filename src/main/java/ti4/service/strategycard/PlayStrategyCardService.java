@@ -95,6 +95,8 @@ public class PlayStrategyCardService {
             }
         }
 
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played " + Helper.getSCRepresentation(game, scToPlay) + ".");
+
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
         }

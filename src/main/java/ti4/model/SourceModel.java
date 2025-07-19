@@ -12,7 +12,7 @@ import ti4.model.Source.ComponentSource;
 
 @Data
 public class SourceModel implements ModelInterface, EmbeddableModel {
-    
+
     private ComponentSource source; // unique identifiying name
     private String name; // Long fancy name
     private String canal; // Must be "official" or "community", must be non null
@@ -93,7 +93,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     }
 
     /**
-     * 
+     *
      * @return true if field 'Canal' = "Official", false otherwise
      */
     public boolean isCanalOfficial() {

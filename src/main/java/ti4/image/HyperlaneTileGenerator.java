@@ -130,7 +130,7 @@ public class HyperlaneTileGenerator {
     );
 
     private static final Shape ROUNDABOUT = new Ellipse2D.Float(
-          112.5f, 90, 
+          112.5f, 90,
           120, 120
     );
 
@@ -152,7 +152,7 @@ public class HyperlaneTileGenerator {
     private static final Map<String, BufferedImage> HYPERLANE_CACHE = new HashMap<>();
 
     /*
-     * Connection matrix format: 0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0 
+     * Connection matrix format: 0,0,0,1,0,0;0,0,0,0,0,0;0,0,0,0,0,0;1,0,0,0,0,0;0,0,0,0,0,0;0,0,0,0,0,0
      * Generates the hyperlane as roundabout if any connections connect to itself
      */
     public static BufferedImage generateHyperlaneTile(Tile tile, Game game) {
@@ -217,7 +217,7 @@ public class HyperlaneTileGenerator {
         g.setColor(color);
         for (Shape shape : shapes) g.draw(shape);
     }
-    
+
     //If looking for selfConnections, return only those
     private static Set<List<Integer>> getConnectionsFromMatrix(String matrix, boolean selfConnections) {
         Set<List<Integer>> pairs = new HashSet<>();
@@ -319,7 +319,7 @@ public class HyperlaneTileGenerator {
 
     //Connection rules to angles with shape cache
     private static class ConnectionRule {
-        private final Map<List<Integer>, Shape> rotatedCache = new HashMap<>();      
+        private final Map<List<Integer>, Shape> rotatedCache = new HashMap<>();
         private final Map<List<Integer>, Integer> angleMap;
         private final Shape template;
 
@@ -331,7 +331,7 @@ public class HyperlaneTileGenerator {
         public boolean matches(List<Integer> connection) {
             return angleMap.containsKey(connection);
         }
-    
+
         public Shape getShape(List<Integer> connection) {
             return rotatedCache.computeIfAbsent(connection, conn -> {
                 double angleRad = Math.toRadians(angleMap.get(conn));

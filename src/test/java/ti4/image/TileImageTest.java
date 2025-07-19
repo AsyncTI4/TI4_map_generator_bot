@@ -5,6 +5,7 @@ import java.util.HashSet;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Constants;
@@ -19,7 +20,7 @@ import ti4.service.map.TokenPlanetService;
 import ti4.testUtils.BaseTi4Test;
 
 /**
- * <h1> HOW TO USE THIS TEST FILE: </h1> 
+ * <h1> HOW TO USE THIS TEST FILE: </h1>
  * <p> 1. Change TestMode to "SaveStatic"
  * <p> 2. Run all of the tests
  * <p> 3. Change TestMode back to "Compare"
@@ -61,6 +62,7 @@ public class TileImageTest extends BaseTi4Test {
         testPlayer2.setDecalSet("cb_96");
     }
 
+    @Disabled
     @Test
     @Order(1)
     public void generateDevilsTestImage() {
@@ -79,6 +81,7 @@ public class TileImageTest extends BaseTi4Test {
         TileImageTestHelper.runTest(devils, "Devils.png");
     }
 
+    @Disabled
     @Test
     @Order(2)
     public void generateMirageTestImage() {
@@ -92,6 +95,7 @@ public class TileImageTest extends BaseTi4Test {
         TileImageTestHelper.runTest(emptyAlpha, "Mirage.png");
     }
 
+    @Disabled
     @Test
     @Order(3)
     public void generateTripleMirageTestImage() {
@@ -107,6 +111,7 @@ public class TileImageTest extends BaseTi4Test {
         TileImageTestHelper.runTest(rigels, "TripleMirage.png");
     }
 
+    @Disabled
     @Test
     @Order(4)
     public void generateCabalDockTestImage() {

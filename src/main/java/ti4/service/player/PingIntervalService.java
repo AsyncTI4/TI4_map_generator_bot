@@ -15,7 +15,7 @@ public class PingIntervalService {
         }
         settings.setPersonalPingInterval(pingInterval);
         UserSettingsManager.save(settings);
-        
+
         if (event == null) {
             return;
         }

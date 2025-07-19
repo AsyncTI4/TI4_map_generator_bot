@@ -1240,6 +1240,14 @@ public class Helper {
 
         if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
             msg.append("for a total spend of ").append(res).append(" resources.");
+
+            if (!game.getStoredValue("producedUnitCostFor" + player.getFaction()).isEmpty()) {
+                int amount = Integer.parseInt(game.getStoredValue("producedUnitCostFor" + player.getFaction()));
+                msg.append(" (Previous build cost " + amount + " resources).");
+                if (amount > res) {
+                    msg.append("\n### WARNING: Have not spent enough resources yet.");
+                }
+            }
         } else if ("inf".equalsIgnoreCase(resOrInfOrBoth)) {
             msg.append("for a total spend of ").append(inf).append(" influence.");
         } else if ("freelancers".equalsIgnoreCase(resOrInfOrBoth)) {
@@ -1254,6 +1262,7 @@ public class Helper {
         Map<String, Integer> producedUnits = player.getCurrentProducedUnits();
         StringBuilder msg = new StringBuilder();
         List<String> uniquePlaces = new ArrayList<>();
+        Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
         for (String unit : producedUnits.keySet()) {
             String tilePos = unit.split("_")[1];
             String planetOrSpace = unit.split("_")[2];
@@ -1261,10 +1270,11 @@ public class Helper {
                 uniquePlaces.add(tilePos + "_" + planetOrSpace);
             }
         }
+        Tile tile = null;
         for (String uniquePlace : uniquePlaces) {
             String tilePos2 = uniquePlace.split("_")[0];
             String planetOrSpace2 = uniquePlace.split("_")[1];
-            Tile tile = game.getTileByPosition(tilePos2);
+            tile = game.getTileByPosition(tilePos2);
             StringBuilder localPlace = new StringBuilder();
             if (msg.isEmpty()) {
                 localPlace.append(player.getRepresentationNoPing()).append(" is producing units in ").append(tile.getRepresentationForButtons(game, player));
@@ -1297,8 +1307,23 @@ public class Helper {
         if (unitCount <= 1) {
             msg.append("For a cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
         } else {
-            msg.append("Producing a total of ").append(unitCount).append(" unit").append(unitCount == 1 ? "" : "s")
-                .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
+            int productionLimit = 0;
+            if (tile != null && activeSystem != null && tile == activeSystem && Helper.getProductionValue(player, game, tile, false) > 0) {
+                productionLimit = Helper.getProductionValue(player, game, tile, false);
+                boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
+                if (warM) {
+                    productionLimit = productionLimit + 4;
+                }
+                msg.append("Producing a total of ").append(unitCount).append(" units (PRODUCTION limit is " + productionLimit + ")")
+                    .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
+                if (productionLimit < unitCount) {
+                    msg.append("\n### Warning! Exceeding PRODUCTION limit of " + productionLimit + "!");
+                }
+            } else {
+                msg.append("Producing a total of ").append(unitCount).append(" unit").append(unitCount == 1 ? "" : "s")
+                    .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
+            }
+
         }
         return msg.toString();
     }

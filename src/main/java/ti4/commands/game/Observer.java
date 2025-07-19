@@ -95,7 +95,7 @@ class Observer extends Subcommand {
     private void removeObserver(SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
         if (channel == null) return;
         // clear permissions instead of revoking permissions.
-        // This resets the member's perms to the default value, 
+        // This resets the member's perms to the default value,
         //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
         Guild guild = channel.getGuild();
         Member user = guild.getMemberById(userID);
