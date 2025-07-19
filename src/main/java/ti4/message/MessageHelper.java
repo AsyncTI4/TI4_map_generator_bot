@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -371,6 +372,18 @@ public class MessageHelper {
     private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction, List<MessageEmbed> embeds, List<Button> buttons) {
         if (channel == null) {
             return;
+        }
+
+        if (channel instanceof GuildMessageChannel guildChannel) {
+            try {
+                if (!guildChannel.canTalk()) {
+                    BotLogger.warning(guildChannel.getAsMention() + " Bot missing permission to send messages");
+                    return;
+                }
+            } catch (Exception e) {
+                BotLogger.error("Permission check failure for channel: " + guildChannel.getId(), e);
+                return;
+            }
         }
 
         List<MessageEmbed> sanitizedEmbeds;
