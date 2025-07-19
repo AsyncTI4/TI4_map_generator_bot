@@ -68,7 +68,17 @@ class SampleColors extends Subcommand {
             stroke = new BasicStroke(3.0f);
         }
 
-        int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - 6 * DREADWIDTH);
+        int columns = 0;
+        for (String h : hues) {
+            int cnt = (int) Mapper.getColors().stream().filter(c -> c.getHue().equals(h)).count();
+            columns = Math.max(columns, cnt);
+        }
+        if (columns == 0) {
+            MessageHelper.sendMessageToEventChannel(event, "No colours found. Something has probably gone wrong.");
+            return;
+        }
+        int leftBound = Math.max(1, PAGEWIDTH - columns * DREADWIDTH);
+        int left = ThreadLocalRandom.current().nextInt(leftBound);
         int top = ThreadLocalRandom.current().nextInt(PAGEHIGHT - 2 * hues.size() * DREADTEXHIGHT);
         int right = left;
         int bottom = top + 2 * hues.size() * DREADTEXHIGHT;
@@ -122,6 +132,8 @@ class SampleColors extends Subcommand {
             MessageHelper.sendMessageToEventChannel(event, "No colours found. Something has probably gone wrong.");
             return;
         }
+        right = Math.min(right, PAGEWIDTH);
+        bottom = Math.min(bottom, PAGEHIGHT);
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
         String fileNamePrefix = "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : Constants.ALL);
         try (var fileUpload = FileUploadService.createFileUpload(coloursImage, fileNamePrefix)) {
