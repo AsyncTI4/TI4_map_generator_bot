@@ -786,10 +786,10 @@ public class UnfiledButtonHandlers {
             if (uH.getTokenList().contains("attachment_facilityresearchlab.png")) {
                 int amountThereNow = game.changeCommsOnPlanet(1, planetName);
 
-                String msg = player.getRepresentation() + " gained 1 trade good on the research lab due to exhausting "
+                String msg = player.getRepresentation() + " gained 1 trade good on the _Research Lab_ due to exhausting "
                     + Helper.getPlanetRepresentation(planetName, game)
-                    + " while it had a _Research Lab_ on it. It now has " + amountThereNow
-                    + " trade goods on it.";
+                    + ". It now has " + amountThereNow
+                    + " trade good" + (amountThereNow == 1 ? "" : "s") + " on it.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             }
         }

@@ -417,7 +417,7 @@ public class ButtonHelperTacticalAction {
                 String planet = planetUH.getName();
                 if (player.getPlanetsAllianceMode().contains(planetUH.getName())) {
                     String msg10 = player.getRepresentationUnfogged()
-                        + " when you get to the invasion step of the tactical action, you may have an opportunity to use Scavenger Exos on "
+                        + " when you get to the invasion step of the tactical action, you may have an opportunity to use _Scavenger Exos_ on "
                         + Helper.getPlanetRepresentation(planet, game)
                         + ". Only use this on one planet, per the **Plague Reservoir** ability.";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
