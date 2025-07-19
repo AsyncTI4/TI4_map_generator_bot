@@ -52,8 +52,7 @@ public class SearchCommand implements ParentCommand {
         //new SearchGames(),
         new SearchForGame(),
         new SearchMyGames(),
-        new SearchMyTitles(),
-        new SearchWinningPath()
+        new SearchMyTitles()
 
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

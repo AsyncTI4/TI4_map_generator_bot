@@ -1,4 +1,4 @@
-package ti4.commands.search;
+package ti4.commands.special;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,21 +27,18 @@ class SearchWinningPath extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String path = event.getOption(Constants.WINNING_PATH, OptionMapping::getAsString);
+        String searchedPath = event.getOption(Constants.WINNING_PATH, OptionMapping::getAsString);
 
         Set<String> foundGames = new HashSet<>();
-        StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ").append(path).append("\n");
+        StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ").append(searchedPath).append("\n");
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event)
-                .and(game -> game.getWinner()
-                    .map(winner -> WinningPathHelper.buildWinningPath(game, winner).equalsIgnoreCase(path))
-                    .orElse(false)),
+            game -> game.getWinner()
+                .map(winner -> hasWinningPath(game, winner, searchedPath))
+                .orElse(false),
             game -> {
-                if (!foundGames.contains(game.getName())) {
-                    foundGames.add(game.getName());
-                    sb.append(formatGame(game)).append("\n");
-                }
+                foundGames.add(game.getName());
+                sb.append(formatGame(game)).append("\n");
             }
         );
 
@@ -50,6 +47,12 @@ class SearchWinningPath extends Subcommand {
         }
 
         MessageHelper.sendMessageToThread(event.getChannel(), "Winning Path Games", sb.toString());
+    }
+
+    private static boolean hasWinningPath(Game game, Player winner, String searchedPath) {
+        return WinningPathHelper.buildWinningPath(game, winner)
+            .replaceAll("_", "") // needed due to Support for the Throne being italicized
+            .equalsIgnoreCase(searchedPath);
     }
 
     private static String formatGame(Game game) {
