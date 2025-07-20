@@ -407,9 +407,9 @@ public class ExploreService {
                     } else {
                         tile.addToken(tokenFilename, Constants.SPACE);
                         message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
-                        if ("gamma".equalsIgnoreCase(token) && mallice.equals(planetID) && !game.isFowMode()) {
+                        if ("gamma".equalsIgnoreCase(token) && "mallice".equals(planetID) && !game.isFowMode()) {
                             DisasterWatchHelper.sendMessageInDisasterWatch(game, 
-                                player.getRepresentation() + " has explored Mallice in " + game.getName()  ", and discovered the _Gamma Wormhole_.");
+                                player.getRepresentation() + " has explored Mallice in " + game.getName() + ", and discovered the _Gamma Wormhole_.");
                         } 
                     }
 
