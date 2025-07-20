@@ -2453,27 +2453,25 @@ public class Player extends PlayerProperties {
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel faction = getFactionModel();
-        if (faction == null) {
-            StringBuilder title = new StringBuilder();
-            title.append(getFactionEmoji()).append(" ");
-            if (!"null".equals(getDisplayName()))
-                title.append(getDisplayName()).append(" ");
-            title.append("No Faction");
-            eb.setTitle(title.toString());
-            eb.setDescription(ColorEmojis.getColorEmojiWithName(getColor()));
-            eb.setColor(Mapper.getColor(getColor()).primaryColor());
-            eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
-            eb.setFooter("");
-            return eb.build();
-        }
 
         // TITLE
         StringBuilder title = new StringBuilder();
         title.append(getFactionEmoji()).append(" ");
-        if (!"null".equals(getDisplayName()))
+        if (!"null".equals(getDisplayName())) {
             title.append(getDisplayName()).append(" ");
-        title.append(faction.getFactionNameWithSourceEmoji());
+        }
+        if (faction == null) {
+            title.append("No Faction");
+        } else {
+            title.append(faction.getFactionNameWithSourceEmoji());
+        }
         eb.setTitle(title.toString());
+
+        if (faction == null) {
+            eb.setDescription(ColorEmojis.getColorEmojiWithName(getColor()));
+            applyEmbedDefaults(eb);
+            return eb.build();
+        }
 
         // // ICON
         // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
@@ -2535,14 +2533,15 @@ public class Player extends PlayerProperties {
         }
         eb.addField("__Leaders__", sb.toString(), false);
 
-        // Author (Player Avatar)
-        eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
-
-        // FOOTER
-        eb.setFooter("");
-
-        eb.setColor(Mapper.getColor(getColor()).primaryColor());
+        // Add avatar, color and footer
+        applyEmbedDefaults(eb);
         return eb.build();
+    }
+
+    private void applyEmbedDefaults(EmbedBuilder eb) {
+        eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
+        eb.setFooter("");
+        eb.setColor(Mapper.getColor(getColor()).primaryColor());
     }
 
     @JsonIgnore
