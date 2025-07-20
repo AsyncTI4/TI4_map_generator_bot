@@ -1548,7 +1548,21 @@ public class AgendaHelper {
 
     @ButtonHandler("rider_")
     public static void placeRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String[] choiceParams = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.lastIndexOf("_")).split(";");
+        int firstIndex = buttonID.indexOf("_");
+        int lastIndex = buttonID.lastIndexOf("_");
+        if (firstIndex == -1 || lastIndex <= firstIndex) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game),
+                "Could not parse rider info from button id: " + buttonID);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse rider choice.");
+            return;
+        }
+        String[] choiceParams = buttonID.substring(firstIndex + 1, lastIndex).split(";");
+        if (choiceParams.length < 2) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game),
+                "Invalid rider parameters in button id: " + buttonID);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse rider choice.");
+            return;
+        }
         String choice = choiceParams[1];
 
         String rider = buttonID.substring(buttonID.lastIndexOf("_") + 1);
