@@ -1098,7 +1098,7 @@ public class ButtonHelperModifyUnits {
         buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
         if (!damaged && unitModel.getSustainDamage()) {
             id = player.finChecker() + "assignDamage_" + tile.getPosition() + "_" + 1 + "_" + unitName;
-            label = "Sustain " + 1 + " " + unitModel.getBaseType();
+            label = "Sustain 1 " + unitModel.getBaseType();
             buttons.add(Buttons.blue(id, label, unitModel.getUnitEmoji()));
         }
 
