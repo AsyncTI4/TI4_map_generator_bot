@@ -2460,12 +2460,18 @@ public class Player extends PlayerProperties {
         if (!"null".equals(getDisplayName())) {
             title.append(getDisplayName()).append(" ");
         }
-        if (faction != null) {
-            title.append(faction.getFactionNameWithSourceEmoji());
-        } else {
+        if (faction == null) {
             title.append("No Faction");
+        } else {
+            title.append(faction.getFactionNameWithSourceEmoji());
         }
         eb.setTitle(title.toString());
+
+        if (faction == null) {
+            eb.setDescription(ColorEmojis.getColorEmojiWithName(getColor()));
+            applyEmbedDefaults(eb);
+            return eb.build();
+        }
 
         // // ICON
         // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
@@ -2527,14 +2533,15 @@ public class Player extends PlayerProperties {
         }
         eb.addField("__Leaders__", sb.toString(), false);
 
-        // Author (Player Avatar)
-        eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
-
-        // FOOTER
-        eb.setFooter("");
-
-        eb.setColor(Mapper.getColor(getColor()).primaryColor());
+        // Add avatar, color and footer
+        applyEmbedDefaults(eb);
         return eb.build();
+    }
+
+    private void applyEmbedDefaults(EmbedBuilder eb) {
+        eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
+        eb.setFooter("");
+        eb.setColor(Mapper.getColor(getColor()).primaryColor());
     }
 
     @JsonIgnore
