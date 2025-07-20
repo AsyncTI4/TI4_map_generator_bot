@@ -124,7 +124,7 @@ public class EndTurnService {
         if (!game.isFowMode() && !game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()).isEmpty()) {
             for (ThreadChannel summary : game.getActionsChannel().getThreadChannels()) {
                 if (summary.getName().equalsIgnoreCase("Turn Summary")) {
-                    MessageHelper.sendMessageToChannel(summary, mainPlayer.getFactionEmoji() + game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()));
+                    MessageHelper.sendMessageToChannel(summary, "(Turn " + mainPlayer.getInRoundTurnCount() + ") " + mainPlayer.getFactionEmoji() + game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()));
                     game.removeStoredValue("currentActionSummary" + mainPlayer.getFaction());
                 }
             }
