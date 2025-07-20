@@ -2453,6 +2453,19 @@ public class Player extends PlayerProperties {
     public MessageEmbed getRepresentationEmbed() {
         EmbedBuilder eb = new EmbedBuilder();
         FactionModel faction = getFactionModel();
+        if (faction == null) {
+            StringBuilder title = new StringBuilder();
+            title.append(getFactionEmoji()).append(" ");
+            if (!"null".equals(getDisplayName()))
+                title.append(getDisplayName()).append(" ");
+            title.append("No Faction");
+            eb.setTitle(title.toString());
+            eb.setDescription(ColorEmojis.getColorEmojiWithName(getColor()));
+            eb.setColor(Mapper.getColor(getColor()).primaryColor());
+            eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
+            eb.setFooter("");
+            return eb.build();
+        }
 
         // TITLE
         StringBuilder title = new StringBuilder();
