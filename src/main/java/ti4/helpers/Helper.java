@@ -1314,6 +1314,9 @@ public class Helper {
                 if (warM) {
                     productionLimit = productionLimit + 4;
                 }
+                if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+                    productionLimit = productionLimit + 2;
+                }
                 msg.append("Producing a total of ").append(unitCount).append(" units (PRODUCTION limit is " + productionLimit + ")")
                     .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
                 if (productionLimit < unitCount) {
