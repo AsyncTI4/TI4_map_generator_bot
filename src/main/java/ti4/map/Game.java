@@ -429,69 +429,96 @@ public class Game extends GameProperties {
     public Optional<Player> getWinner() {
         Player winner = null;
         for (Player player : getRealPlayersNDummies()) {
-            if (player.getTotalVictoryPoints() >= getVp()) {
-                if (isLiberationC4Mode()) {
-                    if (!player.getAllianceMembers().isEmpty()) {
-                        Player ally = null;
-                        for (Player p2 : getRealPlayersNDummies()) {
-                            if (p2 != player && p2.getAllianceMembers().contains(player.getFaction())) {
-                                ally = p2;
-                            }
-                        }
-                        boolean allyGood = ally != null && ally.getTotalVictoryPoints() >= getVp() && (player.getTotalVictoryPoints() > 11 || ally.getTotalVictoryPoints() > 11);
-                        if (!allyGood) {
-                            continue;
-                        }
-                    }
-                }
-                if (winner == null) {
-                    winner = player;
-                } else if (hasFullPriorityTrackMode()) {
-                    if (player.hasPriorityPosition() && !winner.hasPriorityPosition()) {
-                        winner = player;
-                    } else if (player.hasPriorityPosition() && winner.hasPriorityPosition()) {
-                        winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
-                    }
-                } else if (isNotEmpty(player.getSCs()) && isNotEmpty(winner.getSCs())) {
-                    winner = getLowestInitiativePlayer(player, winner);
-                } else {
-                    return Optional.empty();
-                }
+            if (!meetsVictoryRequirement(player)) {
+                continue;
             }
-        }
-        if (winner == null && isOmegaPhaseMode() && revealedPublicObjectives.containsKey(Constants.IMPERIUM_REX_ID)) {
-            // If no winner was found, but Imperium Rex is revealed, the player with the most VP wins (Priority Track is tie-breaker)
-            for (Player player : getRealPlayersNDummies()) {
-                if (player == null || !player.hasPriorityPosition())
-                    continue;
+            if (winner == null) {
+                winner = player;
+                continue;
+            }
 
-                if (winner == null) {
-                    winner = player;
-                } else if (player.getTotalVictoryPoints() > winner.getTotalVictoryPoints()) {
-                    winner = player;
-                } else if (player.getTotalVictoryPoints() == winner.getTotalVictoryPoints()) {
-                    winner = player.getPriorityPosition() < winner.getPriorityPosition() ? player : winner;
-                }
+            Player candidate = compareWinners(player, winner);
+            if (candidate == null) {
+                return Optional.empty();
             }
+            winner = candidate;
+        }
+
+        if (winner == null && isOmegaPhaseMode() && revealedPublicObjectives.containsKey(Constants.IMPERIUM_REX_ID)) {
+            winner = getOmegaPhaseWinner().orElse(null);
         }
         return Optional.ofNullable(winner);
     }
 
     @JsonIgnore
     public List<Player> getWinners() {
-        List<Player> winners = new ArrayList<>();
-        Player winner = getWinner().orElse(null);
-        if (winner != null) {
-            winners.add(winner);
-            if (winner.getAllianceMembers() != null) {
-                for (Player player : getRealPlayers()) {
-                    if (player.getAllianceMembers() != null && player.getAllianceMembers().contains(winner.getFaction())) {
-                        winners.add(player);
-                    }
-                }
-            }
+        Optional<Player> winnerOptional = getWinner();
+        if (winnerOptional.isEmpty()) {
+            return Collections.emptyList();
         }
+
+        Player winner = winnerOptional.get();
+        List<Player> winners = new ArrayList<>();
+        winners.add(winner);
+
+        if (winner.getAllianceMembers() != null) {
+            String faction = winner.getFaction();
+            getRealPlayers().stream()
+                .filter(p -> p.getAllianceMembers() != null && p.getAllianceMembers().contains(faction))
+                .forEach(winners::add);
+        }
+
         return winners;
+    }
+
+    private boolean meetsVictoryRequirement(Player player) {
+        if (player.getTotalVictoryPoints() < getVp()) {
+            return false;
+        }
+
+        if (!isLiberationC4Mode()) {
+            return true;
+        }
+
+        if (player.getAllianceMembers().isEmpty()) {
+            return false;
+        }
+
+        Player ally = getRealPlayersNDummies().stream()
+            .filter(p -> p != player && p.getAllianceMembers().contains(player.getFaction()))
+            .findFirst()
+            .orElse(null);
+
+        return ally != null
+            && ally.getTotalVictoryPoints() >= getVp()
+            && (player.getTotalVictoryPoints() > 11 || ally.getTotalVictoryPoints() > 11);
+    }
+
+    private Player compareWinners(Player contender, Player current) {
+        if (hasFullPriorityTrackMode()) {
+            if (contender.hasPriorityPosition() && !current.hasPriorityPosition()) {
+                return contender;
+            }
+            if (contender.hasPriorityPosition() && current.hasPriorityPosition()) {
+                return contender.getPriorityPosition() < current.getPriorityPosition() ? contender : current;
+            }
+            return current;
+        }
+        if (isNotEmpty(contender.getSCs()) && isNotEmpty(current.getSCs())) {
+            return getLowestInitiativePlayer(contender, current);
+        }
+        return null; // not enough info to break tie
+    }
+
+    private Optional<Player> getOmegaPhaseWinner() {
+        return getRealPlayersNDummies().stream()
+            .filter(Player::hasPriorityPosition)
+            .reduce((p1, p2) -> {
+                if (p1.getTotalVictoryPoints() != p2.getTotalVictoryPoints()) {
+                    return p1.getTotalVictoryPoints() > p2.getTotalVictoryPoints() ? p1 : p2;
+                }
+                return p1.getPriorityPosition() < p2.getPriorityPosition() ? p1 : p2;
+            });
     }
 
     private static Player getLowestInitiativePlayer(Player player1, Player player2) {
@@ -4035,7 +4062,6 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Tile getMecatolTile() {
-
         if (isOrdinianC1Mode()) {
             return ButtonHelper.getTileWithCoatl(this);
         }
@@ -4244,6 +4270,7 @@ public class Game extends GameProperties {
             || isTotalWarMode()
             || isAgeOfCommerceMode()
             || isMinorFactionsMode()
+            || isLiberationC4Mode()
             || isFacilitiesMode()
             || isLightFogMode()
             || isRedTapeMode()
