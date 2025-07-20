@@ -266,7 +266,8 @@ public class AddPlanetService {
                 game.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
 
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Established control of " + Helper.getPlanetRepresentation(planet, game) + ".");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), 
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " established control of " + Helper.getPlanetRepresentation(planet, game) + ".");
         if ((game.getPhaseOfGame().contains("agenda")
             || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
             && player.hasAbility("scavenge") && !doubleCheck && !setup) {
@@ -315,7 +316,7 @@ public class AddPlanetService {
             UnitKey infKey = Mapper.getUnitKey("gf", player.getColor());
             tile.getUnitHolders().get(planet).addUnit(infKey, 1);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Added 1 infantry to " + planet + " because of the Enslave Ability.");
+                "Added 1 infantry to " + planet + " due to **Enslave**.");
         }
 
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))

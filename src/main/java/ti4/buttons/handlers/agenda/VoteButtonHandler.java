@@ -81,7 +81,7 @@ public class VoteButtonHandler {
                 voteMessage = player.getRepresentation() + " is up to vote."
                     + " Since there are too many planets in the game to represent all as buttons,"
                     + " please use the buttons to choose the player who controls the planet you wish to vote for."
-                    + " You will then be given a list of their planets to vote fore.";
+                    + " You will then be given a list of their planets to vote for.";
                 outcomeActionRow = getPlayerOutcomeButtons(game, null, "planetOutcomes",
                     null);
             } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
