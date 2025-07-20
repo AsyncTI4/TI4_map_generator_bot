@@ -4062,7 +4062,6 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public Tile getMecatolTile() {
-
         if (isOrdinianC1Mode()) {
             return ButtonHelper.getTileWithCoatl(this);
         }
@@ -4271,6 +4270,7 @@ public class Game extends GameProperties {
             || isTotalWarMode()
             || isAgeOfCommerceMode()
             || isMinorFactionsMode()
+            || isLiberationC4Mode()
             || isFacilitiesMode()
             || isLightFogMode()
             || isRedTapeMode()
