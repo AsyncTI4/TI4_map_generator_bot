@@ -1743,7 +1743,7 @@ public class Helper {
             }
             if (playerHasWarMachine(player)) {
                 ActionCardHelper.sendActionCardInfo(game, player, event);
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + " Reminder that you have _War Machine_ and this is the window for it.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentation() + ", a reminder that you have _War Machine_, and this is the window for it.");
             }
         }
         for (UnitHolder unitHolder : unitHolders.values()) {

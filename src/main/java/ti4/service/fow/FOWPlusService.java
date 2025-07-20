@@ -175,7 +175,7 @@ public class FOWPlusService {
         }
 
         String message = player.getRepresentationUnfoggedNoPing() + " lost " + valueOfUnitsLost + " resources ";
-        message += unitEmojis + " to The Void round " + game.getRound() + " turn " + player.getInRoundTurnCount();
+        message += unitEmojis + " to The Void round " + game.getRound() + " turn " + player.getInRoundTurnCount() + ".";
         GMService.logPlayerActivity(game, player, message, null, true);
         game.getTacticalActionDisplacement().clear();
     }

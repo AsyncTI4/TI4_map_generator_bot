@@ -22,7 +22,7 @@ class WinningPathsStatisticsService {
         Map<String, Integer> winningPathCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null),
             game -> getWinningPath(game, winningPathCount)
         );
 

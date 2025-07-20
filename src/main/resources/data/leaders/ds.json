@@ -928,7 +928,7 @@
         "title": "Polemarch",
         "abilityName": "Contingency Plan - Biomass Event",
         "abilityWindow": "ACTION:",
-        "abilityText": "Gather units from your reinforcements equal to your starting units, (or as many as are available. You can also gather less units if you want). Place these units, in any combination, in the space area of any systems that contain 1 of your structures and no other players' ships, or on planets you control. Then, purge this card.",
+        "abilityText": "Gather units from your reinforcements up to equal to your starting units. Place these units, in any combination, in the space area of any systems that contain 1 of your structures and no other players' ships, or on planets you control. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "ds"
     },

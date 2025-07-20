@@ -501,7 +501,7 @@ public class StartCombatService {
             }
             if (game.isOrdinianC1Mode() && (tile.getSpaceUnitHolder().getTokenList().contains("token_custc1.png") || tile.getSpaceUnitHolder().getTokenList().contains("token_custvpc1.png"))) {
                 MessageHelper.sendMessageToChannel(threadChannel, "Reminder that you cannot use SPACE CANNON against ships in this system "
-                    + " due to the ability of the Coatl (the Argent flagship represented as the custodians token).");
+                    + " due to the ability of the Coatl (the Argent flagship represented as the Custodians token).");
             }
         }
     }

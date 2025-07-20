@@ -95,7 +95,7 @@ public class OtherHeroButtonHandler {
             buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "pharadnHeroCommit_" + planet + "_" + x, "Commit " + x + " Infantry"));
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getFactionEmoji() + " you chose to use the Pharadn Hero on " + Mapper.getPlanet(planet).getAutoCompleteName() + ". Decide whether to destroy all infantry or commit infantry.", buttons);
+            player.getFactionEmoji() + ", you've chosen to use Pharad'n the Immortal on " + Mapper.getPlanet(planet).getAutoCompleteName() + ". Decide whether to destroy all infantry or commit infantry.", buttons);
 
         Leader playerLeader = player.unsafeGetLeader("pharadnhero");
         StringBuilder message = new StringBuilder(player.getRepresentation()).append(" played ")
