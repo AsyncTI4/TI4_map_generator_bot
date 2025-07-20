@@ -232,6 +232,9 @@ public class TacticalActionOutputService {
 
     public int getUnitMoveValue(Game game, Player player, Tile tile, UnitKey unit, boolean skipBonus) {
         UnitModel model = player.getUnitFromUnitKey(unit);
+        if (model == null) {
+            return 0;
+        }
 
         boolean movingFromHome = tile == player.getHomeSystemTile();
         boolean tileHasWormhole = FoWHelper.doesTileHaveAlphaOrBeta(game, tile.getPosition());
