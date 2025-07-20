@@ -540,8 +540,11 @@ public class Tile {
             for (UnitKey unit : unitHolder.getUnitKeys()) {
                 if (unit.getUnitType() == UnitType.Spacedock && game != null) {
                     Player player = game.getPlayerFromColorOrFaction(unit.getColor());
-                    if (player != null && player.getUnitFromUnitKey(unit).getId().contains("cabal_spacedock")) {
-                        return true;
+                    if (player != null) {
+                        UnitModel model = player.getUnitFromUnitKey(unit);
+                        if (model != null && model.getId().contains("cabal_spacedock")) {
+                            return true;
+                        }
                     }
                 }
             }
