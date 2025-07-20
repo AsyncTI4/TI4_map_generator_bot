@@ -172,12 +172,14 @@ public class RelicHelper {
                         name = poID;
                     }
                 }
-                String msg = player.getRepresentation() + " you have the opportunity to use the Neuraloop relic to replace the objective " + name +
-                    " with a random objective from the stage 1s/stage 2s/secret objective decks. Doing so will cause you to purge one of your relics. Use buttons to decide.";
+                String msg = player.getRepresentation() + " you have the opportunity to use the _Neuraloop_ relic to replace the objective " + name
+                    + " with a random objective from __any__ of the objective decks. Doing so will cause you to purge one of your relics."
+                    + " Use buttons to decide which objective deck, if any, you wish to draw the new objective from..";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";stage1", "Replace with Stage 1", CardEmojis.Public1));
                 buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";stage2", "Replace with Stage 2", CardEmojis.Public2));
                 buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";secret", "Replace with Secret Objective", CardEmojis.SecretObjective));
+                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
             }
         }

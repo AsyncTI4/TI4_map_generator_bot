@@ -24,7 +24,7 @@ public class AbilityInfoService {
     }
 
     public static void sendAbilityInfo(Game game, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "_ _\n__**Abilities:**__", getAbilityMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Abilities:__", getAbilityMessageEmbeds(player));
     }
 
     private static List<MessageEmbed> getAbilityMessageEmbeds(Player player) {

@@ -507,7 +507,8 @@ public class ButtonHelperAgents {
             ssruuClever = "Clever Clever ";
             ssruuSlash = "/Yssaril";
         }
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Exhausted the " + playerLeader.getLeaderModel().get().getShortName() + " leader.");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), 
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " exhausted the " + playerLeader.getLeaderModel().get().getShortName() + " leader.");
 
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
@@ -741,7 +742,7 @@ public class ButtonHelperAgents {
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + " the Red Creuss " + ssruuSlash + " agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "\"Who Knows?\", the Red Creuss " + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("redcreussagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);

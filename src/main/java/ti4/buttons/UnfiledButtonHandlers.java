@@ -1342,7 +1342,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler(value = "get_so_discard_buttons", save = false)
     public static void getSODiscardButtons(ButtonInteractionEvent event, Player player, Game game) {
-        String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
+        String secretScoreMsg = "Click a button below to discard your secret objective.";
         List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
         if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
@@ -1746,7 +1746,7 @@ public class UnfiledButtonHandlers {
                 String pos = buttonID.split("_")[1];
                 buttonID = buttonID.split("_")[0];
                 tile = game.getTileByPosition(pos);
-                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Produced units in " + tile.getRepresentationForButtons() + ".");
+                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " produced units in " + tile.getRepresentationForButtons() + ".");
             }
             ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
@@ -1762,7 +1762,7 @@ public class UnfiledButtonHandlers {
                 player.setTotalExpenses(
                     player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, game, true));
                 String message2 = player.getRepresentationUnfogged()
-                    + ", please choose the planets you wish to exhaust to pay a cost of " + cost;
+                    + ", please choose the planets you wish to exhaust to pay a cost of " + cost + ".";
                 boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
@@ -2449,7 +2449,8 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("exploreAPlanet")
     public static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " Use buttons to explore", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
+            player.getRepresentation() + ", please use these buttons to explore.", buttons);
     }
 
     @ButtonHandler("doAnotherAction")

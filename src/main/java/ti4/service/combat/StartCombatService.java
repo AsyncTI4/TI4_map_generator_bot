@@ -126,12 +126,14 @@ public class StartCombatService {
             }
             createSpectatorThread(game, player3, threadName, tile, event, "space");
         }
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a space combat in " + tile.getRepresentationForButtons() + " against " + player2.getFactionEmoji() + ".");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), 
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " had a space combat in " + tile.getRepresentationForButtons() + " against " + player2.getFactionEmoji() + ".");
     }
 
     public static void startGroundCombat(Player player, Player player2, Game game, GenericInteractionCreateEvent event, UnitHolder unitHolder, Tile tile) {
         String threadName = combatThreadName(game, player, player2, tile, null);
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a ground combat on " + Helper.getPlanetRepresentation(unitHolder.getName(), game) + " against " + player2.getFactionEmoji() + ".");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), 
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " had a ground combat on " + Helper.getPlanetRepresentation(unitHolder.getName(), game) + " against " + player2.getFactionEmoji() + ".");
         if (!game.isFowMode()) {
             findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
                 threadName, tile, event, "ground", unitHolder.getName());
@@ -379,8 +381,8 @@ public class StartCombatService {
                     }
                     if (player.hasTech("md") && player.getPlanetsAllianceMode().contains(unitHolderName)) {
                         if (uH.getUnitCount(UnitType.Pds, player) > 0 || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
-                            MessageHelper.sendMessageToChannel(threadChannel,
-                                player.getRepresentation() + " reminder to use magen defence grid (button should be above, but it and pds fire are not part of automated ground combat)");
+                            MessageHelper.sendMessageToChannel(threadChannel, player.getRepresentation() 
+                                + ", a reminder to use _Magen Defense Grid_. The button should be above, but it (and SPACE CANNON) are not part of automated ground combat.");
                         }
                     }
                 }
@@ -1208,7 +1210,7 @@ public class StartCombatService {
                     String po_name = "Liberate Ordinian";
                     int value = game.getRevealedPublicObjectives().get(po_name);
                     if (game.getRevealedPublicObjectives().get(po_name) != null) {
-                        buttons.add(Buttons.gray(Constants.PO_SCORING + value, "Score " + po_name + " (Win against Nekro)"));
+                        buttons.add(Buttons.gray(Constants.PO_SCORING + value, "Score " + po_name + " (Win Against Nekro)"));
                     }
                 }
             }
@@ -1296,7 +1298,7 @@ public class StartCombatService {
                     // Magen
                     if (p.hasTech("md") && isGroundCombat && (unitH.getUnitCount(Units.UnitType.Spacedock, p.getColor()) > 0 || unitH.getUnitCount(Units.UnitType.Pds, p.getColor()) > 0)) {
                         String id = p.finChecker() + "magenHit_" + unitH.getName();
-                        String label = "Use Magen Defence Grid on " + nameOfHolder;
+                        String label = "Use Magen Defense Grid on " + nameOfHolder;
                         buttons.add(Buttons.gray(id, label, TechEmojis.WarfareTech));
                     }
                     // Letnev Mech

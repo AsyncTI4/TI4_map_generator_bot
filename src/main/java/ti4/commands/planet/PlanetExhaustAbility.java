@@ -84,7 +84,7 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             }
             case "ordinianc4" -> {
                 ActionCardHelper.drawActionCards(game, player, 1, true);
-                String msg = "Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain 1 command token.:";
+                String msg = "Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, ButtonHelper.getGainCCButtons(player));
             }
 

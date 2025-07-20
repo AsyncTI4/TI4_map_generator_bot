@@ -30,7 +30,7 @@ public class PassService {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Passed.");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " passed.");
 
         String text = player.getRepresentation(true, false) + " has passed " + (autoPass ? " (preset)." : ".");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);

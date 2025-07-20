@@ -22,7 +22,7 @@ class PingIntervalButtonHandler {
         List<Button> buttons = getPersonalAutoPingButtons();
         UserSettings userSettings = UserSettingsManager.get(event.getUser().getId());
         String message = event.getUser().getAsMention() + ", please choose the number of hours you would like the bot to wait before it pings you that it is your turn."
-            + "\n**This will apply to all your games**.\n> Your current interval is `" + userSettings.getPersonalPingInterval() + "`.";
+            + "\nThis will apply to __all__ of your games.\nYour current interval is `" + userSettings.getPersonalPingInterval() + "`.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
