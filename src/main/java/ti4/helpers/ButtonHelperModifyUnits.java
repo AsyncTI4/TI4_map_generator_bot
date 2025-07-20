@@ -1071,7 +1071,7 @@ public class ButtonHelperModifyUnits {
 
         UnitModel unitModel = player.getUnitFromUnitKey(key);
 
-        String unitName = key.asyncID();
+        String unitName = key.unitName();
         if (exo) {
             String dmg = "";
             if (damaged) {

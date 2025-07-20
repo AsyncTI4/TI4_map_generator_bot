@@ -187,7 +187,7 @@ public class RiftUnitsHelper {
                         continue;
                     }
 
-                    String asyncID = key.unitName();
+                    String unitName = key.unitName();
 
                     int totalUnits = unitEntry.getValue();
 
@@ -197,14 +197,14 @@ public class RiftUnitsHelper {
                     }
                     for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID + "damaged",
+                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName + "damaged",
                             "Rift " + x + " Damaged " + unitModel.getBaseType(), unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
                     totalUnits -= damagedUnits;
                     for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID,
+                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName,
                             "Rift " + x + " " + unitModel.getBaseType(), unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
