@@ -732,8 +732,8 @@ public class CombatRollService {
         result += CombatMessageHelper.displayHitResults(totalHits, x89applies);
         player.setActualHits(player.getActualHits() + totalHits);
         if (totalHits > 0 && usesX89c4) {
-            result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hits using "
-                + Mapper.getTech("x89c4").getNameRepresentation();
+            result += "\n" + player.getFactionEmoji() + " produced " + (totalHits / 2) + " additional hit" + ((totalHits / 2) == 1 ? "" : "s") + " using "
+                + Mapper.getTech("x89c4").getNameRepresentation() + ".";
         }
 
         if (player.hasRelic("thalnos") && rollType == CombatRollType.combatround && totalMisses > 0

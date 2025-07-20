@@ -134,7 +134,7 @@ public class FowCommunicationThreadService {
             if (!threadLocked && isHiddenAgenda(game)) {
                 //Reminder of Hidden Agenda mode
                 threadChannel.getManager().setArchived(false).queue(success ->
-                    threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda __only__ speaker is allowed to speak.").queue());
+                    threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.").queue());
             } else if (areNeighbors && threadLocked) {
                 //Allow talking
                 threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))

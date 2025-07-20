@@ -32,8 +32,9 @@ public class UnlockLeaderService {
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
 
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".");
-            channel.sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, true, showFlavourText)).queue();
+            MessageHelper.sendMessageToChannelWithEmbed(channel,
+                player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".",
+                leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
         } else {
             MessageHelper.sendMessageToChannel(channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
             String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
