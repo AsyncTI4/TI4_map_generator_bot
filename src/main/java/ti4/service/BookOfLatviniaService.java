@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -72,5 +73,6 @@ public class BookOfLatviniaService {
             message = "Custom PO '" + book + "' has been added.\n" + player.getRepresentation() + " scored '" + book + "'";
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+        Helper.checkEndGame(game, player);
     }
 }
