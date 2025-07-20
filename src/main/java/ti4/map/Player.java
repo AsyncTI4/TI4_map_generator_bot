@@ -2457,9 +2457,14 @@ public class Player extends PlayerProperties {
         // TITLE
         StringBuilder title = new StringBuilder();
         title.append(getFactionEmoji()).append(" ");
-        if (!"null".equals(getDisplayName()))
+        if (!"null".equals(getDisplayName())) {
             title.append(getDisplayName()).append(" ");
-        title.append(faction.getFactionNameWithSourceEmoji());
+        }
+        if (faction != null) {
+            title.append(faction.getFactionNameWithSourceEmoji());
+        } else {
+            title.append("No Faction");
+        }
         eb.setTitle(title.toString());
 
         // // ICON
