@@ -1672,10 +1672,10 @@ public class ButtonHelperAbilities {
         String protocol = buttonID.split("_")[1];
         if (!player.hasAbility("protocol_" + protocol)) {
             player.addAbility("protocol_" + protocol);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the " + StringUtils.capitalize(protocol) + " protocol");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained the _" + StringUtils.capitalize(protocol) + "_ Protocol.");
             event.getMessage().delete().queue();
         } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you already had the " + StringUtils.capitalize(protocol) + " protocol");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + ", you already had the _" + StringUtils.capitalize(protocol) + "_ Protocol.");
         }
     }
 
@@ -1722,10 +1722,11 @@ public class ButtonHelperAbilities {
             }
             if (player.hasAbility("protocols")) {
                 List<Button> buttons = getAvailableProtocols(player);
-                String sb = player.getRepresentationUnfogged() + " your **Protocols** ability was triggered. You can now select two protocols that you did not select last round to be your active protocols and give your leaders abilities.";
+                String sb = player.getRepresentationUnfogged() + ", your **Protocols** ability was triggered."
+                    + " You can now select two Protocols that you did not select last round to be your active Protocols, and give your leaders abilities.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " choose first protocol", buttons);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " choose second protocol", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please choose your first Protocol.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please choose your second Protocol.", buttons);
 
             }
             if (!player.hasAbility("council_patronage"))

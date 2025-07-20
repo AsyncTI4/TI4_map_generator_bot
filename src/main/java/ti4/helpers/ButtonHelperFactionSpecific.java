@@ -2432,7 +2432,7 @@ public class ButtonHelperFactionSpecific {
 
     public static List<Button> getButtonsToTakeSomeonesAC(Player thief, Player victim) {
         List<Button> takeACs = new ArrayList<>();
-        String secretScoreMsg = "_ _\nClick a button to take 1 action card";
+        String secretScoreMsg = "Click a button to take an action card.";
         List<Button> acButtons = ActionCardHelper.getToBeStolenActionCardButtons(victim);
         if (!acButtons.isEmpty()) {
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);

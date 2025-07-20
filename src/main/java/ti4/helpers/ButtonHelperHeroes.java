@@ -2014,8 +2014,8 @@ public class ButtonHelperHeroes {
 
     public static void resolveToldarHero(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
-        String message = player.getRepresentation() + ", please choose the objective that you wish to attach your hero to."+
-            "You will gain two command tokens whenever another player scores it, and the player(s) with the fewest victory points will not need to meet its requirements in order to score it.";
+        String message = player.getRepresentation() + ", please choose the objective that you wish to attach your hero to."
+            + " You will gain two command tokens whenever another player scores it, and the player(s) with the fewest victory points will not need to meet its requirements in order to score it.";
         for (String obj : game.getRevealedPublicObjectives().keySet()) {
             if (Mapper.getPublicObjective(obj) != null) {
                 buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "toldarHero_" + Mapper.getPublicObjective(obj).getName(), Mapper.getPublicObjective(obj).getName()));

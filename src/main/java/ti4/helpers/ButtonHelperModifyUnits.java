@@ -968,8 +968,9 @@ public class ButtonHelperModifyUnits {
     public static void magenHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
         String planet = buttonID.split("_")[1];
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving magen defense grid");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " choose the opposing unit to hit", getOpposingUnitsToHitOnGround(player, game, event, game.getTileFromPlanet(planet), planet));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving _Magen Defense Grid_.");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
+            player.getRepresentation() + ", please choose the opposing unit to hit.", getOpposingUnitsToHitOnGround(player, game, event, game.getTileFromPlanet(planet), planet));
     }
 
     public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String planet) {
@@ -1032,7 +1033,8 @@ public class ButtonHelperModifyUnits {
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
-        String msg = player.getRepresentation() + " you have had one of your units assigned a hit via magen defense grid, please cancel the hit somehow (Titans Agent, SUSTAIN DAMAGE, etc.), or accept the loss of the unit.";
+        String msg = player.getRepresentation() + ", you have had one of your units assigned a hit with _Magen Defense Grid_."
+            + " Please either cancel the hit somehow, or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         UnitModel unitModel = player.getUnitFromUnitKey(key);
@@ -1064,7 +1066,8 @@ public class ButtonHelperModifyUnits {
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
-        String msg = player.getRepresentation() + " you have had one of your units assigned a hit, please cancel the hit somehow (_Shields Holding_, SUSTAIN DAMAGE, etc.), or accept the loss of the unit.";
+        String msg = player.getRepresentation() + ", you have had one of your units assigned a hit."
+            + " Please either cancel the hit somehow, or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
 
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());

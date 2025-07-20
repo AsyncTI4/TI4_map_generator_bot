@@ -1110,7 +1110,7 @@ public class ButtonHelper {
             player.setTg(cTG + 1);
             MessageHelper.sendMessageToChannel(channel,
                 player.getRepresentation() + " gained 1 trade good (" + cTG + "->" + player.getTg()
-                    + ") for the Void Tap Ability.");
+                    + ") for **Void Tap**.");
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
             ButtonHelperAbilities.pillageCheck(player, game);
         }
@@ -3509,7 +3509,7 @@ public class ButtonHelper {
 
             String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
             if (d1.getResult() > 4) {
-                message += "blue backed tile";
+                message += "blue backed tile.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
                     .filter(tile -> tile.getTierList().isBlue())
@@ -3519,7 +3519,7 @@ public class ButtonHelper {
                 Collections.shuffle(unusedBlueTiles);
 
                 if (unusedBlueTiles.size() < 1) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
                     return;
                 }
 
@@ -3536,7 +3536,7 @@ public class ButtonHelper {
                 event.getMessageChannel().sendMessageEmbeds(tileEmbeds).queue();
                 newTileID = ids.getFirst();
             } else {
-                message += "red backed tile";
+                message += "red backed tile.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 List<String> tilesToPullFrom = new ArrayList<>(List.of(
                     //Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
@@ -3576,7 +3576,7 @@ public class ButtonHelper {
                 Collections.shuffle(tilesToPullFrom);
 
                 if (tilesToPullFrom.size() < 1) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from");
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
                     return;
                 }
 
@@ -3619,7 +3619,9 @@ public class ButtonHelper {
             StartTurnService.getStartOfTurnButtons(player, game, true, event, true));
 
         if (!player.hasTech("fl") && !player.hasTech("absol_fl") && !game.playerHasLeaderUnlockedOrAlliance(player, "kelerescommander")) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "##" + player.getRepresentation() + " if you are not a new player, you can ignore this, but know that on your turn you can only do one action normally. Doing a second action button is reserved for homebrew/master planet/other abilitys. If you dont have one of those, please don't do another turn. ");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "##" + player.getRepresentation() 
+                + " if you are not a new player, you can ignore this, but know that on your turn you can only do one action normally."
+                + " Doing a second action button is reserved for homebrew/master planet/other abilities. If you don't have one of those, please don't do another turn. ");
         }
         GMService.logPlayerActivity(game, player, msg);
     }

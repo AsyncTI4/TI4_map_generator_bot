@@ -1753,7 +1753,8 @@ public class ButtonHelperActionCards {
         buttons.add(Buttons.blue("olradinPreserveStep2_cultural_prof", "Explore Cultural"));
         buttons.add(Buttons.red("olradinPreserveStep2_hazardous_prof", "Explore Hazardous"));
         buttons.add(Buttons.gray("olradinPreserveStep2_frontier_prof", "Explore Frontier"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please use buttons to resolve the action card.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+            player.getRepresentation() + ", please use buttons to resolve the action card.", buttons);
 
     }
 

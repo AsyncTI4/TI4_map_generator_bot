@@ -132,7 +132,7 @@ public class ScorePublicObjectiveService {
         if (idC.equalsIgnoreCase(game.getStoredValue("toldarHeroObj"))) {
             if (!game.getStoredValue("toldarHeroPlayer").equalsIgnoreCase(player.getFaction())) {
                 Player p2 = game.getPlayerFromColorOrFaction(game.getStoredValue("toldarHeroPlayer"));
-                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " gains 2 command token due to their Concord Renewed hero ability.");
+                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " gains 2 command tokens due to their Concord Renewed hero ability.");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(p2);
                 String message2 = p2.getRepresentationUnfogged() + ", your current command tokens are " + p2.getCCRepresentation()
                     + ". Use buttons to gain 2 command tokens.";

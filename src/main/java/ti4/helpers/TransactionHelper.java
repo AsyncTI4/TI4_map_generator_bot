@@ -1248,7 +1248,7 @@ public class TransactionHelper {
             case "Technology" -> {
                 p2.addTech(amountToTrans);
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), 
-                    p2.getRepresentation() + " you received the technology " + Mapper.getTech(amountToTrans) + " from a transaction.");
+                    p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans) + "_ from a transaction.");
             }
         }
         Button button = Buttons.gray(finChecker + "transactWith_" + p2.getColor(),
