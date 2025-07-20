@@ -59,6 +59,23 @@ public class WebHelper {
         return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
     }
 
+    private static List<String> getConfiguredUrls(String propertyKey) {
+        String urlsProperty = webProperties.getProperty(propertyKey, "");
+        List<String> urls = new ArrayList<>();
+        
+        if (!urlsProperty.isEmpty()) {
+            String[] urlArray = urlsProperty.split(",");
+            for (String url : urlArray) {
+                String trimmedUrl = url.trim();
+                if (!trimmedUrl.isEmpty()) {
+                    urls.add(trimmedUrl);
+                }
+            }
+        }
+        
+        return urls;
+    }
+
     public static void putData(String gameName, Game game) {
         if (!sendingToWeb()) return;
 
@@ -66,16 +83,21 @@ public class WebHelper {
             Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
             String json = objectMapper.writeValueAsString(exportableFieldMap);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s", gameName)))
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
+            List<String> urls = getConfiguredUrls("gamestate.api.urls");
+            for (String urlTemplate : urls) {
+                String url = urlTemplate.replace("{gameName}", gameName);
+                
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
 
-            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .exceptionally(e -> {
-                    BotLogger.error(new BotLogger.LogMessageOrigin(game), "An exception occurred while performing an async send of game data to the website.", e);
-                    return null;
-                });
+                httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .exceptionally(e -> {
+                        BotLogger.error(new BotLogger.LogMessageOrigin(game), "An exception occurred while performing an async send of game data to: " + url, e);
+                        return null;
+                    });
+            }
         } catch (IOException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
@@ -282,18 +304,21 @@ public class WebHelper {
         try {
             String statisticsOptInRequest = objectMapper.writeValueAsString(statisticsOptIn);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://api.ti4ultimate.com/api/Async/player-settings"))
-                .header("Content-Type", "application/json")
-                .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
-                .POST(HttpRequest.BodyPublishers.ofString(statisticsOptInRequest))
-                .build();
+            List<String> urls = getConfiguredUrls("statistics.api.urls");
+            for (String url : urls) {
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
+                    .POST(HttpRequest.BodyPublishers.ofString(statisticsOptInRequest))
+                    .build();
 
-            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .exceptionally(e -> {
-                    BotLogger.error(String.format("An exception occurred while sending a stats opt in: %s", statisticsOptInRequest), e);
-                    return null;
-                });
+                httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .exceptionally(e -> {
+                        BotLogger.error(String.format("An exception occurred while sending a stats opt in to %s: %s", url, statisticsOptInRequest), e);
+                        return null;
+                    });
+            }
         } catch (IOException e) {
             BotLogger.error("An IOException occurred while sending a stats opt in.", e);
         }
