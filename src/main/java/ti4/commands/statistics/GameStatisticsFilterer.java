@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.image.Mapper;
 import ti4.map.Game;
+import ti4.model.Source.ComponentSource;
 
 @UtilityClass
 public class GameStatisticsFilterer {
@@ -107,11 +108,14 @@ public class GameStatisticsFilterer {
             case "action_deck_2" -> "action_deck_2".equals(game.getAcDeckID());
             case "little_omega" -> game.isLittleOmega();
             case "franken" -> game.isFrankenGame();
-            case "milty_mod" -> game.isMiltyModMode();
+            case "milty_mod" -> isMiltyModGame(game);
             case "red_tape" -> game.isRedTapeMode();
             case "age_of_exploration" -> game.isAgeOfExplorationMode();
             case "minor_factions" -> game.isMinorFactionsMode();
             case "alliance" -> game.isAllianceMode();
+            case "age_of_commerce" -> game.isAgeOfCommerceMode();
+            case "facilities" -> game.isFacilitiesMode();
+            case "total_war" -> game.isTotalWarMode();
             default -> false;
         };
     }
@@ -142,7 +146,14 @@ public class GameStatisticsFilterer {
     private static boolean isDiscordantStarsGame(Game game) {
         return game.isDiscordantStarsMode() ||
             Mapper.getFactionsValues().stream()
-                .filter(faction -> "ds".equals(faction.getSource().name()))
+                .filter(faction -> ComponentSource.ds.equals(faction.getSource()))
+                .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
+    }
+
+    private static boolean isMiltyModGame(Game game) {
+        return game.isMiltyModMode() ||
+            Mapper.getFactionsValues().stream()
+                .filter(faction -> ComponentSource.miltymod.equals(faction.getSource()))
                 .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 
