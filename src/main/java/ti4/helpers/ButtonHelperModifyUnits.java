@@ -1089,18 +1089,19 @@ public class ButtonHelperModifyUnits {
         }
 
         int x = 1;
+        String id;
+        String label;
         if (damaged) {
-            String id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + unitName + "damaged";
-            String label = "Remove " + x + " damaged " + unitModel.getBaseType();
-            buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
+            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName + "_damaged";
+            label = "Remove " + x + " damaged " + unitModel.getBaseType();
         } else {
-            String id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + unitName;
-            String label = "Remove " + x + " " + unitModel.getBaseType();
-            buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
+            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName;
+            label = "Remove " + x + " " + unitModel.getBaseType();
         }
+        buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
         if (!damaged && unitModel.getSustainDamage()) {
-            String id = player.finChecker() + "assignDamage_" + tile.getPosition() + "_" + 1 + unitName;
-            String label = "Sustain " + 1 + " " + unitModel.getBaseType();
+            id = player.finChecker() + "assignDamage_" + tile.getPosition() + "_" + 1 + "_" + unitName;
+            label = "Sustain 1 " + unitModel.getBaseType();
             buttons.add(Buttons.blue(id, label, unitModel.getUnitEmoji()));
         }
 

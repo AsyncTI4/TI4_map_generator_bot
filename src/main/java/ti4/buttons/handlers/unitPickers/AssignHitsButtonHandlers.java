@@ -2,11 +2,10 @@ package ti4.buttons.handlers.unitPickers;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.RegexHelper;
@@ -48,7 +47,6 @@ public class AssignHitsButtonHandlers {
             UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
             UnitType type = Units.findUnitType(matcher.group("unittype"));
             String planetName = matcher.group("planet");
-            String color = matcher.group("color");
             UnitHolder holder = planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
             ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(game, player, matcher);
             if (remove) {
