@@ -550,7 +550,7 @@ public class ButtonHelperActionCards {
                     }
                     if (FoWHelper.playerHasShipsInSystem(p2, game.getTileFromPositionOrAlias(game.getActiveSystem()))) {
                         List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(p2, game, tile, "courageouscannoncombat");
-                        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + ", you can use the buttons to destroy your ship(s)", buttons);
+                        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentation() + ", you can use the buttons to destroy your ship(s).", buttons);
                     }
                 }
             }
@@ -1069,7 +1069,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("psionicHammerStep2_")
     public static void resolvepPsionicHammerStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        String message = "## " + p2.getRepresentationUnfogged() + ", you have been _Neural Hammer_'d to show a random unscored secret objective. Please press the button to resolve.";
+        String message = p2.getRepresentationUnfogged() + ", you have been _Neural Hammer_'d to show a random unscored secret objective. Please press the button to resolve.";
         MessageHelper.sendMessageToChannelWithButton(p2.getCardsInfoThread(), message,
             Buttons.green("psionicHammerStep3_" + player.getFaction(), "Show A Random Unscored Secret Objective"));
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

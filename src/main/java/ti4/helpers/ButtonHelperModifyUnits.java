@@ -1126,7 +1126,7 @@ public class ButtonHelperModifyUnits {
             + game.getTileByPosition(pos2).getRepresentationForButtons(game, player) + ".";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), retreatMessage);
         FOWCombatThreadMirroring.mirrorMessage(event, game, player.getRepresentationNoPing()
-            + " retreated " + amount + " " + unitType + " on " + planet);
+            + " retreated " + amount + " " + unitType + " on " + planet + ".");
         event.getMessage().editMessage(event.getMessage().getContentRaw())
             .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }

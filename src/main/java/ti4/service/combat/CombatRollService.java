@@ -410,24 +410,13 @@ public class CombatRollService {
 
             buttons.add(Buttons.red("getDamageButtons_" + tile.getPosition() + "_bombardment",
                 "Assign Hit" + (h == 1 ? "" : "s")));
-            String msg2 = " you may use this button to assign " + (h == 1 ? "the BOMBARDMENT hit" : "BOMBARDMENT hits")
-                + ".";
-            boolean someone = false;
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
                 }
                 if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
-                    msg2 = p2.getRepresentation() + msg2;
-                    someone = true;
-                    if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), msg2, buttons);
-                    }
-                }
-            }
-            if (someone) {
-                if (!game.isFowMode()) {
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
+                        p2.getRepresentation() + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + ".", buttons);
                 }
             }
 

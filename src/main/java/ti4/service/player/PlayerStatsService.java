@@ -101,7 +101,7 @@ public class PlayerStatsService {
         }
         if (!scTradeGoods.containsKey(scNumber)) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                "Strategy Card must be from possible ones in Game: " + scTradeGoods.keySet());
+                "Strategy Card must be from possible ones in game: " + scTradeGoods.keySet());
             return false;
         }
 
@@ -218,13 +218,13 @@ public class PlayerStatsService {
         Integer setToNumber, Integer existingNumber, String explanation
     ) {
         if (explanation == null || "".equalsIgnoreCase(explanation)) {
-            return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
+            return "Set __" + optionName + "__ to " + setToNumber + " (was "
                 + existingNumber + ", a change of " + (setToNumber - existingNumber)
-                + ")_";
+                + ").";
         } else {
-            return "> set **" + optionName + "** to **" + setToNumber + "**   _(was "
+            return "Set __" + optionName + "__ to " + setToNumber + " (was "
                 + existingNumber + ", a change of " + (setToNumber - existingNumber)
-                + ")_ for the reason of: " + explanation;
+                + ") for the reason of: " + explanation + ".";
         }
 
     }
@@ -233,27 +233,27 @@ public class PlayerStatsService {
         String optionName,
         Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation
     ) {
-        String changeDescription = "changed";
+        String changeDescription = "Changed";
         if (changeNumber > 0) {
-            changeDescription = "increased";
+            changeDescription = "Increased";
         } else if (changeNumber < 0) {
-            changeDescription = "decreased";
+            changeDescription = "Decreased";
         }
         if (explanation == null || "".equalsIgnoreCase(explanation)) {
-            return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
-                + existingNumber + ", now **" + newNumber + "**)_";
+            return changeDescription + " __" + optionName + "__ by " + changeNumber + " (was "
+                + existingNumber + ", now " + newNumber + ").";
         } else {
-            return "> " + changeDescription + " **" + optionName + "** by " + changeNumber + "   _(was "
-                + existingNumber + ", now **" + newNumber + "**)_ for the reason of: " + explanation;
+            return changeDescription + " __" + optionName + "__ by " + changeNumber + " (was "
+                + existingNumber + ", now " + newNumber + ") for the reason of: " + explanation + ".";
         }
     }
 
     public static void setTotalCommodities(GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
+        String message = "> Set base commodity to " + commoditiesTotalCount + MiscEmojis.comm + ".";
         if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
-            MessageHelper.sendMessageToEventChannel(event, "**Warning:** Total Commodities count seems like a wrong value:");
+            message = "__Warning__: Total commodity count seems like a wrong value.\n" + message;
         }
         player.setCommoditiesBase(Math.max(0, commoditiesTotalCount));
-        String message = ">  set **Base Commodities** to " + commoditiesTotalCount + MiscEmojis.comm;
         MessageHelper.sendMessageToEventChannel(event, message);
     }
 }

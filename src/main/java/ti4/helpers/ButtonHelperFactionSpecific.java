@@ -983,7 +983,8 @@ public class ButtonHelperFactionSpecific {
                 if (FoWHelper.playerHasShipsInSystem(p2, game.getTileFromPositionOrAlias(game.getActiveSystem()))) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.red("getDamageButtons_" + game.getActiveSystem() + "_spacecombat", "Assign Hits"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), p2.getRepresentation() + ", you can use the buttons to assign hits.", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+                        p2.getRepresentation() + ", please use the buttons to assign the hit" + (totalHits == 1 ? "" : "s") + ".", buttons);
                 }
             }
         }
@@ -1771,8 +1772,8 @@ public class ButtonHelperFactionSpecific {
         return buttons;
     }
 
-    @ButtonHandler("redCreussWash")
-    public static void redCreussWash(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    @ButtonHandler("redCreussWashPartial")
+    public static void redCreussWashPartial(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         if (player.getCommodities() == 0)
         {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you don't have any commodities.");
@@ -1821,6 +1822,60 @@ public class ButtonHelperFactionSpecific {
                 int remain = p2.getCommodities();
                 int orig = remain + wash;
                 message += p2.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + p2.gainTG(wash)
+                    + " with " + player.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
+            }
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            ButtonHelper.deleteMessage(event);
+            return;
+        }
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - couldn't find the other player.");
+    }
+
+    @ButtonHandler("redCreussWashFull")
+    public static void redCreussWashFull(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        if (player.getCommodities() == 0)
+        {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you don't have any commodities.");
+            return;
+        }
+        String other = buttonID.split("_")[1];
+        for (Player p2 : game.getRealPlayers()) {
+            if (!other.equals(p2.getUserID()))
+            {
+                continue;
+            }
+            if (!player.getNeighbouringPlayers(true).contains(p2))
+            {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you are not neighbours with " + p2.getRepresentationNoPing() + ".");
+                return;
+            }
+            int commP1 = player.getCommodities();
+            int commP2 = p2.getCommodities();
+            int wash = Math.min(commP1 + player.getTg(), commP2 + p2.getTg());
+            player.setCommodities(Math.max(commP1 - wash, 0));
+            p2.setCommodities(Math.max(commP2 - wash, 0));
+            String message = "";
+            if (wash >= commP1)
+            {
+                message += player.getRepresentationUnfogged() + " has washed all " + commP1 + " of their commodit" + (commP1 == 1 ? "y" : "ies") + " " + player.gainTG(commP1)
+                    + " with " + p2.getFactionEmojiOrColor() + ".";
+            }
+            else
+            {
+                int remain = commP1 - wash;
+                message += player.getRepresentationUnfogged() + " has washed " + wash + " of their " + commP1 + " commodit" + (commP1 == 1 ? "y" : "ies") + " " + player.gainTG(commP1)
+                    + " with " + p2.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
+            }
+            message += "\n";
+            if (wash >= commP2)
+            {
+                message += p2.getRepresentationUnfogged() + " has washed all " + commP2 + " of their commodit" + (commP2 == 1 ? "y" : "ies") + " " + p2.gainTG(commP2)
+                    + " with " + player.getFactionEmojiOrColor() + ".";
+            }
+            else
+            {
+                int remain = commP2 - wash;
+                message += p2.getRepresentationUnfogged() + " has washed " + wash + " of their " + commP2 + " commodit" + (commP2 == 1 ? "y" : "ies") + " " + p2.gainTG(commP2)
                     + " with " + player.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), message);

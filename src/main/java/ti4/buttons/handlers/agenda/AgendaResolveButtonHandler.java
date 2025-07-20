@@ -852,9 +852,11 @@ class AgendaResolveButtonHandler {
                         ButtonHelperAbilities.pillageCheck(playerB, game);
                     }
                 }
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + " Set all players' trade goods to " + finalTG + ".");
-                if (!comrades.isEmpty()) {
-                    for (Player playerB : comrades) {
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + ", all players' trade goods have been set to " + finalTG + ".");
+                if (!comrades.isEmpty())
+                {
+                    for (Player playerB : comrades)
+                    {
                         DisasterWatchHelper.sendMessageInDisasterWatch(game,
                             "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate "
                                 + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");

@@ -69,7 +69,7 @@ public class FinishDraftService {
                         List<Button> buttons = new ArrayList<>();
                         String message = player.getPing() + " choose a flavor of keleres:";
                         if (allowed.isEmpty()) {
-                            MessageHelper.sendMessageToPlayerCardsInfoThread(player, "*Hrrnnggh*\nThis is awkward, all of the keleres flavors got drafted. I'll let you pick any of them, but don't do that again!");
+                            MessageHelper.sendMessageToPlayerCardsInfoThread(player, "*Hrrnnggh*\nThis is awkward, all of the Keleres flavors got drafted. I'll let you pick any of them, but don't do that again!");
                             allowed.addAll(Set.of("mentak", "xxcha", "argent"));
                         }
                         for (String flavor : allowed) {

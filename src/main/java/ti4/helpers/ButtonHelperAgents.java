@@ -75,10 +75,10 @@ public class ButtonHelperAgents {
             }
             if (cabal.hasUnexhaustedLeader("cabalagent")) {
                 List<Button> buttons = new ArrayList<>();
-                String msg = cabal.getRepresentationUnfogged() + " you have the ability to use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + " The Stillness of Stars, the Vuil'raith" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
+                String msg = cabal.getRepresentationUnfogged() + " you may use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "The Stillness of Stars, the Vuil'raith" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
                     + p2.getFactionEmojiOrColor() + " who has "
-                    + p2.getCommoditiesTotal() + " commodities";
+                    + p2.getCommoditiesTotal() + " commodit" + (p2.getCommoditiesTotal() == 1 ? "y" : "ies") + ".";
                 buttons.add(Buttons.green("exhaustAgent_cabalagent_startCabalAgent_" + p2.getFaction(),
                     "Use Vuil'raith Agent"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -86,10 +86,10 @@ public class ButtonHelperAgents {
             }
             if (cabal.hasUnexhaustedLeader("toldaragent")) {
                 List<Button> buttons = new ArrayList<>();
-                String msg = cabal.getRepresentationUnfogged() + " you have the ability to use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + " the Toldar" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
-                    + p2.getFactionEmojiOrColor() + " who has "
-                    + p2.getCommoditiesTotal() + " commodities";
+                String msg = cabal.getRepresentationUnfogged() + ", you may use " + (cabal.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "Maertin Donaais, the Toldar" + (cabal.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
+                    + p2.getFactionEmojiOrColor() + ", who has "
+                    + p2.getCommoditiesTotal() + " commodit" + (p2.getCommoditiesTotal() == 1 ? "y" : "ies") + ".";
                 buttons.add(Buttons.green("toldarAgent_" + p2.getFaction() + "_" + p2.getCommoditiesTotal(),
                     "Use Toldar Agent"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -105,9 +105,9 @@ public class ButtonHelperAgents {
             }
             if (toldar.hasUnexhaustedLeader("toldaragent")) {
                 List<Button> buttons = new ArrayList<>();
-                String msg = toldar.getRepresentationUnfogged() + " you have the ability to use " + (toldar.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                    + " the Toldar" + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
-                    + p2.getFactionEmojiOrColor() + " for " + amount + " commodities";
+                String msg = toldar.getRepresentationUnfogged() + ", you may use " + (toldar.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "Maertin Donaais, the Toldar" + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, on "
+                    + p2.getFactionEmojiOrColor() + " for " + amount + " commodit" + (amount == 1 ? "y" : "ies") + ".";
                 buttons.add(Buttons.green("toldarAgent_" + p2.getFaction() + "_" + amount,
                     "Use Toldar Agent"));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -124,11 +124,14 @@ public class ButtonHelperAgents {
         ButtonHelperAgents.exhaustAgent("exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
         int commodities = p2.getCommodities();
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentationUnfogged() + " your " + commodities + " commodities have been washed by the Toldar agent.");
+            p2.getRepresentationUnfogged() + ", your " + commodities + " commodit" + (commodities == 1 ? "y" : "ies") + " have been washed by " 
+                + (toldar.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                + "Maertin Donaais, the Toldar" + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         p2.setTg(p2.getTg() + commodities);
         p2.setCommodities(0);
         toldar.setCommodities(toldar.getCommodities() + amount);
-        MessageHelper.sendMessageToChannel(toldar.getCorrectChannel(), toldar.getRepresentation() + " you now have " + toldar.getCommodities() + " commodities after using your agent");
+        MessageHelper.sendMessageToChannel(toldar.getCorrectChannel(), toldar.getRepresentation() + ", you now have " + toldar.getCommodities() 
+            + " commodit" + (toldar.getCommodities() == 1 ? "y" : "ies") + " after using your agent.");
         toldarAgentInitiation(game, toldar, amount);
     }
 
@@ -137,7 +140,7 @@ public class ButtonHelperAgents {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         List<Button> buttons = getUnitsForCabalAgent(game, p2);
-        String msg = cabal.getRepresentationUnfogged() + " use buttons to capture a ship";
+        String msg = cabal.getRepresentationUnfogged() + ", use buttons to capture a ship.";
         MessageHelper.sendMessageToChannelWithButtons(cabal.getCardsInfoThread(), msg, buttons);
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();
@@ -364,7 +367,7 @@ public class ButtonHelperAgents {
 
         int comms = Math.min(player.getCommoditiesTotal(), amountToKill);
         message += ". " + amountToKill + " infantry were destroyed. " + comms + " commodit" + (comms == 1 ? "y" : "ies")
-            + " were gained and then all commodities were converted into trade goods.";
+            + " were gained, and then all commodities were converted into trade goods.";
         player.setTg(player.getTg() + Math.min(player.getCommoditiesTotal(), player.getCommodities() + amountToKill));
         player.setCommodities(0);
         if (amountToKill > 0) {
@@ -586,7 +589,7 @@ public class ButtonHelperAgents {
             startCabalAgent(player, game, rest.replace("cabalagent_", ""), event);
         }
         if ("toldaragent".equalsIgnoreCase(agent)) {
-            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "the Toldar agent.";
+            String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Maertin Donaais, the Toldar" + ssruuSlash + " agent.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
         }
         if ("jolnaragent".equalsIgnoreCase(agent)) {

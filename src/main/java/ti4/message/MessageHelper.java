@@ -17,6 +17,8 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import java.net.SocketTimeoutException;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,6 +27,7 @@ import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -309,7 +312,7 @@ public class MessageHelper {
     public static void editMessageWithActionRowsAndFiles(ButtonInteractionEvent event, String message, List<ActionRow> rows, List<FileUpload> files) {
 
         if (message.length() > 2000) {
-            message = message.substring(0, 1920) + "\nMessage shortened due to exceeding max char limit. Sorry";
+            message = message.substring(0, 1920) + "\nMessage shortened due to exceeding max char limit. Sorry.";
         }
         event.getHook().editOriginal(message).setComponents(rows).setFiles(files).queue();
     }
@@ -371,6 +374,18 @@ public class MessageHelper {
             return;
         }
 
+        if (channel instanceof GuildMessageChannel guildChannel) {
+            try {
+                if (!guildChannel.canTalk()) {
+                    BotLogger.warning(guildChannel.getAsMention() + " Bot missing permission to send messages");
+                    return;
+                }
+            } catch (Exception e) {
+                BotLogger.error("Permission check failure for channel: " + guildChannel.getId(), e);
+                return;
+            }
+        }
+
         List<MessageEmbed> sanitizedEmbeds;
         if (embeds == null) {
             sanitizedEmbeds = Collections.emptyList();
@@ -405,10 +420,9 @@ public class MessageHelper {
         while (iterator.hasNext()) {
             MessageCreateData messageCreateData = iterator.next();
             if (iterator.hasNext()) { // not last message
-                channel.sendMessage(messageCreateData).queue(null,
-                    error -> BotLogger.error(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error), error));
+                sendMessageWithRetry(channel, messageCreateData, null, "Failed to send intermediate message", 1);
             } else { // last message, do action
-                channel.sendMessage(messageCreateData).queue(message -> {
+                sendMessageWithRetry(channel, messageCreateData, message -> {
                     ManagedGame managedGame = GameManager.getManagedGame(gameName);
                     if (finalMessageText != null && managedGame != null && !managedGame.isFowMode()) {
                         if (finalMessageText.contains("Use buttons to do your turn") || finalMessageText.contains("Use buttons to end turn")) {
@@ -420,9 +434,31 @@ public class MessageHelper {
                     if (restAction != null) {
                         restAction.run(message);
                     }
-                }, error -> BotLogger.error(getRestActionFailureMessage(channel, finalMessageText, messageCreateData, error), error));
+                }, finalMessageText, 1);
             }
         }
+    }
+
+    private static void sendMessageWithRetry(
+        MessageChannel channel,
+        MessageCreateData messageCreateData,
+        MessageFunction successAction,
+        String errorHeader,
+        int remainingAttempts
+    ) {
+        channel.sendMessage(messageCreateData).queue(message -> {
+            if (successAction != null) {
+                successAction.run(message);
+            }
+        }, error -> {
+            boolean shouldRetry = error instanceof ErrorResponseException && error.getCause() instanceof SocketTimeoutException && remainingAttempts > 0;
+            if (shouldRetry) {
+                BotLogger.warning(getRestActionFailureMessage(channel, errorHeader + " (retrying)", messageCreateData, error), error);
+                sendMessageWithRetry(channel, messageCreateData, successAction, errorHeader, remainingAttempts - 1);
+            } else {
+                BotLogger.error(getRestActionFailureMessage(channel, errorHeader, messageCreateData, error), error);
+            }
+        });
     }
 
     public static String getRestActionFailureMessage(MessageChannel channel, String errorHeader, MessageCreateData messageCreateData, Throwable error) {

@@ -112,7 +112,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (game.isCompetitiveTIGLGame()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
             } else if (game.isOmegaPhaseMode() && priorityTrackMode != PriorityTrackMode.FULL) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Omega Phase requires the FULL Priority Track. Priority Track is unchanged.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Omega Phase requires the __full__ Priority Track. Priority Track is unchanged.");
             } else if (game.getPhaseOfGame().equals("strategy")) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot add or remove the Priority Track during the Strategy Phase. Either UNDO out of it or wait for after it. Priority Track is unchanged.");
             } else {

@@ -172,7 +172,12 @@ class GameUndoService {
     }
 
     public static Game loadUndoForMissingGame(String gameName) {
-        int latestUndoIndex = GameUndoNameService.getSortedUndoNumbers(gameName).getLast();
+        List<Integer> sortedUndoNumbers = GameUndoNameService.getSortedUndoNumbers(gameName);
+        if (sortedUndoNumbers.isEmpty()) {
+            BotLogger.warning("Attempted to load undo for missing game, but one did not exist: " + gameName);
+            return null;
+        }
+        int latestUndoIndex = sortedUndoNumbers.getLast();
         File currentGameFile = Storage.getGameFile(gameName + Constants.TXT);
         try {
             replaceGameFileWithUndo(gameName, latestUndoIndex, currentGameFile.toPath());
