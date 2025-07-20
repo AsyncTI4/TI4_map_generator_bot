@@ -536,7 +536,7 @@ public class MessageHelper {
                 privateChannel = player.getCardsInfoThread();
             }
             if (privateChannel == null) {
-                sendMessageToUser(game.getName() + " " + messageText, user);
+                sendMessageToUser(game.getName() + " " + messageText, user, feedbackChannel, failText);
             } else {
                 sendMessageToChannel(privateChannel, messageText);
             }
@@ -569,7 +569,28 @@ public class MessageHelper {
     }
 
     public static void sendMessageToUser(String messageText, User user) {
-        user.openPrivateChannel().queue(channel -> splitAndSent(messageText, channel));
+        sendMessageToUser(messageText, user, null);
+    }
+
+    public static void sendMessageToUser(String messageText, User user, @Nullable MessageChannel failureChannel) {
+        sendMessageToUser(messageText, user, failureChannel, null);
+    }
+
+    public static void sendMessageToUser(
+        String messageText,
+        User user,
+        @Nullable MessageChannel failureChannel,
+        @Nullable String failText
+    ) {
+        if (user == null) {
+            return;
+        }
+        user.openPrivateChannel().queue(channel -> splitAndSent(messageText, channel), error -> {
+            BotLogger.warning("Failed to DM user " + user.getId(), error);
+            if (failureChannel != null && failText != null) {
+                sendMessageToChannel(failureChannel, failText);
+            }
+        });
     }
 
     /**
