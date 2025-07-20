@@ -137,6 +137,12 @@ public class WebHelper {
                         return null;
                     });
             }
+                httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .exceptionally(e -> {
+                        BotLogger.error(new BotLogger.LogMessageOrigin(game), "An exception occurred while performing an async send of game data to: " + url, e);
+                        return null;
+                    });
+            }
         } catch (IOException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
@@ -346,7 +352,21 @@ public class WebHelper {
                     .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
                     .POST(HttpRequest.BodyPublishers.ofString(statisticsOptInRequest))
                     .build();
+            List<String> urls = getConfiguredUrls("statistics.api.urls");
+            for (String url : urls) {
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
+                    .POST(HttpRequest.BodyPublishers.ofString(statisticsOptInRequest))
+                    .build();
 
+                httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .exceptionally(e -> {
+                        BotLogger.error(String.format("An exception occurred while sending a stats opt in to %s: %s", url, statisticsOptInRequest), e);
+                        return null;
+                    });
+            }
                 httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                     .exceptionally(e -> {
                         BotLogger.error(String.format("An exception occurred while sending a stats opt in to %s: %s", url, statisticsOptInRequest), e);

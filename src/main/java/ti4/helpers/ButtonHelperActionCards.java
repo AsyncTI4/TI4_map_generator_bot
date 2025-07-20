@@ -565,7 +565,7 @@ public class ButtonHelperActionCards {
                     totalHits = 0;
                     result = player.getFactionEmojiOrColor() + " rolling for " + type + ":\n";
                     StringBuilder resultBuilder = new StringBuilder(result);
-                    resultBuilder.append("Rolling against " + numOfUnit + " " + key.getUnitType().getUnitTypeEmoji() + " owned by " + key.getColor() + "\n");
+                    resultBuilder.append("Rolling against " + numOfUnit + " " + key.getUnitType().getUnitTypeEmoji() + " owned by " + key.getColor() + ".\n");
                     int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
                     List<Die> resultRolls = DiceHelper.rollDice(toHit - modifierToHit, numRolls);
                     player.setExpectedHitsTimes10(
@@ -1753,7 +1753,8 @@ public class ButtonHelperActionCards {
         buttons.add(Buttons.blue("olradinPreserveStep2_cultural_prof", "Explore Cultural"));
         buttons.add(Buttons.red("olradinPreserveStep2_hazardous_prof", "Explore Hazardous"));
         buttons.add(Buttons.gray("olradinPreserveStep2_frontier_prof", "Explore Frontier"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please use buttons to resolve the action card.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+            player.getRepresentation() + ", please use buttons to resolve the action card.", buttons);
 
     }
 

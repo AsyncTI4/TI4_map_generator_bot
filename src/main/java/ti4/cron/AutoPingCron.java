@@ -261,7 +261,7 @@ public class AutoPingCron {
                 } else if (game.isFowMode() && game.getStoredValue("fowStatusDone") != null
                     && !game.getStoredValue("fowStatusDone").contains(player.getFaction())) {
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
-                        + ", please click **Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase.**");
+                        + ", please click \"Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase\".");
                 }
 
             }
