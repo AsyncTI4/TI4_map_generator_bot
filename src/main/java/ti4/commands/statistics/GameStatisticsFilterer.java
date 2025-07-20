@@ -109,6 +109,9 @@ public class GameStatisticsFilterer {
             case "age_of_exploration" -> game.isAgeOfExplorationMode();
             case "minor_factions" -> game.isMinorFactionsMode();
             case "alliance" -> game.isAllianceMode();
+            case "age_of_commerce" -> game.isAgeOfCommerceMode();
+            case "facilities" -> game.isFacilitiesMode();
+            case "total_war" -> game.isTotalWarMode();
             default -> false;
         };
     }
@@ -132,34 +135,18 @@ public class GameStatisticsFilterer {
         return homebrewFilter == null || homebrewFilter == game.hasHomebrew();
     }
 
-    /**
-     * Determines whether the given game should be considered a Discordant Stars game.
-     * <p>
-     * Previously a game was flagged as a DS game if it contained any Discordant
-     * Stars factions. This caused statistics queries filtering on game type
-     * {@code ds} to inadvertently include games that simply had a DS faction
-     * drafted but were otherwise normal PoK games. To ensure only games that were
-     * actually played with Discordant Stars rules are included, the check now
-     * solely relies on the game's {@code discordantStarsMode} flag.
-     */
     private static boolean isDiscordantStarsGame(Game game) {
-        return game.isDiscordantStarsMode();
+        return game.isDiscordantStarsMode() ||
+            Mapper.getFactionsValues().stream()
+                .filter(faction -> ComponentSource.ds.equals(faction.getSource()))
+                .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 
-    /**
-     * Determines whether the given game should be considered a MiltyMod game.
-     * <p>
-     * In addition to checking the game's {@code miltyModMode} flag, this
-     * method also checks if any faction present in the game originates from the
-     * MiltyMod source.
-     */
     private static boolean isMiltyModGame(Game game) {
-        if (game.isMiltyModMode()) {
-            return true;
-        }
-        return Mapper.getFactionsValues().stream()
-            .filter(faction -> ComponentSource.miltymod.equals(faction.getSource()))
-            .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
+        return game.isMiltyModMode() ||
+            Mapper.getFactionsValues().stream()
+                .filter(faction -> ComponentSource.miltymod.equals(faction.getSource()))
+                .anyMatch(faction -> game.getFactions().contains(faction.getAlias()));
     }
 
     private static boolean filterOnVictoryPointGoal(Integer victoryPointGoal, Game game) {
