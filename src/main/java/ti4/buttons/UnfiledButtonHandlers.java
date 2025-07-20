@@ -2379,8 +2379,18 @@ public class UnfiledButtonHandlers {
     public static void announceReadyForDice(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String p1Color = buttonID.split("_")[1];
         Player p1 = game.getPlayerFromColorOrFaction(p1Color);
+        if (p1 == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Unable to determine player for color or faction `" + p1Color + "`.");
+            return;
+        }
         String p2Color = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(p2Color);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Unable to determine player for color or faction `" + p2Color + "`.");
+            return;
+        }
         if (player != p1 && player != p2) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + ", don't press buttons that aren't meant for you.");
             return;
