@@ -142,7 +142,7 @@ public class WebHelper {
         }
     }
 
-    public static void putPlayerData(String gameId, Game game, Map<String, Map<String, List<Point>>> factionCoordinates) {
+    public static void putPlayerData(String gameId, Game game) {
         if (!sendingToWeb())  return;
 
         try {

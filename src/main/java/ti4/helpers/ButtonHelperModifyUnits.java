@@ -894,7 +894,7 @@ public class ButtonHelperModifyUnits {
     @ButtonHandler("resolveDevote_")
     public static void resolveDevote(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile, false);
+        List<Button> buttons = getOpposingUnitsToHit(player, game, tile, false);
         String msg = player.getRepresentation() + ", please choose which opposing unit to hit.";
         String unit = buttonID.split("_")[2];
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
@@ -910,7 +910,7 @@ public class ButtonHelperModifyUnits {
         }
     }
 
-    public static List<Button> getOpposingUnitsToHit(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, boolean exoHit) {
+    public static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         String exo = "";
@@ -970,10 +970,10 @@ public class ButtonHelperModifyUnits {
         String planet = buttonID.split("_")[1];
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving _Magen Defense Grid_.");
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
-            player.getRepresentation() + ", please choose the opposing unit to hit.", getOpposingUnitsToHitOnGround(player, game, event, game.getTileFromPlanet(planet), planet));
+            player.getRepresentation() + ", please choose the opposing unit to hit.", getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet));
     }
 
-    public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String planet) {
+    public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, Tile tile, String planet) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         List<Button> buttons = new ArrayList<>();
@@ -1185,15 +1185,6 @@ public class ButtonHelperModifyUnits {
                 MoveUnitService.moveUnits(event, tile1, game, player.getColor(), totalUnits + " " + unitName, tile2, "space");
             }
         }
-    }
-
-    public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident) {
-        String pos = buttonID.replace("umbatTile_", "");
-        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos),
-            "muaatagent", "place");
-        String message = player.getRepresentation() + " Use the buttons to produce units. ";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue();
     }
 
     /**
@@ -1700,18 +1691,18 @@ public class ButtonHelperModifyUnits {
             msg = opponent.getRepresentationUnfogged() + " " + player.getFactionEmoji()
                 + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
-            buttons = getOpposingUnitsToHit(player, game, event, tile, false);
+            buttons = getOpposingUnitsToHit(player, game, tile, false);
             msg = player.getRepresentation() + ", please choose which opposing unit to hit.";
         } else if (cause.contains("exo")) {
             DestroyUnitService.destroyUnits(event, tile, game, player.getColor(), "1 dread", true);
-            buttons = getOpposingUnitsToHit(player, game, event, tile, true);
+            buttons = getOpposingUnitsToHit(player, game, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to destroy 2 opposing ships of their choice."
                     + " This occurs after any retreats. The dread has been removed.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         } else if (cause.contains("caled")) {
-            buttons = getOpposingUnitsToHit(player, game, event, tile, true);
+            buttons = getOpposingUnitsToHit(player, game, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation(false, false) + " has chosen to destroy one of opposing ships using the _Caled_ Superweapon ability."
