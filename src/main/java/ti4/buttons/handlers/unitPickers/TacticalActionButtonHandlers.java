@@ -88,8 +88,7 @@ public class TacticalActionButtonHandlers {
 
     @ButtonHandler("doneWithOneSystem_")
     public static void finishMovingFromOneTile(
-        Player player, Game game, ButtonInteractionEvent event,
-        String buttonID
+        Player player, Game game, ButtonInteractionEvent event
     ) {
         TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(event, game, player);
     }
