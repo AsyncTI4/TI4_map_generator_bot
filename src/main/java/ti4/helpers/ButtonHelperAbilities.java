@@ -1046,7 +1046,7 @@ public class ButtonHelperAbilities {
                 }
             }
             case "mors" -> {
-                Set<String> adjPos = FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, true);
+                Set<String> adjPos = FoWHelper.getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, true);
                 for (Tile loc : game.getTileMap().values()) {
                     if (!adjPos.contains(loc.getPosition()))
                         buttons.add(Buttons.gray("morsPart2_" + loc.getPosition(), loc.getRepresentationForButtons()));

@@ -1739,14 +1739,16 @@ public class UnfiledButtonHandlers {
 
         }
         if (("Done Exhausting Planets".equalsIgnoreCase(buttonLabel)
-            || "Done Producing Units".equalsIgnoreCase(buttonLabel))
-            && !event.getMessage().getContentRaw().contains("Please choose the planets you wish")) {
+            || "Done Producing Units".equalsIgnoreCase(buttonLabel))) {
             Tile tile = null;
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel) && buttonID.contains("_")) {
                 String pos = buttonID.split("_")[1];
                 buttonID = buttonID.split("_")[0];
                 tile = game.getTileByPosition(pos);
                 game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " produced units in " + tile.getRepresentationForButtons() + ".");
+            }
+            if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel) && player.hasAbility("amalgamation") && !game.getStoredValue("amalgAmount").isEmpty()) {
+                editedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             }
             ButtonHelper.sendMessageToRightStratThread(player, game, editedMessage, buttonID);
             if ("Done Producing Units".equalsIgnoreCase(buttonLabel)) {
@@ -1869,6 +1871,9 @@ public class UnfiledButtonHandlers {
             }
             player.resetSpentThings();
             game.removeStoredValue("producedUnitCostFor" + player.getFaction());
+            if (player.hasAbility("amalgamation")) {
+                game.removeStoredValue("amalgAmount");
+            }
             if (buttonID.contains("lumi7Build")) {
                 if (!game.getStoredValue("lumi7System").isEmpty()) {
                     Tile tile = game.getTileByPosition(game.getStoredValue("lumi7System"));
@@ -3402,7 +3407,7 @@ public class UnfiledButtonHandlers {
                 " didn't have any commodities or trade goods to spend, so no action card was drawn.");
             return;
         }
-        String message = hasSchemingAbility 
+        String message = hasSchemingAbility
             ? " spent 1 " + commOrTg + " to draw " + count2
                 + " action card (**Scheming** added 1 action card). Please discard 1 action card from your hand."
             : " spent 1 " + commOrTg + " to draw " + count2 + " action card.";

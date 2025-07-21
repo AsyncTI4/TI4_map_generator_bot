@@ -1239,6 +1239,12 @@ public class Helper {
         }
 
         if ("res".equalsIgnoreCase(resOrInfOrBoth)) {
+            if (player.hasAbility("amalgamation") && !game.getStoredValue("amalgAmount").isEmpty()) {
+                double existingDiscount = Double.parseDouble(game.getStoredValue("amalgAmount")) + 0.5;
+                int discount = (int) existingDiscount;
+                res += discount;
+                msg.append("> Released units with a total resource value of " + discount + "\n");
+            }
             msg.append("for a total spend of ").append(res).append(" resources.");
 
             if (!game.getStoredValue("producedUnitCostFor" + player.getFaction()).isEmpty()) {
