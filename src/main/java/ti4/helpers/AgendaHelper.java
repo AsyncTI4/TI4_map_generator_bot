@@ -183,7 +183,7 @@ public class AgendaHelper {
         buttons.add(Buttons.red("undoPassOnAllWhensNAfters", "Undo Pass"));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentation() + ", you have successfully passed on all \"when\"s and \"after\"s for the entire Agenda Phase."
-                + " You can undo this during the agenda if necessary, or with this button",
+                + " You can undo this during the agenda if necessary, or with this button.",
             buttons);
         game.setStoredValue("passOnAllWhensNAfters" + player.getFaction(), "Yes");
 
@@ -1548,7 +1548,21 @@ public class AgendaHelper {
 
     @ButtonHandler("rider_")
     public static void placeRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String[] choiceParams = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.lastIndexOf("_")).split(";");
+        int firstIndex = buttonID.indexOf("_");
+        int lastIndex = buttonID.lastIndexOf("_");
+        if (firstIndex == -1 || lastIndex <= firstIndex) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game),
+                "Could not parse rider info from button id: " + buttonID);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse rider choice.");
+            return;
+        }
+        String[] choiceParams = buttonID.substring(firstIndex + 1, lastIndex).split(";");
+        if (choiceParams.length < 2) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, game),
+                "Invalid rider parameters in button id: " + buttonID);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse rider choice.");
+            return;
+        }
         String choice = choiceParams[1];
 
         String rider = buttonID.substring(buttonID.lastIndexOf("_") + 1);
@@ -4099,7 +4113,7 @@ public class AgendaHelper {
         String faction = buttonID.replace("forceAbstainForPlayer_", "");
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained by " + player.getRepresentationNoPing());
+            (game.isFowMode() ? "A player" : p2.getRepresentation()) + " was forcefully abstained by " + player.getRepresentationNoPing() + ".");
         AgendaHelper.resolvingAnAgendaVote("resolveAgendaVote_0", event, game, p2);
     }
 

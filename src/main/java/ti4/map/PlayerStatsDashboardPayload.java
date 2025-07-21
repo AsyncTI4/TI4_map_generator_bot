@@ -113,6 +113,7 @@ public class PlayerStatsDashboardPayload {
         return game.getLaws().keySet().stream()
             .filter(lawId -> ButtonHelper.isPlayerElected(game, player, lawId))
             .map(Mapper::getAgenda)
+            .filter(Objects::nonNull)
             .map(AgendaModel::getName)
             .toList();
     }
@@ -273,6 +274,7 @@ public class PlayerStatsDashboardPayload {
     public List<String> getTechnologies() {
         return player.getTechs().stream()
             .map(Mapper::getTech)
+            .filter(Objects::nonNull)
             .map(TechnologyModel::getName)
             .toList();
     }

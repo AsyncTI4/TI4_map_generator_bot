@@ -88,10 +88,12 @@ public class GameStatsDashboardPayload {
     public List<String> getLaws() {
         var lawsInPlay = game.getLaws().keySet().stream()
             .map(Mapper::getAgenda)
+            .filter(Objects::nonNull)
             .map(AgendaModel::getName)
             .toList();
         var agendasInDiscard = game.getDiscardAgendas().keySet().stream()
             .map(Mapper::getAgenda)
+            .filter(Objects::nonNull)
             .map(AgendaModel::getName)
             .toList();
         return Stream.concat(lawsInPlay.stream(), agendasInDiscard.stream()).toList();

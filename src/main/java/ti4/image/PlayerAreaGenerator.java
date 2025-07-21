@@ -1307,7 +1307,7 @@ public class PlayerAreaGenerator {
 
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (!game.isHasEnded() && numInReinforcements < 0 && game.isCcNPlasticLimit()) {
-                    String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
+                    String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove.";
                     List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warningMessage, removeButtons);
                     GMService.logPlayerActivity(game, player, warningMessage);

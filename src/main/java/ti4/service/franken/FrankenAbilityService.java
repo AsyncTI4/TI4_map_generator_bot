@@ -80,8 +80,8 @@ public class FrankenAbilityService {
                 String unitID = AliasHandler.resolveUnit("mech");
                 player.setUnitCap(unitID, 6);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set mech unit max to 6 for " + player.getRepresentation()
-                        + " due to the **Machine Cult** ability.");
+                    "Set mech unit maximum to 6 for " + player.getRepresentation()
+                        + ", due to their **Machine Cult** ability.");
             }
             if (abilityID.equalsIgnoreCase("diplomats")) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());

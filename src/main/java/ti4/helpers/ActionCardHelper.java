@@ -50,7 +50,7 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, getActionCardInfo(game, player));
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an action card.", getPlayActionCardButtons(game, player));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Click a button below to play an action card.", getPlayActionCardButtons(game, player));
         }
 
         sendTrapCardInfo(game, player);
@@ -111,7 +111,7 @@ public class ActionCardHelper {
     }
 
     private static String getActionCardInfo(Game game, Player player) {
-        StringBuilder sb = new StringBuilder("_ _\n");
+        StringBuilder sb = new StringBuilder();
 
         // ACTION CARDS
         sb.append("__Action Cards__ (").append(player.getAc()).append("/").append(ButtonHelper.getACLimit(game, player)).append("):").append("\n");
@@ -375,7 +375,7 @@ public class ActionCardHelper {
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
 
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played the " + actionCardTitle + " action card.");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " played _" + actionCardTitle + "_ action card.");
 
         if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);
@@ -435,7 +435,7 @@ public class ActionCardHelper {
                         it = true;
                     }
                     if (!watcher && (game.isFowMode() || Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
-                        noSabosMessage.append("\n> A player may have access to a **Watcher**, so 𝓌𝒶𝓉𝒸𝒽 out.");
+                        noSabosMessage.append("\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
                         watcher = true;
                     }
                 }
@@ -622,7 +622,8 @@ public class ActionCardHelper {
 
             if (automationID.equals("experimental")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(), buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + "\n\nMake sure to declare any graviton laser system usage before pressing this button", codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg 
+                    + (player.hasTechReady("gls") ? "\n-# Make sure to declare _Graviton Laser System_, should you so wish, before pressing this button." : ""), codedButtons);
             }
 
             if (automationID.equals("blitz")) {

@@ -9,7 +9,7 @@ import ti4.map.Player;
 
 public class ElectVoiceOfTheCouncilButtonHandler {
     @ButtonHandler("elect_voice_of_the_council")
-    public static void electVoiceOfTheCouncil(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void electVoiceOfTheCouncil(ButtonInteractionEvent event, Game game) {
         VoiceOfTheCouncilHelper.RevealVoiceOfTheCouncil(game, event);
         ButtonHelper.deleteMessage(event);
     }
