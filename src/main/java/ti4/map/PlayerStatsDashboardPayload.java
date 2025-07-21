@@ -113,6 +113,7 @@ public class PlayerStatsDashboardPayload {
         return game.getLaws().keySet().stream()
             .filter(lawId -> ButtonHelper.isPlayerElected(game, player, lawId))
             .map(Mapper::getAgenda)
+            .filter(Objects::nonNull)
             .map(AgendaModel::getName)
             .toList();
     }
