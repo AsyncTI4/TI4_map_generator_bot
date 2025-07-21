@@ -214,13 +214,32 @@ public class AutoCompleteProvider {
             }
             case Constants.PO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
-                List<Command.Choice> options = publicObjectives.entrySet().stream()
-                    .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
-                    .limit(25)
-                    .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
-                    .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                // Some commands use an INTEGER option type for Public Objective IDs
+                // (for example `status po_remove_custom`). When that is the case, the
+                // autocomplete must return choices with integer values instead of
+                // string aliases.
+                if (event.getFocusedOption().getType() == OptionType.INTEGER
+                    && Constants.REMOVE_CUSTOM.equals(subcommandName)
+                    && gameName != null
+                    && GameManager.isValid(gameName)) {
+                    Game game = GameManager.getManagedGame(gameName).getGame();
+                    List<Command.Choice> options = game.getCustomPublicVP().keySet().stream()
+                        .map(name -> Map.entry(name, game.getRevealedPublicObjectives().get(name)))
+                        .filter(entry -> entry.getValue() != null)
+                        .filter(entry -> (entry.getValue() + " - " + entry.getKey()).toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(entry -> new Command.Choice(entry.getValue() + " - " + entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else {
+                    Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
+                    List<Command.Choice> options = publicObjectives.entrySet().stream()
+                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
             case Constants.SO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
