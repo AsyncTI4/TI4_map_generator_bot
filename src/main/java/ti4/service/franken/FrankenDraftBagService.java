@@ -162,7 +162,7 @@ public class FrankenDraftBagService {
             MessageHelper.sendMessageToChannelWithButtons(bagChannel, player.getRepresentationUnfogged() + ", please choose an item to draft:", getSelectionButtons(draftables, player));
         }
 
-        if (draftQueueCount > 0) {
+        if (draftQueueCount > 0 || draftables.isEmpty()) {
             List<Button> queueButtons = new ArrayList<>();
             if (isQueueFull || draftables.isEmpty()) {
                 queueButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "frankenDraftAction;confirm_draft", "I wish to draft these cards."));
