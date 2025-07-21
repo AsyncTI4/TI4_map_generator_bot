@@ -273,6 +273,7 @@ public class PlayerStatsDashboardPayload {
     public List<String> getTechnologies() {
         return player.getTechs().stream()
             .map(Mapper::getTech)
+            .filter(Objects::nonNull)
             .map(TechnologyModel::getName)
             .toList();
     }
