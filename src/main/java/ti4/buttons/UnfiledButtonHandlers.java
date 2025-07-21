@@ -1113,7 +1113,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("toldarPN")
-    public static void toldarPN(ButtonInteractionEvent event, Player player, Game game) {
+    public static void toldarPN(ButtonInteractionEvent event, Player player) {
         player.setCommodities(player.getCommodities() + 3);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " used _Concordat Allegiant_ (the Toldar promissory note)" +
             " to gain 3 commodities after winning a combat against someone with more victory points than them. They can do this once per action. Their currently hold "
@@ -1341,7 +1341,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler(value = "get_so_discard_buttons", save = false)
-    public static void getSODiscardButtons(ButtonInteractionEvent event, Player player, Game game) {
+    public static void getSODiscardButtons(ButtonInteractionEvent event, Player player) {
         String secretScoreMsg = "Click a button below to discard your secret objective.";
         List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
         if (!soButtons.isEmpty()) {
@@ -2510,7 +2510,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("getDiscardButtonsACs")
-    public static void getDiscardButtonsACs(Player player, Game game) {
+    public static void getDiscardButtonsACs(Player player) {
         String msg = player.getRepresentationUnfogged() + ", use buttons to discard an action card.";
         List<Button> buttons = ActionCardHelper.getDiscardActionCardButtons(player, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -3242,7 +3242,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler(value = "refreshStatusSummary", save = false)
-    public static void refreshStatusSummary(ButtonInteractionEvent event, Player player, Game game) {
+    public static void refreshStatusSummary(ButtonInteractionEvent event, Game game) {
         String msg = "Please score objectives.";
         msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
         event.getMessage().editMessage(msg).queue();
@@ -3386,7 +3386,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("comm_for_AC")
-    public static void commForAC(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void commForAC(ButtonInteractionEvent event, Game game, Player player) {
         boolean hasSchemingAbility = player.hasAbility("scheming");
         int count2 = hasSchemingAbility ? 2 : 1;
         String commOrTg = "";

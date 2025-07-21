@@ -48,7 +48,7 @@ public class AssignHitsButtonHandlers {
             UnitType type = Units.findUnitType(matcher.group("unittype"));
             String planetName = matcher.group("planet");
             UnitHolder holder = planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
-            ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(game, player, matcher);
+            ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(player, matcher);
             if (remove) {
                 RemoveUnitService.removeUnit(event, tile, game, unit, state);
             } else {
