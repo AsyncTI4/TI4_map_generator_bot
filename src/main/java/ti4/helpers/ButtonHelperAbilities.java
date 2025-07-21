@@ -31,6 +31,7 @@ import ti4.model.ExploreModel;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
+import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
@@ -1962,6 +1963,7 @@ public class ButtonHelperAbilities {
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + planet);
         String opponent = "their opponent's";
+        String colour = "";
         for (Player p2 : game.getPlayers().values()) {
             if (p2.getColor() == null || p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
                 continue; // fix indoctrinate vs neutral
@@ -1970,6 +1972,7 @@ public class ButtonHelperAbilities {
                 RemoveUnitService.removeUnits(event, tile, game, p2.getColor(), "1 infantry " + planet);
                 ButtonHelper.resolveInfantryRemoval(p2, 1);
                 opponent = p2.getRepresentationNoPing();
+                colour = p2.getColor();
                 break;
             }
         }
@@ -1979,6 +1982,52 @@ public class ButtonHelperAbilities {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getFactionEmoji() + " replaced 1 of their opponent's infantry with 1 " + unit + " on "
                     + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
+        } else if (RandomHelper.isOneInX(100) && colour.length() > 0 && "infantry".equals(unit)) {
+            String poem = "";
+            switch (ThreadLocalRandom.current().nextInt(20))
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                    poem += "\\> Roses are red\n";
+                    break;
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                    poem += "\\> Violets are blue\n";
+                    break;
+                case 14:
+                    poem += "\\> Violets are purple\n";
+                    break;
+                case 15:
+                    poem += "\\> Daffodils are yellow\n";
+                    break;
+                case 16:
+                    poem += "\\> Daisies are white\n";
+                    break;
+                case 17:
+                    poem += "\\> Marigolds are orange\n";
+                    break;
+                case 18:
+                    poem += "\\> Carnations are pink\n";
+                    break;
+                case 19:
+                    poem += "\\> Lilacs are lilac\n";
+                    break;
+            }
+            poem += "\\> Infantry are " +  ColorEmojis.getColorEmojiWithName(colour) + "\n";
+            poem += "\\> Wololo " + MiscEmojis.Wololo + "\n";
+            poem += "\\> Now infantry are " +  ColorEmojis.getColorEmojiWithName(player.getColor()) + "\n";
+            poem += "-# Yes, it doesn't rhyme (probably), but there's like, " + Mapper.getColors().size() + " available colours, and I'm not writing a unique poem for every possible pair.";
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), poem);
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentationNoPing() + " replaced 1 of " + opponent + " infantry with 1 " + unit + " on "
