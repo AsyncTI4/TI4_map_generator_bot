@@ -3619,7 +3619,7 @@ public class ButtonHelper {
             StartTurnService.getStartOfTurnButtons(player, game, true, event, true));
 
         if (!player.hasTech("fl") && !player.hasTech("absol_fl") && !game.playerHasLeaderUnlockedOrAlliance(player, "kelerescommander")) {
-            MessageHelper.sendEphemeralMessageToEventChannel(event, "##" + player.getRepresentation() + " if you are not a new player, you can ignore this, but know that on your turn you can only do one action normally. Doing a second action button is reserved for homebrew/master planet/other abilitys. If you dont have one of those, please don't do another turn. ");
+            MessageHelper.sendEphemeralMessageToEventChannel(event, "## " + player.getRepresentation() + " if you are not a new player, you can ignore this, but know that on your turn you can only do one action normally. Doing a second action button is reserved for homebrew/master planet/other abilitys. If you dont have one of those, please don't do another turn. ");
         }
         GMService.logPlayerActivity(game, player, msg);
     }

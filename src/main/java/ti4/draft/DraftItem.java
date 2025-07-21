@@ -172,7 +172,7 @@ public abstract class DraftItem implements ModelInterface {
         DraftBag draftHand = player.getDraftHand();
         boolean isAtHandLimit = draftHand.getCategoryCount(ItemCategory) + player.getDraftQueue().getCategoryCount(ItemCategory) >= draftRules.getItemLimitForCategory(ItemCategory);
         if (draftRules instanceof FrankenDraft) {
-            isAtHandLimit = draftHand.getCategoryCount(ItemCategory) >= FrankenDraft.getItemLimitForCategory(ItemCategory, player.getGame());
+            isAtHandLimit = draftHand.getCategoryCount(ItemCategory) + player.getDraftQueue().getCategoryCount(ItemCategory) >= FrankenDraft.getItemLimitForCategory(ItemCategory, player.getGame());
         }
         if (isAtHandLimit) {
             return false;

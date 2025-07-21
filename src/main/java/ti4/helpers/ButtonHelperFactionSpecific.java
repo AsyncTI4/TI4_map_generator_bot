@@ -331,14 +331,14 @@ public class ButtonHelperFactionSpecific {
             player.setDishonorCounter(Math.min(8 - player.getHonorCounter(), player.getDishonorCounter()));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " has gained an Honor by beating someone with more victory points than them in combat."
-                + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter() + " Dishonor.");
+                    + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter() + " Dishonor.");
         }
         if (p2.getTotalVictoryPoints() < player.getTotalVictoryPoints()) {
             player.setDishonorCounter(Math.min(8, player.getDishonorCounter() + 1));
             player.setHonorCounter(Math.min(8 - player.getDishonorCounter(), player.getHonorCounter()));
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " has gained 1 Dishonor by beating someone with fewer victory points than them in combat."
-                + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter() + " Dishonor.");
+                    + " You now have " + player.getHonorCounter() + " Honor and " + player.getDishonorCounter() + " Dishonor.");
         }
         correctHonorAbilities(player, game);
 
@@ -1381,6 +1381,20 @@ public class ButtonHelperFactionSpecific {
             .containsKey(Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor()))) {
             ButtonHelper.deleteTheOneButton(event);
         }
+        if (cabal.hasAbility("amalgamation")) {
+            double existingDiscount = 0;
+            if (!game.getStoredValue("amalgAmount").isEmpty()) {
+                existingDiscount = Double.parseDouble(game.getStoredValue("amalgAmount"));
+            }
+            double cost = player.getUnitFromAsyncID(AliasHandler.resolveUnit(unit)).getCost();
+            boolean regulated = ButtonHelper.isLawInPlay(game, "conscription")
+                || ButtonHelper.isLawInPlay(game, "absol_conscription");
+            if (cost == 0.5 && regulated) {
+                cost = 1;
+            }
+            existingDiscount += cost;
+            game.setStoredValue("amalgAmount", "" + existingDiscount);
+        }
     }
 
     @ButtonHandler("kolleccRelease_")
@@ -1774,24 +1788,20 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("redCreussWashPartial")
     public static void redCreussWashPartial(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        if (player.getCommodities() == 0)
-        {
+        if (player.getCommodities() == 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you don't have any commodities.");
             return;
         }
         String other = buttonID.split("_")[1];
         for (Player p2 : game.getRealPlayers()) {
-            if (!other.equals(p2.getUserID()))
-            {
+            if (!other.equals(p2.getUserID())) {
                 continue;
             }
-            if (!player.getNeighbouringPlayers(true).contains(p2))
-            {
+            if (!player.getNeighbouringPlayers(true).contains(p2)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you are not neighbours with " + p2.getRepresentationNoPing() + ".");
                 return;
             }
-            if (p2.getCommodities() == 0)
-            {
+            if (p2.getCommodities() == 0) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - " + p2.getRepresentationNoPing() + " doesn't have any commodities.");
                 return;
             }
@@ -1799,26 +1809,20 @@ public class ButtonHelperFactionSpecific {
             player.setCommodities(player.getCommodities() - wash);
             p2.setCommodities(p2.getCommodities() - wash);
             String message = "";
-            if (player.getCommodities() == 0)
-            {
+            if (player.getCommodities() == 0) {
                 message += player.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit" + (wash == 1 ? "y" : "ies") + " " + player.gainTG(wash)
                     + " with " + p2.getFactionEmojiOrColor() + ".";
-            }
-            else
-            {
+            } else {
                 int remain = player.getCommodities();
                 int orig = remain + wash;
                 message += player.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + player.gainTG(wash)
                     + " with " + p2.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
             }
             message += "\n";
-            if (p2.getCommodities() == 0)
-            {
+            if (p2.getCommodities() == 0) {
                 message += p2.getRepresentationUnfogged() + " has washed all " + wash + " of their commodit" + (wash == 1 ? "y" : "ies") + " " + p2.gainTG(wash)
                     + " with " + player.getFactionEmojiOrColor() + ".";
-            }
-            else
-            {
+            } else {
                 int remain = p2.getCommodities();
                 int orig = remain + wash;
                 message += p2.getRepresentationUnfogged() + " has washed " + wash + " of their " + orig + " commodit" + (orig == 1 ? "y" : "ies") + " " + p2.gainTG(wash)
@@ -1833,19 +1837,16 @@ public class ButtonHelperFactionSpecific {
 
     @ButtonHandler("redCreussWashFull")
     public static void redCreussWashFull(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
-        if (player.getCommodities() == 0)
-        {
+        if (player.getCommodities() == 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you don't have any commodities.");
             return;
         }
         String other = buttonID.split("_")[1];
         for (Player p2 : game.getRealPlayers()) {
-            if (!other.equals(p2.getUserID()))
-            {
+            if (!other.equals(p2.getUserID())) {
                 continue;
             }
-            if (!player.getNeighbouringPlayers(true).contains(p2))
-            {
+            if (!player.getNeighbouringPlayers(true).contains(p2)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong - you are not neighbours with " + p2.getRepresentationNoPing() + ".");
                 return;
             }
@@ -1855,25 +1856,19 @@ public class ButtonHelperFactionSpecific {
             player.setCommodities(Math.max(commP1 - wash, 0));
             p2.setCommodities(Math.max(commP2 - wash, 0));
             String message = "";
-            if (wash >= commP1)
-            {
+            if (wash >= commP1) {
                 message += player.getRepresentationUnfogged() + " has washed all " + commP1 + " of their commodit" + (commP1 == 1 ? "y" : "ies") + " " + player.gainTG(commP1)
                     + " with " + p2.getFactionEmojiOrColor() + ".";
-            }
-            else
-            {
+            } else {
                 int remain = commP1 - wash;
                 message += player.getRepresentationUnfogged() + " has washed " + wash + " of their " + commP1 + " commodit" + (commP1 == 1 ? "y" : "ies") + " " + player.gainTG(commP1)
                     + " with " + p2.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
             }
             message += "\n";
-            if (wash >= commP2)
-            {
+            if (wash >= commP2) {
                 message += p2.getRepresentationUnfogged() + " has washed all " + commP2 + " of their commodit" + (commP2 == 1 ? "y" : "ies") + " " + p2.gainTG(commP2)
                     + " with " + player.getFactionEmojiOrColor() + ".";
-            }
-            else
-            {
+            } else {
                 int remain = commP2 - wash;
                 message += p2.getRepresentationUnfogged() + " has washed " + wash + " of their " + commP2 + " commodit" + (commP2 == 1 ? "y" : "ies") + " " + p2.gainTG(commP2)
                     + " with " + player.getFactionEmojiOrColor() + ", leaving them with " + remain + ".";
@@ -2120,16 +2115,16 @@ public class ButtonHelperFactionSpecific {
         if (cabal == null) {
             for (Player p2 : game.getRealPlayers()) {
                 if (ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", p2, tile)
-                        || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile)
-                        || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile)) {
+                    || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", p2, tile)
+                    || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", p2, tile)) {
                     cabal = p2;
                 }
             }
         }
         if (cabal != null && (!uH.getPlayersUnitListOnHolder(cabal).isEmpty()
-                || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)
-                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", cabal, tile)
-                || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", cabal, tile))) {
+            || ButtonHelper.doesPlayerHaveFSHere("cabal_flagship", cabal, tile)
+            || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_1", cabal, tile)
+            || ButtonHelper.doesPlayerHaveFSHere("sigma_vuilraith_flagship_2", cabal, tile))) {
             cabalEatsUnit(player, game, cabal, amount, unit, event, false);
         }
     }
@@ -2137,8 +2132,8 @@ public class ButtonHelperFactionSpecific {
     public static void mentakHeroProducesUnit(Player player, Game game, Player mentak, int amount, String unit, GenericInteractionCreateEvent event, Tile tile) {
         String unitP = AliasHandler.resolveUnit(unit);
         if (mentak == player || unitP.contains("sd") || unitP.contains("pd")
-                || (unitP.contains("ws") && !mentak.hasWarsunTech()) || unitP.contains("mf") || unitP.contains("gf")
-                || (mentak.getAllianceMembers().contains(player.getFaction()))) {
+            || (unitP.contains("ws") && !mentak.hasWarsunTech()) || unitP.contains("mf") || unitP.contains("gf")
+            || (mentak.getAllianceMembers().contains(player.getFaction()))) {
             return;
         }
         String msg = mentak.getRepresentationUnfogged() + " placed " + amount + " of the " + unit
@@ -2185,8 +2180,8 @@ public class ButtonHelperFactionSpecific {
         ButtonHelper.deleteMessage(event);
         MessageHelper.sendMessageToChannel(killer.getCorrectChannel(),
             killer.getRepresentationNoPing() + " added " + winnings + " commodit" + (winnings == 1 ? "y" : "ies") + " to the planet of "
-            + Helper.getPlanetRepresentation(planet, game) + " (which now has " + newAmount + " commodit" + (newAmount == 1 ? "y" : "ies")
-            + " on it) by destroying units owned by " + player.getRepresentationNoPing() + ".");
+                + Helper.getPlanetRepresentation(planet, game) + " (which now has " + newAmount + " commodit" + (newAmount == 1 ? "y" : "ies")
+                + " on it) by destroying units owned by " + player.getRepresentationNoPing() + ".");
     }
 
     @ButtonHandler("letnevMechRes_")
