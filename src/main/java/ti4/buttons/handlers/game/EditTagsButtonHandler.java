@@ -21,7 +21,7 @@ import ti4.message.MessageHelper;
 public class EditTagsButtonHandler {
 
     @ButtonHandler("editTags~MDL")
-    public static void handleEditTags(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void handleEditTags(ButtonInteractionEvent event, Game game) {
         String modalId = "editTags";
         String currentTags = String.join(";", game.getTags());
         if (currentTags.isBlank()) currentTags = null;
@@ -36,7 +36,7 @@ public class EditTagsButtonHandler {
     }
 
     @ModalHandler("editTags")
-    public static void finishEditTags(ModalInteractionEvent event, Game game, Player player, String modalID) {
+    public static void finishEditTags(ModalInteractionEvent event, Game game) {
         ModalMapping mapping = event.getValue("tags");
         String tagsRaw = mapping.getAsString();
         List<String> currentTags = game.getTags();

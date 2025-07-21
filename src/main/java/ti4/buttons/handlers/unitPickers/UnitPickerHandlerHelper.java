@@ -26,7 +26,7 @@ public class UnitPickerHandlerHelper {
     }
 
     // TODO: Jazz make this useful
-    public ParsedUnit parsedUnitFromMatcher(Game game, Player player, Matcher matcher) {
+    public ParsedUnit parsedUnitFromMatcher(Player player, Matcher matcher) {
         int amt = Integer.parseInt(matcher.group("amt"));
         UnitType type = Units.findUnitType(matcher.group("unittype"));
         // TODO: Jazz add this functionality by default to parsed unit

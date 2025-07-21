@@ -114,7 +114,7 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("resolveChainReaction")
-    public static void resolveChainReaction(Player player, Game game, ButtonInteractionEvent event) {
+    public static void resolveChainReaction(ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(event.getChannel(), "Effect changed, so old implementation was deprecated. Roll manually.");
 //        StringBuilder msg = new StringBuilder("The _Chain Reaction_ rolled: ");
@@ -227,7 +227,7 @@ class ActionCardDeck2ButtonHandler {
     }
 
     @ButtonHandler("armsDealStep2_")
-    public static void resolveArmsDealStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+    public static void resolveArmsDealStep2(Game game, ButtonInteractionEvent event, String buttonID) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;

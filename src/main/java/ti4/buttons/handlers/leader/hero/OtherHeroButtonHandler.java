@@ -191,7 +191,7 @@ public class OtherHeroButtonHandler {
     }
 
     @ButtonHandler("purgeOrlandoHero_")
-    public static void purgeOrlandoHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
+    public static void purgeOrlandoHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         String p = "p";
         while (RandomHelper.isOneInX(20))
         {
