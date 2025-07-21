@@ -109,7 +109,8 @@ public class PlayerTechService {
             }
         }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology " + techModel.getRepresentation(false) + ".";
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Exhausted the " + techModel.getName() + " tech.");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), 
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " exhausted the _" + techModel.getName() + "_ technology.");
         if (game.isShowFullComponentTextEmbeds()) {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
         } else {

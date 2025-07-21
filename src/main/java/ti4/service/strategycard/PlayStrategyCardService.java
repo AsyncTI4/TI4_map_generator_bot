@@ -95,7 +95,8 @@ public class PlayStrategyCardService {
             }
         }
 
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played " + Helper.getSCRepresentation(game, scToPlay) + ".");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), 
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " played " + Helper.getSCRepresentation(game, scToPlay) + ".");
 
         if (!winnuHero) {
             game.setSCPlayed(scToPlay, true);
@@ -387,9 +388,8 @@ public class PlayStrategyCardService {
                             game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
                         }
                         MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                            "You were automatically marked as not following **"
-                                + stratCardName
-                                + "** because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
+                            "You were automatically marked as not following **" + stratCardName
+                                + "**, because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
                     }
                 } else {
                     if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship")
@@ -445,9 +445,8 @@ public class PlayStrategyCardService {
                                 game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
                             }
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                                "You were automatically marked as not following **"
-                                    + stratCardName
-                                    + "** because the bot believes you have already scored all of your possible Secret Objectives.");
+                                "You were automatically marked as not following **" + stratCardName
+                                    + "** because the bot believes you have already scored all " + p2.getSoScored() + " of your secret objectives.");
                         }
                     }
                 }

@@ -59,7 +59,7 @@ public class PickStrategyCardButtonHandler {
     }
 
     @ButtonHandler("restartSCQueue")
-    public static void restartSCQueue(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void restartSCQueue(ButtonInteractionEvent event, Game game, Player player) {
         event.getMessage().delete().queue();
         game.setStoredValue(player.getFaction() + "scpickqueue", "");
         List<Button> buttons = StartPhaseService.getQueueSCPickButtons(game, player);

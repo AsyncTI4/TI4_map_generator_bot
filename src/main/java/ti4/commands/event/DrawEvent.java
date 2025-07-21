@@ -24,6 +24,6 @@ class DrawEvent extends GameStateSubcommand {
         for (int i = 0; i < count; i++) {
             game.drawEvent(player.getUserID());
         }
-        EventInfo.sendEventInfo(game, player, event);
+        EventInfo.sendEventInfo(player, event);
     }
 }

@@ -218,7 +218,7 @@ public class CryypterHelper {
         if (player.hasUnexhaustedLeader("yssarilenvoy") && game.getPhaseOfGame() != null && game.getPhaseOfGame().startsWith("agenda")) {
             String msg = player.getRepresentation()
                 + " you have the option to user your Envoy on someone."
-                + " It will ping them saying that they may copy the effect of the AC you just played.";
+                + " It will ping them saying that they may copy the effect of the action card you just played.";
             List<Button> buttons2 = new ArrayList<>();
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
@@ -247,7 +247,7 @@ public class CryypterHelper {
 
         String msg = yssarilPlayer.getRepresentation(false, true) + " is using the Yssaril Envoy to allow "
             + targetPlayer.getRepresentation(false, true)
-            + " to copy the effect of their AC. The Envoy has been exhausted.";
+            + " to copy the effect of their action card. The Envoy has been exhausted.";
         MessageHelper.sendMessageToChannel(targetPlayer.getCorrectChannel(), msg);
 
         msg = targetPlayer.getRepresentation(false, true) +

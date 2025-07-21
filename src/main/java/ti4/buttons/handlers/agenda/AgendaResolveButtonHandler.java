@@ -900,7 +900,7 @@ class AgendaResolveButtonHandler {
             if (voter.hasTech("dskyrog")) {
                 MessageHelper.sendMessageToChannel(voter.getCorrectChannel(), voter.getFactionEmoji() + " gets to drop 2 infantry on a planet due to _Indoctrination Team_.");
                 List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(voter, game, "2gf", "placeOneNDone_skipbuild"));
-                MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), "please use buttons to drop 2 infantry on a planet.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(voter.getCorrectChannel(), "Please use buttons to drop 2 infantry on a planet.", buttons);
             }
         }
         voters.addAll(riders);

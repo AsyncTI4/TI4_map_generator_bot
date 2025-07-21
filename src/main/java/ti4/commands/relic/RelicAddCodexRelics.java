@@ -17,18 +17,31 @@ class RelicAddCodexRelics extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
+        String newRelics = "";
+        int relicCount = 0;
         List<String> allRelics = game.getAllRelics();
         if (!allRelics.contains("bookoflatvinia")) {
             game.shuffleRelicBack("bookoflatvinia");
-            MessageHelper.sendMessageToEventChannel(event, "Relic Book of Latvinia added into deck");
+            newRelics += (relicCount > 0 ? " and " : "") +  "_Book of Latvinia_";
+            relicCount++;
         }
         if (!allRelics.contains("circletofthevoid")) {
             game.shuffleRelicBack("circletofthevoid");
-            MessageHelper.sendMessageToEventChannel(event, "Relic Circlet Of The Void added into deck");
+            newRelics += (relicCount > 0 ? " and " : "") +  "_Circlet Of The Void_";
+            relicCount++;
         }
         if (!allRelics.contains("neuraloop")) {
             game.shuffleRelicBack("neuraloop");
-            MessageHelper.sendMessageToEventChannel(event, "Relic Neuraloop added into deck");
+            newRelics += (relicCount > 0 ? " and " : "") +  "_Neuraloop_";
+            relicCount++;
+        }
+        if (relicCount == 0)
+        {
+        MessageHelper.sendMessageToEventChannel(event, "No new relics have been added.");
+        }
+        else
+        {
+            MessageHelper.sendMessageToEventChannel(event, (relicCount == 2 ? newRelics : newRelics.replaceFirst(" and ", ", ")) + (relicCount == 1 ? "has" : "have") + " been shuffled into the relic deck.");
         }
     }
 }

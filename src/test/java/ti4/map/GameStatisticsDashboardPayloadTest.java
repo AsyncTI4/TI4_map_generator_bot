@@ -4,7 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class GameStatisticsDashboardPayloadTest {
+import java.util.Map;
+
+import ti4.testUtils.BaseTi4Test;
+
+class GameStatisticsDashboardPayloadTest extends BaseTi4Test {
 
     @Test
     void getSetupTime() {
@@ -24,6 +28,27 @@ class GameStatisticsDashboardPayloadTest {
         var setupTimestamp = new GameStatsDashboardPayload(game).getSetupTimestamp();
 
         assertThat(String.valueOf(setupTimestamp)).endsWith("70");
+    }
+
+    @Test
+    void getLawsIgnoresUnknownIds() {
+        var game = createGame();
+        game.setLaws(Map.of("unknown_law", 1));
+        game.setDiscardAgendas(Map.of("another_unknown", 2));
+
+        var laws = new GameStatsDashboardPayload(game).getLaws();
+
+        assertThat(laws).isEmpty();
+    }
+
+    @Test
+    void getLawsReturnsKnownNames() {
+        var game = createGame();
+        game.setLaws(Map.of("revolution", 1));
+
+        var laws = new GameStatsDashboardPayload(game).getLaws();
+
+        assertThat(laws).containsExactly("Anti-Intellectual Revolution");
     }
 
     private Game createGame() {

@@ -894,7 +894,7 @@ public class ButtonHelperModifyUnits {
     @ButtonHandler("resolveDevote_")
     public static void resolveDevote(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
-        List<Button> buttons = getOpposingUnitsToHit(player, game, event, tile, false);
+        List<Button> buttons = getOpposingUnitsToHit(player, game, tile, false);
         String msg = player.getRepresentation() + ", please choose which opposing unit to hit.";
         String unit = buttonID.split("_")[2];
         UnitKey unitKey = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColor());
@@ -910,7 +910,7 @@ public class ButtonHelperModifyUnits {
         }
     }
 
-    public static List<Button> getOpposingUnitsToHit(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, boolean exoHit) {
+    public static List<Button> getOpposingUnitsToHit(Player player, Game game, Tile tile, boolean exoHit) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         String exo = "";
@@ -968,11 +968,12 @@ public class ButtonHelperModifyUnits {
     public static void magenHit(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         ButtonHelper.deleteTheOneButton(event);
         String planet = buttonID.split("_")[1];
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving magen defense grid");
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " choose the opposing unit to hit", getOpposingUnitsToHitOnGround(player, game, event, game.getTileFromPlanet(planet), planet));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationNoPing() + " is resolving _Magen Defense Grid_.");
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
+            player.getRepresentation() + ", please choose the opposing unit to hit.", getOpposingUnitsToHitOnGround(player, game, game.getTileFromPlanet(planet), planet));
     }
 
-    public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, GenericInteractionCreateEvent event, Tile tile, String planet) {
+    public static List<Button> getOpposingUnitsToHitOnGround(Player player, Game game, Tile tile, String planet) {
         String finChecker = "FFCC_" + player.getFaction() + "_";
 
         List<Button> buttons = new ArrayList<>();
@@ -1032,7 +1033,8 @@ public class ButtonHelperModifyUnits {
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
-        String msg = player.getRepresentation() + " you have had one of your units assigned a hit via magen defense grid, please cancel the hit somehow (Titans Agent, SUSTAIN DAMAGE, etc.), or accept the loss of the unit.";
+        String msg = player.getRepresentation() + ", you have had one of your units assigned a hit with _Magen Defense Grid_."
+            + " Please either cancel the hit somehow, or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
         UnitModel unitModel = player.getUnitFromUnitKey(key);
@@ -1064,7 +1066,8 @@ public class ButtonHelperModifyUnits {
         if (game.isFowMode()) {
             channel = player.getPrivateChannel();
         }
-        String msg = player.getRepresentation() + " you have had one of your units assigned a hit, please cancel the hit somehow (_Shields Holding_, SUSTAIN DAMAGE, etc.), or accept the loss of the unit.";
+        String msg = player.getRepresentation() + ", you have had one of your units assigned a hit."
+            + " Please either cancel the hit somehow, or accept the loss of the unit.";
         List<Button> buttons = new ArrayList<>();
 
         UnitKey key = Mapper.getUnitKey(AliasHandler.resolveUnit(unit), player.getColorID());
@@ -1086,18 +1089,19 @@ public class ButtonHelperModifyUnits {
         }
 
         int x = 1;
+        String id;
+        String label;
         if (damaged) {
-            String id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + unitName + "damaged";
-            String label = "Remove " + x + " damaged " + unitModel.getBaseType();
-            buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
+            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName + "_damaged";
+            label = "Remove " + x + " damaged " + unitModel.getBaseType();
         } else {
-            String id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + unitName;
-            String label = "Remove " + x + " " + unitModel.getBaseType();
-            buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
+            id = player.finChecker() + "assignHits_" + tile.getPosition() + "_" + x + "_" + unitName;
+            label = "Remove " + x + " " + unitModel.getBaseType();
         }
+        buttons.add(Buttons.red(id, label, unitModel.getUnitEmoji()));
         if (!damaged && unitModel.getSustainDamage()) {
-            String id = player.finChecker() + "assignDamage_" + tile.getPosition() + "_" + 1 + unitName;
-            String label = "Sustain " + 1 + " " + unitModel.getBaseType();
+            id = player.finChecker() + "assignDamage_" + tile.getPosition() + "_" + 1 + "_" + unitName;
+            label = "Sustain 1 " + unitModel.getBaseType();
             buttons.add(Buttons.blue(id, label, unitModel.getUnitEmoji()));
         }
 
@@ -1181,15 +1185,6 @@ public class ButtonHelperModifyUnits {
                 MoveUnitService.moveUnits(event, tile1, game, player.getColor(), totalUnits + " " + unitName, tile2, "space");
             }
         }
-    }
-
-    public static void umbatTile(String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident) {
-        String pos = buttonID.replace("umbatTile_", "");
-        List<Button> buttons = Helper.getPlaceUnitButtons(event, player, game, game.getTileByPosition(pos),
-            "muaatagent", "place");
-        String message = player.getRepresentation() + " Use the buttons to produce units. ";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-        event.getMessage().delete().queue();
     }
 
     /**
@@ -1323,19 +1318,19 @@ public class ButtonHelperModifyUnits {
                     if (player.hasLeaderUnlocked("redcreusshero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
-                            Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
+                            Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                            "You may place this produced ship on the Red Creuss Hero.",
+                            "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
                             shroadedFleets);
                     }
                     if (player.hasLeaderUnlocked("redcreusshero")) {
                         List<Button> shroadedFleets = new ArrayList<>();
                         shroadedFleets.add(
-                            Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 fighter"));
+                            Buttons.green("cloakedFleets_" + tile2.getPosition() + "_ff", "Capture 1 Fighter"));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                            "You may place this produced ship on the Red Creuss Hero.",
+                            "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
                             shroadedFleets);
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
@@ -1355,7 +1350,7 @@ public class ButtonHelperModifyUnits {
                         List<Button> cloakedFleets = new ArrayList<>();
                         cloakedFleets.add(Buttons.green("cloakedFleets_" + tile.getPosition() + "_" + unitID, "Capture 1 " + StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(unitID))));
                         cloakedFleets.add(Buttons.red("deleteButtons", "Decline"));
-                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "You may place this produced ship on the Red Creuss Hero.", cloakedFleets);
+                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "You may place this produced ship on the \"A Tall Stranger\", Red Creuss Hero.", cloakedFleets);
                     }
                 }
 
@@ -1467,9 +1462,9 @@ public class ButtonHelperModifyUnits {
                     + " in " + tile.getRepresentationForButtons(game, player) + " using the **Cloaked Fleets** ability (limit of 2 ships may be captured per build).");
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " captured 1 newly produced " + UnitEmojis.getUnitEmoji(name)
-                    + " in " + tile.getRepresentationForButtons(game, player) + " using the Red Creuss Hero ability (note: not strictly a capture)." +
-                    "\nThey will be able to deploy all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
+                player.getRepresentationUnfogged() + " captured\\* 1 newly produced " + UnitEmojis.getUnitEmoji(name)
+                    + " in " + tile.getRepresentationForButtons(game, player) + " using \"A Tall Stranger\", the Red Creuss Hero ability."
+                    + "\nThey will be able to mobilize all ships that are on the hero (represented as captured in async) later in a space combat of their choosing.");
         }
         AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), unitID);
         event.getMessage().delete().queue();
@@ -1584,7 +1579,7 @@ public class ButtonHelperModifyUnits {
                         shroadedFleets.add(Buttons.green("cloakedFleets_" + tile2.getPosition() + "_" + unitID, "Capture 1 " + Mapper.getUnitBaseTypeFromAsyncID(unitID)));
                         shroadedFleets.add(Buttons.red("deleteButtons", "Decline"));
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                            "You may place this produced ship on the Red Creuss Hero.",
+                            "You may place this produced ship on \"A Tall Stranger\", the Red Creuss Hero.",
                             shroadedFleets);
                     }
                     if (tile2 != null && !willSkipBuild && player.hasAbility("rally_to_the_cause")
@@ -1696,18 +1691,18 @@ public class ButtonHelperModifyUnits {
             msg = opponent.getRepresentationUnfogged() + " " + player.getFactionEmoji()
                 + " used Clona Bathru, the Dih-Mohn Commander, to generate a hit against you. Please assign it with buttons.";
         } else if (cause.contains("ds")) {
-            buttons = getOpposingUnitsToHit(player, game, event, tile, false);
+            buttons = getOpposingUnitsToHit(player, game, tile, false);
             msg = player.getRepresentation() + ", please choose which opposing unit to hit.";
         } else if (cause.contains("exo")) {
             DestroyUnitService.destroyUnits(event, tile, game, player.getColor(), "1 dread", true);
-            buttons = getOpposingUnitsToHit(player, game, event, tile, true);
+            buttons = getOpposingUnitsToHit(player, game, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation(false, false) + " has chosen to destroy one of their dreadnoughts in order to destroy 2 opposing ships of their choice."
                     + " This occurs after any retreats. The dread has been removed.");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
         } else if (cause.contains("caled")) {
-            buttons = getOpposingUnitsToHit(player, game, event, tile, true);
+            buttons = getOpposingUnitsToHit(player, game, tile, true);
             msg = player.getRepresentation() + ", please choose which opposing unit to destroy.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                 player.getRepresentation(false, false) + " has chosen to destroy one of opposing ships using the _Caled_ Superweapon ability."

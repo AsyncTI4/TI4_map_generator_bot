@@ -29,7 +29,7 @@ public enum MiscEmojis implements TI4Emoji {
     // Other
     Sabotage, NoSabo, NoWhens, NoAfters, //
     Winemaking, BortWindow, SpoonAbides, AsyncTI4Logo, TIGL, RollDice, //
-    BLT, Stroter;
+    BLT, Stroter, Wololo;
 
     public static TI4Emoji getCreussWormhole(@NotNull String wormhole) {
         return switch (wormhole.toLowerCase()) {

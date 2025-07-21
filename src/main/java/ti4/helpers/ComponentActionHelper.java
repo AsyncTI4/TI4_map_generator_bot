@@ -443,18 +443,15 @@ public class ComponentActionHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, purgeFragButtons);
 
                 } else if ("stallTactics".equalsIgnoreCase(buttonID)) {
-                    String secretScoreMsg = "_ _\n" + p1.getRepresentationUnfogged()
-                        + " Click a button below to discard an Action Card";
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
-                    MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
-                        p1.getRepresentation() + " is stalling with their **Stall Tactics** ability.");
                     if (!acButtons.isEmpty()) {
-                        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg,
-                            acButtons);
-                        ThreadChannel cardsInfoThreadChannel = p1.getCardsInfoThread();
-                        for (MessageCreateData message : messageList) {
-                            cardsInfoThreadChannel.sendMessage(message).queue();
-                        }
+                        MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
+                            p1.getRepresentation() + " is doing nothing with their **Stall Tactics** ability.");
+                        MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), 
+                            p1.getRepresentationUnfogged() + ", please discard an action card.", acButtons);
+                    } else {
+                        MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(),
+                            p1.getRepresentation() + ", you don't have any action cards to discard.");
                     }
                 } else if ("mantlecracking".equalsIgnoreCase(buttonID)) {
                     List<Button> buttons = ButtonHelperAbilities.getMantleCrackingButtons(p1, game);

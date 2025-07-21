@@ -88,6 +88,11 @@ public class PromissoryNoteHelper {
                             PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn.getKey());
                             sb.append(index++).append("\\. ").append(CardEmojis.PN).append("  _").append(pnModel.getName()).append("_ ");
                             Player pnOwner = game.getPNOwner(pn.getKey());
+                            if (pnOwner == null) {
+                                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                                    player.getRepresentation() + ", one of your promissory notes has no owner. The promissory note id is " + pn.getKey() + " and number is " + pn.getValue() + ".");
+                                continue;
+                            }
                             if (pnOwner == player) {
                                 sb.append("✋");
                             } else {
@@ -505,7 +510,8 @@ public class PromissoryNoteHelper {
         }
         if (pn.getText().toLowerCase().contains("action:") && !"acq".equalsIgnoreCase(id)) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
-            game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played the " + Mapper.getPromissoryNote(id).getName() + " promissory note.");
+            game.setStoredValue("currentActionSummary" + player.getFaction(), 
+                game.getStoredValue("currentActionSummary" + player.getFaction()) + " played the _" + Mapper.getPromissoryNote(id).getName() + "_ promissory note.");
         }
         TemporaryCombatModifierModel possibleCombatMod = CombatTempModHelper.getPossibleTempModifier(Constants.PROMISSORY_NOTES, pn.getAlias(), player.getNumberOfTurns());
         if (possibleCombatMod != null) {

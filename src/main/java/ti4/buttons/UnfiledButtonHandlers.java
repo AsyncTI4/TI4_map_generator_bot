@@ -1113,7 +1113,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("toldarPN")
-    public static void toldarPN(ButtonInteractionEvent event, Player player, Game game) {
+    public static void toldarPN(ButtonInteractionEvent event, Player player) {
         player.setCommodities(player.getCommodities() + 3);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " used _Concordat Allegiant_ (the Toldar promissory note)" +
             " to gain 3 commodities after winning a combat against someone with more victory points than them. They can do this once per action. Their currently hold "
@@ -1341,8 +1341,8 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler(value = "get_so_discard_buttons", save = false)
-    public static void getSODiscardButtons(ButtonInteractionEvent event, Player player, Game game) {
-        String secretScoreMsg = "_ _\nClick a button below to discard your Secret Objective";
+    public static void getSODiscardButtons(ButtonInteractionEvent event, Player player) {
+        String secretScoreMsg = "Click a button below to discard your secret objective.";
         List<Button> soButtons = SecretObjectiveHelper.getUnscoredSecretObjectiveDiscardButtons(player);
         if (!soButtons.isEmpty()) {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), secretScoreMsg, soButtons);
@@ -1745,7 +1745,7 @@ public class UnfiledButtonHandlers {
                 String pos = buttonID.split("_")[1];
                 buttonID = buttonID.split("_")[0];
                 tile = game.getTileByPosition(pos);
-                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Produced units in " + tile.getRepresentationForButtons() + ".");
+                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " produced units in " + tile.getRepresentationForButtons() + ".");
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel) && player.hasAbility("amalgamation") && !game.getStoredValue("amalgAmount").isEmpty()) {
                 editedMessage = Helper.buildSpentThingsMessage(player, game, "res");
@@ -1764,7 +1764,7 @@ public class UnfiledButtonHandlers {
                 player.setTotalExpenses(
                     player.getTotalExpenses() + Helper.calculateCostOfProducedUnits(player, game, true));
                 String message2 = player.getRepresentationUnfogged()
-                    + ", please choose the planets you wish to exhaust to pay a cost of " + cost;
+                    + ", please choose the planets you wish to exhaust to pay a cost of " + cost + ".";
                 boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
 
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "res");
@@ -2384,8 +2384,18 @@ public class UnfiledButtonHandlers {
     public static void announceReadyForDice(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String p1Color = buttonID.split("_")[1];
         Player p1 = game.getPlayerFromColorOrFaction(p1Color);
+        if (p1 == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Unable to determine player for color or faction `" + p1Color + "`.");
+            return;
+        }
         String p2Color = buttonID.split("_")[2];
         Player p2 = game.getPlayerFromColorOrFaction(p2Color);
+        if (p2 == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "Unable to determine player for color or faction `" + p2Color + "`.");
+            return;
+        }
         if (player != p1 && player != p2) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentation() + ", don't press buttons that aren't meant for you.");
             return;
@@ -2444,7 +2454,8 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("exploreAPlanet")
     public static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " Use buttons to explore", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
+            player.getRepresentation() + ", please use these buttons to explore.", buttons);
     }
 
     @ButtonHandler("doAnotherAction")
@@ -2504,7 +2515,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("getDiscardButtonsACs")
-    public static void getDiscardButtonsACs(Player player, Game game) {
+    public static void getDiscardButtonsACs(Player player) {
         String msg = player.getRepresentationUnfogged() + ", use buttons to discard an action card.";
         List<Button> buttons = ActionCardHelper.getDiscardActionCardButtons(player, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -3236,7 +3247,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler(value = "refreshStatusSummary", save = false)
-    public static void refreshStatusSummary(ButtonInteractionEvent event, Player player, Game game) {
+    public static void refreshStatusSummary(ButtonInteractionEvent event, Game game) {
         String msg = "Please score objectives.";
         msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
         event.getMessage().editMessage(msg).queue();
@@ -3380,7 +3391,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("comm_for_AC")
-    public static void commForAC(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+    public static void commForAC(ButtonInteractionEvent event, Game game, Player player) {
         boolean hasSchemingAbility = player.hasAbility("scheming");
         int count2 = hasSchemingAbility ? 2 : 1;
         String commOrTg = "";

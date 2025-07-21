@@ -135,7 +135,7 @@ public class LoreService {
             .setMaxLength(1000);
         TextInput.Builder footer = TextInput.create("footer", "Other info", TextInputStyle.SHORT)
             .setRequired(false)
-            .setPlaceholder("Please use /add_token token:gravityrift on this system.");
+            .setPlaceholder("Please use `/add_token token:gravityrift` on this system.");
 
         if (!"System".equals(target) && !"Planet".equals(target)) {
             position.setValue(target);

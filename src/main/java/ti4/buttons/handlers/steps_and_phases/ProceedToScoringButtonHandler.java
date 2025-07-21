@@ -11,7 +11,7 @@ import ti4.map.Player;
 @UtilityClass
 public class ProceedToScoringButtonHandler {
     @ButtonHandler("proceed_to_scoring")
-    public void proceedToScoring(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public void proceedToScoring(ButtonInteractionEvent event, Game game) {
         StatusHelper.BeginScoring(event, game, event.getChannel());
         ButtonHelper.deleteMessage(event);
     }
