@@ -338,48 +338,48 @@ public class WebHelper {
 
     public static void sendTiglGameReport(TiglGameReport report, MessageChannel channel) {
         try {
-            String json = objectMapper.writeValueAsString(report);
-
-            List<String> urls = getConfiguredUrls("tigl.report-game.api.urls");
-            for (String url : urls) {
-                HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .header("Content-Type", "application/json")
-                    .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
-
-                httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .thenAccept(response -> {
-                        if (response == null) return;
-                        if (response.statusCode() == 200) {
-                            MessageHelper.sendMessageToChannel(channel, "TIGL game successfully reported.");
-                        } else if (response.statusCode() >= 400) {
-                            String body = response.body();
-                            try {
-                                JsonNode node = objectMapper.readTree(body);
-                                String title = node.path("problemDetails").path("title").asText();
-                                String detail = node.path("problemDetails").path("detail").asText();
-                                if (title.isEmpty()) {
-                                    title = node.path("data").path("errorTitle").asText();
-                                    detail = node.path("data").path("errorMessage").asText();
-                                }
-                                MessageHelper.sendMessageToChannel(channel,
-                                    String.format("Failed to report TIGL game: %s - %s. Please report manually: https://www.ti4ultimate.com/community/tigl/report-game", title, detail));
-                            } catch (Exception ex) {
-                                BotLogger.error("Failed to parse TIGL response: " + body, ex);
-                                MessageHelper.sendMessageToChannel(channel,
-                                    TIGL_REPORT_FAILURE_MESSAGE);
-                            }
-                        }
-                    })
-                    .exceptionally(e -> {
-                        BotLogger.error(String.format("An exception occurred while sending a TIGL game report to %s: %s", url, json), e);
-                        MessageHelper.sendMessageToChannel(channel,
-                            TIGL_REPORT_FAILURE_MESSAGE);
-                        return null;
-                    });
+            String url = webProperties.getProperty("tigl.report-game.api.url");
+            if (url == null) {
+                BotLogger.error("TIGL game report URL not set. Property: tigl.report-game.api.url");
             }
+            String json = objectMapper.writeValueAsString(report);
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+            httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    if (response == null) return;
+                    if (response.statusCode() == 200) {
+                        MessageHelper.sendMessageToChannel(channel, "TIGL game successfully reported.");
+                    } else if (response.statusCode() >= 400) {
+                        String body = response.body();
+                        try {
+                            JsonNode node = objectMapper.readTree(body);
+                            String title = node.path("problemDetails").path("title").asText();
+                            String detail = node.path("problemDetails").path("detail").asText();
+                            if (title.isEmpty()) {
+                                title = node.path("data").path("errorTitle").asText();
+                                detail = node.path("data").path("errorMessage").asText();
+                            }
+                            MessageHelper.sendMessageToChannel(channel,
+                                String.format("Failed to report TIGL game: %s - %s. Please report manually: https://www.ti4ultimate.com/community/tigl/report-game", title, detail));
+                        } catch (Exception ex) {
+                            BotLogger.error("Failed to parse TIGL response: " + body, ex);
+                            MessageHelper.sendMessageToChannel(channel,
+                                TIGL_REPORT_FAILURE_MESSAGE);
+                        }
+                    }
+                })
+                .exceptionally(e -> {
+                    BotLogger.error(String.format("An exception occurred while sending a TIGL game report to %s: %s", url, json), e);
+                    MessageHelper.sendMessageToChannel(channel,
+                        TIGL_REPORT_FAILURE_MESSAGE);
+                    return null;
+                });
         } catch (IOException e) {
             BotLogger.error("An IOException occurred while sending a TIGL game report.", e);
             MessageHelper.sendMessageToChannel(channel,
@@ -406,7 +406,6 @@ public class WebHelper {
                         return null;
                     });
             }
-
         } catch (IOException e) {
             BotLogger.error("An IOException occurred while sending a stats opt in.", e);
         }
