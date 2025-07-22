@@ -395,9 +395,7 @@ public class EndGameService {
     private static TiglGameReport buildTiglReport(Game game) {
         var report = new TiglGameReport();
         report.setGameId(game.getID());
-        var winner = game.getWinner().orElse(null);
-        int winningScore = winner != null ? winner.getTotalVictoryPoints() : game.getVp();
-        report.setScore(winningScore);
+        report.setScore(game.getVp());
 
         var tiglPlayerResults = game.getRealPlayers().stream()
             .map(player -> {
