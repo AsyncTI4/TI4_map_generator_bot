@@ -399,26 +399,18 @@ public class EndGameService {
         int winningScore = winner != null ? winner.getTotalVictoryPoints() : game.getVp();
         report.setScore(winningScore);
 
-        List<TiglPlayerResult> results = new ArrayList<>();
-        for (Player player : game.getRealPlayers()) {
-            TiglPlayerResult r = new TiglPlayerResult();
-            r.setScore(player.getTotalVictoryPoints());
-            var factionModel = player.getFactionModel();
-            r.setFaction(factionModel == null ? player.getFaction() : factionModel.getFactionName());
-            try {
-                r.setDiscordId(Long.parseLong(player.getUserID()));
-            } catch (NumberFormatException e) {
-                r.setDiscordId(0L);
-            }
-            var user = player.getUser();
-            if (user != null) {
-                r.setDiscordTag(user.getName() + "#" + user.getDiscriminator());
-            } else {
-                r.setDiscordTag(player.getUserName());
-            }
-            results.add(r);
-        }
-        report.setPlayerResults(results);
+        var tiglPlayerResults = game.getRealPlayers().stream()
+            .map(player -> {
+                var tiglPlayerResult = new TiglPlayerResult();
+                tiglPlayerResult.setScore(player.getTotalVictoryPoints());
+                tiglPlayerResult.setFaction(player.getFaction());
+                tiglPlayerResult.setDiscordId(player.getUserID());
+                tiglPlayerResult.setDiscordTag(player.getUserName());
+                return tiglPlayerResult;
+            })
+            .toList();
+
+        report.setPlayerResults(tiglPlayerResults);
         report.setSource("Async");
         report.setTimestamp(System.currentTimeMillis() / 1000);
         return report;

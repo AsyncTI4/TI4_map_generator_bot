@@ -1,6 +1,5 @@
 package ti4.website;
 
-import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,12 +22,12 @@ import java.util.Properties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SequenceWriter;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.GameStatsDashboardPayload;
@@ -36,9 +35,9 @@ import ti4.map.Player;
 import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.service.tigl.TiglGameReport;
-import ti4.service.tigl.TiglPlayerResult;
 import ti4.settings.GlobalSettings;
 
 public class WebHelper {
@@ -355,7 +354,7 @@ public class WebHelper {
                         if (response == null) return;
                         if (response.statusCode() == 200) {
                             MessageHelper.sendMessageToChannel(channel, "TIGL game successfully reported.");
-                        } else if (response.statusCode() == 400) {
+                        } else if (response.statusCode() >= 400) {
                             String body = response.body();
                             try {
                                 JsonNode node = objectMapper.readTree(body);

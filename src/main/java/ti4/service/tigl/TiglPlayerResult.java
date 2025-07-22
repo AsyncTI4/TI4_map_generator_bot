@@ -6,6 +6,6 @@ import lombok.Data;
 public class TiglPlayerResult {
     private int score;
     private String faction;
-    private long discordId;
+    private String discordId;
     private String discordTag;
 }
