@@ -28,6 +28,7 @@ public class GameProperties {
     private @ExportableField long lastModifiedDate;
     private @ExportableField long endedDate;
     private @ExportableField boolean hasEnded;
+    private @ExportableField boolean replacementMade;
 
     // Deck IDs
     private @ExportableField String acDeckID = "action_cards_pok";

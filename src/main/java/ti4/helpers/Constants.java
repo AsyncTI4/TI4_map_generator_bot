@@ -1126,6 +1126,7 @@ public class Constants {
     public static final String IMAGE_GEN_COUNT = "image_gen_count";
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
     public static final String ENDED_DATE = "ended_date";
+    public static final String REPLACEMENT_MADE = "replacement_made";
     public static final String AVERAGE_TURN_TIME = "average_turn_time";
     public static final String DICE_LUCK = "dice_luck";
     public static final String LIFETIME_RECORD = "lifetime_record";
