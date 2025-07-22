@@ -38,6 +38,9 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.GameStatisticsService;
 import ti4.service.statistics.game.WinningPathHelper;
+import ti4.service.tigl.TiglGameReport;
+import ti4.service.tigl.TiglPlayerResult;
+import ti4.website.WebHelper;
 
 @UtilityClass
 public class EndGameService {
@@ -217,6 +220,12 @@ public class EndGameService {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
                     TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
+                    if (!game.isReplacementMade()) {
+                        WebHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            "This game had a replacement. Please report the results manually: https://www.ti4ultimate.com/community/tigl/report-game");
+                    }
                 }
             });
         } else if (publish) { //FOW SUMMARY
@@ -381,6 +390,38 @@ public class EndGameService {
         sb.append("'\n```");
 
         return sb.toString();
+    }
+
+    private static TiglGameReport buildTiglReport(Game game) {
+        var report = new TiglGameReport();
+        report.setGameId(game.getID());
+        var winner = game.getWinner().orElse(null);
+        int winningScore = winner != null ? winner.getTotalVictoryPoints() : game.getVp();
+        report.setScore(winningScore);
+
+        List<TiglPlayerResult> results = new ArrayList<>();
+        for (Player player : game.getRealPlayers()) {
+            TiglPlayerResult r = new TiglPlayerResult();
+            r.setScore(player.getTotalVictoryPoints());
+            var factionModel = player.getFactionModel();
+            r.setFaction(factionModel == null ? player.getFaction() : factionModel.getFactionName());
+            try {
+                r.setDiscordId(Long.parseLong(player.getUserID()));
+            } catch (NumberFormatException e) {
+                r.setDiscordId(0L);
+            }
+            var user = player.getUser();
+            if (user != null) {
+                r.setDiscordTag(user.getName() + "#" + user.getDiscriminator());
+            } else {
+                r.setDiscordTag(player.getUserName());
+            }
+            results.add(r);
+        }
+        report.setPlayerResults(results);
+        report.setSource("Async");
+        report.setTimestamp(System.currentTimeMillis() / 1000);
+        return report;
     }
 
     public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {

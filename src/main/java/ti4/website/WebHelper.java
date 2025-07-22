@@ -28,6 +28,7 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.ResourceHelper;
 import ti4.map.Game;
 import ti4.map.GameStatsDashboardPayload;
@@ -36,6 +37,8 @@ import ti4.map.manage.GameManager;
 import ti4.map.manage.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.service.statistics.StatisticOptIn;
+import ti4.service.tigl.TiglGameReport;
+import ti4.service.tigl.TiglPlayerResult;
 import ti4.settings.GlobalSettings;
 
 public class WebHelper {
@@ -45,6 +48,8 @@ public class WebHelper {
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private static final S3AsyncClient s3AsyncClient = S3AsyncClient.builder().region(Region.US_EAST_1).build();
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String TIGL_REPORT_FAILURE_MESSAGE =
+        "Failed to report TIGL game. Please report manually: https://www.ti4ultimate.com/community/tigl/report-game";
     private static final Properties webProperties;
     static {
         webProperties = new Properties();
@@ -329,6 +334,57 @@ public class WebHelper {
             );
         } catch (SdkClientException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
+        }
+    }
+
+    public static void sendTiglGameReport(TiglGameReport report, MessageChannel channel) {
+        try {
+            String json = objectMapper.writeValueAsString(report);
+
+            List<String> urls = getConfiguredUrls("tigl.report-game.api.urls");
+            for (String url : urls) {
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+
+                httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                    .thenAccept(response -> {
+                        if (response == null) return;
+                        if (response.statusCode() == 200) {
+                            MessageHelper.sendMessageToChannel(channel, "TIGL game successfully reported.");
+                        } else if (response.statusCode() == 400) {
+                            String body = response.body();
+                            try {
+                                JsonNode node = objectMapper.readTree(body);
+                                String title = node.path("problemDetails").path("title").asText();
+                                String detail = node.path("problemDetails").path("detail").asText();
+                                if (title.isEmpty()) {
+                                    title = node.path("data").path("errorTitle").asText();
+                                    detail = node.path("data").path("errorMessage").asText();
+                                }
+                                MessageHelper.sendMessageToChannel(channel,
+                                    String.format("Failed to report TIGL game: %s - %s. Please report manually: https://www.ti4ultimate.com/community/tigl/report-game", title, detail));
+                            } catch (Exception ex) {
+                                BotLogger.error("Failed to parse TIGL response: " + body, ex);
+                                MessageHelper.sendMessageToChannel(channel,
+                                    TIGL_REPORT_FAILURE_MESSAGE);
+                            }
+                        }
+                    })
+                    .exceptionally(e -> {
+                        BotLogger.error(String.format("An exception occurred while sending a TIGL game report to %s: %s", url, json), e);
+                        MessageHelper.sendMessageToChannel(channel,
+                            TIGL_REPORT_FAILURE_MESSAGE);
+                        return null;
+                    });
+            }
+        } catch (IOException e) {
+            BotLogger.error("An IOException occurred while sending a TIGL game report.", e);
+            MessageHelper.sendMessageToChannel(channel,
+                TIGL_REPORT_FAILURE_MESSAGE);
         }
     }
 
