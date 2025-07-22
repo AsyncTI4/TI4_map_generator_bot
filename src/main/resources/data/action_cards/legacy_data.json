@@ -986,5 +986,14 @@
         "text": "Predict aloud an outcome of this agenda. If your prediction is correct, each other player that voted for that outcome reveals 1 random action card from their hand; take 1 of those cards and discard the rest.",
         "flavorText": "As they placed the noose around her neck, Menda wailed. Suffi, who was next in line, gave her a confident smile. \"First time?\"",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "sensor_jam",
+        "name": "Sensor Jam",
+        "phase": "Action",
+        "window": "After a player activates a system",
+        "text": "Your cruisers and destroyers gain SUSTAIN DAMAGE during this tactical action.",
+        "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
+        "source": "action_deck_2_old"
     }
 ]
