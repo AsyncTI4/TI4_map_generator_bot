@@ -456,7 +456,13 @@ public class MessageHelper {
                 BotLogger.warning(getRestActionFailureMessage(channel, errorHeader + " (retrying)", messageCreateData, error), error);
                 sendMessageWithRetry(channel, messageCreateData, successAction, errorHeader, remainingAttempts - 1);
             } else {
-                BotLogger.error(getRestActionFailureMessage(channel, errorHeader, messageCreateData, error), error);
+                if (error instanceof ErrorResponseException restError && restError.getResponseCode() == 503) {
+                    String notice = "Encountered a Discord 503 error. Please try again in 10 minutes.";
+                    channel.sendMessage(notice).queue(Consumers.nop(), BotLogger::catchRestError);
+                    BotLogger.error(getRestActionFailureMessage(channel, errorHeader, messageCreateData, error) + "\n" + notice, error);
+                } else {
+                    BotLogger.error(getRestActionFailureMessage(channel, errorHeader, messageCreateData, error), error);
+                }
             }
         });
     }
