@@ -109,6 +109,8 @@ public class StartCombatService {
         if (!game.isFowMode()) {
             findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
                 threadName, tile, event, "space", "space");
+            game.setStoredValue("currentActionSummary" + player.getFaction(),
+                game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a space combat in " + tile.getRepresentationForButtons() + " against " + player2.getFactionEmoji() + ".");
             return;
         }
         findOrCreateCombatThread(game, player.getPrivateChannel(), player, player2,
@@ -126,14 +128,13 @@ public class StartCombatService {
             }
             createSpectatorThread(game, player3, threadName, tile, event, "space");
         }
-        game.setStoredValue("currentActionSummary" + player.getFaction(), 
-            game.getStoredValue("currentActionSummary" + player.getFaction()) + " had a space combat in " + tile.getRepresentationForButtons() + " against " + player2.getFactionEmoji() + ".");
+
     }
 
     public static void startGroundCombat(Player player, Player player2, Game game, GenericInteractionCreateEvent event, UnitHolder unitHolder, Tile tile) {
         String threadName = combatThreadName(game, player, player2, tile, null);
-        game.setStoredValue("currentActionSummary" + player.getFaction(), 
-            game.getStoredValue("currentActionSummary" + player.getFaction()) + " had a ground combat on " + Helper.getPlanetRepresentation(unitHolder.getName(), game) + " against " + player2.getFactionEmoji() + ".");
+        game.setStoredValue("currentActionSummary" + player.getFaction(),
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " Had a ground combat on " + Helper.getPlanetRepresentation(unitHolder.getName(), game) + " against " + player2.getFactionEmoji() + ".");
         if (!game.isFowMode()) {
             findOrCreateCombatThread(game, game.getActionsChannel(), player, player2,
                 threadName, tile, event, "ground", unitHolder.getName());
@@ -381,7 +382,7 @@ public class StartCombatService {
                     }
                     if (player.hasTech("md") && player.getPlanetsAllianceMode().contains(unitHolderName)) {
                         if (uH.getUnitCount(UnitType.Pds, player) > 0 || uH.getUnitCount(UnitType.Spacedock, player) > 0) {
-                            MessageHelper.sendMessageToChannel(threadChannel, player.getRepresentation() 
+                            MessageHelper.sendMessageToChannel(threadChannel, player.getRepresentation()
                                 + ", a reminder to use _Magen Defense Grid_. The button should be above, but it (and SPACE CANNON) are not part of automated ground combat.");
                         }
                     }

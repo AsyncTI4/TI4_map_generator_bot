@@ -139,7 +139,7 @@
     "alias": "outer_rim",
     "name": "Populate the Outer Rim",
     "phase": "Status",
-    "text": "Have units in 3 systems on the edge of the game board other than your home system.",
+    "text": "Have units in 3 systems on the edge of the game board other than your home system.[Note: Mallice counts as on the edge]",
     "points": 1,
     "source": "pok"
   },
@@ -275,7 +275,7 @@
     "alias": "control_borderlands",
     "name": "Control the Borderlands",
     "phase": "Status",
-    "text": "Have units in 5 systems on the edge of the game board other than your home system.",
+    "text": "Have units in 5 systems on the edge of the game board other than your home system. [Note: Mallice counts as on the edge]",
     "points": 2,
     "source": "pok"
   },
