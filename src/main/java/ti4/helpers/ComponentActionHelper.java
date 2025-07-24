@@ -3,7 +3,6 @@ package ti4.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -327,6 +326,8 @@ public class ComponentActionHelper {
             case "relic" -> resolveRelicComponentAction(game, p1, event, buttonID);
             case "pn" -> PromissoryNoteHelper.resolvePNPlay(buttonID, p1, game, event);
             case "ability" -> {
+                game.setStoredValue("currentActionSummary" + p1.getFaction(),
+                    game.getStoredValue("currentActionSummary" + p1.getFaction()) + " Used the " + buttonID + " ability.");
                 if ("starForge".equalsIgnoreCase(buttonID)) {
 
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnits(game, p1, UnitType.Warsun);
@@ -447,7 +448,7 @@ public class ComponentActionHelper {
                     if (!acButtons.isEmpty()) {
                         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
                             p1.getRepresentation() + " is doing nothing with their **Stall Tactics** ability.");
-                        MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), 
+                        MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(),
                             p1.getRepresentationUnfogged() + ", please discard an action card.", acButtons);
                     } else {
                         MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(),
@@ -588,6 +589,8 @@ public class ComponentActionHelper {
                 "Invalid relic or player does not have specified relic: `" + relicID + "`");
             return;
         }
+        game.setStoredValue("currentActionSummary" + player.getFaction(),
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " Used the " + Mapper.getRelic(relicID).getName() + " relic.");
         String purgeOrExhaust = "purged";
         List<String> juniorRelics = List.of("titanprototype", "absol_jr");
         if (juniorRelics.contains(relicID)) { // EXHAUST THE RELIC

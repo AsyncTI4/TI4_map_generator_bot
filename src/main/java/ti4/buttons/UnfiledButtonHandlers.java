@@ -1745,7 +1745,7 @@ public class UnfiledButtonHandlers {
                 String pos = buttonID.split("_")[1];
                 buttonID = buttonID.split("_")[0];
                 tile = game.getTileByPosition(pos);
-                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " produced units in " + tile.getRepresentationForButtons() + ".");
+                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Produced units in " + tile.getRepresentationForButtons() + ".");
             }
             if ("Done Exhausting Planets".equalsIgnoreCase(buttonLabel) && player.hasAbility("amalgamation") && !game.getStoredValue("amalgAmount").isEmpty()) {
                 editedMessage = Helper.buildSpentThingsMessage(player, game, "res");
@@ -2454,7 +2454,7 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("exploreAPlanet")
     public static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getRepresentation() + ", please use these buttons to explore.", buttons);
     }
 

@@ -124,13 +124,13 @@ public class ButtonHelperAgents {
         ButtonHelperAgents.exhaustAgent("exhaustAgent_toldaragent_startToldarAgent_" + p2.getFaction(), event, game, toldar);
         int commodities = p2.getCommodities();
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
-            p2.getRepresentationUnfogged() + ", your " + commodities + " commodit" + (commodities == 1 ? "y" : "ies") + " have been washed by " 
+            p2.getRepresentationUnfogged() + ", your " + commodities + " commodit" + (commodities == 1 ? "y" : "ies") + " have been washed by "
                 + (toldar.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
                 + "Maertin Donaais, the Toldar" + (toldar.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
         p2.setTg(p2.getTg() + commodities);
         p2.setCommodities(0);
         toldar.setCommodities(toldar.getCommodities() + amount);
-        MessageHelper.sendMessageToChannel(toldar.getCorrectChannel(), toldar.getRepresentation() + ", you now have " + toldar.getCommodities() 
+        MessageHelper.sendMessageToChannel(toldar.getCorrectChannel(), toldar.getRepresentation() + ", you now have " + toldar.getCommodities()
             + " commodit" + (toldar.getCommodities() == 1 ? "y" : "ies") + " after using your agent.");
         toldarAgentInitiation(game, toldar, amount);
     }
@@ -507,8 +507,8 @@ public class ButtonHelperAgents {
             ssruuClever = "Clever Clever ";
             ssruuSlash = "/Yssaril";
         }
-        game.setStoredValue("currentActionSummary" + player.getFaction(), 
-            game.getStoredValue("currentActionSummary" + player.getFaction()) + " exhausted the " + playerLeader.getLeaderModel().get().getShortName() + " leader.");
+        game.setStoredValue("currentActionSummary" + player.getFaction(),
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " Exhausted the " + playerLeader.getLeaderModel().get().getAlias() + " leader.");
 
         if ("nomadagentartuno".equalsIgnoreCase(agent)) {
             String exhaustText = player.getRepresentation() + " has exhausted " + ssruuClever + "Artuno the Betrayer, a Nomad" + ssruuSlash + " agent.";
@@ -1180,7 +1180,7 @@ public class ButtonHelperAgents {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
-            if (!actionRow2.isEmpty() && !exhaustedMessage.contains("select the user of the agent")
+            if (!actionRow2.isEmpty() && !exhaustedMessage.contains("choose the user of the agent")
                 && !exhaustedMessage.contains("choose the target of the agent")) {
                 if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
                     buttonEvent.getMessage().delete().queue();

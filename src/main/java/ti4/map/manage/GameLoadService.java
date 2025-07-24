@@ -175,6 +175,7 @@ class GameLoadService {
             game.setTileMap(tileMap);
             //     System.out.println(game.getName() + " Finish");
             TransientGameInfoUpdater.update(game);
+            game.setStoredValue("loadedGame", "yes");
             return game;
         } catch (Exception e) {
             BotLogger.error("Data read error: " + gameFile.getName(), e);
