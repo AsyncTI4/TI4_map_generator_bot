@@ -69,6 +69,14 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
         }
     };
 
+    public String getRepresentation() {
+        return getRepresentation(true);
+    }
+
+    public String getRepresentation(boolean vps) {
+        return CardEmojis.SecretObjective + "_" + name + "_ - " + text + (vps ? " (" + points + " VP)" : "");
+    }
+
     public MessageEmbed getRepresentationEmbed() {
         return getRepresentationEmbed(false);
     }
