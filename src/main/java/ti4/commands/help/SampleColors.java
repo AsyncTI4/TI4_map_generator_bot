@@ -68,10 +68,26 @@ class SampleColors extends Subcommand {
             stroke = new BasicStroke(3.0f);
         }
 
-        int left = ThreadLocalRandom.current().nextInt(PAGEWIDTH - 6 * DREADWIDTH);
-        int top = ThreadLocalRandom.current().nextInt(PAGEHIGHT - 2 * hues.size() * DREADTEXHIGHT);
+        int maxColorCount = 0;
+        for (String h : hues) {
+            int count = 0;
+            for (ColorModel c : Mapper.getColors()) {
+                if (c.getHue().equals(h)) {
+                    count++;
+                }
+            }
+            maxColorCount = Math.max(maxColorCount, count);
+        }
+
+        int maxWidth = maxColorCount * DREADWIDTH;
+        int maxHeight = 2 * hues.size() * DREADTEXHIGHT;
+
+        int leftBound = PAGEWIDTH - maxWidth;
+        int topBound = PAGEHIGHT - maxHeight;
+        int left = leftBound > 0 ? ThreadLocalRandom.current().nextInt(leftBound) : 0;
+        int top = topBound > 0 ? ThreadLocalRandom.current().nextInt(topBound) : 0;
         int right = left;
-        int bottom = top + 2 * hues.size() * DREADTEXHIGHT;
+        int bottom = top + maxHeight;
         int x;
         int y = top;
 
@@ -122,7 +138,12 @@ class SampleColors extends Subcommand {
             MessageHelper.sendMessageToEventChannel(event, "No colours found. Something has probably gone wrong.");
             return;
         }
-        coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
+        right = Math.min(right, PAGEWIDTH);
+        bottom = Math.min(bottom, PAGEHIGHT);
+
+        int subWidth = Math.max(1, right - left);
+        int subHeight = Math.max(1, bottom - top);
+        coloursImage = coloursImage.getSubimage(left, top, subWidth, subHeight);
         String fileNamePrefix = "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : Constants.ALL);
         try (var fileUpload = FileUploadService.createFileUpload(coloursImage, fileNamePrefix)) {
             fileUpload.setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
