@@ -1108,7 +1108,7 @@ public class ButtonHelper {
         if (player.hasAbility("void_tap") && (activeSystem.getPlanetUnitHolders().isEmpty() || ButtonHelper.doesPlayerHaveFSHere("eidolon_flagship", player, activeSystem))) {
             int cTG = player.getTg();
             player.setTg(cTG + 1);
-            MessageHelper.sendMessageToChannel(channel,
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation() + " gained 1 trade good (" + cTG + "->" + player.getTg()
                     + ") for **Void Tap**.");
             ButtonHelperAgents.resolveArtunoCheck(player, 1);
@@ -4464,7 +4464,7 @@ public class ButtonHelper {
         Button buildButton = Buttons.green(finChecker + "genericBuild_" + tile.getPosition(),
             "Build in " + tile.getRepresentationForButtons(game, player));
         buttons.add(buildButton);
-        Button remove = Buttons.red(finChecker + "getDamageButtons_" + tile.getPosition(),
+        Button remove = Buttons.red(finChecker + "getDamageButtons_" + tile.getPosition() + "_remove",
             "Remove or Damage Units in " + tile.getRepresentationForButtons(game, player));
         buttons.add(remove);
         Button validTile2 = Buttons.gray(finChecker + "deleteButtons", "Delete These Buttons");

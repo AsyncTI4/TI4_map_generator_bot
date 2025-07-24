@@ -84,6 +84,7 @@ class GameSaveService {
     }
 
     private static void saveGameInfo(Writer writer, Game game) throws IOException {
+        game.setStoredValue("loadedGame", "no");
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
