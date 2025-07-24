@@ -434,7 +434,7 @@ public class ListPlayerInfoService {
                 if (player.hasAbility("privileged_citizenry")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
                 }
-                if (player.hasAbility("orbital_foundaries")) {
+                if (player.hasAbility("orbital_foundries")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
                 }
                 int maxPlanets = counter;
@@ -545,7 +545,14 @@ public class ListPlayerInfoService {
                 }
             }
             case "build_defenses", "massive_cities", "massive_cities_omegaphase" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
+                int counter = 0;
+                if (player.hasAbility("orbital_foundries")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                }
+                if (player.hasUnit("ghoti_flagship")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false);
+                }
+                return counter + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
                     + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {

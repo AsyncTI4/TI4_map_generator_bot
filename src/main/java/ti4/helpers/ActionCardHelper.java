@@ -375,7 +375,7 @@ public class ActionCardHelper {
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
 
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " played _" + actionCardTitle + "_ action card.");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played _" + actionCardTitle + "_ action card.");
 
         if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);
@@ -622,7 +622,7 @@ public class ActionCardHelper {
 
             if (automationID.equals("experimental")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(), buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg 
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg
                     + (player.hasTechReady("gls") ? "\n-# Make sure to declare _Graviton Laser System_, should you so wish, before pressing this button." : ""), codedButtons);
             }
 
