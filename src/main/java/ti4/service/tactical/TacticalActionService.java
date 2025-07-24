@@ -286,13 +286,13 @@ public class TacticalActionService {
         String message = "Moved all units to the space area.";
         if (!unitsWereMoved && !hasGfsInRange) {
             message = "Nothing moved. Use buttons to decide if you wish to build (if you can), or finish the activation.";
-            game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " did not move units.");
+            game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Did not move units.");
             systemButtons = getBuildButtons(event, game, player, tile);
         } else {
             systemButtons = getLandingTroopsButtons(game, player, tile);
             if (unitsWereMoved) {
                 ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, tile, unitsWereMoved);
-                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " moved ships there.");
+                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Moved ships there.");
             }
         }
 
