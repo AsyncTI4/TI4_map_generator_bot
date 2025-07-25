@@ -14,6 +14,7 @@ import ti4.map.GamesPage;
 public class WinningPathCacheService {
 
     private static final Cache<CacheKey, Map<String, Integer>> WINNING_PATH_CACHE = Caffeine.newBuilder().build();
+    private static boolean hasBeenComputed = false;
 
     public static synchronized void recomputeCache() {
         WINNING_PATH_CACHE.invalidateAll();
@@ -21,6 +22,7 @@ public class WinningPathCacheService {
             GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null),
             WinningPathCacheService::addGame
         );
+        hasBeenComputed = true;
     }
 
     public static synchronized void addGame(Game game) {
@@ -33,6 +35,7 @@ public class WinningPathCacheService {
     }
 
     public static synchronized Map<String, Integer> getWinningPathCounts(int playerCount, int victoryPoints) {
+        if (!hasBeenComputed) recomputeCache();
         Map<String, Integer> map = WINNING_PATH_CACHE.getIfPresent(new CacheKey(playerCount, victoryPoints));
         return map == null ? Map.of() : Map.copyOf(map);
     }
