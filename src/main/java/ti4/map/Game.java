@@ -638,7 +638,7 @@ public class Game extends GameProperties {
         gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
-        gameModes.put("Homebrew", !isNormalGame);
+        gameModes.put("Homebrew", isHomebrew());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);
