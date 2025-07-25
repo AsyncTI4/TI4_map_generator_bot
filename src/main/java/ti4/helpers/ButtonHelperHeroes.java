@@ -1428,7 +1428,7 @@ public class ButtonHelperHeroes {
         if (nothing)
         {
             DisasterWatchHelper.sendMessageInDisasterWatch(game, player.getRepresentationUnfogged() 
-                + " purged It Feeds on Carrion, their hero, and captured... nothing" + MiscEmojis.TaDont + ".");
+                + " purged It Feeds on Carrion, their hero, and captured... nothing " + MiscEmojis.TaDont + ".");
         }
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         ButtonHelper.deleteMessage(event);
