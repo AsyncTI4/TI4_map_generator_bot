@@ -98,6 +98,7 @@ public class GameProperties {
     private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
     private @ExportableField boolean totalWarMode;
+    private @ExportableField boolean noSwapMode;
     private @ExportableField boolean ageOfCommerceMode;
     private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean ordinianC1Mode;
