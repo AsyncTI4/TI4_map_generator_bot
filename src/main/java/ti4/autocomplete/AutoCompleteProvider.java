@@ -338,6 +338,12 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
+            case GameStatisticsFilterer.HAS_GALACTIC_EVENT_FILTER -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                var tokens = List.of("age_of_exploration", "total_war", "age_of_commerce", "minor_factions");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
+                event.replyChoices(options).queue();
+            }
             case Constants.DECK_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Map<String, DeckModel> decks = Mapper.getDecks();
