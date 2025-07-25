@@ -36,8 +36,8 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.statistics.game.GameStatisticsService;
 import ti4.service.statistics.game.WinningPathCacheService;
+import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglPlayerResult;
@@ -354,7 +354,8 @@ public class EndGameService {
         if (winner.isPresent() && game.isNormalGame()) {
             String winningPath = WinningPathHelper.buildWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
-            sb.append(GameStatisticsService.getWinningPathComparison(winningPath, game.getRealAndEliminatedPlayers().size(), vpCount));
+            String comparison = WinningPathComparisonService.compareWinningPathToAllOthers(winningPath, game.getRealAndEliminatedPlayers().size(), vpCount);
+            sb.append(comparison);
         }
 
         return sb.toString();

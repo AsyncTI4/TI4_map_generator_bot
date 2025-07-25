@@ -46,8 +46,4 @@ public class GameStatisticsService {
             BotLogger.error("Failed to process statistic: " + statType, e);
         }
     }
-
-    public String getWinningPathComparison(String winningPath, int playerCount, int totalVictoryPoints) {
-        return WinningPathsStatisticsService.compareWinningPathToAllOthers(winningPath, playerCount, totalVictoryPoints);
-    }
 }
