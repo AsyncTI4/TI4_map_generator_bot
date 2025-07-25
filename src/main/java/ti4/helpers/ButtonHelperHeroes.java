@@ -1197,7 +1197,7 @@ public class ButtonHelperHeroes {
             empties.add(Buttons.blue(finChecker + "cabalHeroTile_" + tile.getPosition(),
                 "Roll For Units In " + tile.getRepresentationForButtons(game, player)));
         }
-        empties.add(Buttons.red(finChecker + "cabalHeroAll", "Resolve Hero For All Tiles (Experimental)"));
+        empties.add(Buttons.red(finChecker + "cabalHeroAll", "Resolve Hero For All Tiles [Experimental]"));
         SortHelper.sortButtonsByTitle(empties);
         return empties;
     }
