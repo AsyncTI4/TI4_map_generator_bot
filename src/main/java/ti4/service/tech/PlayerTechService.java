@@ -85,7 +85,10 @@ public class PlayerTechService {
     public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         String pos = "";
         if (tech.contains("dskortg")) {
-            pos = tech.split("_")[1];
+            String[] splitTech = tech.split("_");
+            if (splitTech.length > 1) {
+                pos = splitTech[1];
+            }
             tech = "dskortg";
         }
         String inf = "";

@@ -20,7 +20,7 @@ class SpendToWinCorrelationStatisticsService {
         AtomicInteger gamesWhereHighestWon = new AtomicInteger();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> calculate(game, num, gamesWhereHighestWon, names)
         );
 

@@ -22,7 +22,7 @@ class RelicAddCodexRelics extends GameStateSubcommand {
         List<String> allRelics = game.getAllRelics();
         if (!allRelics.contains("bookoflatvinia")) {
             game.shuffleRelicBack("bookoflatvinia");
-            newRelics += (relicCount > 0 ? " and " : "") +  "_Book of Latvinia_";
+            newRelics += "_Book of Latvinia_";
             relicCount++;
         }
         if (!allRelics.contains("circletofthevoid")) {
@@ -35,12 +35,9 @@ class RelicAddCodexRelics extends GameStateSubcommand {
             newRelics += (relicCount > 0 ? " and " : "") +  "_Neuraloop_";
             relicCount++;
         }
-        if (relicCount == 0)
-        {
-        MessageHelper.sendMessageToEventChannel(event, "No new relics have been added.");
-        }
-        else
-        {
+        if (relicCount == 0) {
+            MessageHelper.sendMessageToEventChannel(event, "No new relics have been added.");
+        } else {
             MessageHelper.sendMessageToEventChannel(event, (relicCount == 2 ? newRelics : newRelics.replaceFirst(" and ", ", ")) + (relicCount == 1 ? "has" : "have") + " been shuffled into the relic deck.");
         }
     }

@@ -23,7 +23,7 @@ class MostWinningColorStatisticsService {
         Map<String, Integer> winnerColorCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> getWinningColor(game, winnerColorCount));
 
         StringBuilder sb = new StringBuilder();

@@ -185,6 +185,8 @@ class Replace extends GameStateSubcommand {
             DraftDisplayService.repostDraftInformation(event, manager, game);
         }
 
+        game.setReplacementMade(true);
+
         String message = "Game: " + game.getName() + "  Player: " + oldPlayerUserId + " replaced by player: " + replacementUser.getName();
         if (FoWHelper.isPrivateGame(game)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);

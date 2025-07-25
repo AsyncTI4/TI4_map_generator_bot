@@ -2706,6 +2706,11 @@ public class AgendaHelper {
             }
         }
         AgendaModel agendaModel = Mapper.getAgenda(agendaID);
+        if (agendaModel == null) {
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+                "Unable to refresh agenda; no active agenda found.");
+            return;
+        }
         MessageEmbed agendaEmbed = agendaModel.getRepresentationEmbed();
 
         String revealMessage = "Refreshed Agenda";

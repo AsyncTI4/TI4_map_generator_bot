@@ -16,7 +16,6 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.service.emoji.FactionEmojis;
@@ -38,10 +37,10 @@ public class StartScenario extends GameStateSubcommand {
         Game game = getGame();
         String scenario = event.getOption(Constants.SCENARIO).getAsString();
 
-        if (scenario != null && scenario.contains("ordinian")) {
+        if (scenario.contains("ordinian")) {
             startOrdinianCodex1(game, event);
         }
-        if (scenario != null && scenario.contains("liberation")) {
+        if (scenario.contains("liberation")) {
             startLiberationCodex4(game, event);
         }
         MessageHelper.replyToMessage(event, "Successfully started the scenario.");
@@ -50,7 +49,7 @@ public class StartScenario extends GameStateSubcommand {
     public static void startOrdinianCodex1(Game game, GenericInteractionCreateEvent event) {
         game.setOrdinianC1Mode(true);
         var factions = List.of("arborec", "ghost", "muaat", "letnev", "nekro", "l1z1x");
-        if (game.getRealPlayers().size() == 0) {
+        if (game.getRealPlayers().isEmpty()) {
             AddTileListService.addTileListToMap(game, "{42} 32 43 25 47 33 36 19 37 28 21 48 29 27 24 38 30 40 22 10 50 26 4 49 45 17 35 31 5 44 39 8 41 34 6 20 23", event);
         }
         List<Player> players = new ArrayList<>();
@@ -99,7 +98,7 @@ public class StartScenario extends GameStateSubcommand {
     public static void startLiberationCodex4(Game game, GenericInteractionCreateEvent event) {
         game.setLiberationC4Mode(true);
         var factions = List.of("ghost", "xxcha", "sol", "naaz", "nekro", "nomad");
-        if (game.getRealPlayers().size() == 0) {
+        if (game.getRealPlayers().isEmpty()) {
             AddTileListService.addTileListToMap(game, "{c41} 21 35 77 63 48 70 68 60 47 76 25 66 30 72 27 26 22 75 1 74 67 8 62 79 14 31 29 53 41 34 17 65 45 57 64 49", event);
         }
         List<Player> players = new ArrayList<>();
@@ -109,8 +108,7 @@ public class StartScenario extends GameStateSubcommand {
             }
         }
         for (String faction : factions) {
-            if (players.size() == 0)
-            {
+            if (players.isEmpty()) {
                 MessageHelper.sendMessageToEventChannel(event, "You don't have six players, but I'll try my best anyway.");
                 break;
             }
@@ -120,10 +118,7 @@ public class StartScenario extends GameStateSubcommand {
                 if (faction.equalsIgnoreCase("ghost")) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
-                boolean speaker = false;
-                if (faction.equalsIgnoreCase("nekro")) {
-                    speaker = true;
-                }
+                boolean speaker = faction.equalsIgnoreCase("nekro");
                 String color = players.get(face).getNextAvailableColour();
                 switch (faction.toLowerCase())
                 {

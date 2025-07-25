@@ -626,6 +626,7 @@ class GameLoadService {
                 case Constants.COMMUNITY_MODE -> game.setCommunityMode(loadBooleanOrDefault(info, false));
                 case Constants.ALLIANCE_MODE -> game.setAllianceMode(loadBooleanOrDefault(info, false));
                 case Constants.FOW_MODE -> game.setFowMode(loadBooleanOrDefault(info, false));
+                case Constants.REPLACEMENT_MADE -> game.setReplacementMade(loadBooleanOrDefault(info, false));
                 case Constants.NAALU_AGENT -> game.setNaaluAgent(loadBooleanOrDefault(info, false));
                 case Constants.L1_HERO -> game.setL1Hero(loadBooleanOrDefault(info, false));
                 case Constants.NOMAD_COIN -> game.setNomadCoin(loadBooleanOrDefault(info, false));
