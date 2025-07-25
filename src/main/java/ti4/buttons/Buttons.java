@@ -122,7 +122,7 @@ public class Buttons {
         List<Button> buttonsWeb = new ArrayList<>();
         if (game != null && !game.isFowMode()) {
             if (WebHelper.sendingToWeb()) {
-                String baseUrl = "https://ti4.westaddisonheavyindustries.com/game/" + game.getName();
+                String baseUrl = "https://asyncti4.com/game/" + game.getName();
                 String url = isStandardPoKOrOnly444(game) ? baseUrl + "/newui" : baseUrl;
                 buttonsWeb.add(Button.link(url, "Website View"));
             }
