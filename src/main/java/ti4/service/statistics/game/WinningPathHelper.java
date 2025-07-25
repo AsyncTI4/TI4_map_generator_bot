@@ -19,8 +19,7 @@ public class WinningPathHelper {
         int supportCount = winner.getSupportForTheThroneVictoryPoints();
         String otherPoints = summarizeOtherVictoryPoints(game, winner.getUserID());
 
-        if (supportCount >= 2)
-        {
+        if (supportCount >= 2) {
             return String.format(
                 "%d stage 1 objectives, %d stage 2 objectives, %d secret objectives, %d _Supports for the Thrones_%s",
                 stage1Count, stage2Count, secretCount, supportCount,
@@ -72,6 +71,7 @@ public class WinningPathHelper {
         if (normalized.contains("imperial")) return "imperial rider";
         if (normalized.contains("censure")) return "censure";
         if (normalized.contains("crown") || normalized.contains("emph")) return "crown";
+        if (normalized.contains("latvinia")) return "latvinia";
         return "other (probably _Classified Document Leaks_)";
     }
 }

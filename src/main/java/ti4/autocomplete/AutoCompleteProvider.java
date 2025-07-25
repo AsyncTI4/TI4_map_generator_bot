@@ -338,6 +338,31 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
+            case GameStatisticsFilterer.GAME_TYPES_FILTER,
+                GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                var tokens = List.of(
+                    "base",
+                    "pok",
+                    "absol",
+                    "ds",
+                    "action_deck_2",
+                    "little_omega",
+                    "franken",
+                    "milty_mod",
+                    "red_tape",
+                    "age_of_exploration",
+                    "minor_factions",
+                    "alliance",
+                    "age_of_commerce",
+                    "facilities",
+                    "total_war",
+                    "liberation",
+                    "ordinian"
+                );
+                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
+                event.replyChoices(options).queue();
+            }
             case Constants.DECK_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Map<String, DeckModel> decks = Mapper.getDecks();
