@@ -24,7 +24,7 @@ class PlayerWinPercentStatisticsService {
         Map<String, String> playerUserIdToUsername = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> getPlayerWinPercent(game, playerWinCount, playerGameCount, playerUserIdToUsername)
         );
 
