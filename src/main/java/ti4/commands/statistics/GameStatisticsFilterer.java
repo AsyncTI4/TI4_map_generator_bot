@@ -57,7 +57,7 @@ public class GameStatisticsFilterer {
         Integer minPlayerCountFilter = event.getOption(MIN_PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt);
         Integer victoryPointGoalFilter = event.getOption(VICTORY_POINT_GOAL_FILTER, null, OptionMapping::getAsInt);
         Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
-        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, true, OptionMapping::getAsBoolean);
+        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, null, OptionMapping::getAsBoolean);
         String gameTypesFilter = event.getOption(GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         String excludedGameTypesFilter = event.getOption(EXCLUDED_GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
@@ -85,7 +85,7 @@ public class GameStatisticsFilterer {
         if (winningFactionFilter == null) {
             return true;
         }
-        return game.getWinner().isPresent() && game.getWinner().get().getFaction().equals(winningFactionFilter);
+        return game.getWinners().stream().anyMatch(winner -> winner.getFaction().equalsIgnoreCase(winningFactionFilter));
     }
 
     public static Predicate<Game> getNormalFinishedGamesFilter(Integer playerCountFilter, Integer victoryPointGoalFilter) {

@@ -407,11 +407,6 @@ public class Game extends GameProperties {
         Collections.shuffle(getActionCards());
     }
 
-    public void addSecretDuplicates(List<String> soIDs) {
-        getSecretObjectives().addAll(soIDs);
-        Collections.shuffle(getSecretObjectives());
-    }
-
     public void setPurgedPNs(List<String> purgedPN) {
         this.purgedPN = purgedPN;
     }
@@ -4353,7 +4348,6 @@ public class Game extends GameProperties {
     }
 
     public boolean checkAllDecksAreOfficial() {
-        // needs to check for homebrew tiles still
         // Decks
         List<String> deckIDs = new ArrayList<>();
         deckIDs.add(getAcDeckID());
