@@ -39,7 +39,7 @@ public class GameWinsWithOtherFactionsService {
         }
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> getGameWinsWithOtherFactions(game, factionWinCount, factionGameCount, reqFactions)
         );
 
