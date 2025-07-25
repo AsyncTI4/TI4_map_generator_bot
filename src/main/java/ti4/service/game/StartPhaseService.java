@@ -734,7 +734,7 @@ public class StartPhaseService {
                 game.setPriorityTrackMode(PriorityTrackMode.NONE);
             }
         }
-        if (game.getRound() == 1 && !game.isFowMode() && completedSurvey > 0) {
+        if (game.getRound() == 1 && !game.isFowMode() && completedSurvey > 1) {
             String header = "# __Survey Results__\n";
             String question1 = "## Question #1: Whispers\n";
             String question2 = "## Question #2: Supports\n";
