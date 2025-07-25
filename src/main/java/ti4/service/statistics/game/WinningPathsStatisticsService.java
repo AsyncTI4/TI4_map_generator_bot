@@ -55,7 +55,7 @@ class WinningPathsStatisticsService {
         AtomicInteger gameWithWinnerCount = new AtomicInteger();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> getWinsWithSupport(game, supportWinCount, gameWithWinnerCount)
         );
 

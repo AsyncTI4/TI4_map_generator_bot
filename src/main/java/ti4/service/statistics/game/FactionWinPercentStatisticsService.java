@@ -25,7 +25,7 @@ class FactionWinPercentStatisticsService {
         Map<String, Integer> factionWinsWithRelics = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> getFactionWinPercent(game, factionWinCount, factionGameCount, factionWinsWithRelics)
         );
 

@@ -21,7 +21,7 @@ class MostWinningFactionsStatisticsService {
         Map<String, Integer> factionToWinCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> countFactionWins(game, factionToWinCount)
         );
 
