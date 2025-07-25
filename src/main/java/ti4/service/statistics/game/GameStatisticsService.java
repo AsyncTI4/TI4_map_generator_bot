@@ -42,7 +42,6 @@ public class GameStatisticsService {
         }
     }
 
-    // WARNING: This iterates over each game and is very slow.
     public String getWinningPathComparison(String winningPath, int playerCount, int totalVictoryPoints) {
         return WinningPathsStatisticsService.compareWinningPathToAllOthers(winningPath, playerCount, totalVictoryPoints);
     }

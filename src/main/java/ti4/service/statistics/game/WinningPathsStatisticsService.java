@@ -89,7 +89,6 @@ class WinningPathsStatisticsService {
         Map<String, Integer> winningPathCounts = WinningPathCacheService.getWinningPathCounts(playerCount, victoryPointTotal);
         int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
         if (gamesWithWinnerCount >= 100) {
-            // TODO: Previously this was never null, but after loadless it is? Need investigation, but for now defaulting to 1.
             int winningPathCount = winningPathCounts.getOrDefault(winningPath, 1);
             double winningPathPercent = winningPathCount / (double) gamesWithWinnerCount;
             String winningPathCommonality = getWinningPathCommonality(winningPathCounts, winningPathCount);
