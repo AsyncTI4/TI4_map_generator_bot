@@ -2343,7 +2343,7 @@ public class UnfiledButtonHandlers {
         player.removeRelic(relic);
         player.removeExhaustedRelic(relic);
         game.removeRevealedObjective(poID);
-        String msg = player.getRepresentation() + " is using _Neuraloop_, purge " + (relic.equals("neuraloop") ? "itself" : Mapper.getRelic(relic).getName())
+        String msg = player.getRepresentation() + " is using _Neuraloop_, purging " + (relic.equals("neuraloop") ? "itself" : Mapper.getRelic(relic).getName())
             + ", to replace the recently revealed objective with a random " + type + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (type.equalsIgnoreCase("stage1")) {
