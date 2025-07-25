@@ -162,7 +162,7 @@ public class RematchService {
             "### __Other helpful commands:__\n" +
             "> `/game replace` to replace a player in the game with a new one\n";
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
-        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + newName);
+        MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://asyncti4.com/game/" + newName);
 
         List<Button> buttons2 = new ArrayList<>();
         buttons2.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
