@@ -4344,7 +4344,7 @@ public class Game extends GameProperties {
     }
 
     private boolean isCodex4() {
-        return getPlayers().values().stream().anyMatch(player -> player.getTechs().contains("x89c4"));
+        return getTechnologyDeck().contains("x89c4");
     }
 
     public boolean checkAllDecksAreOfficial() {
