@@ -4314,8 +4314,8 @@ public class Game extends GameProperties {
     private boolean hasUnofficialNumberOfRevealedObjectives() {
         int revealedStage1Count = (int) revealedPublicObjectives.keySet().stream()
             .map(Mapper::getPublicObjective)
-            .filter(objective -> objective.getPoints() == 1)
             .filter(objective -> objective.getSource().isOfficial())
+            .filter(objective -> objective.getPoints() == 1)
             .count();
         if (revealedStage1Count < 2) {
             return true;
@@ -4323,8 +4323,8 @@ public class Game extends GameProperties {
 
         int revealedStage2Count = (int) revealedPublicObjectives.keySet().stream()
             .map(Mapper::getPublicObjective)
-            .filter(objective -> objective.getPoints() == 2)
             .filter(objective -> objective.getSource().isOfficial())
+            .filter(objective -> objective.getPoints() == 2)
             .count();
         int round = getRound();
         String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
@@ -4339,8 +4339,9 @@ public class Game extends GameProperties {
                 if (revealedStage1Count < round + 1) return true;
                 // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're not in action phase
                 if (revealedStage1Count > round + 2 + extraIfNotActionPhase) return true;
-                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase
-                if (revealedStage2Count > 1 + extraIfNotActionPhase) return true;
+                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase and its round 4
+                int extraIfRound4AndNotActionPhase = round != 4 ? 0 : extraIfNotActionPhase;
+                if (revealedStage2Count > 1 + extraIfRound4AndNotActionPhase) return true;
             }
             if (round >= 5) {
                 // We can't have less stage 1s than this
