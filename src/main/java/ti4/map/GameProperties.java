@@ -35,7 +35,7 @@ public class GameProperties {
     private @ExportableField String soDeckID = "secret_objectives_pok";
     private @ExportableField String stage1PublicDeckID = "public_stage_1_objectives_pok";
     private @ExportableField String stage2PublicDeckID = "public_stage_2_objectives_pok";
-    private @ExportableField String relicDeckID = "relics_pok";
+    private @ExportableField String relicDeckID = "relics_pok_c4";
     private @ExportableField String agendaDeckID = "agendas_pok";
     private @ExportableField String explorationDeckID = "explores_pok";
     private @ExportableField String technologyDeckID = "techs_pok_c4";
