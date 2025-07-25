@@ -476,7 +476,7 @@ public class Game extends GameProperties {
         }
 
         if (player.getAllianceMembers().isEmpty()) {
-            return false;
+            return true;
         }
 
         Player ally = getRealPlayersNDummies().stream()

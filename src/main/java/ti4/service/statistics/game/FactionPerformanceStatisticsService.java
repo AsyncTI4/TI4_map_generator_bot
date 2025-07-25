@@ -24,7 +24,7 @@ class FactionPerformanceStatisticsService {
         Map<String, Integer> gameCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> calculate(game, actualWins, expectedWins, gameCount)
         );
 
