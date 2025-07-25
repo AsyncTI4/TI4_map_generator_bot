@@ -72,6 +72,7 @@ public class WinningPathHelper {
         if (normalized.contains("imperial")) return "imperial rider";
         if (normalized.contains("censure")) return "censure";
         if (normalized.contains("crown") || normalized.contains("emph")) return "crown";
+        if (normalized.contains("latvinia")) return "latvinia";
         return "other (probably _Classified Document Leaks_)";
     }
 }
