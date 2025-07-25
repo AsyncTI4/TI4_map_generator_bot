@@ -562,9 +562,9 @@ public class MapGenerator implements AutoCloseable {
         if (game.getVp() > 14) {
             boxWidth = 120;
         }
-        if (game.isAllianceMode())
+        if (game.isLiberationC4Mode())
         {
-            for (int i = game.getVp() + 1; i <= 14; i++) {
+            for (int i = game.getVp() + 1; i <= 12; i++) {
                 graphics.setColor(Color.WHITE);
                 Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
                 DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
@@ -572,9 +572,9 @@ public class MapGenerator implements AutoCloseable {
                 g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
             }
         }
-        if (game.isLiberationC4Mode())
+        else if (game.isAllianceMode())
         {
-            for (int i = game.getVp() + 1; i <= 12; i++) {
+            for (int i = game.getVp() + 1; i <= 14; i++) {
                 graphics.setColor(Color.WHITE);
                 Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
                 DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
