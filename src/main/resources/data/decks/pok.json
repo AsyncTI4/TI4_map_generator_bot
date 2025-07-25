@@ -295,10 +295,10 @@
         "source": "pok"
     },
     {
-        "alias": "relics_pok",
+        "alias": "relics_pok_c4",
         "name": "PoK Relics",
         "type": "relic",
-        "description": "All Relics in a 'vanilla' PoK game",
+        "description": "All Relics in a 'vanilla' PoK game, plus Codex 2 and Codex 4",
         "cardIDs": [
             "codex",
             "dominusorb",
@@ -316,6 +316,47 @@
             "neuraloop",
             "circletofthevoid",
             "bookoflatvinia"
+        ],
+        "source": "pok"
+    },
+    {
+        "alias": "relics_pok_c2",
+        "name": "PoK Relics",
+        "type": "relic",
+        "description": "All Relics in a 'vanilla' PoK game, plus Codex 2",
+        "cardIDs": [
+            "codex",
+            "dominusorb",
+            "dynamiscore",
+            "emelpar",
+            "emphidia",
+            "mawofworlds",
+            "nanoforge",
+            "obsidian",
+            "prophetstears",
+            "shard",
+            "stellarconverter",
+            "thalnos",
+            "titanprototype"
+        ],
+        "source": "pok"
+    },
+    {
+        "alias": "relics_pok",
+        "name": "PoK Relics",
+        "type": "relic",
+        "description": "All Relics in a 'vanilla' PoK game",
+        "cardIDs": [
+            "codex",
+            "dominusorb",
+            "emelpar",
+            "emphidia",
+            "mawofworlds",
+            "obsidian",
+            "prophetstears",
+            "shard",
+            "stellarconverter",
+            "thalnos"
         ],
         "source": "pok"
     },

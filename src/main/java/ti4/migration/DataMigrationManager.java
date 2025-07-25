@@ -48,6 +48,7 @@ public class DataMigrationManager {
         migrations.put("removeWekkersAbsolsPoliticalSecret_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecrets);
         migrations.put("removeWekkersAbsolsPoliticalSecretAgain_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
         migrations.put("warnGamesWithOldDisplaceMap_270525", MigrationHelper::warnGamesWithOldDisplaceMap);
+        migrations.put("updatePokRelicDeckID_300725", DataMigrationManager::migrationUpdatePokRelicDeckID_300725);
         //migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
@@ -120,5 +121,27 @@ public class DataMigrationManager {
             }
         }
         return migrationsApplied;
+    }
+
+    private static boolean migrationUpdatePokRelicDeckID_300725(Game game) {
+        if (!"relics_pok".equals(game.getRelicDeckID())) {
+            return false;
+        }
+
+        var deck = game.getAllRelics();
+        boolean deckHasTitan = deck.contains("titanprototype");
+        boolean playersHaveTitan = game.getPlayers().values().stream()
+            .anyMatch(p -> p.getRelics().contains("titanprototype"));
+        if (!deckHasTitan && !playersHaveTitan) {
+            return false;
+        }
+
+        boolean hasC4 = deck.contains("neuraloop") || deck.contains("circletofthevoid") || deck.contains("bookoflatvinia");
+        if (!hasC4) {
+            game.setRelicDeckID("relics_pok_c2");
+        } else {
+            game.setRelicDeckID("relics_pok_c4");
+        }
+        return true;
     }
 }
