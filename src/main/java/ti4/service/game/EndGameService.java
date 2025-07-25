@@ -38,6 +38,7 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.GameStatisticsService;
 import ti4.service.statistics.game.WinningPathHelper;
+import ti4.service.statistics.game.WinningPathCacheService;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglPlayerResult;
 import ti4.website.WebHelper;
@@ -187,6 +188,7 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
+        WinningPathCacheService.addGame(game);
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {

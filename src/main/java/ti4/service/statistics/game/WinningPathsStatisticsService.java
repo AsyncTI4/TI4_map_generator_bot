@@ -86,7 +86,7 @@ class WinningPathsStatisticsService {
 
     static String compareWinningPathToAllOthers(String winningPath, int playerCount, int victoryPointTotal) {
         StringBuilder sb = new StringBuilder();
-        Map<String, Integer> winningPathCounts = getNormalGameWinningPaths(playerCount, victoryPointTotal);
+        Map<String, Integer> winningPathCounts = WinningPathCacheService.getWinningPathCounts(playerCount, victoryPointTotal);
         int gamesWithWinnerCount = winningPathCounts.values().stream().reduce(0, Integer::sum);
         if (gamesWithWinnerCount >= 100) {
             // TODO: Previously this was never null, but after loadless it is? Need investigation, but for now defaulting to 1.
@@ -109,17 +109,6 @@ class WinningPathsStatisticsService {
             }
         }
         return sb.toString();
-    }
-
-    private static Map<String, Integer> getNormalGameWinningPaths(int playerCount, int victoryPointTotal) {
-        Map<String, Integer> winningPathCount = new HashMap<>();
-
-        GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getNormalFinishedGamesFilter(playerCount, victoryPointTotal),
-            game -> getWinningPath(game, winningPathCount)
-        );
-
-        return winningPathCount;
     }
 
     private static String getWinningPathCommonality(Map<String, Integer> winningPathCounts, int winningPathCount) {
