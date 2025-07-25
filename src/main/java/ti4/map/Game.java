@@ -4310,8 +4310,8 @@ public class Game extends GameProperties {
     private boolean hasUnofficialNumberOfRevealedObjectives() {
         int revealedStage1Count = (int) revealedPublicObjectives.keySet().stream()
             .map(Mapper::getPublicObjective)
-            .filter(objective -> objective.getPoints() == 1)
             .filter(objective -> objective.getSource().isOfficial())
+            .filter(objective -> objective.getPoints() == 1)
             .count();
         if (revealedStage1Count < 2) {
             return true;
@@ -4319,8 +4319,8 @@ public class Game extends GameProperties {
 
         int revealedStage2Count = (int) revealedPublicObjectives.keySet().stream()
             .map(Mapper::getPublicObjective)
-            .filter(objective -> objective.getPoints() == 2)
             .filter(objective -> objective.getSource().isOfficial())
+            .filter(objective -> objective.getPoints() == 2)
             .count();
         int round = getRound();
         String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
