@@ -4319,8 +4319,7 @@ public class Game extends GameProperties {
         // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people reveal despite game end
         int extraIfNotActionPhase = phaseOfGame.contains("action") ? 0 : 1;
         // if neuraloop is in the deck, or we're not using Codex 4, we can make additional assumptions about number of publics
-        // TODO: this should really say ... || !isCodex4()
-        if (relics.contains("neuraloop")) {
+        if (relics.contains("neuraloop") || !isCodex4()) {
             // 5 revealed by round 5 and Incentive Program
             if (revealedStage1Count > 6) return true;
             if (round < 5) {
@@ -4342,6 +4341,10 @@ public class Game extends GameProperties {
 
         // Extra stage 1 on round 1, Incentive Program during agenda phase; 1 extra if we're not in action phase
         return revealedStage1Count + revealedStage2Count > round + 2 + extraIfNotActionPhase;
+    }
+
+    private boolean isCodex4() {
+        return getPlayers().values().stream().anyMatch(player -> player.getTechs().contains("x89c4"));
     }
 
     public boolean checkAllDecksAreOfficial() {
