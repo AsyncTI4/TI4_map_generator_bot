@@ -52,12 +52,20 @@ public class GameStatisticsFilterer {
         return filters;
     }
 
+    public static Predicate<Game> getGamesFilterForWonGame(SlashCommandInteractionEvent event) {
+        return getGamesFilter(event, true);
+    }
+
     public static Predicate<Game> getGamesFilter(SlashCommandInteractionEvent event) {
+        return getGamesFilter(event, null);
+    }
+
+    private static Predicate<Game> getGamesFilter(SlashCommandInteractionEvent event, Boolean defaultHasWinner) {
         Integer playerCountFilter = event.getOption(PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt);
         Integer minPlayerCountFilter = event.getOption(MIN_PLAYER_COUNT_FILTER, null, OptionMapping::getAsInt);
         Integer victoryPointGoalFilter = event.getOption(VICTORY_POINT_GOAL_FILTER, null, OptionMapping::getAsInt);
         Boolean homebrewFilter = event.getOption(HOMEBREW_FILTER, null, OptionMapping::getAsBoolean);
-        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, null, OptionMapping::getAsBoolean);
+        Boolean hasWinnerFilter = event.getOption(HAS_WINNER_FILTER, defaultHasWinner, OptionMapping::getAsBoolean);
         String gameTypesFilter = event.getOption(GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         String excludedGameTypesFilter = event.getOption(EXCLUDED_GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
