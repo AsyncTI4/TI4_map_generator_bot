@@ -120,7 +120,7 @@
         "title": "Shadow of Tyria Prime",
         "abilityWindow": "",
         "abilityText": "This card has the Tier 2 ability of each active protocol.",
-        "unlockCondition": "Have units with a combined PRODUCTION value of at least 10 in a single system.",
+        "unlockCondition": "Have units with a combined PRODUCTION value of at least 4 in two non-home systems.",
         "source": "eronous"
     },
     {

@@ -53,6 +53,7 @@ public class Constants {
     public static final String SPIN_TILES_IN_RINGS = "spin_tiles_in_rings";
     public static final String OFFER_AUTOPASS_OPTIONS = "offer_autopass_options";
     public static final String OFFER_AFKTIME_OPTIONS = "offer_afktime_options";
+    public static final String SURVEY = "survey";
     public static final String WIPE_TURN_TIME = "wipe_turn_time";
     public static final String ALLIANCE_MEMBERS = "alliance_members";
     public static final String AFK_HOURS = "afk_hours";
@@ -1075,6 +1076,7 @@ public class Constants {
     public static final String HIDDEN_AGENDA_MODE = "hidden_agenda_mode";
     public static final String AGE_OF_COMMERCE_MODE = "age_of_commerce_mode";
     public static final String TOTAL_WAR_MODE = "total_war_mode";
+    public static final String NO_SWAP_MODE = "no_swap_mode";
     public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
     public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";
