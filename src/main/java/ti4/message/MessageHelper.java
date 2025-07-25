@@ -1,6 +1,7 @@
 package ti4.message;
 
 import java.io.File;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -17,8 +18,6 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import java.net.SocketTimeoutException;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -36,6 +35,7 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -131,7 +131,7 @@ public class MessageHelper {
 
     public static List<Button> addUndoButtonToList(List<Button> buttons, String gameName) {
         for (Button button : buttons) {
-            if (button.getId().contains("ultimateUndo")) {
+            if (button.getId().contains("ultimateUndo") || button.getId().contains("answerSurvey")) {
                 return buttons;
             }
         }

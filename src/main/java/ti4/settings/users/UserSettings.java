@@ -1,6 +1,6 @@
 package ti4.settings.users;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -25,6 +25,13 @@ public class UserSettings {
     private LocalDateTime lockedFromCreatingGamesUntil;
     private boolean pingOnNextTurn;
     private boolean showTransactables;
+
+    private boolean hasAnsweredSurvey;
+    private String whisperPref = "No Preference";
+    private String supportPref = "No Preference";
+    private String winmakingPref = "No Preference";
+    private String takebackPref = "No Preference";
+    private String metaPref = "No Preference";
 
     UserSettings() {} // needed for ObjectMapper
 

@@ -420,6 +420,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.TOTAL_WAR_MODE + " " + game.isTotalWarMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.NO_SWAP_MODE + " " + game.isNoSwapMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_COMMERCE_MODE + " " + game.isAgeOfCommerceMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.ORDINIAN_C1_MODE + " " + game.isOrdinianC1Mode());

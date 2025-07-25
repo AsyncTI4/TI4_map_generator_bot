@@ -1,6 +1,9 @@
 package ti4.map;
 
-import java.awt.*;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
+
+import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -22,6 +25,10 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,6 +36,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -41,9 +49,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -93,9 +98,6 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
-
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
 
@@ -626,6 +628,10 @@ public class Game extends GameProperties {
         gameModes.put("Community", isCommunityMode());
         gameModes.put("Minor Factions", isMinorFactionsMode());
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
+        gameModes.put("Hidden Agenda", isHiddenAgendaMode());
+        gameModes.put("Total War", isTotalWarMode());
+        gameModes.put("No Support Swaps", isNoSwapMode());
+        gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Alliance", isAllianceMode());
         gameModes.put("FoW", isFowMode());
         gameModes.put("Franken", isFrankenGame());
@@ -4271,6 +4277,7 @@ public class Game extends GameProperties {
             || isAgeOfCommerceMode()
             || isMinorFactionsMode()
             || isLiberationC4Mode()
+            || isNoSwapMode()
             || isFacilitiesMode()
             || isLightFogMode()
             || isRedTapeMode()
