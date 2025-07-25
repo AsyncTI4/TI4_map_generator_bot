@@ -4,43 +4,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.message.MessageHelper;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.GMService;
 
 @UtilityClass
 public class FOWOptionService {
 
+    public enum FOWOptionCategory { 
+        GAME, PLAYER, MAP;
+
+        static FOWOptionCategory fromString(String string) {
+            for (FOWOptionCategory category : FOWOptionCategory.values()) {
+                if (category.name().equalsIgnoreCase(string)) {
+                    return category;
+                }
+            }
+            throw new IllegalArgumentException("No FOWOptionCategory enum for '" + string + "'");
+        }
+    }
+
     public enum FOWOption {
-        MANAGED_COMMS("Managed comms", "Use managed player-to-player communication threads"),
-        ALLOW_AGENDA_COMMS("Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
-        HIDE_TOTAL_VOTES("Hide total votes", "Hide total votes amount in agenda"),
-        HIDE_VOTE_ORDER("Hide voting order", "Hide player colors from vote order"),
-        HIDE_PLAYER_NAMES("Hide real names", "Completely hide player Discord names on the map"),
-        STATUS_SUMMARY("Status summary", "Prints explores info as summary thread in status homework"),
-        FOW_PLUS("FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details"),
+        //Game Options
+        MANAGED_COMMS(FOWOptionCategory.GAME, "Managed comms", "Use managed player-to-player communication threads"),
+        ALLOW_AGENDA_COMMS(FOWOptionCategory.GAME, "Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
+        HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
+        HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
+        STATUS_SUMMARY(FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
+
+        //Player Options
+        HIDE_PLAYER_NAMES(FOWOptionCategory.PLAYER, "Hide real names", "Completely hide player Discord names on the map"),
+
+        //Map Options
+        FOW_PLUS(FOWOptionCategory.MAP, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details"),
 
         //Hidden from normal options
-        RIFTSET_MODE("RiftSet Mode", "For Eronous to run fow300", false);
+        RIFTSET_MODE(null, "RiftSet Mode", "For Eronous to run fow300", false);
 
+        private final FOWOptionCategory category;
         private final String title;
         private final String description;
         private final boolean visible;
 
-        FOWOption(String title, String description) {
-            this(title, description, true);
+        FOWOption(FOWOptionCategory category, String title, String description) {
+            this(category, title, description, true);
         }
 
-        FOWOption(String title, String description, boolean visible) {
+        FOWOption(FOWOptionCategory category, String title, String description, boolean visible) {
+            this.category = category;
             this.title = title;
             this.description = description;
             this.visible = visible;
+        }
+
+        public FOWOptionCategory getCategory() {
+            return category;
         }
 
         public String getTitle() {
@@ -70,38 +93,53 @@ public class FOWOptionService {
         }
     }
 
-    public static void offerFOWOptionButtons(Game game, MessageChannel channel) {
-        offerFOWOptionButtons(game, channel, null);
+    public static void offerFOWOptionButtons(Game game) {
+        offerFOWOptionButtons(null, game, FOWOptionCategory.GAME);
     }
 
-    private static void offerFOWOptionButtons(Game game, MessageChannel channel, ButtonInteractionEvent event) {
+    private static void offerFOWOptionButtons(ButtonInteractionEvent event, Game game, FOWOptionCategory selectedCategory) {
+        StringBuilder sb = new StringBuilder("### Change FoW " + selectedCategory + " Options\n\n");
+
+        List<ActionRow> rows = new ArrayList<>();
+        List<Button> categoryButtons = new ArrayList<>();
+        for (FOWOptionCategory category : FOWOptionCategory.values()) {
+            if (category == selectedCategory) {
+                categoryButtons.add(Buttons.gray("fowOptionCategory_" + category, category.name() + " Options"));
+            } else {
+                categoryButtons.add(Buttons.blue("fowOptionCategory_" + category, category.name() + " Options"));
+            }
+        }
+        categoryButtons.add(Buttons.gray("deleteButtons", "Done"));
+
         List<Button> optionButtons = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
         for (FOWOption option : FOWOption.values()) {
-            if (!option.isVisible()) continue;
+            if (!option.isVisible() || !option.getCategory().equals(selectedCategory)) continue;
 
             boolean currentValue = game.getFowOption(option);
             sb.append(valueRepresentation(currentValue)).append(" **").append(option.getTitle()).append("**\n");
             sb.append("-# ").append(option.getDescription()).append("\n");
 
             optionButtons.add(currentValue
-                ? Buttons.red("fowOption_false_" + option, "Disable " + option.getTitle())
-                : Buttons.green("fowOption_true_" + option, "Enable " + option.getTitle()));
+                ? Buttons.red("fowOption_" + selectedCategory + "_false_" + option, "Disable " + option.getTitle())
+                : Buttons.green("fowOption_" + selectedCategory + "_true_" + option, "Enable " + option.getTitle()));
         }
-        optionButtons.add(Buttons.gray("deleteButtons", "Done"));
+
+        rows.add(ActionRow.of(optionButtons));
+        rows.add(ActionRow.of(categoryButtons));
+
         if (event == null) {
-            MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, sb.toString(), optionButtons);
+            GMService.getGMChannel(game).sendMessage(sb.toString()).addComponents(rows).queue();
         } else {
-            List<List<ActionRow>> buttonRows = MessageHelper.getPartitionedButtonLists(optionButtons);
-            event.getHook().editOriginal(sb.toString()).setComponents(buttonRows.getFirst()).queue();
+            event.getHook().editOriginal(sb.toString()).setComponents(rows).queue();
         }
     }
 
     @ButtonHandler("fowOption_")
     public static void changeFOWOptions(ButtonInteractionEvent event, Game game, String buttonID) {
-        String[] parts = buttonID.split("fowOption_")[1].split("_", 2);
-        String value = parts[0];
-        String option = parts[1];
+        String[] parts = buttonID.split("fowOption_")[1].split("_", 3);
+        FOWOptionCategory category = FOWOptionCategory.fromString(parts[0]);
+        String value = parts[1];
+        String option = parts[2];
 
         FOWOption fowOption = FOWOption.fromString(option);
         boolean newValue = Boolean.parseBoolean(value);
@@ -110,7 +148,13 @@ public class FOWOptionService {
         }
 
         game.setFowOption(fowOption, newValue);
-        offerFOWOptionButtons(game, event.getChannel(), event);
+        offerFOWOptionButtons(event, game, category);
+    }
+
+    @ButtonHandler("fowOptionCategory_")
+    public static void changeFOWOptionsCategory(ButtonInteractionEvent event, Game game, String buttonID) {
+        FOWOptionCategory category = FOWOptionCategory.fromString(buttonID.replace("fowOptionCategory_", ""));
+        offerFOWOptionButtons(event, game, category);
     }
 
     public static String valueRepresentation(boolean value) {
