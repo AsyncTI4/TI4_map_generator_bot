@@ -89,8 +89,7 @@ public class GameStatisticsFilterer {
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
             .and(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
-            .and(GameStatisticsFilterer::filterNoGalacticEventOrScenario)
-            .and(game -> filterOnHomebrew(Boolean.FALSE, game))
+            .and(game -> filterOnIsNormal(Boolean.TRUE, game))
             .and(game -> filterOnHasWinner(Boolean.TRUE, game))
             .and(GameStatisticsFilterer::filterAbortedGames)
             .and(GameStatisticsFilterer::filterEarlyRounds);
@@ -155,6 +154,10 @@ public class GameStatisticsFilterer {
         return homebrewFilter == null || homebrewFilter == game.hasHomebrew();
     }
 
+    private static boolean filterOnIsNormal(Boolean isNormalFilter, Game game) {
+        return isNormalFilter == null || isNormalFilter == game.isNormalGame();
+    }
+
     private static boolean filterOnGalacticEvent(String galacticEventFilter, Game game) {
         if (galacticEventFilter == null) {
             return true;
@@ -203,15 +206,6 @@ public class GameStatisticsFilterer {
 
     private static boolean filterOnMinPlayerCount(Integer minPlayerCount, Game game) {
         return minPlayerCount == null || minPlayerCount <= game.getRealAndEliminatedPlayers().size();
-    }
-
-    private static boolean filterNoGalacticEventOrScenario(Game game) {
-        return !(game.isAgeOfExplorationMode()
-            || game.isTotalWarMode()
-            || game.isAgeOfCommerceMode()
-            || game.isMinorFactionsMode()
-            || game.isLiberationC4Mode()
-            || game.isOrdinianC1Mode());
     }
 
 }
