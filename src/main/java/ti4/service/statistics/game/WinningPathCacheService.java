@@ -9,6 +9,7 @@ import lombok.experimental.UtilityClass;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
 import ti4.map.GamesPage;
+import ti4.message.BotLogger;
 
 @UtilityClass
 public class WinningPathCacheService {
@@ -17,12 +18,14 @@ public class WinningPathCacheService {
     private static boolean hasBeenComputed = false;
 
     public static synchronized void recomputeCache() {
+        BotLogger.info("**Recomputing win path cache**");
         WINNING_PATH_CACHE.invalidateAll();
         GamesPage.consumeAllGames(
             GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null),
             WinningPathCacheService::addGame
         );
         hasBeenComputed = true;
+        BotLogger.info("**Finished recomputing win path cache**");
     }
 
     public static synchronized void addGame(Game game) {
