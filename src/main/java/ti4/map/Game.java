@@ -626,6 +626,10 @@ public class Game extends GameProperties {
         gameModes.put("Community", isCommunityMode());
         gameModes.put("Minor Factions", isMinorFactionsMode());
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
+        gameModes.put("Age of Commerce", isAgeOfCommerceMode());
+        gameModes.put("Total War", isTotalWarMode());
+        gameModes.put("Liberation", isLiberationC4Mode());
+        gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
         gameModes.put("FoW", isFowMode());
         gameModes.put("Franken", isFrankenGame());
@@ -648,7 +652,13 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean isNormalGame() {
-        return !hasHomebrew();
+        return !hasHomebrew()
+            && !isAgeOfExplorationMode()
+            && !isTotalWarMode()
+            && !isAgeOfCommerceMode()
+            && !isMinorFactionsMode()
+            && !isLiberationC4Mode()
+            && !isOrdinianC1Mode();
     }
 
     public boolean isFrankenGame() {
@@ -4266,11 +4276,6 @@ public class Game extends GameProperties {
         return isHomebrew()
             || isExtraSecretMode()
             || isFowMode()
-            || isAgeOfExplorationMode()
-            || isTotalWarMode()
-            || isAgeOfCommerceMode()
-            || isMinorFactionsMode()
-            || isLiberationC4Mode()
             || isFacilitiesMode()
             || isLightFogMode()
             || isRedTapeMode()
