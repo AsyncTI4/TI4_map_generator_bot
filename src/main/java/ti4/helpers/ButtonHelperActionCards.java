@@ -2308,12 +2308,35 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("economicInitiative")
     public static void economicInitiative(Player player, Game game, ButtonInteractionEvent event) {
-        for (String planet : player.getPlanetsAllianceMode()) {
+        String message = "";
+        List<String> exhaustedPlanets = new ArrayList<>(player.getExhaustedPlanets());
+        for (String planet : exhaustedPlanets) {
             if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
                 player.refreshPlanet(planet);
+                message += "\n> " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game);
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmoji() + " readied each of their cultural planets.");
+        if (!"".equalsIgnoreCase(player.getAllianceMembers())) {
+            for (Player player2 : game.getRealPlayers()) {
+                if (player.getAllianceMembers().contains(player2.getFaction())) {
+                    exhaustedPlanets = new ArrayList<>(player2.getExhaustedPlanets());
+                    for (String planet : exhaustedPlanets) {
+                        if (ButtonHelper.getTypeOfPlanet(game, planet).contains("cultural")) {
+                            player2.refreshPlanet(planet);
+                            message += "\n> " + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game);
+                        }
+                    }
+                }
+            }
+        }
+        if (message.isEmpty())
+        {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " would have readied each of their cultural planets, but they have none.");
+        }
+        else
+        {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " readied each of their cultural planets." + message);
+        }
         ButtonHelper.deleteMessage(event);
     }
 

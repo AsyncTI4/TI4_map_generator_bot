@@ -154,7 +154,7 @@ public class TacticalActionOutputService {
                     String unitHolderStr = (uh instanceof Planet p) ? " from the planet " + p.getRepresentation(game) : "";
                     unitMoveStr += unitHolderStr;
 
-                    String distanceStr = validateMoveValue(game, player, tile, key, movingUnitsFromTile, distance, riftDistance);
+                    String distanceStr = validateMoveValue(game, player, tile, key, distance, riftDistance);
                     unitMoveStr += distanceStr;
                     lines.add(unitMoveStr);
                 }
@@ -194,7 +194,7 @@ public class TacticalActionOutputService {
         return sb.toString();
     }
 
-    public String validateMoveValue(Game game, Player player, Tile tile, UnitKey unit, Set<UnitKey> allMovingUnits, int distance, int riftDistance) {
+    public String validateMoveValue(Game game, Player player, Tile tile, UnitKey unit, int distance, int riftDistance) {
         int moveValue = getUnitMoveValue(game, player, tile, unit, false);
         if (moveValue == 0) return "";
 

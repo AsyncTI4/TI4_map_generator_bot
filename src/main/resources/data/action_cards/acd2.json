@@ -518,6 +518,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "mass_transference",
+        "name": "Mass Transference",
+        "phase": "Action",
+        "window": "After you activate a system",
+        "text": "Remove any number of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
+        "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "mercenary_contract",
         "name": "Mercenary Contract",
         "phase": "Action",
@@ -840,15 +849,6 @@
         "window": "After an agenda is revealed",
         "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda and choose 1 non-faction technology owned by another player. If your prediction is correct, gain that technology.",
         "flavorText": "R7-82's optic servo motors malfunctioned momentarily as the council discussed 'feeding' the Virus to satiate its hunger.",
-        "source": "action_deck_2"
-    },
-    {
-        "alias": "sensor_jam",
-        "name": "Sensor Jam",
-        "phase": "Action",
-        "window": "After a player activates a system",
-        "text": "Your cruisers and destroyers gain SUSTAIN DAMAGE during this tactical action.",
-        "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
         "source": "action_deck_2"
     },
     {

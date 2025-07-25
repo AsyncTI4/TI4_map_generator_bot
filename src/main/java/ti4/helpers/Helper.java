@@ -80,6 +80,7 @@ import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.emoji.UnitEmojis;
+import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.fow.GMService;
 import ti4.service.game.SetOrderService;
 import ti4.service.info.SecretObjectiveInfoService;
@@ -647,6 +648,9 @@ public class Helper {
     }
 
     public static Emoji getPlayerReactionEmoji(Game game, Player player, String messageId) {
+        if (player == null) {
+            return Emoji.fromFormatted(ApplicationEmojiService.fallbackEmoji);
+        }
         Emoji emojiToUse = Emoji.fromFormatted(player.getFactionEmoji());
         if (game.isFowMode()) {
             int index = 0;
@@ -2456,7 +2460,7 @@ public class Helper {
                 if (player.getFaction().equalsIgnoreCase("sol") || player.getFaction().equalsIgnoreCase("xxcha")) {
                     Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
                     Player sol = game.getPlayerFromColorOrFaction("sol");
-                    if (sol != null && xxcha != null && (sol.getTotalVictoryPoints() > 11 || xxcha.getTotalVictoryPoints() > 11) && sol.getTotalVictoryPoints() > 9 && xxcha.getTotalVictoryPoints() > 9) {
+                    if (sol != null && xxcha != null && (sol.getTotalVictoryPoints() >= 12 || xxcha.getTotalVictoryPoints() >= 12) && sol.getTotalVictoryPoints() >= 10 && xxcha.getTotalVictoryPoints() >= 10) {
                         //good
                     } else {
                         return;

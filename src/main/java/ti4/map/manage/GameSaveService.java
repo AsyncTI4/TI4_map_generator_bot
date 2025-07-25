@@ -336,6 +336,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + game.isFowMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.REPLACEMENT_MADE + " " + game.isReplacementMade());
+        writer.write(System.lineSeparator());
         StringBuilder fowOptions = new StringBuilder();
         for (Map.Entry<FOWOption, Boolean> entry : game.getFowOptions().entrySet()) {
             fowOptions.append(entry.getKey()).append(",").append(entry.getValue()).append(";");

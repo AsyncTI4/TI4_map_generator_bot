@@ -409,11 +409,6 @@ public class Game extends GameProperties {
         Collections.shuffle(getActionCards());
     }
 
-    public void addSecretDuplicates(List<String> soIDs) {
-        getSecretObjectives().addAll(soIDs);
-        Collections.shuffle(getSecretObjectives());
-    }
-
     public void setPurgedPNs(List<String> purgedPN) {
         this.purgedPN = purgedPN;
     }
@@ -483,7 +478,7 @@ public class Game extends GameProperties {
         }
 
         if (player.getAllianceMembers().isEmpty()) {
-            return false;
+            return true;
         }
 
         Player ally = getRealPlayersNDummies().stream()
@@ -493,7 +488,7 @@ public class Game extends GameProperties {
 
         return ally != null
             && ally.getTotalVictoryPoints() >= getVp()
-            && (player.getTotalVictoryPoints() > 11 || ally.getTotalVictoryPoints() > 11);
+            && (player.getTotalVictoryPoints() >= 12 || ally.getTotalVictoryPoints() >= 12);
     }
 
     private Player compareWinners(Player contender, Player current) {
@@ -632,6 +627,8 @@ public class Game extends GameProperties {
         gameModes.put("Total War", isTotalWarMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
+        gameModes.put("Liberation", isLiberationC4Mode());
+        gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
         gameModes.put("FoW", isFowMode());
         gameModes.put("Franken", isFrankenGame());
@@ -654,7 +651,13 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public boolean isNormalGame() {
-        return !hasHomebrew();
+        return !hasHomebrew()
+            && !isAgeOfExplorationMode()
+            && !isTotalWarMode()
+            && !isAgeOfCommerceMode()
+            && !isMinorFactionsMode()
+            && !isLiberationC4Mode()
+            && !isOrdinianC1Mode();
     }
 
     public boolean isFrankenGame() {
@@ -4272,12 +4275,6 @@ public class Game extends GameProperties {
         return isHomebrew()
             || isExtraSecretMode()
             || isFowMode()
-            || isAgeOfExplorationMode()
-            || isTotalWarMode()
-            || isAgeOfCommerceMode()
-            || isMinorFactionsMode()
-            || isLiberationC4Mode()
-            || isNoSwapMode()
             || isFacilitiesMode()
             || isLightFogMode()
             || isRedTapeMode()
@@ -4308,13 +4305,61 @@ public class Game extends GameProperties {
                 .anyMatch(player -> player.getSecretVictoryPoints() > 3
                     && !player.getRelics().contains("obsidian"))
             || getPlayerCountForMap() < 3
-            || getRealAndEliminatedAndDummyPlayers().size() < 3
+            || getRealAndEliminatedPlayers().size() < 3
             || getPlayerCountForMap() > 8
-            || getRealAndEliminatedAndDummyPlayers().size() > 8;
+            || getRealAndEliminatedPlayers().size() > 8
+            || hasUnofficialNumberOfRevealedObjectives();
+    }
+
+    private boolean hasUnofficialNumberOfRevealedObjectives() {
+        int revealedStage1Count = (int) revealedPublicObjectives.keySet().stream()
+            .map(Mapper::getPublicObjective)
+            .filter(objective -> objective.getPoints() == 1)
+            .filter(objective -> objective.getSource().isOfficial())
+            .count();
+        if (revealedStage1Count < 2) {
+            return true;
+        }
+
+        int revealedStage2Count = (int) revealedPublicObjectives.keySet().stream()
+            .map(Mapper::getPublicObjective)
+            .filter(objective -> objective.getPoints() == 2)
+            .filter(objective -> objective.getSource().isOfficial())
+            .count();
+        int round = getRound();
+        String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
+        // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people reveal despite game end
+        int extraIfNotActionPhase = phaseOfGame.contains("action") ? 0 : 1;
+        // if neuraloop is in the deck, or we're not using Codex 4, we can make additional assumptions about number of publics
+        if (relics.contains("neuraloop") || !isCodex4()) {
+            // 5 revealed by round 5 and Incentive Program
+            if (revealedStage1Count > 6) return true;
+            if (round < 5) {
+                // We can't have less stage 1s than this
+                if (revealedStage1Count < round + 1) return true;
+                // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're not in action phase
+                if (revealedStage1Count > round + 2 + extraIfNotActionPhase) return true;
+                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase
+                if (revealedStage2Count > 1 + extraIfNotActionPhase) return true;
+            }
+            if (round >= 5) {
+                // We can't have less stage 1s than this
+                if (revealedStage1Count < 5) return true;
+                if (revealedStage2Count < round - 4) return true;
+                // 1 revealed per round past round 4 and Incentive Program; 1 extra if we're not in action phase
+                if (revealedStage2Count > round - 3 + extraIfNotActionPhase) return true;
+            }
+        }
+
+        // Extra stage 1 on round 1, Incentive Program during agenda phase; 1 extra if we're not in action phase
+        return revealedStage1Count + revealedStage2Count > round + 2 + extraIfNotActionPhase;
+    }
+
+    private boolean isCodex4() {
+        return getTechnologyDeck().contains("x89c4");
     }
 
     public boolean checkAllDecksAreOfficial() {
-        // needs to check for homebrew tiles still
         // Decks
         List<String> deckIDs = new ArrayList<>();
         deckIDs.add(getAcDeckID());
@@ -4470,15 +4515,6 @@ public class Game extends GameProperties {
             }
         }
         return false;
-    }
-
-    public List<String> getAllTeamMateIDs() {
-        List<String> teamMateIDs = new ArrayList<>();
-        for (Player player : getPlayers().values()) {
-            teamMateIDs.addAll(player.getTeamMateIDs());
-            teamMateIDs.remove(player.getUserID());
-        }
-        return teamMateIDs;
     }
 
     public List<String> peekAtSecrets(int count) {

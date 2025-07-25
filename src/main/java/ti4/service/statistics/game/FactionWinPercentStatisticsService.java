@@ -1,8 +1,8 @@
 package ti4.service.statistics.game;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -25,7 +25,7 @@ class FactionWinPercentStatisticsService {
         Map<String, Integer> factionWinsWithRelics = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> getFactionWinPercent(game, factionWinCount, factionGameCount, factionWinsWithRelics)
         );
 
@@ -75,21 +75,22 @@ class FactionWinPercentStatisticsService {
     }
 
     private static void getFactionWinPercent(Game game, Map<String, Integer> factionWinCount, Map<String, Integer> factionGameCount, Map<String, Integer> factionWinsWithRelics) {
-        Optional<Player> winner = game.getWinner();
-        if (winner.isEmpty()) {
+        List<Player> winners = game.getWinners();
+        if (winners.isEmpty()) {
             return;
         }
 
-        Player winningPlayer = winner.get();
-        String winningFaction = winningPlayer.getFaction();
+        for (Player winner : winners) {
+            String winningFaction = winner.getFaction();
 
-        incrementMapValue(factionWinCount, winningFaction);
-        incrementMapValue(factionWinCount, "allWinners");
+            incrementMapValue(factionWinCount, winningFaction);
+            incrementMapValue(factionWinCount, "allWinners");
 
-        boolean emphidiaScored = hasEmphidiaScored(game, winningPlayer);
-        if (usedRelicsOrEmphidia(winningPlayer, emphidiaScored)) {
-            incrementMapValue(factionWinsWithRelics, winningFaction);
-            incrementMapValue(factionWinsWithRelics, "allWinners");
+            boolean emphidiaScored = hasEmphidiaScored(game, winner);
+            if (usedRelicsOrEmphidia(winner, emphidiaScored)) {
+                incrementMapValue(factionWinsWithRelics, winningFaction);
+                incrementMapValue(factionWinsWithRelics, "allWinners");
+            }
         }
 
         game.getRealAndEliminatedAndDummyPlayers()

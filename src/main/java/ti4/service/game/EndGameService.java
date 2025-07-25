@@ -37,7 +37,11 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.statistics.game.GameStatisticsService;
+import ti4.service.statistics.game.WinningPathCacheService;
 import ti4.service.statistics.game.WinningPathHelper;
+import ti4.service.tigl.TiglGameReport;
+import ti4.service.tigl.TiglPlayerResult;
+import ti4.website.WebHelper;
 
 @UtilityClass
 public class EndGameService {
@@ -184,6 +188,7 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
+        WinningPathCacheService.addGame(game);
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
@@ -217,6 +222,12 @@ public class EndGameService {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
                     TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
+                    if (!game.isReplacementMade()) {
+                        WebHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            "This game had a replacement. Please report the results manually: https://www.ti4ultimate.com/community/tigl/report-game");
+                    }
                 }
             });
         } else if (publish) { //FOW SUMMARY
@@ -340,7 +351,7 @@ public class EndGameService {
             .append("\n");
 
         var winner = game.getWinner();
-        if (winner.isPresent() && !game.hasHomebrew()) {
+        if (winner.isPresent() && game.isNormalGame()) {
             String winningPath = WinningPathHelper.buildWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
             sb.append(GameStatisticsService.getWinningPathComparison(winningPath, game.getRealAndEliminatedPlayers().size(), vpCount));
@@ -381,6 +392,28 @@ public class EndGameService {
         sb.append("'\n```");
 
         return sb.toString();
+    }
+
+    private static TiglGameReport buildTiglReport(Game game) {
+        var report = new TiglGameReport();
+        report.setGameId(game.getID());
+        report.setScore(game.getVp());
+
+        var tiglPlayerResults = game.getRealPlayers().stream()
+            .map(player -> {
+                var tiglPlayerResult = new TiglPlayerResult();
+                tiglPlayerResult.setScore(player.getTotalVictoryPoints());
+                tiglPlayerResult.setFaction(player.getFaction());
+                tiglPlayerResult.setDiscordId(player.getUserID());
+                tiglPlayerResult.setDiscordTag(player.getUserName());
+                return tiglPlayerResult;
+            })
+            .toList();
+
+        report.setPlayerResults(tiglPlayerResults);
+        report.setSource("Async");
+        report.setTimestamp(System.currentTimeMillis() / 1000);
+        return report;
     }
 
     public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {
