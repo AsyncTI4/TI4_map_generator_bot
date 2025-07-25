@@ -338,15 +338,28 @@ public class AutoCompleteProvider {
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }
-            case GameStatisticsFilterer.HAS_GALACTIC_EVENT_FILTER -> {
+            case GameStatisticsFilterer.GAME_TYPES_FILTER,
+                GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of("age_of_exploration", "total_war", "age_of_commerce", "minor_factions");
-                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
-                event.replyChoices(options).queue();
-            }
-            case GameStatisticsFilterer.HAS_SCENARIO_FILTER -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                var tokens = List.of("ordinian", "liberation");
+                var tokens = List.of(
+                    "base",
+                    "pok",
+                    "absol",
+                    "ds",
+                    "action_deck_2",
+                    "little_omega",
+                    "franken",
+                    "milty_mod",
+                    "red_tape",
+                    "age_of_exploration",
+                    "minor_factions",
+                    "alliance",
+                    "age_of_commerce",
+                    "facilities",
+                    "total_war",
+                    "liberation",
+                    "ordinian"
+                );
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }

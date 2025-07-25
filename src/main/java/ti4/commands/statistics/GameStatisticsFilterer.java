@@ -36,16 +36,19 @@ public class GameStatisticsFilterer {
         filters.add(new OptionData(OptionType.INTEGER, GameStatisticsFilterer.PLAYER_COUNT_FILTER, "Filter games by player count, e.g. 3-8"));
         filters.add(new OptionData(OptionType.INTEGER, GameStatisticsFilterer.MIN_PLAYER_COUNT_FILTER, "Filter games by minimum player count, e.g. 3-8"));
         filters.add(new OptionData(OptionType.INTEGER, GameStatisticsFilterer.VICTORY_POINT_GOAL_FILTER, "Filter games by victory point goal, e.g. 10-14"));
-        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.GAME_TYPES_FILTER, "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2"));
-        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER, "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2"));
+        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.GAME_TYPES_FILTER,
+            "Filter games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
+            .setAutoComplete(true));
+        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER,
+            "Filter excluded games by game type, comma seperated, e.g. base, pok, absol, ds, action_deck_2")
+            .setAutoComplete(true));
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.FOG_FILTER, "Filter games by if the game is a fog game"));
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.HOMEBREW_FILTER, "Filter games by if the game has any homebrew"));
         filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.HAS_WINNER_FILTER, "Filter games by if the game has a winner"));
-        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.HAS_GALACTIC_EVENT_FILTER,
-            "Filter games by galactic event, e.g. age_of_exploration")
-            .setAutoComplete(true));
-        filters.add(new OptionData(OptionType.STRING, GameStatisticsFilterer.HAS_SCENARIO_FILTER,
-            "Filter games by scenario, e.g. ordinian"));
+        filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.HAS_GALACTIC_EVENT_FILTER,
+            "Filter games by if the game has a galactic event"));
+        filters.add(new OptionData(OptionType.BOOLEAN, GameStatisticsFilterer.HAS_SCENARIO_FILTER,
+            "Filter games by if the game has a scenario"));
         return filters;
     }
 
@@ -59,8 +62,8 @@ public class GameStatisticsFilterer {
         String excludedGameTypesFilter = event.getOption(EXCLUDED_GAME_TYPES_FILTER, null, OptionMapping::getAsString);
         Boolean fogFilter = event.getOption(FOG_FILTER, null, OptionMapping::getAsBoolean);
         String winningFactionFilter = event.getOption(WINNING_FACTION_FILTER, null, OptionMapping::getAsString);
-        String galacticEventFilter = event.getOption(HAS_GALACTIC_EVENT_FILTER, null, OptionMapping::getAsString);
-        String scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsString);
+        Boolean galacticEventFilter = event.getOption(HAS_GALACTIC_EVENT_FILTER, null, OptionMapping::getAsBoolean);
+        Boolean scenarioFilter = event.getOption(HAS_SCENARIO_FILTER, null, OptionMapping::getAsBoolean);
 
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
@@ -127,6 +130,8 @@ public class GameStatisticsFilterer {
             case "age_of_commerce" -> game.isAgeOfCommerceMode();
             case "facilities" -> game.isFacilitiesMode();
             case "total_war" -> game.isTotalWarMode();
+            case "liberation" -> game.isLiberationC4Mode();
+            case "ordinian" -> game.isOrdinianC1Mode();
             default -> false;
         };
     }
@@ -158,28 +163,23 @@ public class GameStatisticsFilterer {
         return isNormalFilter == null || isNormalFilter == game.isNormalGame();
     }
 
-    private static boolean filterOnGalacticEvent(String galacticEventFilter, Game game) {
+    private static boolean filterOnGalacticEvent(Boolean galacticEventFilter, Game game) {
         if (galacticEventFilter == null) {
             return true;
         }
-        return switch (galacticEventFilter.toLowerCase()) {
-            case "age_of_exploration" -> game.isAgeOfExplorationMode();
-            case "total_war" -> game.isTotalWarMode();
-            case "age_of_commerce" -> game.isAgeOfCommerceMode();
-            case "minor_factions" -> game.isMinorFactionsMode();
-            default -> false;
-        };
+        boolean hasEvent = game.isAgeOfExplorationMode()
+            || game.isTotalWarMode()
+            || game.isAgeOfCommerceMode()
+            || game.isMinorFactionsMode();
+        return galacticEventFilter == hasEvent;
     }
 
-    private static boolean filterOnScenario(String scenarioFilter, Game game) {
+    private static boolean filterOnScenario(Boolean scenarioFilter, Game game) {
         if (scenarioFilter == null) {
             return true;
         }
-        return switch (scenarioFilter.toLowerCase()) {
-            case "liberation" -> game.isLiberationC4Mode();
-            case "ordinian" -> game.isOrdinianC1Mode();
-            default -> false;
-        };
+        boolean hasScenario = game.isLiberationC4Mode() || game.isOrdinianC1Mode();
+        return scenarioFilter == hasScenario;
     }
 
     private static boolean isDiscordantStarsGame(Game game) {
