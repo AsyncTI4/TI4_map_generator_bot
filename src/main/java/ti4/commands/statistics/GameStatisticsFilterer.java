@@ -89,6 +89,7 @@ public class GameStatisticsFilterer {
         Predicate<Game> playerCountPredicate = game -> filterOnPlayerCount(playerCountFilter, game);
         return playerCountPredicate
             .and(game -> filterOnVictoryPointGoal(victoryPointGoalFilter, game))
+            .and(GameStatisticsFilterer::filterNoGalacticEventOrScenario)
             .and(game -> filterOnHomebrew(Boolean.FALSE, game))
             .and(game -> filterOnHasWinner(Boolean.TRUE, game))
             .and(GameStatisticsFilterer::filterAbortedGames)
@@ -202,6 +203,15 @@ public class GameStatisticsFilterer {
 
     private static boolean filterOnMinPlayerCount(Integer minPlayerCount, Game game) {
         return minPlayerCount == null || minPlayerCount <= game.getRealAndEliminatedPlayers().size();
+    }
+
+    private static boolean filterNoGalacticEventOrScenario(Game game) {
+        return !(game.isAgeOfExplorationMode()
+            || game.isTotalWarMode()
+            || game.isAgeOfCommerceMode()
+            || game.isMinorFactionsMode()
+            || game.isLiberationC4Mode()
+            || game.isOrdinianC1Mode());
     }
 
 }
