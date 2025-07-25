@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -26,12 +19,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -2541,7 +2533,7 @@ public class PlayerAreaGenerator {
         if (player.isSearchWarrant()) {
             graphics.setColor(Color.LIGHT_GRAY);
             Map<String, Integer> revealedSecrets = new LinkedHashMap<>(secrets);
-            y = displaySecretObjectives(y, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, customPublicVP);
+            y = displaySecretObjectives(y, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret);
         }
         Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
@@ -2556,7 +2548,7 @@ public class PlayerAreaGenerator {
             scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         graphics.setColor(Color.RED);
-        y = displaySecretObjectives(y, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret, customPublicVP);
+        y = displaySecretObjectives(y, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret);
         if (player.isSearchWarrant()) {
             return secretsScored.size() + player.getSecrets().size();
         }
@@ -2569,10 +2561,8 @@ public class PlayerAreaGenerator {
         Map<String, Integer> revealedPublicObjectives,
         Map<String, Player> players,
         Map<String, String> publicObjectivesState,
-        Set<String> po,
-        Map<String, Integer> customPublicVP
+        Set<String> po
     ) {
-
         Set<String> keysToRemove = new HashSet<>();
         for (Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
             int x = 50;

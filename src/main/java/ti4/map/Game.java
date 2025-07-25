@@ -4308,12 +4308,20 @@ public class Game extends GameProperties {
     }
 
     private boolean hasUnofficialNumberOfRevealedObjectives() {
-        int revealedStage1Count = publicObjectives1 == null ? 0 : publicObjectives1.size();
+        int revealedStage1Count = (int) revealedPublicObjectives.keySet().stream()
+            .map(Mapper::getPublicObjective)
+            .filter(objective -> objective.getPoints() == 1)
+            .filter(objective -> objective.getSource().isOfficial())
+            .count();
         if (revealedStage1Count < 2) {
             return true;
         }
 
-        int revealedStage2Count = publicObjectives2 == null ? 0 : publicObjectives2.size();
+        int revealedStage2Count = (int) revealedPublicObjectives.keySet().stream()
+            .map(Mapper::getPublicObjective)
+            .filter(objective -> objective.getPoints() == 2)
+            .filter(objective -> objective.getSource().isOfficial())
+            .count();
         int round = getRound();
         String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
         // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people reveal despite game end
@@ -4503,15 +4511,6 @@ public class Game extends GameProperties {
             }
         }
         return false;
-    }
-
-    public List<String> getAllTeamMateIDs() {
-        List<String> teamMateIDs = new ArrayList<>();
-        for (Player player : getPlayers().values()) {
-            teamMateIDs.addAll(player.getTeamMateIDs());
-            teamMateIDs.remove(player.getUserID());
-        }
-        return teamMateIDs;
     }
 
     public List<String> peekAtSecrets(int count) {
