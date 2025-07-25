@@ -491,7 +491,7 @@ public class Game extends GameProperties {
 
         return ally != null
             && ally.getTotalVictoryPoints() >= getVp()
-            && (player.getTotalVictoryPoints() > 11 || ally.getTotalVictoryPoints() > 11);
+            && (player.getTotalVictoryPoints() >= 12 || ally.getTotalVictoryPoints() >= 12);
     }
 
     private Player compareWinners(Player contender, Player current) {

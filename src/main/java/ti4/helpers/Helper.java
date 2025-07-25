@@ -2460,7 +2460,7 @@ public class Helper {
                 if (player.getFaction().equalsIgnoreCase("sol") || player.getFaction().equalsIgnoreCase("xxcha")) {
                     Player xxcha = game.getPlayerFromColorOrFaction("xxcha");
                     Player sol = game.getPlayerFromColorOrFaction("sol");
-                    if (sol != null && xxcha != null && (sol.getTotalVictoryPoints() > 11 || xxcha.getTotalVictoryPoints() > 11) && sol.getTotalVictoryPoints() > 9 && xxcha.getTotalVictoryPoints() > 9) {
+                    if (sol != null && xxcha != null && (sol.getTotalVictoryPoints() >= 12 || xxcha.getTotalVictoryPoints() >= 12) && sol.getTotalVictoryPoints() >= 10 && xxcha.getTotalVictoryPoints() >= 10) {
                         //good
                     } else {
                         return;
