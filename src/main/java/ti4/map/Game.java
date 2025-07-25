@@ -4306,9 +4306,50 @@ public class Game extends GameProperties {
                 .anyMatch(player -> player.getSecretVictoryPoints() > 3
                     && !player.getRelics().contains("obsidian"))
             || getPlayerCountForMap() < 3
-            || getRealAndEliminatedAndDummyPlayers().size() < 3
+            || getRealAndEliminatedPlayers().size() < 3
             || getPlayerCountForMap() > 8
-            || getRealAndEliminatedAndDummyPlayers().size() > 8;
+            || getRealAndEliminatedPlayers().size() > 8
+            || hasUnofficialNumberOfRevealedObjectives();
+    }
+
+    private boolean hasUnofficialNumberOfRevealedObjectives() {
+        int revealedStage1Count = publicObjectives1 == null ? 0 : publicObjectives1.size();
+        if (revealedStage1Count < 2) {
+            return true;
+        }
+
+        int revealedStage2Count = publicObjectives2 == null ? 0 : publicObjectives2.size();
+        int round = getRound();
+        String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
+        // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people reveal despite game end
+        int extraIfNotActionPhase = phaseOfGame.contains("action") ? 0 : 1;
+        // if neuraloop is in the deck, or we're not using Codex 4, we can make additional assumptions about number of publics
+        if (relics.contains("neuraloop") || !isCodex4()) {
+            // 5 revealed by round 5 and Incentive Program
+            if (revealedStage1Count > 6) return true;
+            if (round < 5) {
+                // We can't have less stage 1s than this
+                if (revealedStage1Count < round + 1) return true;
+                // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're not in action phase
+                if (revealedStage1Count > round + 2 + extraIfNotActionPhase) return true;
+                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase
+                if (revealedStage2Count > 1 + extraIfNotActionPhase) return true;
+            }
+            if (round >= 5) {
+                // We can't have less stage 1s than this
+                if (revealedStage1Count < 5) return true;
+                if (revealedStage2Count < round - 4) return true;
+                // 1 revealed per round past round 4 and Incentive Program; 1 extra if we're not in action phase
+                if (revealedStage2Count > round - 3 + extraIfNotActionPhase) return true;
+            }
+        }
+
+        // Extra stage 1 on round 1, Incentive Program during agenda phase; 1 extra if we're not in action phase
+        return revealedStage1Count + revealedStage2Count > round + 2 + extraIfNotActionPhase;
+    }
+
+    private boolean isCodex4() {
+        return getTechnologyDeck().contains("x89c4");
     }
 
     public boolean checkAllDecksAreOfficial() {
