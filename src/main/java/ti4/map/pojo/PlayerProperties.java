@@ -37,6 +37,7 @@ public class PlayerProperties {
     // State and settings
     private boolean passed;
     private boolean readyToPassBag;
+    private boolean autoFrankenDraft;
     private boolean searchWarrant;
     private boolean dummy;
     private boolean autoPassOnWhensAfters;
