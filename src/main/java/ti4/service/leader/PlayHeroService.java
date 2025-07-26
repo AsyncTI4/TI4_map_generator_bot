@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -81,7 +83,8 @@ public class PlayHeroService {
         } else {
             boolean purged = true;
             LeaderModel playerLeaderModel = playerLeader.getLeaderModel().orElse(null);
-            String leaderName = playerLeaderModel == null ? "Hero " + playerLeader.getId() : playerLeaderModel.getName() + ", the " + playerLeaderModel.getFaction() + " hero,";
+            String leaderName = playerLeaderModel == null ? "Hero " + playerLeader.getId() 
+                : playerLeaderModel.getName() + ", the " + StringUtils.capitalize(playerLeaderModel.getFaction()) + " hero,";
             String msg = leaderName + " has been purged.";
             if (!"mykomentorihero".equals(playerLeader.getId())) {
                 purged = player.removeLeader(playerLeader);

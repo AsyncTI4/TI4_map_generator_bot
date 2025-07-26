@@ -542,7 +542,19 @@ public class PlayerTechService {
                     String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
                         ? nextPlayer.getRepresentationUnfogged()
                         : nextPlayer.getRepresentationNoPing();
-                    text += "\n-# " + ping + " will start their turn once you've ended yours.";
+                        int numUnpassed = -2;
+                        for (Player p2 : game.getPlayers().values()) {
+                            numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                        }
+                        text += "\n-# " + ping + " will start their turn once you've ended yours. ";
+                        if (numUnpassed == 0)
+                        {
+                            text += "No other players are unpassed.";
+                        }
+                        else
+                        {
+                            text += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                        }
                 }
             }
             String buttonText = "Use buttons to do your turn. ";

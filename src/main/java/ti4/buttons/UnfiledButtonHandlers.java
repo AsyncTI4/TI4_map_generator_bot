@@ -1410,17 +1410,17 @@ public class UnfiledButtonHandlers {
                         }
                         if (player.hasTech("hm")) {
                             properGain += 1;
-                            reasons += ", _Hyper Metabolism_";
+                            reasons += (properGain == 1 ? "" : ", ") + "_Hyper Metabolism_";
                         }
                         if (cyber) {
                             properGain += 1;
-                            reasons += ", _Cybernetic Enhancements_";
+                            reasons += (properGain == 1 ? "" : ", ") + "_Cybernetic Enhancements_";
                         }
                         if (netGain < properGain && netGain != 1) {
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()
-                                    + " heads up, bot thinks you should have gained " + properGain
-                                    + " command tokens due to " + reasons + ".");
+                                    + ", heads up, bot thinks you should have gained " + properGain
+                                    + " command token" + (properGain == 1 ? "" : "s") + " due to " + reasons + ".");
                         }
                     }
                     if (game.isFowMode()) {
@@ -2586,16 +2586,16 @@ public class UnfiledButtonHandlers {
                 }
                 if (player.hasTech("hm")) {
                     properGain += 1;
-                    reasons += "_Hypermetabolism_ ";
+                    reasons += (properGain == 1 ? "" : ", ") + "_Hyper Metabolism_";
                 }
                 if (cyber) {
                     properGain += 1;
-                    reasons += "_Cybernetic Enhancements_ ";
+                    reasons += (properGain == 1 ? "" : ", ") + "_Cybernetic Enhancements_";
                 }
                 if (properGain > 2) {
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
-                        "Heads up " + player.getRepresentationUnfogged()
-                            + ", the bot thinks you should gain " + properGain + " command tokens now due to: " + reasons + ".");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), player.getRepresentationUnfogged() 
+                        + ", heads up, the bot thinks you should gain " + properGain + " command token"
+                        + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
                 }
             }
             if (game.isCcNPlasticLimit()) {

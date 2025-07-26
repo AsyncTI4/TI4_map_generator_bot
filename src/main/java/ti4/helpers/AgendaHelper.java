@@ -1724,7 +1724,6 @@ public class AgendaHelper {
             return;
         }
         if (game.getCurrentAgendaInfo() != null) {
-            String message = " up to vote! Resolve using buttons. \n \n" + getSummaryOfVotes(game, true);
 
             Player nextInLine = null;
             try {
@@ -1737,6 +1736,7 @@ public class AgendaHelper {
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
+            String message = getSummaryOfVotes(game, true) + "\n" + realIdentity + " up to vote! Resolve using buttons.";
             int[] voteInfo = getVoteTotal(nextInLine, game);
             int counter = 0;
             boolean willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
@@ -1781,7 +1781,6 @@ public class AgendaHelper {
             }
 
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
-            message = realIdentity + message;
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
             Button Vote = Buttons.green(finChecker + "vote", pFaction + " Choose To Vote");
             Button Abstain;
@@ -2884,10 +2883,10 @@ public class AgendaHelper {
         }
 
         if (outcomes.isEmpty()) {
-            summary = "# Agenda Name: " + agendaName + "\nNo current riders or votes have been cast yet.";
+            summary = "# _" + agendaName + "_\nNo current riders or votes have been cast yet.";
         } else {
             StringBuilder summaryBuilder = new StringBuilder(
-                "# Agenda Name: " + agendaName + "\nCurrent status of votes and outcomes is: \n");
+                "# _" + agendaName + "_\nCurrent status of votes and outcomes is: \n");
             for (String outcome : outcomes.keySet()) {
                 if (StringUtils.countMatches(game.getCurrentAgendaInfo(), "_") > 1) {
                     agendaDetails = game.getCurrentAgendaInfo().split("_")[1];

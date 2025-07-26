@@ -32,7 +32,7 @@ public class PassService {
         }
         game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " passed.");
 
-        String text = player.getRepresentation(true, false) + " has passed " + (autoPass ? " (preset)." : ".");
+        String text = player.getRepresentation(true, false) + " has passed" + (autoPass ? " (preset)." : ".");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation() + " since you have _AI Development Algorithm_, you may research 1 unit upgrade now for 6 influence.";

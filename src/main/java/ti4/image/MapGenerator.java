@@ -565,7 +565,7 @@ public class MapGenerator implements AutoCloseable {
         int boxWidth = 150;
         int boxBuffer = -1;
         if (game.getVp() > 14) {
-            boxWidth = 120;
+            boxWidth = 2250 / (game.getVp() + 1);
         }
         if (game.isLiberationC4Mode())
         {
