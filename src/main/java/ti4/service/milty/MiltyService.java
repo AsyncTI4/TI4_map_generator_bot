@@ -37,7 +37,7 @@ import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;

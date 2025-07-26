@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;

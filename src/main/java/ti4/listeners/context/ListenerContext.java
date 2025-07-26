@@ -12,7 +12,7 @@ import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;
