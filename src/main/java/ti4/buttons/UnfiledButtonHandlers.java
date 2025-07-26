@@ -24,7 +24,6 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
@@ -48,7 +47,6 @@ import ti4.helpers.Helper;
 import ti4.helpers.ObjectiveHelper;
 import ti4.helpers.PlayerPreferenceHelper;
 import ti4.helpers.PromissoryNoteHelper;
-import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.Units.UnitKey;
@@ -66,7 +64,6 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
-import ti4.model.RelicModel;
 import ti4.model.TechnologyModel;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.model.UnitModel;
@@ -75,12 +72,10 @@ import ti4.service.StatusCleanupService;
 import ti4.service.button.ReactionService;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
-import ti4.service.emoji.ExploreEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TechEmojis;
-import ti4.service.explore.ExploreService;
 import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.game.EndGameService;
 import ti4.service.game.StartPhaseService;
@@ -571,17 +566,6 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    @ButtonHandler("useRelic_")
-    public static void useRelic(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String relic = buttonID.replace("useRelic_", "");
-        ButtonHelper.deleteTheOneButton(event);
-        if ("boon".equals(relic)) {// Sarween Tools
-            player.addSpentThing("boon");
-            String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
-            event.getMessage().editMessage(exhaustedMessage).queue();
-        }
-    }
-
     @ButtonHandler("bombardConfirm_")
     public static void bombardConfirm(ButtonInteractionEvent event, Player player, String buttonID) {
         List<Button> buttons = new ArrayList<>();
@@ -1022,23 +1006,6 @@ public class UnfiledButtonHandlers {
             " to gain 3 commodities after winning a combat against someone with more victory points than them. They can do this once per action. Their currently hold "
             + player.getCommodities() + " commodit" + (player.getCommodities() == 1 ? "y" : "ies") + ".");
         ButtonHelper.deleteTheOneButton(event);
-    }
-
-    @ButtonHandler("exhaustRelic_")
-    public static void exhaustRelic(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String relic = buttonID.replace("exhaustRelic_", "");
-        if (player.hasRelicReady(relic)) {
-            player.addExhaustedRelic(relic);
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                player.getFactionEmoji() + " exhausted " + Mapper.getRelic(relic).getName());
-            ButtonHelper.deleteTheOneButton(event);
-            if ("absol_luxarchtreatise".equalsIgnoreCase(relic)) {
-                game.setStoredValue("absolLux", "true");
-            }
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                player.getFactionEmoji() + " doesn't have an unexhausted " + relic + ".");
-        }
     }
 
     @ButtonHandler("reveal_stage_")
@@ -1882,34 +1849,6 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    @ButtonHandler("relic_look_top")
-    public static void relicLookTop(ButtonInteractionEvent event, Game game, Player player) {
-        List<String> deck = game.getAllRelics();
-        if (deck.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "The " + ExploreEmojis.Relic + " relic deck & discard is empty - nothing to look at.");
-            return;
-        }
-        if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "The top card of the " + ExploreEmojis.Relic + " relic deck has been sent to "
-                    + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
-        } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation(true, false) + " looked at top card of the " + ExploreEmojis.Relic
-                    + " relic deck. The card has been sent to their `#cards-info` thread.");
-        }
-
-        // Cards Info Message
-        String topCard = deck.getFirst();
-        RelicModel relic = Mapper.getRelic(topCard);
-        String message = "You looked at the top of the " + ExploreEmojis.Relic + " relic deck and saw _"
-            + relic.getName() + "_.";
-        MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message,
-            relic.getRepresentationEmbed());
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("reinforcements_cc_placement_")
     public static void reinforcementsCCPlacement(
         GenericInteractionCreateEvent event, Game game, Player player,
@@ -2013,9 +1952,8 @@ public class UnfiledButtonHandlers {
         Planet uH = game.getUnitHolderFromPlanet(tPlanet);
         List<Button> facilities = new ArrayList<>();
         List<String> usedFacilities = ButtonHelperSCs.findUsedFacilities(game, player);
-        String facilityID = "facilitycorefactory";
 
-        facilityID = "facilitytransitnode";
+        String facilityID = "facilitytransitnode";
         if (!usedFacilities.contains(facilityID)) {
             facilities.add(Buttons.green("addFacility_" + tPlanet + "_" + facilityID + "_dont", "Transit Node"));
         }
@@ -2066,50 +2004,6 @@ public class UnfiledButtonHandlers {
             player.getRepresentation() + ", please choose the facility you wish to replace the Core Factory.", facilities);
 
         doAnotherAction(event, player, game);
-    }
-
-    @ButtonHandler("drawRelicFromFrag")
-    public static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
-        RelicHelper.drawRelicAndNotify(player, event, game);
-        doAnotherAction(event, player, game);
-    }
-
-    @ButtonHandler("neuraloopPart1")
-    public static void neuraloopPart1(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String poID = buttonID.split(";")[1];
-        String type = buttonID.split(";")[2];
-        String msg = player.getRepresentation() + ", please choose the relic you wish to purge in order to replace the objective with a " + type + ".";
-        List<Button> buttons = RelicHelper.getNeuraLoopButton(player, poID, type, game);
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("neuraloopPart2")
-    public static void neuraloopPart2(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
-        String poID = buttonID.split(";")[1];
-        String type = buttonID.split(";")[2];
-        String relic = buttonID.split(";")[3];
-        player.removeRelic(relic);
-        player.removeExhaustedRelic(relic);
-        game.removeRevealedObjective(poID);
-        String msg = player.getRepresentation() + " is using _Neuraloop_, purge " + (relic.equals("neuraloop") ? "itself" : Mapper.getRelic(relic).getName())
-            + ", to replace the recently revealed objective with a random " + type + ".";
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-        if (type.equalsIgnoreCase("stage1")) {
-            RevealPublicObjectiveService.revealS1(game, event, game.getActionsChannel(), true);
-        } else if (type.equalsIgnoreCase("stage2")) {
-            RevealPublicObjectiveService.revealS2(game, event, game.getActionsChannel(), true);
-        } else {
-            RevealPublicObjectiveService.revealSO(game, event, game.getActionsChannel());
-        }
-
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("drawRelic")
-    public static void drawRelic(ButtonInteractionEvent event, Player player, Game game) {
-        RelicHelper.drawRelicAndNotify(player, event, game);
-        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("thronePoint")
@@ -2229,22 +2123,6 @@ public class UnfiledButtonHandlers {
             "Please choose the planets you wish to exhaust to pay the 1 influence.", buttons);
         ButtonHelper.deleteTheOneButton(event);
         game.setStoredValue("lawsDisabled", "yes");
-    }
-
-    @ButtonHandler("dominusOrb")
-    public static void dominusOrb(ButtonInteractionEvent event, Player player, Game game) {
-        game.setDominusOrb(true);
-        String purgeOrExhaust = "Purged ";
-        String relicId = "dominusorb";
-        player.removeRelic(relicId);
-        player.removeExhaustedRelic(relicId);
-        String relicName = Mapper.getRelic(relicId).getName();
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            purgeOrExhaust + ExploreEmojis.Relic + " relic: " + relicName);
-        ButtonHelper.deleteMessage(event);
-        String message = "Please choose a system to move from.";
-        List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
     }
 
 
@@ -2536,35 +2414,6 @@ public class UnfiledButtonHandlers {
         String editedMessage = player.getRepresentation() + " command tokens have gone from "
             + originalCCs + " -> " + player.getCCRepresentation() + ". Net gain of: " + netGain + ".";
         event.getMessage().editMessage(editedMessage).queue();
-    }
-
-    @ButtonHandler("exhauste6g0network")
-    public static void exhaustE6G0Network(ButtonInteractionEvent event, Player player, Game game) {
-        player.addExhaustedRelic("e6-g0_network");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getFactionEmoji() + " chose to exhaust _E6-G0 Network_.");
-        String message;
-        if (player.hasAbility("scheming")) {
-            game.drawActionCard(player.getUserID());
-            game.drawActionCard(player.getUserID());
-            message = player.getFactionEmoji()
-                + " drew 2 action cards with **Scheming**. Please discard 1 action card.";
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " use buttons to discard",
-                ActionCardHelper.getDiscardActionCardButtons(player, false));
-        } else if (player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            game.drawActionCard(player.getUserID());
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = player.getFactionEmoji() + " drew 1 action card.";
-        }
-        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-        ButtonHelper.checkACLimit(game, player);
-        ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("resetProducedThings")

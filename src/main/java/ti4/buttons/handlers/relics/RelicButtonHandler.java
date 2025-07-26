@@ -177,4 +177,5 @@ class RelicButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
         ButtonHelper.deleteMessage(event);
     }
+
 }
