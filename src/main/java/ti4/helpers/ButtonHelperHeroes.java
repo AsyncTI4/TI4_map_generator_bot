@@ -1514,7 +1514,7 @@ public class ButtonHelperHeroes {
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p1, false);
         PromissoryNoteHelper.sendPromissoryNoteInfo(game, p2, false);
         if (sendSftT || sendAlliance) {
-            String text = sendSftT ? "_Support for the Throne_ " : "_Alliance_";
+            String text = sendSftT ? "_Support for the Throne_" : "_Alliance_";
             message2 = p1.getRepresentation() + " sent " + text + " directly to the play area of " + ident2 + ".";
         } else {
             message2 = p1.getRepresentation() + " sent a promissory note to the hand of " + ident2 + ".";
