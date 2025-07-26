@@ -1,6 +1,5 @@
 package ti4.spring.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +15,7 @@ import ti4.map.Player;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.spring.model.GetPlayerActionCards;
+import ti4.spring.service.auth.ActionCardService;
 import ti4.spring.service.auth.DiscordOAuthService;
 import ti4.spring.validator.GameNameValidator;
 import ti4.spring.validator.UserIdValidator;
@@ -26,6 +26,7 @@ import ti4.spring.validator.UserIdValidator;
 public class ActionCardController {
 
     private final DiscordOAuthService discordOAuthService;
+    private final ActionCardService actionCardService;
 
     @PostMapping("/game/{gameName}/shuffle")
     public ResponseEntity<String> shuffle(@PathVariable String gameName) {
@@ -48,17 +49,9 @@ public class ActionCardController {
 
         Game game = GameManager.getManagedGame(gameName).getGame();
         Player player = game.getPlayer(userId);
+        List<String> hand = actionCardService.getHand(player);
 
-        return new GetPlayerActionCards(getHand(player));
+        return new GetPlayerActionCards(hand);
     }
 
-    private List<String> getHand(Player player) {
-        var actionCards = new ArrayList<String>();
-        player.getActionCards().forEach((actionCardId, count) -> {
-            for (int i = 0; i < count; i++) {
-                actionCards.add(actionCardId);
-            }
-        });
-        return actionCards;
-    }
 }
