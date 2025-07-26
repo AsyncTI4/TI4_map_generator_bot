@@ -51,8 +51,6 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
@@ -72,7 +70,12 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
-import ti4.map.manage.GameManager;
+import ti4.map.manager.BorderAnomalyManager;
+import ti4.map.manager.StrategyCardManager;
+import ti4.map.persistence.GameManager;
+import ti4.map.pojo.ExportableField;
+import ti4.map.pojo.MapPairKeyDeserializer;
+import ti4.map.pojo.MapPairKeySerializer;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
@@ -125,7 +128,7 @@ public class Game extends GameProperties {
     @Setter
     @Getter
     private DisplayType displayTypeForced;
-    private @Getter @Setter List<BorderAnomalyHolder> borderAnomalies = new ArrayList<>();
+    private final BorderAnomalyManager borderAnomalyManager = new BorderAnomalyManager();
     private Date lastActivePlayerChange = new Date(0);
     @JsonProperty("autoPingStatus")
     private boolean autoPingEnabled;
@@ -136,7 +139,7 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private Map<String, Integer> eventsInEffect = new LinkedHashMap<>();
-    private Map<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
+    private final StrategyCardManager strategyCardManager = new StrategyCardManager(this);
     private Map<String, Integer> discardAgendas = new LinkedHashMap<>();
     private Map<String, Integer> sentAgendas = new LinkedHashMap<>();
     private Map<String, Integer> laws = new LinkedHashMap<>();
@@ -270,20 +273,23 @@ public class Game extends GameProperties {
     }
 
     public boolean hasBorderAnomalyOn(String tile, Integer direction) {
-        List<BorderAnomalyHolder> anomaliesOnBorder = borderAnomalies.stream()
-            .filter(anomaly -> anomaly.getType() != BorderAnomalyModel.BorderAnomalyType.ARROW)
-            .filter(anomaly -> anomaly.getTile().equals(tile))
-            .filter(anomaly -> anomaly.getDirection() == direction)
-            .collect(Collectors.toList());
-        return isNotEmpty(anomaliesOnBorder);
+        return borderAnomalyManager.has(tile, direction);
     }
 
     public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
-        borderAnomalies.add(new BorderAnomalyHolder(tile, direction, anomalyType));
+        borderAnomalyManager.add(tile, direction, anomalyType);
     }
 
     public void removeBorderAnomaly(String tile, Integer direction) {
-        borderAnomalies.removeIf(anom -> anom.getTile().equals(tile) && anom.getDirection() == direction);
+        borderAnomalyManager.remove(tile, direction);
+    }
+
+    public List<BorderAnomalyHolder> getBorderAnomalies() {
+        return borderAnomalyManager.get();
+    }
+
+    public void setBorderAnomalies(List<BorderAnomalyHolder> anomalies) {
+        borderAnomalyManager.set(anomalies);
     }
 
     public int getNumberOfSOsInPlayersHands() {
@@ -621,8 +627,10 @@ public class Game extends GameProperties {
         gameModes.put("Community", isCommunityMode());
         gameModes.put("Minor Factions", isMinorFactionsMode());
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
-        gameModes.put("Age of Commerce", isAgeOfCommerceMode());
+        gameModes.put("Hidden Agenda", isHiddenAgendaMode());
         gameModes.put("Total War", isTotalWarMode());
+        gameModes.put("No Support Swaps", isNoSwapMode());
+        gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
@@ -636,7 +644,7 @@ public class Game extends GameProperties {
         gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
-        gameModes.put("Homebrew", !isNormalGame);
+        gameModes.put("Homebrew", isHomebrew());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);
@@ -1176,76 +1184,32 @@ public class Game extends GameProperties {
      * @return Map of (scInitiativeNum, tradeGoodCount)
      */
     public Map<Integer, Integer> getScTradeGoods() {
-        return scTradeGoods;
+        return strategyCardManager.getTradeGoodCounts();
     }
 
-    public void setScTradeGoods(Map<Integer, Integer> scTradeGoods) {
-        this.scTradeGoods = scTradeGoods;
+    public void setScTradeGoods(Map<Integer, Integer> strategyCardToTradeGoodCount) {
+        strategyCardManager.setTradeGoodCounts(strategyCardToTradeGoodCount);
     }
 
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
-        if (Objects.isNull(tradeGoodCount))
-            tradeGoodCount = 0;
-        if (tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(this)) {
-            Player player = getPlayerFromColorOrFaction(getStoredValue("kyroHeroPlayer"));
-            if (player != null) {
-                player.setTg(player.getTg() + tradeGoodCount);
-                ButtonHelperAbilities.pillageCheck(player, this);
-                ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
-                tradeGoodCount = 0;
-                MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + " trade good" + (tradeGoodCount == 1 ? "" : "s")
-                    + " that would be placed on **" + Helper.getSCName(sc, this) + "** have instead been given to the Kyro "
-                    + (isFrankenGame() ? "hero " : "") + "player, as per the text on Speygh, the Kyro Hero.");
-            }
-        }
-        scTradeGoods.put(sc, tradeGoodCount);
+        strategyCardManager.setTradeGoodCount(sc, tradeGoodCount);
     }
 
     public void incrementScTradeGoods() {
-        Set<Integer> scPickedList = new HashSet<>();
-        for (Player player_ : getRealPlayers()) {
-            scPickedList.addAll(player_.getSCs());
-            if (!player_.getSCs().isEmpty()) {
-                StringBuilder scs = new StringBuilder();
-                for (int SC : player_.getSCs()) {
-                    scs.append(SC).append("_");
-                }
-                scs = new StringBuilder(scs.substring(0, scs.length() - 1));
-                setStoredValue("Round" + getRound() + "SCPickFor" + player_.getFaction(), scs.toString());
-            }
-        }
-
-        //ADD A TG TO UNPICKED SC
-        if (!islandMode()) {
-            for (Integer scNumber : scTradeGoods.keySet()) {
-                if (!scPickedList.contains(scNumber) && scNumber != 0) {
-                    Integer tgCount = scTradeGoods.get(scNumber);
-                    tgCount = tgCount == null ? 1 : tgCount + 1;
-                    setScTradeGood(scNumber, tgCount);
-                }
-            }
-        }
+        strategyCardManager.incrementTradeGoods();
     }
 
     public boolean addSC(Integer sc) {
-        if (!scTradeGoods.containsKey(sc)) {
-            setScTradeGood(sc, 0);
-            return true;
-        }
-        return false;
+        return strategyCardManager.add(sc);
     }
 
     public boolean removeSC(Integer sc) {
-        if (scTradeGoods.containsKey(sc)) {
-            scTradeGoods.remove(sc);
-            return true;
-        } else
-            return false;
+        return strategyCardManager.remove(sc);
     }
 
     @JsonIgnore
     public List<Integer> getSCList() {
-        return (new ArrayList<>(getScTradeGoods().keySet()));
+        return strategyCardManager.list();
     }
 
     public Map<String, Integer> getRevealedPublicObjectives() {
@@ -4308,12 +4272,22 @@ public class Game extends GameProperties {
     }
 
     private boolean hasUnofficialNumberOfRevealedObjectives() {
-        int revealedStage1Count = publicObjectives1 == null ? 0 : publicObjectives1.size();
+        int revealedStage1Count = (int) revealedPublicObjectives.keySet().stream()
+            .map(Mapper::getPublicObjective)
+            .filter(Objects::nonNull)
+            .filter(objective -> objective.getSource().isOfficial())
+            .filter(objective -> objective.getPoints() == 1)
+            .count();
         if (revealedStage1Count < 2) {
             return true;
         }
 
-        int revealedStage2Count = publicObjectives2 == null ? 0 : publicObjectives2.size();
+        int revealedStage2Count = (int) revealedPublicObjectives.keySet().stream()
+            .map(Mapper::getPublicObjective)
+            .filter(Objects::nonNull)
+            .filter(objective -> objective.getSource().isOfficial())
+            .filter(objective -> objective.getPoints() == 2)
+            .count();
         int round = getRound();
         String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
         // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people reveal despite game end
@@ -4327,8 +4301,9 @@ public class Game extends GameProperties {
                 if (revealedStage1Count < round + 1) return true;
                 // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're not in action phase
                 if (revealedStage1Count > round + 2 + extraIfNotActionPhase) return true;
-                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase
-                if (revealedStage2Count > 1 + extraIfNotActionPhase) return true;
+                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase and its round 4
+                int extraIfRound4AndNotActionPhase = round != 4 ? 0 : extraIfNotActionPhase;
+                if (revealedStage2Count > 1 + extraIfRound4AndNotActionPhase) return true;
             }
             if (round >= 5) {
                 // We can't have less stage 1s than this
@@ -4505,20 +4480,15 @@ public class Game extends GameProperties {
         return false;
     }
 
-    public List<String> getAllTeamMateIDs() {
-        List<String> teamMateIDs = new ArrayList<>();
-        for (Player player : getPlayers().values()) {
-            teamMateIDs.addAll(player.getTeamMateIDs());
-            teamMateIDs.remove(player.getUserID());
-        }
-        return teamMateIDs;
-    }
-
     public List<String> peekAtSecrets(int count) {
         var peekedSecrets = new ArrayList<String>();
         for (int i = 0; i < count && i < getSecretObjectives().size(); i++) {
             peekedSecrets.add(getSecretObjectives().get(i));
         }
         return peekedSecrets;
+    }
+
+    public int addTradeGoodsToStrategyCard(int strategyCard, int tradeGoodCount) {
+        return strategyCardManager.addTradeGoods(strategyCard, tradeGoodCount);
     }
 }

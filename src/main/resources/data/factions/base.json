@@ -27,6 +27,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArborec_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheArborec_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheArborec",
+        "preferredColours": ["frs", "grn", "ptr"],
         "source": "base"
     },
     {
@@ -58,6 +59,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhostsOfCreuss_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheGhostsOfCreuss_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheGhostsOfCreuss",
+        "preferredColours": ["eth", "blu", "gcr"],
         "source": "base"
     },
     {
@@ -88,6 +90,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmiratesOfHacan_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmiratesOfHacan_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmiratesOfHacan",
+        "preferredColours": ["gld", "ylw", "crm"],
         "source": "base"
     },
     {
@@ -119,6 +122,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheUniversitiesOfJolNar_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheUniversitiesOfJolNar_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheUniversitiesOfJolNar",
+        "preferredColours": ["nvy", "ppl", "lgy"],
         "source": "base"
     },
     {
@@ -150,6 +154,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheL1z1xMindnet_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheL1z1xMindnet_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheL1z1xMindnet",
+        "preferredColours": ["bld", "red", "rby"],
         "source": "base"
     },
     {
@@ -180,6 +185,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBaronyOfLetnev_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheBaronyOfLetnev_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheBaronyOfLetnev",
+        "preferredColours": ["pld", "red", "blk"],
         "source": "base"
     },
     {
@@ -211,6 +217,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMentakCoalition_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheMentakCoalition_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheMentakCoalition",
+        "preferredColours": ["dw", "org", "gld"],
         "source": "base"
     },
     {
@@ -242,6 +249,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmbersOfMuaat_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheEmbersOfMuaat_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheEmbersOfMuaat",
+        "preferredColours": ["cpr", "org", "mgm"],
         "source": "base"
     },
     {
@@ -272,6 +280,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaaluCollective_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNaaluCollective_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNaaluCollective",
+        "preferredColours": ["tqs", "grn", "wtm"],
         "source": "base"
     },
     {
@@ -307,6 +316,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNekroVirus_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheNekroVirus_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheNekroVirus",
+        "preferredColours": ["bld", "red", "pld"],
         "source": "base"
     },
     {
@@ -337,6 +347,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheClanOfSaar_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheClanOfSaar_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheClanOfSaar",
+        "preferredColours": ["rst", "org", "tan"],
         "source": "base"
     },
     {
@@ -369,6 +380,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/SardakkNorr_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/SardakkNorr_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=SardakkNorr",
+        "preferredColours": ["red", "wtm", "psn"],
         "source": "base"
     },
     {
@@ -399,6 +411,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFederationOfSol_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheFederationOfSol_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheFederationOfSol",
+        "preferredColours": ["blu", "spr", "gry"],
         "source": "base"
     },
     {
@@ -439,6 +452,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheWinnu_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheWinnu_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheWinnu",
+        "preferredColours": ["ppl", "sns", "crm"],
         "source": "base"
     },
     {
@@ -469,6 +483,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheXxchaKingdom_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheXxchaKingdom_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheXxchaKingdom",
+        "preferredColours": ["lme", "grn", "hqn"],
         "source": "base"
     },
     {
@@ -499,6 +514,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYinBrotherhood_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYinBrotherhood",
+        "preferredColours": ["plm", "ppl", "rby"],
         "source": "base"
     },
     {
@@ -529,6 +545,7 @@
         "factionSheetFrontImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYssarilTribes_FactionSheet.webp",
         "factionSheetBackImageURL": "https://ti4ultimate.com/resources/images/shared/factionimages/TheYssarilTribes_FactionSheetBack.webp",
         "wikiURL": "https://ti4ultimate.com/game/factions?faction=TheYssarilTribes",
+        "preferredColours": ["tqs", "grn", "cqr"],
         "source": "base"
     }
 ]

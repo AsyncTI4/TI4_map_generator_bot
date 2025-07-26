@@ -452,6 +452,11 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Absol", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
+        if (game.isNoSwapMode()) {
+            drawGeneralImage(x + deltaX, y + deltaY, "NoSwap.png");
+            addWebsiteOverlay("No Support Swap", null, x + deltaX, y + deltaY, 180, 90);
+            deltaX += 190;
+        }
         if (game.isMiltyModMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
             addWebsiteOverlay("MiltyMod", null, x + deltaX, y + deltaY, 90, 90);
@@ -690,7 +695,7 @@ public class MapGenerator implements AutoCloseable {
         int y = coord.y;
         boolean convertToGenericSC = isFoWPrivate;
         int deltaY = y + 80;
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
+        Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
         Collection<Player> players = game.getPlayers().values();
         Set<Integer> scPicked = new HashSet<>();
         for (Player player : players) {
@@ -698,7 +703,7 @@ public class MapGenerator implements AutoCloseable {
         }
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
 
-        for (Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
+        for (Map.Entry<Integer, Integer> scTGs : strategyCardToTradeGoodCount.entrySet()) {
             Integer sc = scTGs.getKey();
             if (sc == 0) {
                 continue;

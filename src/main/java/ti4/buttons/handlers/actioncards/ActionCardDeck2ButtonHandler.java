@@ -280,8 +280,8 @@ class ActionCardDeck2ButtonHandler {
         event.getMessage().delete().queue();
     }
 
-    @ButtonHandler("breakthrough") // TODO: this might be annoying at some point in time
-    public static void resolveBreakthrough(Player player, Game game, ButtonInteractionEvent event) {
+    @ButtonHandler("innovation")
+    public static void resolveInnovation(Player player, Game game, ButtonInteractionEvent event) {
         for (String planet : player.getPlanetsAllianceMode()) {
             if (ButtonHelper.checkForTechSkips(game, planet)) {
                 player.refreshPlanet(planet);
