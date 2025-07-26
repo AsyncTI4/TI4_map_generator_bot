@@ -128,14 +128,14 @@ public class PlayerTitleHelper {
         }
         game.setStoredValue("removeSupports", "true");
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Purged Supports from the game");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Purged _Supports For The Thrones_ from the game.");
     }
 
     @ButtonHandler(value = "noSupportSwaps")
     public static void noSupportSwaps(ButtonInteractionEvent event, String buttonID, Game game) {
         game.setNoSwapMode(true);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Made it so you cannot support swap in this game");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Made it so you cannot swap _Supports For The Thrones_ in this game.");
     }
 
     @ButtonHandler(value = "answerSurvey_", save = false)
@@ -155,7 +155,7 @@ public class PlayerTitleHelper {
             case "2" -> {
                 userSettings.setWhisperPref(answer);
                 msg = "### Survey Question 2/5: Support For The Throne\n" + msg;
-                msg += " What are your preferences when it comes to support for the throne? ";
+                msg += " What are your preferences when it comes to _Support For The Throne_? ";
             }
             case "3" -> {
                 userSettings.setSupportPref(answer);
@@ -171,11 +171,15 @@ public class PlayerTitleHelper {
             case "5" -> {
                 userSettings.setWinmakingPref(answer);
                 msg = "### Survey Question 5/5: Meta Preferences\n" + msg;
-                msg += " Many players prefer not to play \"space risk\", where the game features early and ferocious attacks without an objective providing motivation for the attacks. Many other players prefer not to play with a \"passive boat float\" where everyone sits in their slice until the end game and players promise forever wars for the slightest early game aggression. Which describes you better?";
+                msg += " Many players prefer not to play \"space risk\", where the game features early and ferocious attacks without an objective providing motivation for the attacks."
+                    + " Many other players prefer not to play with a \"passive boat float\" where everyone sits in their slice until the end game and players promise forever wars for the slightest early game aggression."
+                    + " Which describes you better?";
             }
             case "6" -> {
                 userSettings.setMetaPref(answer);
-                msg += " Thank you for completing the survey. You will see anonymous results after the first strategy phase of every game if at least two people in the game have completed the survey. You can retake this survey at any time via /user survey, but you will never be asked to complete it again. Hope you have a good rest of your day! ";
+                msg += " Thank you for completing the survey."
+                    + " You will see anonymous results after the first strategy phase of every game if at least two people in the game have completed the survey."
+                    + " You can retake this survey at any time via /user survey, but you will never be asked to complete it again. Hope you have a good rest of your day!";
             }
         }
         if (event instanceof SlashCommandInteractionEvent sevent) {
