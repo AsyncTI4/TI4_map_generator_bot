@@ -1,7 +1,7 @@
 package ti4.controller.validator;
 
 import ti4.controller.exception.InvalidGameNameException;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 
 public class GameNameValidator {
 
