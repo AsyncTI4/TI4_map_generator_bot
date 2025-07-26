@@ -174,6 +174,12 @@ class FrankenButtonHandler {
                     }
                     return;
                 }
+                case "done" -> {
+                    player.setAutoFrankenDraft(true);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "The bot will finish drafting for you.");
+                    FrankenDraftBagService.autoDraftCurrentBag(game, player);
+                    return;
+                }
                 case "show_bag" -> {
                     FrankenDraftBagService.showPlayerBag(game, player);
                     return;
