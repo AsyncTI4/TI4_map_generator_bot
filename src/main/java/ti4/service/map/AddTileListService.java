@@ -1,10 +1,9 @@
 package ti4.service.map;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -24,7 +23,6 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
-import ti4.map.MapStringMapper;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;

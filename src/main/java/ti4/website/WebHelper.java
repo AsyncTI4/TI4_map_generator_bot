@@ -30,16 +30,16 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
 import ti4.map.Game;
-import ti4.map.GameStatsDashboardPayload;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglUsernameChangeRequest;
 import ti4.settings.GlobalSettings;
+import ti4.website.model.stats.GameStatsDashboardPayload;
 
 public class WebHelper {
 

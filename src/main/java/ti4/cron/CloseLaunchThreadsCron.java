@@ -4,8 +4,8 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
 import ti4.helpers.GameLaunchThreadHelper;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 
 @UtilityClass
 public class CloseLaunchThreadsCron {
