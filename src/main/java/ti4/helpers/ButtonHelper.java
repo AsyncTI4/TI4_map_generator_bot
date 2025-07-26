@@ -2660,27 +2660,6 @@ public class ButtonHelper {
         });
     }
 
-    public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
-            boolean containsRealButton = false;
-            List<Button> buttons = new ArrayList<>(bevent.getMessage().getButtons());
-            List<Button> newButtons = new ArrayList<>();
-            for (Button button : buttons) {
-                if (!button.getId().contains(partialID)) {
-                    if (!button.getId().contains("deleteButtons") && !button.getId().contains("ultimateUndo")) {
-                        containsRealButton = true;
-                    }
-                    newButtons.add(button);
-                }
-            }
-            if (containsRealButton) {
-                MessageHelper.editMessageButtons(bevent, newButtons);
-            } else {
-                ButtonHelper.deleteMessage(bevent);
-            }
-        }
-    }
-
     public static void deleteTheOneButton(ButtonInteractionEvent event, String buttonID, boolean deleteMsg) {
         if (event == null) return;
 
