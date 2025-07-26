@@ -1,12 +1,11 @@
 package ti4.map.persistence;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import javax.annotation.Nullable;
 
 import lombok.experimental.UtilityClass;
 import ti4.AsyncTI4DiscordBot;

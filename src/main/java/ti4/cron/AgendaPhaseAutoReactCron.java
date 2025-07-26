@@ -2,7 +2,6 @@ package ti4.cron;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import static java.util.function.Predicate.not;
 
 import lombok.experimental.UtilityClass;
 import ti4.image.Mapper;
@@ -15,6 +14,8 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.model.ActionCardModel;
 import ti4.service.button.ReactionService;
+
+import static java.util.function.Predicate.not;
 
 @UtilityClass
 public class AgendaPhaseAutoReactCron {

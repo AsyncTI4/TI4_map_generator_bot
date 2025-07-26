@@ -1,7 +1,5 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.*;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +18,8 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
+
+import static java.util.function.Predicate.not;
 
 @UtilityClass
 public class AutoPingCron {
