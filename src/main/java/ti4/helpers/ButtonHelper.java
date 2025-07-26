@@ -2636,7 +2636,8 @@ public class ButtonHelper {
             int total = 0;
             UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
 
-            String msg = player.getFactionEmoji() + " resolved _Magen Defense Grid_ on " + tile.getPosition() + ":";
+            String msg = player.getFactionEmoji() + " resolved _Magen Defense Grid_ on " + tile.getPosition()
+                + ", placing %s infantry (%%s total so far):";
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
@@ -2653,8 +2654,10 @@ public class ButtonHelper {
                     }
                 }
             }
+            player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, Integer.toString(total)));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                String.format(msg, total, player.getMagenInfantryCounter()));
         });
     }
 

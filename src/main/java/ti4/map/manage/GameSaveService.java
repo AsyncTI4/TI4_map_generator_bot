@@ -626,6 +626,9 @@ class GameSaveService {
             writer.write(Constants.SARWEEN_COUNT + " " + player.getSarweenCounter());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.MAGEN_INFANTRY_COUNT + " " + player.getMagenInfantryCounter());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.PATH_TOKEN_COUNT + " " + player.getPathTokenCounter());
             writer.write(System.lineSeparator());
 
