@@ -30,6 +30,7 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.model.ExploreModel;
 
 @UtilityClass
 class ExploreButtonHandler {
@@ -350,5 +351,55 @@ class ExploreButtonHandler {
             String pF = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pF + " " + message);
         }
+    }
+
+    @ButtonHandler("explore_look_All")
+    public static void exploreLookAll(ButtonInteractionEvent event, Player player, Game game) {
+        String message = player.getRepresentationUnfogged() + ", you may look at all explore cards.";
+        List<Button> buttons = Helper.getExploreButtons(game, player);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("discardExploreTop_")
+    public static void discardExploreTop(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String trait = buttonID.replace("discardExploreTop_", "");
+        String cardID = game.discardExplore(trait);
+        ExploreModel exploreModel = Mapper.getExplore(cardID);
+        String message = player.getFactionEmoji() + " discarded " + exploreModel.getRepresentation() + " from the top of the " + trait + " deck.";
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("resolveExp_Look_")
+    public static void resolveExpLook(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String[] parts = buttonID.split("_");
+        String cardID = parts[2];
+        String trait = parts[3];
+        ExploreService.resolveExploreCard(event, cardID, trait, player, game, true);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    public static void movedNExplored(
+        ButtonInteractionEvent event, Player player, String buttonID, Game game
+    ) {
+        String planet = buttonID.replace("movedNExplored_", "");
+        String trait = "CULTURAL";
+        if (planet.contains("_")) {
+            trait = planet.split("_")[1];
+            planet = planet.split("_")[0];
+        }
+        ExploreService.explorePlanet(event, game.getTileFromPlanet(planet), planet, trait, player, true, game, 1, false);
+        String message = player.getFactionEmoji() + " explored " + Helper.getPlanetRepresentation(planet, game);
+        ReactionService.addReaction(event, game, player, message);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("exploreAPlanet")
+    public static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
+        String message = player.getRepresentationUnfogged() + ", choose a planet to explore.";
+        List<Button> buttons = Helper.getPlanetExplorationButtons(game, player);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+        ButtonHelper.deleteMessage(event);
     }
 }
