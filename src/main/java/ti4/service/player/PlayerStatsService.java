@@ -93,15 +93,15 @@ public class PlayerStatsService {
     }
 
     public static boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game game, Player player, int scNumber) {
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
+        Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
         if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
                 "Can only pick strategy card if both faction and color have been picked.");
             return false;
         }
-        if (!scTradeGoods.containsKey(scNumber)) {
+        if (!strategyCardToTradeGoodCount.containsKey(scNumber)) {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                "Strategy Card must be from possible ones in game: " + scTradeGoods.keySet());
+                "Strategy Card must be from possible ones in game: " + strategyCardToTradeGoodCount.keySet());
             return false;
         }
 
@@ -131,7 +131,7 @@ public class PlayerStatsService {
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
         }
 
-        Integer tgCount = scTradeGoods.get(scNumber);
+        Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
         String msg = player.getRepresentationUnfogged() +
             " picked " + Helper.getSCRepresentation(game, scNumber) + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);

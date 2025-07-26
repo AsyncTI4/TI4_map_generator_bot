@@ -6,9 +6,6 @@ import java.util.List;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 
-/**
- * Responsible for tracking border anomalies present on a map.
- */
 public class BorderAnomalyManager {
     private final List<BorderAnomalyHolder> anomalies = new ArrayList<>();
 

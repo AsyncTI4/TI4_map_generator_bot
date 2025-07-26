@@ -1184,8 +1184,8 @@ public class Game extends GameProperties {
         return strategyCardManager.getTradeGoods();
     }
 
-    public void setScTradeGoods(Map<Integer, Integer> scTradeGoods) {
-        strategyCardManager.setTradeGoods(scTradeGoods);
+    public void setScTradeGoods(Map<Integer, Integer> strategyCardToTradeGoodCount) {
+        strategyCardManager.setTradeGoods(strategyCardToTradeGoodCount);
     }
 
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {

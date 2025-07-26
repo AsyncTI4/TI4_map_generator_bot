@@ -393,14 +393,14 @@ class GameLoadService {
                 }
                 case Constants.SC_TRADE_GOODS -> {
                     StringTokenizer scTokenizer = new StringTokenizer(info, ";");
-                    Map<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
+                    Map<Integer, Integer> strategyCardToTradeGoodCount = new LinkedHashMap<>();
                     while (scTokenizer.hasMoreTokens()) {
                         StringTokenizer cardInfo = new StringTokenizer(scTokenizer.nextToken(), ",");
                         Integer id = Integer.parseInt(cardInfo.nextToken());
                         Integer value = Integer.parseInt(cardInfo.nextToken());
-                        scTradeGoods.put(id, value);
+                        strategyCardToTradeGoodCount.put(id, value);
                     }
-                    game.setScTradeGoods(scTradeGoods);
+                    game.setScTradeGoods(strategyCardToTradeGoodCount);
                 }
                 case Constants.SPEAKER -> game.setSpeakerUserID(info);
                 case Constants.ACTIVE_PLAYER -> game.setActivePlayerID(info);

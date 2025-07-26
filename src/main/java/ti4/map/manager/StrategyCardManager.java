@@ -16,25 +16,22 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-/**
- * Handles the trade goods that accumulate on strategy cards.
- */
 public class StrategyCardManager {
     private final Game game;
-    private final Map<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
+    private final Map<Integer, Integer> strategyCardToTradeGoodCount = new LinkedHashMap<>();
 
     public StrategyCardManager(Game game) {
         this.game = game;
     }
 
     public Map<Integer, Integer> getTradeGoods() {
-        return scTradeGoods;
+        return strategyCardToTradeGoodCount;
     }
 
     public void setTradeGoods(Map<Integer, Integer> goods) {
-        scTradeGoods.clear();
+        strategyCardToTradeGoodCount.clear();
         if (goods != null) {
-            scTradeGoods.putAll(goods);
+            strategyCardToTradeGoodCount.putAll(goods);
         }
     }
 
@@ -56,7 +53,7 @@ public class StrategyCardManager {
                         + (game.isFrankenGame() ? "hero " : "") + "player, as per the text on Speygh, the Kyro Hero.");
             }
         }
-        scTradeGoods.put(sc, tradeGoodCount);
+        strategyCardToTradeGoodCount.put(sc, tradeGoodCount);
     }
 
     public void incrementTradeGoods() {
@@ -74,9 +71,9 @@ public class StrategyCardManager {
         }
 
         if (!game.islandMode()) {
-            for (Integer scNumber : scTradeGoods.keySet()) {
+            for (Integer scNumber : strategyCardToTradeGoodCount.keySet()) {
                 if (!scPickedList.contains(scNumber) && scNumber != 0) {
-                    Integer tgCount = scTradeGoods.get(scNumber);
+                    Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
                     tgCount = tgCount == null ? 1 : tgCount + 1;
                     setTradeGood(scNumber, tgCount);
                 }
@@ -85,7 +82,7 @@ public class StrategyCardManager {
     }
 
     public boolean addSC(Integer sc) {
-        if (!scTradeGoods.containsKey(sc)) {
+        if (!strategyCardToTradeGoodCount.containsKey(sc)) {
             setTradeGood(sc, 0);
             return true;
         }
@@ -93,14 +90,14 @@ public class StrategyCardManager {
     }
 
     public boolean removeSC(Integer sc) {
-        if (scTradeGoods.containsKey(sc)) {
-            scTradeGoods.remove(sc);
+        if (strategyCardToTradeGoodCount.containsKey(sc)) {
+            strategyCardToTradeGoodCount.remove(sc);
             return true;
         }
         return false;
     }
 
     public List<Integer> getSCList() {
-        return new ArrayList<>(scTradeGoods.keySet());
+        return new ArrayList<>(strategyCardToTradeGoodCount.keySet());
     }
 }

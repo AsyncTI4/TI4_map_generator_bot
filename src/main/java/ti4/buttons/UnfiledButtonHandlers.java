@@ -924,8 +924,8 @@ public class UnfiledButtonHandlers {
     public static void increaseTGonSC(ButtonInteractionEvent event, String buttonID, Game game) {
         String sc = buttonID.replace("increaseTGonSC_", "");
         int scNum = Integer.parseInt(sc);
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
-        int tgCount = scTradeGoods.get(scNum);
+        Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
+        int tgCount = strategyCardToTradeGoodCount.get(scNum);
         game.setScTradeGood(scNum, (tgCount + 1));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
             "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There " + (tgCount == 0 ? "is" : "are")
