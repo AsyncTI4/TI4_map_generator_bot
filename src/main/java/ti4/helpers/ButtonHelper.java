@@ -2635,7 +2635,8 @@ public class ButtonHelper {
             int total = 0;
             UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
 
-            String msg = player.getFactionEmoji() + " resolved _Magen Defense Grid_ on " + tile.getPosition() + ":";
+            StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " resolved _Magen Defense Grid_ on " + tile.getPosition()
+                + ", placing %s infantry (%s total so far):");
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
@@ -2646,36 +2647,17 @@ public class ButtonHelper {
                     String infStr = emoji.repeat(count);
                     if (count > 6) infStr += "(" + count + " total)";
                     if (uh instanceof Space) {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to space.";
+                        msg.append("\n-# > ").append(infStr).append(" added to space.");
                     } else {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to " + Helper.getPlanetRepresentation(uh.getName(), game) + ".";
+                        msg.append("\n-# > ").append(infStr).append(" added to ").append(Helper.getPlanetRepresentation(uh.getName(), game)).append(".");
                     }
                 }
             }
+            player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, total));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                String.format(msg.toString(), total, player.getMagenInfantryCounter()));
         });
-    }
-
-    public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
-            boolean containsRealButton = false;
-            List<Button> buttons = new ArrayList<>(bevent.getMessage().getButtons());
-            List<Button> newButtons = new ArrayList<>();
-            for (Button button : buttons) {
-                if (!button.getId().contains(partialID)) {
-                    if (!button.getId().contains("deleteButtons") && !button.getId().contains("ultimateUndo")) {
-                        containsRealButton = true;
-                    }
-                    newButtons.add(button);
-                }
-            }
-            if (containsRealButton) {
-                MessageHelper.editMessageButtons(bevent, newButtons);
-            } else {
-                ButtonHelper.deleteMessage(bevent);
-            }
-        }
     }
 
     public static void deleteTheOneButton(ButtonInteractionEvent event, String buttonID, boolean deleteMsg) {
