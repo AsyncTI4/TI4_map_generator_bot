@@ -11,6 +11,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
@@ -25,11 +26,17 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.PlanetService;
 import ti4.service.button.ReactionService;
+import ti4.service.emoji.ExploreEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.buttons.Buttons;
+import ti4.model.ExploreModel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.message.BotLogger;
 
 @UtilityClass
 class ExploreButtonHandler {
@@ -349,6 +356,118 @@ class ExploreButtonHandler {
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pF + " " + message);
+        }
+    }
+
+    @ButtonHandler("garboziaAbilityExhaust_")
+    static void garboziaAbilityExhaust(ButtonInteractionEvent event, Player player, Game game) {
+        String planet = "garbozia";
+        player.exhaustPlanetAbility(planet);
+        ExploreService.explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
+    }
+
+    @ButtonHandler("resFrontier_")
+    static void resFrontier(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        buttonID = buttonID.replace("resFrontier_", "");
+        String[] stuff = buttonID.split("_");
+        String cardChosen = stuff[0];
+        String pos = stuff[1];
+        String cardRefused = stuff[2];
+        game.addExplore(cardRefused);
+        ExploreService.expFrontAlreadyDone(event, game.getTileByPosition(pos), game, player, cardChosen);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("explore_look_All")
+    static void exploreLookAll(ButtonInteractionEvent event, Player player, Game game) {
+        List<String> order = List.of("cultural", "industrial", "hazardous");
+        for (String type : order) {
+            List<String> deck = game.getExploreDeck(type);
+            List<String> discard = game.getExploreDiscard(type);
+
+            String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(type) + type;
+            if (deck.isEmpty() && discard.isEmpty()) {
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
+                continue;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("__**Look at Top of ").append(traitNameWithEmoji).append(" Deck**__\n");
+            ExploreModel exp = Mapper.getExplore(deck.getFirst());
+            sb.append(exp.textRepresentation());
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
+        }
+
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            "The top card of each of the cultural, industrial, and hazardous exploration decks has been set to "
+                + player.getFactionEmoji() + " `#cards-info` thread.");
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("discardExploreTop_")
+    static void discardExploreTop(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String deckType = buttonID.replace("discardExploreTop_", "");
+        ButtonHelperFactionSpecific.resolveExpDiscard(player, game, event, deckType);
+    }
+
+    @ButtonHandler("resolveExp_Look_")
+    static void resolveExpLook(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String deckType = buttonID.replace("resolveExp_Look_", "");
+        ButtonHelperFactionSpecific.resolveExpLook(player, game, event, deckType);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    static void movedNExplored(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        String bID = buttonID.replace("movedNExplored_", "");
+        boolean dsdihmy = bID.startsWith("dsdihmy_");
+        String[] info = bID.split("_");
+        Tile tile = game.getTileFromPlanet(info[1]);
+        ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, false);
+        if (dsdihmy) {
+            player.exhaustPlanet(info[1]);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info[1] + " was exhausted by _Impressment Programs_.");
+        }
+        if (tile != null && player.getTechs().contains("dsdihmy")) {
+            List<Button> produce = new java.util.ArrayList<>();
+            String pos = tile.getPosition();
+            produce.add(Buttons.blue("dsdihmy_" + pos, "Produce (1) Units"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentation() + ", you explored a planet, and due to _Impressment Programs_ you may now produce 1 ship in the system.",
+                produce);
+        }
+        event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
+    }
+
+    @ButtonHandler("crownofemphidiaexplore")
+    static void crownOfEmphidiaExplore(ButtonInteractionEvent event, Player player, Game game) {
+        player.addExhaustedRelic("emphidia");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmojiOrColor() + " Exhausted _The Crown of Emphidia_.");
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("exploreAPlanet")
+    static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            player.getRepresentation() + ", please use these buttons to explore.", buttons);
+    }
+
+    @ButtonHandler("shuffleExplores")
+    static void shuffleExplores(ButtonInteractionEvent event, Game game) {
+        game.shuffleExplores();
+        ButtonHelper.deleteMessage(event);
+    }
+
+    static void declineExplore(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
+        ReactionService.addReaction(event, game, player, "declined exploration card.");
+        ButtonHelper.deleteMessage(event);
+        if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
+            String pF = player.getFactionEmoji();
+            MessageHelper.sendMessageToChannel(mainGameChannel, pF + " declined exploration card.");
         }
     }
 }
