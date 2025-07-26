@@ -41,6 +41,7 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
     private String factionSheetBackImageURL;
     private String factionReferenceImageURL;
     private String wikiURL;
+    private List<String> preferredColours;
 
     public boolean isValid() {
         return alias != null
@@ -129,6 +130,13 @@ public class FactionModel implements ModelInterface, EmbeddableModel {
 
     public Optional<String> getWikiURL() {
         return Optional.ofNullable(wikiURL);
+    }
+
+    public List<String> getPreferredColours() {
+        return Optional.ofNullable(preferredColours).orElse(
+            homebrewReplacesID != null
+                ? Mapper.getFaction(homebrewReplacesID).getPreferredColours()
+                : new ArrayList<>());
     }
 
     public String getLinksText() {

@@ -476,7 +476,7 @@ public class Game extends GameProperties {
         }
 
         if (player.getAllianceMembers().isEmpty()) {
-            return false;
+            return true;
         }
 
         Player ally = getRealPlayersNDummies().stream()
@@ -621,8 +621,10 @@ public class Game extends GameProperties {
         gameModes.put("Community", isCommunityMode());
         gameModes.put("Minor Factions", isMinorFactionsMode());
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
-        gameModes.put("Age of Commerce", isAgeOfCommerceMode());
+        gameModes.put("Hidden Agenda", isHiddenAgendaMode());
         gameModes.put("Total War", isTotalWarMode());
+        gameModes.put("No Support Swaps", isNoSwapMode());
+        gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
         gameModes.put("Ordinian", isOrdinianC1Mode());
         gameModes.put("Alliance", isAllianceMode());
@@ -636,7 +638,7 @@ public class Game extends GameProperties {
         gameModes.put("AC Deck 2", "action_deck_2".equals(getAcDeckID()));
         gameModes.put("Omega Phase", isOmegaPhaseMode());
         gameModes.put("Priority Track", hasAnyPriorityTrackMode());
-        gameModes.put("Homebrew", !isNormalGame);
+        gameModes.put("Homebrew", isHomebrew());
 
         for (String tag : getTags()) {
             gameModes.put(tag, true);
@@ -4308,12 +4310,22 @@ public class Game extends GameProperties {
     }
 
     private boolean hasUnofficialNumberOfRevealedObjectives() {
-        int revealedStage1Count = publicObjectives1 == null ? 0 : publicObjectives1.size();
+        int revealedStage1Count = (int) revealedPublicObjectives.keySet().stream()
+            .map(Mapper::getPublicObjective)
+            .filter(Objects::nonNull)
+            .filter(objective -> objective.getSource().isOfficial())
+            .filter(objective -> objective.getPoints() == 1)
+            .count();
         if (revealedStage1Count < 2) {
             return true;
         }
 
-        int revealedStage2Count = publicObjectives2 == null ? 0 : publicObjectives2.size();
+        int revealedStage2Count = (int) revealedPublicObjectives.keySet().stream()
+            .map(Mapper::getPublicObjective)
+            .filter(Objects::nonNull)
+            .filter(objective -> objective.getSource().isOfficial())
+            .filter(objective -> objective.getPoints() == 2)
+            .count();
         int round = getRound();
         String phaseOfGame = StringUtils.defaultString(getPhaseOfGame());
         // if we're in action, we haven't revealed this round's public; can't filter on status because sometimes people reveal despite game end
@@ -4327,8 +4339,9 @@ public class Game extends GameProperties {
                 if (revealedStage1Count < round + 1) return true;
                 // Round + 1 revealed by this point, plus Incentive Program; 1 extra if we're not in action phase
                 if (revealedStage1Count > round + 2 + extraIfNotActionPhase) return true;
-                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase
-                if (revealedStage2Count > 1 + extraIfNotActionPhase) return true;
+                // At most 1 Stage 2 can be revealed, by Incentive Program; 1 extra if we're not in action phase and its round 4
+                int extraIfRound4AndNotActionPhase = round != 4 ? 0 : extraIfNotActionPhase;
+                if (revealedStage2Count > 1 + extraIfRound4AndNotActionPhase) return true;
             }
             if (round >= 5) {
                 // We can't have less stage 1s than this
@@ -4503,15 +4516,6 @@ public class Game extends GameProperties {
             }
         }
         return false;
-    }
-
-    public List<String> getAllTeamMateIDs() {
-        List<String> teamMateIDs = new ArrayList<>();
-        for (Player player : getPlayers().values()) {
-            teamMateIDs.addAll(player.getTeamMateIDs());
-            teamMateIDs.remove(player.getUserID());
-        }
-        return teamMateIDs;
     }
 
     public List<String> peekAtSecrets(int count) {

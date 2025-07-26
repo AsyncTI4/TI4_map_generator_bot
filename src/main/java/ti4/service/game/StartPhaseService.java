@@ -1,6 +1,7 @@
 package ti4.service.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -711,8 +712,12 @@ public class StartPhaseService {
         game.setStoredValue("willRevolution", "");
         game.setPhaseOfGame("action");
         GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
-
+        int completedSurvey = 0;
         for (Player p2 : game.getRealPlayers()) {
+            var userSettings = UserSettingsManager.get(p2.getUserID());
+            if (userSettings.isHasAnsweredSurvey()) {
+                completedSurvey++;
+            }
             ButtonHelperActionCards.checkForAssigningCoup(game, p2);
             if (game.getStoredValue("Play Naalu PN") != null
                 && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
@@ -728,6 +733,51 @@ public class StartPhaseService {
             if (game.getPriorityTrackMode() == PriorityTrackMode.THIS_ROUND_ONLY) {
                 game.setPriorityTrackMode(PriorityTrackMode.NONE);
             }
+        }
+        if (game.getRound() == 1 && !game.isFowMode() && completedSurvey > 1) {
+            String header = "# __Survey Results__\n";
+            String question1 = "## Question #1: Whispers\n";
+            String question2 = "## Question #2: Supports\n";
+            String question4 = "## Question #4: Winmaking\n";
+            String question3 = "## Question #3: How To Handle Rollback Disputes\n";
+            String question5 = "## Question #5: Meta Preferences\n";
+            List<Player> randomPlayers = new ArrayList<>();
+            randomPlayers.addAll(game.getRealPlayers());
+            boolean anyoneWantsToBan = false;
+            boolean anyoneWantsNoSwaps = false;
+            Collections.shuffle(randomPlayers);
+            for (Player player : randomPlayers) {
+                var userSettings = UserSettingsManager.get(player.getUserID());
+                if (!userSettings.isHasAnsweredSurvey()) {
+                    continue;
+                }
+                question1 += "* " + userSettings.getWhisperPref() + "\n";
+                question2 += "* " + userSettings.getSupportPref() + "\n";
+                if (userSettings.getSupportPref().contains("Purge")) {
+                    anyoneWantsToBan = true;
+                }
+                if (userSettings.getSupportPref().contains("Swap")) {
+                    anyoneWantsNoSwaps = true;
+                }
+                question4 += "* " + userSettings.getWinmakingPref() + "\n";
+                question3 += "* " + userSettings.getTakebackPref() + "\n";
+                question5 += "* " + userSettings.getMetaPref() + "\n";
+            }
+            MessageHelper.sendMessageToChannelAndPin(game.getTableTalkChannel(), game.getPing() + "\n" + header + question1 + question2 + question3 + question4 + question5);
+
+            List<Button> buttons = new ArrayList<>();
+            if (anyoneWantsNoSwaps || anyoneWantsToBan) {
+                if (anyoneWantsNoSwaps) {
+                    buttons.add(Buttons.blue("noSupportSwaps", "Ban Support Swaps"));
+                }
+                if (anyoneWantsToBan) {
+                    buttons.add(Buttons.red("purgeSupports", "Purge Supports"));
+                }
+                buttons.add(Buttons.gray("deleteButtons", "Stay With Rules as Written Supports"));
+                MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), "If you wish to do anything unusual with _Supports For The Thrones_, you can use these buttons.", buttons);
+            }
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "You are encouraged to discuss these results if there appears to be any disagreement on questions 1-3,"
+                + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
         }
 
         Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
