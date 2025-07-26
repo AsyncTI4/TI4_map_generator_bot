@@ -13,7 +13,6 @@ import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperFactionSpecific;
-import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -22,14 +21,13 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
-class HandActionCardButtonHandler {
+class ActionCardHandButtonHandler {
 
     @ButtonHandler("getACFrom_")
     static void getACFrom(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
@@ -79,7 +77,7 @@ class HandActionCardButtonHandler {
             event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
             return;
         }
-        
+
         try {
             String acID = null;
             for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
@@ -197,6 +195,32 @@ class HandActionCardButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
     }
 
+    @ButtonHandler("draw_1_ACDelete")
+    static void draw1ACDelete(ButtonInteractionEvent event, Player player, Game game) {
+        draw1Ac(event, player, game);
+        ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("draw_1_AC")
+    static void draw1AC(ButtonInteractionEvent event, Player player, Game game) {
+        draw1Ac(event, player, game);
+    }
+
+    private static void draw1Ac(ButtonInteractionEvent event, Player player, Game game) {
+        String message;
+        if (player.hasAbility("autonetic_memory")) {
+            ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
+        } else {
+            game.drawActionCard(player.getUserID());
+            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+            ActionCardHelper.sendActionCardInfo(game, player, event);
+            message = " drew 1 action card.";
+        }
+        ReactionService.addReaction(event, game, player, true, false, message);
+        ButtonHelper.checkACLimit(game, player);
+    }
+
     @ButtonHandler("draw_2_ACDelete")
     static void draw2ACDelete(ButtonInteractionEvent event, Player player, Game game) {
         String message;
@@ -215,39 +239,6 @@ class HandActionCardButtonHandler {
             player.getRepresentationUnfogged() + ", use buttons to discard an action card.",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
         ButtonHelper.deleteMessage(event);
-        ButtonHelper.checkACLimit(game, player);
-    }
-
-    @ButtonHandler("draw_1_ACDelete")
-    static void draw1ACDelete(ButtonInteractionEvent event, Player player, Game game) {
-        String message;
-        if (player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            game.drawActionCard(player.getUserID());
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = " drew 1 action card.";
-        }
-        ReactionService.addReaction(event, game, player, true, false, message);
-        ButtonHelper.deleteMessage(event);
-        ButtonHelper.checkACLimit(game, player);
-    }
-
-    @ButtonHandler("draw_1_AC")
-    static void draw1AC(ButtonInteractionEvent event, Player player, Game game) {
-        String message;
-        if (player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, 1);
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            game.drawActionCard(player.getUserID());
-            CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = " drew 1 action card.";
-        }
-        ReactionService.addReaction(event, game, player, true, false, message);
         ButtonHelper.checkACLimit(game, player);
     }
 
@@ -285,67 +276,5 @@ class HandActionCardButtonHandler {
             ActionCardHelper.drawActionCards(game, player, count, true);
             ButtonHelper.deleteTheOneButton(event);
         } catch (Exception ignored) {}
-    }
-
-    @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")
-    static void applytempcombatmodAC(ButtonInteractionEvent event, Player player, String buttonID) {
-        String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
-        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC,
-            acAlias,
-            player.getNumberOfTurns());
-        if (combatModAC != null) {
-            player.addNewTempCombatMod(combatModAC);
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Combat modifier will be applied next time you push the combat roll button.");
-        }
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("comm_for_AC")
-    static void commForAC(ButtonInteractionEvent event, Game game, Player player) {
-        boolean hasSchemingAbility = player.hasAbility("scheming");
-        int count2 = hasSchemingAbility ? 2 : 1;
-        String commOrTg = "";
-        if (player.getCommodities() > 0) {
-            commOrTg = "commodity";
-            player.setCommodities(player.getCommodities() - 1);
-
-        } else if (player.getTg() > 0) {
-            player.setTg(player.getTg() - 1);
-            commOrTg = "trade good";
-        } else {
-            ReactionService.addReaction(event, game, player,
-                " didn't have any commodities or trade goods to spend, so no action card was drawn.");
-            return;
-        }
-        String message = hasSchemingAbility
-            ? " spent 1 " + commOrTg + " to draw " + count2
-                + " action card (**Scheming** added 1 action card). Please discard 1 action card from your hand."
-            : " spent 1 " + commOrTg + " to draw " + count2 + " action card.";
-        if (player.hasAbility("autonetic_memory")) {
-            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count2);
-            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
-        } else {
-            for (int i = 0; i < count2; i++) {
-                game.drawActionCard(player.getUserID());
-            }
-            ButtonHelper.checkACLimit(game, player);
-            ActionCardHelper.sendActionCardInfo(game, player, event);
-        }
-
-        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
-
-        if (hasSchemingAbility) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " use buttons to discard.",
-                ActionCardHelper.getDiscardActionCardButtons(player, false));
-        }
-
-        ReactionService.addReaction(event, game, player, message);
-        ButtonHelper.deleteMessage(event);
-        if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
-            String pF = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pF + " " + message);
-        }
     }
 }
