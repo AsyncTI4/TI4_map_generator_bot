@@ -5276,9 +5276,27 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
-        List<ColorModel> unusedColors = game.getUnusedColorsPreferringBase();
-        unusedColors = ColourHelper.sortColours(factionId, unusedColors);
-        for (ColorModel color : unusedColors) {
+        List<ColorModel> unusedColors = game.getUnusedColors();
+
+        List<ColorModel> factionPrefColors = Mapper.getFaction(factionId).getPreferredColours().stream().map(Mapper::getColor).toList();
+        for (ColorModel color : factionPrefColors)
+        {
+            if (color != null && unusedColors.contains(color))
+            {
+                String colorName = color.getName();
+                Emoji colorEmoji = color.getEmoji();
+                String step3id = "setupStep3_" + userId + "_" + factionId + "_" + colorName;
+                buttons.add(Buttons.green(step3id, colorName).withEmoji(colorEmoji));
+            }
+        }
+
+        List<ColorModel> unusedPrefColors = game.getUnusedColorsPreferringBase();
+        unusedPrefColors = ColourHelper.sortColours(factionId, unusedPrefColors);
+        for (ColorModel color : unusedPrefColors) {
+            if (factionPrefColors.contains(color))
+            {
+                continue;
+            }
             String colorName = color.getName();
             Emoji colorEmoji = color.getEmoji();
             String step3id = "setupStep3_" + userId + "_" + factionId + "_" + colorName;
@@ -5402,6 +5420,12 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         deleteMessage(event);
         List<Button> buttons = getFactionSetupButtons(game, buttonID);
+        if (buttons.size() <= 25)
+        {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+                "Please tell the bot the desired faction.", buttons);
+            return;
+        }
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = -1;
         long numberOfHomes = Mapper.getFactionsValues().stream()
@@ -5421,8 +5445,8 @@ public class ButtonHelper {
         }
         newButtons.add(
             Buttons.gray("setupStep2_" + userId + "_" + (maxBefore + numberOfHomes) + "!", "Get More Factions"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction.",
-            newButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+            "Please tell the bot the desired faction.", newButtons);
     }
 
     @ButtonHandler("setupStep2_")

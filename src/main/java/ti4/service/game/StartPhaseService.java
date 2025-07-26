@@ -774,9 +774,10 @@ public class StartPhaseService {
                     buttons.add(Buttons.red("purgeSupports", "Purge Supports"));
                 }
                 buttons.add(Buttons.gray("deleteButtons", "Stay With Rules as Written Supports"));
-                MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), "If you wish to do anything unusual with supports, you can use these buttons", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), "If you wish to do anything unusual with _Supports For The Thrones_, you can use these buttons.", buttons);
             }
-            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "You are encouraged to discuss these results if there appears to be any disagreement on questions 1-3, as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
+            MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "You are encouraged to discuss these results if there appears to be any disagreement on questions 1-3,"
+                + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
         }
 
         Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();

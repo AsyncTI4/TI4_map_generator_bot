@@ -648,10 +648,10 @@ public class TransactionHelper {
 
                     }
                 }
-                message += "\nReminder that, unlike other things, you may only send a player 1 promissory note in each transaction"
+                message += "\n A reminder that, unlike other things, you may only send a player 1 promissory note in each transaction"
                     + " (and you may only perform one transaction with each other player on a turn).";
                 if (game.isNoSwapMode()) {
-                    message += "\n### Reminder that you cannot swap supports in this game";
+                    message += "\n### A reminder that you cannot swap _Supports For The Thrones_ in this game.";
                 }
             }
             case "Frags" -> {
@@ -998,10 +998,10 @@ public class TransactionHelper {
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
-                MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), "Reminder that, unlike other things,"
+                MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), "A reminder that, unlike other things,"
                     + " you may only send a player 1 promissory note in each transaction (and you may only perform one transaction with each other player on a turn).");
                 if (game.isNoSwapMode()) {
-                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), "### Reminder that you cannot swap supports in this game");
+                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), "### A reminder that you cannot swap _Supports For The Thrones_ in this game");
                 }
             }
             case "Technology" -> {
@@ -1209,7 +1209,8 @@ public class TransactionHelper {
                 }
                 if (game.isNoSwapMode()) {
                     if (id.endsWith("sftt") && p1.getPromissoryNotesInPlayArea().contains(p2.getColor() + "_sftt")) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getRepresentation() + " Can not swap Support for the Throne in a game that has banned support swaps.");
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+                            p1.getRepresentation() + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
                         return;
                     }
                 }

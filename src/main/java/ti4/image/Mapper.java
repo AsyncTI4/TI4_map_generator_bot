@@ -607,7 +607,7 @@ public class Mapper {
 
     public static List<FactionModel> getFactionsValues() {
         return factions.values().stream()
-            .sorted(Comparator.comparing(FactionModel::getFactionName))
+            .sorted(Comparator.comparing(f -> f.getFactionName().toLowerCase().replace("the ", "")))
             .collect(Collectors.toList());
     }
 
