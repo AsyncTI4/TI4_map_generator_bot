@@ -113,8 +113,6 @@ public class ButtonProcessor {
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (false) {
             // Don't add anymore if/else startWith statements - use @ButtonHandler
-        } else if (buttonID.startsWith("ac_discard_from_hand_")) {
-            UnfiledButtonHandlers.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             UnfiledButtonHandlers.soScoreFromHand(event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {

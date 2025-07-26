@@ -1,4 +1,4 @@
-package ti4.buttons.handlers;
+package ti4.buttons.handlers.options;
 
 import java.util.ArrayList;
 import java.util.List;
