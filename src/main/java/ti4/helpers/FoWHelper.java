@@ -34,6 +34,7 @@ import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 public class FoWHelper {
 
@@ -99,7 +100,7 @@ public class FoWHelper {
             return true;
         }
         if ((hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer))
-            && !FOWPlusService.isActive(game)) {
+            && !FOWPlusService.isActive(game) && !game.getFowOption(FOWOption.STATS_FROM_HS_ONLY)) {
             return true;
         }
         FoWHelper.initializeFog(game, viewingPlayer, false);
@@ -188,7 +189,7 @@ public class FoWHelper {
 
     private static void updatePlayerFogTiles(Game game, Player player) {
         for (Tile tileToUpdate : game.getTileMap().values()) {
-            if (!tileToUpdate.hasFog(player)) {
+            if (!tileToUpdate.hasFog(player) || tileToUpdate.isSupernova() && game.getFowOption(FOWOption.BRIGHT_NOVAS)) {
                 player.updateFogTile(tileToUpdate, "Rnd " + game.getRound());
             }
         }

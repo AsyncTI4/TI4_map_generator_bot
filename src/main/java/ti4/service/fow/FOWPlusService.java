@@ -85,7 +85,7 @@ public class FOWPlusService {
 
     //Hide all 0b tiles from FoW map
     public static boolean hideFogTile(String tileID, String label, Game game) {
-        return isActive(game) && tileID.equals("0b") && StringUtils.isEmpty(label);
+        return (isActive(game) || game.getFowOption(FOWOption.HIDE_MAP)) && tileID.equals("0b") && StringUtils.isEmpty(label);
     }
 
     public static boolean isVoid(Game game, String position) {
@@ -211,7 +211,7 @@ public class FOWPlusService {
 
     //Hide explore and relic decks
     public static boolean deckInfoAvailable(Player player, Game game) {
-        if (!isActive(game) || game.getPlayersWithGMRole().contains(player)) return true;
+        if (!isActive(game) && !game.getFowOption(FOWOption.HIDE_EXPLORES) || game.getPlayersWithGMRole().contains(player)) return true;
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "Deck info not available in FoW+ mode.");
         return false;
