@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.buttons.handlers.explore.ExploreButtonHandler;
 import ti4.executors.ExecutorManager;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -120,8 +119,6 @@ public class ButtonProcessor {
             UnfiledButtonHandlers.poScoring(event, player, buttonID, game, privateChannel);
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             ReactionService.addReaction(event, game, player);
-        } else if (buttonID.startsWith("movedNExplored_")) {
-            ExploreButtonHandler.movedNExplored(event, player, buttonID, game);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("strategicAction_")) {
@@ -153,7 +150,6 @@ public class ButtonProcessor {
                 case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
                 case "gain1tgFromMuaatCommander" -> UnfiledButtonHandlers.gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
                 case "gain1tgFromCommander" -> UnfiledButtonHandlers.gain1tgFromCommander(event, player, game, mainGameChannel); // should be deprecated
-                case "decline_explore" -> ExploreButtonHandler.declineExplore(event, player, game, mainGameChannel);
                 case "resolveHarness" -> ButtonHelperStats.replenishComms(event, game, player, false);
                 case "pass_on_abilities" -> ReactionService.addReaction(event, game, player, " is " + event.getButton().getLabel().toLowerCase() + ".");
                 case "lastMinuteDeliberation" -> UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);

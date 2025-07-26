@@ -3,9 +3,12 @@ package ti4.buttons.handlers.explore;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -23,7 +26,9 @@ import ti4.map.Leader;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ExploreModel;
 import ti4.service.PlanetService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ExploreEmojis;
@@ -32,11 +37,6 @@ import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.leader.RefreshLeaderService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
-import ti4.buttons.Buttons;
-import ti4.model.ExploreModel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import org.apache.commons.lang3.function.Consumers;
-import ti4.message.BotLogger;
 
 @UtilityClass
 class ExploreButtonHandler {
@@ -359,13 +359,6 @@ class ExploreButtonHandler {
         }
     }
 
-    @ButtonHandler("garboziaAbilityExhaust_")
-    static void garboziaAbilityExhaust(ButtonInteractionEvent event, Player player, Game game) {
-        String planet = "garbozia";
-        player.exhaustPlanetAbility(planet);
-        ExploreService.explorePlanet(event, game.getTileFromPlanet(planet), planet, "INDUSTRIAL", player, true, game, 1, false);
-    }
-
     @ButtonHandler("resFrontier_")
     static void resFrontier(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         buttonID = buttonID.replace("resFrontier_", "");
@@ -418,6 +411,7 @@ class ExploreButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("movedNExplored_")
     static void movedNExplored(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String bID = buttonID.replace("movedNExplored_", "");
         boolean dsdihmy = bID.startsWith("dsdihmy_");
@@ -439,16 +433,6 @@ class ExploreButtonHandler {
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
 
-    @ButtonHandler("crownofemphidiaexplore")
-    static void crownOfEmphidiaExplore(ButtonInteractionEvent event, Player player, Game game) {
-        player.addExhaustedRelic("emphidia");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmojiOrColor() + " Exhausted _The Crown of Emphidia_.");
-        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
-        ButtonHelper.deleteMessage(event);
-    }
-
     @ButtonHandler("exploreAPlanet")
     static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
@@ -462,6 +446,7 @@ class ExploreButtonHandler {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("decline_explore")
     static void declineExplore(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
         ReactionService.addReaction(event, game, player, "declined exploration card.");
         ButtonHelper.deleteMessage(event);

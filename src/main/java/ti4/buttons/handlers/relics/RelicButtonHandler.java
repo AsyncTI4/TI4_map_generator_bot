@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.buttons.Buttons;
+import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.Helper;
@@ -18,7 +18,6 @@ import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ExploreEmojis;
-import ti4.service.explore.ExploreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
 import ti4.service.tactical.TacticalActionService;
@@ -59,22 +58,22 @@ class RelicButtonHandler {
         List<String> deck = game.getAllRelics();
         if (deck.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "The " + ExploreEmojis.Relic.toString() + " relic deck & discard is empty - nothing to look at.");
+                "The " + ExploreEmojis.Relic + " relic deck & discard is empty - nothing to look at.");
             return;
         }
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                "The top card of the " + ExploreEmojis.Relic.toString() + " relic deck has been sent to "
+                "The top card of the " + ExploreEmojis.Relic + " relic deck has been sent to "
                     + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation(true, false) + " looked at top card of the " + ExploreEmojis.Relic.toString()
+                player.getRepresentation(true, false) + " looked at top card of the " + ExploreEmojis.Relic
                     + " relic deck. The card has been sent to their `#cards-info` thread.");
         }
 
         String topCard = deck.getFirst();
         RelicModel relic = Mapper.getRelic(topCard);
-        String message = "You looked at the top of the " + ExploreEmojis.Relic.toString() + " relic deck and saw _"
+        String message = "You looked at the top of the " + ExploreEmojis.Relic + " relic deck and saw _"
             + relic.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message,
             relic.getRepresentationEmbed());
@@ -133,7 +132,7 @@ class RelicButtonHandler {
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Purged " + ExploreEmojis.Relic.toString() + " relic: " + relicName);
+            "Purged " + ExploreEmojis.Relic + " relic: " + relicName);
         ButtonHelper.deleteMessage(event);
         String message = "Please choose a system to move from.";
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
@@ -167,5 +166,15 @@ class RelicButtonHandler {
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         ButtonHelper.checkACLimit(game, player);
         ButtonHelper.deleteTheOneButton(event);
+    }
+
+    @ButtonHandler("crownofemphidiaexplore")
+    static void crownOfEmphidiaExplore(ButtonInteractionEvent event, Player player, Game game) {
+        player.addExhaustedRelic("emphidia");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmojiOrColor() + " Exhausted _The Crown of Emphidia_.");
+        List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to explore", buttons);
+        ButtonHelper.deleteMessage(event);
     }
 }
