@@ -1,4 +1,4 @@
-package ti4.buttons.handlers;
+package ti4.buttons.handlers.draft;
 
 import java.util.List;
 

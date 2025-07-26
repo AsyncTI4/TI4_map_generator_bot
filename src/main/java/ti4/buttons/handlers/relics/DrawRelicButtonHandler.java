@@ -1,4 +1,4 @@
-package ti4.buttons.handlers.explore;
+package ti4.buttons.handlers.relics;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;

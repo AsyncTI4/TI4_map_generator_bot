@@ -2,14 +2,14 @@ package ti4.buttons.handlers.explore;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ExploreHelper;
 import ti4.helpers.Helper;
@@ -302,5 +302,53 @@ class ExploreButtonHandler {
     @ButtonHandler("resolve_explore_")
     public static void resolveExplore(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         ExploreService.resolveExplore(event, player, buttonID, game);
+    }
+
+    @ButtonHandler("comm_for_AC")
+    static void commForAC(ButtonInteractionEvent event, Game game, Player player) {
+        boolean hasSchemingAbility = player.hasAbility("scheming");
+        int count2 = hasSchemingAbility ? 2 : 1;
+        String commOrTg = "";
+        if (player.getCommodities() > 0) {
+            commOrTg = "commodity";
+            player.setCommodities(player.getCommodities() - 1);
+
+        } else if (player.getTg() > 0) {
+            player.setTg(player.getTg() - 1);
+            commOrTg = "trade good";
+        } else {
+            ReactionService.addReaction(event, game, player,
+                " didn't have any commodities or trade goods to spend, so no action card was drawn.");
+            return;
+        }
+        String message = hasSchemingAbility
+            ? " spent 1 " + commOrTg + " to draw " + count2
+            + " action card (**Scheming** added 1 action card). Please discard 1 action card from your hand."
+            : " spent 1 " + commOrTg + " to draw " + count2 + " action card.";
+        if (player.hasAbility("autonetic_memory")) {
+            ButtonHelperAbilities.autoneticMemoryStep1(game, player, count2);
+            message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
+        } else {
+            for (int i = 0; i < count2; i++) {
+                game.drawActionCard(player.getUserID());
+            }
+            ButtonHelper.checkACLimit(game, player);
+            ActionCardHelper.sendActionCardInfo(game, player, event);
+        }
+
+        CommanderUnlockCheckService.checkPlayer(player, "yssaril");
+
+        if (hasSchemingAbility) {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                player.getRepresentationUnfogged() + " use buttons to discard.",
+                ActionCardHelper.getDiscardActionCardButtons(player, false));
+        }
+
+        ReactionService.addReaction(event, game, player, message);
+        ButtonHelper.deleteMessage(event);
+        if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
+            String pF = player.getFactionEmoji();
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), pF + " " + message);
+        }
     }
 }

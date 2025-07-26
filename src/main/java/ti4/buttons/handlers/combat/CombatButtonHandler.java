@@ -1,4 +1,4 @@
-package ti4.buttons.handlers;
+package ti4.buttons.handlers.combat;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -6,11 +6,14 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
+import ti4.helpers.CombatTempModHelper;
+import ti4.helpers.Constants;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.TemporaryCombatModifierModel;
 
 @UtilityClass
 class CombatButtonHandler {
@@ -57,4 +60,17 @@ class CombatButtonHandler {
         MessageHelper.sendMessageToChannel(game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg);
     }
 
+    @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")
+    static void applyTemporaryCombatMod(ButtonInteractionEvent event, Player player, String buttonID) {
+        String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
+        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC,
+            acAlias,
+            player.getNumberOfTurns());
+        if (combatModAC != null) {
+            player.addNewTempCombatMod(combatModAC);
+            MessageHelper.sendMessageToChannel(event.getChannel(),
+                "Combat modifier will be applied next time you push the combat roll button.");
+        }
+        ButtonHelper.deleteMessage(event);
+    }
 }
