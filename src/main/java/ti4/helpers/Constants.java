@@ -1285,6 +1285,8 @@ public class Constants {
     public static final String SHOW_UNPLAYED_AC = "show_unplayed_ac";
     public static final String TIGL_RANK = "tigl_rank";
     public static final String TIGL = "tigl";
+    public static final String TIGL_CHANGE_NICKNAME = "change_nickname";
+    public static final String TIGL_NICKNAME = "nickname";
     public static final String SEARCH_NAMES = "search_names";
     public static final String SEARCH_TAGS = "search_tags";
     public static final String SEARCH_USERS = "search_users";
