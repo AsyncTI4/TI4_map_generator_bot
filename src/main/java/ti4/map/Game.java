@@ -70,7 +70,7 @@ import ti4.helpers.settingsFramework.menus.MiltySettings;
 import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.map.manager.BorderAnomalyManager;
 import ti4.map.manager.StrategyCardManager;
 import ti4.message.BotLogger;
@@ -270,23 +270,23 @@ public class Game extends GameProperties {
     }
 
     public boolean hasBorderAnomalyOn(String tile, Integer direction) {
-        return borderAnomalyManager.hasAnomaly(tile, direction);
+        return borderAnomalyManager.has(tile, direction);
     }
 
     public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
-        borderAnomalyManager.addAnomaly(tile, direction, anomalyType);
+        borderAnomalyManager.add(tile, direction, anomalyType);
     }
 
     public void removeBorderAnomaly(String tile, Integer direction) {
-        borderAnomalyManager.removeAnomaly(tile, direction);
+        borderAnomalyManager.remove(tile, direction);
     }
 
     public List<BorderAnomalyHolder> getBorderAnomalies() {
-        return borderAnomalyManager.getAnomalies();
+        return borderAnomalyManager.get();
     }
 
     public void setBorderAnomalies(List<BorderAnomalyHolder> anomalies) {
-        borderAnomalyManager.setAnomalies(anomalies);
+        borderAnomalyManager.set(anomalies);
     }
 
     public int getNumberOfSOsInPlayersHands() {

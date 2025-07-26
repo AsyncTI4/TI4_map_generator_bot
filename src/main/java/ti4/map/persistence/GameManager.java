@@ -1,4 +1,4 @@
-package ti4.map.manage;
+package ti4.map.persistence;
 
 import java.util.ArrayList;
 import java.util.List;

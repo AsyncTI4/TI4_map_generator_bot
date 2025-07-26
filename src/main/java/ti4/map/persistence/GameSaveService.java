@@ -1,6 +1,6 @@
-package ti4.map.manage;
+package ti4.map.persistence;
 
-import static ti4.map.manage.GamePersistenceKeys.*;
+import static ti4.map.persistence.GamePersistenceKeys.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
