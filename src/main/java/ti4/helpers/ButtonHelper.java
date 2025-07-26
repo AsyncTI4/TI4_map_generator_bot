@@ -295,8 +295,13 @@ public class ButtonHelper {
         List<Button> stuffToTransButtons = new ArrayList<>();
         for (String pnShortHand : sender.getPromissoryNotes().keySet()) {
             if (sender.getPromissoryNotesInPlayArea().contains(pnShortHand)
-                || (receiver.getAbilities().contains("hubris") && pnShortHand.endsWith("an"))) {
+                || (receiver.getAbilities().contains("hubris") && pnShortHand.endsWith("_an"))) {
                 continue;
+            }
+            if (game.isNoSwapMode()) {
+                if (pnShortHand.endsWith("sftt") && sender.getPromissoryNotesInPlayArea().contains(receiver.getColor() + "_sftt")) {
+                    continue;
+                }
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = game.getPNOwner(pnShortHand);

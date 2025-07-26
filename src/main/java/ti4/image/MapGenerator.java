@@ -452,6 +452,11 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Absol", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
+        if (game.isNoSwapMode()) {
+            drawGeneralImage(x + deltaX, y + deltaY, "NoSwap.png");
+            addWebsiteOverlay("No Support Swap", null, x + deltaX, y + deltaY, 180, 90);
+            deltaX += 190;
+        }
         if (game.isMiltyModMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
             addWebsiteOverlay("MiltyMod", null, x + deltaX, y + deltaY, 90, 90);

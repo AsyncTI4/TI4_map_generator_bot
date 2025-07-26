@@ -650,6 +650,9 @@ public class TransactionHelper {
                 }
                 message += "\nReminder that, unlike other things, you may only send a player 1 promissory note in each transaction"
                     + " (and you may only perform one transaction with each other player on a turn).";
+                if (game.isNoSwapMode()) {
+                    message += "\n### Reminder that you cannot swap supports in this game";
+                }
             }
             case "Frags" -> {
                 message += " Please choose the number of relic fragments you wish to " + requestOrOffer + ".";
@@ -997,6 +1000,9 @@ public class TransactionHelper {
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(), message, stuffToTransButtons);
                 MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), "Reminder that, unlike other things,"
                     + " you may only send a player 1 promissory note in each transaction (and you may only perform one transaction with each other player on a turn).");
+                if (game.isNoSwapMode()) {
+                    MessageHelper.sendMessageToChannel(p1.getCardsInfoThread(), "### Reminder that you cannot swap supports in this game");
+                }
             }
             case "Technology" -> {
                 String message = "Please choose the technology you wish to send.";
@@ -1201,6 +1207,12 @@ public class TransactionHelper {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that promissory note, so no promissory note was sent.");
                     return;
                 }
+                if (game.isNoSwapMode()) {
+                    if (id.endsWith("sftt") && p1.getPromissoryNotesInPlayArea().contains(p2.getColor() + "_sftt")) {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getRepresentation() + " Can not swap Support for the Throne in a game that has banned support swaps.");
+                        return;
+                    }
+                }
                 p1.removePromissoryNote(id);
                 p2.setPromissoryNote(id);
                 if (id.contains("dspnveld")) {
@@ -1247,7 +1259,7 @@ public class TransactionHelper {
             }
             case "Technology" -> {
                 p2.addTech(amountToTrans);
-                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), 
+                MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                     p2.getRepresentation() + ", you have received the technology _" + Mapper.getTech(amountToTrans) + "_ from a transaction.");
             }
         }
