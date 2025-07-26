@@ -78,6 +78,7 @@ public class PlayerProperties {
     //Stat tracking
     private int sarweenCounter;
     private int pillageCounter;
+    private int magenInfantryCounter;
 
     //Omega Phase
     private int priorityPosition;

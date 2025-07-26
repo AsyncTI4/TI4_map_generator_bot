@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,11 +14,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -42,6 +35,10 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -111,6 +108,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.WebHelper;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -2636,7 +2635,8 @@ public class ButtonHelper {
             int total = 0;
             UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
 
-            String msg = player.getFactionEmoji() + " resolved _Magen Defense Grid_ on " + tile.getPosition() + ":";
+            StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " resolved _Magen Defense Grid_ on " + tile.getPosition()
+                + ", placing %s infantry (%s total so far):");
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
@@ -2647,36 +2647,17 @@ public class ButtonHelper {
                     String infStr = emoji.repeat(count);
                     if (count > 6) infStr += "(" + count + " total)";
                     if (uh instanceof Space) {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to space.";
+                        msg.append("\n-# > ").append(infStr).append(" added to space.");
                     } else {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to " + Helper.getPlanetRepresentation(uh.getName(), game) + ".";
+                        msg.append("\n-# > ").append(infStr).append(" added to ").append(Helper.getPlanetRepresentation(uh.getName(), game)).append(".");
                     }
                 }
             }
+            player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, Integer.toString(total)));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                String.format(msg.toString(), total, player.getMagenInfantryCounter()));
         });
-    }
-
-    public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
-            boolean containsRealButton = false;
-            List<Button> buttons = new ArrayList<>(bevent.getMessage().getButtons());
-            List<Button> newButtons = new ArrayList<>();
-            for (Button button : buttons) {
-                if (!button.getId().contains(partialID)) {
-                    if (!button.getId().contains("deleteButtons") && !button.getId().contains("ultimateUndo")) {
-                        containsRealButton = true;
-                    }
-                    newButtons.add(button);
-                }
-            }
-            if (containsRealButton) {
-                MessageHelper.editMessageButtons(bevent, newButtons);
-            } else {
-                ButtonHelper.deleteMessage(bevent);
-            }
-        }
     }
 
     public static void deleteTheOneButton(ButtonInteractionEvent event, String buttonID, boolean deleteMsg) {
