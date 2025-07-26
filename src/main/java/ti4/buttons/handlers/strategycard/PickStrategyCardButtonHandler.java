@@ -217,7 +217,7 @@ public class PickStrategyCardButtonHandler {
 
     public static void secondHalfOfSCPickWhenChecksNBalances(ButtonInteractionEvent event, Player player, Game game, int scPicked) {
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scPicked);
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
+        Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
 
         for (Player playerStats : game.getRealPlayers()) {
             if (playerStats.getSCs().contains(scPicked)) {
@@ -225,7 +225,7 @@ public class PickStrategyCardButtonHandler {
                 return;
             }
         }
-        Integer tgCount = scTradeGoods.get(scPicked);
+        Integer tgCount = strategyCardToTradeGoodCount.get(scPicked);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
             tg += tgCount;

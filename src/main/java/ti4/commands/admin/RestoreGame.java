@@ -10,7 +10,7 @@ import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 
 class RestoreGame extends Subcommand {

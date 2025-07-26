@@ -20,8 +20,8 @@ import ti4.helpers.CombatMessageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 
 @UtilityClass
