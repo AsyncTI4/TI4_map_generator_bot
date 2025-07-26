@@ -995,5 +995,14 @@
         "text": "Your cruisers and destroyers gain SUSTAIN DAMAGE during this tactical action.",
         "flavorText": "\"What's wrong with these blasted sensors?\" The Count slapped his data console, and with that, it displayed the enemy's signature in a thirteenth different location.",
         "source": "action_deck_2_old"
+    },
+    {
+        "alias": "breakthrough",
+        "name": "Breakthrough",
+        "phase": "Any",
+        "window": "When or after you research a technology",
+        "text": "Ready up to 2 of your planets that have a technology specialty.",
+        "flavorText": "The conference erupted in cheers as Doctor Sucaban announced his findings. Despite the countless sacrifices to reach these results, the wide range of applications made it difficult to feel regret.",
+        "source": "action_deck_2_old"
     }
 ]

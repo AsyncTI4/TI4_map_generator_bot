@@ -1410,7 +1410,6 @@ public class UnfiledButtonHandlers {
         }
     }
 
-
     public static void soScoreFromHand(
         ButtonInteractionEvent event,
         String buttonID,
