@@ -1,6 +1,7 @@
 package ti4.spring.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -48,13 +49,16 @@ public class ActionCardController {
         Game game = GameManager.getManagedGame(gameName).getGame();
         Player player = game.getPlayer(userId);
 
+        return new GetPlayerActionCards(getHand(player));
+    }
+
+    private List<String> getHand(Player player) {
         var actionCards = new ArrayList<String>();
-        player.getActionCards().forEach((key, value) -> {
-            for (int i = 0; i < value; i++) {
-                actionCards.add(key);
+        player.getActionCards().forEach((actionCardId, count) -> {
+            for (int i = 0; i < count; i++) {
+                actionCards.add(actionCardId);
             }
         });
-
-        return new GetPlayerActionCards(actionCards);
+        return actionCards;
     }
 }
