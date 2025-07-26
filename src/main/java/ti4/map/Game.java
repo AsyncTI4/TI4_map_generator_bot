@@ -51,8 +51,6 @@ import ti4.draft.DraftItem;
 import ti4.draft.FrankenDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
-import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ButtonHelperAgents;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
@@ -73,9 +71,11 @@ import ti4.helpers.settingsFramework.menus.SourceSettings;
 import ti4.image.Mapper;
 import ti4.json.ObjectMapperFactory;
 import ti4.map.manage.GameManager;
+import ti4.map.manager.BorderAnomalyManager;
+import ti4.map.manager.StrategyCardManager;
+import ti4.model.BorderAnomalyHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorModel;
 import ti4.model.DeckModel;
@@ -125,7 +125,7 @@ public class Game extends GameProperties {
     @Setter
     @Getter
     private DisplayType displayTypeForced;
-    private @Getter @Setter List<BorderAnomalyHolder> borderAnomalies = new ArrayList<>();
+    private final BorderAnomalyManager borderAnomalyManager = new BorderAnomalyManager();
     private Date lastActivePlayerChange = new Date(0);
     @JsonProperty("autoPingStatus")
     private boolean autoPingEnabled;
@@ -136,7 +136,7 @@ public class Game extends GameProperties {
     @Getter
     @Setter
     private Map<String, Integer> eventsInEffect = new LinkedHashMap<>();
-    private Map<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
+    private final StrategyCardManager strategyCardManager = new StrategyCardManager(this);
     private Map<String, Integer> discardAgendas = new LinkedHashMap<>();
     private Map<String, Integer> sentAgendas = new LinkedHashMap<>();
     private Map<String, Integer> laws = new LinkedHashMap<>();
@@ -270,20 +270,23 @@ public class Game extends GameProperties {
     }
 
     public boolean hasBorderAnomalyOn(String tile, Integer direction) {
-        List<BorderAnomalyHolder> anomaliesOnBorder = borderAnomalies.stream()
-            .filter(anomaly -> anomaly.getType() != BorderAnomalyModel.BorderAnomalyType.ARROW)
-            .filter(anomaly -> anomaly.getTile().equals(tile))
-            .filter(anomaly -> anomaly.getDirection() == direction)
-            .collect(Collectors.toList());
-        return isNotEmpty(anomaliesOnBorder);
+        return borderAnomalyManager.hasAnomaly(tile, direction);
     }
 
     public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
-        borderAnomalies.add(new BorderAnomalyHolder(tile, direction, anomalyType));
+        borderAnomalyManager.addAnomaly(tile, direction, anomalyType);
     }
 
     public void removeBorderAnomaly(String tile, Integer direction) {
-        borderAnomalies.removeIf(anom -> anom.getTile().equals(tile) && anom.getDirection() == direction);
+        borderAnomalyManager.removeAnomaly(tile, direction);
+    }
+
+    public List<BorderAnomalyHolder> getBorderAnomalies() {
+        return borderAnomalyManager.getAnomalies();
+    }
+
+    public void setBorderAnomalies(List<BorderAnomalyHolder> anomalies) {
+        borderAnomalyManager.setAnomalies(anomalies);
     }
 
     public int getNumberOfSOsInPlayersHands() {
@@ -1178,76 +1181,32 @@ public class Game extends GameProperties {
      * @return Map of (scInitiativeNum, tradeGoodCount)
      */
     public Map<Integer, Integer> getScTradeGoods() {
-        return scTradeGoods;
+        return strategyCardManager.getTradeGoods();
     }
 
     public void setScTradeGoods(Map<Integer, Integer> scTradeGoods) {
-        this.scTradeGoods = scTradeGoods;
+        strategyCardManager.setTradeGoods(scTradeGoods);
     }
 
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
-        if (Objects.isNull(tradeGoodCount))
-            tradeGoodCount = 0;
-        if (tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(this)) {
-            Player player = getPlayerFromColorOrFaction(getStoredValue("kyroHeroPlayer"));
-            if (player != null) {
-                player.setTg(player.getTg() + tradeGoodCount);
-                ButtonHelperAbilities.pillageCheck(player, this);
-                ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
-                tradeGoodCount = 0;
-                MessageHelper.sendMessageToChannel(getActionsChannel(), "The " + tradeGoodCount + " trade good" + (tradeGoodCount == 1 ? "" : "s")
-                    + " that would be placed on **" + Helper.getSCName(sc, this) + "** have instead been given to the Kyro "
-                    + (isFrankenGame() ? "hero " : "") + "player, as per the text on Speygh, the Kyro Hero.");
-            }
-        }
-        scTradeGoods.put(sc, tradeGoodCount);
+        strategyCardManager.setTradeGood(sc, tradeGoodCount);
     }
 
     public void incrementScTradeGoods() {
-        Set<Integer> scPickedList = new HashSet<>();
-        for (Player player_ : getRealPlayers()) {
-            scPickedList.addAll(player_.getSCs());
-            if (!player_.getSCs().isEmpty()) {
-                StringBuilder scs = new StringBuilder();
-                for (int SC : player_.getSCs()) {
-                    scs.append(SC).append("_");
-                }
-                scs = new StringBuilder(scs.substring(0, scs.length() - 1));
-                setStoredValue("Round" + getRound() + "SCPickFor" + player_.getFaction(), scs.toString());
-            }
-        }
-
-        //ADD A TG TO UNPICKED SC
-        if (!islandMode()) {
-            for (Integer scNumber : scTradeGoods.keySet()) {
-                if (!scPickedList.contains(scNumber) && scNumber != 0) {
-                    Integer tgCount = scTradeGoods.get(scNumber);
-                    tgCount = tgCount == null ? 1 : tgCount + 1;
-                    setScTradeGood(scNumber, tgCount);
-                }
-            }
-        }
+        strategyCardManager.incrementTradeGoods();
     }
 
     public boolean addSC(Integer sc) {
-        if (!scTradeGoods.containsKey(sc)) {
-            setScTradeGood(sc, 0);
-            return true;
-        }
-        return false;
+        return strategyCardManager.addSC(sc);
     }
 
     public boolean removeSC(Integer sc) {
-        if (scTradeGoods.containsKey(sc)) {
-            scTradeGoods.remove(sc);
-            return true;
-        } else
-            return false;
+        return strategyCardManager.removeSC(sc);
     }
 
     @JsonIgnore
     public List<Integer> getSCList() {
-        return (new ArrayList<>(getScTradeGoods().keySet()));
+        return strategyCardManager.getSCList();
     }
 
     public Map<String, Integer> getRevealedPublicObjectives() {
