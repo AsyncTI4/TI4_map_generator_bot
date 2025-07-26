@@ -38,6 +38,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.service.tigl.TiglGameReport;
+import ti4.service.tigl.TiglUsernameChangeRequest;
 import ti4.settings.GlobalSettings;
 
 public class WebHelper {
@@ -384,6 +385,53 @@ public class WebHelper {
             BotLogger.error("An IOException occurred while sending a TIGL game report.", e);
             MessageHelper.sendMessageToChannel(channel,
                 TIGL_REPORT_FAILURE_MESSAGE);
+        }
+    }
+
+    public static void sendTiglUsernameChange(TiglUsernameChangeRequest request, MessageChannel channel) {
+        try {
+            String url = webProperties.getProperty("tigl.change-username.api.url");
+            if (url == null) {
+                BotLogger.error("TIGL change username URL not set. Property: tigl.change-username.api.url");
+            }
+            String json = objectMapper.writeValueAsString(request);
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+            httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> {
+                    if (response == null) return;
+                    if (response.statusCode() == 200) {
+                        MessageHelper.sendMessageToChannel(channel, "TIGL nickname successfully updated.");
+                    } else if (response.statusCode() >= 400) {
+                        String body = response.body();
+                        try {
+                            JsonNode node = objectMapper.readTree(body);
+                            String title = node.path("problemDetails").path("title").asText();
+                            String detail = node.path("problemDetails").path("detail").asText();
+                            if (title.isEmpty()) {
+                                title = node.path("data").path("errorTitle").asText();
+                                detail = node.path("data").path("errorMessage").asText();
+                            }
+                            MessageHelper.sendMessageToChannel(channel,
+                                String.format("Failed to change TIGL nickname: %s - %s", title, detail));
+                        } catch (Exception ex) {
+                            BotLogger.error("Failed to parse TIGL response: " + body, ex);
+                            MessageHelper.sendMessageToChannel(channel, "Failed to change TIGL nickname.");
+                        }
+                    }
+                })
+                .exceptionally(e -> {
+                    BotLogger.error(String.format("An exception occurred while sending a TIGL username change to %s: %s", url, json), e);
+                    MessageHelper.sendMessageToChannel(channel, "Failed to change TIGL nickname.");
+                    return null;
+                });
+        } catch (IOException e) {
+            BotLogger.error("An IOException occurred while sending a TIGL username change.", e);
+            MessageHelper.sendMessageToChannel(channel, "Failed to change TIGL nickname.");
         }
     }
 

@@ -59,6 +59,7 @@ import ti4.commands.units.RemoveAllUnits;
 import ti4.commands.units.RemoveUnitDamage;
 import ti4.commands.units.RemoveUnits;
 import ti4.commands.user.UserCommand;
+import ti4.commands.tigl.TiglCommand;
 
 public class CommandManager {
 
@@ -119,6 +120,7 @@ public class CommandManager {
         new PlanetCommand(),
         new SelectionBoxDemoCommand(),
         new UserCommand(),
+        new TiglCommand(),
         new AsyncCommand(),
         new OmegaPhaseCommand()).collect(Collectors.toMap(ParentCommand::getName, command -> command));
 
