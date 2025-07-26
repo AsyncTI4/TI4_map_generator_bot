@@ -1,11 +1,14 @@
 package ti4.controller;
 
+import java.util.ArrayList;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ti4.controller.model.GetPlayerActionCards;
 import ti4.controller.validator.GameNameValidator;
 import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
@@ -23,12 +26,19 @@ public class ActionCardController {
         return ResponseEntity.ok("Shuffled the action card deck.");
     }
 
-    @GetMapping("/game/{gameName}/{player}")
-    public ResponseEntity<String> getPlayerHand(@PathVariable String gameName, @PathVariable String player) {
+    @GetMapping("/game/{gameName}/{userId}")
+    public GetPlayerActionCards getHand(@PathVariable String gameName, @PathVariable String userId) {
         GameNameValidator.validate(gameName);
         var game = GameManager.getManagedGame(gameName).getGame();
-        game.shuffleActionCards();
-        MessageHelper.sendMessageToChannel(game.getActionsChannel(), "Shuffled the action card deck.");
-        return ResponseEntity.ok("Shuffled the action card deck.");
+        var player = game.getPlayer(userId);
+
+        var actionCards = new ArrayList<String>();
+        player.getActionCards().forEach((key, value) -> {
+            for (int i = 0; i < value; i++) {
+                actionCards.add(key);
+            }
+        });
+
+        return new GetPlayerActionCards(actionCards);
     }
 }
