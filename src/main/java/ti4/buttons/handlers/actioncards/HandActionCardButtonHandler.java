@@ -24,10 +24,9 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.button.ReactionService;
-import ti4.service.turn.StartTurnService;
-import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.turn.StartTurnService;
 
 @UtilityClass
 class HandActionCardButtonHandler {
@@ -54,6 +53,7 @@ class HandActionCardButtonHandler {
         }
     }
 
+    @ButtonHandler(value = "ac_discard_from_hand_")
     static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player,
         MessageChannel actionsChannel) {
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");
@@ -75,70 +75,71 @@ class HandActionCardButtonHandler {
 
         MessageChannel channel = game.getMainGameChannel() != null ? game.getMainGameChannel() : actionsChannel;
 
-        if (channel != null) {
-            try {
-                String acID = null;
-                for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-                    if (so.getValue().equals(Integer.parseInt(acIndex))) {
-                        acID = so.getKey();
-                    }
-                }
-
-                boolean removed = game.discardActionCard(player.getUserID(), Integer.parseInt(acIndex));
-                if (!removed) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(),
-                        "No such Action Card ID found, please retry");
-                    return;
-                }
-                String sb = player.getRepresentation() + " discarded the action card _"
-                    + Mapper.getActionCard(acID).getName() + "_.\n" +
-                    Mapper.getActionCard(acID).getRepresentation();
-                MessageChannel channel2 = game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel();
-                MessageHelper.sendMessageToChannel(channel2, sb);
-                ActionCardHelper.sendActionCardInfo(game, player);
-                String message = "Use buttons to end turn or do another action.";
-                if (stalling) {
-                    if (player.hasUnit("yssaril_mech") && !ButtonHelper.isLawInPlay(game, "articles_war")
-                        && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
-                        String message3 = "Use buttons to drop 1 mech on a planet or decline";
-                        List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game,
-                            "mech", "placeOneNDone_skipbuild"));
-                        buttons.add(Buttons.red("deleteButtons", "Decline to Drop Mech"));
-                        MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
-                    }
-                    List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
-                    MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
-                }
-                if (drawReplacement) {
-                    ActionCardHelper.drawActionCards(game, player, 1, true);
-                }
-                ButtonHelper.checkACLimit(game, player);
-                if (!retainButtons) {
-                    ButtonHelper.deleteMessage(event);
-                } else {
-                    ButtonHelper.deleteTheOneButton(event, buttonID, false);
-                }
-                if (player.hasUnexhaustedLeader("cymiaeagent")) {
-                    List<Button> buttons2 = new ArrayList<>();
-                    Button hacanButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(),
-                        "Use Cymiae Agent", FactionEmojis.cymiae);
-                    buttons2.add(hacanButton);
-                    MessageHelper.sendMessageToChannelWithButtons(
-                        player.getCorrectChannel(),
-                        player.getRepresentationUnfogged()
-                            + " you may use "
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                            + "Skhot Unit X-12, the Cymiae"
-                            + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
-                            + " agent, to make yourself draw 1 action card.",
-                        buttons2);
-                }
-                ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
-            } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Something went wrong discarding", e);
-            }
-        } else {
+        if (channel == null) {
             event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
+            return;
+        }
+        
+        try {
+            String acID = null;
+            for (Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+                if (so.getValue().equals(Integer.parseInt(acIndex))) {
+                    acID = so.getKey();
+                }
+            }
+
+            boolean removed = game.discardActionCard(player.getUserID(), Integer.parseInt(acIndex));
+            if (!removed) {
+                MessageHelper.sendMessageToChannel(event.getChannel(),
+                    "No such Action Card ID found, please retry");
+                return;
+            }
+            String sb = player.getRepresentation() + " discarded the action card _"
+                + Mapper.getActionCard(acID).getName() + "_.\n" +
+                Mapper.getActionCard(acID).getRepresentation();
+            MessageChannel channel2 = game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel();
+            MessageHelper.sendMessageToChannel(channel2, sb);
+            ActionCardHelper.sendActionCardInfo(game, player);
+            String message = "Use buttons to end turn or do another action.";
+            if (stalling) {
+                if (player.hasUnit("yssaril_mech") && !ButtonHelper.isLawInPlay(game, "articles_war")
+                    && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech", true) < 4) {
+                    String message3 = "Use buttons to drop 1 mech on a planet or decline";
+                    List<Button> buttons = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game,
+                        "mech", "placeOneNDone_skipbuild"));
+                    buttons.add(Buttons.red("deleteButtons", "Decline to Drop Mech"));
+                    MessageHelper.sendMessageToChannelWithButtons(channel2, message3, buttons);
+                }
+                List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+            }
+            if (drawReplacement) {
+                ActionCardHelper.drawActionCards(game, player, 1, true);
+            }
+            ButtonHelper.checkACLimit(game, player);
+            if (!retainButtons) {
+                ButtonHelper.deleteMessage(event);
+            } else {
+                ButtonHelper.deleteTheOneButton(event, buttonID, false);
+            }
+            if (player.hasUnexhaustedLeader("cymiaeagent")) {
+                List<Button> buttons2 = new ArrayList<>();
+                Button hacanButton = Buttons.gray("exhaustAgent_cymiaeagent_" + player.getFaction(),
+                    "Use Cymiae Agent", FactionEmojis.cymiae);
+                buttons2.add(hacanButton);
+                MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentationUnfogged()
+                        + " you may use "
+                        + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        + "Skhot Unit X-12, the Cymiae"
+                        + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
+                        + " agent, to make yourself draw 1 action card.",
+                    buttons2);
+            }
+            ActionCardHelper.serveReverseEngineerButtons(game, player, List.of(acID));
+        } catch (Exception e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Something went wrong discarding", e);
         }
     }
 
