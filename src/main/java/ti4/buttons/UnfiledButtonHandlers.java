@@ -924,9 +924,10 @@ public class UnfiledButtonHandlers {
         String sc = buttonID.replace("increaseTGonSC_", "");
         int scNum = Integer.parseInt(sc);
         int newTradeGoodCount = game.addTradeGoodsToStrategyCard(scNum, 1);
+        boolean useSingular = newTradeGoodCount == 1;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There " + (newTradeGoodCount == 0 ? "is" : "are")
-                + " now " + newTradeGoodCount + " trade good" + (newTradeGoodCount == 0 ? "" : "s") + " on it.");
+            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There " + (useSingular ? "is" : "are")
+                + " now " + newTradeGoodCount + " trade good" + (useSingular ? "" : "s") + " on it.");
     }
 
     @ButtonHandler("autoAssignAFBHits_")
