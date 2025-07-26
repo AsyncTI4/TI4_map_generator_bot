@@ -17,7 +17,7 @@ import ti4.service.fow.GMService;
 public class FOWOptionService {
 
     public enum FOWOptionCategory { 
-        GAME, PLAYER, MAP;
+        GAME, VISIBILITY, OTHER;
 
         static FOWOptionCategory fromString(String string) {
             for (FOWOptionCategory category : FOWOptionCategory.values()) {
@@ -30,18 +30,22 @@ public class FOWOptionService {
     }
 
     public enum FOWOption {
-        //Game Options
+        //Comm Options (max 5)
         MANAGED_COMMS(FOWOptionCategory.GAME, "Managed comms", "Use managed player-to-player communication threads"),
         ALLOW_AGENDA_COMMS(FOWOptionCategory.GAME, "Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
+        STATUS_SUMMARY(FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
-        STATUS_SUMMARY(FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
+        
+        //Visibility Options (max 5)
+        BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),
+        HIDE_EXPLORES(FOWOptionCategory.VISIBILITY, "Hide Explore Decks", "Disables looking at explore and relic decks"),
+        HIDE_MAP(FOWOptionCategory.VISIBILITY, "Hide Unexplored Map", "Hides unexplored (blue 0b) map tiles."),
+        STATS_FROM_HS_ONLY(FOWOptionCategory.VISIBILITY, "Stats from HS", "Only way to see players stats is to see their Home System"),
 
-        //Player Options
-        HIDE_PLAYER_NAMES(FOWOptionCategory.PLAYER, "Hide real names", "Completely hide player Discord names on the map"),
-
-        //Map Options
-        FOW_PLUS(FOWOptionCategory.MAP, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details"),
+        //Other Options (max 5)
+        HIDE_PLAYER_NAMES(FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
+        FOW_PLUS(FOWOptionCategory.OTHER, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details"),
 
         //Hidden from normal options
         RIFTSET_MODE(null, "RiftSet Mode", "For Eronous to run fow300", false);
@@ -145,6 +149,14 @@ public class FOWOptionService {
         boolean newValue = Boolean.parseBoolean(value);
         if (FOWOption.FOW_PLUS.equals(fowOption)) {
             FOWPlusService.toggleTag(game, newValue);
+            if (newValue) {
+                game.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, false);
+                game.setFowOption(FOWOption.HIDE_TOTAL_VOTES, true);
+                game.setFowOption(FOWOption.HIDE_VOTE_ORDER, true);
+                game.setFowOption(FOWOption.STATS_FROM_HS_ONLY, true);
+                game.setFowOption(FOWOption.HIDE_EXPLORES, true);
+                game.setFowOption(FOWOption.HIDE_MAP, true);
+            }
         }
 
         game.setFowOption(fowOption, newValue);
