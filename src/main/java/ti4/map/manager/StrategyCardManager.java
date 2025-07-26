@@ -51,6 +51,10 @@ public class StrategyCardManager {
         strategyCardToTradeGoodCount.put(strategyCard, tradeGoodCount);
     }
 
+    public void incrementTradeGoods(int strategyCard, int tradeGoodCount) {
+        strategyCardToTradeGoodCount.put(strategyCard, strategyCardToTradeGoodCount.get(strategyCard) + tradeGoodCount);
+    }
+
     public void incrementTradeGoods() {
         Set<Integer> pickedStrategyCards = new HashSet<>();
         for (Player player_ : game.getRealPlayers()) {
