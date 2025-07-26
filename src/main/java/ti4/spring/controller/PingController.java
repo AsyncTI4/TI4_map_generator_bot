@@ -1,4 +1,4 @@
-package ti4.controller;
+package ti4.spring.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

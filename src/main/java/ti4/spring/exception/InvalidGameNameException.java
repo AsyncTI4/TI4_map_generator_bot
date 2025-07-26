@@ -1,4 +1,4 @@
-package ti4.controller.exception;
+package ti4.spring.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

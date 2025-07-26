@@ -1,8 +1,10 @@
-package ti4.controller.validator;
+package ti4.spring.validator;
 
-import ti4.controller.exception.InvalidGameNameException;
+import lombok.experimental.UtilityClass;
 import ti4.map.persistence.GameManager;
+import ti4.spring.exception.InvalidGameNameException;
 
+@UtilityClass
 public class GameNameValidator {
 
     public static void validate(String gameName) {

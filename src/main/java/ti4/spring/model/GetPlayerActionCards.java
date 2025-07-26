@@ -1,4 +1,4 @@
-package ti4.controller.model;
+package ti4.spring.model;
 
 import java.util.List;
 
