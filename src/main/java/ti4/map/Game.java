@@ -4484,4 +4484,8 @@ public class Game extends GameProperties {
         }
         return peekedSecrets;
     }
+
+    public int addTradeGoodsToStrategyCard(int strategyCard, int tradeGoodCount) {
+        return strategyCardManager.addTradeGoods(strategyCard, tradeGoodCount);
+    }
 }

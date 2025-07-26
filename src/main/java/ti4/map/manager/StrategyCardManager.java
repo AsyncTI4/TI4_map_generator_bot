@@ -51,8 +51,11 @@ public class StrategyCardManager {
         strategyCardToTradeGoodCount.put(strategyCard, tradeGoodCount);
     }
 
-    public void incrementTradeGoods(int strategyCard, int tradeGoodCount) {
-        strategyCardToTradeGoodCount.put(strategyCard, strategyCardToTradeGoodCount.get(strategyCard) + tradeGoodCount);
+    public int addTradeGoods(int strategyCard, int tradeGoodCount) {
+        int oldCount = strategyCardToTradeGoodCount.get(strategyCard);
+        int newCount = oldCount + tradeGoodCount;
+        strategyCardToTradeGoodCount.put(strategyCard, newCount);
+        return newCount;
     }
 
     public void incrementTradeGoods() {
