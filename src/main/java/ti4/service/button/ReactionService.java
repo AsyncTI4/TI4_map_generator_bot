@@ -20,6 +20,8 @@ import ti4.message.GameMessageManager;
 import ti4.message.GameMessageType;
 import ti4.message.MessageHelper;
 import ti4.service.fow.GMService;
+import ti4.listeners.annotations.ButtonHandler;
+import ti4.helpers.Constants;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -191,5 +193,15 @@ public class ReactionService {
         return  GameMessageManager.getOne(game.getName(), messageId)
             .filter(message -> checkForSpecificPlayerReact(player, message))
             .isPresent();
+    }
+
+    @ButtonHandler(Constants.GENERIC_BUTTON_ID_PREFIX)
+    public static void genericButton(ButtonInteractionEvent event, Game game, Player player) {
+        addReaction(event, game, player);
+    }
+
+    @ButtonHandler("pass_on_abilities")
+    public static void passOnAbilities(ButtonInteractionEvent event, Game game, Player player) {
+        addReaction(event, game, player, " is " + event.getButton().getLabel().toLowerCase() + ".");
     }
 }

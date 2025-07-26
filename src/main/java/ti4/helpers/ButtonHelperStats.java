@@ -26,6 +26,18 @@ public class ButtonHelperStats {
         });
     }
 
+    @ButtonHandler("convert_1_comms")
+    @ButtonHandler("convert_2_comms")
+    @ButtonHandler("convert_3_comms")
+    @ButtonHandler("convert_4_comms")
+    @ButtonHandler("convert_2_comms_stay")
+    public static void convertCommsLegacy(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.split("_");
+        int amt = Integer.parseInt(parts[1]);
+        boolean deleteMsg = !buttonID.endsWith("_stay");
+        convertComms(event, game, player, amt, deleteMsg);
+    }
+
     static final Pattern gainCommsRegex = Pattern.compile("gainComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
 
     @ButtonHandler("gainComms_") // gainComms_12(_stay)
@@ -35,6 +47,21 @@ public class ButtonHelperStats {
             int amt = Integer.parseInt(matcher.group("amt"));
             gainComms(event, game, player, amt, deleteMsg);
         });
+    }
+
+    @ButtonHandler("gain_1_comms")
+    @ButtonHandler("gain_2_comms")
+    @ButtonHandler("gain_3_comms")
+    @ButtonHandler("gain_4_comms")
+    @ButtonHandler("gain_1_comms_stay")
+    @ButtonHandler("gain_2_comms_stay")
+    @ButtonHandler("gain_3_comms_stay")
+    @ButtonHandler("gain_4_comms_stay")
+    public static void gainCommsLegacy(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
+        String[] parts = buttonID.split("_");
+        int amt = Integer.parseInt(parts[1]);
+        boolean deleteMsg = !buttonID.endsWith("_stay");
+        gainComms(event, game, player, amt, deleteMsg);
     }
 
     public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt) {
@@ -106,6 +133,11 @@ public class ButtonHelperStats {
         afterGainCommsChecks(game, player, finalComm - initComm);
         ButtonHelper.resolveMinisterOfCommerceCheck(game, player, event);
         ButtonHelperAgents.cabalAgentInitiation(game, player);
+    }
+
+    @ButtonHandler("resolveHarness")
+    public static void resolveHarness(ButtonInteractionEvent event, Game game, Player player) {
+        replenishComms(event, game, player, false);
     }
 
     public static void gainTGs(GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean skipOutput) {

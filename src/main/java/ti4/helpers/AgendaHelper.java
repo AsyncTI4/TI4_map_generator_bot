@@ -4089,6 +4089,7 @@ public class AgendaHelper {
         ReactionService.addReaction(event, game, player, message);
     }
 
+    @ButtonHandler("play_when")
     public static void playWhen(ButtonInteractionEvent event, Game game, Player player, MessageChannel mainGameChannel) {
         UnfiledButtonHandlers.clearAllReactions(event);
         ReactionService.addReaction(event, game, player, true, true, "is playing a \"when\".");

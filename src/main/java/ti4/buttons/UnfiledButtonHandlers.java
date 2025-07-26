@@ -899,7 +899,7 @@ public class UnfiledButtonHandlers {
         }
     }
 
-    // @ButtonHandler("strategicAction_")
+    @ButtonHandler("strategicAction_")
     public static void strategicAction(
         ButtonInteractionEvent event, Player player, String buttonID, Game game,
         MessageChannel mainGameChannel
@@ -1023,6 +1023,12 @@ public class UnfiledButtonHandlers {
                 Integer.parseInt(buttonID.split("_")[2]), event, false));
     }
 
+    @ButtonHandler("autoAssignGroundHits_")
+    public static void autoAssignGroundHits(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+        ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, game, buttonID.split("_")[1],
+            Integer.parseInt(buttonID.split("_")[2]), event);
+    }
+
     @ButtonHandler("explore_look_All")
     public static void exploreLookAll(ButtonInteractionEvent event, Player player, Game game) {
         List<String> order = List.of("cultural", "industrial", "hazardous");
@@ -1063,6 +1069,7 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("movedNExplored_")
     public static void movedNExplored(
         ButtonInteractionEvent event, Player player, String buttonID, Game game
     ) {
@@ -1244,6 +1251,7 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler(Constants.PO_SCORING)
     public static void poScoring(
         ButtonInteractionEvent event, Player player, String buttonID, Game game,
         MessageChannel privateChannel
@@ -1411,6 +1419,7 @@ public class UnfiledButtonHandlers {
     }
 
 
+    @ButtonHandler(Constants.SO_SCORE_FROM_HAND)
     public static void soScoreFromHand(
         ButtonInteractionEvent event,
         String buttonID,
@@ -2365,6 +2374,78 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "", buttons);
     }
 
+    @ButtonHandler("checkWHView")
+    public static void checkWHView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.wormholes);
+    }
+
+    @ButtonHandler("checkAnomView")
+    public static void checkAnomView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.anomalies);
+    }
+
+    @ButtonHandler("checkLegendView")
+    public static void checkLegendView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.legendaries);
+    }
+
+    @ButtonHandler("checkEmptyView")
+    public static void checkEmptyView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.empties);
+    }
+
+    @ButtonHandler("checkAetherView")
+    public static void checkAetherView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.aetherstream);
+    }
+
+    @ButtonHandler("checkCannonView")
+    public static void checkCannonView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.spacecannon);
+    }
+
+    @ButtonHandler("checkTraitView")
+    public static void checkTraitView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.traits);
+    }
+
+    @ButtonHandler("checkTechSkipView")
+    public static void checkTechSkipView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.techskips);
+    }
+
+    @ButtonHandler("checkAttachmView")
+    public static void checkAttachmView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.attachments);
+    }
+
+    @ButtonHandler("checkShiplessView")
+    public static void checkShiplessView(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.shipless);
+    }
+
+    @ButtonHandler("checkUnlocked")
+    public static void checkUnlocked(ButtonInteractionEvent event, Game game) {
+        ButtonHelper.showFeatureType(event, game, DisplayType.unlocked);
+    }
+
+    @ButtonHandler("getSwapButtons_")
+    public static void getSwapButtons(ButtonInteractionEvent event, Player player, Game game) {
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Swap",
+            ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, game, true));
+    }
+
+    @ButtonHandler("refreshInfoButtons")
+    public static void refreshInfoButtons(ButtonInteractionEvent event) {
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), null, Buttons.REFRESH_INFO_BUTTONS);
+    }
+
+    @ButtonHandler("factionEmbedRefresh")
+    public static void factionEmbedRefresh(ButtonInteractionEvent event, Player player) {
+        MessageHelper.sendMessageToChannelWithEmbedsAndButtons(player.getCardsInfoThread(), null,
+            List.of(player.getRepresentationEmbed()), List.of(Buttons.FACTION_EMBED));
+    }
+
     @ButtonHandler("resetSpend_")
     public static void resetSpend_(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         Helper.refreshPlanetsOnTheRespend(player, game);
@@ -2448,6 +2529,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Reversed strategy card picking order.");
     }
 
+    @ButtonHandler("lastMinuteDeliberation")
     public static void lastMinuteDeliberation(
         ButtonInteractionEvent event, Player player, Game game,
         MessageChannel actionsChannel
@@ -2486,6 +2568,7 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("decline_explore")
     public static void declineExplore(
         ButtonInteractionEvent event, Player player, Game game,
         MessageChannel mainGameChannel
@@ -2530,6 +2613,7 @@ public class UnfiledButtonHandlers {
     }
 
     @Deprecated
+    @ButtonHandler("gain1tgFromCommander")
     public static void gain1tgFromCommander(
         ButtonInteractionEvent event, Player player, Game game,
         MessageChannel mainGameChannel
@@ -2542,6 +2626,7 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("gain1tgFromMuaatCommander")
     public static void gain1tgFromMuaatCommander(
         ButtonInteractionEvent event, Player player, Game game,
         MessageChannel mainGameChannel
@@ -2554,6 +2639,7 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("gain1tgFromLetnevCommander")
     public static void gain1tgFromLetnevCommander(
         ButtonInteractionEvent event, Player player, Game game,
         MessageChannel mainGameChannel
@@ -2566,6 +2652,7 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    @ButtonHandler("gain_1_tg")
     public static void gain1TG(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
         String message = "";
         String labelP = event.getButton().getLabel();

@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -67,6 +68,11 @@ public class SearchGameHelper {
         }
         return filteredManagedGames.size();
 
+    }
+
+    @ButtonHandler("searchMyGames")
+    public static void searchMyGames(ButtonInteractionEvent event) {
+        searchGames(event.getUser(), event, false, false, false, true, false, true, false, false);
     }
 
     public static ArrayList<Integer> getGameDaysLength(User user, GenericInteractionCreateEvent event, boolean onlyMyTurn, boolean includeEndedGames, boolean showAverageTurnTime, boolean showSecondaries, boolean showGameModes, boolean ignoreSpectate, boolean ignoreAborted, boolean wantNum) {
