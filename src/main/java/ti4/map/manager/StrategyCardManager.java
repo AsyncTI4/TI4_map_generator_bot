@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import ti4.helpers.ButtonHelper;
@@ -24,22 +23,19 @@ public class StrategyCardManager {
         this.game = game;
     }
 
-    public Map<Integer, Integer> getTradeGoods() {
+    public Map<Integer, Integer> getTradeGoodCounts() {
         return strategyCardToTradeGoodCount;
     }
 
-    public void setTradeGoods(Map<Integer, Integer> goods) {
-        strategyCardToTradeGoodCount.clear();
-        if (goods != null) {
-            strategyCardToTradeGoodCount.putAll(goods);
+    public void setTradeGoodCounts(Map<Integer, Integer> strategyCardToTradeGoodCount) {
+        this.strategyCardToTradeGoodCount.clear();
+        if (strategyCardToTradeGoodCount != null) {
+            this.strategyCardToTradeGoodCount.putAll(strategyCardToTradeGoodCount);
         }
     }
 
-    public void setTradeGood(Integer sc, Integer tradeGoodCount) {
-        if (Objects.isNull(tradeGoodCount)) {
-            tradeGoodCount = 0;
-        }
-        if (tradeGoodCount > 0 && sc == ButtonHelper.getKyroHeroSC(game)) {
+    public void setTradeGoodCount(int strategyCard, int tradeGoodCount) {
+        if (tradeGoodCount > 0 && strategyCard == ButtonHelper.getKyroHeroSC(game)) {
             Player player = game.getPlayerFromColorOrFaction(game.getStoredValue("kyroHeroPlayer"));
             if (player != null) {
                 player.setTg(player.getTg() + tradeGoodCount);
@@ -47,19 +43,18 @@ public class StrategyCardManager {
                 ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                    "The " + tradeGoodCount + " trade good" + (tradeGoodCount == 1 ? "" : "s")
-                        + " that would be placed on **" + Helper.getSCName(sc, game)
+                    "The trade goods  that would be placed on **" + Helper.getSCName(strategyCard, game)
                         + "** have instead been given to the Kyro "
                         + (game.isFrankenGame() ? "hero " : "") + "player, as per the text on Speygh, the Kyro Hero.");
             }
         }
-        strategyCardToTradeGoodCount.put(sc, tradeGoodCount);
+        strategyCardToTradeGoodCount.put(strategyCard, tradeGoodCount);
     }
 
     public void incrementTradeGoods() {
-        Set<Integer> scPickedList = new HashSet<>();
+        Set<Integer> pickedStrategyCards = new HashSet<>();
         for (Player player_ : game.getRealPlayers()) {
-            scPickedList.addAll(player_.getSCs());
+            pickedStrategyCards.addAll(player_.getSCs());
             if (!player_.getSCs().isEmpty()) {
                 StringBuilder scs = new StringBuilder();
                 for (int sc : player_.getSCs()) {
@@ -72,32 +67,32 @@ public class StrategyCardManager {
 
         if (!game.islandMode()) {
             for (Integer scNumber : strategyCardToTradeGoodCount.keySet()) {
-                if (!scPickedList.contains(scNumber) && scNumber != 0) {
+                if (!pickedStrategyCards.contains(scNumber) && scNumber != 0) {
                     Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
                     tgCount = tgCount == null ? 1 : tgCount + 1;
-                    setTradeGood(scNumber, tgCount);
+                    setTradeGoodCount(scNumber, tgCount);
                 }
             }
         }
     }
 
-    public boolean addSC(Integer sc) {
-        if (!strategyCardToTradeGoodCount.containsKey(sc)) {
-            setTradeGood(sc, 0);
+    public boolean add(int strategyCard) {
+        if (!strategyCardToTradeGoodCount.containsKey(strategyCard)) {
+            strategyCardToTradeGoodCount.put(strategyCard, 0);
             return true;
         }
         return false;
     }
 
-    public boolean removeSC(Integer sc) {
-        if (strategyCardToTradeGoodCount.containsKey(sc)) {
-            strategyCardToTradeGoodCount.remove(sc);
+    public boolean remove(int strategyCard) {
+        if (strategyCardToTradeGoodCount.containsKey(strategyCard)) {
+            strategyCardToTradeGoodCount.remove(strategyCard);
             return true;
         }
         return false;
     }
 
-    public List<Integer> getSCList() {
+    public List<Integer> list() {
         return new ArrayList<>(strategyCardToTradeGoodCount.keySet());
     }
 }

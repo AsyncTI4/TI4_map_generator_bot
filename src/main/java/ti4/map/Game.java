@@ -73,9 +73,9 @@ import ti4.json.ObjectMapperFactory;
 import ti4.map.manage.GameManager;
 import ti4.map.manager.BorderAnomalyManager;
 import ti4.map.manager.StrategyCardManager;
-import ti4.model.BorderAnomalyHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.ColorModel;
 import ti4.model.DeckModel;
@@ -1181,15 +1181,15 @@ public class Game extends GameProperties {
      * @return Map of (scInitiativeNum, tradeGoodCount)
      */
     public Map<Integer, Integer> getScTradeGoods() {
-        return strategyCardManager.getTradeGoods();
+        return strategyCardManager.getTradeGoodCounts();
     }
 
     public void setScTradeGoods(Map<Integer, Integer> strategyCardToTradeGoodCount) {
-        strategyCardManager.setTradeGoods(strategyCardToTradeGoodCount);
+        strategyCardManager.setTradeGoodCounts(strategyCardToTradeGoodCount);
     }
 
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
-        strategyCardManager.setTradeGood(sc, tradeGoodCount);
+        strategyCardManager.setTradeGoodCount(sc, tradeGoodCount);
     }
 
     public void incrementScTradeGoods() {
@@ -1197,16 +1197,16 @@ public class Game extends GameProperties {
     }
 
     public boolean addSC(Integer sc) {
-        return strategyCardManager.addSC(sc);
+        return strategyCardManager.add(sc);
     }
 
     public boolean removeSC(Integer sc) {
-        return strategyCardManager.removeSC(sc);
+        return strategyCardManager.remove(sc);
     }
 
     @JsonIgnore
     public List<Integer> getSCList() {
-        return strategyCardManager.getSCList();
+        return strategyCardManager.list();
     }
 
     public Map<String, Integer> getRevealedPublicObjectives() {
