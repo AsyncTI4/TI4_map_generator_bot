@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
+import ti4.buttons.handlers.actioncards.HandActionCardButtonHandler;
 import ti4.executors.ExecutorManager;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -114,7 +115,7 @@ public class ButtonProcessor {
         if (false) {
             // Don't add anymore if/else startWith statements - use @ButtonHandler
         } else if (buttonID.startsWith("ac_discard_from_hand_")) {
-            UnfiledButtonHandlers.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
+            HandActionCardButtonHandler.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             UnfiledButtonHandlers.soScoreFromHand(event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
