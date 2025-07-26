@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 
 @UtilityClass
 public class GameNameService {

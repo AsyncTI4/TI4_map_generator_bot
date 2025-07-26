@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 import ti4.json.PersistenceManager;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.BotLogger;
 
 public class ReserveGameNumberService {

@@ -1,4 +1,4 @@
-package ti4.map.manage;
+package ti4.map.persistence;
 
 import javax.annotation.Nullable;
 import java.io.File;

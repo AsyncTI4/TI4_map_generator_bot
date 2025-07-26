@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.ManagedGame;
 
 @UtilityClass
 public class ManagedGameService {

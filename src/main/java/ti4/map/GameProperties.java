@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
+import ti4.map.pojo.ExportableField;
 
 @Getter
 @Setter

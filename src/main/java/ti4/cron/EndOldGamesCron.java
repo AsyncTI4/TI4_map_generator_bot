@@ -7,8 +7,8 @@ import java.time.ZoneId;
 
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.BotLogger;
 
 import static java.util.function.Predicate.not;

@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.service.event.EventAuditService;
 import ti4.service.game.GameNameService;
 

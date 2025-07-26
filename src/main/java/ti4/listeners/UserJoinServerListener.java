@@ -1,10 +1,9 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -19,8 +18,8 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 

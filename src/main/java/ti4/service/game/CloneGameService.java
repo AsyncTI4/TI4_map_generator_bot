@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 
 @UtilityClass
 public class CloneGameService {

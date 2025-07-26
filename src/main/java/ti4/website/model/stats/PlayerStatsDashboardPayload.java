@@ -1,4 +1,4 @@
-package ti4.map;
+package ti4.website.model.stats;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,10 +13,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
-import ti4.image.Mapper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.image.Mapper;
+import ti4.map.Game;
+import ti4.map.Planet;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.AgendaModel;
 import ti4.model.RelicModel;

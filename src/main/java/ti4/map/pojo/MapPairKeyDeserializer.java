@@ -1,4 +1,4 @@
-package ti4.map;
+package ti4.map.pojo;
 
 import java.util.StringTokenizer;
 

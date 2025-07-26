@@ -13,8 +13,8 @@ import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
