@@ -1147,7 +1147,7 @@ public class UnfiledButtonHandlers {
                         missingPeople.append(player.getRepresentation(false, true));
                     }
                 }
-                if (missingPeople.length() > 0) {
+                if (!missingPeople.isEmpty()) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), missingPeople
                         + " need to indicate if they are scoring a secret objective before the next public objective can be flipped.");
                     return;
@@ -1692,17 +1692,17 @@ public class UnfiledButtonHandlers {
                         }
                         if (player.hasTech("hm")) {
                             properGain += 1;
-                            reasons += (properGain == 1 ? "" : ", ") + "_Hyper Metabolism_";
+                            reasons += ", _Hyper Metabolism_";
                         }
                         if (cyber) {
                             properGain += 1;
-                            reasons += (properGain == 1 ? "" : ", ") + "_Cybernetic Enhancements_";
+                            reasons += ", _Cybernetic Enhancements_";
                         }
                         if (netGain < properGain && netGain != 1) {
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()
                                     + " heads up, bot thinks you should have gained " + properGain
-                                    + " command token" + (properGain == 1 ? "" : "s") + " due to " + reasons + ".");
+                                    + " command tokens due to " + reasons + ".");
                         }
                     }
                     if (game.isFowMode()) {
@@ -3114,8 +3114,7 @@ public class UnfiledButtonHandlers {
                 if (properGain > 2) {
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                         "Heads up " + player.getRepresentationUnfogged()
-                            + ", the bot thinks you should gain " + properGain + " command token"
-                            + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
+                            + ", the bot thinks you should gain " + properGain + " command tokens now due to: " + reasons + ".");
                 }
             }
             if (game.isCcNPlasticLimit()) {
