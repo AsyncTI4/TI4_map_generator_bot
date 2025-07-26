@@ -2660,6 +2660,27 @@ public class ButtonHelper {
         });
     }
 
+    public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
+        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+            boolean containsRealButton = false;
+            List<Button> buttons = new ArrayList<>(bevent.getMessage().getButtons());
+            List<Button> newButtons = new ArrayList<>();
+            for (Button button : buttons) {
+                if (!button.getId().contains(partialID)) {
+                    if (!button.getId().contains("deleteButtons") && !button.getId().contains("ultimateUndo")) {
+                        containsRealButton = true;
+                    }
+                    newButtons.add(button);
+                }
+            }
+            if (containsRealButton) {
+                MessageHelper.editMessageButtons(bevent, newButtons);
+            } else {
+                ButtonHelper.deleteMessage(bevent);
+            }
+        }
+    }
+
     public static void deleteTheOneButton(ButtonInteractionEvent event, String buttonID, boolean deleteMsg) {
         if (event == null) return;
 
@@ -5924,7 +5945,19 @@ public class ButtonHelper {
                 String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
                     ? nextPlayer.getRepresentationUnfogged()
                     : nextPlayer.getRepresentationNoPing();
-                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours.";
+                int numUnpassed = -2;
+                for (Player p2 : game.getPlayers().values()) {
+                    numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                }
+                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
+                if (numUnpassed == 0)
+                {
+                    msgExtra += "No other players are unpassed.";
+                }
+                else
+                {
+                    msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                }
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
             StartTurnService.reviveInfantryII(player);
