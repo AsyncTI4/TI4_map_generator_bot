@@ -15,14 +15,13 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.CombatMessageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -146,7 +145,7 @@ public class FOWCombatThreadMirroring {
             if (pChan != null) {
                 boolean combatParticipant = combatParticipants.contains(playerOther);
                 String newMessage = (combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "")
-                    + StringUtils.substringBefore(message, "\n");
+                    + message;
 
                 List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                 for (ThreadChannel threadChannel_ : threadChannels) {

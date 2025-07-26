@@ -1,14 +1,14 @@
-package ti4.map;
-
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+package ti4.website.model.stats;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.Test;
+import ti4.map.Game;
 import ti4.testUtils.BaseTi4Test;
 
-class GameStatisticsDashboardPayloadTest extends BaseTi4Test {
+import static org.assertj.core.api.Assertions.assertThat;
+
+class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
     @Test
     void getSetupTime() {

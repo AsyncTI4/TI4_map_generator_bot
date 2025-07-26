@@ -1,7 +1,5 @@
 package ti4.buttons;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,10 +10,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Message;
@@ -29,6 +23,9 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.helpers.ActionCardHelper;
@@ -103,6 +100,8 @@ import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * TODO: move all of these methods to a better location, closer to the original button call and/or other related code
@@ -914,13 +913,11 @@ public class UnfiledButtonHandlers {
     public static void increaseTGonSC(ButtonInteractionEvent event, String buttonID, Game game) {
         String sc = buttonID.replace("increaseTGonSC_", "");
         int scNum = Integer.parseInt(sc);
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
-        int tgCount = scTradeGoods.get(scNum);
-        game.setScTradeGood(scNum, (tgCount + 1));
+        int newTradeGoodCount = game.addTradeGoodsToStrategyCard(scNum, 1);
+        boolean useSingular = newTradeGoodCount == 1;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There " + (tgCount == 0 ? "is" : "are")
-                + " now "
-                + (tgCount + 1) + " trade good" + (tgCount == 0 ? "" : "s") + " on it.");
+            "Added 1 trade good to " + Helper.getSCName(scNum, game) + ". There " + (useSingular ? "is" : "are")
+                + " now " + newTradeGoodCount + " trade good" + (useSingular ? "" : "s") + " on it.");
     }
 
     @ButtonHandler("autoAssignAFBHits_")
@@ -1140,7 +1137,7 @@ public class UnfiledButtonHandlers {
                         missingPeople.append(player.getRepresentation(false, true));
                     }
                 }
-                if (missingPeople.length() > 0) {
+                if (!missingPeople.isEmpty()) {
                     MessageHelper.sendMessageToChannel(game.getActionsChannel(), missingPeople
                         + " need to indicate if they are scoring a secret objective before the next public objective can be flipped.");
                     return;
@@ -1531,17 +1528,17 @@ public class UnfiledButtonHandlers {
                         }
                         if (player.hasTech("hm")) {
                             properGain += 1;
-                            reasons += (properGain == 1 ? "" : ", ") + "_Hyper Metabolism_";
+                            reasons += ", _Hyper Metabolism_";
                         }
                         if (cyber) {
                             properGain += 1;
-                            reasons += (properGain == 1 ? "" : ", ") + "_Cybernetic Enhancements_";
+                            reasons += ", _Cybernetic Enhancements_";
                         }
                         if (netGain < properGain && netGain != 1) {
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                                 player.getRepresentationUnfogged()
                                     + " heads up, bot thinks you should have gained " + properGain
-                                    + " command token" + (properGain == 1 ? "" : "s") + " due to " + reasons + ".");
+                                    + " command tokens due to " + reasons + ".");
                         }
                     }
                     if (game.isFowMode()) {
@@ -2865,8 +2862,7 @@ public class UnfiledButtonHandlers {
                 if (properGain > 2) {
                     MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                         "Heads up " + player.getRepresentationUnfogged()
-                            + ", the bot thinks you should gain " + properGain + " command token"
-                            + (properGain == 1 ? "" : "s") + " now due to: " + reasons + ".");
+                            + ", the bot thinks you should gain " + properGain + " command tokens now due to: " + reasons + ".");
                 }
             }
             if (game.isCcNPlasticLimit()) {

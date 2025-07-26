@@ -1,4 +1,4 @@
-package ti4.map;
+package ti4.map.persistence;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import lombok.Getter;
-import ti4.map.manage.GameManager;
+import ti4.map.Game;
 
 public class GamesPage {
 

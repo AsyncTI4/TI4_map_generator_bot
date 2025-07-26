@@ -1,10 +1,11 @@
-package ti4.map;
+package ti4.service.map;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
 import ti4.helpers.AliasHandler;
+import ti4.map.Game;
 import ti4.message.BotLogger;
 
 public class MapStringMapper {
