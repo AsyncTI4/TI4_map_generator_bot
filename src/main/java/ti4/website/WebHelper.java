@@ -148,7 +148,7 @@ public class WebHelper {
     }
 
     public static void putPlayerData(String gameId, Game game) {
-//        if (!sendingToWeb())  return;
+        if (!sendingToWeb())  return;
 
         try {
             List<WebPlayerArea> playerDataList = new ArrayList<>();
@@ -196,15 +196,12 @@ public class WebHelper {
             webData.put("gameCustomName", game.getCustomName());
 
             String json = objectMapper.writeValueAsString(webData);
-
-            System.out.println(json);
-            
-//            putObjectToAllBuckets(
-//                String.format("webdata/%s/%s.json", gameId, gameId),
-//                AsyncRequestBody.fromString(json),
-//                "application/json",
-//                "no-cache, no-store, must-revalidate"
-//            );
+            putObjectToAllBuckets(
+                String.format("webdata/%s/%s.json", gameId, gameId),
+                AsyncRequestBody.fromString(json),
+                "application/json",
+                "no-cache, no-store, must-revalidate"
+            );
         } catch (IOException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
