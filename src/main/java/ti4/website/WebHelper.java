@@ -196,7 +196,6 @@ public class WebHelper {
             webData.put("gameCustomName", game.getCustomName());
 
             String json = objectMapper.writeValueAsString(webData);
-            
             putObjectToAllBuckets(
                 String.format("webdata/%s/%s.json", gameId, gameId),
                 AsyncRequestBody.fromString(json),
