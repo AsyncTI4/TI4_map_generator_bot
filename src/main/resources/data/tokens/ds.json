@@ -18,7 +18,9 @@
         "id": "gledge_core",
         "imagePath": "token_ds_gledgecore.png",
         "spaceOrPlanet": "planet",
-        "source": "ds"
+        "source": "ds",
+        "placement": "center",
+        "scale": 0.8
     },
     {
         "id": "blight",
