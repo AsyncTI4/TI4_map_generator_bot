@@ -37,8 +37,13 @@ public class ButtonProcessor {
         BotLogger.logButton(event);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("ButtonProcessor task " + event.getButton().getLabel() + " for " + gameName,
-            gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorManager.runAsync(eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+    }
+
+    private static String eventToString(ButtonInteractionEvent event, String gameName) {
+        return "ButtonProcessor task for `" + event.getUser().getEffectiveName() + "`" +
+            (gameName == null ? "" : " in `" + gameName + "`") +
+            ": `" + ButtonHelper.getButtonRepresentation(event.getButton()) + "`";
     }
 
     private static void process(ButtonInteractionEvent event) {
@@ -108,16 +113,12 @@ public class ButtonProcessor {
         // TODO Convert all else..if..startsWith to use @ButtonHandler
         if (false) {
             // Don't add anymore if/else startWith statements - use @ButtonHandler
-        } else if (buttonID.startsWith("ac_discard_from_hand_")) {
-            UnfiledButtonHandlers.acDiscardFromHand(event, buttonID, game, player, mainGameChannel);
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             UnfiledButtonHandlers.soScoreFromHand(event, buttonID, game, player, privateChannel, mainGameChannel, mainGameChannel);
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
             UnfiledButtonHandlers.poScoring(event, player, buttonID, game, privateChannel);
         } else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             ReactionService.addReaction(event, game, player);
-        } else if (buttonID.startsWith("movedNExplored_")) {
-            UnfiledButtonHandlers.movedNExplored(event, player, buttonID, game);
         } else if (buttonID.startsWith("autoAssignGroundHits_")) {
             ButtonHelperModifyUnits.autoAssignGroundCombatHits(player, game, buttonID.split("_")[1], Integer.parseInt(buttonID.split("_")[2]), event);
         } else if (buttonID.startsWith("strategicAction_")) {
@@ -149,7 +150,6 @@ public class ButtonProcessor {
                 case "gain1tgFromLetnevCommander" -> UnfiledButtonHandlers.gain1tgFromLetnevCommander(event, player, game, mainGameChannel);
                 case "gain1tgFromMuaatCommander" -> UnfiledButtonHandlers.gain1tgFromMuaatCommander(event, player, game, mainGameChannel);
                 case "gain1tgFromCommander" -> UnfiledButtonHandlers.gain1tgFromCommander(event, player, game, mainGameChannel); // should be deprecated
-                case "decline_explore" -> UnfiledButtonHandlers.declineExplore(event, player, game, mainGameChannel);
                 case "resolveHarness" -> ButtonHelperStats.replenishComms(event, game, player, false);
                 case "pass_on_abilities" -> ReactionService.addReaction(event, game, player, " is " + event.getButton().getLabel().toLowerCase() + ".");
                 case "lastMinuteDeliberation" -> UnfiledButtonHandlers.lastMinuteDeliberation(event, player, game, actionsChannel);

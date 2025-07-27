@@ -11,12 +11,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.image.Mapper;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-
-import org.jetbrains.annotations.Nullable;
 
 public class Units {
 
@@ -100,9 +99,6 @@ public class Units {
         }
     }
 
-    /**
-     * UnitType - aka {@link UnitModel.getAsyncId()} - is a list of all the units in the game.
-     */
     public enum UnitType {
         Infantry("gf"), Mech("mf"), Pds("pd"), Spacedock("sd"), Monument("monument"), // ground based
         Fighter("ff"), Destroyer("dd"), Cruiser("ca"), Carrier("cv"), Dreadnought("dn"), Flagship("fs"), Warsun("ws"), //ships

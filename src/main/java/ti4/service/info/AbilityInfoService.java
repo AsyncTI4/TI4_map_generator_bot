@@ -18,13 +18,13 @@ import ti4.model.AbilityModel;
 public class AbilityInfoService {
 
     public static void sendAbilityInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendAbilityInfo(game, player);
     }
 
     public static void sendAbilityInfo(Game game, Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "_ _\n__**Abilities:**__", getAbilityMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Abilities:__", getAbilityMessageEmbeds(player));
     }
 
     private static List<MessageEmbed> getAbilityMessageEmbeds(Player player) {

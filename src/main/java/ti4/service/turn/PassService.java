@@ -20,12 +20,19 @@ import ti4.message.MessageHelper;
 public class PassService {
 
     public static void passPlayerForRound(GenericInteractionCreateEvent event, Game game, Player player, boolean autoPass) {
+        if (game.isFowMode() && !player.isActivePlayer() && !autoPass) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                "You are not the active player. If you need to, you can force pass with `/player stats passed:y`.");
+            return;
+        }
+
         player.setPassed(true);
         if (game.playerHasLeaderUnlockedOrAlliance(player, "olradincommander")) {
             ButtonHelperCommanders.olradinCommanderStep1(player, game);
         }
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " passed.");
 
-        String text = player.getRepresentation(true, false) + " has passed " + (autoPass ? " (preset)." : ".");
+        String text = player.getRepresentation(true, false) + " has passed" + (autoPass ? " (preset)." : ".");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), text);
         if (player.hasTech("absol_aida")) {
             String msg = player.getRepresentation() + " since you have _AI Development Algorithm_, you may research 1 unit upgrade now for 6 influence.";
@@ -52,13 +59,13 @@ public class PassService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
         }
         if (player.hasAbility("bestow")) {
-            String msg = player.getRepresentation() + ", since you have the Bestow Honor card,"
+            String msg = player.getRepresentation() + ", since you have the _Bestow_ Honor card,"
                 + " you can allow your neighbors to each gain 2 commodities with the below button. If you do, for each one that does you will gain 1 commodity.";
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("startBestow", "Allow Neighbors To Gain 2 Comms"));
+            buttons.add(Buttons.green("startBestow", "Allow Neighbors To Gain 2 Commodities"));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to resolve", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Use buttons to resolve.", buttons);
         }
         if (player.hasTech("dskolug")) {
             int oldComm = player.getCommodities();
@@ -78,7 +85,7 @@ public class PassService {
             }
         }
 
-        if (game.isOmegaPhaseMode()) {
+        if (game.hasAnyPriorityTrackMode()) {
             PriorityTrackHelper.AssignPlayerToPriority(game, player, null);
         }
 

@@ -107,7 +107,7 @@ public class ButtonHelperCommanders {
             String message = p2.getRepresentationUnfogged()
                 + " You've been hit by"
                 + (RandomHelper.isOneInX(1000) ? ", you've been struck by" : "")
-                + " S'ula Mentarion, the Mentak commander. Please select the promissory note you would most like to send and/or least like to keep.";
+                + " S'ula Mentarion, the Mentak commander. Please choose the promissory note you would most like to send and/or least like to keep.";
             MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Sent " + color + " the buttons for resolving S'ula Mentarion, the Mentak commander.");
@@ -121,22 +121,23 @@ public class ButtonHelperCommanders {
         String systemPos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(systemPos);
         // if (player.getTg() < 2) {
-        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required 2tgs");
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you don't have the required two trade goods");
         //     return;
         // }
         // if (player.getStrategicCC() < 1) {
-        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you dont have the required strategy CC");
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " you don't have the required strategy token");
         //     return;
         // }
         if (!CommandCounterHelper.hasCC(player, tile)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " the system does not have your CC in it");
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " the system does not have your command token in it.");
             return;
         }
         // player.setTg(player.getTg() - 2);
         // player.setStrategicCC(player.getStrategicCC() - 1);
-        RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
+        RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " remove the command token from " + tile.getRepresentationForButtons() + " using their hero ability");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+            player.getRepresentation() + " remove the command token from " + tile.getRepresentationForButtons() + " using Tvor Khage, the Qhet hero.");
     }
 
     @ButtonHandler("arboCommanderBuild_")
@@ -154,7 +155,7 @@ public class ButtonHelperCommanders {
     @ButtonHandler("olradinCommanderStep2_")
     public static void olradinCommanderStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         String planetID = buttonID.split("_")[1];
-        Planet planet = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
+        Planet planet = ButtonHelper.getUnitHolderFromPlanetName(planetID, game);
         int count = Math.max(planet.getInfluence(), planet.getResources());
         PlanetExhaust.doAction(player, planetID, game);
         ButtonHelperAbilities.pillageCheck(player, game);
@@ -300,7 +301,7 @@ public class ButtonHelperCommanders {
         String newMessage = null;
         List<Button> newButtons = new ArrayList<>();
         if (Pattern.compile(part1).matcher(buttonID).matches()) {
-            String message = player.getRepresentation() + " Choose a tile to migrate from:";
+            String message = player.getRepresentation() + ", please choose a system to migrate from:";
             Predicate<Tile> pred = t -> t.containsPlayersUnitsWithModelCondition(player, um -> !um.getIsStructure());
             List<Button> buttons = ButtonHelper.getTilesWithPredicateForAction(player, game, buttonID, pred, false);
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
@@ -308,7 +309,7 @@ public class ButtonHelperCommanders {
 
         } else if ((matcher = Pattern.compile(part2).matcher(buttonID)).matches()) {
             Tile from = game.getTileByPosition(matcher.group("posfrom"));
-            newMessage = player.getRepresentation() + " You are migrating from " + from.getRepresentationForButtons(game, player) + ". Choose a unit you'd like to move:";
+            newMessage = player.getRepresentation() + " You are migrating from " + from.getRepresentationForButtons(game, player) + ". Please choose the unit you wish to move:";
             for (UnitHolder uh : from.getUnitHolders().values()) {
                 PlanetModel planet = Mapper.getPlanet(uh.getName());
                 String planetName = planet == null ? uh.getName() : planet.getName();
@@ -448,7 +449,7 @@ public class ButtonHelperCommanders {
     public static List<Button> resolveFlorzenCommander(Player player, Game game) {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getExhaustedPlanets()) {
-            Planet planetReal = (Planet) ButtonHelper.getUnitHolderFromPlanetName(planet, game);
+            Planet planetReal = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (planetReal != null && isNotBlank(planetReal.getOriginalPlanetType()) && player.getPlanetsAllianceMode().contains(planet)) {
                 List<Button> planetButtons = ButtonHelper.getPlanetExplorationButtons(game, planetReal, player);
                 buttons.addAll(planetButtons);
@@ -477,17 +478,17 @@ public class ButtonHelperCommanders {
     @ButtonHandler("uydaiCommander")
     public static void uydaiCommander(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         if (player.getTg() < 1) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " you need at least 1 tg to use this ability");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + ", you need at least 1 trade good to use this ability.");
             return;
         }
         if (game.getActivePlayer() != player) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " you need to be the active player to use this ability");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + ", you need to be the active player to use this ability.");
             return;
         }
         player.setTg(player.getTg() - 1);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is paying 1tg to look at the top card of a deck");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is paying 1 trade good to look at the top card of a deck.");
         List<Button> buttons = ButtonHelperCommanders.getUydaiCommanderButtons(game, false, player);
-        String message = player.getRepresentationUnfogged() + " select which deck you wish to look at the top of.";
+        String message = player.getRepresentationUnfogged() + ", please choose which deck you wish to look at the top of.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
 
@@ -495,7 +496,7 @@ public class ButtonHelperCommanders {
     public static void uydaiCommanderLook(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String target = buttonID.split("_")[1];
         String ableToBot = buttonID.split("_")[2];
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is choosing to look at the top of the " + event.getButton().getLabel() + " deck");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing() + " is choosing to look at the top of the " + event.getButton().getLabel() + " deck.");
         event.getMessage().delete().queue();
         switch (target) {
             case "industrial", "hazardous", "frontier", "cultural" -> {
@@ -507,34 +508,34 @@ public class ButtonHelperCommanders {
             case "relics" -> {
                 List<String> relicDeck = game.getAllRelics();
                 if (relicDeck.isEmpty()) {
-                    MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty");
+                    MessageHelper.sendMessageToEventChannel(event, "Relic deck is empty.");
                     return;
                 }
                 String relicID = relicDeck.getFirst();
                 RelicModel relicModel = Mapper.getRelic(relicID);
-                String sb = "**Relic - Look at Top**\n" + player.getRepresentation() + "\n" + relicModel.getSimpleRepresentation();
+                String sb = player.getRepresentation() + "*, the top card of the relic deck is:\n" + relicModel.getSimpleRepresentation();
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
             }
             case "secrets" -> {
                 List<String> secretDeck = game.getSecretObjectives();
                 String secretID = secretDeck.getFirst();
                 SecretObjectiveModel secretModel = Mapper.getSecretObjective(secretID);
-                String sb = "**Secret - Look at Top**\n" + player.getRepresentation() + "\n" + secretModel.getName() + "\n" + secretModel.getText();
+                String sb = player.getRepresentation() + "*, the top card of the secret objective deck is:\n" + secretModel.getText();
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
             }
             case "acs" -> {
                 List<String> acDeck = game.getActionCards();
                 String acID = acDeck.getFirst();
                 ActionCardModel acModel = Mapper.getActionCard(acID);
-                String sb = "**Action Card - Look at Top**\n" + player.getRepresentation() + "\n" + acModel.getRepresentation();
+                String sb = player.getRepresentation() + "*, the top card of the action card deck is:\n" + acModel.getRepresentation();
                 MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
             }
         }
         if (ableToBot.equalsIgnoreCase("yes")) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "uydaiCommanderBottom_" + target, "Bottom It"));
-            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Leave it on top"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " would you like to bottom the card or leave it on top?", buttons);
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "deleteButtons", "Leave It On Top"));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + ", would you like to bottom the card or leave it on top?", buttons);
         }
     }
 
@@ -573,7 +574,7 @@ public class ButtonHelperCommanders {
     }
 
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event) {
-        resolveMuaatCommanderCheck(player, game, event, "unknown trigger");
+        resolveMuaatCommanderCheck(player, game, event, "some unknown trigger");
     }
 
     public static List<Button> getPharadnCommanderUnlockButtons(Player player, Game game) {
@@ -594,13 +595,13 @@ public class ButtonHelperCommanders {
     public static void resolveMuaatCommanderCheck(Player player, Game game, GenericInteractionCreateEvent event, String reason) {
         if (game.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
             if (!ButtonHelperAbilities.canBePillaged(player, game, player.getTg() + 1) || game.isFowMode()) {
-                String message = player.getRepresentationUnfogged() + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1) + " (" + reason + ")";
+                String message = player.getRepresentationUnfogged() + " you gained a trade good from Magmus, the Muaat Commander, " + player.gainTG(1) + ", when you " + reason + ".";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, 1);
             } else {
                 String mMessage = player.getRepresentationUnfogged() + ", you have Magmus, the Muaat Commander, unlocked,"
-                    + " so you __may__ gain 1 trade good, but since you are in **Pillage** range, this has not been done automatically.";
+                    + " so you __may__ gain 1 trade good when you " + reason + ", but since you are in **Pillage** range, this has not been done automatically.";
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("gain1tgFromMuaatCommander", "Gain 1 Trade Good", MiscEmojis.tg));
                 buttons.add(Buttons.red("deleteButtons", "Decline"));
@@ -612,7 +613,8 @@ public class ButtonHelperCommanders {
                 for (UnitHolder uH : tile.getUnitHolders().values()) {
                     if (uH.getDamagedUnitCount(UnitType.Mech, player.getColorID()) > 0) {
                         uH.removeDamagedUnit(Mapper.getUnitKey(AliasHandler.resolveUnit("mech"), player.getColorID()), uH.getDamagedUnitCount(UnitType.Mech, player.getColorID()));
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                            player.getRepresentation() + " repaired damaged mech in " + tile.getRepresentation() + " due to spending a strategy token.");
                     }
                 }
             }
@@ -671,13 +673,14 @@ public class ButtonHelperCommanders {
         String message = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), player.getRepresentation() + " use buttons to destroy infantry on 5 planets in order to unlock the commander", getPharadnCommanderUnlockButtons(player, game));
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
+            player.getRepresentation() + ", use buttons to destroy infantry on 5 planets in order to unlock Avhkan, your commander.", getPharadnCommanderUnlockButtons(player, game));
     }
 
     @ButtonHandler("pharadnCommanderUnlockKill_")
-    public static void pharadnAgentKill(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
+    public static void pharadnCommanderUnlockKill(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String planet = buttonID.split("_")[1];
-        String message = player.getRepresentation() + " chose to destroy 2 infantry on " + Helper.getPlanetRepresentation(planet, game) + " as part of the Pharadn Commander unlock";
+        String message = player.getRepresentation() + " chose to destroy 2 infantry on " + Helper.getPlanetRepresentation(planet, game) + " in the process of unlocking Avhkan, the Pharad’n commander.";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
         int amountToKill = 2;
         DestroyUnitService.destroyUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), amountToKill + " inf " + planet, false);
@@ -708,7 +711,8 @@ public class ButtonHelperCommanders {
                 break;
             }
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji() + " destroyed 1 opposing infantry on " + Helper.getPlanetRepresentation(planet, game) + " using the Pharadn Commander.");
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            player.getFactionEmoji() + " destroyed 1 opposing infantry on " + Helper.getPlanetRepresentation(planet, game) + " using the Avhkan, the Pharad’n commander.");
     }
 
     @ButtonHandler("yssarilcommander_")

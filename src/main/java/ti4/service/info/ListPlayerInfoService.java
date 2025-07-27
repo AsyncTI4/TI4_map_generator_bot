@@ -20,6 +20,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.BotLogger.LogMessageOrigin;
 import ti4.message.MessageHelper;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.Source;
@@ -62,7 +63,7 @@ public class ListPlayerInfoService {
             case "protect_border" -> 5;
             case "distant_lands" -> 2;
 
-            //status phase secrets
+            //Status Phase secrets
             case "pem" -> 8; // 8 production
             case "sai" -> 1; //legendary
             case "syc" -> 1; // control a planet in same system someone else does
@@ -91,7 +92,7 @@ public class ListPlayerInfoService {
             case "faa" -> 4; // 4 cultural
             case "fc" -> (game.getRealPlayers().size() - 1); // neighbors
 
-            // Omega phase objectives
+            // Omega Phase objectives
             case "corner_omegaphase" -> 4;
             case "galvanize_omegaphase" -> 6;
             case "manipulate_law_omegaphase", "golden_age_omegaphase" -> 16;
@@ -134,7 +135,7 @@ public class ListPlayerInfoService {
         Game game,
         int closestScore
     ) {
-        // Success condition  
+        // Success condition
         if (currentResources >= goal && currentInfluence >= goal) {
             return new ObjectiveResult(true, goal * 2);
         }
@@ -146,15 +147,15 @@ public class ListPlayerInfoService {
         int newResources2 = currentResources + additionalResources2;
         int newInfluence2 = currentInfluence + additionalInfluence2;
 
-        // Calculate closeness score  
+        // Calculate closeness score
         int resourceShortfall2 = Math.max(0, goal - newResources2);
         int influenceShortfall2 = Math.max(0, goal - newInfluence2);
         int closenessScore2 = goal * 2 - (resourceShortfall2 + influenceShortfall2);
         closestScore = Math.max(closenessScore2, closestScore);
 
-        // Failure condition - run out of options  
+        // Failure condition - run out of options
         if (index >= planets.size() && remainingTradeGoods == 0) {
-            // Calculate closeness score  
+            // Calculate closeness score
             int resourceShortfall = Math.max(0, goal - currentResources);
             int influenceShortfall = Math.max(0, goal - currentInfluence);
             int closenessScore = goal * 2 - (resourceShortfall + influenceShortfall);
@@ -162,9 +163,9 @@ public class ListPlayerInfoService {
             return new ObjectiveResult(false, Math.max(0, closenessScore));
         }
 
-        // If we've run out of planets, try using trade goods  
+        // If we've run out of planets, try using trade goods
         if (index >= planets.size()) {
-            // Try using remaining trade goods for resources  
+            // Try using remaining trade goods for resources
             int additionalResources = Math.min(remainingTradeGoods,
                 Math.max(0, goal - currentResources));
             int additionalInfluence = Math.min(remainingTradeGoods - additionalResources,
@@ -173,7 +174,7 @@ public class ListPlayerInfoService {
             int newResources = currentResources + additionalResources;
             int newInfluence = currentInfluence + additionalInfluence;
 
-            // Calculate closeness score  
+            // Calculate closeness score
             int resourceShortfall = Math.max(0, goal - newResources);
             int influenceShortfall = Math.max(0, goal - newInfluence);
             int closenessScore = goal * 2 - (resourceShortfall + influenceShortfall);
@@ -185,6 +186,15 @@ public class ListPlayerInfoService {
         String current = planets.get(index);
 
         Planet planet = game.getPlanetsInfo().get(current);
+        if (planet == null) {
+            BotLogger.warning(new LogMessageOrigin(player), "ListPlayerInfoService: Planet \"" + current + "\" not found for game " + game.getName());
+            return backtrack(planets,
+                currentResources,
+                currentInfluence,
+                index + 1,
+                usedPlanets,
+                remainingTradeGoods, goal, player, game, closestScore);
+        }
         int resources = planet.getResources();
         int influence = planet.getInfluence();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -203,7 +213,7 @@ public class ListPlayerInfoService {
                 return resourceResult;
             }
         }
-        // Try using planet for influence  
+        // Try using planet for influence
         if (influence > 0) {
             ObjectiveResult influenceResult = backtrack(planets,
                 currentResources,
@@ -217,7 +227,7 @@ public class ListPlayerInfoService {
             }
         }
 
-        // Skip this planet  
+        // Skip this planet
         return backtrack(planets,
             currentResources,
             currentInfluence,
@@ -413,7 +423,7 @@ public class ListPlayerInfoService {
             }
             case "infrastructure", "protect_border" -> {
                 int counter = 0;
-                for (String planet : player.getPlanets()) {
+                for (String planet : player.getPlanetsAllianceMode()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()
                         && (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
@@ -424,7 +434,14 @@ public class ListPlayerInfoService {
                 if (player.hasAbility("privileged_citizenry")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
                 }
-                return counter;
+                if (player.hasAbility("orbital_foundries")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                }
+                int maxPlanets = counter;
+                if (player.getHomeSystemTile() != null) {
+                    maxPlanets = Math.max(0, player.getPlanetsAllianceMode().size() - player.getHomeSystemTile().getPlanetUnitHolders().size());
+                }
+                return Math.min(counter, maxPlanets);
             }
             case "corner", "unify_colonies", "corner_omegaphase" -> {
                 int max = 0;
@@ -528,7 +545,14 @@ public class ListPlayerInfoService {
                 }
             }
             case "build_defenses", "massive_cities", "massive_cities_omegaphase" -> {
-                return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
+                int counter = 0;
+                if (player.hasAbility("orbital_foundries")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                }
+                if (player.hasUnit("ghoti_flagship")) {
+                    counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false);
+                }
+                return counter + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
                     + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
@@ -628,7 +652,7 @@ public class ListPlayerInfoService {
                 // This number may be inaccurate when it's greater than 3, but it is always accurate for 2
                 return Math.min(planetsAdjToHomes.size(), homesAdjTo.size());
             }
-            //status phase secrets
+            //Status Phase secrets
             case "pem" -> {
                 return ButtonHelper.checkHighestProductionSystem(player, game); // 8 production
             }
@@ -706,7 +730,7 @@ public class ListPlayerInfoService {
             case "dfat" -> {
                 Tile tile = Optional.ofNullable(game.getTileFromPlanet("mallice"))
                     .orElseGet(() -> game.getTileFromPlanet("hexmallice"));
-                if (tile == null || !FoWHelper.playerHasUnitsInSystem(player, tile)) {
+                if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                     return 0;
                 } else {
                     return 1;
@@ -736,7 +760,7 @@ public class ListPlayerInfoService {
                 Tile mecatol = game.getMecatolTile();
                 boolean controlsMecatol = player.getPlanets().stream()
                     .anyMatch(Constants.MECATOLS::contains);
-                if (mecatol == null || !FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
+                if (!FoWHelper.playerHasUnitsInSystem(player, mecatol) || !controlsMecatol) {
                     return 0;
                 } else {
                     return ButtonHelper.checkNumberShips(player, mecatol);

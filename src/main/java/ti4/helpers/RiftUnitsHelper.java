@@ -62,45 +62,42 @@ public class RiftUnitsHelper {
     public static void riftAllUnitsInASystem(String pos, ButtonInteractionEvent event, Game game, Player player, String ident, Player cabal) {
         Tile tile = game.getTileByPosition(pos);
 
-        Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            String name = entry.getKey();
-            String representation = planetRepresentations.get(name);
             UnitHolder unitHolder = entry.getValue();
-            Map<UnitKey, Integer> units = unitHolder.getUnits();
-            if (!(unitHolder instanceof Planet)) {
-                Map<UnitKey, Integer> tileUnits = new HashMap<>(units);
-                for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
-                    if (!player.unitBelongsToPlayer(unitEntry.getKey()))
-                        continue;
-                    UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
-                    if (unitModel == null)
-                        continue;
+            if ((unitHolder instanceof Planet)) {
+                continue;
+            }
+            Map<UnitKey, Integer> tileUnits = new HashMap<>(unitHolder.getUnits());
+            for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
+                if (!player.unitBelongsToPlayer(unitEntry.getKey()))
+                    continue;
+                UnitModel unitModel = player.getUnitFromUnitKey(unitEntry.getKey());
+                if (unitModel == null)
+                    continue;
 
-                    UnitKey key = unitEntry.getKey();
-                    if (key.getUnitType() == UnitType.Infantry
-                        || key.getUnitType() == UnitType.Mech
-                        || (!player.hasFF2Tech() && key.getUnitType() == UnitType.Fighter)
-                        || (cabal != null && (key.getUnitType() == UnitType.Fighter
-                            || key.getUnitType() == UnitType.Spacedock))) {
-                        continue;
-                    }
+                UnitKey key = unitEntry.getKey();
+                if (key.getUnitType() == UnitType.Infantry
+                    || key.getUnitType() == UnitType.Mech
+                    || (!player.hasFF2Tech() && key.getUnitType() == UnitType.Fighter)
+                    || (cabal != null && (key.getUnitType() == UnitType.Fighter
+                        || key.getUnitType() == UnitType.Spacedock))) {
+                    continue;
+                }
 
-                    int totalUnits = unitEntry.getValue();
-                    String unitAsyncID = unitModel.getAsyncId();
-                    int damagedUnits = 0;
-                    if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
-                        damagedUnits = unitHolder.getUnitDamage().get(key);
-                    }
-                    for (int x = 1; x < damagedUnits + 1; x++) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            "A " + ident + riftUnit(unitAsyncID + "damaged", tile, game, event, player, cabal));
-                    }
-                    totalUnits -= damagedUnits;
-                    for (int x = 1; x < totalUnits + 1; x++) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                            "A " + ident + riftUnit(unitAsyncID, tile, game, event, player, cabal));
-                    }
+                int totalUnits = unitEntry.getValue();
+                String unitAsyncID = unitModel.getAsyncId();
+                int damagedUnits = 0;
+                if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
+                    damagedUnits = unitHolder.getUnitDamage().get(key);
+                }
+                for (int x = 0; x < damagedUnits; x++) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        "A " + ident + riftUnit(unitAsyncID + "damaged", tile, game, event, player, cabal));
+                }
+                totalUnits -= damagedUnits;
+                for (int x = 0; x < totalUnits; x++) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        "A " + ident + riftUnit(unitAsyncID, tile, game, event, player, cabal));
                 }
             }
         }
@@ -187,7 +184,7 @@ public class RiftUnitsHelper {
                         continue;
                     }
 
-                    String asyncID = key.unitName();
+                    String unitName = key.unitName();
 
                     int totalUnits = unitEntry.getValue();
 
@@ -197,14 +194,14 @@ public class RiftUnitsHelper {
                     }
                     for (int x = 1; x < damagedUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID + "damaged",
+                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName + "damaged",
                             "Rift " + x + " Damaged " + unitModel.getBaseType(), unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }
                     totalUnits -= damagedUnits;
                     for (int x = 1; x < totalUnits + 1 && x <= 2; x++) {
                         Button validTile2 = Buttons.red(
-                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + asyncID,
+                            finChecker + "riftUnit_" + tile.getPosition() + "_" + x + unitName,
                             "Rift " + x + " " + unitModel.getBaseType(), unitModel.getUnitEmoji());
                         buttons.add(validTile2);
                     }

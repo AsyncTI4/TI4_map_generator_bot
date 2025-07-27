@@ -16,8 +16,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ColorEmojis;
@@ -185,7 +185,7 @@ public class SearchGameHelper {
                 if (winner.getUserID().equals(player.getUserID())) sb.append(" **👑WINNER👑**");
             }
         }
-        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded()) sb.append(" **[__IT IS YOUR TURN__]**");
+        if (game.getActivePlayerID() != null && game.getActivePlayerID().equals(userID) && !game.isHasEnded()) sb.append(" - __It is your turn__");
         if (showSecondaries && !game.isHasEnded()) {
             List<String> secondaries = new ArrayList<>();
             for (int sc : game.getPlayedSCs()) {

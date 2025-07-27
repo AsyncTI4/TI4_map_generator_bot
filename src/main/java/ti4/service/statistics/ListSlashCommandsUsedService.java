@@ -13,7 +13,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.SortHelper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GamesPage;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 
@@ -21,8 +21,7 @@ import ti4.model.ActionCardModel;
 public class ListSlashCommandsUsedService {
 
     public static void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("listSlashCommandsUsed", event, () -> listSlashCommandsUsed(event)));
+        StatisticsPipeline.queue(event, () -> listSlashCommandsUsed(event));
     }
 
     private static void listSlashCommandsUsed(SlashCommandInteractionEvent event) {

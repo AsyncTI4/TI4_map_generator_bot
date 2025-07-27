@@ -125,6 +125,7 @@ public class CommanderUnlockCheckService {
             case "nokar" -> shouldBeUnlocked = true;
             case "atokera" -> shouldBeUnlocked = true;
             case "belkosea" -> shouldBeUnlocked = true;
+            case "redcreuss" -> shouldBeUnlocked = true;
             case "veldyr" -> {
                 if (ButtonHelperFactionSpecific.getPlayersWithBranchOffices(game, player).size() > 1) {
                     shouldBeUnlocked = true;
@@ -172,7 +173,14 @@ public class CommanderUnlockCheckService {
                 }
             }
             case "sardakk" -> {
-                if (player.getPlanets().size() > 6) {
+                int count = 0;
+                for (String p : player.getPlanets()) {
+                    Tile tile = game.getTileFromPlanet(p);
+                    if (tile != null && !tile.isHomeSystem(game)) {
+                        count++;
+                    }
+                }
+                if (count > 4) {
                     shouldBeUnlocked = true;
                 }
             }

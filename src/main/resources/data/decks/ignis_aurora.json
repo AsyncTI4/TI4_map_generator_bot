@@ -32,7 +32,7 @@
         "name": "Baldricks Ignis Aurora Relics",
         "type": "relic",
         "description": "All Relics for Ignis Aurora",
-        "cardIDs": ["baldrick_stellarconverter","baldrick_crownofemphidia","baldrick_crownofthalnos","baldrick_nanoforge","baldrick_prophetstears","baldrick_hyperdrive","baldrick_realitymatrix","baldrick_herostriumph","baldrick_visionofelephar","baldrick_sirenscall","baldrick_galacticprecession","baldrick_voiceofarvid","dominusorb","mawofworlds","emelpar","shard","codex","obsidian","dynamiscore","titanprototype"],
+        "cardIDs": ["baldrick_stellarconverter","baldrick_crownofemphidia","baldrick_crownofthalnos","baldrick_nanoforge","baldrick_prophetstears","baldrick_hyperdrive","baldrick_realitymatrix","baldrick_herostriumph","baldrick_visionofelephar","baldrick_sirenscall","baldrick_galacticprecession","baldrick_voiceofarvid","dominusorb","mawofworlds","emelpar","shard","codex","obsidian","dynamiscore","titanprototype","neuraloop","circletofthevoid", "bookoflatvinia"],
         "source": "ignis_aurora"
     }
 ]

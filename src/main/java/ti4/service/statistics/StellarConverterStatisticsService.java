@@ -12,16 +12,15 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GamesPage;
 import ti4.map.UnitHolder;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
 public class StellarConverterStatisticsService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getStellarConverterStatistics", event, () -> getStellarConverterStatistics(event)));
+        StatisticsPipeline.queue(event, () -> getStellarConverterStatistics(event));
     }
 
     private void getStellarConverterStatistics(SlashCommandInteractionEvent event) {

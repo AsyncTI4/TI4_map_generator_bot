@@ -11,13 +11,15 @@ import ti4.helpers.Constants;
 public class UserCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-                    new ShowUserSettings(),
-                    new SetPreferredColourList(),
-                    new SetPersonalPingInterval(),
-                    new SetPingOnNextTurn(),
-                    new OfferAFKTimeOptions(),
-                    new SetFowFilter())
-            .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
+        new ShowUserSettings(),
+        new SetPreferredColourList(),
+        new SetPersonalPingInterval(),
+        new SetPingOnNextTurn(),
+        new OfferAFKTimeOptions(),
+        new Survey(),
+        new WipeTurnTime(),
+        new SetFowFilter())
+        .collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override
     public String getName() {

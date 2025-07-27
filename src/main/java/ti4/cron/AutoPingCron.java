@@ -1,7 +1,5 @@
 package ti4.cron;
 
-import static java.util.function.Predicate.*;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +12,14 @@ import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.settings.users.UserSettingsManager;
+
+import static java.util.function.Predicate.not;
 
 @UtilityClass
 public class AutoPingCron {
@@ -160,7 +160,8 @@ public class AutoPingCron {
         if (!playersInCombat.isBlank() && playersInCombat.contains(player.getFaction())) {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 != player && playersInCombat.contains(p2.getFaction())) {
-                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant");
+                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                        p2.getRepresentationUnfogged() + ", the bot thinks you might be in combat and should receive a reminder ping as well. Ignore if not relevant.");
                 }
             }
         }
@@ -185,7 +186,7 @@ public class AutoPingCron {
         if (game.isFowMode()) {
             MessageHelper.sendPrivateMessageToPlayer(player, game, pingMessage);
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "Active player has been pinged. This is ping #" + pingNumber);
+                "Active player has been pinged. This is ping #" + pingNumber + ".");
             return;
         }
         MessageChannel gameChannel = player.getCorrectChannel();
@@ -197,7 +198,7 @@ public class AutoPingCron {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("temporaryPingDisable", "Disable Pings For Turn"));
             buttons.add(Buttons.gray("deleteButtons", "Delete These Buttons"));
-            MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + " if the game is not waiting on you, you may disable the" +
+            MessageHelper.sendMessageToChannelWithButtons(gameChannel, realIdentity + ", if the game is not waiting on you, you may disable the" +
                 " auto ping for this turn so it doesn't annoy you. It will turn back on for the next turn.",
                 buttons);
         }
@@ -226,22 +227,22 @@ public class AutoPingCron {
                 String so = game.getStoredValue(player.getFaction() + "round" + game.getRound() + "SO");
                 if (po.isEmpty()) {
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " please indicate if you are scoring a public objective");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please indicate if you are scoring a public objective.");
                     }
-                    poMsg.append(player.getRepresentation()).append(" ");
+                    poMsg.append(player.getRepresentation()).append(", ");
                 }
                 if (so.isEmpty()) {
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " please indicate if you are scoring a secret objective");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + ", please indicate if you are scoring a secret objective.");
                     }
-                    soMsg.append(player.getRepresentation()).append(" ");
+                    soMsg.append(player.getRepresentation()).append(", ");
                 }
             }
             if (!game.isFowMode() && (poMsg.length() > 0)) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), poMsg + "please indicate if you are scoring a public objective");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), poMsg + "please indicate if you are scoring a public objective.");
             }
             if (!game.isFowMode() && (soMsg.length() > 0)) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), soMsg + "please indicate if you are scoring a secret objective");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), soMsg + "please indicate if you are scoring a secret objective.");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
@@ -253,14 +254,19 @@ public class AutoPingCron {
             for (Player player : game.getRealPlayers()) {
                 if (!game.getCurrentACDrawStatusInfo().contains(player.getFaction())) {
                     if (game.isFowMode()) {
-                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " please draw ACs and allocate command tokens");
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
+                            + ", please draw action cards and allocate command tokens.");
                     }
-                    msg.append(player.getRepresentation()).append(" ");
+                    msg.append(player.getRepresentation()).append(", ");
+                } else if (game.isFowMode() && game.getStoredValue("fowStatusDone") != null
+                    && !game.getStoredValue("fowStatusDone").contains(player.getFaction())) {
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged()
+                        + ", please click \"Ready for " + (game.isCustodiansScored() ? "Agenda" : "Strategy") + " Phase\".");
                 }
 
             }
             if (!game.isFowMode() && (msg.length() > 0)) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please draw ACs and allocate command tokens\n");
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please draw action cards and allocate command tokens.\n");
             }
             AutoPingMetadataManager.addPing(game.getName());
         }
@@ -282,8 +288,8 @@ public class AutoPingCron {
 
     private static String getPingMessage(String realIdentity, int pingNumber) {
         if (pingNumber > PING_MESSAGES.size()) {
-            return realIdentity + " Rumors of the bot running out of stamina are greatly exaggerated. The bot will win this stare-down," +
-                " it is simply a matter of time.";
+            return realIdentity + ", rumors of the bot running out of stamina are greatly exaggerated." +
+                " The bot will win this stare-down, it is simply a matter of time.";
         }
 
         return realIdentity + PING_MESSAGES.get(pingNumber - 1);
@@ -306,18 +312,18 @@ public class AutoPingCron {
             if (p2.isAFK()) continue;
 
             if (!game.getStoredValue("queuedWhens").contains(p2.getFaction()) && !game.getStoredValue("declinedWhens").contains(p2.getFaction())) {
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"whens\".");
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"when\"s.");
                 continue;
             }
             if (!game.getStoredValue("queuedAfters").contains(p2.getFaction()) && !game.getStoredValue("declinedAfters").contains(p2.getFaction()) && !game.getStoredValue("queuedWhens").contains(p2.getFaction())) {
-                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"afters\".");
+                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to play (or pass on) your \"after\"s.");
             }
             if (game.isHiddenAgendaMode() || game.isOmegaPhaseMode()) {
                 if (AgendaHelper.getPlayersWhoNeedToPreVoted(game).contains(p2)) {
                     List<Button> buttons = new ArrayList<>();
                     buttons.add(Buttons.green("preVote", "Pre-Vote"));
-                    buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
-                    buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
+                    buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-Abstain"));
+                    buttons.add(Buttons.red("deleteButtons", "Don't Do Anything"));
                     MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), p2.getRepresentation(true, true) + ", this is a reminder to decide on voting.", buttons);
                 }
             }

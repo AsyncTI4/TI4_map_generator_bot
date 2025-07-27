@@ -3,13 +3,13 @@ package ti4.buttons;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.helpers.WebHelper;
+import ti4.website.WebHelper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.service.emoji.CardEmojis;
@@ -18,11 +18,12 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
+import ti4.image.Mapper;
 
 public class Buttons {
 
     public enum ButtonColor {
-        green, red, gray, blue;
+        green, red, gray, blue
     }
 
     public static final Button GET_A_TECH = green("acquireATech", "Get a Technology");
@@ -68,11 +69,62 @@ public class Buttons {
         REFRESH_PLANET_INFO,
         FACTION_EMBED);
 
+    /**
+     * Check if a game is standard PoK or only uses 4/4/4 homebrew
+     */
+    private static boolean isStandardPoKOrOnly444(Game game) {
+        if (game == null) return false;
+
+        // FIRST: Check that NO other homebrew elements are present
+        if (game.isHomebrew() // explicit homebrew flag
+            || game.isExtraSecretMode()
+            || game.isFowMode()
+            || game.isAgeOfExplorationMode()
+            || game.isFacilitiesMode()
+            || game.isMinorFactionsMode()
+            || game.isLightFogMode()
+            || game.isRedTapeMode()
+            || game.isDiscordantStarsMode()
+            || game.isFrankenGame()
+            || game.isMiltyModMode()
+            || game.isAbsolMode()
+            || game.isVotcMode()
+            || game.isPromisesPromisesMode()
+            || game.isFlagshippingMode()
+            || game.isAllianceMode()
+            || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
+            || game.isHomebrewSCMode()
+            || game.isCommunityMode()
+            || game.getPlayerCountForMap() < 3
+            || game.getPlayerCountForMap() > 8) {
+
+            return false; // Has other homebrew elements, not standard
+        }
+
+        // Check decks, tiles, and factions are official
+        try {
+            if (!game.checkAllDecksAreOfficial()
+                || !game.checkAllTilesAreOfficial()
+                || game.getFactions().stream()
+                    .map(Mapper::getFaction)
+                    .filter(java.util.Objects::nonNull)
+                    .anyMatch(faction -> !faction.getSource().isOfficial())) {
+                return false;
+            }
+        } catch (Exception e) {
+            return false; // If we can't verify, assume not standard
+        }
+
+        return true;
+    }
+
     public static List<Button> mapImageButtons(Game game) {
         List<Button> buttonsWeb = new ArrayList<>();
         if (game != null && !game.isFowMode()) {
             if (WebHelper.sendingToWeb()) {
-                buttonsWeb.add(Button.link("https://ti4.westaddisonheavyindustries.com/game/" + game.getName(), "Website View"));
+                String baseUrl = "https://asyncti4.com/game/" + game.getName();
+                String url = isStandardPoKOrOnly444(game) ? baseUrl + "/newui" : baseUrl;
+                buttonsWeb.add(Button.link(url, "Website View"));
             }
             buttonsWeb.add(PLAYER_INFO);
         }
@@ -81,6 +133,8 @@ public class Buttons {
         buttonsWeb.add(REFRESH_MAP);
         return buttonsWeb;
     }
+
+    private static final int PAGE_SIZE = 20;
 
     /** A blue button (primary style) */
     public static Button blue(String buttonID, String buttonLabel) {
@@ -171,5 +225,45 @@ public class Buttons {
 
     public static Button declineAndNotify(String buttonLabel, String notificationMessage) {
         return gray("deleteMessage_" + notificationMessage, buttonLabel);
+    }
+
+    public static List<ActionRow> paginateButtons(List<Button> mainButtons, List<Button> persistentButtons,
+                                   int page, String pageButtonId) {
+        int totalPages = (int) Math.ceil((double) mainButtons.size() / PAGE_SIZE);
+        int currentPage = Math.max(1, Math.min(page, totalPages));
+        int fromIndex = (currentPage - 1) * PAGE_SIZE;
+        int toIndex = Math.min(fromIndex + PAGE_SIZE, mainButtons.size());
+
+        List<Button> pageButtons = new ArrayList<>(mainButtons.subList(fromIndex, toIndex));
+
+        // Split main buttons into rows of max 5 (Discord limit)
+        List<ActionRow> rows = new ArrayList<>();
+        for (int i = 0; i < pageButtons.size(); i += 5) {
+            rows.add(ActionRow.of(pageButtons.subList(i, Math.min(i + 5, pageButtons.size()))));
+        }
+
+        // Prepare persistent + navigation buttons for their own row
+        List<Button> persistentAndNav = new ArrayList<>();
+        if (persistentButtons != null && !persistentButtons.isEmpty()) {
+            for (int i = 0; i < Math.min(3, persistentButtons.size()); i++) {
+                persistentAndNav.add(persistentButtons.get(i));
+            }
+        }
+        // Add navigation buttons if more than one page
+        if (totalPages > 1) {
+            if (currentPage > 1) {
+                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage - 1),
+                        "Previous Page", "⏪"));
+            }
+            if (currentPage < totalPages) {
+                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage + 1),
+                        "Next Page", "⏩"));
+            }
+        }
+        if (!persistentAndNav.isEmpty()) {
+            rows.add(ActionRow.of(persistentAndNav));
+        }
+
+        return rows;
     }
 }

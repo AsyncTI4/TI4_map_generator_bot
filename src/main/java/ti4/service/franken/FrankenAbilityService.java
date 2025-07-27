@@ -55,7 +55,8 @@ public class FrankenAbilityService {
                 player.addAbility("policy_the_economy_empower");
                 player.removeOwnedUnitByID("olradin_mech");
                 player.addOwnedUnitByID("olradin_mech_positive");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " automatically set all of your policies to the positive side, but you can flip any of them now with these buttons");
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
@@ -75,6 +76,13 @@ public class FrankenAbilityService {
                     "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
                         + " due to the **Teeming** ability.");
             }
+            if (abilityID.equalsIgnoreCase("machine_cult")) {
+                String unitID = AliasHandler.resolveUnit("mech");
+                player.setUnitCap(unitID, 6);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    "Set mech unit maximum to 6 for " + player.getRepresentation()
+                        + ", due to their **Machine Cult** ability.");
+            }
             if (abilityID.equalsIgnoreCase("diplomats")) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -86,9 +94,9 @@ public class FrankenAbilityService {
             }
             if (abilityID.equalsIgnoreCase("ancient_empire")) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.green("startAncientEmpire", "Place a tomb token"));
+                buttons.add(Buttons.green("startAncientEmpire", "Place a Tomb Token"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation() + " You can use this button to place 14 tomb tokens.", buttons);
+                    player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.", buttons);
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

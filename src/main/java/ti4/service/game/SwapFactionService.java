@@ -26,16 +26,48 @@ public class SwapFactionService {
             List<String> value = poEntry.getValue();
             boolean removed = value.remove(removedPlayer.getUserID());
             boolean removed2 = value.remove(swapperPlayer.getUserID());
+            boolean removed4 = value.remove(swapperPlayer.getUserID());
             if (removed) {
-                value.add(addedUser.getId());
+                boolean removed3 = value.remove(removedPlayer.getUserID());
+                value.add(swapperPlayer.getUserID());
+                if (removed3) {
+                    value.add(swapperPlayer.getUserID());
+                }
             }
             if (removed2) {
                 value.add(removedPlayer.getUserID());
+
+                if (removed4) {
+                    value.add(removedPlayer.getUserID());
+
+                }
             }
         }
+        String oldActive = game.getActivePlayerID();
+        String oldSpeaker = game.getSpeakerUserID();
+
+        if (swapperPlayer.getUserID().equalsIgnoreCase(oldActive)) {
+            game.setActivePlayerID(removedPlayer.getUserID());
+        }
+        if (removedPlayer.getUserID().equalsIgnoreCase(oldActive)) {
+            game.setActivePlayerID(swapperPlayer.getUserID());
+        }
+
+        if (swapperPlayer.getUserID().equalsIgnoreCase(oldSpeaker)) {
+            game.setSpeakerUserID(removedPlayer.getUserID());
+        }
+        if (removedPlayer.getUserID().equalsIgnoreCase(oldSpeaker)) {
+            game.setSpeakerUserID(swapperPlayer.getUserID());
+        }
+
         if (player.isDummy()) {
             player.setDummy(false);
             swapperPlayer.setDummy(true);
+        }
+
+        if (game.isFowMode()) {
+            //Fog data is saved by userID so need to swap it too
+            game.getTileMap().values().forEach(tile -> tile.swapFogData(player, swapperPlayer));
         }
 
         String before = "> **Before:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";

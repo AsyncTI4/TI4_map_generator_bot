@@ -10,14 +10,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -27,13 +26,14 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyHolder;
 import ti4.model.WormholeModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.game.GameNameService;
+import ti4.service.option.FOWOptionService.FOWOption;
 
 public class FoWHelper {
 
@@ -80,8 +80,8 @@ public class FoWHelper {
     }
 
     public static boolean canSeeStatsOfFaction(Game game, String faction, Player viewingPlayer) {
-        for (Player player : game.getPlayers().values()) {
-            if (faction.equals(player.getFaction())) {
+        for (Player player : game.getRealPlayers()) {
+            if (faction.equalsIgnoreCase(player.getFaction())) {
                 return canSeeStatsOfPlayer(game, player, viewingPlayer);
             }
         }
@@ -89,17 +89,21 @@ public class FoWHelper {
     }
 
     public static boolean canSeeStatsOfPlayer(Game game, Player player, Player viewingPlayer) {
-        if (!player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
+        if (game == null || !player.isRealPlayer() || !viewingPlayer.isRealPlayer()) {
             return false;
         }
         if (player == viewingPlayer) {
             return true;
         }
-
-        return game != null && (hasHomeSystemInView(player, viewingPlayer) 
-            || (hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer)) 
-            && !FOWPlusService.isActive(game)
-            || viewingPlayer.getAllianceMembers().contains(player.getFaction()));
+        if (viewingPlayer.getAllianceMembers().contains(player.getFaction())) {
+            return true;
+        }
+        if ((hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer))
+            && !FOWPlusService.isActive(game) && !game.getFowOption(FOWOption.STATS_FROM_HS_ONLY)) {
+            return true;
+        }
+        FoWHelper.initializeFog(game, viewingPlayer, false);
+        return hasHomeSystemInView(player, viewingPlayer);
     }
 
     /**
@@ -184,7 +188,7 @@ public class FoWHelper {
 
     private static void updatePlayerFogTiles(Game game, Player player) {
         for (Tile tileToUpdate : game.getTileMap().values()) {
-            if (!tileToUpdate.hasFog(player)) {
+            if (!tileToUpdate.hasFog(player) || tileToUpdate.isSupernova() && game.getFowOption(FOWOption.BRIGHT_NOVAS)) {
                 player.updateFogTile(tileToUpdate, "Rnd " + game.getRound());
             }
         }
@@ -223,7 +227,7 @@ public class FoWHelper {
     }
 
     public static Set<String> getAdjacentTiles(Game game, String position, Player player, boolean toShow, boolean includeTile) {
-        if (FOWPlusService.isVoid(game, position)) 
+        if (FOWPlusService.isVoid(game, position))
             return new HashSet<>();
 
         Set<String> adjacentPositions = traverseAdjacencies(game, false, position);
@@ -378,7 +382,7 @@ public class FoWHelper {
                 // the hyperlane doesn't exist & doesn't go that direction, skip.
                 continue;
             }
-            
+
             if (!FOWPlusService.shouldTraverseAdjacency(game, position_, dirFrom)) {
                 continue;
             }
@@ -598,7 +602,7 @@ public class FoWHelper {
             wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
         }
 
-        boolean ghostAgent = player != null && player.isActivePlayer() 
+        boolean ghostAgent = player != null && player.isActivePlayer()
             && !StringUtils.isEmpty(game.getStoredValue("ghostagent_active")) && game.getActiveSystem().equals(game.getStoredValue("ghostagent_active"));
         for (Tile tile_ : allTiles) {
             String position_ = tile_.getPosition();
@@ -776,7 +780,7 @@ public class FoWHelper {
 
     public static boolean playerHasFightersInSystem(Player player, Tile tile) {
         String colorID = Mapper.getColorID(player.getColor());
-        if (tile == null || colorID == null) return false; 
+        if (tile == null || colorID == null) return false;
 
         UnitHolder unitHolder = tile.getUnitHolders().get(Constants.SPACE);
         Map<UnitKey, Integer> units = new HashMap<>(unitHolder.getUnits());
@@ -837,11 +841,11 @@ public class FoWHelper {
     }
 
     /** Ping the players adjacent to a given system */
-    public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message) {
-        pingSystem(game, event, position, message, true);
+    public static void pingSystem(Game game, String position, String message) {
+        pingSystem(game, position, message, true);
     }
 
-    public static void pingSystem(Game game, GenericInteractionCreateEvent event, String position, String message, boolean viewSystemButton) {
+    public static void pingSystem(Game game, String position, String message, boolean viewSystemButton) {
         Tile tile = game.getTileByPosition(position);
         if (tile == null) {
             return;
@@ -852,8 +856,8 @@ public class FoWHelper {
             if (player_.isRealPlayer()) {
                 String playerMessage = player_.getRepresentation() + " - System " + tile.getRepresentationForButtons() + " has been pinged:\n>>> "
                     + message;
-                List<Button> refreshButton = viewSystemButton 
-                    ? StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture", event) 
+                List<Button> refreshButton = viewSystemButton
+                    ? StartCombatService.getGeneralCombatButtons(game, position, player_, player_, "justPicture")
                     : new ArrayList<>();
                 MessageHelper.sendMessageToChannelWithButtons(player_.getPrivateChannel(), playerMessage, refreshButton);
             }

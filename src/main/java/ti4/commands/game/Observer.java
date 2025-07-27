@@ -14,8 +14,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
 import ti4.service.game.CreateGameService;
 
@@ -95,7 +95,7 @@ class Observer extends Subcommand {
     private void removeObserver(SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
         if (channel == null) return;
         // clear permissions instead of revoking permissions.
-        // This resets the member's perms to the default value, 
+        // This resets the member's perms to the default value,
         //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
         Guild guild = channel.getGuild();
         Member user = guild.getMemberById(userID);

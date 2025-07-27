@@ -19,14 +19,14 @@ import ti4.model.TechnologyModel;
 public class TechInfoService {
 
     public static void sendTechInfo(Game game, Player player, GenericInteractionCreateEvent event) {
-        String headerText = player.getRepresentation() + CommandHelper.getHeaderText(event);
+        String headerText = player.getRepresentation() + " Somebody" + CommandHelper.getHeaderText(event);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendTechInfo(player);
     }
 
     public static void sendTechInfo(Player player) {
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "_ _\n__**Technologies Researched:**__", getTechMessageEmbeds(player));
-        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "_ _\n__**Faction Technologies (Not Yet Researched)**__", getFactionTechMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Technologies Researched:__", getTechMessageEmbeds(player));
+        MessageHelper.sendMessageEmbedsToCardsInfoThread(player, "__Faction Technologies (Not Yet Researched)__", getFactionTechMessageEmbeds(player));
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), null, getTechButtons());
     }
 

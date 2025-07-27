@@ -11,10 +11,13 @@ import ti4.helpers.Constants;
 public class SearchCommand implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
-    
+        // TO DO:
+        // - keep in this command /search commands, sources, emojis, games, forgames, mygames, mytitles
+        // - create a new command /search_comps for all the rest
+
         new SearchCommandsSubcommand(),
 
-        // From \data\
+        /* From \data\ */
         new SearchAbilitiesSubcommand(),
         new SearchActionCardsSubcommand(),
         new SearchAgendasSubcommand(),
@@ -40,16 +43,17 @@ public class SearchCommand implements ParentCommand {
         new SearchTokensSubcommand(),
         new SearchUnitsSubcommand(),
 
-        // From \resources\
+        /* From \resources\ */
         new SearchEmojis(),
         new SearchPlanetsSubcommand(),
         new SearchTilesSubcommand(),
 
-        // Others
+        /* From others */
         //new SearchGames(),
-        new SearchMyGames(),
         new SearchForGame(),
+        new SearchMyGames(),
         new SearchMyTitles()
+
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
     @Override

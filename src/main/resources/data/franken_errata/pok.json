@@ -78,11 +78,6 @@
         "AdditionalComponents": [
             "PN:dark_pact"
         ],
-        "source": "pok"
-    },
-    {
-        "ItemCategory": "ABILITY",
-        "ItemId": "dark_whispers",
         "alternateText": "[Franken only] During setup, take the Dark Pact promissory note as an additional component, and you may choose Blood Pact as an optional component in place of your drafted promissory notes; you have 2 faction promissory notes.",
         "source": "pok"
     },
@@ -326,6 +321,9 @@
         "AdditionalComponents": [
             "ABILITY:devour"
         ],
+        "OptionalSwaps": [
+            "HERO:cabalhero"
+        ],
         "source": "pok"
     },
     {
@@ -334,23 +332,25 @@
         "AdditionalComponents": [
             "ABILITY:devour"
         ],
+        "OptionalSwaps": [
+            "TECH:vtx",
+            "AGENT:cabalagent"
+        ],
+        "alternateText": "[Franken only] When you research a unit upgrade technology, you may return 1 captured unit of that type to ignore all of the technology's prerequisites. If you do not have the Amalgamation ability, you may only have one captured unit of each non-fighter ship type in your play area.",
         "source": "pok"
     },
     {
         "ItemCategory": "TECH",
         "ItemId": "dt2",
         "OptionalSwaps": [
-            "HERO:cabalhero"
+            "COMMANDER:cabalcommander"
         ],
         "source": "pok"
     },
     {
         "ItemCategory": "TECH",
         "ItemId": "vtx",
-        "OptionalSwaps": [
-            "COMMANDER:cabalcommander",
-            "AGENT:cabalagent"
-        ],
+        "Undraftable": true,
         "source": "pok"
     },
     {
@@ -369,6 +369,7 @@
         "ItemCategory": "HERO",
         "ItemId": "cabalhero",
         "Undraftable": true,
+        "alternateText": "[Franken only] ACTION: Each other player rolls a die for each of their non-fighter ships that are in or adjacent to a system that contains your Space Dock; on a 1-3, capture that unit. If this causes a player's ground forces or fighters to be removed, also capture those units. Then, purge this card.",
         "source": "pok"
     },
     {

@@ -23,8 +23,6 @@ import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.CombatTempModHelper;
 import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.DiceHelper;
-import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.StringHelper;
@@ -57,7 +55,8 @@ public class PlayerTechService {
     public static void addTech(GenericInteractionCreateEvent event, Game game, Player player, String techID) {
         player.addTech(techID);
         ButtonHelperCommanders.resolveNekroCommanderCheck(player, techID, game);
-        String message = player.getRepresentation() + " added technology: " + Mapper.getTech(techID).getRepresentation(false) + ".";
+        String message = player.getRepresentation() + " added technology: "
+            + Mapper.getTech(techID).getRepresentation(false) + ".";
         if ("iihq".equalsIgnoreCase(AliasHandler.resolveTech(techID))) {
             message += "\nAutomatically added the Custodia Vigilia planet.";
         }
@@ -67,23 +66,29 @@ public class PlayerTechService {
 
     public static void removeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.removeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " removed technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " removed technology: "
+            + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void purgeTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.purgeTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " purged technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " purged technology: "
+            + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void refreshTech(GenericInteractionCreateEvent event, Player player, String techID) {
         player.refreshTech(techID);
-        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " readied technology: " + Mapper.getTech(techID).getRepresentation(false) + ".");
+        MessageHelper.sendMessageToEventChannel(event, player.getRepresentation(false, false) + " readied technology: "
+            + Mapper.getTech(techID).getRepresentation(false) + ".");
     }
 
     public static void exhaustTechAndResolve(GenericInteractionCreateEvent event, Game game, Player player, String tech) {
         String pos = "";
         if (tech.contains("dskortg")) {
-            pos = tech.split("_")[1];
+            String[] splitTech = tech.split("_");
+            if (splitTech.length > 1) {
+                pos = splitTech[1];
+            }
             tech = "dskortg";
         }
         String inf = "";
@@ -101,11 +106,14 @@ public class PlayerTechService {
                 }
             }
             if (!hasSub) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " does not have the tech known as " + techModel.getName());
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    player.getRepresentation() + " does not own the _" + techModel.getName() + "_ (`" + techModel.getAlias() + "`) technology.");
                 return;
             }
         }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology " + techModel.getRepresentation(false) + ".";
+        game.setStoredValue("currentActionSummary" + player.getFaction(), 
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " exhausted the _" + techModel.getName() + "_ technology.");
         if (game.isShowFullComponentTextEmbeds()) {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
         } else {
@@ -172,8 +180,8 @@ public class PlayerTechService {
             }
             case "dsvadey" -> {
                 deleteTheOneButtonIfButtonEvent(event);
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                    player.getFactionEmoji() + " is destroying a unit that sustained damage by using Krovoz Strike Teams. The owner should destroy the unit with the assign hits button.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getFactionEmoji()
+                    + " is destroying a unit that sustained damage by using _Krovoz Strike Teams_. The owner should destroy the unit with the assign hits button.");
             }
             case "absol_nm" -> { // Absol's Neural Motivator
                 deleteIfButtonEvent(event);
@@ -193,7 +201,7 @@ public class PlayerTechService {
                     String ident = player.getFactionEmoji();
                     String msg = ident + " removed command token from " + tileRep + ".";
                     MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
-                    RemoveCommandCounterService.fromTile(event, player.getColor(), tile, game);
+                    RemoveCommandCounterService.fromTile(player.getColor(), tile, game);
                 }
             }
             case "td", "absol_td" -> // Transit Diodes
@@ -254,19 +262,26 @@ public class PlayerTechService {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
+            case "nekroc4r" -> {
+                List<Button> buttons = ButtonHelperFactionSpecific.getc4RedTechButtons(player);
+                String message = player.getRepresentation() + ", please choose one of the options for this technology:";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
+                sendNextActionButtonsIfButtonEvent(event, game, player);
+            }
             case "dsuydag" -> {
                 deleteIfButtonEvent(event);
                 ActionCardHelper.doRise(player, event, game);
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
                 buttons.add(doneExhausting);
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), "Click the names of the planets you wish to exhaust to pay the required " + player.getPlanetsAllianceMode().size() + " influence.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    "Please choose the planets you wish to exhaust to pay the required " + player.getPlanetsAllianceMode().size() + " influence.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsuydab" -> {
                 game.setDominusOrb(true);
                 ButtonHelper.deleteMessage(event);
-                String message = "Choose a system to move from.";
+                String message = "Please choose a system to move from.";
                 List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
             }
@@ -275,7 +290,7 @@ public class PlayerTechService {
                 List<Button> buttons = Helper.getPlanetPlaceUnitButtons(player, game, "sd",
                     "placeOneNDone_skipbuild");
                 String message = player.getRepresentationUnfogged()
-                    + " select the planet you would like to place or move a space dock to.";
+                    + ", please choose the planet you wish to place or move a space dock to.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -295,21 +310,21 @@ public class PlayerTechService {
             case "vtx", "absol_vtx" -> { // Vortex
                 deleteIfButtonEvent(event);
                 List<Button> buttons = ButtonHelperFactionSpecific.getUnitButtonsForVortex(player, game, event);
-                String message = player.getRepresentationUnfogged() + ", please select which unit you would like to capture.";
+                String message = player.getRepresentationUnfogged() + ", please choose which unit you wish to capture.";
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "wg" -> { // Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentationUnfogged() + " select the type of wormhole you wish to drop.";
+                String message = player.getRepresentationUnfogged() + ", please choose the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "absol_wg" -> { // Absol's Wormhole Generator
                 deleteIfButtonEvent(event);
                 List<Button> buttons = new ArrayList<>(ButtonHelperFactionSpecific.getCreussIFFTypeOptions());
-                String message = player.getRepresentationUnfogged() + " select the type of wormhole you wish to drop.";
+                String message = player.getRepresentationUnfogged() + ", please choose the type of wormhole you wish to drop.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     message, buttons);
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -336,18 +351,7 @@ public class PlayerTechService {
             }
             case "det", "absol_det" -> {
                 deleteIfButtonEvent(event);
-                DiceHelper.Die d1 = new DiceHelper.Die(5);
-
-                String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
-                if (d1.getResult() > 4) {
-                    message += "blue backed tile";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    DiscordantStarsHelper.drawBlueBackTiles(event, game, player, 1);
-                } else {
-                    message += "red backed tile";
-                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                    DiscordantStarsHelper.drawRedBackTiles(event, game, player, 1);
-                }
+                ButtonHelper.starChartStep1(game, player, "unknown");
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "sr", "absol_sar" -> { // Sling Relay or Absol Self Assembley Routines
@@ -368,12 +372,12 @@ public class PlayerTechService {
                     }
                 }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-                    "Select which tile you would like to produce a ship in ", buttons);
+                    "Please choose which system you wish to produce a ship in.", buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
             case "dsdihmy" -> { // Impressment Programs
                 List<Button> buttons = ButtonHelper.getButtonsToExploreReadiedPlanets(player, game);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select a planet to explore",
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please choose a planet to explore.",
                     buttons);
                 sendNextActionButtonsIfButtonEvent(event, game, player);
             }
@@ -398,7 +402,10 @@ public class PlayerTechService {
         }
     }
 
-    private static void sendNextActionButtonsIfButtonEvent(GenericInteractionCreateEvent event, Game game, Player player) {
+    private static void sendNextActionButtonsIfButtonEvent(
+        GenericInteractionCreateEvent event, Game game,
+        Player player
+    ) {
         if (event instanceof ButtonInteractionEvent) {
             ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         }
@@ -428,7 +435,8 @@ public class PlayerTechService {
         String techID = StringUtils.substringAfter(buttonID, "getTech_");
         techID = AliasHandler.resolveTech(techID);
         if (!Mapper.isValidTech(techID)) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
+            BotLogger.warning(new BotLogger.LogMessageOrigin(event),
+                "`ButtonHelper.getTech` Invalid TechID in 'getTech_' Button: " + techID);
             return;
         }
         TechnologyModel techM = Mapper.getTech(techID);
@@ -442,11 +450,18 @@ public class PlayerTechService {
         if (techM.isUnitUpgrade()) {
             if (player.hasUnexhaustedLeader("mirvedaagent") && player.getStrategicCC() > 0) {
                 List<Button> buttons = new ArrayList<>();
-                buttons.add(Buttons.gray("exhaustAgent_mirvedaagent_" + player.getFaction(), "Use Mirveda Agent", FactionEmojis.mirveda));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentationUnfogged()
-                    + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Logic Machina, the Mirveda"
-                    + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, by spending 1 command token from your strategy pool"
-                    + " to research a technology of the same color as a prerequisite of the unit upgrade you just got.",
+                buttons.add(Buttons.gray("exhaustAgent_mirvedaagent_" + player.getFaction(), "Use Mirveda Agent",
+                    FactionEmojis.mirveda));
+                MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(), player.getRepresentationUnfogged()
+                        + " you may use "
+                        + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                        + "Logic Machina, the Mirveda"
+                        + (player.hasUnexhaustedLeader("yssarilagent")
+                            ? "/Yssaril"
+                            : "")
+                        + " agent, by spending 1 command token from your strategy pool"
+                        + " to research a technology of the same color as a prerequisite of the unit upgrade you just got.",
                     buttons);
             }
             if (player.hasAbility("obsessive_designs") && paymentRequired
@@ -460,14 +475,17 @@ public class PlayerTechService {
                 List<Button> buttons;
                 Tile tile = game.getTile(AliasHandler.resolveTile(player.getFaction()));
                 if (player.hasAbility("mobile_command")
-                    && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship).isEmpty()) {
-                    tile = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship).getFirst();
+                    && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship)
+                        .isEmpty()) {
+                    tile = ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, Units.UnitType.Flagship)
+                        .getFirst();
                 }
                 if (tile == null) {
                     tile = player.getHomeSystemTile();
                 }
                 if (tile == null) {
-                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Could not find your home system, sorry bro.");
+                    MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                        "Could not find your home system, sorry bro.");
                 }
                 buttons = Helper.getPlaceUnitButtons(event, player, game, tile, "obsessivedesigns", "place");
                 int val = Helper.getProductionValue(player, game, tile, true);
@@ -489,10 +507,12 @@ public class PlayerTechService {
 
         if (player.hasUnexhaustedLeader("zealotsagent")) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Rhodun Agent", FactionEmojis.zealots));
+            buttons.add(Buttons.gray("exhaustAgent_zealotsagent_" + player.getFaction(), "Use Rhodun Agent",
+                FactionEmojis.zealots));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
                 player.getRepresentationUnfogged()
-                    + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "") + "Priestess Tuh, the Rhodun"
+                    + " you may use " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
+                    + "Priestess Tuh, the Rhodun"
                     + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
                     + " agent, to produce 1 ship at home or in a system where you have a technology specialty planet.",
                 buttons);
@@ -505,7 +525,8 @@ public class PlayerTechService {
         if ("iihq".equalsIgnoreCase(techID)) {
             message.append("\n Automatically added the Custodia Vigilia planet");
         }
-        if ("cm".equalsIgnoreCase(techID) && game.getActivePlayer() != null && game.getActivePlayerID().equalsIgnoreCase(player.getUserID()) && !player.getSCs().contains(7)) {
+        if ("cm".equalsIgnoreCase(techID) && game.getActivePlayer() != null
+            && game.getActivePlayerID().equalsIgnoreCase(player.getUserID()) && !player.getSCs().contains(7)) {
             if (!game.isFowMode()) {
                 GameMessageManager
                     .remove(game.getName(), GameMessageType.TURN)
@@ -516,10 +537,24 @@ public class PlayerTechService {
             Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
             if (nextPlayer != null && !game.isFowMode()) {
                 if (nextPlayer == player) {
-                    text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+                    text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
                 } else {
-                    String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
-                    text += "\n-# " + ping + " will start their turn once you've ended yours.";
+                    String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
+                        ? nextPlayer.getRepresentationUnfogged()
+                        : nextPlayer.getRepresentationNoPing();
+                        int numUnpassed = -2;
+                        for (Player p2 : game.getPlayers().values()) {
+                            numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                        }
+                        text += "\n-# " + ping + " will start their turn once you've ended yours. ";
+                        if (numUnpassed == 0)
+                        {
+                            text += "No other players are unpassed.";
+                        }
+                        else
+                        {
+                            text += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                        }
                 }
             }
             String buttonText = "Use buttons to do your turn. ";
@@ -552,18 +587,24 @@ public class PlayerTechService {
         }
         if (player.hasUnit("augers_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") < 4) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getFactionEmoji() + " has the opportunity to DEPLOY an Iledrith (Ilyxum mech) on a legendary planet or planet with a technology specialty.");
-            String message2 = player.getRepresentationUnfogged() + ", please use buttons to drop 1 mech on a legendary planet or planet with a technology specialty.";
-            List<Button> buttons2 = new ArrayList<>(Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
+                player.getFactionEmoji()
+                    + " has the opportunity to DEPLOY an Iledrith (Ilyxum mech) on a legendary planet or planet with a technology specialty.");
+            String message2 = player.getRepresentationUnfogged()
+                + ", please use buttons to drop 1 mech on a legendary planet or planet with a technology specialty.";
+            List<Button> buttons2 = new ArrayList<>(
+                Helper.getPlanetPlaceUnitButtons(player, game, "mech", "placeOneNDone_skipbuild"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message2, buttons2);
         }
 
         ButtonHelper.deleteMessage(event);
     }
 
-    public static void payForTech(Game game, Player player, ButtonInteractionEvent event, String tech, final String payWith) {
+    public static void payForTech(
+        Game game, Player player, ButtonInteractionEvent event, String tech,
+        final String payWith
+    ) {
         String trueIdentity = player.getRepresentationUnfogged();
-        String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
+        String message2 = trueIdentity + ", please choose the planets you wish to exhaust. ";
         String payType = payWith != null ? payWith : "res";
         if (!payType.equals("res") && !payType.equals("inf") && !payType.equals("tgsonly")) {
             payType = "res";
@@ -585,22 +626,26 @@ public class PlayerTechService {
         if (!techM.isUnitUpgrade() && player.hasAbility("iconoclasm")) {
 
             for (int x = 1; x < player.getCrf() + 1; x++) {
-                Button transact = Buttons.blue("purge_Frags_CRF_" + x, "Purge Cultural Fragments (" + x + ")", ExploreEmojis.CFrag);
+                Button transact = Buttons.blue("purge_Frags_CRF_" + x, "Purge Cultural Fragments (" + x + ")",
+                    ExploreEmojis.CFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; (x < player.getIrf() + 1 && x < 4); x++) {
-                Button transact = Buttons.green("purge_Frags_IRF_" + x, "Purge Industrial Fragments (" + x + ")", ExploreEmojis.IFrag);
+                Button transact = Buttons.green("purge_Frags_IRF_" + x, "Purge Industrial Fragments (" + x + ")",
+                    ExploreEmojis.IFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; (x < player.getHrf() + 1 && x < 4); x++) {
-                Button transact = Buttons.red("purge_Frags_HRF_" + x, "Purge Hazardous Fragments (" + x + ")", ExploreEmojis.HFrag);
+                Button transact = Buttons.red("purge_Frags_HRF_" + x, "Purge Hazardous Fragments (" + x + ")",
+                    ExploreEmojis.HFrag);
                 buttons.add(transact);
             }
 
             for (int x = 1; x < player.getUrf() + 1; x++) {
-                Button transact = Buttons.gray("purge_Frags_URF_" + x, "Purge Frontier Fragments (" + x + ")", ExploreEmojis.UFrag);
+                Button transact = Buttons.gray("purge_Frags_URF_" + x, "Purge Frontier Fragments (" + x + ")",
+                    ExploreEmojis.UFrag);
                 buttons.add(transact);
             }
 
@@ -617,7 +662,8 @@ public class PlayerTechService {
             buttons.add(Buttons.gray("exhaustAgent_jolnaragent", "Use Jol-Nar Agent", FactionEmojis.Jolnar));
         }
         if (player.hasUnexhaustedLeader("veldyragent")) {
-            buttons.add(Buttons.red("exhaustAgent_veldyragent_" + player.getFaction(), "Use Veldyr Agent", FactionEmojis.veldyr));
+            buttons.add(Buttons.red("exhaustAgent_veldyragent_" + player.getFaction(), "Use Veldyr Agent",
+                FactionEmojis.veldyr));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "yincommander")) {
             buttons.add(Buttons.gray("yinCommanderStep1_", "Remove Infantry via Yin Commander", FactionEmojis.Yin));
@@ -628,7 +674,8 @@ public class PlayerTechService {
         }
         if (ButtonHelper.isLawInPlay(game, "revolution")) {
             MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(),
-                player.getRepresentation() + ", due to the _Anti-Intellectual Revolution_ law, you now have to destroy a non-fighter ship (if you __researched__ the technology you just acquired).",
+                player.getRepresentation()
+                    + ", due to the _Anti-Intellectual Revolution_ law, you now have to destroy a non-fighter ship (if you __researched__ the technology you just acquired).",
                 Buttons.gray("getModifyTiles", "Modify Units"));
         }
     }

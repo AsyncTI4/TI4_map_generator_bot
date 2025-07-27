@@ -210,10 +210,19 @@
         "source": "ds"
     },
     {
-        "ItemCategory": "ABILITY",
-        "ItemId": "spawning_grounds",
-        "OptionalSwaps": [
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "ghoti_flagship",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "STARTINGFLEET",
+        "ItemId": "ghoti",
+        "AdditionalComponents": [
             "ABILITY:mobile_command"
+        ],
+        "OptionalSwaps": [
+            "FLAGSHIP:ghoti_flagship"
         ],
         "source": "ds"
     },
@@ -524,11 +533,11 @@
         "ItemCategory": "MECH",
         "ItemId": "nivyn_mech",
         "AdditionalComponents": [
-            "ABILITY:singularity_point",
-            "HERO:nivynhero"
+            "ABILITY:singularity_point"
         ],
         "OptionalSwaps": [
-            "TECH:dsnivymf"
+            "TECH:dsnivymf",
+            "HERO:nivynhero"
         ],
         "source": "ds"
     },
@@ -636,9 +645,6 @@
         "AdditionalComponents": [
             "ABILITY:fine_print"
         ],
-        "OptionalSwaps": [
-            "MECH:vaden_mech"
-        ],
         "source": "ds"
     },
     {
@@ -654,15 +660,14 @@
             "ABILITY:binding_debts",
             "ABILITY:fine_print"
         ],
-        "OptionalSwaps": [
-            "MECH:vaden_mech"
-        ],
         "source": "ds"
     },
     {
         "ItemCategory": "MECH",
         "ItemId": "vaden_mech",
-        "Undraftable": true,
+        "AdditionalComponents": [
+            "ABILITY:fine_print"
+        ],
         "source": "ds"
     },
     {
@@ -801,12 +806,6 @@
     },
     {
         "ItemCategory": "ABILITY",
-        "ItemId":"dark_purpose",
-        "Undraftable": true,
-        "source": "ds"
-    },
-    {
-        "ItemCategory": "ABILITY",
         "ItemId":"mark_of_pharadn",
         "Undraftable": true,
         "source": "ds"
@@ -828,12 +827,127 @@
         "ItemId": "dspharinf",
         "AdditionalComponents": [
             "ABILITY:ancient_empire",
-            "ABILITY:dark_purpose",
             "ABILITY:mark_of_pharadn"
         ],
         "OptionalSwaps": [
             "COMMANDER:pharadncommander",
             "HERO:pharadnhero"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "black_ops",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "data_recovery",
+        "AdditionalComponents": [
+            "ABILITY:black_ops"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "toldarcommander",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "pride",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "the_code",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "MECH",
+        "ItemId": "toldar_mech",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "honor_bound",
+        "AdditionalComponents": [
+            "ABILITY:pride",
+            "ABILITY:the_code"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:toldarcommander",
+            "MECH:toldar_mech"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "belkoseacommander",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "superweapon_projects",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "classified_developments",
+        "AdditionalComponents": [
+            "ABILITY:superweapon_projects"
+        ],
+        "OptionalSwaps": [
+            "COMMANDER:belkoseacommander"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "AGENT",
+        "ItemId": "atokeraagent",
+        "Undraftable": true,
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "living_metals",
+        "Undraftable": true,
+        "source": "ds"
+    }, 
+    {
+        "ItemCategory": "TECH",
+        "ItemId": "dsatoky",
+        "Undraftable": true,
+        "source": "ds"
+    }, 
+    {
+        "ItemCategory": "COMMANDER",
+        "ItemId": "atokeracommander",
+        "OptionalSwaps": [
+            "AGENT:atokeraagent"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "ABILITY",
+        "ItemId": "synthesis",
+        "AdditionalComponents": [
+            "ABILITY:living_metals"
+        ],
+        "source": "ds"
+    },
+    {
+        "ItemCategory": "FLAGSHIP",
+        "ItemId": "atokera_flagship",
+        "OptionalSwaps": [
+            "TECH:dsatoky"
         ],
         "source": "ds"
     }

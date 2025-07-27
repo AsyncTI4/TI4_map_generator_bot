@@ -8,12 +8,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -24,6 +23,7 @@ import ti4.helpers.ColorChangeHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.ThreadArchiveHelper;
 import ti4.helpers.TitlesHelper;
 import ti4.helpers.Units;
 import ti4.helpers.settingsFramework.menus.GameSettings;
@@ -36,7 +36,7 @@ import ti4.image.PositionMapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
 import ti4.model.MapTemplateModel;
@@ -271,12 +271,14 @@ public class MiltyService {
             tileSources.add(Source.ComponentSource.codex1);
             tileSources.add(Source.ComponentSource.codex2);
             tileSources.add(Source.ComponentSource.codex3);
+            tileSources.add(Source.ComponentSource.codex4);
             factionSources = new ArrayList<>(tileSources);
         }
     }
 
     public static void secondHalfOfPlayerSetup(Player player, Game game, String color, String faction, String positionHS, GenericInteractionCreateEvent event, boolean setSpeaker) {
         Map<String, Player> players = game.getPlayers();
+        ThreadArchiveHelper.checkThreadLimitAndArchive(event.getGuild());
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
@@ -286,6 +288,10 @@ public class MiltyService {
                     return;
                 } else if (faction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setup Failed - Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
+                    return;
+                }
+                if (faction.equalsIgnoreCase("franken1") || faction.equalsIgnoreCase("franken2")) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Setup Failed - Franken1 and Franken2 have issues and should not be used by anyone going forward. Try a different franken number");
                     return;
                 }
             }
@@ -339,12 +345,19 @@ public class MiltyService {
         // HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction) || "miltymod_ghost".equals(faction)) {
             tile.addToken(Mapper.getTokenID(Constants.FRONTIER), Constants.SPACE);
-            tile = new Tile("51", "tr");
+            String pos = "tr";
+            if (positionHS.equalsIgnoreCase("307") || positionHS.equalsIgnoreCase("310")) {
+                pos = "br";
+            }
+            if (positionHS.equalsIgnoreCase("313") || positionHS.equalsIgnoreCase("316")) {
+                pos = "bl";
+            }
+            tile = new Tile("51", pos);
             game.setTile(tile);
         }
 
         // STARTING COMMODITIES
-        player.setCommoditiesTotal(factionModel.getCommodities());
+        player.setCommoditiesBase(factionModel.getCommodities());
 
         // STARTING PLANETS
         for (String planet : factionModel.getHomePlanets()) {
@@ -487,20 +500,20 @@ public class MiltyService {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("startAncientEmpire", "Place a tomb token"));
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation() + " You can use this button to place 14 tomb tokens.", buttons);
+                player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.", buttons);
         }
 
         if (player.hasAbility("private_fleet")) {
             String unitID = AliasHandler.resolveUnit("destroyer");
             player.setUnitCap(unitID, 12);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set destroyer max to 12 for " + player.getRepresentation() + " due to the **Private Fleet** ability,");
+                "Set destroyer max to 12 for " + player.getRepresentation() + ", due to the **Private Fleet** ability,");
         }
         if (player.hasAbility("industrialists")) {
             String unitID = AliasHandler.resolveUnit("spacedock");
             player.setUnitCap(unitID, 4);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                "Set space dock max to 4 for " + player.getRepresentation() + " due to the **Industrialists** ability,");
+                "Set space dock max to 4 for " + player.getRepresentation() + ", due to the **Industrialists** ability,");
         }
         if (player.hasAbility("teeming")) {
             String unitID = AliasHandler.resolveUnit("dreadnought");
@@ -509,7 +522,14 @@ public class MiltyService {
             player.setUnitCap(unitID, 5);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
-                    + " due to the **Teeming** ability.");
+                    + ", due to the **Teeming** ability.");
+        }
+        if (player.hasAbility("machine_cult")) {
+            String unitID = AliasHandler.resolveUnit("mech");
+            player.setUnitCap(unitID, 6);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                "Set mech unit maximum to 6 for " + player.getRepresentation()
+                    + ", due to their **Machine Cult** ability.");
         }
         if (player.hasAbility("policies")) {
             player.removeAbility("policies");
@@ -518,14 +538,11 @@ public class MiltyService {
             player.addAbility("policy_the_economy_empower");
             player.removeOwnedUnitByID("olradin_mech");
             player.addOwnedUnitByID("olradin_mech_positive");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationUnfogged() + " automatically set all of your policies to the positive side, but you can flip any of them now with these buttons");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
             ButtonHelperHeroes.offerOlradinHeroFlips(game, player);
-        }
-        if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
-            player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
-                Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), player.getColor())));
         }
         if (player.hasAbility("oracle_ai")) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),

@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -26,13 +19,11 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
@@ -398,7 +389,7 @@ public class PlayerAreaGenerator {
         // Row 2
         xDeltaBottom = reinforcements(player, xDeltaBottom, yPlayAreaSecondRow, unitCount);
 
-        // EQUALIZE AND CONTINUE 
+        // EQUALIZE AND CONTINUE
         xDeltaTop = xDeltaBottom = Math.max(xDeltaTop, xDeltaBottom);
 
         // Row 1
@@ -565,13 +556,16 @@ public class PlayerAreaGenerator {
     }
 
     private int honorOrPathTokens(Player player, int xDeltaFromRightSide, int yDelta) {
-        if (player.getHonorCounter() < 1 && player.getPathTokenCounter() < 1) {
+        if (player.getDishonorCounter() < 1 && player.getHonorCounter() < 1 && player.getPathTokenCounter() < 1) {
             return xDeltaFromRightSide;
         }
         if (player.getHonorCounter() > 0) {
             DrawingUtil.superDrawStringCenteredDefault(graphics, "Honor Count: " + player.getHonorCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
         } else {
             DrawingUtil.superDrawStringCenteredDefault(graphics, "Path Token Count: " + player.getPathTokenCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 50);
+        }
+        if (player.getDishonorCounter() > 0) {
+            DrawingUtil.superDrawStringCenteredDefault(graphics, "Dishonor Count: " + player.getHonorCounter(), mapWidth - xDeltaFromRightSide - 300, yDelta + 100);
         }
         return xDeltaFromRightSide + 200;
     }
@@ -600,6 +594,10 @@ public class PlayerAreaGenerator {
 
         if (!gammaOnMap) {
             String tokenFile = Mapper.getTokenPath(gammaID);
+            if (game.isLiberationC4Mode())
+            {
+                tokenFile = tokenFile.replace("token_creuss", "token_crimsoncreuss");
+            }
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, mapWidth - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             xDeltaSecondRowFromRightSide += 40;
@@ -608,6 +606,10 @@ public class PlayerAreaGenerator {
 
         if (!betaOnMap) {
             String tokenFile = Mapper.getTokenPath(betaID);
+            if (game.isLiberationC4Mode())
+            {
+                tokenFile = tokenFile.replace("token_creuss", "token_crimsoncreuss");
+            }
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, mapWidth - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             if (travelBan) {
@@ -624,6 +626,10 @@ public class PlayerAreaGenerator {
 
         if (!alphaOnMap) {
             String tokenFile = Mapper.getTokenPath(alphaID);
+            if (game.isLiberationC4Mode())
+            {
+                tokenFile = tokenFile.replace("token_creuss", "token_crimsoncreuss");
+            }
             BufferedImage bufferedImage = ImageHelper.read(tokenFile);
             graphics.drawImage(bufferedImage, mapWidth - xDeltaSecondRowFromRightSide, yPlayAreaSecondRow, null);
             if (travelBan) {
@@ -968,7 +974,11 @@ public class PlayerAreaGenerator {
 
             if (Mapper.isValidLeader(leader.getId())) {
                 LeaderModel leaderModel = Mapper.getLeader(leader.getId());
-                drawFactionIconImage(graphics, leaderModel.getFaction(), x + deltaX - 1, y + 108, 42, 42);
+                String fac = leaderModel.getFaction();
+                if (leader.getId().contains("redcreuss")) {
+                    fac = "redcreuss";
+                }
+                drawFactionIconImage(graphics, fac, x + deltaX - 1, y + 108, 42, 42);
             }
 
             if (leader.getTgCount() != 0) {
@@ -1143,9 +1153,23 @@ public class PlayerAreaGenerator {
                     graphics.drawImage(resourceBufferedImage, x + deltaX, y, null);
                     drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
                 } else {
-                    drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
-                    g2.setFont(Storage.getFont16());
-                    DrawingUtil.drawTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 6, y + 144, 130);
+                    if (game.isLiberationC4Mode() && "ghost".equals(abilityModel.getFaction())) {
+                        drawFactionIconImage(g2, "redcreuss", x + deltaX - 1, y, 42, 42);
+                    }
+                    else
+                    {
+                        drawFactionIconImage(g2, abilityModel.getFaction(), x + deltaX - 1, y, 42, 42);
+                    }
+                    if (abilityModel.getShrinkName())
+                    {
+                        g2.setFont(Storage.getFont16());
+                        DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 9, y + 144, 130);
+                    }
+                    else
+                    {
+                        g2.setFont(Storage.getFont18());
+                        DrawingUtil.drawOneOrTwoLinesOfTextVertically(g2, abilityModel.getShortName(), x + deltaX + 7, y + 144, 130);
+                    }
                     drawRectWithOverlay(g2, x + deltaX - 2, y - 2, 44, 152, abilityModel);
                 }
 
@@ -1274,8 +1298,8 @@ public class PlayerAreaGenerator {
                 }
 
                 String unitName = unitKey.getUnitType().humanReadableName();
-                if (numInReinforcements < 0 && game.isCcNPlasticLimit()) {
-                    String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove";
+                if (!game.isHasEnded() && numInReinforcements < 0 && game.isCcNPlasticLimit()) {
+                    String warningMessage = player.getRepresentation() + " is exceeding unit plastic or cardboard limits for " + unitName + ". Use buttons to remove.";
                     List<Button> removeButtons = ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), warningMessage, removeButtons);
                     GMService.logPlayerActivity(game, player, warningMessage);
@@ -1665,8 +1689,9 @@ public class PlayerAreaGenerator {
         List<String> fakePlanets = new ArrayList<>();
         for (String planet : planets) {
             PlanetModel model = Mapper.getPlanet(planet);
+
             Set<PlanetType> types = new HashSet<>();
-            if (model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
+            if (model != null && model.getPlanetTypes() != null) types.addAll(model.getPlanetTypes());
 
             if (types.contains(PlanetType.FAKE)) {
                 fakePlanets.add(planet);
@@ -1746,6 +1771,11 @@ public class PlayerAreaGenerator {
 
         try {
             Planet planet = planetsInfo.get(planetName);
+            if (planet == null) {
+                player.removePlanet(planetName);
+                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Planet " + planetName + " not found in game " + game.getName() + ". Removing planet from player.");
+                return deltaX;
+            }
             PlanetModel planetModel = planet.getPlanetModel();
             if (planetModel == null) return deltaX;
 
@@ -1763,8 +1793,12 @@ public class PlayerAreaGenerator {
             }
             if (originalPlanetTypes != null && originalPlanetTypes.contains(PlanetType.FACTION)) {
                 planetDisplayIcon = Mapper.getPlanet(planetName).getFactionHomeworld();
-                if (planetDisplayIcon == null) // fallback to current player's faction
+                if (planetDisplayIcon == null) { // fallback to current player's faction
                     planetDisplayIcon = player.getFaction();
+                }
+                if (game.isLiberationC4Mode() && "ghost".equals(planetDisplayIcon)) {
+                    planetDisplayIcon = "redcreuss";
+                }
             }
 
             Set<String> planetTypes = planet.getPlanetTypes();
@@ -1780,7 +1814,7 @@ public class PlayerAreaGenerator {
                     planetDisplayIcon = "keleres";
                 }
 
-                if (Mapper.isValidFaction(planetDisplayIcon)) {
+                if (Mapper.isValidFaction(planetDisplayIcon) || "redcreuss".equals(planetDisplayIcon)) {
                     drawFactionIconImage(graphics, planetDisplayIcon, x + deltaX - 2, y - 2, 52, 52);
                 } else {
                     String planetTypeName = "pc_attribute_" + planetDisplayIcon + ".png";
@@ -1871,6 +1905,25 @@ public class PlayerAreaGenerator {
                 DrawingUtil.drawTextVertically(graphics, planetModel.getShortName().toUpperCase(), x + deltaX + 9, y + 144, Storage.getFont16());
             } else {
                 DrawingUtil.drawTextVertically(graphics, planetModel.getShortName().toUpperCase(), x + deltaX + 7, y + 144, Storage.getFont18());
+            }
+
+            if (!game.getStoredValue("CommsOnPlanet" + planet.getName()).isEmpty()) {
+                int comms = Integer.parseInt(game.getStoredValue("CommsOnPlanet" + planet.getName()));
+                graphics.setColor(Color.GRAY);
+                graphics.setFont(Storage.getFont26());
+                int offset2 = 20 - graphics.getFontMetrics().stringWidth("" + comms) / 2;
+                if (game.isFacilitiesMode()) {
+                    graphics.setColor(ColorUtil.TradeGoodColor);
+                }
+                graphics.drawString(Integer.toString(comms), x + deltaX + 15 + offset2, y + 67);
+            }
+            if (player.getHarvestCounter() > 0 && planet.getName().equalsIgnoreCase("uikos")) {
+                int comms = player.getHarvestCounter();
+                graphics.setFont(Storage.getFont26());
+                int offset2 = 20 - graphics.getFontMetrics().stringWidth("" + comms) / 2;
+                graphics.setColor(Color.GRAY);
+
+                graphics.drawString(Integer.toString(comms), x + deltaX + offset2 - 10, y + 69);
             }
 
             return deltaX + 56;
@@ -1982,7 +2035,13 @@ public class PlayerAreaGenerator {
 
             // Draw Faction Tech Icon
             if (techModel.getFaction().isPresent()) {
-                drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
+                if (game.isLiberationC4Mode() && "ghost".equals(techModel.getFaction().get())) {
+                    drawFactionIconImage(graphics, "redcreuss", x + deltaX - 1, y + 108, 42, 42);
+                }
+                else
+                {
+                    drawFactionIconImage(graphics, techModel.getFaction().get(), x + deltaX - 1, y + 108, 42, 42);
+                }
             } else {
                 Color foreground = switch (techModel.getFirstType()) {
                     case PROPULSION -> ColorUtil.PropulsionTech;
@@ -2128,7 +2187,13 @@ public class PlayerAreaGenerator {
             }
 
             if (techModel.getFaction().isPresent()) {
-                drawFactionIconImageOpaque(graphics, techModel.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
+                if (game.isLiberationC4Mode() && "ghost".equals(techModel.getFaction().get())) {
+                    drawFactionIconImageOpaque(graphics, "redcreuss", x + deltaX + 1, y + 108, 42, 42, 0.5f);
+                }
+                else
+                {
+                    drawFactionIconImageOpaque(graphics, techModel.getFaction().get(), x + deltaX + 1, y + 108, 42, 42, 0.5f);
+                }
             }
 
             if (techModel.getShrinkName()) {
@@ -2468,7 +2533,7 @@ public class PlayerAreaGenerator {
         if (player.isSearchWarrant()) {
             graphics.setColor(Color.LIGHT_GRAY);
             Map<String, Integer> revealedSecrets = new LinkedHashMap<>(secrets);
-            y = displaySecretObjectives(y, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, customPublicVP);
+            y = displaySecretObjectives(y, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret);
         }
         Map<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
@@ -2483,7 +2548,7 @@ public class PlayerAreaGenerator {
             scoredSecretObjectives.put(id, List.of(player.getUserID()));
         }
         graphics.setColor(Color.RED);
-        y = displaySecretObjectives(y, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret, customPublicVP);
+        y = displaySecretObjectives(y, scoredSecretObjectives, revealedSecretObjectives, players, secretObjectives, secret);
         if (player.isSearchWarrant()) {
             return secretsScored.size() + player.getSecrets().size();
         }
@@ -2496,10 +2561,8 @@ public class PlayerAreaGenerator {
         Map<String, Integer> revealedPublicObjectives,
         Map<String, Player> players,
         Map<String, String> publicObjectivesState,
-        Set<String> po,
-        Map<String, Integer> customPublicVP
+        Set<String> po
     ) {
-
         Set<String> keysToRemove = new HashSet<>();
         for (Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
             int x = 50;

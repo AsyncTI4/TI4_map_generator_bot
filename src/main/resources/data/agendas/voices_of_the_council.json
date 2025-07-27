@@ -1,0 +1,470 @@
+[
+    {
+        "alias": "cryypter_revolution",
+        "name": "Anti-Intellectual Revolution",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player that cast 5 or more votes \"For\" places a control token on this card. After a player researches a technology, that player must destroy 1 of their non-fighter ships - that ship must have a total cost at least equal to the number of tokens on this card, if able.",
+        "text2": "Against: At the start of the next strategy phase, each player exhausts 1 planet for each technology that they own, reduced by 1 for each player that cast fewer votes For.",
+        "mapText": "After a player researches a technology, that player must destroy 1 of their non-fighter ships - that ship must have a total cost at least equal to the number of tokens on this card, if able.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_secret",
+        "name": "Archived Secret",
+        "type": "Directive",
+        "target": "Elect Player",
+        "text1": "The elected player draws 2 secret objectives, chooses 1 to keep, and gives the other card to the runner-up.",
+        "text2": "",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_arms_reduction",
+        "name": "Arms Reduction",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player destroys all but 2 of their dreadnoughts, then destroys 1 of their cruisers or destroyers for each player who cast more votes 'For'.",
+        "text2": "Against: At the start of the next strategy phase, each player exhausts each of their planets that have a technology specialty, then the player that cast the fewest votes 'Against' exhausts each of their technologies that has an exhaust ability.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_classified",
+        "name": "Classified Document Leaks",
+        "type": "Law",
+        "target": "Elect Scored Secret Objective (When this agenda is revealed, if there are 2 or fewer scored secret objectives, discard this card and reveal another agenda from the top of the deck.)",
+        "text1": "The elected secret objective becomes a public objective; place it near the other public objectives in the common play area. The player who owns the runner-up gains 1 command token.",
+        "text2": "",
+        "mapText": "The elected secret objective becomes a public objective. Place it near the other public objectives in the common play area.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_redistribution",
+        "name": "Colonial Redistribution",
+        "type": "Directive",
+        "target": "Elect 2 Non-Home Planets Other Than Mecatol Rex controlled by different players",
+        "text1": "Destroy each unit on the elected planets. Then, for each planet, the player who controls that planet chooses 1 player with the fewest victory points; that player gains control of that planet and may place 1 infantry from their reinforcements on that planet.",
+        "text2": "",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_committee",
+        "name": "Committee Formation",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card, then the runner-up places a control token on this card. Before players vote on an agenda that requires a player to be elected, the owner of this card may discard this card to choose a player to be elected, then the player whose control token is on this card chooses a 2nd player to be the runner-up. Players do not vote on that agenda.",
+        "text2": "",
+        "mapText": "Before players vote on an elect-player agenda, you may discard this card to choose a player to be elected, then the player whose control token is on this card chooses a 2nd player to be the runner-up. Players do not vote on that agenda.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_disarmamament",
+        "name": "Compensated Disarmament",
+        "type": "Directive",
+        "target": "Elect 2 Planets controlled by different players",
+        "text1": "Destroy each ground force on the elected planets. For each unit that was destroyed, the player who controls that planet gains 1 trade good.",
+        "text2": "",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_conventions",
+        "name": "Conventions of War",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: The player that cast the most votes \"For\" attaches this card to a planet they control with a planet trait. Players cannot use BOMBARDMENT against units that are on planets with the same trait as this planet.",
+        "text2": "Against: Each player that voted \"Against\" chooses 1 action card from their hand for each player that cast fewer votes Against, then discards the rest.",
+        "mapText": "Players cannot use BOMBARDMENT against units that are on planets with the same trait as this planet.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_economic_equality",
+        "name": "Economic Equality",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player returns all of their trade goods to the supply. Then, each player gains 1 trade good for every 7 votes cast 'For'.",
+        "text2": "Against: Each player loses 1 trade good for each player that did not cast 5 or more votes against.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_travel_ban",
+        "name": "Enforced Travel Ban",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Alpha and beta wormholes have no effect during movement. In order of most votes cast \"For\", each player may place 1 cruiser from their reinforcements in a system that contains a wormhole and no other player’s ships.",
+        "text2": "Against: Each player chooses 1 of their PDS in or adjacent to a system that contains a wormhole for each player that cast fewer votes, then destroys the rest.",
+        "mapText": "Alpha and beta wormholes have no effect during movement.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_sanctions",
+        "name": "Executive Sanctions",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: The player that cast the most votes \"For\" places their control token on this card. Each player can have a maximum of 3 action cards in their hand. When a player discards an action card, a player may remove their control token from this card to take that action card.",
+        "text2": "Against: Each player discards 1 random action card from their hand. The player that cast the most votes \"Against\" draws 1 action card.",
+        "mapText": "Each player can have a maximum of 3 action cards in their hand. When a player discards an action card, a player may remove their control token from this card to take that action card.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_regulations",
+        "name": "Fleet Regulations",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player cannot have more than 4 tokens in their fleet pool. Players that cast 5 or more votes “For” may redistribute any command tokens that would be lost when resolving this law.",
+        "text2": "Against: Each player that cast 5 or more votes “Against” places 1 command token from their reinforcements in their fleet pool.",
+        "mapText": "Each player cannot have more than 4 tokens in their fleet pool.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_defense_act",
+        "name": "Homeland Defense Act",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player can have any number of PDS units on planets they control. Each player that cast 5 or more votes “For” may place 1 PDS on a planet they control.",
+        "text2": "Against: Each player destroys 1 PDS owned by a player that cast fewer votes \"Against\".",
+        "mapText": "Each player can have any number of PDS units on planets they control.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_arbiter",
+        "name": "Imperial Arbiter",
+        "type": "Law",
+        "target": "Elect Player",
+        "text1": "The elected player gains this card, then the runner-up places a control token on this card. At the end of the strategy phase, the owner of this card may choose a player who has no control tokens on this card, then discard this card to swap 1 of their strategy cards with 1 of the chosen player's strategy cards.",
+        "text2": "",
+        "mapText": "At the end of the strategy phase, the owner of this card may choose a player who has no control tokens on this card, then discard this card to swap 1 of their strategy cards with 1 of the chosen player's strategy cards.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_incentive",
+        "name": "Incentive Program",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: The player that cast the most votes 'For' draws 2 stage I public objectives from the deck, chooses 1 to reveal and place near the public objectives, and discards the other.",
+        "text2": "Against: The player with the fewest victory points draws 2 stage II public objectives from the deck, chooses 1 to reveal and place near the public objectives, and discards the other.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_artifact",
+        "name": "Ixthian Artifact",
+        "type": "Directive",
+        "target": "For/Against. When this agenda resolves, the speaker rolls 1 die. If the result is 6-10, the chosen players may research 2 technologies. If the result is 1-5, destroy all units in the chosen system, and each player with units in systems adjacent to the chosen system destroys 3 of their units in each of those systems.",
+        "text1": "For: Choose all players and Mecatol Rex's system.",
+        "text2": "Against: The player that cast the most votes 'For' is chosen, and choses a system that contains a planet they control.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_abolishment",
+        "name": "Judicial Abolishment",
+        "type": "Directive",
+        "target": "Elect Law (When this agenda is revealed, if there are 2 or fewer laws in play, discard this card and reveal another agenda from the top of the deck.)",
+        "text1": "Discard the elected law from play. Treat the runner-up as blank until the next agenda phase.",
+        "text2": "",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_minister_commerce",
+        "name": "Minister of Commerce",
+        "type": "Law",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "* Gain this card: After the owner of this card replenishes commodities, they gain 1 trade good for each player that is their neighbor.",
+        "text2": "* Gain 3 trade goods",
+        "mapText": "After you replenish commodities, gain 1 trade good for each player that is your neighbor.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_minister_exploration",
+        "name": "Minister of Exploration",
+        "type": "Law",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain this card: When the owner of this card gains control of a planet, they gain 1 trade good.",
+        "text2": "*Explore 1 planet you control",
+        "mapText": "When you gain control of a planet, you gain 1 trade good.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_minister_industry",
+        "name": "Minister of Industry",
+        "type": "Law",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain this card: When the owner of this card places a space dock in a system, his units in that system may use their PRODUCTION abilities. When the owner of this card places a PDS in a system, he may produce 1 unit in that system.",
+        "text2": "*Place 1 structure on a planet you control",
+        "mapText": "When you place a space dock in a system, your units in that system may use their PRODUCTION abilities. When you place a PDS in a system, you may produce 1 unit in that system.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_minister_peace",
+        "name": "Minister of Peace",
+        "type": "Law",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain this card: After a player activates a system that contains 1 or more of a different player's units, the owner of this card may discard this card - immediately end the active player's turn.",
+        "text2": "*Choose a system containing a planet you control. Each other non-elected player places a command token from their reinforcements in that system.",
+        "mapText": "After a player activates a system that contains 1 or more of a different player's units, you may discard this card - immediately end the active player's turn.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_minister_policy",
+        "name": "Minister of Policy",
+        "type": "Law",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain this card: At the end of the status phase, the owner of this card draws 1 action card.",
+        "text2": "*Draw 2 action cards.",
+        "mapText": "The owner of this card can have 3 additional action cards. At the end of the status phase, you draw 1 action card.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_minister_sciences",
+        "name": "Minister of Sciences",
+        "type": "Law",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain this card: The owner of this card does not need to spend resources or influence to research technology.",
+        "text2": "*You may spend a token from your strategy pool to research 1 technology",
+        "mapText": "You do not need to spend resources or influence to research technology.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_minister_war",
+        "name": "Minister of War",
+        "type": "Law",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain this card: The owner of this card may discard this card after performing an action to remove 1 of their command counters from the game board and return it to their reinforcements - then they may perform 1 additional action.",
+        "text2": "*Use the PRODUCTION ability of 1 of your units.",
+        "mapText": "Discard this card after performing an action to return 1 of your command counters from the game board to your reinforcements. then you may perform 1 additional action.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_miscount",
+        "name": "Miscount Disclosed",
+        "type": "Directive",
+        "target": "Elect Law (When this agenda is revealed, if there are fewer than 2 laws in play, discard this card and reveal another agenda from the top of the deck.)",
+        "text1": "Vote on the elected law as if it were just revealed from the top of the deck.",
+        "text2": "",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_mutiny",
+        "name": "Mutiny",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player that voted \"For\" gains 1 victory point. The player who cast the most votes \"For\" gains the speaker token.",
+        "text2": "Against: Each player that voted \"For\" loses 1 victory point. The player who cast the most votes \"For\" cannot vote, play action cards, or use faction abilities during this agenda phase.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_constitution",
+        "name": "New Constitution",
+        "type": "Directive",
+        "target": "Elect Player or Against (If more votes are cast for players than 'Against', this agenda resolves 'For')",
+        "text1": "For: Discard all laws from play. The elected player gains the Speaker token, unless the runner-up has it. At the start of the next strategy phase, each player exhausts each planet in their home system.",
+        "text2": "Against: Reveal 1 agenda from the top of the deck. Players vote on this agenda.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_prophecy",
+        "name": "Prophecy of Ixth",
+        "type": "Law",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain this card: The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses PRODUCTION, they discard this card unless they produce 2 or more fighters.",
+        "text2": "*Place 1 fighter from your reinforcements in any number of systems that contains 1 or more of your space docks or ships and no other player’s ships.",
+        "mapText": "Apply +1 to the result of your fighter's combat rolls. When you use PRODUCTION, discard this card unless you produce 2 or more fighters.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_execution",
+        "name": "Public Execution",
+        "type": "Directive",
+        "target": "Elect Player (The runner-up resolves one of the following, then the elected player resolves the other)",
+        "text1": "*Discard all of your action cards. If you have the speaker token, give it to the player on your left. You cannot vote, play action cards, or use faction abilities during this agenda phase.",
+        "text2": "*Reveal all your action cards. You cannot vote, play action cards, or use faction abilities during this agenda phase.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_schematics",
+        "name": "Publicize Weapon Schematics",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies, and the player that cast the most votes \"For\" may gain their war sun technology. All war suns lose SUSTAIN DAMAGE.",
+        "text2": "Against: Each player that owns a war sun technology discards 1 action card for each player that cast fewer votes \"Against\".",
+        "mapText": "If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose SUSTAIN DAMAGE.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_conscription",
+        "name": "Regulated Conscription",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player that cast 5 or more votes \"For\" places their control token on this card. When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2. Players with control tokens on this card apply +1 to the result of each of their fighters and infantry’s combat rolls during the first round of combat.",
+        "text2": "Against: Each player that cast 5 or more votes \"Against\" may ready up to 2 planets they control. Reveal 1 agenda from the top of the deck. Players vote on this agenda.",
+        "mapText": "When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2. Players with control tokens on this card apply +1 to the result of each of their fighters and infantry’s combat rolls during the first round of combat.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_seed_empire",
+        "name": "Seed of an Empire",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: The player with the most victory points gains 1 victory point. The player that cast the most votes “Against” draws 1 secret objective.",
+        "text2": "Against: The player with the fewest victory points gains 1 victory point. The player that cast the most votes “For” draws 1 secret objective.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_shared_research",
+        "name": "Shared Research",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player's units can move through nebulae and do not need to roll for gravity rifts. Each player that cast 5 or more votes \"For\" may gain their Antimass Deflectors technology.",
+        "text2": "Against: Each player places a command token from their reinforcements in their home system, if able - players that cast 5 or more votes place the token from their reinforcements instead.",
+        "mapText": "Each player's units can move through nebulae and do not need to roll for gravity rifts.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_plowshares",
+        "name": "Swords to Plowshares",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player destroys half of their infantry on each planet they control, rounded up. Then, each player gains trade goods equal to the number of their infantry that were destroyed, plus 1 for each other player that cast fewer votes \"For\".",
+        "text2": "Against: Each player places 1 infantry from their reinforcements on each planet they control, then places 1 infantry from their reinforcements on a planet they control in their home system for each other player that cast fewer votes \"Against\".",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_unconventional",
+        "name": "Unconventional Measures",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player that voted \"For\" draws 1 action card for each player that cast fewer votes For.",
+        "text2": "Against: Each player that voted \"For\" discards 1 action card for every 5 votes cast by that player.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_wormhole_recon",
+        "name": "Wormhole Reconstruction",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player that cast 5 or more votes \"For\" places their control token on this card. All systems that contain an alpha or beta wormhole are adjacent to each other, and if your control token is on this card, other players cannot use SPACE CANNON against your ships in these systems.",
+        "text2": "Against: Each player places a command token from their reinforcements in 1 system that contains a wormhole and 1 or more of their ships for each player that cast more votes.",
+        "mapText": "All systems that contain either an alpha or beta wormhole are adjacent to each other, and if your control token is on this card, other players cannot use SPACE CANNON against your ships in these systems.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_wormhole_research",
+        "name": "Wormhole Research",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player who has 1 or more ships in a system that contains a wormhole may research 1 technology, ignoring 1 prerequisite for every 5 votes cast by that player. Then, destroy all ships in systems that contain an alpha or beta wormhole.",
+        "text2": "Against: Each player that voted \"Against\" removes 1 command token from their command sheet and returns it to their reinforcements.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_standardization",
+        "name": "Armed Forces Standardization",
+        "type": "Directive",
+        "target": "Elect Player (The runner-up resolves one of the following, then the elected player resolves the other)",
+        "text1": "*Gain command tokens so that you have 3 tokens each in your tactic and fleet pools, and 2 tokens in your strategy pool, losing any excess tokens.",
+        "text2": "*Remove 1 command token from your pool with the most tokens and place it in your pool with the least tokens.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_articles_war",
+        "name": "Articles of War",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player that cast 5 or more votes \"For\" gains 1 trade good for each of their mechs on the board. All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
+        "text2": "Against: Each player that cast 5 or more votes \"For\" gains 1 command token or places 1 unit from their reinforcements with a cost of 3 or less with their units.",
+        "mapText": "All mechs lose their printed abilities except for SUSTAIN DAMAGE.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_checks",
+        "name": "Checks and Balances",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who has the lowest number of strategy cards, if able.",
+        "text2": "Against: At the end of this agenda phase, each player readies only 1 of their planets for each player that cast fewer votes For.",
+        "mapText": "When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who has the lowest number of strategy cards, if able.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_clandestine",
+        "name": "Clandestine Operations",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player removes 2 command tokens from their command sheet and returns those tokens to their reinforcements. The player that cast the most votes 'For' draws 2 action cards.",
+        "text2": "Against: Each player removes 1 command token from their fleet pool and returns that token to their reinforcements. The player that cast the most votes 'Against' gains 2 trade goods.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_crisis",
+        "name": "Galactic Crisis Pact",
+        "type": "Directive",
+        "target": "Elect Strategy Card",
+        "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token - command tokens placed by the ability are placed from a player's reinforcements instead. Place 2 trade goods on the runner-up.",
+        "text2": "",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_minister_antiquities",
+        "name": "Minister of Antiquities",
+        "type": "Directive",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain a relic",
+        "text2": "*Search an exploration deck that matches a planet you control for a relic fragment, gain it, then shuffle the deck.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_nexus",
+        "name": "Nexus Sovereignty",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Alpha and beta wormholes in the wormhole nexus have no effect during movement. The player that cast the most votes \"For\" places their control token on this card. Players with control tokens on this card apply +2 to each of their units’ combat rolls in the wormhole nexus.",
+        "text2": "Against: The player that cast the most votes \"Against\" places a gamma wormhole token in a non-home system.",
+        "mapText": "Alpha and beta wormholes in the wormhole nexus have no effect during movement. Players with control tokens on this card apply +2 to each of their units’ combat rolls in the wormhole nexus.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_censure",
+        "name": "Political Censure",
+        "type": "Law",
+        "target": "Elect Player (The runner-up chooses 1 of the following to resolve, then the elected player resolves the other)",
+        "text1": "*Gain this card and 1 victory point: The owner of this card cannot play action cards. If the owner of this card loses this card, they lose 1 victory point.",
+        "text2": "*Discard half your action cards, rounded up, then draw 1 secret objective.",
+        "mapText": "Gain this card and 1 victory point. You cannot play action cards. If you lose this card, you lose 1 victory point.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_rearmament",
+        "name": "Rearmament Agreement",
+        "type": "Directive",
+        "target": "For/Against",
+        "text1": "For: Each player places 1 mech from their reinforcements on a planet they control in their home system for every 5 votes cast \"For\" by that player.",
+        "text2": "Against: Each player chooses 1 of their mechs for each player that cast fewer votes, and replaces the rest with 1 infantry from their reinforcements.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_rep_govt",
+        "name": "Representative Government",
+        "type": "Law",
+        "target": "For/Against",
+        "text1": "For: Each player that cast 5 or more votes \"For\" places their control token on this card. Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead (if that player’s control token is on this card, this counts as casting 5 votes for game effects). Players cannot cast additional votes.",
+        "text2": "Against: At the start of the next strategy phase, each player exhausts 1 cultural planet they control for each player that cast fewer votes \"Against\".",
+        "mapText": "Players cannot exhaust planets to cast votes during the agenda phase; each player may cast 1 vote on each agenda instead (if that player’s control token is on this card, this counts as casting 5 votes for game effects). Players cannot cast additional votes.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_grant_reallocation",
+        "name": "Research Grant Reallocation",
+        "type": "Directive",
+        "target": "Elect Player (The elected player chooses 1 of the following to resolve, then the runner-up resolves the other)",
+        "text1": "*Gain a technology. Then, for each prerequisite on that technology, remove 1 token from your fleet pool and return it to your reinforcements.",
+        "text2": "*You may spend a command token from your fleet pool to gain 1 technology with no prerequisites owned by another player.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_warrant",
+        "name": "Search Warrant",
+        "type": "Law",
+        "target": "Elect Player (The runner-up chooses 1 of the following to resolve, then the elected player resolves the other)",
+        "text1": "*Gain this card and draws 2 secret objectives. The owner of this card plays with their secret objectives revealed.",
+        "text2": "*Reveal your secret objectives, then draw 1 secret objective",
+        "mapText": "You play with your secret objectives revealed.",
+        "source": "voices_of_the_council"
+    }
+]

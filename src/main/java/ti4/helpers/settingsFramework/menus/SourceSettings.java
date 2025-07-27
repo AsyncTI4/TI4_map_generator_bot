@@ -44,7 +44,7 @@ public class SourceSettings extends SettingsMenu {
         // Initialize Settings to default values
         base = new BooleanSetting("BaseGame", "Base Game", true);
         pok = new BooleanSetting("PoK", "Prophecy of Kings", true);
-        codexes = new BooleanSetting("Codexes", "Codex 1-3", true);
+        codexes = new BooleanSetting("Codexes", "Codex 1-4", true);
         discoStars = new BooleanSetting("DiscoStars", "DS Factions", game.isDiscordantStarsMode());
         unchartedSpace = new BooleanSetting("UnchartSpace", "Uncharted Space", game.isUnchartedSpaceStuff());
         absol = new BooleanSetting("Absol", "Absol Mod", game.isAbsolMode());
@@ -81,7 +81,7 @@ public class SourceSettings extends SettingsMenu {
             absol.initialize(json.get("absol"));
             // miltymod.initialize(json.get("miltymod"));
             eronous.initialize(json.get("eronous"));
-            // cryypter.initialize(json.get("voice_of_the_council"));
+            // cryypter.initialize(json.get("voices_of_the_council"));
         }
         base.setEditable(false);
     }
@@ -123,8 +123,8 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
-        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3));
-        if (unchartedSpace.isVal()) sources.add(ComponentSource.uncharted_space);
+        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
+        if (unchartedSpace.isVal() || discoStars.isVal()) sources.add(ComponentSource.uncharted_space);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         //if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
@@ -137,12 +137,12 @@ public class SourceSettings extends SettingsMenu {
         List<ComponentSource> sources = new ArrayList<>();
         if (base.isVal()) sources.add(ComponentSource.base);
         if (pok.isVal()) sources.add(ComponentSource.pok);
-        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3));
+        if (codexes.isVal()) sources.addAll(List.of(ComponentSource.codex1, ComponentSource.codex2, ComponentSource.codex3, ComponentSource.codex4));
         if (discoStars.isVal()) sources.add(ComponentSource.ds);
         if (absol.isVal()) sources.add(ComponentSource.absol);
         //if (miltymod.isVal()) sources.add(ComponentSource.miltymod);
         if (eronous.isVal()) sources.add(ComponentSource.eronous);
-        if(ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
+        if (ignis.isVal()) sources.add(ComponentSource.ignis_aurora);
         //if (cryypter.isVal()) sources.add(ComponentSource.cryypter);
         return sources;
     }
@@ -167,28 +167,26 @@ public class SourceSettings extends SettingsMenu {
                 .sendMessage("This setting doesn't really do much. It only disables Keleres.")
                 .setEphemeral(true).queue();
             case "DiscoStars" -> event.getHook()
-                .sendMessage("This setting only controls factions. If you want techs, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
+                .sendMessage("This setting only controls factions. If you want technologies, relics, explores, etc, you need to also enable **__Uncharted Space__**.")
                 .setEphemeral(true).queue();
             case "Ignis" -> {
                 boolean ignis = getIgnis().isVal();
 
                 // Decks with both
                 String relic = ignis ? "relics_baldrick" : "relics_pok";
-                String techs = ignis ? "techs_baldrick" : "techs_pok";
+                String techs = ignis ? "techs_baldrick" : "techs_pok_c4";
 
                 // Decks for ABSOL
                 String agenda = ignis ? "agendas_baldrick" : "agendas_pok";
 
-                
                 String sc = ignis ? "ignis_aurora" : "pok";
-                
+
                 game.setStrategyCardSet(sc);
                 game.setEventDeckID("events_baldrick");
                 // set 'em up
                 decks.getRelics().setChosenKey(relic);
                 decks.getTechs().setChosenKey(techs);
                 decks.getAgendas().setChosenKey(agenda);
-                
 
                 String absolDS = "Reset your decks to include all of the Ignis cards.";
                 String pokStr = "Reset your decks to include only PoK cards.";
@@ -201,7 +199,7 @@ public class SourceSettings extends SettingsMenu {
 
                 // Decks with both
                 String relic = both ? "relics_absol_ds" : (abs ? "relics_absol" : (ds ? "relics_ds" : "relics_pok"));
-                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (ds ? "techs_ds" : "techs_pok"));
+                String techs = both ? "techs_ds_absol" : (abs ? "techs_absol" : (ds ? "techs_ds" : "techs_pok_c4"));
 
                 // Decks for ABSOL
                 String agenda = abs ? "agendas_absol" : "agendas_pok";

@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.TIGLHelper;
+import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -27,15 +28,20 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.MILTYMOD_MODE, "True to switch to MiltyMod mode (only compatabile with No Expansion Mode)"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Dane Tweet."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Dane Tweet."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNCHARTED_SPACE_STUFF, "True to add the Uncharted Space Stuff to the draft pool."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Codex 4."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Codex 4.."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.HIDDEN_AGENDA_MODE, "True to enable Hidden Agenda, per Dane Leek."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_COMMERCE_MODE, "True to enable the Age of Commerce, per Codex 4."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TOTAL_WAR_MODE, "True to enable Total War, per Codex 4."));
         //addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXTRA_SECRET_MODE, "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(new OptionData(OptionType.BOOLEAN, FOWOption.RIFTSET_MODE.toString(), "True to enable Eronous RiftSet mode"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Catc Facilities"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));
+        addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game").setAutoComplete(true));
     }
 
     @Override
@@ -58,11 +64,39 @@ class WeirdGameSetup extends GameStateSubcommand {
         Boolean explorationMode = event.getOption(Constants.AGE_OF_EXPLORATION_MODE, null, OptionMapping::getAsBoolean);
         if (explorationMode != null) game.setAgeOfExplorationMode(explorationMode);
 
+        Boolean uncharted = event.getOption(Constants.UNCHARTED_SPACE_STUFF, null, OptionMapping::getAsBoolean);
+        if (uncharted != null) {
+            game.setUnchartedSpaceStuff(uncharted);
+            if (uncharted) {
+                game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_DS"));
+                game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_ds"));
+                if (game.isAbsolMode()) {
+                    if (game.getTechnologyDeckID().contains("absol")) {
+                        game.setTechnologyDeckID("techs_ds_absol");
+                    }
+                    if (game.getRelicDeckID().contains("absol")) {
+                        game.validateAndSetRelicDeck(Mapper.getDeck("relics_absol_ds"));
+                    }
+
+                } else {
+                    game.validateAndSetRelicDeck(Mapper.getDeck("relics_ds"));
+                    game.setTechnologyDeckID("techs_ds");
+
+                }
+            }
+        }
+
         Boolean minorMode = event.getOption(Constants.MINOR_FACTIONS_MODE, null, OptionMapping::getAsBoolean);
         if (minorMode != null) game.setMinorFactionsMode(minorMode);
 
         Boolean agendaMode = event.getOption(Constants.HIDDEN_AGENDA_MODE, null, OptionMapping::getAsBoolean);
         if (agendaMode != null) game.setHiddenAgendaMode(agendaMode);
+
+        Boolean totalMode = event.getOption(Constants.TOTAL_WAR_MODE, null, OptionMapping::getAsBoolean);
+        if (totalMode != null) game.setTotalWarMode(totalMode);
+
+        Boolean commcerceMode = event.getOption(Constants.AGE_OF_COMMERCE_MODE, null, OptionMapping::getAsBoolean);
+        if (commcerceMode != null) game.setAgeOfCommerceMode(commcerceMode);
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
@@ -70,8 +104,25 @@ class WeirdGameSetup extends GameStateSubcommand {
         Boolean facilitiesMode = event.getOption(Constants.FACILITIES_MODE, null, OptionMapping::getAsBoolean);
         if (facilitiesMode != null) game.setFacilitiesMode(facilitiesMode);
 
+        Boolean noSwapMode = event.getOption(Constants.NO_SWAP_MODE, null, OptionMapping::getAsBoolean);
+        if (noSwapMode != null) game.setNoSwapMode(noSwapMode);
+
         Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
         if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");
+
+        String priorityTrackModeString = event.getOption(Constants.PRIORITY_TRACK, null, OptionMapping::getAsString);
+        if (priorityTrackModeString != null) {
+            PriorityTrackMode priorityTrackMode = PriorityTrackMode.parse(priorityTrackModeString);
+            if (game.isCompetitiveTIGLGame()) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes. Priority Track is unchanged.");
+            } else if (game.isOmegaPhaseMode() && priorityTrackMode != PriorityTrackMode.FULL) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Omega Phase requires the __full__ Priority Track. Priority Track is unchanged.");
+            } else if (game.getPhaseOfGame().equals("strategy")) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Cannot add or remove the Priority Track during the Strategy Phase. Either UNDO out of it or wait for after it. Priority Track is unchanged.");
+            } else {
+                game.setPriorityTrackMode(priorityTrackMode);
+            }
+        }
     }
 
     public static boolean setGameMode(SlashCommandInteractionEvent event, Game game) {
@@ -213,7 +264,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         game.setAbsolMode(absolMode);
 
         // JUST PoK
-        if (!absolMode && !discordantStarsMode) {
+        if (!absolMode && !discordantStarsMode && !votcMode) {
             if (!game.validateAndSetAgendaDeck(event, Mapper.getDeck("agendas_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
@@ -221,7 +272,7 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
             if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
-            game.setTechnologyDeckID("techs_pok");
+            game.setTechnologyDeckID("techs_pok_c4");
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
@@ -234,14 +285,14 @@ class WeirdGameSetup extends GameStateSubcommand {
             if (!game.validateAndSetPublicObjectivesStage1Deck(event, Mapper.getDeck("public_stage_1_objectives_pok"))) return false;
             if (!game.validateAndSetPublicObjectivesStage2Deck(event, Mapper.getDeck("public_stage_2_objectives_pok"))) return false;
             if (!game.validateAndSetSecretObjectiveDeck(event, Mapper.getDeck("secret_objectives_pok"))) return false;
-            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_pok"))) return false;
+            if (!game.validateAndSetActionCardDeck(event, Mapper.getDeck("action_cards_cryypter"))) return false;
             if (!game.validateAndSetRelicDeck(Mapper.getDeck("relics_pok"))) return false;
             if (!game.validateAndSetExploreDeck(event, Mapper.getDeck("explores_pok"))) return false;
-            game.setTechnologyDeckID("techs_pok");
+            game.setTechnologyDeckID("techs_cryypter");
             game.setBaseGameMode(false);
             game.setAbsolMode(false);
             game.setDiscordantStarsMode(false);
-            game.swapOutVariantTechs();
+            game.swapInVariantTechs();
             game.swapInVariantUnits("pok");
             game.setScSetID("votc");
             game.setVotcMode(true);
@@ -249,9 +300,20 @@ class WeirdGameSetup extends GameStateSubcommand {
             // Add envoys to players
             for (Player player : game.getPlayers().values()) {
                 String faction = player.getFaction();
+
+                if (player.hasLeader("xxchahero")) {
+                    player.removeLeader("xxchahero");
+                    player.addLeader("votc_xxchahero");
+                }
+                if (player.hasLeader("keleresheroodlynn")) {
+                    player.removeLeader("keleresheroodlynn");
+                    player.addLeader("votc_keleresheroxxcha");
+                }
+
                 if (faction.startsWith("keleres")) {
                     faction = "keleres";
                 }
+
                 String leaderID = faction + "envoy";
                 if (Mapper.isValidLeader(leaderID)) {
                     player.addLeader(leaderID);

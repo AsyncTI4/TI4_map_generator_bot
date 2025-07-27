@@ -6,9 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jetbrains.annotations.Nullable;
-
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 @Data
 public class PlayerProperties {
@@ -51,9 +50,8 @@ public class PlayerProperties {
     private int inRoundTurnCount;
     private int tg;
     private int commodities;
-    private int commoditiesTotal;
-    // private int commoditiesBonus; // TODO
-    // private int commoditiesBase;
+    public int commoditiesTotal;
+    private int commoditiesBase;
     private int crf;
     private int hrf;
     private int irf;
@@ -80,6 +78,7 @@ public class PlayerProperties {
     //Stat tracking
     private int sarweenCounter;
     private int pillageCounter;
+    private int magenInfantryCounter;
 
     //Omega Phase
     private int priorityPosition;
@@ -88,6 +87,7 @@ public class PlayerProperties {
     private int pathTokenCounter;
     private int harvestCounter;
     private int honorCounter;
+    private int dishonorCounter;
 
     // OLRADIN POLICY ONCE PER ACTION EXHAUST PLANET ABILITIES
     private boolean hasUsedEconomyEmpowerAbility;

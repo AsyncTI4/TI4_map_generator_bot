@@ -32,6 +32,7 @@ import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.LeaderEmojis;
+import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
@@ -45,6 +46,7 @@ public class StartTurnService {
 
     public static void turnStart(GenericInteractionCreateEvent event, Game game, Player player) {
         player.setInRoundTurnCount(player.getInRoundTurnCount() + 1);
+        game.removeStoredValue("currentActionSummary" + player.getFaction());
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         Map<String, String> maps = new HashMap<>(game.getMessagesThatICheckedForAllReacts());
         for (String id : maps.keySet()) {
@@ -56,6 +58,7 @@ public class StartTurnService {
         ButtonHelperTacticalAction.resetStoredValuesForTacticalAction(game);
         game.setStoredValue(player.getFaction() + "planetsExplored", "");
         game.setStoredValue("lawsDisabled", "no");
+        game.removeStoredValue("audioSent");
         game.checkSOLimit(player);
         CardsInfoService.sendVariousAdditionalButtons(game, player);
         boolean goingToPass = false;
@@ -73,10 +76,22 @@ public class StartTurnService {
         Player nextPlayer = EndTurnService.findNextUnpassedPlayer(game, player);
         if (nextPlayer != null && !game.isFowMode()) {
             if (nextPlayer == player) {
-                text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the action phase.";
+                text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
             } else {
                 String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
-                text += "\n-# " + ping + " will start their turn once you've ended yours.";
+                int numUnpassed = -2;
+                for (Player p2 : game.getPlayers().values()) {
+                    numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                }
+                text += "\n-# " + ping + " will start their turn once you've ended yours. ";
+                if (numUnpassed == 0)
+                {
+                    text += "No other players are unpassed.";
+                }
+                else
+                {
+                    text += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                }
             }
         }
 
@@ -149,6 +164,24 @@ public class StartTurnService {
                     p2.getRepresentationUnfogged() + " your future message got delivered");
                 WhisperService.sendWhisper(game, p2, player, msg2, "n", p2.getCardsInfoThread(), event.getGuild());
                 game.setStoredValue("futureMessageFor_" + player.getFaction() + "_" + p2.getFaction(), "");
+            }
+        }
+
+        if (game.playerHasLeaderUnlockedOrAlliance(player, "redcreusscommander") && player.getCommodities() > 0) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (!p2.equals(player) && game.playerHasLeaderUnlockedOrAlliance(p2, "redcreusscommander") && p2.getCommodities() > 0
+                    && player.getNeighbouringPlayers(true).contains(p2)) {
+                    List<Button> buttonsRedCreuss = new ArrayList<>();
+                    buttonsRedCreuss.add(Buttons.green("redCreussWashFull_" + p2.getUserID(), "Full Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.blue("redCreussWashPartial_" + p2.getUserID(), "Partial Wash", MiscEmojis.Wash));
+                    buttonsRedCreuss.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        player.getRepresentationUnfogged() + ", both you and " + p2.getRepresentationNoPing() + " have commodities."
+                            + " You may use these buttons to wash them, should you both agree."
+                            + "\n-# \"Partial Wash\" will only swap commodities for an equal number of commodities. \"Full Wash\" will also swap trade goods, to wash as many commodities as possible."
+                            + " If both player have the same number of commodities, the buttons are identical.",
+                        buttonsRedCreuss);
+                }
             }
         }
 
@@ -336,8 +369,11 @@ public class StartTurnService {
             if (player.getTechs().contains("cm")) {
                 startButtons.add(Buttons.gray(finChecker + "startChaosMapping", "Use Chaos Mapping", FactionEmojis.Saar));
             }
+            if (game.isOrdinianC1Mode() && !ButtonHelper.isCoatlHealed(game) && player == ButtonHelper.getPlayerWhoControlsCoatl(game)) {
+                startButtons.add(Buttons.gray(finChecker + "healCoatl", "Heal Coatl (Costs 6 Resources)", FactionEmojis.Argent));
+            }
             if (player.getTechs().contains("dspharinf") && !ButtonHelperFactionSpecific.getPharadnInf2ReleaseButtons(player, game).isEmpty()) {
-                startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Inf", FactionEmojis.pharadn));
+                startButtons.add(Buttons.gray(finChecker + "startPharadnInfRevive", "Release 1 Infantry", FactionEmojis.pharadn));
             }
             if (player.getTechs().contains("dscymiy") && !player.getExhaustedTechs().contains("dscymiy")) {
                 startButtons.add(Buttons.gray(finChecker + "exhaustTech_dscymiy", "Exhaust Recursive Worm", FactionEmojis.cymiae));
@@ -391,7 +427,9 @@ public class StartTurnService {
         }
 
         if (!confirmed2ndAction && doneActionThisTurn) {
+
             startButtons.add(Buttons.red(finChecker + "confirmSecondAction", "Use Ability To Do Another Action"));
+
         }
         return startButtons;
     }

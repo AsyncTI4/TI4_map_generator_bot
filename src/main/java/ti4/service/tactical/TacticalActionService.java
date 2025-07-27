@@ -14,10 +14,10 @@ import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import software.amazon.awssdk.utils.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAgents;
-
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.ButtonHelperTacticalAction;
@@ -108,7 +108,20 @@ public class TacticalActionService {
             Map<UnitKey, List<Integer>> movement = displaced.getOrDefault(uhKey, new HashMap<>());
             for (UnitKey unitKey : new HashSet<>(uh.getUnitsByState().keySet())) {
                 boolean movableFromPlanet = movableFromPlanets.contains(unitKey.getUnitType());
-                if (!player.unitBelongsToPlayer(unitKey)) continue;
+                if (!player.unitBelongsToPlayer(unitKey)) {
+                    boolean belongsToUnlockedAlly = false;
+                    UnitType uT = unitKey.getUnitType();
+                    if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
+                        for (Player p2 : game.getRealPlayers()) {
+                            if (p2.unitBelongsToPlayer(unitKey) && player.getAllianceMembers().contains(p2.getFaction()) && !tile.hasPlayerCC(p2)) {
+                                belongsToUnlockedAlly = true;
+                            }
+                        }
+                    }
+                    if (!belongsToUnlockedAlly) {
+                        continue;
+                    }
+                }
                 if (uh instanceof Planet && !movableFromPlanet) continue;
 
                 List<Integer> states = uh.removeUnit(unitKey, uh.getUnitCount(unitKey));
@@ -128,7 +141,20 @@ public class TacticalActionService {
 
         Map<UnitKey, List<Integer>> movement = displaced.getOrDefault(uhKey, new HashMap<>());
         for (UnitKey unitKey : new HashSet<>(uh.getUnitsByState().keySet())) {
-            if (!player.unitBelongsToPlayer(unitKey)) continue;
+            if (!player.unitBelongsToPlayer(unitKey)) {
+                boolean belongsToUnlockedAlly = false;
+                UnitType uT = unitKey.getUnitType();
+                if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
+                    for (Player p2 : game.getRealPlayers()) {
+                        if (p2.unitBelongsToPlayer(unitKey) && player.getAllianceMembers().contains(p2.getFaction()) && !tile.hasPlayerCC(p2)) {
+                            belongsToUnlockedAlly = true;
+                        }
+                    }
+                }
+                if (!belongsToUnlockedAlly) {
+                    continue;
+                }
+            }
 
             List<Integer> states = uh.removeUnit(unitKey, uh.getUnitCount(unitKey));
             movement.put(unitKey, states);
@@ -138,7 +164,7 @@ public class TacticalActionService {
         TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, tile, moveOrRemove);
     }
 
-    public void moveSingleUnit(ButtonInteractionEvent event, Game game, Player player, Tile tile, String planetName, UnitType type, int amt, UnitState state, String moveOrRemove) {
+    public void moveSingleUnit(ButtonInteractionEvent event, Game game, Player player, Tile tile, String planetName, UnitType type, int amt, UnitState state, String moveOrRemove, String color) {
         UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getUnitHolderFromPlanet(planetName);
         if (uh == null) return;
         String uhKey = tile.getPosition() + "-" + uh.getName();
@@ -146,7 +172,11 @@ public class TacticalActionService {
         // setup a fake unitholder to take advantage of that code
         Map<UnitKey, List<Integer>> displaced = game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
         UnitHolder fakeUh = new Space("fake", null);
-        UnitKey unitKey = Units.getUnitKey(type, player.getColor());
+        String pColor = player.getColor();
+        if (color != null && !color.isEmpty()) {
+            pColor = color;
+        }
+        UnitKey unitKey = Units.getUnitKey(type, pColor);
         if (displaced.containsKey(unitKey))
             fakeUh.addUnitsWithStates(unitKey, displaced.get(unitKey));
 
@@ -160,14 +190,18 @@ public class TacticalActionService {
         TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, tile, moveOrRemove);
     }
 
-    public void reverseSingleUnit(ButtonInteractionEvent event, Game game, Player player, Tile tile, String planetName, UnitType type, int amt, UnitState state, String moveOrRemove) {
+    public void reverseSingleUnit(ButtonInteractionEvent event, Game game, Player player, Tile tile, String planetName, UnitType type, int amt, UnitState state, String moveOrRemove, String color) {
         UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getUnitHolderFromPlanet(planetName);
         if (uh == null) return;
         String uhKey = tile.getPosition() + "-" + uh.getName();
 
         // Get the data
         Map<UnitKey, List<Integer>> displaced = game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
-        UnitKey unitKey = Units.getUnitKey(type, player.getColor());
+        String pColor = player.getColor();
+        if (color != null && !color.isEmpty()) {
+            pColor = color;
+        }
+        UnitKey unitKey = Units.getUnitKey(type, pColor);
         if (!displaced.containsKey(unitKey)) return;
 
         // setup a fake unitholder to take advantage of that code
@@ -195,7 +229,7 @@ public class TacticalActionService {
     }
 
     public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
-        boolean skipPlacingAbilities = game.isNaaluAgent() || game.isL1Hero();
+        boolean skipPlacingAbilities = game.isNaaluAgent() || game.isL1Hero() || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
         if (!skipPlacingAbilities && !CommandCounterHelper.hasCC(event, player.getColor(), tile) && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 player.setTacticalCC(player.getTacticalCC() + 1);
@@ -212,7 +246,7 @@ public class TacticalActionService {
         if (!game.getTacticalActionDisplacement().isEmpty()) {
             tile = FlipTileService.flipTileIfNeeded(event, tile, game);
             if (tile == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to flip mallice. Please yell at Jazzxhands");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Failed to flip the Wormhole Nexus. Please yell at Jazzxhands");
                 return false;
             }
         }
@@ -234,11 +268,13 @@ public class TacticalActionService {
         if (FOWPlusService.isVoid(game, tile.getPosition())) {
             FOWPlusService.resolveVoidActivation(player, game);
             Button conclude = Buttons.red(player.finChecker() + "doneWithTacticalAction", "Conclude Tactical Action");
-            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "All units were lost to the void.", conclude);
+            MessageHelper.sendMessageToChannelWithButton(player.getCorrectChannel(), "All units were lost to The Void.", conclude);
+            ButtonHelper.deleteAllButtons(event);
             return;
         }
 
         // Move units and place token and also determine some other heuristics
+        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
         boolean unitsWereMoved = moveUnitsIntoActiveSystem(event, game, player, tile);
         tile = game.getTileByPosition(tile.getPosition());
         spendAndPlaceTokenIfNecessary(event, game, player, tile);
@@ -250,11 +286,13 @@ public class TacticalActionService {
         String message = "Moved all units to the space area.";
         if (!unitsWereMoved && !hasGfsInRange) {
             message = "Nothing moved. Use buttons to decide if you wish to build (if you can), or finish the activation.";
+            game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Did not move units.");
             systemButtons = getBuildButtons(event, game, player, tile);
         } else {
             systemButtons = getLandingTroopsButtons(game, player, tile);
             if (unitsWereMoved) {
                 ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, tile, unitsWereMoved);
+                game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Moved ships there.");
             }
         }
 
@@ -269,7 +307,6 @@ public class TacticalActionService {
         CommanderUnlockCheckService.checkPlayer(player, "nivyn", "ghoti", "zelian", "gledge", "mortheus");
         CommanderUnlockCheckService.checkAllPlayersInGame(game, "empyrean");
 
-        List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, game, tile.getPosition());
         if (!game.isL1Hero() && !playersWithPds2.isEmpty()) {
             ButtonHelperTacticalAction.tacticalActionSpaceCannonOffenceStep(game, player, playersWithPds2, tile);
         }
@@ -318,7 +355,13 @@ public class TacticalActionService {
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             boolean movedFrom = game.getTacticalActionDisplacement().keySet().stream().anyMatch(s -> s.startsWith(tileEntry.getValue().getPosition() + "-"));
             boolean hasUnits = FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue());
-
+            for (Player p2 : game.getRealPlayers()) {
+                if (player.getAllianceMembers().contains(p2.getFaction())) {
+                    if (FoWHelper.playerHasUnitsInSystem(p2, tileEntry.getValue()) && !CommandCounterHelper.hasCC(event, p2.getColor(), tileEntry.getValue())) {
+                        hasUnits = true;
+                    }
+                }
+            }
             if ((movedFrom || hasUnits)
                 && (!CommandCounterHelper.hasCC(event, player.getColor(), tileEntry.getValue())
                     || ButtonHelper.nomadHeroAndDomOrbCheck(player, game))) {
@@ -425,14 +468,29 @@ public class TacticalActionService {
                     String stateStr = state != UnitState.none ? " " + state.humanDescr() : "";
                     for (int x = 1; x <= 2; x++) {
                         if (space.getUnitCountForState(gf, player, state) >= x) {
-                            String id = landPrefix + x + gf.getValue() + "_" + planetName;
+                            String id = landPrefix + x + gf.getValue() + "_" + planetName + "_" + player.getColor();
                             String label = "Land " + x + stateStr + " " + gf.humanReadableName() + " on " + planetRep;
                             buttons.add(Buttons.red(id, label, gf.getUnitTypeEmoji()));
                         }
                         if (planet.getUnitCountForState(gf, player, state) >= x) {
-                            String id = unlandPrefix + x + gf.getValue() + "_" + planetName;
+                            String id = unlandPrefix + x + gf.getValue() + "_" + planetName + "_" + player.getColor();
                             String label = "Un-land " + x + stateStr + " " + gf.humanReadableName() + " from " + planetRep;
                             unlandUnitButtons.add(Buttons.gray(id, label, gf.getUnitTypeEmoji()));
+                        }
+                        for (Player p2 : game.getRealPlayers()) {
+                            if (player.getAllianceMembers().contains(p2.getFaction()) && player != p2) {
+                                String color = " " + StringUtils.capitalize(p2.getColor()) + " ";
+                                if (space.getUnitCountForState(gf, p2, state) >= x) {
+                                    String id = landPrefix + x + gf.getValue() + "_" + planetName + "_" + p2.getColor();
+                                    String label = "Land " + x + color + stateStr + " " + gf.humanReadableName() + " on " + planetRep;
+                                    buttons.add(Buttons.red(id, label, gf.getUnitTypeEmoji()));
+                                }
+                                if (planet.getUnitCountForState(gf, p2, state) >= x) {
+                                    String id = unlandPrefix + x + gf.getValue() + "_" + planetName + "_" + p2.getColor();
+                                    String label = "Un-land " + x + color + stateStr + " " + gf.humanReadableName() + " from " + planetRep;
+                                    unlandUnitButtons.add(Buttons.gray(id, label, gf.getUnitTypeEmoji()));
+                                }
+                            }
                         }
                     }
                 }

@@ -40,7 +40,7 @@ public final class JsonValidator<T> {
 
     /**
      * Scans an object and confirms we only see attributes in the JSON output that we expect to see.
-     * 
+     *
      * Any any missing attributes or unknown attributes will cause an exception to be thrown.
      */
     public static void assertAvailableJsonAttributes(Object obj, Set<String> knownJsonAttributes) throws JacksonConfigurationException {

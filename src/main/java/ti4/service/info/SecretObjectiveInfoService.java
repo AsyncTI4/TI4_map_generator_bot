@@ -50,17 +50,17 @@ public class SecretObjectiveInfoService {
         // SCORE/DISCARD BUTTONS
         String secretMsg = "Use these buttons to score or discard a secret objective.";
         List<Button> buttons = new ArrayList<>();
-        Button scoreB = Buttons.blue("get_so_score_buttons", "Score A Secret Objective");
-        Button discardB = Buttons.red("get_so_discard_buttons", "Discard A Secret Objective");
+        Button scoreB = Buttons.red("get_so_score_buttons", "Score A Secret Objective");
+        Button discardB = Buttons.blue("get_so_discard_buttons", "Discard A Secret Objective");
         ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread();
-        if(!game.getPhaseOfGame().isEmpty()){
+        if (game.getRevealedPublicObjectives().size() > 1) {
             buttons.add(scoreB);
         }
         buttons.add(discardB);
         MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
     }
 
-    private static String getSecretObjectiveCardInfo(Game game, Player player) {
+    public static String getSecretObjectiveCardInfo(Game game, Player player) {
         Map<String, Integer> secretObjective = player.getSecrets();
         Map<String, Integer> scoredSecretObjective = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : game.getSoToPoList()) {
@@ -92,7 +92,7 @@ public class SecretObjectiveInfoService {
                     SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
                     sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName()).append("_ - ").append(soModel.getPhase()).append(" Phase `(")
                         .append(Helper.leftpad("" + so.getValue(), 3)).append(")`\n> ").append(soModel.getText());
-                    
+
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
                     if (threshold > 0) {
                         sb.append(" (").append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(threshold).append(")");

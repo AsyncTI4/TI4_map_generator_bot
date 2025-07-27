@@ -53,7 +53,8 @@ public class VoteButtonHandler {
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
         buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
         buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), player.getRepresentation() + " due to the playing of an after, your pre-vote was erased. You can use these buttons to pre-vote again.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+            player.getRepresentation() + " due to the playing of an \"after\", your pre-vote was erased. You can use these buttons to pre-vote again.", buttons);
     }
 
     @ButtonHandler("preVote")
@@ -69,7 +70,7 @@ public class VoteButtonHandler {
             pfaction2 = player.getFaction();
         }
         if (pfaction2 != null) {
-            String voteMessage = player.getRepresentation() + " Chose to Vote. Click buttons for which outcome to vote for.";
+            String voteMessage = player.getRepresentation() + " is up to vote. Please use the buttons to choose the outcome you wish to vote for.";
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
             List<Button> outcomeActionRow;
             if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
@@ -77,7 +78,10 @@ public class VoteButtonHandler {
             } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
                 outcomeActionRow = getPlayerOutcomeButtons(game, null, "outcome", null);
             } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
-                voteMessage = "Chose to Vote. Too many planets in the game to represent all as buttons. Click buttons for which player owns the planet you wish to elect.";
+                voteMessage = player.getRepresentation() + " is up to vote."
+                    + " Since there are too many planets in the game to represent all as buttons,"
+                    + " please use the buttons to choose the player who controls the planet you wish to vote for."
+                    + " You will then be given a list of their planets to vote for.";
                 outcomeActionRow = getPlayerOutcomeButtons(game, null, "planetOutcomes",
                     null);
             } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
@@ -101,8 +105,8 @@ public class VoteButtonHandler {
     public static void planetOutcomes(ButtonInteractionEvent event, String buttonID, Game game) {
         String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
-        String voteMessage = "Chose to vote for one of " + factionOrColor
-            + "'s planets. Click buttons for which outcome to vote for.";
+        String voteMessage = "Choosing to vote for one of " + factionOrColor
+            + "'s planets. Please use the buttons to choose the planet you wish to vote for.";
         List<Button> outcomeActionRow;
         outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "outcome", null);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
@@ -116,8 +120,8 @@ public class VoteButtonHandler {
         buttonID = buttonID.replace("agendaResolution_", "");
         String factionOrColor = buttonID;
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
-        String voteMessage = "Chose to break tie for one of " + factionOrColor
-            + "'s planets. Use buttons to select which one.";
+        String voteMessage = "Choosing to break tie for one of " + factionOrColor
+            + "'s planets. As Speaker, please decide a winner.";
         List<Button> outcomeActionRow;
         outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game,
             "resolveAgendaVote_outcomeTie*", null);

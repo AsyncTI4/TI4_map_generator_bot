@@ -7,8 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.lang3.StringUtils;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.DiceHelper.Die;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -16,6 +17,7 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
@@ -32,7 +34,9 @@ public class CombatMessageHelper {
         // Gracefully fail when units don't exist
         String error = "You seem to own multiple of the following unit types. I will roll all of them, just ignore any that you shouldn't have.\n" +
             "> Duplicate units: " + dupes;
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+        if (event != null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+        }
     }
 
     public static void displayMissingUnits(GenericInteractionCreateEvent event, List<String> missing) {
@@ -41,7 +45,9 @@ public class CombatMessageHelper {
         String error = "You do not seem to own any of the following unit types, so they will be skipped." +
             " Ping bothelper if this seems to be in error.\n" +
             "> Unowned units: " + missing + "\n";
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+        if (event != null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), error);
+        }
     }
 
     public static String displayUnitRoll(UnitModel unitModel, int toHit, int modifier, int unitQuantity, int numRollsPerUnit, int extraRolls, List<Die> resultRolls, int numHit) {
@@ -94,17 +100,25 @@ public class CombatMessageHelper {
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_9.toString(), DiceEmojis.d10blue_9.toString());
             resultRollsString = resultRollsString.replace(DiceEmojis.d10red_0.toString(), DiceEmojis.d10blue_0.toString());
         }
-        
+
+        String nice = "";
+        if (resultRolls.size() == 2 && resultRolls.get(0).getResult() == 6 && resultRolls.get(1).getResult() == 9)
+        {
+            nice = " (nice)";
+        }
+
         String winnu_sigma = "";
         if ("sigma_winnu_flagship_2".equals(unitModel.getId())) {
             winnu_sigma = "-# The number of dice may not be correct; if so, you will need to manually roll the extra.\n";
         }
 
-        return String.format("> `%sx`%s %s %s - %s hit%s\n%s", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix, winnu_sigma);
+        return String.format("> `%sx`%s %s %s - %s hit%s%s\n%s", unitQuantity, unitEmoji, optionalText, resultRollsString, numHit, hitsSuffix, nice, winnu_sigma);
     }
 
-    public static String displayModifiers(String prefixText, Map<UnitModel, Integer> units,
-        List<NamedCombatModifierModel> modifiers) {
+    public static String displayModifiers(
+        String prefixText, Map<UnitModel, Integer> units,
+        List<NamedCombatModifierModel> modifiers
+    ) {
         String result = "";
         if (!modifiers.isEmpty()) {
 
@@ -145,6 +159,13 @@ public class CombatMessageHelper {
         return String.format("\n**Total hits %s** %s\n", totalHits, ":boom:".repeat(Math.max(0, totalHits)));
     }
 
+    public static String displayHitResults(int totalHits, boolean x89) {
+        String fmt = "\n**Total hits %s** %s\n";
+        String emoji = x89 ? MiscEmojis.DoubleBoom.emojiString() : ":boom:";
+        int hits = Math.max(0, x89 ? totalHits / 2 : totalHits);
+        return String.format(fmt, totalHits, emoji.repeat(hits));
+    }
+
     public static String displayCombatSummary(Player player, Tile tile, UnitHolder combatOnHolder, CombatRollType rollType) {
         String holderName = combatOnHolder.getName();
         Planet holderPlanet = null;
@@ -161,8 +182,7 @@ public class CombatMessageHelper {
         String combatTypeName = StringUtils.capitalize(holderName) + " combat";
         if (rollType != CombatRollType.combatround) {
             combatTypeName = rollType.getValue();
-            if (rollType == CombatRollType.bombardment || rollType == CombatRollType.AFB)
-            {
+            if (rollType == CombatRollType.bombardment || rollType == CombatRollType.AFB) {
                 combatTypeName = combatTypeName.toUpperCase();
             }
             if (holderPlanet != null) {
@@ -197,7 +217,7 @@ public class CombatMessageHelper {
                 }
             }
         }
-        return String.format("%s rolls for %s %s :  \n",
-            player.getFactionEmoji(), combatTypeName, MiscEmojis.RollDice);
+        return String.format("%s rolls for %s %s :\n",
+            player.getFactionEmoji(), combatTypeName.toLowerCase(), MiscEmojis.RollDice);
     }
 }

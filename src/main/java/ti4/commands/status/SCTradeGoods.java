@@ -41,8 +41,8 @@ class SCTradeGoods extends GameStateSubcommand {
             }
             int sc = scOption.getAsInt();
             int tg = tgOption.getAsInt();
-            Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
-            if (!scTradeGoods.containsKey(sc)) {
+            Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
+            if (!strategyCardToTradeGoodCount.containsKey(sc)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy card must be from possible ones in game.");
                 return;
             }
@@ -58,14 +58,14 @@ class SCTradeGoods extends GameStateSubcommand {
             return;
         }
 
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
+        Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
         Set<Integer> scPicked = new HashSet<>();
         for (Player player_ : game.getPlayers().values()) {
             scPicked.addAll(player_.getSCs());
         }
-        for (Integer scNumber : scTradeGoods.keySet()) {
+        for (Integer scNumber : strategyCardToTradeGoodCount.keySet()) {
             if (!scPicked.contains(scNumber)) {
-                Integer tgCount = scTradeGoods.get(scNumber);
+                Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
                 tgCount = tgCount == null ? 1 : tgCount + 1;
                 game.setScTradeGood(scNumber, tgCount);
             }

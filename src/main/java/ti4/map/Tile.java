@@ -1,6 +1,6 @@
 package ti4.map;
 
-import java.awt.Point;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,14 +13,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.CalendarHelper;
@@ -66,11 +64,18 @@ public class Tile {
         initPlanetsAndSpace(tileID);
     }
 
-    public Tile(String tileID, String position, UnitHolder spaceHolder) {
+    public Tile(String tileID, String position, UnitHolder space) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
         initPlanetsAndSpace(tileID);
-        unitHolders.replace(Constants.SPACE, spaceHolder);
+
+        UnitHolder tileSpace = getSpaceUnitHolder();
+
+        // Copy stuff from space that can be copied
+        for (UnitKey unit : space.getUnitKeys())
+            tileSpace.addUnitsWithStates(unit, space.getUnitsByState().get(unit));
+        space.getCcList().forEach(tileSpace::addCC);
+        space.getControlList().forEach(tileSpace::addControl);
     }
 
     private void initPlanetsAndSpace(String tileID) {
@@ -293,6 +298,22 @@ public class Tile {
         return tilePath;
     }
 
+    public void swapFogData(Player player1, Player player2) {
+        if (player1 == null || player2 == null) return;
+
+        Boolean fog1 = fog.remove(player1.getUserID());
+        if (fog1 != null) fog.put(player2.getUserID(), fog1);
+
+        String label1 = fogLabel.remove(player1.getUserID());
+        if (label1 != null) fogLabel.put(player2.getUserID(), label1);
+
+        Boolean fog2 = fog.remove(player2.getUserID());
+        if (fog2 != null) fog.put(player1.getUserID(), fog2);
+
+        String label2 = fogLabel.remove(player2.getUserID());
+        if (label2 != null) fogLabel.put(player1.getUserID(), label2);
+    }
+
     public Map<String, Boolean> getFog() {
         return new HashMap<>(fog);
     }
@@ -324,7 +345,7 @@ public class Tile {
     }
 
     public String getFogLabel(Player player) {
-        return fogLabel.get(player.getUserID());
+        return player == null ? null : fogLabel.get(player.getUserID());
     }
 
     public void setFogLabel(@NotNull Player player, String fogLabel_) {
@@ -378,8 +399,10 @@ public class Tile {
     }
 
     @JsonIgnore
-    public UnitHolder getSpaceUnitHolder() {
-        return unitHolders.get("space");
+    public Space getSpaceUnitHolder() {
+        UnitHolder space = unitHolders.get("space");
+        if (space instanceof Space s) return s;
+        return null;
     }
 
     @JsonIgnore
@@ -517,8 +540,11 @@ public class Tile {
             for (UnitKey unit : unitHolder.getUnitKeys()) {
                 if (unit.getUnitType() == UnitType.Spacedock && game != null) {
                     Player player = game.getPlayerFromColorOrFaction(unit.getColor());
-                    if (player != null && player.getUnitFromUnitKey(unit).getId().contains("cabal_spacedock")) {
-                        return true;
+                    if (player != null) {
+                        UnitModel model = player.getUnitFromUnitKey(unit);
+                        if (model != null && model.getId().contains("cabal_spacedock")) {
+                            return true;
+                        }
                     }
                 }
             }

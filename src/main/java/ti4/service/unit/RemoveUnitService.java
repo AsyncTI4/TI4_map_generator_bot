@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -49,7 +48,7 @@ public class RemoveUnitService {
         public Player getPlayer(Game game) {
             return game.getPlayerFromColorOrFaction(unitKey().getColorID());
         }
-    };
+    }
 
     @NotNull
     public List<RemovedUnit> removeAllUnits(GenericInteractionCreateEvent event, Tile tile, Game game, UnitHolder unitHolder) {
@@ -65,6 +64,19 @@ public class RemoveUnitService {
     public List<RemovedUnit> removeAllPlayerUnits(GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
+            ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
+            removed.addAll(removeUnit(event, tile, game, u));
+        }
+        return removed;
+    }
+
+    @NotNull
+    public List<RemovedUnit> removeAllPlayerNonStructureUnits(GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
+        List<RemovedUnit> removed = new ArrayList<>();
+        for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
+            if (uk.getUnitType() == UnitType.Pds || uk.getUnitType() == UnitType.Spacedock) {
+                continue;
+            }
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
             removed.addAll(removeUnit(event, tile, game, u));
         }
@@ -139,13 +151,6 @@ public class RemoveUnitService {
 
         if (toRemoveCount > 0 && event != null) {
             MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " missing.");
-        }
-        Player player = game.getPlayerFromColorOrFaction(parsedUnit.getUnitKey().getColor());
-        if (player != null) {
-            if (player.hasAbility("necrophage") && player.getCommoditiesTotal() < 5 && !player.getFaction().contains("franken")) {
-                player.setCommoditiesTotal(1 + ButtonHelper.getNumberOfUnitsOnTheBoard(game,
-                    Units.getUnitKey(UnitType.Spacedock, player.getColor())));
-            }
         }
 
         tile.getUnitHolders().values().forEach(unitHolder -> AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game));

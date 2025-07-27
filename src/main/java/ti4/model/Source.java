@@ -17,10 +17,10 @@ public class Source {
         //   (or you can use the search functionality of your IDE ofc)
 
         // official
-        base, pok, codex1, codex2, codex3,
+        base, pok, codex1, codex2, codex3, codex4,
 
         //big homebrew
-        ds, absol, franken, uncharted_space, monuments,
+        ds, absol, franken, uncharted_space, monuments, blue_reverie,
 
         // lil homebrew
         lazax, action_deck_2, action_deck_2_old, keleresplus, little_omega, project_pi, neutral, lost_star_charts_of_ixth, flagshipping, promises_promises,
@@ -29,7 +29,10 @@ public class Source {
         draft, admins, pbd100, pbd500, pbd1000, testsource, pbd2000, fow, dane_leaks,
 
         // personal projs
-        somno, ignis_aurora, asteroid, cryypter, voice_of_the_council, cpti, oath_of_kings, eronous, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, riftset, omega_phase,
+        somno, ignis_aurora, asteroid, cryypter, voices_of_the_council, cpti, oath_of_kings, miltymod, luminous, holytispoon, salliance, nomadfalcon, unfulvio, andcat, sigma, byz_agendas, memephilosopher, omega_phase, fowplus,
+
+        // eronous' stuff
+        eronous, riftset, ascendant_sun,
 
         // catchall
         other;
@@ -40,7 +43,7 @@ public class Source {
 
         /**
          * Converts a string identifier to the corresponding ComponentSource enum value.
-         * 
+         *
          * @param id the string identifier
          * @return the ComponentSource enum value, or null if not found
          */
@@ -55,21 +58,21 @@ public class Source {
 
         public boolean isOfficial() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3 -> true;
+                case base, pok, codex1, codex2, codex3, codex4 -> true;
                 default -> false;
             };
         }
 
         public boolean isPok() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3 -> true;
+                case base, pok, codex1, codex2, codex3, codex4 -> true;
                 default -> false;
             };
         }
 
         public boolean isDs() {
             return switch (this) {
-                case base, pok, codex1, codex2, codex3, ds, uncharted_space -> true;
+                case base, pok, codex1, codex2, codex3, codex4, ds, uncharted_space, blue_reverie -> true;
                 default -> false;
             };
         }
@@ -107,6 +110,7 @@ public class Source {
                 case codex1 -> "Codex 1 - Omega Techs";
                 case codex2 -> "Codex 2 - Relics";
                 case codex3 -> "Codex 3 - Naalu, Yin, Keleres";
+                case codex4 -> "Codex 4 - Relics";
                 case ds -> "Discordant Stars [Homebrew]";
                 case absol -> "Absol's Mod [Homebrew]";
                 case flagshipping -> "Flagshipping [Homebrew]";
@@ -114,6 +118,7 @@ public class Source {
                 case franken -> "Franken Draft [Homebrew Game Mode]";
                 case monuments -> "Monuments+ [Homebrew]";
                 case omega_phase -> "Omega Phase [Homebrew]";
+                case voices_of_the_council -> "Voices of the Council [Homebrew]";
                 default -> toString();
             };
         }

@@ -17,7 +17,7 @@ import ti4.helpers.Storage;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -62,7 +62,7 @@ class UndoButtonHandler {
                 .mapToInt(value -> value)
                 .max()
                 .orElseThrow(NoSuchElementException::new);
-        
+
         if (highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber - 1)) || highestNumBefore.equalsIgnoreCase(String.valueOf(maxNumber + 1))) {
             ButtonHelper.deleteMessage(event);
         }

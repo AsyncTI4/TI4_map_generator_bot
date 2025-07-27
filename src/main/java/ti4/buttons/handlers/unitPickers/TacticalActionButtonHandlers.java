@@ -1,10 +1,11 @@
 package ti4.buttons.handlers.unitPickers;
 
 import java.util.List;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import org.apache.commons.lang3.StringUtils;
 
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperTacticalAction;
 import ti4.helpers.RegexHelper;
@@ -19,6 +20,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.fow.FOWPlusService;
 import ti4.service.regex.RegexService;
 import ti4.service.tactical.TacticalActionOutputService;
 import ti4.service.tactical.TacticalActionService;
@@ -37,6 +39,7 @@ public class TacticalActionButtonHandlers {
         regexSingleUnit += "_" + RegexHelper.unitTypeRegex();
         regexSingleUnit += RegexHelper.optional("_" + RegexHelper.unitStateRegex());
         regexSingleUnit += RegexHelper.optional("_" + RegexHelper.planetNameRegex(game, "planet"));
+        regexSingleUnit += RegexHelper.optional("_" + RegexHelper.colorRegex(game));
         regexSingleUnit += RegexHelper.optional("_" + "(?<reverse>reverse)");
         if (RegexService.runMatcher(regexSingleUnit, buttonID, matcher -> {
             String moveOrRemove = matcher.group("type");
@@ -47,13 +50,14 @@ public class TacticalActionButtonHandlers {
             UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
             String planetName = matcher.group("planet");
             boolean reverse = StringUtils.isNotBlank(matcher.group("reverse"));
+            String color = matcher.group("color");
 
             if (!reverse)
                 TacticalActionService.moveSingleUnit(event, game, player, tile, planetName, typeToMove, amt, state,
-                    moveOrRemove);
+                    moveOrRemove, color);
             if (reverse)
                 TacticalActionService.reverseSingleUnit(event, game, player, tile, planetName, typeToMove, amt, state,
-                    moveOrRemove);
+                    moveOrRemove, color);
         }, x -> {})) {
             return;
         }
@@ -84,8 +88,7 @@ public class TacticalActionButtonHandlers {
 
     @ButtonHandler("doneWithOneSystem_")
     public static void finishMovingFromOneTile(
-        Player player, Game game, ButtonInteractionEvent event,
-        String buttonID
+        Player player, Game game, ButtonInteractionEvent event
     ) {
         TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(event, game, player);
     }
@@ -99,7 +102,7 @@ public class TacticalActionButtonHandlers {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         }
 
-        String message = "Choose a system to move from, or finalize movement.";
+        String message = "Please choose a system to move from, or finalize movement.";
         List<Button> systemButtons = TacticalActionService.getTilesToMoveFrom(player, game, event);
         MessageHelper.sendMessageToEventChannelWithButtons(event, message, systemButtons);
         ButtonHelper.deleteMessage(event);
@@ -112,7 +115,7 @@ public class TacticalActionButtonHandlers {
             TacticalActionService.reverseAllUnitMovement(event, game, player);
         }
 
-        String message = "Choosing a different system to activate. Please select the ring of the map that the system you wish to activate is located in.";
+        String message = "Choosing a different system to activate. Please choose the ring of the map that the system you wish to activate is located in.";
         if (!game.isFowMode()) {
             message += " Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Mecatol Rex. The Wormhole Nexus is in the corner.";
         }
@@ -138,6 +141,9 @@ public class TacticalActionButtonHandlers {
         String rx = "concludeMove_" + RegexHelper.posRegex(game);
         RegexService.runMatcher(rx, buttonID, matcher -> {
             Tile tile = game.getTileByPosition(matcher.group("pos"));
+            if (tile == null && FOWPlusService.isVoid(game, matcher.group("pos"))) {
+                tile = FOWPlusService.voidTile(matcher.group("pos"));
+            }
             TacticalActionService.finishMovement(event, game, player, tile);
         });
     }
@@ -145,20 +151,29 @@ public class TacticalActionButtonHandlers {
     @ButtonHandler("spaceUnits_")
     public static void spaceLandedUnits(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         String regex = "spaceUnits_" + RegexHelper.posRegex(game) + "_" + RegexHelper.intRegex("num")
-            + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh");
+            + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh") + "_" + RegexHelper.colorRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String pos = matcher.group("pos");
             int amount = Integer.parseInt(matcher.group("num"));
             UnitType type = Units.findUnitType(matcher.group("unittype"));
             boolean damaged = matcher.group("dmg") != null && !matcher.group("dmg").isBlank();
             String planet = matcher.group("uh");
+            String color = matcher.group("color");
 
+            Player owner = player;
+            String colorMsg = "";
+            if (color != null && game.getPlayerFromColorOrFaction(color) != null) {
+                owner = game.getPlayerFromColorOrFaction(color);
+                if (owner != player) {
+                    colorMsg = " " + StringUtils.capitalize(owner.getColor()) + " ";
+                }
+            }
             Tile tile = game.getTileByPosition(pos);
             UnitHolder removeFromHolder = tile.getUnitHolderFromPlanet(planet);
             UnitHolder addToHolder = tile.getSpaceUnitHolder();
             game.setActiveSystem(pos);
 
-            List<RemovedUnit> removed = RemoveUnitService.removeUnit(event, tile, game, player, removeFromHolder, type,
+            List<RemovedUnit> removed = RemoveUnitService.removeUnit(event, tile, game, owner, removeFromHolder, type,
                 amount, damaged);
             List<RemovedUnit> toAdd = removed.stream().map(r -> r.onUnitHolder(addToHolder)).toList();
             AddUnitService.addUnits(event, game, toAdd);
@@ -166,7 +181,7 @@ public class TacticalActionButtonHandlers {
             List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
 
             String planetName = Mapper.getPlanet(planet).getNameNullSafe();
-            String undidMsg = player.getFactionEmojiOrColor() + " undid landing of " + amount + " "
+            String undidMsg = player.getFactionEmojiOrColor() + " undid landing of " + amount + colorMsg + " "
                 + type.humanReadableName() + " on " + planetName + ".";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), undidMsg);
             event.getMessage().editMessage(event.getMessage().getContentRaw())
@@ -183,20 +198,29 @@ public class TacticalActionButtonHandlers {
     @ButtonHandler("landUnits_")
     public static void landingUnits(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String regex = "landUnits_" + RegexHelper.posRegex(game) + "_" + RegexHelper.intRegex("num")
-            + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh");
+            + RegexHelper.unitTypeRegex() + "(?<dmg>(damaged)?)_" + RegexHelper.unitHolderRegex(game, "uh") + "_" + RegexHelper.colorRegex(game);
         RegexService.runMatcher(regex, buttonID, matcher -> {
             String pos = matcher.group("pos");
             int amount = Integer.parseInt(matcher.group("num"));
             UnitType type = Units.findUnitType(matcher.group("unittype"));
             boolean damaged = matcher.group("dmg") != null && !matcher.group("dmg").isBlank();
             String planet = matcher.group("uh");
+            String color = matcher.group("color");
 
+            Player owner = player;
+            String colorMsg = "";
+            if (color != null && game.getPlayerFromColorOrFaction(color) != null) {
+                owner = game.getPlayerFromColorOrFaction(color);
+                if (owner != player) {
+                    colorMsg = " " + StringUtils.capitalize(owner.getColor()) + "";
+                }
+            }
             Tile tile = game.getTileByPosition(pos);
             UnitHolder removeFromHolder = tile.getSpaceUnitHolder();
             UnitHolder addToHolder = tile.getUnitHolderFromPlanet(planet);
             game.setActiveSystem(pos);
 
-            List<RemovedUnit> removed = RemoveUnitService.removeUnit(event, tile, game, player, removeFromHolder, type,
+            List<RemovedUnit> removed = RemoveUnitService.removeUnit(event, tile, game, owner, removeFromHolder, type,
                 amount, damaged);
             List<RemovedUnit> toAdd = removed.stream().map(r -> r.onUnitHolder(addToHolder)).toList();
             AddUnitService.addUnits(event, game, toAdd);
@@ -204,7 +228,7 @@ public class TacticalActionButtonHandlers {
             List<Button> systemButtons = TacticalActionService.getLandingTroopsButtons(game, player, tile);
 
             String planetName = Mapper.getPlanet(planet).getNameNullSafe();
-            String landingMsg = player.fogSafeEmoji() + " landed " + amount + " " + type.humanReadableName() + " on "
+            String landingMsg = player.fogSafeEmoji() + " landed " + amount + colorMsg + " " + type.humanReadableName() + " on "
                 + planetName + ".";
             if (!removed.isEmpty()) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), landingMsg);

@@ -1,6 +1,9 @@
 package ti4.message;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -10,14 +13,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -25,6 +20,7 @@ import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -33,12 +29,17 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.helpers.AliasHandler;
@@ -49,8 +50,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.service.actioncard.SabotageService;
 import ti4.service.button.ReactionService;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -128,7 +129,7 @@ public class MessageHelper {
 
     public static List<Button> addUndoButtonToList(List<Button> buttons, String gameName) {
         for (Button button : buttons) {
-            if (button.getId().contains("ultimateUndo")) {
+            if (button.getId().contains("ultimateUndo") || button.getId().contains("answerSurvey")) {
                 return buttons;
             }
         }
@@ -307,6 +308,10 @@ public class MessageHelper {
     }
 
     public static void editMessageWithActionRowsAndFiles(ButtonInteractionEvent event, String message, List<ActionRow> rows, List<FileUpload> files) {
+
+        if (message.length() > 2000) {
+            message = message.substring(0, 1920) + "\nMessage shortened due to exceeding max char limit. Sorry.";
+        }
         event.getHook().editOriginal(message).setComponents(rows).setFiles(files).queue();
     }
 
@@ -367,6 +372,18 @@ public class MessageHelper {
             return;
         }
 
+        if (channel instanceof GuildMessageChannel guildChannel) {
+            try {
+                if (!guildChannel.canTalk()) {
+                    BotLogger.warning(guildChannel.getAsMention() + " Bot missing permission to send messages");
+                    return;
+                }
+            } catch (Exception e) {
+                BotLogger.error("Permission check failure for channel: " + guildChannel.getId(), e);
+                return;
+            }
+        }
+
         List<MessageEmbed> sanitizedEmbeds;
         if (embeds == null) {
             sanitizedEmbeds = Collections.emptyList();
@@ -401,10 +418,9 @@ public class MessageHelper {
         while (iterator.hasNext()) {
             MessageCreateData messageCreateData = iterator.next();
             if (iterator.hasNext()) { // not last message
-                channel.sendMessage(messageCreateData).queue(null,
-                    error -> BotLogger.error(getRestActionFailureMessage(channel, "Failed to send intermediate message", messageCreateData, error), error));
+                sendMessageWithRetry(channel, messageCreateData, null, "Failed to send intermediate message", 1);
             } else { // last message, do action
-                channel.sendMessage(messageCreateData).queue(message -> {
+                sendMessageWithRetry(channel, messageCreateData, message -> {
                     ManagedGame managedGame = GameManager.getManagedGame(gameName);
                     if (finalMessageText != null && managedGame != null && !managedGame.isFowMode()) {
                         if (finalMessageText.contains("Use buttons to do your turn") || finalMessageText.contains("Use buttons to end turn")) {
@@ -416,9 +432,31 @@ public class MessageHelper {
                     if (restAction != null) {
                         restAction.run(message);
                     }
-                }, error -> BotLogger.error(getRestActionFailureMessage(channel, finalMessageText, messageCreateData, error), error));
+                }, finalMessageText, 1);
             }
         }
+    }
+
+    private static void sendMessageWithRetry(
+        MessageChannel channel,
+        MessageCreateData messageCreateData,
+        MessageFunction successAction,
+        String errorHeader,
+        int remainingAttempts
+    ) {
+        channel.sendMessage(messageCreateData).queue(message -> {
+            if (successAction != null) {
+                successAction.run(message);
+            }
+        }, error -> {
+            boolean shouldRetry = error instanceof ErrorResponseException && error.getCause() instanceof SocketTimeoutException && remainingAttempts > 0;
+            if (shouldRetry) {
+                BotLogger.warning(getRestActionFailureMessage(channel, errorHeader + " (retrying)", messageCreateData, error), error);
+                sendMessageWithRetry(channel, messageCreateData, successAction, errorHeader, remainingAttempts - 1);
+            } else {
+                BotLogger.error(getRestActionFailureMessage(channel, errorHeader, messageCreateData, error), error);
+            }
+        });
     }
 
     public static String getRestActionFailureMessage(MessageChannel channel, String errorHeader, MessageCreateData messageCreateData, Throwable error) {
@@ -466,7 +504,7 @@ public class MessageHelper {
      * @return True if the message was sent successfully, false otherwise
      */
     public static boolean sendPrivateMessageToPlayer(Player player, Game game, String messageText) {
-        if (player.getUser().isBot() && !game.isCommunityMode()) {
+        if (player != null && player.getUser() != null && player.getUser().isBot() && !game.isCommunityMode()) {
             return true;
         }
         return sendPrivateMessageToPlayer(player, game, (MessageChannel) null, messageText, null, null);
@@ -486,7 +524,7 @@ public class MessageHelper {
     public static boolean sendPrivateMessageToPlayer(Player player, Game game, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
         if (messageText == null || messageText.isEmpty())
             return true; // blank message counts as a success
-        User user = AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
+        User user = player == null ? null : AsyncTI4DiscordBot.jda.getUserById(player.getUserID());
         if (user == null) {
             sendMessageToChannel(feedbackChannel, failText);
             return false;
@@ -496,7 +534,7 @@ public class MessageHelper {
                 privateChannel = player.getCardsInfoThread();
             }
             if (privateChannel == null) {
-                sendMessageToUser(game.getName() + " " + messageText, user);
+                sendMessageToUser(game.getName() + " " + messageText, user, feedbackChannel, failText);
             } else {
                 sendMessageToChannel(privateChannel, messageText);
             }
@@ -529,7 +567,28 @@ public class MessageHelper {
     }
 
     public static void sendMessageToUser(String messageText, User user) {
-        user.openPrivateChannel().queue(channel -> splitAndSent(messageText, channel));
+        sendMessageToUser(messageText, user, null);
+    }
+
+    public static void sendMessageToUser(String messageText, User user, @Nullable MessageChannel failureChannel) {
+        sendMessageToUser(messageText, user, failureChannel, null);
+    }
+
+    public static void sendMessageToUser(
+        String messageText,
+        User user,
+        @Nullable MessageChannel failureChannel,
+        @Nullable String failText
+    ) {
+        if (user == null) {
+            return;
+        }
+        user.openPrivateChannel().queue(channel -> splitAndSent(messageText, channel), error -> {
+            BotLogger.warning("Failed to DM user " + user.getId(), error);
+            if (failureChannel != null && failText != null) {
+                sendMessageToChannel(failureChannel, failText);
+            }
+        });
     }
 
     /**
@@ -589,7 +648,7 @@ public class MessageHelper {
      *          <p>
      *          </p>
      *          Example of use:
-     * 
+     *
      *          <pre>
     * {@code
         for (MessageCreateData messageData : getMessageObject(message, embeds, buttons)) {

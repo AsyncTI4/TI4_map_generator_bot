@@ -30,7 +30,7 @@ public abstract class BagDraft {
             return new OnePickFrankenDraft(game);
         }
         if ("poweredonepick_franken".equals(draftType)) {
-          return new PoweredOnePickFrankenDraft(game);
+            return new PoweredOnePickFrankenDraft(game);
         }
         return null;
     }
@@ -57,8 +57,14 @@ public abstract class BagDraft {
 
     public boolean isDraftStageComplete() {
         List<Player> players = owner.getRealPlayers();
+
         for (Player p : players) {
             if (!p.getCurrentDraftBag().Contents.isEmpty() || !p.getDraftQueue().Contents.isEmpty()) {
+                if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
+                    return false;
+                }
+            }
+            if (p.getDraftHand().Contents.size() != owner.getFrankenBagSize()) {
                 return false;
             }
         }
@@ -110,10 +116,10 @@ public abstract class BagDraft {
         player.setReadyToPassBag(ready);
     }
 
-    public String getLongBagRepresentation(DraftBag bag) {
+    public String getLongBagRepresentation(DraftBag bag, Game game) {
         StringBuilder sb = new StringBuilder();
         for (DraftItem.Category cat : DraftItem.Category.values()) {
-            sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat));
+            sb.append(FrankenDraftBagService.getLongCategoryRepresentation(this, bag, cat, game));
         }
         sb.append("**Total Cards: ").append(bag.Contents.size()).append("**\n");
         return sb.toString();
@@ -149,7 +155,7 @@ public abstract class BagDraft {
 
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
-        boolean isPrivateChannel = (!owner.isCommunityMode() && !owner.isFowMode());
+        boolean isPrivateChannel = (!owner.isFowMode());
         if (owner.getName().contains("pbd100") || owner.getName().contains("pbd500")) {
             isPrivateChannel = true;
         }
@@ -252,8 +258,12 @@ public abstract class BagDraft {
             } else {
                 sb.append("❌");
             }
-            sb.append(player.getRepresentationNoPing());
-            sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getActiveBagDraft().getBagSize()).append(")");
+            if (owner.getRealPlayers().size() > 10) {
+                sb.append(player.getFactionEmoji());
+            } else {
+                sb.append(player.getRepresentationNoPing());
+            }
+            sb.append(" (").append(player.getDraftHand().Contents.size()).append("/").append(owner.getFrankenBagSize()).append(")");
             sb.append("\n");
         }
         return sb.toString();

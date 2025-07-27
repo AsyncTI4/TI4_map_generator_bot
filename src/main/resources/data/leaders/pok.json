@@ -45,6 +45,54 @@
         "source": "pok"
     },
     {
+        "id": "redcreussagent",
+        "faction": "ghost",
+        "type": "agent",
+        "name": "\"Who Knows?\"",
+        "title": "Forlorn Shadow",
+        "abilityWindow": "ACTION:",
+        "abilityText": "Exhaust this card to choose 1 player. That player may swap the position of 2 of their ships in any systems; they may transport units when they swap.",
+        "unlockCondition": "Always Unlocked",
+        "source": "pok"
+    },
+    {
+        "id": "redcreusscommander",
+        "faction": "ghost",
+        "type": "commander",
+        "name": "\"Total Mystery\"",
+        "title": "Wistful Soul",
+        "abilityWindow": "At the end of a combat between any players:",
+        "abilityText": "Gain 1 commodity or convert 1 of your commodities to a trade good.",
+        "unlockCondition": "Resolve a combat with another player",
+        "source": "pok"
+    },
+    {
+        "id": "redcreusshero",
+        "faction": "ghost",
+        "type": "hero",
+        "name": "\"A Tall Stranger\"",
+        "title": "Wayward Riftwalker",
+        "abilityName": "Fragment Reality - Dimensional Reflection",
+        "abilityWindow": "When you produce ships",
+        "abilityText": "You may place any of those ships onto this card. At the start of a space combat, you may purge this card to place all ships from this card into the active system.",
+        "unlockCondition": "Have 3 scored objectives.",
+        "source": "pok"
+    },
+    {
+        "id": "orlandohero",
+        "faction": "xxcha",
+        "type": "hero",
+        "name": "F.S.S. Orlando",
+        "title": "Apollo Prototol",
+        "abilityName": "Apollo Prototol - Intelligence Unshackled",
+        "abilityWindow": "When one of your units in the Ordinian system is destroyed",
+        "abilityText": "You may purge this card to designate that unit as a catalyst: roll 1 die for each other player's unit in the system; For each result equal to or greater than the catalyst's combat value, destroy that unit.",
+        "unlockCondition": "The Nekro Virus has 5 victory points.",
+
+        "source": "pok"
+    },
+
+    {
         "id": "empyreanagent",
         "faction": "empyrean",
         "type": "agent",

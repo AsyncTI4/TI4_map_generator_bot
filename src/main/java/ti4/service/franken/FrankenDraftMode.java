@@ -1,7 +1,7 @@
 package ti4.service.franken;
 
 public enum FrankenDraftMode {
-      POWERED("powered", "Adds 1 extra faction technology/ability to pick from."), 
+      POWERED("powered", "Adds 1 extra faction technology/ability to pick from."),
       ONEPICK("onepick", "Draft 1 item a time."),
       POWEREDONEPICK("poweredonepick", "Combines powered and onepick modes.");
 
@@ -12,7 +12,7 @@ public enum FrankenDraftMode {
           this.name = name;
           this.description = description;
       }
-    
+
       @Override
       public String toString() {
           return super.toString().toLowerCase();

@@ -1,6 +1,5 @@
 package ti4.commands.tokens;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -109,27 +108,14 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 Map<String, UnitHolder> unitHolders = tile.getUnitHolders();
                 UnitHolder planetUnitHolder = unitHolders.get(planet);
                 UnitHolder spaceUnitHolder = unitHolders.get(Constants.SPACE);
-                if (planetUnitHolder != null && spaceUnitHolder != null) {
-                    Map<UnitKey, Integer> units = new HashMap<>(planetUnitHolder.getUnits());
-                    for (Player player_ : game.getPlayers().values()) {
-                        String color = player_.getColor();
-                        planetUnitHolder.removeAllUnits(color);
+                for (UnitKey key : planetUnitHolder.getUnitKeys()) {
+                    int amt = planetUnitHolder.getUnitCount(key);
+                    var removed = planetUnitHolder.removeUnit(key, amt);
+                    if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
+                        spaceUnitHolder.addUnitsWithStates(key, removed);
                     }
-                    Map<UnitKey, Integer> spaceUnits = spaceUnitHolder.getUnits();
-                    for (Map.Entry<UnitKey, Integer> unitEntry : units.entrySet()) {
-                        UnitKey key = unitEntry.getKey();
-                        if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
-                            Integer count = spaceUnits.get(key);
-                            if (count == null) {
-                                count = unitEntry.getValue();
-                            } else {
-                                count += unitEntry.getValue();
-                            }
-                            spaceUnits.put(key, count);
-                        }
-                    }
-
                 }
+
             }
             if (tokenID.contains("facility")) {
                 String facility = tokenID;
@@ -143,17 +129,16 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                     tile.addToken(tokenID, planet);
                 } else {
                     int embassy = ButtonHelperSCs.getNearbyEmbassyCount(game, tile, player);
-                    tile.addToken("attachment_facilityembassy" + +(embassy + 1) + ".png", planet);
+                    tile.addToken("attachment_facilityembassy" + (embassy + 1) + ".png", planet);
                     ButtonHelperSCs.updateEmbassies(game, player, tile);
-                }
-                if (facility.contains("logistics")) {
-                    player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
                 }
             } else {
                 tile.addToken(tokenID, planet);
             }
-            if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)) {
-                Helper.addMirageToTile(tile);
+            for (String tp : Constants.TOKEN_PLANETS) {
+                if (tokenID.equals(Mapper.getTokenID(tp))) {
+                    Helper.addTokenPlanetToTile(game, tile, tp);
+                }
             }
         }
     }

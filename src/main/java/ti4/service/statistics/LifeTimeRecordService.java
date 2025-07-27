@@ -14,8 +14,7 @@ import ti4.message.MessageHelper;
 public class LifeTimeRecordService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("getLifeTimeRecords", event, () -> getLifeTimeRecords(event)));
+        StatisticsPipeline.queue(event, () -> getLifeTimeRecords(event));
     }
 
     private void getLifeTimeRecords(SlashCommandInteractionEvent event) {
@@ -30,7 +29,7 @@ public class LifeTimeRecordService {
         }
         String records = DiceLuckService.getDiceLuck(members) + AverageTurnTimeService.getAverageTurnTime(members) + SearchGameHelper.getTotalCompletedNOngoingGames(members, event);
 
-        
+
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), records);
     }
 }

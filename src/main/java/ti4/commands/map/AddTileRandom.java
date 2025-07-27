@@ -43,7 +43,7 @@ class AddTileRandom extends GameStateSubcommand {
             MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
             return;
         }
-        
+
         if (!RandomOption.isValid(randomType)) {
             MessageHelper.replyToMessage(event, "Invalid type: " + randomType);
             return;
@@ -81,7 +81,7 @@ class AddTileRandom extends GameStateSubcommand {
                 AddTileService.addTile(getGame(), new Tile(randomTile.getId(), position));
             }
 
-            msg.append(drawOnly ? "Drew " : "Added ").append(randomTile.getEmbedTitle()).append(" to ").append(position).append(" from ").append(availableTiles.size()).append(" options\n");
+            msg.append(drawOnly ? "Drew " : "Added ").append(randomTile.getEmbedTitle()).append(" to ").append(position).append(" from ").append(availableTiles.size()).append(" options.\n");
         }
 
         MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());

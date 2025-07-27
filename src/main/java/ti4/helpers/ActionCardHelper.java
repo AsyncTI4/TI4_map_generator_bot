@@ -7,15 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.CommandHelper;
@@ -50,7 +49,7 @@ public class ActionCardHelper {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, getActionCardInfo(game, player));
         Map<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null && !actionCards.isEmpty()) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "_ _\nClick a button below to play an action card.", getPlayActionCardButtons(game, player));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), "Click a button below to play an action card.", getPlayActionCardButtons(game, player));
         }
 
         sendTrapCardInfo(game, player);
@@ -61,14 +60,13 @@ public class ActionCardHelper {
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, getTrapCardInfo(player));
         }
         if (player.hasAbility("classified_developments")) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Info on your superweapons are as follows:\n");
-            sb.append(Mapper.getRelic("superweaponavailyn").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponcaled").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponglatison").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweapongrom").getSimpleRepresentation()).append("\n");
-            sb.append(Mapper.getRelic("superweaponmors").getSimpleRepresentation()).append("\n");
-            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
+            String sb = "Info on your superweapons are as follows:\n" +
+                Mapper.getRelic("superweaponavailyn").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponcaled").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponglatison").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweapongrom").getSimpleRepresentation() + "\n" +
+                Mapper.getRelic("superweaponmors").getSimpleRepresentation() + "\n";
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb);
         }
     }
 
@@ -105,14 +103,14 @@ public class ActionCardHelper {
             if (representation == null) {
                 representation = planet;
             }
-            sb.append("\n> Planet: ").append(representation).append("");
+            sb.append("\n> Planet: ").append(representation);
         }
         sb.append("\n");
         return sb.toString();
     }
 
     private static String getActionCardInfo(Game game, Player player) {
-        StringBuilder sb = new StringBuilder("_ _\n");
+        StringBuilder sb = new StringBuilder();
 
         // ACTION CARDS
         sb.append("__Action Cards__ (").append(player.getAc()).append("/").append(ButtonHelper.getACLimit(game, player)).append("):").append("\n");
@@ -192,6 +190,27 @@ public class ActionCardHelper {
                 String actionCardWindow = actionCard.getWindow();
                 if (ac_name != null && "action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, CardEmojis.ActionCard));
+                }
+            }
+        }
+        return acButtons;
+    }
+
+    public static List<Button> getCombatActionCardButtons(Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        Map<String, Integer> actionCards = player.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCard(key).getName();
+                ActionCardModel actionCard = Mapper.getActionCard(key);
+                String actionCardWindow = actionCard.getWindow();
+                if (ac_name != null) {
+                    if (actionCardWindow.contains("combat") || actionCardWindow.contains("roll") || actionCardWindow.contains("hit")) {
+                        acButtons.add(Buttons.red(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, CardEmojis.ActionCard));
+                    }
+
                 }
             }
         }
@@ -343,15 +362,19 @@ public class ActionCardHelper {
         if (actionCard.getPhase().equalsIgnoreCase("agenda") && game.getPhaseOfGame() != null && game.getPhaseOfGame().equalsIgnoreCase("action")) {
             if (!player.getFaction().equalsIgnoreCase("edyn") && !player.getFaction().contains("franken")) {
                 return player.getRepresentationUnfogged()
-                    + " The bot thinks it is the action phase and this is an agenda card. If this is a mistake, ping bothelper in the actions channel";
+                    + ", the bot thinks it is the Action Phase and this is an Agenda Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
         if (actionCard.getPhase().equalsIgnoreCase("action") && game.getPhaseOfGame() != null && game.getPhaseOfGame().contains("agenda")) {
             if (!actionCard.getName().toLowerCase().contains("war machine")) {
                 return player.getRepresentationUnfogged()
-                    + " The bot thinks it is the agenda phase and this is an action phase card. If this is a mistake, ping bothelper in the actions channel";
+                    + ", the bot thinks it is the Agenda Phase and this is an Action Phase card. If this is a mistake, ping bothelper in the actions channel.";
             }
         }
+
+        CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
+
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played _" + actionCardTitle + "_ action card.");
 
         if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);
@@ -388,7 +411,7 @@ public class ActionCardHelper {
                     + " Use buttons to decide whether to Sabo _" + actionCardTitle + "_.", xxchaButtons);
             }
         }
-        MessageEmbed acEmbed = actionCard.getRepresentationEmbed();
+        MessageEmbed acEmbed = actionCard.getRepresentationEmbed(false, true);
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithEmbed(mainGameChannel, message, acEmbed);
         } else {
@@ -407,11 +430,11 @@ public class ActionCardHelper {
                 for (Player p : game.getRealPlayers()) {
                     if (p == player) continue;
                     if (!it && (game.isFowMode() || p.hasTechReady("it"))) {
-                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Xxcha + "**Instinct Training**, watch out");
+                        noSabosMessage.append("\n> A player may have access to **Instinct Training**, so watch out.");
                         it = true;
                     }
                     if (!watcher && (game.isFowMode() || Helper.getPlayerFromUnit(game, "empyrean_mech") != null)) {
-                        noSabosMessage.append("\n> A player may have access to " + FactionEmojis.Empyrean + UnitEmojis.mech + "**Watcher**, 𝓌𝒶𝓉𝒸𝒽 out");
+                        noSabosMessage.append("\n> A player may have access to a Watcher mech, so 𝓌𝒶𝓉𝒸𝒽 out.");
                         watcher = true;
                     }
                 }
@@ -486,6 +509,11 @@ public class ActionCardHelper {
 
             if (automationID.equals("last_minute_deliberation")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "lastMinuteDeliberation", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
+
+            if (automationID.equals("professional_archeologists")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveProfessionalArcheologists", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -566,8 +594,8 @@ public class ActionCardHelper {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
-            if (automationID.equals("technological_breakthrough")) {
-                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "technologicalBreakthrough", buttonLabel));
+            if (automationID.equals("innovation")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "innovation", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
 
@@ -593,7 +621,8 @@ public class ActionCardHelper {
 
             if (automationID.equals("experimental")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveEBSStep1_" + game.getActiveSystem(), buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg
+                    + (player.hasTechReady("gls") ? "\n-# Make sure to declare _Graviton Laser System_, should you so wish, before pressing this button." : ""), codedButtons);
             }
 
             if (automationID.equals("blitz")) {
@@ -775,7 +804,7 @@ public class ActionCardHelper {
 
             if (automationID.equals("diplo_pressure")) {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "resolveDiplomaticPressureStep1", buttonLabel));
-                MessageHelper.sendMessageToChannelWithButtons(channel2, "Please resolve Diplomatic Pressure now. If any sabo occurs, they will be able to ignore the buttons they are offered.", codedButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, "Please resolve _Diplomatic Pressure_ now. If any Sabo occurs, they will be able to ignore the buttons they are offered.", codedButtons);
             }
 
             if (automationID.equals("renegotiation")) {
@@ -862,6 +891,10 @@ public class ActionCardHelper {
                 codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "riseOfAMessiah", buttonLabel));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
             }
+            if (automationID.equals("courageous")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "courageousStarter", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg, codedButtons);
+            }
             if (automationID.equals("veto")) {
                 codedButtons.add(Buttons.blue(player.getFinsFactionCheckerPrefix() + "resolveVeto", "Reveal next Agenda"));
                 sendResolveMsgToMainChannel(introMsg, codedButtons, player, game);
@@ -882,6 +915,11 @@ public class ActionCardHelper {
                     + ", a reminder that you should declare how you are distributing the trade goods now, before other players choose whether they will Sabo.", codedButtons);
             }
 
+            if (automationID.equals("psionic_hammer")) {
+                codedButtons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "psionicHammerStep1", buttonLabel));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, introMsg + String.format(targetMsg, "player"), codedButtons);
+            }
+
             targetMsg = player.getRepresentation() + ", a reminder that you should declare which %s you are targeting now, before other players choose whether they will Sabo.";
 
             if (automationID.equals("silence_space")) {
@@ -889,16 +927,16 @@ public class ActionCardHelper {
             }
 
             if (automationID.equals("direct_hit") || automationID.equals("courageous")) {
-                MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "ship (if multiple)"), codedButtons);
+                MessageHelper.sendMessageToChannel(channel2, String.format(targetMsg, "ship (if multiple)"));
             }
 
             if (automationID.equals("parley")) {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "planet (if multiple)"), codedButtons);
             }
 
-            if (automationID.equals("reverse_engineer")) {
-                MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "action card (if multiple)"), codedButtons);
-            }
+            // if (automationID.equals("reverse_engineer")) {
+            //     MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "action card (if multiple)"), codedButtons);
+            // }
 
             if (automationID.equals("ghost_squad")) {
                 MessageHelper.sendMessageToChannelWithButtons(channel2, String.format(targetMsg, "ground forces"), codedButtons);
@@ -918,8 +956,8 @@ public class ActionCardHelper {
                 String finChecker = "FFCC_" + player.getFaction() + "_";
                 if (actionCard.getText().toLowerCase().contains("predict aloud")) {
                     List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, game, finChecker);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, (game.isFowMode() ? "" : player.getRepresentation(false, true))
-                        + " Please decide now which outcome you are predicting. If a sabo occurs, it will automatically erase it. Reminder to also decide on other afters now.", game, player, riderButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, (game.isFowMode() ? "P" : player.getRepresentation(false, true) + ", p")
+                        + "lease decide now which outcome you are predicting. If a Sabo occurs, it will automatically erase it. Reminder to also decide on other \"after\"s now.", game, player, riderButtons);
                     for (Player p2 : game.getRealPlayers()) {
                         if (!game.getStoredValue("preVoting" + p2.getFaction()).isEmpty()) {
                             VoteButtonHandler.erasePreVoteDueToAfterPlay(p2, game);

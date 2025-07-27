@@ -9,15 +9,14 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.helpers.SortHelper;
 import ti4.map.Game;
-import ti4.map.GamesPage;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ListTitlesGivenService {
 
     public void queueReply(SlashCommandInteractionEvent event) {
-        StatisticsPipeline.queue(
-            new StatisticsPipeline.StatisticsEvent("listTitlesGiven", event, () -> listTitlesGiven(event)));
+        StatisticsPipeline.queue(event, () -> listTitlesGiven(event));
     }
 
     private void listTitlesGiven(SlashCommandInteractionEvent event) {

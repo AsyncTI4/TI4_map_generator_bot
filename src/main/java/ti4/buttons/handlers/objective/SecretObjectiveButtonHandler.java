@@ -1,8 +1,12 @@
 package ti4.buttons.handlers.objective;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -13,6 +17,7 @@ import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.objectives.DiscardSecretService;
 import ti4.service.objectives.DrawSecretService;
+import ti4.settings.users.UserSettingsManager;
 
 class SecretObjectiveButtonHandler {
 
@@ -30,10 +35,32 @@ class SecretObjectiveButtonHandler {
 
         try {
             int soIndex = Integer.parseInt(soID);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " discarded a secret objective.");
+
+            String msg = player.getRepresentation() + " discarded a secret objective.";
+            if (game.getRound() == 1 && !game.isFowMode()) {
+                int amountLeftToDiscard = -1;
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2.getSo() > 1) {
+                        amountLeftToDiscard++;
+                    }
+                }
+                msg += " (" + amountLeftToDiscard + " players still to discard)";
+            }
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
             DiscardSecretService.discardSO(player, soIndex, game);
+
             if (drawReplacement) {
                 DrawSecretService.drawSO(event, game, player);
+            }
+            if (game.getRound() == 1 && !game.isFowMode() && !game.isCommunityMode()) {
+                var userSettings = UserSettingsManager.get(player.getUserID());
+                if (!userSettings.isHasAnsweredSurvey()) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("answerSurvey_yes_1", "Yes"));
+                    buttons.add(Buttons.red("deleteButtons", "No"));
+                    String msg2 = player.getRepresentation() + " Hullo there! Welcome to async! As part of the ground rules setup process here, we request each player complete a 1 time survey of 5 questions. Would you like to complete it now?";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg2, buttons);
+                }
             }
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse SO ID: " + soID, e);
@@ -66,12 +93,13 @@ class SecretObjectiveButtonHandler {
                 if (manager.getPlayerDraft(playerID).getFaction().equals("keleresm"))
                     keleres = game.getPlayer(playerID);
             if (keleres != null) {
-                MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(), "Keleres is not set up yet!!! " + keleres.getPing() + " the game is waiting for you to set up :)");
+                MessageHelper.sendMessageToChannel(keleres.getCorrectChannel(),
+                    "Keleres is not set up yet!!! " + keleres.getPing() + ", the game is waiting for you to set up :).");
                 return;
             }
         }
         boolean allPlayersSetup = true;
-        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting tech. If you wish to proceed anyways, just press the button again";
+        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting technologies. If you wish to proceed anyways, just press the button again.";
         for (Player p : game.getRealPlayers()) {
             if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
                 message += "\n> " + p.getRepresentation();

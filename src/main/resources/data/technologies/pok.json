@@ -135,6 +135,18 @@
         "shortName": "X-89 Bact. Weapon"
     },
     {
+        "alias": "x89c4",
+        "name": "X-89 Bacterial Weapon ΩΩ",
+        "types": [
+            "BIOTIC"
+        ],
+        "requirements": "GGG",
+        "source": "codex4",
+        "text": "Double the hits produced by your units' BOMBARDMENT and ground combat rolls.\nExhaust each planet you use BOMBARDMENT against.",
+        "initials": "X89",
+        "shortName": "X-89 Bact. Weapon"
+    },
+    {
         "alias": "pa",
         "name": "Psychoarchaeology",
         "types": [
@@ -185,14 +197,13 @@
     },
     {
         "alias": "md",
-        "name": "Magen Defense Grid Ω",
+        "name": "Magen Defense Grid ΩΩ",
         "types": [
             "WARFARE"
         ],
         "requirements": "R",
-        "source": "codex1",
-        "text": "At the start of ground combat on a planet that contains 1 or more of your structures, you may produce 1 hit and assign it to 1 of your opponent's ground forces.",
-        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/generic/magen_defense_grid_omega.png?raw=true",
+        "source": "codex4",
+        "text": "When any player activates a system that contains 1 or more of your structures, place 1 infantry from your reinforcements with each of those structures.\nAt the start of ground combat on a planet that contains 1 or more of your structures, produce 1 hit and assign it to 1 of your opponent's ground forces.",
         "initials": "MDG",
         "shortName": "Magen Def. Grid"
     },
@@ -1061,5 +1072,34 @@
         "shortName": "Agency\nSupply Net.",
         "shrinkName": false,
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/agency_supply_network.jpg?raw=true"
+    },
+    
+    {
+        "alias": "nekroc4y",
+        "name": "???\\_NULL\\_REFERENCE\\_???",
+        "types": [
+            "CYBERNETIC"
+        ],
+        "requirements": "Y",
+        "faction": "nekro",
+        "source": "pok",
+        "text": "When one of your ships is destroyed, you may produce a ship of the same type at a space dock in your home system.",
+        "shortName": "Null_\nRef'rence",
+        "shrinkName": false,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/null_ref.jpg?raw=true"
+    },
+    {
+        "alias": "nekroc4r",
+        "name": "???\\_ERROR\\_ERROR\\_???",
+        "types": [
+            "WARFARE"
+        ],
+        "requirements": "R",
+        "faction": "nekro",
+        "source": "pok",
+        "text": "ACTION: Exhaust this card to place 1 PDS on a planet you control. \nACTION: Exhaust this card to repair all of your damaged units. \nACTION: Exhaust this card and discard 1 action card to draw 1 action card.",
+        "shortName": "Error\nError",
+        "shrinkName": false,
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/techs/faction/error_error.jpg?raw=true"
     }
 ]

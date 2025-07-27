@@ -32,8 +32,9 @@ public class UnlockLeaderService {
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
 
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannel(channel, player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".");
-            channel.sendMessageEmbeds(leaderModel.getRepresentationEmbed(false, true, true, showFlavourText)).queue();
+            MessageHelper.sendMessageToChannelWithEmbed(channel,
+                player.getRepresentation() + " has unlocked their " + leaderModel.getType() + ".",
+                leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
         } else {
             MessageHelper.sendMessageToChannel(channel, LeaderEmojis.getLeaderEmoji(playerLeader).toString());
             String message = player.getRepresentation() + " unlocked " + Helper.getLeaderFullRepresentation(playerLeader) + ".";
@@ -41,7 +42,6 @@ public class UnlockLeaderService {
         }
 
         if (leaderID.contains("bentorcommander")) {
-            player.setCommoditiesTotal(player.getCommoditiesTotal() + 1);
             MessageHelper.sendMessageToChannel(channel, player.getFactionEmoji() + ", your commodity value has been set to " + player.getCommoditiesTotal() + ".");
         }
 

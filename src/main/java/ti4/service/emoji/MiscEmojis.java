@@ -11,7 +11,7 @@ public enum MiscEmojis implements TI4Emoji {
     // Tokens
     Custodians, CustodiansVP, tg, NomadCoin, comm, Sleeper, Wash, //
     WHalpha, WHbeta, WHgamma, CreussAlpha, CreussBeta, CreussGamma, //
-    LegendaryPlanet, SpeakerToken,
+    LegendaryPlanet, SpeakerToken, DoubleBoom,
 
     // Res / Inf
     influence, resources, ResInf, //
@@ -29,7 +29,7 @@ public enum MiscEmojis implements TI4Emoji {
     // Other
     Sabotage, NoSabo, NoWhens, NoAfters, //
     Winemaking, BortWindow, SpoonAbides, AsyncTI4Logo, TIGL, RollDice, //
-    BLT, Stroter;
+    BLT, Stroter, Wololo, TaDont;
 
     public static TI4Emoji getCreussWormhole(@NotNull String wormhole) {
         return switch (wormhole.toLowerCase()) {

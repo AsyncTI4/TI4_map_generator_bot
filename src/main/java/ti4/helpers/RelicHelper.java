@@ -19,10 +19,13 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ExploreModel;
 import ti4.model.RelicModel;
+import ti4.model.TechnologyModel;
+import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.service.tech.ListTechService;
 
 @UtilityClass
 public class RelicHelper {
@@ -112,10 +115,86 @@ public class RelicHelper {
                 helpMessage.append("Custom objective _").append(customPOName).append("_ has been added.\n")
                     .append(player.getRepresentation()).append(" scored _").append(customPOName).append("_.");
             }
+            case "bookoflatvinia" -> {
+                if (player.hasAbility("propagation")) {
+                    List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                    String message2 = player.getRepresentation()
+                        + ", you would research two technologies, but because of **Propagation**, you instead gain 6 command tokens."
+                        + " Your current command tokens are " + player.getCCRepresentation()
+                        + ". Use buttons to gain command tokens.";
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                        message2, buttons);
+                    game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
+                } else {
+                    List<String> startingTechOptions = new ArrayList<>(Arrays.asList("amd", "det", "nm", "pa", "st", "sdn", "ps", "aida"));
+                    List<TechnologyModel> techs = new ArrayList<>();
+                    if (!startingTechOptions.isEmpty()) {
+                        for (String tech : game.getTechnologyDeck()) {
+                            TechnologyModel model = Mapper.getTech(tech);
+                            boolean homebrewReplacesAnOption = model.getHomebrewReplacesID().map(startingTechOptions::contains).orElse(false);
+                            if (startingTechOptions.contains(model.getAlias()) || homebrewReplacesAnOption) {
+                                if (!player.getTechs().contains(tech)) {
+                                    techs.add(model);
+                                }
+                            }
+                        }
+                    }
+
+                    List<Button> buttons = ListTechService.getTechButtons(techs, player, "free");
+                    String msg = player.getRepresentationUnfogged() + ", please use the buttons to research a technology with no prerequisites:";
+                    if (techs.isEmpty()) {
+                        buttons = List.of(Buttons.GET_A_FREE_TECH, Buttons.DONE_DELETE_BUTTONS);
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                    } else {
+                        for (int x = 0; x < 2; x++) {
+                            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, buttons);
+                        }
+                    }
+                }
+
+            }
         }
 
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), helpMessage.toString());
         Helper.checkEndGame(game, player);
+    }
+
+    public static void offerInitialNeuraLoopChoice(Game game, String poID) {
+        for (Player player : game.getRealPlayers()) {
+            if (player.hasRelic("neuraloop")) {
+                String name = "";
+                if (Mapper.getPublicObjective(poID) != null) {
+                    name = Mapper.getPublicObjective(poID).getName();
+                } else {
+                    if (Mapper.getSecretObjective(poID) != null) {
+                        name = Mapper.getSecretObjective(poID).getName();
+                    } else {
+                        name = poID;
+                    }
+                }
+                String msg = player.getRepresentation() + " you have the opportunity to use the _Neuraloop_ relic to replace the objective " + name
+                    + " with a random objective from __any__ of the objective decks. Doing so will cause you to purge one of your relics."
+                    + " Use buttons to decide which objective deck, if any, you wish to draw the new objective from..";
+                List<Button> buttons = new ArrayList<>();
+                buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";stage1", "Replace with Stage 1", CardEmojis.Public1));
+                buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";stage2", "Replace with Stage 2", CardEmojis.Public2));
+                buttons.add(Buttons.gray("neuraloopPart1;" + poID + ";secret", "Replace with Secret Objective", CardEmojis.SecretObjective));
+                buttons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+            }
+        }
+    }
+
+    public static List<Button> getNeuraLoopButton(Player player, String poID, String type, Game game) {
+        List<Button> buttons = new ArrayList<>();
+
+        for (String relic : player.getRelics()) {
+            if (Mapper.getRelic(relic) == null || Mapper.getRelic(relic).isFakeRelic()) {
+                continue;
+            }
+            buttons.add(Buttons.gray("neuraloopPart2;" + poID + ";" + type + ";" + relic, Mapper.getRelic(relic).getName()));
+        }
+        return buttons;
     }
 
     public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Game game) {

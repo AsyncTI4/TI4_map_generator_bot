@@ -21,7 +21,7 @@ class ShufflePublicBack extends GameStateSubcommand {
         Game game = getGame();
         OptionMapping option = event.getOption(Constants.PO_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Public Objective to shuffle back in");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please choose what public objective to shuffle back in");
             return;
         }
         boolean shuffled = game.shuffleObjectiveBackIntoDeck(option.getAsInt());

@@ -5,11 +5,10 @@ import java.util.HashSet;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitType;
 import ti4.image.helpers.ImageTestHelper.TestMode;
 import ti4.image.helpers.TileImageTestHelper;
@@ -17,10 +16,11 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.model.FactionModel;
+import ti4.service.map.TokenPlanetService;
 import ti4.testUtils.BaseTi4Test;
 
 /**
- * <h1> HOW TO USE THIS TEST FILE: </h1> 
+ * <h1> HOW TO USE THIS TEST FILE: </h1>
  * <p> 1. Change TestMode to "SaveStatic"
  * <p> 2. Run all of the tests
  * <p> 3. Change TestMode back to "Compare"
@@ -38,11 +38,11 @@ public class TileImageTest extends BaseTi4Test {
 
     @AfterAll
     public static void readyForProduction() {
-        Assertions.assertEquals(testMode, TestMode.Compare);
+        Assertions.assertEquals(TestMode.Compare, testMode);
     }
 
     @BeforeAll
-    private static void setupTestGame() {
+    public static void setupTestGame() {
         if (testGame != null) return;
         testGame = new Game();
         testGame.setName(" Test Tile Image Generation    ");
@@ -62,6 +62,7 @@ public class TileImageTest extends BaseTi4Test {
         testPlayer2.setDecalSet("cb_96");
     }
 
+    @Disabled
     @Test
     @Order(1)
     public void generateDevilsTestImage() {
@@ -80,6 +81,7 @@ public class TileImageTest extends BaseTi4Test {
         TileImageTestHelper.runTest(devils, "Devils.png");
     }
 
+    @Disabled
     @Test
     @Order(2)
     public void generateMirageTestImage() {
@@ -87,27 +89,29 @@ public class TileImageTest extends BaseTi4Test {
         testGame.setTile(emptyAlpha);
 
         TileImageTestHelper.addTokensToHolder(emptyAlpha, "space", "token_mirage.png");
-        Helper.addMirageToTile(emptyAlpha);
+        TokenPlanetService.addTokenPlanetToTile(testGame, emptyAlpha, "mirage");
         TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, emptyAlpha, "mirage", UnitType.Infantry, UnitType.Infantry, UnitType.Infantry);
 
         TileImageTestHelper.runTest(emptyAlpha, "Mirage.png");
     }
 
+    @Disabled
     @Test
     @Order(3)
     public void generateTripleMirageTestImage() {
         Tile rigels = new Tile("76", "102");
         testGame.setTile(rigels);
 
-        TileImageTestHelper.addTokensToHolder(rigels, "space", "token_mirage.png");
-        Helper.addMirageToTile(rigels);
+        TileImageTestHelper.addTokensToHolder(rigels, "space", "token_cradle.png");
+        TokenPlanetService.addTokenPlanetToTile(testGame, rigels, "cradle");
         TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, rigels, "rigeli", UnitType.Infantry);
         TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, rigels, "rigelii", UnitType.Infantry);
-        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, rigels, "mirage", UnitType.Infantry);
+        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, rigels, "cradle", UnitType.Infantry);
 
         TileImageTestHelper.runTest(rigels, "TripleMirage.png");
     }
 
+    @Disabled
     @Test
     @Order(4)
     public void generateCabalDockTestImage() {

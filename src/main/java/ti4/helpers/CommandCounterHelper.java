@@ -32,7 +32,7 @@ public class CommandCounterHelper {
         }
         if (player.getGame().isFowMode() && ping) {
             String colorMention = ColorEmojis.getColorEmojiWithName(player.getColor());
-            FoWHelper.pingSystem(player.getGame(), event, tile.getPosition(), colorMention + " has placed a command token in the system.");
+            FoWHelper.pingSystem(player.getGame(), tile.getPosition(), colorMention + " has placed a command token in the system.");
         }
         tile.addCC(ccID);
     }

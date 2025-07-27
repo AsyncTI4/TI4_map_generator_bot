@@ -2,11 +2,10 @@ package ti4.buttons.handlers.unitPickers;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
 import ti4.helpers.RegexHelper;
@@ -22,6 +21,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
+import ti4.service.fow.FOWCombatThreadMirroring;
 import ti4.service.regex.RegexService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParseUnitService;
@@ -47,9 +47,8 @@ public class AssignHitsButtonHandlers {
             UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
             UnitType type = Units.findUnitType(matcher.group("unittype"));
             String planetName = matcher.group("planet");
-
             UnitHolder holder = planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
-            ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(game, player, matcher);
+            ParsedUnit unit = UnitPickerHandlerHelper.parsedUnitFromMatcher(player, matcher);
             if (remove) {
                 RemoveUnitService.removeUnit(event, tile, game, unit, state);
             } else {
@@ -63,6 +62,7 @@ public class AssignHitsButtonHandlers {
             List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);
             MessageHelper.editMessageButtons(event, systemButtons);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
         }, x -> {});
         if (success) return;
 
@@ -97,6 +97,7 @@ public class AssignHitsButtonHandlers {
             List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);
             MessageHelper.editMessageButtons(event, systemButtons);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
         }, x -> {});
         if (success) return;
 
@@ -118,7 +119,7 @@ public class AssignHitsButtonHandlers {
             boolean prefersState = matcher.group("state") != null && StringUtils.isNotBlank(matcher.group("state"));
             UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
             String planetName = matcher.group("planet");
-
+            String color = matcher.group("color");
             UnitHolder holder = planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
             UnitKey key = Units.getUnitKey(type, player.getColorID());
             if (holder != null) holder.removeDamagedUnit(key, amt);
@@ -129,6 +130,7 @@ public class AssignHitsButtonHandlers {
             List<Button> repairButtons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, game, tile);
             MessageHelper.editMessageButtons(event, repairButtons);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
         }, x -> {
             // Refresh buttons if there was an error
             Tile activeSystem = game.getTileByPosition(game.getActiveSystem());
@@ -149,7 +151,7 @@ public class AssignHitsButtonHandlers {
             boolean prefersState = matcher.group("state") != null && StringUtils.isNotBlank(matcher.group("state"));
             UnitState state = prefersState ? Units.findUnitState(matcher.group("state")) : UnitState.none;
             String planetName = matcher.group("planet");
-
+            String color = matcher.group("color");
             UnitHolder holder = planetName != null ? tile.getUnitHolderFromPlanet(planetName) : tile.getSpaceUnitHolder();
             if (holder != null) holder.addDamagedUnit(Units.getUnitKey(type, player.getColorID()), amt);
 
@@ -160,6 +162,7 @@ public class AssignHitsButtonHandlers {
             List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);
             MessageHelper.editMessageButtons(event, systemButtons);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+            FOWCombatThreadMirroring.mirrorMessage(event, game, msg);
 
             for (int x = 0; x < amt; x++) {
                 ButtonHelperCommanders.resolveLetnevCommanderCheck(player, game, event);

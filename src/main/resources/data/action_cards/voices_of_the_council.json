@@ -1,0 +1,74 @@
+[
+    {
+        "alias": "cryypter_abs",
+        "name": "Ancient Burial Sites",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Exhaust each cultural planet owned by other players.",
+        "flavorText": "The images depicted a race that Rin had never seen before. Curious. Could it be that this was a race that was exterminated by the Lazax?",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_const_rider",
+        "name": "Construction Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 structure from your reinforcements on a planet you control.",
+        "flavorText": "The vote was nearly unanimous. The council would provide funding for the restoration. Ciel was furious.",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_war_rider",
+        "name": "Warfare Rider",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 dreadnought, 2 cruisers, or 3 destroyers from your reinforcements in a system that contains 1 or more of your ships.",
+        "flavorText": "Elder Junn sighed. \"Disarmament, it seems, has fallen out of fashion in these dark days.\"",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_hack",
+        "name": "Hack Election",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "During this agenda, you vote after the Speaker.",
+        "flavorText": "YOUR [NULL ID] STATELY GAME WILL BE FOR NAUGHT<< [VAR:42687] ORDER WILL ARISE FROM [VAR:89001] CHAOS<< IT IS OUR HAND THAT CONTROLS THE OUTCOME",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_dp1",
+        "name": "Diplomatic Pressure",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
+        "flavorText": "The Arborec emissary leaned close, and Brother Milor flinched at the faint whiff of decay. \"You do not understand,\" Dirzuga Ohao rasped. \"You must support this measure.\"",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_dp2",
+        "name": "Diplomatic Pressure",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
+        "flavorText": "Brother Milor shook his head. \"The Brotherhood can not support your war against this extra-dimensional threat.\" Dirzuga Ohao raised an eyebrow. \"Are you certain?\"",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_dp3",
+        "name": "Diplomatic Pressure",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
+        "flavorText": "It would be unfortunate, the Arborec Dirzuga said, \"if your supplies of diraxium were to dry up. How would your fleet defend you if we stopped supplying its fuel?\"",
+        "source": "voices_of_the_council"
+    },
+    {
+        "alias": "cryypter_dp4",
+        "name": "Diplomatic Pressure",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "Choose a player and an outcome of this agenda. If that player votes for that outcome, you may look at that player’s hand of promissory notes. Choose 1 of those cards and add it to your hand. [Note: one player cannot play multiple of these on another player in the same agenda]",
+        "flavorText": "Damn you! Brother MIlor hissed. \"You leave us no choice but to fight in your war.\" Dirzuga Ohao smiled, dead skin stretching over her teeth.",
+        "source": "voices_of_the_council"
+    }
+]

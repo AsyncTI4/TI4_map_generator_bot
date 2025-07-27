@@ -1,12 +1,15 @@
 package ti4.draft.items;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
+import ti4.map.Game;
 import ti4.model.DraftErrataModel;
 import ti4.model.FactionModel;
 import ti4.model.TechnologyModel;
@@ -46,6 +49,7 @@ public class StartingTechDraftItem extends DraftItem {
         Map.entry("kjalengard", "Choose 1 non-faction unit upgrade."),
         Map.entry("kolume", "Choose 1 of the following: :Cybernetictech: Graviton Laser System, :Cybernetictech: Predictive Intelligence."),
         Map.entry("kyro", "Choose 1 of the following: :Biotictech: Dacxive Animators, :Biotictech: Bio-Stims."),
+        Map.entry("toldar", "Choose 1 of the following: Antimass Deflectors, Dark Energy Trap, Neural Motivator, Psychoarcheology."),
         Map.entry("lanefir", "Choose 2 of the following: :Propulsiontech: Dark Energy Tap, :Cybernetictech: Scanlink Drone Network, :Warfaretech: AI Development Algorithm."),
         Map.entry("nokar", "Choose 2 of the following: :Biotictech: Psychoarchaeology, :Propulsiontech: Dark Energy Tap, :Warfaretech: AI Development Algorithm."),
         Map.entry("tnelis", "Choose 2 of the following: :Biotictech: Neural Motivator, :Propulsiontech: Antimass Deflectors, :Warfaretech: Plasma Scoring."),
@@ -91,6 +95,24 @@ public class StartingTechDraftItem extends DraftItem {
     public static List<DraftItem> buildAllItems(List<FactionModel> factions) {
         List<DraftItem> allItems = new ArrayList<>();
         for (FactionModel faction : factions) {
+            allItems.add(DraftItem.generate(Category.STARTINGTECH, faction.getAlias()));
+        }
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllDraftableItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = buildAllItems(factions, game);
+        DraftErrataModel.filterUndraftablesAndShuffle(allItems, Category.STARTINGTECH);
+        return allItems;
+    }
+
+    public static List<DraftItem> buildAllItems(List<FactionModel> factions, Game game) {
+        List<DraftItem> allItems = new ArrayList<>();
+        String[] results = game.getStoredValue("bannedStartingTechs").split("finSep");
+        for (FactionModel faction : factions) {
+            if (Arrays.asList(results).contains(faction.getAlias())) {
+                continue;
+            }
             allItems.add(DraftItem.generate(Category.STARTINGTECH, faction.getAlias()));
         }
         return allItems;

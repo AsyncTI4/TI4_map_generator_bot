@@ -139,7 +139,7 @@
     "alias": "outer_rim",
     "name": "Populate the Outer Rim",
     "phase": "Status",
-    "text": "Have units in 3 systems on the edge of the game board other than your home system.",
+    "text": "Have units in 3 systems on the edge of the game board other than your home system.[Note: Mallice counts as on the edge]",
     "points": 1,
     "source": "pok"
   },
@@ -275,7 +275,7 @@
     "alias": "control_borderlands",
     "name": "Control the Borderlands",
     "phase": "Status",
-    "text": "Have units in 5 systems on the edge of the game board other than your home system.",
+    "text": "Have units in 5 systems on the edge of the game board other than your home system. [Note: Mallice counts as on the edge]",
     "points": 2,
     "source": "pok"
   },
@@ -318,5 +318,325 @@
     "text": "Control 2 planets that are each in or adjacent to a different, other player's home system. [Note: The two planets need to be next to or in TWO seperate players HS.]",
     "points": 2,
     "source": "pok"
+  },
+  {
+  "alias": "dont_corner",
+  "name": "Don't Corner the Market",
+  "phase": "Status Phase",
+  "text": "Control 2 planets of each color (red, blue, green).",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_develop",
+  "name": "Don't Develop Weaponry",
+  "phase": "Status Phase", 
+  "text": "Own a unit upgrade technology and own none of the corresponding unit.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_diversify",
+  "name": "Don't Diversify Research",
+  "phase": "Status Phase",
+  "text": "Own 3 technologies of 1 color.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_monument",
+  "name": "Don't Erect a Monument",
+  "phase": "Status Phase",
+  "text": "Have 10 resources available to spend. Don't spend them.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_expand_borders",
+  "name": "Don't Expand Borders",
+  "phase": "Status Phase",
+  "text": "Have two neighbors who own more planets than you.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_research_outposts",
+  "name": "Don't Found Research Outposts",
+  "phase": "Status Phase",
+  "text": "Have 3 structures on a planet in your home system.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_intimidate",
+  "name": "Don't Intimidate the Council",
+  "phase": "Status Phase",
+  "text": "Control Mecatol Rex or an adjacent planet but have no ships in that planet's system.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_lead",
+  "name": "Don't Lead from the Front",
+  "phase": "Status Phase",
+  "text": "There is a trade good on the Leadership strategy card.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_trade_routes",
+  "name": "Don't Negotiate Trade Routes",
+  "phase": "Status Phase",
+  "text": "There is a trade good on the Trade strategy card.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_sway_council",
+  "name": "Don't Sway the Council",
+  "phase": "Status Phase",
+  "text": "There is a trade good on the Politics strategy card.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_amass_wealth",
+  "name": "Don't Amass Wealth",
+  "phase": "Status Phase",
+  "text": "Own no commodities or trade goods and do not hold your own Trade Agreement promissory note.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_build_defenses",
+  "name": "Don't Build Defenses",
+  "phase": "Status Phase",
+  "text": "Own 4 technologies. Own no unit upgrade technologies.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_lost_outposts",
+  "name": "Don't Discover Lost Outposts",
+  "phase": "Status Phase",
+  "text": "Purge an attachment from a planet you own.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_engineer_marvel",
+  "name": "Don't Engineer a Marvel",
+  "phase": "Status Phase",
+  "text": "Have 5 or more non-fighter ships in a system which contains no more than 10 resources' worth of non-fighter ships.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_deep_space",
+  "name": "Don't Explore Deep Space",
+  "phase": "Status Phase",
+  "text": "Every ship you own is in or adjacent to your home system.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_infrastructure",
+  "name": "Don't Improve Infrastructure",
+  "phase": "Status Phase",
+  "text": "Destroy a space dock in your home system.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_make_history",
+  "name": "Don't Make History",
+  "phase": "Action Phase",
+  "text": "Be the first player to pass. You cannot score a stage one public objective this status phase.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_outer_rim",
+  "name": "Don't Populate the Outer Rim",
+  "phase": "Status Phase",
+  "text": "Have at least 2 ground forces in empty systems.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_push_boundaries",
+  "name": "Don't Push Boundaries",
+  "phase": "Status Phase",
+  "text": "Do not hold your own Ceasefire promissory note.",
+  "points": 1,
+  "source": "other"
+},
+{
+  "alias": "dont_raise_fleet",
+  "name": "Don't Raise a Fleet",
+  "phase": "Status Phase",
+  "text": "Own at least as many planets as you have non-fighter ships.",
+  "points": 1,
+  "source": "other"
+},
+{  
+  "alias": "dont_centralize_trade",  
+  "name": "Don't Centralize Galactic Trade",  
+  "phase": "Status Phase",  
+  "text": "Everyone has at least one trade good.",  
+  "points": 2,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_conquer",  
+  "name": "Don't Conquer the Weak",  
+  "phase": "Action Phase",  
+  "text": "Lose a ground combat to a single defending infantry.",  
+  "points": 1,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_brain_trust",  
+  "name": "Don't Form Galactic Brain Trust",  
+  "phase": "Status Phase",  
+  "text": "Own a non-faction technology for which no one else has the prerequisites.",  
+  "points": 2,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_golden_age",  
+  "name": "Don't Found a Golden Age",  
+  "phase": "Action Phase",  
+  "text": "ACTION: Embezzle public funds (spend 3 trade goods). Score this objective when you take this component action for a second time in a row.",  
+  "points": 1,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_galvanize",  
+  "name": "Don't Galvanize the People",  
+  "phase": "Status Phase",  
+  "text": "Have your hero unlocked and unused.",  
+  "points": 1,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_manipulate_law",  
+  "name": "Don't Manipulate Galactic Law",  
+  "phase": "Status Phase",  
+  "text": "Give each other player an action card from your hand at random.",  
+  "points": 2,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_master_science",  
+  "name": "Don't Master the Sciences",  
+  "phase": "Status Phase",  
+  "text": "Own only bad technologies (a technology is bad if it is cybernetic (yellow), biotic (green) but not a Prophecy of Kings component, warfare (red) but not a Prophecy of Kings component or Assault Cannon, or a unit upgrade but not a faction technology, PDS II, or War Sun).",  
+  "points": 2,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_revolutionize",  
+  "name": "Don't Revolutionize Warfare",  
+  "phase": "Action Phase",  
+  "text": "Win a space combat using only carriers and fighters.",  
+  "points": 1,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_subdue",  
+  "name": "Don't Subdue the Galaxy",  
+  "phase": "Status Phase",  
+  "text": "Repatriate all nonhome planets you control (for each ground force on that planet, move it to the space area of that system or destroy it, then return the planet card to the game board).",  
+  "points": 1,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_unify_colonies",  
+  "name": "Don't Unify the Colonies",  
+  "phase": "Status Phase",  
+  "text": "Control a planet in a system where another player controls a planet, and control a planet in a system where a second other player controls a planet.",  
+  "points": 2,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_supremacy",  
+  "name": "Don't Achieve Supremacy",  
+  "phase": "Status Phase",  
+  "text": "Hold an unscored secret objective. You may not score a secret objective this status phase.",  
+  "points": 2,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_become_legend",  
+  "name": "Don't Become a Legend",  
+  "phase": "Status Phase",  
+  "text": "Have the lowest score.",  
+  "points": 3,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_command_armada",  
+  "name": "Don't Command an Armada",  
+  "phase": "Status Phase",  
+  "text": "Have 6 non-fighter ships in a system without your command token.",  
+  "points": 2,  
+  "source": "other"  
+},  
+{  
+  "alias": "dont_massive_cities",  
+  "name": "Don't Construct Massive Cities",  
+  "phase": "Action",
+    "text": "Destroy a structure by capturing the planet to which it is attached.",
+    "points": 1,
+    "source": "other"
+  },
+  {
+    "alias": "dont_control_borderlands",
+    "name": "Don't Control the Borderlands",
+    "phase": "Status",
+    "text": "Own no ship outside your home system.",
+    "points": 2,
+    "source": "other"
+  },
+  {
+    "alias": "dont_vast_reserves",
+    "name": "Don't Hold Vast Reserves",
+    "phase": "Action",
+    "text": "Resolve a transaction in which you give someone 5 or more total trade goods and commodities, and you receive no trade goods or commodities.",
+    "points": 1,
+    "source": "other"
+  },
+  {
+    "alias": "dont_vast_territories",
+    "name": "Don't Patrol Vast Territories",
+    "phase": "Status",
+    "text": "Have ships in 4 systems without your command tokens.",
+    "points": 2,
+    "source": "other"
+  },
+  {
+    "alias": "dont_protect_border",
+    "name": "Don't Protect the Border",
+    "phase": "Status",
+    "text": "Own a space dock with no ships of any color in its system.",
+    "points": 2,
+    "source": "other"
+  },
+  {
+    "alias": "dont_ancient_monuments",
+    "name": "Don't Reclaim Ancient Monuments",
+    "phase": "Status",
+    "text": "Purge 1 cultural, 1 hazardous, and 1 industrial relic fragment you own.",
+    "points": 2,
+    "source": "other"
+  },
+  {
+    "alias": "dont_distant_lands",
+    "name": "Don't Rule Distant Lands",
+    "phase": "Status",
+    "text": "Everyone controls all their home system planets.",
+    "points": 2,
+    "source": "other"
   }
 ]

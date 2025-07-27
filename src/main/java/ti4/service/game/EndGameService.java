@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -37,8 +36,12 @@ import ti4.message.GameMessageManager;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.MiscEmojis;
-import ti4.service.statistics.game.GameStatisticsService;
+import ti4.service.statistics.game.WinningPathCacheService;
+import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
+import ti4.service.tigl.TiglGameReport;
+import ti4.service.tigl.TiglPlayerResult;
+import ti4.website.WebHelper;
 
 @UtilityClass
 public class EndGameService {
@@ -87,8 +90,8 @@ public class EndGameService {
         Category inLimboCategory = limbos.isEmpty() ? null : limbos.getFirst();
         TextChannel tableTalkChannel = game.getTableTalkChannel();
         TextChannel actionsChannel = game.getMainGameChannel();
-        Category og = tableTalkChannel.getParentCategory();
-        if (inLimboCategory != null && archiveChannels && !rematch) {
+        Category og = actionsChannel.getParentCategory();
+        if (!game.isFowMode() && inLimboCategory != null && archiveChannels && !rematch) {
             if (inLimboCategory.getChannels().size() >= 45) { // HANDLE FULL IN-LIMBO
                 cleanUpInLimboCategory(event.getGuild(), 3);
             }
@@ -110,14 +113,23 @@ public class EndGameService {
 
         //DELETE FOW CHANNELS
         if (game.isFowMode() && archiveChannels && !rematch) {
-            Category fogCategory = event.getGuild().getCategoriesByName(game.getName(), true).getFirst();
-            if (fogCategory != null) {
+            List<Category> fogCategories = event.getGuild().getCategoriesByName(game.getName(), true);
+            if (!fogCategories.isEmpty()) {
+                Category fogCategory = fogCategories.getFirst();
                 List<TextChannel> channels = new ArrayList<>(fogCategory.getTextChannels());
-                //Delay deletion so end of game messages have time to go through
-                for (TextChannel channel : channels) {
-                    channel.delete().queueAfter(2, TimeUnit.SECONDS);
+                // Delete channels with delay to avoid race condition and rate limits
+                for (int i = 0; i < channels.size(); i++) {
+                    TextChannel channel = channels.get(i);
+                    channel.delete().queueAfter(2 + i, TimeUnit.SECONDS,
+                        success -> {},
+                        error -> BotLogger.warning("Failed to delete channel: " + channel.getName() + " - " + error.getMessage())
+                    );
                 }
-                fogCategory.delete().queueAfter(2, TimeUnit.SECONDS);
+                // Delete category after all channels are scheduled for deletion
+                fogCategory.delete().queueAfter(2 + channels.size(), TimeUnit.SECONDS,
+                    success -> {},
+                    error -> BotLogger.warning("Failed to delete category: " + fogCategory.getName() + " - " + error.getMessage())
+                );
             }
         }
 
@@ -176,6 +188,7 @@ public class EndGameService {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "**Game: `" + gameName + "` has ended!**");
 
         writeChronicle(game, event, publish);
+        WinningPathCacheService.addGame(game);
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
@@ -209,6 +222,12 @@ public class EndGameService {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
                     TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
+                    if (!game.isReplacementMade()) {
+                        WebHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                            "This game had a replacement. Please report the results manually: https://www.ti4ultimate.com/community/tigl/report-game");
+                    }
                 }
             });
         } else if (publish) { //FOW SUMMARY
@@ -292,7 +311,6 @@ public class EndGameService {
         sb.append("\n");
         sb.append("**Players:**").append("\n");
         int index = 1;
-        Optional<Player> winner = game.getWinner();
         for (Player player : game.getRealAndEliminatedPlayers()) {
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
@@ -332,10 +350,12 @@ public class EndGameService {
             .append(vpCount).append(" victory points")
             .append("\n");
 
-        if (winner.isPresent() && !game.hasHomebrew()) {
+        var winner = game.getWinner();
+        if (winner.isPresent() && game.isNormalGame()) {
             String winningPath = WinningPathHelper.buildWinningPath(game, winner.get());
             sb.append("**Winning Path:** ").append(winningPath).append("\n");
-            sb.append(GameStatisticsService.getWinningPathComparison(winningPath, game.getRealAndEliminatedPlayers().size(), vpCount));
+            String comparison = WinningPathComparisonService.compareWinningPathToAllOthers(winningPath, game.getRealAndEliminatedPlayers().size(), vpCount);
+            sb.append(comparison);
         }
 
         return sb.toString();
@@ -373,6 +393,28 @@ public class EndGameService {
         sb.append("'\n```");
 
         return sb.toString();
+    }
+
+    private static TiglGameReport buildTiglReport(Game game) {
+        var report = new TiglGameReport();
+        report.setGameId(game.getID());
+        report.setScore(game.getVp());
+
+        var tiglPlayerResults = game.getRealPlayers().stream()
+            .map(player -> {
+                var tiglPlayerResult = new TiglPlayerResult();
+                tiglPlayerResult.setScore(player.getTotalVictoryPoints());
+                tiglPlayerResult.setFaction(player.getFaction());
+                tiglPlayerResult.setDiscordId(player.getUserID());
+                tiglPlayerResult.setDiscordTag(player.getUserName());
+                return tiglPlayerResult;
+            })
+            .toList();
+
+        report.setPlayerResults(tiglPlayerResults);
+        report.setSource("Async");
+        report.setTimestamp(System.currentTimeMillis() / 1000);
+        return report;
     }
 
     public static void cleanUpInLimboCategory(Guild guild, int channelCountToDelete) {

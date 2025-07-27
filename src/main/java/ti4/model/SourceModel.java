@@ -12,7 +12,7 @@ import ti4.model.Source.ComponentSource;
 
 @Data
 public class SourceModel implements ModelInterface, EmbeddableModel {
-    
+
     private ComponentSource source; // unique identifiying name
     private String name; // Long fancy name
     private String canal; // Must be "official" or "community", must be non null
@@ -38,9 +38,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(HashMap<String, Integer> occurrences) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        StringBuilder title = new StringBuilder();
-        title.append(getSource().emoji()).append(" ").append(getName());
-        eb.setTitle(title.toString());
+        eb.setTitle(getSource().emoji() + " " + getName());
 
         StringBuilder content = new StringBuilder();
         if (getDescription() != null) content.append("*").append(getDescription()).append("*\n\n");
@@ -95,11 +93,11 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     }
 
     /**
-     * 
+     *
      * @return true if field 'Canal' = "Official", false otherwise
      */
     public boolean isCanalOfficial() {
-        boolean official = (getCanal().equals("official")) ? true : false;
+        boolean official = getCanal().equals("official");
         return official;
     }
 
@@ -109,7 +107,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @return StringBuilder
      */
     private String compTypeOccurrences(HashMap<String, Integer> occurrences){
-        StringBuilder implementation = new StringBuilder("");
+        StringBuilder implementation = new StringBuilder();
         for (Map.Entry<String, Integer> entry : occurrences.entrySet()) {
             if (entry.getValue() != 0) {
                 if (!implementation.toString().equals("")) implementation.append(", ");

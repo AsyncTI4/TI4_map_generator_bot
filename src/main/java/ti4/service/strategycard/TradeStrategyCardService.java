@@ -17,14 +17,18 @@ public class TradeStrategyCardService {
 
     public static void doPrimary(Game game, GenericInteractionCreateEvent event, Player player) {
         boolean reacted = false;
+        int oldComm = player.getCommodities();
         if (event instanceof ButtonInteractionEvent e) {
             reacted = true;
-            String msg = " gained 3" + MiscEmojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3) + " and replenished commodities (" + player.getCommodities() + " -> " + player.getCommoditiesTotal() + MiscEmojis.comm + ")";
+        }
+        ButtonHelperStats.replenishComms(event, game, player, reacted);
+        if (event instanceof ButtonInteractionEvent e) {
+            String msg = " gained 3" + MiscEmojis.getTGorNomadCoinEmoji(game) + " " + player.gainTG(3) + " and replenished commodities (" + oldComm + " -> " + player.getCommodities() + MiscEmojis.comm + ")";
             ReactionService.addReaction(e, game, player, msg);
         }
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
         ButtonHelperAgents.resolveArtunoCheck(player, 3);
         ButtonHelperAbilities.pillageCheck(player, game);
-        ButtonHelperStats.replenishComms(event, game, player, reacted);
+
     }
 }

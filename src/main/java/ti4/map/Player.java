@@ -74,6 +74,7 @@ import ti4.service.emoji.ColorEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.fow.FOWPlusService;
+import ti4.service.fow.LoreService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.turn.EndTurnService;
 import ti4.service.turn.StartTurnService;
@@ -325,7 +326,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean hasInf2Tech() {// "dszeliinf"
         return getTechs().contains("cl2") || getTechs().contains("so2") || getTechs().contains("inf2")
-            || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2")
+            || getTechs().contains("lw2") || getTechs().contains("dscymiinf") || getTechs().contains("absol_inf2") || getTechs().contains("dsqhetinf")
             || getTechs().contains("dszeliinf") || getUnitsOwned().contains("pharadn_infantry") || getUnitsOwned().contains("pharadn_infantry2");
     }
 
@@ -339,7 +340,7 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean hasFF2Tech() {
         return getTechs().contains("ff2") || getTechs().contains("hcf2") || getTechs().contains("dsflorff")
-            || getTechs().contains("dslizhff") || getTechs().contains("dsbelkff") || getTechs().contains("absol_ff2") || getTechs().contains("absol_hcf2") || ownsUnit("florzen_fighter");
+            || getTechs().contains("dslizhff") || getTechs().contains("dsbelkff") || getTechs().contains("absol_ff2") || getTechs().contains("absol_hcf2") || ownsUnit("florzen_fighter") || ownsUnit("eidolon_fighter") || ownsUnit("eidolon_fighter2");
     }
 
     @JsonIgnore
@@ -412,7 +413,7 @@ public class Player extends PlayerProperties {
 
                 // SEARCH FOR EXISTING OPEN THREAD
                 for (ThreadChannel threadChannel_ : threadChannels) {
-                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                    if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
                     }
@@ -422,7 +423,7 @@ public class Player extends PlayerProperties {
                 if (useComplete) {
                     hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                     for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                        if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                        if (threadChannel_.getId().equalsIgnoreCase(cardsInfoThreadID)) {
                             setCardsInfoThreadID(threadChannel_.getId());
                             return threadChannel_;
                         }
@@ -435,9 +436,13 @@ public class Player extends PlayerProperties {
 
         // ATTEMPT TO FIND BY NAME
         try {
+            List<ThreadChannel> threadChannels2 = actionsChannel.getGuild().getThreadChannelsByName(threadName, true);
+            if (!threadChannels2.isEmpty()) {
+                return threadChannels2.getFirst();
+            }
             // SEARCH FOR EXISTING OPEN THREAD
             for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getName().equals(threadName)) {
+                if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                     setCardsInfoThreadID(threadChannel_.getId());
                     return threadChannel_;
                 }
@@ -447,7 +452,7 @@ public class Player extends PlayerProperties {
             if (useComplete) {
                 if (hiddenThreadChannels.isEmpty()) hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                    if (threadChannel_.getName().equals(threadName)) {
+                    if (threadChannel_.getName().equalsIgnoreCase(threadName)) {
                         setCardsInfoThreadID(threadChannel_.getId());
                         return threadChannel_;
                     }
@@ -580,7 +585,7 @@ public class Player extends PlayerProperties {
 
     /**
      * Returns whether the player owns a unit containing the given substring.
-     * 
+     *
      * @param unitIDSubstring The substring to
      * @return true if player owns a unit containing the given substring; false otherwise
      */
@@ -655,7 +660,9 @@ public class Player extends PlayerProperties {
                     + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType()
                     + "`\n> Units Owned: `"
                     + getUnitsOwned() + "`";
-                BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
+                if (!getGame().isFrankenGame()) {
+                    BotLogger.warning(new BotLogger.LogMessageOrigin(this), message);
+                }
                 return message;
             }
         }
@@ -1025,19 +1032,70 @@ public class Player extends PlayerProperties {
         }
     }
 
+    @Override
+    public int getCommoditiesTotal() {
+        if (getCommoditiesBase() == 0) {
+            if (getFaction().contains("franken")) {
+                if (getCommoditiesTotal(true) - getCommoditiesBonus() > 0) {
+                    setCommoditiesBase(getCommoditiesTotal(true) - getCommoditiesBonus());
+                }
+            } else {
+                FactionModel setupInfo = getFactionSetupInfo();
+                if (setupInfo != null) {
+                    setCommoditiesBase(setupInfo.getCommodities());
+                } else {
+                    setCommoditiesBase(0);
+                }
+
+            }
+        }
+
+        return getCommoditiesBase() + getCommoditiesBonus();
+    }
+
+    public int getCommoditiesBonus() {
+        int bonus = 0;
+        if (getGame().playerHasLeaderUnlockedOrAlliance(this, "bentorcommander")) {
+            bonus++;
+        }
+        if (getAbilities().contains("policy_the_economy_exploit")) {
+            bonus += 2 - getCommoditiesBase();
+        }
+        if (hasAbility("necrophage")) {
+            bonus += ButtonHelper.getNumberOfUnitsOnTheBoard(getGame(), Mapper.getUnitKey(AliasHandler.resolveUnit("spacedock"), getColor()));
+        }
+        if (getRelics().contains("dynamiscore") || getRelics().contains("absol_dynamiscore")) {
+            bonus += 2;
+        }
+        if (getGame().isFacilitiesMode()) {
+            for (String planet : getPlanets()) {
+                UnitHolder unitHolder = getGame().getUnitHolderFromPlanet(planet);
+                if (unitHolder != null) {
+                    for (String token : unitHolder.getTokenList()) {
+                        if (token.contains("facility")) {
+                            if (token.contains("logistics")) {
+                                bonus++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return bonus;
+    }
+
+    public int getCommoditiesTotal(boolean old) {
+        return this.commoditiesTotal;
+
+    }
+
     public void addRelic(String relicID) {
         if (!getRelics().contains(relicID) || Constants.ENIGMATIC_DEVICE.equals(relicID)) {
-            if ("dynamiscore".equals(relicID) || "absol_dynamiscore".equals(relicID)) {
-                setCommoditiesTotal(getCommoditiesTotal() + 2);
-            }
             getRelics().add(relicID);
         }
     }
 
     public void removeRelic(String relicID) {
-        if ("dynamiscore".equals(relicID) || "absol_dynamiscore".equals(relicID)) {
-            setCommoditiesTotal(getCommoditiesTotal() - 2);
-        }
         getRelics().remove(relicID);
     }
 
@@ -1224,6 +1282,22 @@ public class Player extends PlayerProperties {
             return ColorEmojis.getColorEmojiWithName(getColor());
         }
         return getFactionEmoji();
+    }
+
+    @JsonIgnore
+    public String getFactionNameOrColor() {
+        if (getGame().isFowMode() || FoWHelper.isPrivateGame(getGame())) {
+            return StringUtils.capitalize(getColor());
+        }
+        return Mapper.getFaction(getFaction()).getFactionName();
+    }
+
+    @JsonIgnore
+    public String getColorIfCanSeeStats(Player viewingPlayer) {
+        if (getGame().isFowMode() && !FoWHelper.canSeeStatsOfPlayer(getGame(), this, viewingPlayer)) {
+            return "???";
+        }
+        return getColor();
     }
 
     @JsonIgnore
@@ -1659,13 +1733,23 @@ public class Player extends PlayerProperties {
 
     @Override
     public void setCommodities(int comms) {
-        super.setCommodities(Math.clamp(comms, 0, getCommoditiesTotal()));
-        if (getCommoditiesTotal() == 0) super.setCommodities(comms);
+        int num = Math.clamp(comms, 0, getCommoditiesTotal());
+        if (hasAbility("necrophage") && (getCommoditiesBonus() == 0 || getCommoditiesBase() == 0)) {
+            num = Math.clamp(comms, 0, getCommoditiesBase() + 10);
+        }
+        if (getGame().isAgeOfCommerceMode() && comms > 0) {
+            num = comms;
+        }
+        if (getGame().getStoredValue("loadedGame").equalsIgnoreCase("no")) {
+            num = comms;
+        }
+        super.setCommodities(num);
+        if (getCommoditiesBase() + getCommoditiesBonus() == 0) super.setCommodities(comms);
     }
 
     @JsonIgnore
     public String getCommoditiesRepresentation() {
-        return getCommodities() + "/" + getCommoditiesTotal();
+        return getCommodities() + "/" + (getCommoditiesBase() + getCommoditiesBonus());
     }
 
     @Override
@@ -1737,6 +1821,15 @@ public class Player extends PlayerProperties {
     }
 
     public boolean controlsMecatol(boolean includeAlliance) {
+
+        if (getGame().isOrdinianC1Mode()) {
+            Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(getGame());
+            if (p2 != null && p2.getFaction().equalsIgnoreCase(getFaction())) {
+                return true;
+            } else {
+                return false;
+            }
+        }
         if (includeAlliance)
             return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
         return CollectionUtils.containsAny(getPlanets(), Constants.MECATOLS);
@@ -1963,6 +2056,7 @@ public class Player extends PlayerProperties {
     public void addPlanet(String planet) {
         if (!getPlanets().contains(planet)) {
             getPlanets().add(planet);
+            LoreService.showPlanetLore(this, getGame(), planet);
         }
     }
 
@@ -2366,10 +2460,21 @@ public class Player extends PlayerProperties {
         // TITLE
         StringBuilder title = new StringBuilder();
         title.append(getFactionEmoji()).append(" ");
-        if (!"null".equals(getDisplayName()))
+        if (!"null".equals(getDisplayName())) {
             title.append(getDisplayName()).append(" ");
-        title.append(faction.getFactionNameWithSourceEmoji());
+        }
+        if (faction == null) {
+            title.append("No Faction");
+        } else {
+            title.append(faction.getFactionNameWithSourceEmoji());
+        }
         eb.setTitle(title.toString());
+
+        if (faction == null) {
+            eb.setDescription(ColorEmojis.getColorEmojiWithName(getColor()));
+            applyEmbedDefaults(eb);
+            return eb.build();
+        }
 
         // // ICON
         // Emoji emoji = Emoji.fromFormatted(getFactionEmoji());
@@ -2431,14 +2536,15 @@ public class Player extends PlayerProperties {
         }
         eb.addField("__Leaders__", sb.toString(), false);
 
-        // Author (Player Avatar)
-        eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
-
-        // FOOTER
-        eb.setFooter("");
-
-        eb.setColor(Mapper.getColor(getColor()).primaryColor());
+        // Add avatar, color and footer
+        applyEmbedDefaults(eb);
         return eb.build();
+    }
+
+    private void applyEmbedDefaults(EmbedBuilder eb) {
+        eb.setAuthor(getUserName(), null, getUser().getEffectiveAvatarUrl());
+        eb.setFooter("");
+        eb.setColor(Mapper.getColor(getColor()).primaryColor());
     }
 
     @JsonIgnore
@@ -2485,6 +2591,17 @@ public class Player extends PlayerProperties {
         return unfollowedSCs;
     }
 
+    @JsonIgnore
+    public List<Integer> getExhaustedSCs() {
+        List<Integer> exhaustedSCs = new ArrayList<>();
+        for (int sc : getSCs()) {
+            if (getGame().getPlayedSCs().contains(sc)) {
+                exhaustedSCs.add(sc);
+            }
+        }
+        return exhaustedSCs;
+    }
+
     public void checkCommanderUnlock(String factionToCheck) {
         CommanderUnlockCheckService.checkPlayer(this, factionToCheck);
     }
@@ -2514,5 +2631,16 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public boolean hasPriorityPosition() {
         return this.getPriorityPosition() != -1 && this.getPriorityPosition() != 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Player that)) return false;
+        return Objects.equals(getUserID(), that.getUserID());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getUserID());
     }
 }

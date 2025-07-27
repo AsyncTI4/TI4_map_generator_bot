@@ -1,66 +1,42 @@
 package ti4.service.statistics;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.executors.CircuitBreaker;
+import ti4.executors.ExecutionHistoryManager;
 import ti4.helpers.TimedRunnable;
 import ti4.message.BotLogger;
 
 public class StatisticsPipeline {
 
-    private static final StatisticsPipeline instance = new StatisticsPipeline();
+    private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
+    private static final int EXECUTION_TIME_SECONDS_WARNING_THRESHOLD = 10;
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 
-    private final BlockingQueue<StatisticsPipeline.StatisticsEvent> statisticsQueue = new LinkedBlockingQueue<>();
-    private final Thread worker;
-    private boolean running = true;
-
-    private StatisticsPipeline() {
-        worker = new Thread(() -> {
-            while (running || !statisticsQueue.isEmpty()) {
-                if (statisticsQueue.size() >= 10) {
-                    BotLogger.warning("Large number of games (" + statisticsQueue.size() + ") in the game render queue...");
-                }
-                try {
-                    StatisticsPipeline.StatisticsEvent statisticsEvent = statisticsQueue.poll(2, TimeUnit.SECONDS);
-                    if (statisticsEvent != null) {
-                        run(statisticsEvent);
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                } catch (Exception e) {
-                    BotLogger.error("StatsComputationPipeline worker threw an exception.", e);
-                }
-            }
-        });
-    }
-
-    public static void start() {
-        instance.worker.start();
+    public static void queue(SlashCommandInteractionEvent event, Runnable runnable) {
+        if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(event.getMessageChannel())) {
+            return;
+        }
+        event.getHook().sendMessage("Your statistics are being processed, please hold...").setEphemeral(true).queue();
+        var timedRunnable = new TimedRunnable(eventToString(event), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, runnable);
+        ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
 
     public static boolean shutdown() {
-        instance.running = false;
+        EXECUTOR_SERVICE.shutdownNow();
         try {
-            instance.worker.join(20000);
-            return !instance.worker.isAlive();
+            return EXECUTOR_SERVICE.awaitTermination(SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            BotLogger.error("StatisticsPipeline shutdown interrupted.", e);
+            BotLogger.error("MapRenderPipeline shutdown interrupted.", e);
             Thread.currentThread().interrupt();
             return false;
         }
     }
 
-    public static void queue(StatisticsPipeline.StatisticsEvent event) {
-        instance.statisticsQueue.add(event);
+    private static String eventToString(SlashCommandInteractionEvent event) {
+        return "StatisticsPipeline task for `" + event.getUser().getEffectiveName() + "`: `" + event.getCommandString() + "`";
     }
-
-    public static void run(StatisticsEvent event) {
-        event.event.getHook().sendMessage("Your statistics are being processed, please hold...").setEphemeral(true).queue();
-        new TimedRunnable(event.name, event.runnable).run(); // would probably be better to rewrite this with a timeout mechanism
-    }
-
-    public record StatisticsEvent(String name, IReplyCallback event, Runnable runnable) {}
 }

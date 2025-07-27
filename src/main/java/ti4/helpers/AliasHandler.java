@@ -79,7 +79,7 @@ public class AliasHandler {
 
     /**
      * Loads aliases in a simple format - used primarily for displaying aliases to users with the /help commands
-     * 
+     *
      * @param fileName file with lines like: key=value1,value2,value3
      * @param map map to load with key and values like: [key],[value1,value2,value3]
      */
@@ -98,7 +98,7 @@ public class AliasHandler {
 
     /**
      * Loads just the key or value for aliases - use the list for simple ifExists / contains checks
-     * 
+     *
      * @param fileName file with lines like: key=value1,value2,value3
      * @param list list to load
      * @param keys true -> load [key] into the list
@@ -131,7 +131,7 @@ public class AliasHandler {
 
     /**
      * Load aliases for actually resolving aliases
-     * 
+     *
      * @param fileName file with lines like: key=value1,value2,value3
      * @param aliasList map to load aliases like: (value1=key),(value2=key),(value=key)
      * @param errorMessage error message provided
@@ -176,7 +176,8 @@ public class AliasHandler {
     }
 
     public static String resolveTile(String name) {
-        if ("mirage".equalsIgnoreCase(name)) {
+        List<String> tokenPlanets = Constants.TOKEN_PLANETS;
+        if (tokenPlanets.contains(name.toLowerCase())) {
             return name;
         }
         if (TileHelper.getTileById(name) != null) { // name is already an ID
@@ -191,7 +192,7 @@ public class AliasHandler {
 
     /**
      * For resolving a TileID specific to this Async bot to a "Standard" TileID used by all other TI4 map tools, including TTPG/TTS
-     * 
+     *
      * @param name - Async specific Tile ID
      * @return Standard TI4 Tile ID number
      */
@@ -318,7 +319,7 @@ public class AliasHandler {
 
     /**
      * Given a Position parameter like [+-][0-9][+-][0-9], will return Async position like [0-9][a-z]
-     * 
+     *
      * @param position TTPG like [+-][0-9][+-][0-9] Eg. +0+0, +2-2, +0+8
      * @return Async position like [0-9][a-z] Eg. 0a, 2e, 4a
      */

@@ -16,6 +16,9 @@ import ti4.ResourceHelper;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.Units;
+import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.ImageHelper;
 import ti4.image.MapGenerator;
@@ -29,6 +32,7 @@ class SampleDecals extends Subcommand {
     public SampleDecals() {
         super(Constants.SAMPLE_DECALS, "Show a sample image of dreadnoughts with various decals.");
         addOptions(new OptionData(OptionType.STRING, Constants.DECAL_HUE, "Category of decals to show (default: all)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Which color to use as the background (default: blue)").setAutoComplete(true));
     }
 
     @Override
@@ -50,6 +54,11 @@ class SampleDecals extends Subcommand {
                     .collect(Collectors.toList());
             }
         }
+
+        String color = event.getOption(Constants.COLOR, "blue", OptionMapping::getAsString);
+        if (!Mapper.isValidColor(color)) color = "blue";
+        String colorID = Mapper.getColorID(color);
+
         Collections.sort(decals);
         if (decals.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No decals found. Something has probably gone wrong.");
@@ -77,13 +86,17 @@ class SampleDecals extends Subcommand {
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
         BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getInstance().getExtraFile("starfield.png"));
-        Graphics graphic = coloursImage.getGraphics();
+        Graphics2D graphic = coloursImage.createGraphics();
         graphic.drawImage(backgroundImage, 0, 0, null);
         BasicStroke stroke = new BasicStroke(3.0f);
 
+        UnitKey base = Units.getUnitKey(UnitType.Dreadnought, colorID);
+        BufferedImage noDecal = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(base));
         for (String d : decals) {
-            BufferedImage dread = ImageHelper.read(ResourceHelper.getInstance().getDecalFile("sample/" + d + "_dn_wht.png"));
-            graphic.drawImage(dread, x + SPACING, y + SPACING, null);
+            String decalName = String.format("%s_%s%s", d, "dn", DrawingUtil.getBlackWhiteFileSuffix(colorID));
+            BufferedImage decal = ImageHelper.read(ResourceHelper.getInstance().getDecalFile(decalName));
+            graphic.drawImage(noDecal, x + SPACING, y + SPACING, null);
+            graphic.drawImage(decal, x + SPACING, y + SPACING, null);
 
             String label = Mapper.getDecalName(d);
             int mid = -1;
@@ -96,16 +109,14 @@ class SampleDecals extends Subcommand {
             }
 
             graphic.setFont(bigFont);
-            DrawingUtil.superDrawString(graphic, (mid == -1 ? label : label.substring(0, mid)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + SPACING,
-                Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
-                stroke, Color.BLACK);
-            DrawingUtil.superDrawString(graphic, (mid == -1 ? "" : label.substring(mid + 1)), x + DREADWIDTH / 2, y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
-                Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
-                stroke, Color.BLACK);
+            String row1 = (mid == -1 ? label : label.substring(0, mid));
+            String row2 = (mid == -1 ? "" : label.substring(mid + 1));
+            int drawX = x + DREADWIDTH / 2;
+            int drawY = y + DREADSUBHIGHT + SPACING;
+            DrawingUtil.superDrawString(graphic, row1, drawX, drawY, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top, stroke, Color.BLACK);
+            DrawingUtil.superDrawString(graphic, row2, drawX, drawY + LINEHEIGHT, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top, stroke, Color.BLACK);
             graphic.setFont(smallFont);
-            DrawingUtil.superDrawString(graphic, d, x + DREADWIDTH / 2, y + DREADSUBHIGHT + 2 * LINEHEIGHT + SPACING,
-                Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
-                stroke, Color.BLACK);
+            DrawingUtil.superDrawString(graphic, d, drawX, drawY + 2 * LINEHEIGHT, Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top, stroke, Color.BLACK);
 
             n += 1;
             if (n >= PERROW) {
@@ -117,8 +128,7 @@ class SampleDecals extends Subcommand {
             }
         }
         coloursImage = coloursImage.getSubimage(left, top, right - left, bottom - top);
-        FileUpload fileUpload = FileUploadService.createFileUpload(coloursImage, "decal_sample_" + top + "_" + left)
-            .setDescription("Decal samples for units.");
+        FileUpload fileUpload = FileUploadService.createFileUpload(coloursImage, "decal_sample_" + top + "_" + left);
         MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
     }
 }

@@ -32,7 +32,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.BotLogger;
 
 public class ConvertTTPGtoAsync {
@@ -212,7 +212,7 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setFaction(asyncGame, AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
             asyncPlayer.setColor(AliasHandler.resolveColor(ttpgPlayer.getColorActual().toLowerCase()));
             asyncPlayer.setCommodities(ttpgPlayer.getCommodities());
-            asyncPlayer.setCommoditiesTotal(ttpgPlayer.getMaxCommodities());
+            asyncPlayer.setCommoditiesBase(ttpgPlayer.getMaxCommodities());
             asyncPlayer.setTg(ttpgPlayer.getTradeGoods());
             asyncPlayer.setTacticalCC(ttpgPlayer.getCommandTokens().getTactics());
             asyncPlayer.setFleetCC(ttpgPlayer.getCommandTokens().getFleet());
@@ -646,7 +646,7 @@ public class ConvertTTPGtoAsync {
                         }
 
                         if (Constants.MIRAGE.equalsIgnoreCase(attachmentResolved)) {
-                            Helper.addMirageToTile(tile);
+                            Helper.addTokenPlanetToTile(asyncGame, tile, Constants.MIRAGE);
                             tile.addToken(tokenFileName, Constants.SPACE);
                         }
                     } else {

@@ -6,11 +6,15 @@
         "credits":"Dane Beltrami, Flight Fantasy Games",
         "data": [
             "Wiki: https://twilight-imperium.fandom.com/wiki/Official_Rules",
-            "Book: https://images-cdn.fantasyflightgames.com/filer_public/da/df/dadf9f07-78f3-43ac-9cce-dd6b55b24ec2/ti4_living_rules_reference_v1_3_web.pdf",
+            "LTP: https://images-cdn.fantasyflightgames.com/filer_public/c4/f0/c4f03c19-f9da-422f-b162-73f393e64a28/ti-k0289_learn_to_play_2020_web.pdf",
+            "LRR: https://images-cdn.fantasyflightgames.com/filer_public/da/df/dadf9f07-78f3-43ac-9cce-dd6b55b24ec2/ti4_living_rules_reference_v1_3_web.pdf",
+            "GTI: https://images-cdn.fantasyflightgames.com/filer_public/b6/d9/b6d969a2-21c2-4b1e-8d6f-ac6fec456b88/guide_to_the_imperium_10_web.pdf",
+            "Achievements: https://images-cdn.fantasyflightgames.com/filer_public/15/c9/15c9e63c-7b84-4b05-9c5b-e58e3aa768b9/ti25_achievementlist_1.pdf",
             "Errata: https://twilight-imperium.fandom.com/wiki/Errata",
             "FAQ: https://twilight-imperium.fandom.com/wiki/FAQ",
             "FAQ: https://docs.google.com/document/d/1_93kw7KkzvAXoQAxRioxo7iAt-Ar6BMIxdNf4Lv25rI/edit",
             "FAQ: https://docs.google.com/document/d/1Bgl9OpP-162sifCcratI9RtbOSTNXtFGnKEU_-89rZI/edit",
+            "FFG: https://www.fantasyflightgames.com/en/products/twilight-imperium-fourth-edition/",
             "Rules: https://www.tirules.com/",
             "Content: https://www.ti4ultimate.com/",
             "Stats: https://lookerstudio.google.com/u/0/reporting/3b435bf2-2100-488c-a424-130f1d22ebb0/page/pE58B"
@@ -23,45 +27,57 @@
         "credits":"Dane Beltrami, Flight Fantasy Games",
         "description":"new Factions, Leaders, Exploration, Relics, Mechs, new Techs, new Tiles, PN Alliance, new Objectives & ACs, modified Agendas, updated SC2 & SC4",
         "data": [
-            "Wiki: https://twilight-imperium.fandom.com/wiki/Prophecy_of_Kings"
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Prophecy_of_Kings",
+            "Rules: https://images-cdn.fantasyflightgames.com/filer_public/bd/a2/bda2d75d-0481-4563-a443-d45e4dea46f8/ti10_rulebook_web-good.pdf",
+            "LRR: https://images-cdn.fantasyflightgames.com/filer_public/51/55/51552c7f-c05c-445b-84bf-4b073456d008/ti10_pok_living_rules_reference_20_web.pdf"
         ]
     },
     {
         "source":"codex1",
-        "name":"Codex I",
+        "name":"Twilight Codex\nVolume I: Ordinian",
         "canal":"official",
         "credits":"Dane Beltrami, Flight Fantasy Games",
         "description":"omega Techs & PNs, new ACs, updated Rules, new Map & Scenario",
         "data": [
             "Wiki: https://twilight-imperium.fandom.com/wiki/Codex#Volume_I_(Ordinian)",
-            "Book: https://images-cdn.fantasyflightgames.com/filer_public/94/c5/94c59830-533e-47aa-a708-25634575161b/twilight_codex_v1-compressed.pdf",
-            "Assets: https://drive.google.com/drive/folders/1NIPQTtyrSREUObfLgg1QGFk3Q2UoF6kQ"
+            "Book: https://images-cdn.fantasyflightgames.com/filer_public/c7/c2/c7c2ac85-8d7a-46f1-a9c0-d633d89865ef/ti_codex_1_rules_compressed.pdf",
+            "Assets: https://images-cdn.fantasyflightgames.com/filer_public/83/39/833992df-184a-42ae-87aa-3f511f5184ac/ti_codex_1_cards_crop_marks.pdf"
         ]
     },
     {
         "source":"codex2",
-        "name":"Codex II",
+        "name":"Twilight Codex\nVolume II: Affinity",
         "canal":"official",
         "credits":"Dane Beltrami, Flight Fantasy Games",
         "description":"Faction Ref Cards & Alliance Ref Cards, Alliance Game mode, new Relics, new Maps",
         "data": [
             "Wiki: https://twilight-imperium.fandom.com/wiki/Codex#Volume_II_(Affinity)",
             "Book: https://images-cdn.fantasyflightgames.com/filer_public/ff/fe/fffe5e9d-33fb-4149-a3a2-cd6dfadb4de3/ti_codex_ii_rules_web.pdf",
-            "Assets: https://images-cdn.fantasyflightgames.com/filer_public/ef/e2/efe2a571-f1dc-4547-97f6-93a5e55cd20e/ti_codex_2_cards_compressed.pdf",
-            "Assets: https://drive.google.com/file/d/1DChH7_coZNkV0m22VJYpGHL9MJRaBZAB/view"
+            "Assets: https://images-cdn.fantasyflightgames.com/filer_public/ac/8c/ac8c18a2-3080-4886-b0c2-b171c47cdb68/ti_codex_2_cards.pdf"
         ]
     },
     {
         "source":"codex3",
-        "name":"Codex III",
+        "name":"Twilight Codex\nVolume III: Vigil",
         "canal":"official",
         "credits":"Dane Beltrami, Flight Fantasy Games",
-        "description":"omega Leaders & Mech & Objectives (Naalu, Yin, Xxcha), new Faction (Keleres), new Frontier",
+        "description":"omega Leaders & Mech & Objectives (Naalu, Yin, Xxcha), new Faction (Keleres), new Frontiers",
         "data": [
             "Wiki: https://twilight-imperium.fandom.com/wiki/Codex#Volume_III_(Vigil)",
             "Book: https://images-cdn.fantasyflightgames.com/filer_public/35/e1/35e10f37-4b6d-4479-a117-4e2c571ddfa7/ti_codex_volume_3_vigil_v2_1-compressed.pdf",
-            "Assets: https://images-cdn.fantasyflightgames.com/filer_public/d6/cf/d6cfc687-621a-4c83-9c83-bdf10e14bdf2/ti_codex_3_cards.pdf",
-            "Assets: https://drive.google.com/file/d/1nxpsU74PEzMMl-C8Fs-BBao3I1lYRp4O/view"
+            "Assets: https://images-cdn.fantasyflightgames.com/filer_public/d6/cf/d6cfc687-621a-4c83-9c83-bdf10e14bdf2/ti_codex_3_cards.pdf"
+        ]
+    },
+    {
+        "source":"codex4",
+        "name":"Twilight Codex\nVolume IV: Liberation",
+        "canal":"official",
+        "credits":"Dane Beltrami, Flight Fantasy Games",
+        "description":"new Relics, Galactic Events, new Scenario",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Codex#Volume_IV_(Liberation)",
+            "Book: https://images-cdn.fantasyflightgames.com/filer_public/f6/be/f6be8343-a4fc-47e4-a722-efe3e01fc5d9/ti_codex_4_rules.pdf",
+            "Assets: https://images-cdn.fantasyflightgames.com/filer_public/cb/66/cb665e94-442d-4bd0-b5bc-6553f64321fc/ti_codex_4_cards.pdf"
         ]
     },
     {
@@ -70,7 +86,7 @@
         "canal":"community",
         "subcanal":"big homebrew",
         "credits":"andcat",
-        "description":"new Factions and all their components\nthe bot may contain some content of Uncharted Space or Blue Reverier expansions",
+        "description":"new Factions and all their components\nthe bot may have some content of Uncharted Space or Blue Reverie expansions labelled has DS",
         "data": [
             "Wiki: https://twilight-imperium.fandom.com/wiki/Discordant_Stars_Expansion_(UNOFFICIAL)",
             "Reference: https://docs.google.com/document/d/1214N4Py1NqvkQzFN5YULKiR7rmn1qpf4OdFqb8_vQUg",
@@ -88,6 +104,7 @@
         "canal":"community",
         "subcanal":"big homebrew",
         "credits":"andcat",
+        "description":"new Tiles, new Explorations and Relics, new ACs",
         "data": [
             "Wiki: https://twilight-imperium.fandom.com/wiki/Uncharted_Space_Expansion_(UNOFFICIAL)",
             "Reference: https://docs.google.com/document/d/10sYWiwVNvdOwDMpvHlbsx4athKwgeTc8usWFMV3Aaas",
@@ -104,6 +121,7 @@
         "canal":"community",
         "subcanal":"big homebrew",
         "credits":"Absol197",
+        "description":"overhaul of Techs, Mechs, Relics and Agendas",
         "data": [
             "Assets: https://drive.google.com/drive/folders/1OV4zr3wcbXQROkv6cOvnO6H_8AvpIL8H",
             "Official channel: https://discord.com/channels/743629929484386395/1215827226302349393"
@@ -115,10 +133,33 @@
         "canal":"community",
         "subcanal":"big homebrew",
         "credits":"Blarknob",
+        "description":"new Structure type Monument, overhaul of SC4, new SOs, Agendas, and ACs",
         "data": [
             "Wiki: https://twilight-imperium.fandom.com/wiki/Monuments",
             "Assets: https://drive.google.com/drive/folders/1kqtY943syNMRsM1ijmHfymCxVVWxYUJq",
+            "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=3442876715",
+            "Post (Monuments, not Monuments+, deprecated): https://www.reddit.com/r/twilightimperium/comments/bpdkmt/monuments_mini_expansion/",
+            "Assets (Monuments, not Monuments+, deprecated): https://drive.google.com/file/d/1JqbTtcYUUodh6L_IgWJ_B0Rrg4dT3m8N/view",
             "Official channel: https://discord.com/channels/743629929484386395/1205395696950321172"
+        ]
+    },
+    {
+        "source":"blue_reverie",
+        "name":"Blue Reverie",
+        "canal":"community",
+        "subcanal":"big homebrew",
+        "credits":"tacticblue",
+        "description":"new Factions, new Techs, Relics and Agendas, rework of Factions, PNs and Techs",
+        "data": [
+            "Wiki: https://twilight-imperium.fandom.com/wiki/Monuments",
+            "Reference: https://docs.google.com/document/d/1odH4Ir78CoCnhuEaDmJy0V_MPZfjZ-3LitrYHPPf_f4",
+            "Assets (new factions): https://drive.google.com/drive/folders/1j_HeiOIxKN26czVU-ROfWblmRLDmCRFm",
+            "Assets (new content): https://drive.google.com/drive/folders/1ekorYx7gPuTMGhTuLD_DGRF052iVgq3R",
+            "Assets (reworks): https://drive.google.com/drive/folders/1esibQDj0HD45qy7QDki3aLG2pSsh96bz",
+            "Official channel (new factions): https://discord.com/channels/743629929484386395/1319549872726081566",
+            "Official channel (new content): https://discord.com/channels/743629929484386395/1335161291865854012",
+            "Official channel (reworks): https://discord.com/channels/743629929484386395/1335160265460678687",
+            "Asynch channel: https://discord.com/channels/943410040369479690/1168522933283598437"
         ]
     },
     {
@@ -136,6 +177,7 @@
         "canal":"community",
         "subcanal":"lil homebrew",
         "credits":"private.static.void",
+        "description":"new ACs",
         "data": [
             "Assets: https://i.imgur.com/sTuGJWi.jpeg",
             "Assets & FAQ: https://drive.google.com/drive/folders/1B-uCJxnW18i8zsoq0tQC6x0bpsPNv7Ny",
@@ -149,6 +191,7 @@
         "canal":"community",
         "subcanal":"lil homebrew",
         "credits":"unfulvio",
+        "description":"new Tiles, new Explores, new deck Terraforming Initiatives",
         "data": [
             "Assets: https://drive.google.com/drive/u/0/folders/1HinrGQ1i8gugvjVTouipRisr7hYYM5n-?ths=true",
             "Mod: https://steamcommunity.com/sharedfiles/filedetails/?id=2841087923",
@@ -161,6 +204,7 @@
         "canal":"community",
         "subcanal":"lil homebrew",
         "credits":"bradleysigma",
+        "description":"new PNs",
         "data": [
             "Official channel: https://discord.com/channels/743629929484386395/1208453502896967790"
         ]
@@ -171,6 +215,7 @@
         "canal":"community",
         "subcanal":"personal projs",
         "credits":"eronous",
+        "description":"new Tiles, new Factions",
         "data": [
             "Official channel: https://discord.com/channels/743629929484386395/1305897691682967552"
         ]
@@ -182,7 +227,17 @@
         "subcanal":"personal projs",
         "credits":"Blarknob",
         "data": [
-            "Official channel: https://discord.com/channels/743629929484386395/1205395696950321172"
+            "Official channel: ?"
+        ]
+    },
+    {
+        "source":"fowplus",
+        "name":"FoW+",
+        "canal":"community",
+        "subcanal":"personal projs",
+        "credits":"Solax",
+        "description":"Make Fog of War more foggy",
+        "data": [
         ]
     }
 ]

@@ -1,0 +1,27 @@
+[
+    {
+        "alias": "neuraloop",
+        "name": "Neuraloop",
+        "text": "When a public objective is revealed, you may purge one of your relics to discard that objective and replace it with a random objective from any objective deck; that objective is a public objective, even if it is a secret objective.",
+        "flavourText": "Knowledge. Creation. Control. Have a wonderful day.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/neuraloop.jpg?raw=true",
+        "source": "codex4"
+    },
+    {
+        "alias": "circletofthevoid",
+        "name": "Circlet of the Void",
+        "text": "Your units do not roll for gravity rifts, and you ignore the effects of all other anomalies on movement.\n\nACTION: Exhaust this card to explore a frontier token in a system that does not contain any other players' ships.",
+        "flavourText": "Xuange touched the silver circlet that sat upon their temple. The pride of the Archive. Knowledge of the stars, passed down from the First, fated for the Last.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/circlet_of_the_void.jpg?raw=true",
+        "source": "codex4"
+    },
+    {
+        "alias": "bookoflatvinia",
+        "name": "Book of Latvinia",
+        "text": "When you gain this card, research up to 2 technologies that have no prerequisites.\n> ACTION: Purge this card; if you control planets that have all 4 types of technology specialties, gain 1 victory point. Otherwise, gain the speaker token.",
+        "flavourText": "A collector's item of incalculable value, none have been able to unlock its secrets - assuming its contents aren't just the ravings of a madwoman.",
+        "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/book_of_latvinia.jpg?raw=true",
+        "source": "codex4"
+    }
+
+]
