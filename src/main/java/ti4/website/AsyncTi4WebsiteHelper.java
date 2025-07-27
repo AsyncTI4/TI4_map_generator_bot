@@ -183,10 +183,10 @@ public class AsyncTi4WebsiteHelper {
                         writer.flush();
                         currentBatchSize = 0;
                     }
-                } catch (Exception ex) {
+                } catch (Exception e) {
                     badGames.add(managedGame.getName());
                     BotLogger.error(
-                        String.format("Failed to create GameStatsDashboardPayload for game: `%s`", managedGame.getName()), ex);
+                        String.format("Failed to create GameStatsDashboardPayload for game: `%s`", managedGame.getName()), e);
                 }
             }
 
@@ -214,12 +214,12 @@ public class AsyncTi4WebsiteHelper {
                 .build();
 
             EgressClientManager.getS3AsyncClient().putObject(req, AsyncRequestBody.fromFile(tempFile))
-                .whenComplete((result, ex) -> {
+                .whenComplete((result, e) -> {
                     synchronized (completedUploads) {
                         completedUploads[0]++;
                         
-                        if (ex != null) {
-                            BotLogger.error(String.format("Failed to upload game stats to S3 bucket %s.", bucketName), ex);
+                        if (e != null) {
+                            BotLogger.error(String.format("Failed to upload game stats to S3 bucket %s.", bucketName), e);
                         } else {
                             BotLogger.info(String.format("Statistics upload to bucket %s complete.", bucketName));
                         }

@@ -22,9 +22,9 @@ public class ErrorLoggingFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (Exception ex) {
-            BotLogger.error("Exception during request to " + request.getRequestURI(), ex);
-            throw ex;
+        } catch (Exception e) {
+            BotLogger.error("Exception during request to " + request.getRequestURI(), e);
+            throw e;
         }
 
         if (response.getStatus() >= 400) {
