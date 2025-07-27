@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.helpers.*;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
@@ -26,6 +24,7 @@ public class WebTileUnitData {
     private List<String> ccs;
     private boolean isAnomaly;
     private Map<String, Integer> production;
+    private Map<String, WebPdsCoverage> pds; // PDS coverage data per faction
 
     public WebTileUnitData() {
         this.space = new HashMap<>();
@@ -33,6 +32,7 @@ public class WebTileUnitData {
         this.ccs = new ArrayList<>();
         this.isAnomaly = false;
         this.production = new HashMap<>();
+        this.pds = null; // Only populated if there is PDS coverage
     }
 
     public static Map<String, WebTileUnitData> fromGame(Game game) {
@@ -200,6 +200,17 @@ public class WebTileUnitData {
             if (productionValue > 0) {
                 tileData.production.put(color, productionValue);
             }
+        }
+
+        // Calculate PDS coverage for this tile
+        Map<String, PdsCoverage> pdsCoverageDetailed = PdsCoverageHelper.calculatePdsCoverage(game, tile);
+        if (pdsCoverageDetailed != null && !pdsCoverageDetailed.isEmpty()) {
+            Map<String, WebPdsCoverage> pdsCoverage = new HashMap<>();
+            for (Map.Entry<String, PdsCoverage> entry : pdsCoverageDetailed.entrySet()) {
+                ti4.helpers.PdsCoverage detailed = entry.getValue();
+                pdsCoverage.put(entry.getKey(), new WebPdsCoverage(detailed.getCount(), detailed.getExpected()));
+            }
+            tileData.setPds(pdsCoverage);
         }
 
         return tileData;
