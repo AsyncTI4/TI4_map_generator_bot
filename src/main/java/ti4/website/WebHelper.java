@@ -366,6 +366,7 @@ public class WebHelper {
                                 title = node.path("data").path("errorTitle").asText();
                                 detail = node.path("data").path("errorMessage").asText();
                             }
+                            BotLogger.error(String.format("Failed to report TIGL game: %s - %s", title, detail));
                             MessageHelper.sendMessageToChannel(channel,
                                 String.format("Failed to report TIGL game: %s - %s. Please report manually: https://www.ti4ultimate.com/community/tigl/report-game", title, detail));
                         } catch (Exception ex) {
@@ -398,6 +399,7 @@ public class WebHelper {
             HttpRequest httpRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
+                .header("x-api-key", TI4_ULTIMATE_STATISTICS_API_KEY)
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
@@ -416,6 +418,7 @@ public class WebHelper {
                                 title = node.path("data").path("errorTitle").asText();
                                 detail = node.path("data").path("errorMessage").asText();
                             }
+                            BotLogger.error(String.format("Failed to change TIGL nickname: %s - %s", title, detail));
                             MessageHelper.sendMessageToChannel(channel,
                                 String.format("Failed to change TIGL nickname: %s - %s", title, detail));
                         } catch (Exception ex) {
