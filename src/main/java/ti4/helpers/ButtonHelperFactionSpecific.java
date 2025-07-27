@@ -2148,6 +2148,7 @@ public class ButtonHelperFactionSpecific {
         String msg = cabal.getRepresentationUnfogged() + " has failed to eat " + amount + " of the " + unit + (amount == 1 ? "" : "s")
             + " owned by " + player.getRepresentationNoPing() + " because they were blockaded. Womp Womp.";
         String unitP = AliasHandler.resolveUnit(unit);
+        unit = Units.findUnitType(unitP).humanReadableName().toLowerCase();
         if (unitP.contains("sd") || unitP.contains("pd")
             || (cabal.getAllianceMembers().contains(player.getFaction()) && !cabalAgent)) {
             return;

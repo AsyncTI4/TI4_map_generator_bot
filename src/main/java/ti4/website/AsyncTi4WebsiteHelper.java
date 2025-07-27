@@ -120,7 +120,7 @@ public class AsyncTi4WebsiteHelper {
             webData.put("gameCustomName", game.getCustomName());
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
-            
+
             putObjectToAllBuckets(
                 String.format("webdata/%s/%s.json", gameId, gameId),
                 AsyncRequestBody.fromString(json),
