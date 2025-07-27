@@ -10,8 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -21,7 +21,7 @@ class MostWinningFactionsStatisticsService {
         Map<String, Integer> factionToWinCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
+            GameStatisticsFilterer.getGamesFilterForWonGame(event),
             game -> countFactionWins(game, factionToWinCount)
         );
 

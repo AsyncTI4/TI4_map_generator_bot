@@ -217,7 +217,7 @@ public class CombatMessageHelper {
                 }
             }
         }
-        return String.format("%s rolls for %s %s :  \n",
-            player.getFactionEmoji(), combatTypeName, MiscEmojis.RollDice);
+        return String.format("%s rolls for %s %s :\n",
+            player.getFactionEmoji(), combatTypeName.toLowerCase(), MiscEmojis.RollDice);
     }
 }

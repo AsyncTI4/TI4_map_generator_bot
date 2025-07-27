@@ -14,14 +14,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.statistics.GameStatisticsFilterer;
@@ -34,8 +33,8 @@ import ti4.image.Mapper;
 import ti4.image.TileHelper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
 import ti4.message.BotLogger;
 import ti4.model.AbilityModel;
 import ti4.model.BorderAnomalyModel;
@@ -335,6 +334,31 @@ public class AutoCompleteProvider {
             case Constants.SCENARIO -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 var tokens = List.of("ordinian (codex 1)", "liberation (codex 4)");
+                List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
+                event.replyChoices(options).queue();
+            }
+            case GameStatisticsFilterer.GAME_TYPES_FILTER,
+                GameStatisticsFilterer.EXCLUDED_GAME_TYPES_FILTER -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                var tokens = List.of(
+                    "base",
+                    "pok",
+                    "absol",
+                    "ds",
+                    "action_deck_2",
+                    "little_omega",
+                    "franken",
+                    "milty_mod",
+                    "red_tape",
+                    "age_of_exploration",
+                    "minor_factions",
+                    "alliance",
+                    "age_of_commerce",
+                    "facilities",
+                    "total_war",
+                    "liberation",
+                    "ordinian"
+                );
                 List<Command.Choice> options = mapTo25ChoicesThatContain(tokens, enteredValue);
                 event.replyChoices(options).queue();
             }

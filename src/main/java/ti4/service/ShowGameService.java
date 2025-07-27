@@ -19,7 +19,7 @@ import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.game.CreateGameService;

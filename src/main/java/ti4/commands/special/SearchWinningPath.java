@@ -12,8 +12,8 @@ import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Game;
-import ti4.map.GamesPage;
 import ti4.map.Player;
+import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.game.WinningPathHelper;
 
@@ -33,7 +33,7 @@ class SearchWinningPath extends Subcommand {
         StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ").append(searchedPath).append("\n");
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event).and(game ->
+            GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game ->
                     game.getWinner().map(winner -> hasWinningPath(game, winner, searchedPath)).orElse(false)),
             game -> {
                 foundGames.add(game.getName());

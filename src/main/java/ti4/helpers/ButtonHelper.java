@@ -1,7 +1,5 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,11 +14,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -42,6 +35,10 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -65,8 +62,8 @@ import ti4.map.Player;
 import ti4.map.Space;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedPlayer;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedPlayer;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
@@ -111,6 +108,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.WebHelper;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -295,8 +294,13 @@ public class ButtonHelper {
         List<Button> stuffToTransButtons = new ArrayList<>();
         for (String pnShortHand : sender.getPromissoryNotes().keySet()) {
             if (sender.getPromissoryNotesInPlayArea().contains(pnShortHand)
-                || (receiver.getAbilities().contains("hubris") && pnShortHand.endsWith("an"))) {
+                || (receiver.getAbilities().contains("hubris") && pnShortHand.endsWith("_an"))) {
                 continue;
+            }
+            if (game.isNoSwapMode()) {
+                if (pnShortHand.endsWith("sftt") && sender.getPromissoryNotesInPlayArea().contains(receiver.getColor() + "_sftt")) {
+                    continue;
+                }
             }
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNote(pnShortHand);
             Player owner = game.getPNOwner(pnShortHand);
@@ -2631,7 +2635,8 @@ public class ButtonHelper {
             int total = 0;
             UnitKey infKey = Units.getUnitKey(UnitType.Infantry, player.getColorID());
 
-            String msg = player.getFactionEmoji() + " resolved _Magen Defense Grid_ on " + tile.getPosition() + ":";
+            StringBuilder msg = new StringBuilder(player.getFactionEmoji() + " resolved _Magen Defense Grid_ on " + tile.getPosition()
+                + ", placing %s infantry (%s total so far):");
             for (UnitHolder uh : tile.getUnitHolders().values()) {
                 int count = uh.countPlayersUnitsWithModelCondition(player, UnitModel::getIsStructure);
                 if (player.hasAbility("byssus")) count += uh.getUnitCount(UnitType.Mech, player);
@@ -2642,14 +2647,16 @@ public class ButtonHelper {
                     String infStr = emoji.repeat(count);
                     if (count > 6) infStr += "(" + count + " total)";
                     if (uh instanceof Space) {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to space.";
+                        msg.append("\n-# > ").append(infStr).append(" added to space.");
                     } else {
-                        msg += "\n-# > " + emoji.repeat(count) + " added to " + Helper.getPlanetRepresentation(uh.getName(), game) + ".";
+                        msg.append("\n-# > ").append(infStr).append(" added to ").append(Helper.getPlanetRepresentation(uh.getName(), game)).append(".");
                     }
                 }
             }
+            player.setMagenInfantryCounter(player.getMagenInfantryCounter() + total);
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), String.format(msg, Integer.toString(total)));
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                String.format(msg.toString(), total, player.getMagenInfantryCounter()));
         });
     }
 
@@ -5271,9 +5278,27 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         String userId = buttonID.split("_")[1];
         String factionId = buttonID.split("_")[2];
-        List<ColorModel> unusedColors = game.getUnusedColorsPreferringBase();
-        unusedColors = ColourHelper.sortColours(factionId, unusedColors);
-        for (ColorModel color : unusedColors) {
+        List<ColorModel> unusedColors = game.getUnusedColors();
+
+        List<ColorModel> factionPrefColors = Mapper.getFaction(factionId).getPreferredColours().stream().map(Mapper::getColor).toList();
+        for (ColorModel color : factionPrefColors)
+        {
+            if (color != null && unusedColors.contains(color))
+            {
+                String colorName = color.getName();
+                Emoji colorEmoji = color.getEmoji();
+                String step3id = "setupStep3_" + userId + "_" + factionId + "_" + colorName;
+                buttons.add(Buttons.green(step3id, colorName).withEmoji(colorEmoji));
+            }
+        }
+
+        List<ColorModel> unusedPrefColors = game.getUnusedColorsPreferringBase();
+        unusedPrefColors = ColourHelper.sortColours(factionId, unusedPrefColors);
+        for (ColorModel color : unusedPrefColors) {
+            if (factionPrefColors.contains(color))
+            {
+                continue;
+            }
             String colorName = color.getName();
             Emoji colorEmoji = color.getEmoji();
             String step3id = "setupStep3_" + userId + "_" + factionId + "_" + colorName;
@@ -5397,6 +5422,12 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         deleteMessage(event);
         List<Button> buttons = getFactionSetupButtons(game, buttonID);
+        if (buttons.size() <= 25)
+        {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+                "Please tell the bot the desired faction.", buttons);
+            return;
+        }
         List<Button> newButtons = new ArrayList<>();
         int maxBefore = -1;
         long numberOfHomes = Mapper.getFactionsValues().stream()
@@ -5416,8 +5447,8 @@ public class ButtonHelper {
         }
         newButtons.add(
             Buttons.gray("setupStep2_" + userId + "_" + (maxBefore + numberOfHomes) + "!", "Get More Factions"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please tell the bot the desired faction.",
-            newButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+            "Please tell the bot the desired faction.", newButtons);
     }
 
     @ButtonHandler("setupStep2_")
@@ -5914,7 +5945,19 @@ public class ButtonHelper {
                 String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
                     ? nextPlayer.getRepresentationUnfogged()
                     : nextPlayer.getRepresentationNoPing();
-                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours.";
+                int numUnpassed = -2;
+                for (Player p2 : game.getPlayers().values()) {
+                    numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                }
+                msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
+                if (numUnpassed == 0)
+                {
+                    msgExtra += "No other players are unpassed.";
+                }
+                else
+                {
+                    msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                }
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
             StartTurnService.reviveInfantryII(player);

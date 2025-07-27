@@ -1,18 +1,17 @@
 package ti4.listeners.context;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
 import ti4.service.event.EventAuditService;

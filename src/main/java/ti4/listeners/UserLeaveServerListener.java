@@ -1,10 +1,9 @@
 package ti4.listeners;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -19,9 +18,9 @@ import ti4.executors.ExecutorManager;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.map.manage.GameManager;
-import ti4.map.manage.ManagedGame;
-import ti4.map.manage.ManagedPlayer;
+import ti4.map.persistence.GameManager;
+import ti4.map.persistence.ManagedGame;
+import ti4.map.persistence.ManagedPlayer;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
@@ -118,7 +117,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
         Player player = game.getPlayer(user.getId());
 
         // HEADER
-        String websiteLink = String.format("[__[%s](https://ti4.westaddisonheavyindustries.com/game/%s)__]", game.getName(), game.getName());
+        String websiteLink = String.format("[__[%s](https://asyncti4.com/game/%s)__]", game.getName(), game.getName());
         String faction = player.getFactionEmoji();
         String tabletalkLink = String.format("[__[Tabletalk](%s)__]", game.getTableTalkChannel().getJumpUrl());
         String actionsLink = String.format("[__[Actions](%s)__]", game.getActionsChannel().getJumpUrl());

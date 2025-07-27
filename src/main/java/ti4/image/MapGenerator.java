@@ -452,6 +452,11 @@ public class MapGenerator implements AutoCloseable {
             addWebsiteOverlay("Absol", null, x + deltaX, y + deltaY, 90, 90);
             deltaX += 100;
         }
+        if (game.isNoSwapMode()) {
+            drawGeneralImage(x + deltaX, y + deltaY, "NoSwap.png");
+            addWebsiteOverlay("No Support Swap", null, x + deltaX, y + deltaY, 180, 90);
+            deltaX += 190;
+        }
         if (game.isMiltyModMode()) {
             drawGeneralImage(x + deltaX, y + deltaY, "GameMode_MiltyMod.png");
             addWebsiteOverlay("MiltyMod", null, x + deltaX, y + deltaY, 90, 90);
@@ -560,7 +565,27 @@ public class MapGenerator implements AutoCloseable {
         int boxWidth = 150;
         int boxBuffer = -1;
         if (game.getVp() > 14) {
-            boxWidth = 120;
+            boxWidth = 2250 / (game.getVp() + 1);
+        }
+        if (game.isLiberationC4Mode())
+        {
+            for (int i = game.getVp() + 1; i <= 12; i++) {
+                graphics.setColor(Color.WHITE);
+                Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+                DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+                g2.setColor(Color.PINK);
+                g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+            }
+        }
+        else if (game.isAllianceMode())
+        {
+            for (int i = game.getVp() + 1; i <= 14; i++) {
+                graphics.setColor(Color.WHITE);
+                Rectangle rect = new Rectangle(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+                DrawingUtil.drawCenteredString(g2, Integer.toString(i), rect, Storage.getFont50());
+                g2.setColor(Color.PINK);
+                g2.drawRect(i * boxWidth + landscapeShift, y, boxWidth, boxHeight);
+            }
         }
         for (int i = 0; i <= game.getVp(); i++) {
             graphics.setColor(Color.WHITE);
@@ -670,7 +695,7 @@ public class MapGenerator implements AutoCloseable {
         int y = coord.y;
         boolean convertToGenericSC = isFoWPrivate;
         int deltaY = y + 80;
-        Map<Integer, Integer> scTradeGoods = game.getScTradeGoods();
+        Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
         Collection<Player> players = game.getPlayers().values();
         Set<Integer> scPicked = new HashSet<>();
         for (Player player : players) {
@@ -678,7 +703,7 @@ public class MapGenerator implements AutoCloseable {
         }
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
 
-        for (Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
+        for (Map.Entry<Integer, Integer> scTGs : strategyCardToTradeGoodCount.entrySet()) {
             Integer sc = scTGs.getKey();
             if (sc == 0) {
                 continue;

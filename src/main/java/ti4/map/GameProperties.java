@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ti4.helpers.Constants;
 import ti4.helpers.omega_phase.PriorityTrackHelper.PriorityTrackMode;
+import ti4.map.pojo.ExportableField;
 
 @Getter
 @Setter
@@ -99,6 +100,7 @@ public class GameProperties {
     private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
     private @ExportableField boolean totalWarMode;
+    private @ExportableField boolean noSwapMode;
     private @ExportableField boolean ageOfCommerceMode;
     private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean ordinianC1Mode;

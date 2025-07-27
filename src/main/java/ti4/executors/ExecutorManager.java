@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.TimedRunnable;
-import ti4.map.manage.GameManager;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 
 @UtilityClass

@@ -31,7 +31,7 @@
         "name": "Armistice",
         "phase": "Action",
         "window": "When another player activates a system that contains your units",
-        "text": "Return that player's command token from that system to their tactic pool and end their turn.",
+        "text": "Return that player's command token from that system to their strategy pool and end their turn.",
         "flavorText": "The titan stared silently as the other diplomats argued. These small creatures... always squabbling, always grasping for more.",
         "source": "action_deck_2"
     },
@@ -99,8 +99,8 @@
         "source": "action_deck_2"
     },
     {
-        "alias": "breakthrough",
-        "name": "Breakthrough",
+        "alias": "innovation",
+        "name": "Innovation",
         "phase": "Any",
         "window": "When or after you research a technology",
         "text": "Ready up to 2 of your planets that have a technology specialty.",
@@ -253,7 +253,7 @@
         "name": "Derelict Station",
         "phase": "Action",
         "window": "After your ships move out of, into, or through a system that does not contain planets",
-        "text": "Explore a frontier token that is in that system or gain 2 commodities.",
+        "text": "Explore a frontier token in that system or gain 2 commodities.",
         "flavorText": "The inhabitants of this forlorn place had long forgotten civilization. Their caches, however, bespoke what they once were.",
         "source": "action_deck_2"
     },
@@ -432,7 +432,7 @@
         "name": "Heist",
         "phase": "Action",
         "window": "After you gain control of a planet that was controlled by another player",
-        "text": "Either take up to 2 of that player's relic fragments or gain 2 trade goods.",
+        "text": "Take up to 2 of that player's relic fragments, trade goods, or commodities. [Note: This is any combination of, e.g. 1 trade good and 1 fragment.]",
         "flavorText": "Mot awoke in a pool of his own blood. S'ula had the courtesy to let him live—just barely—but he was too weak to stand. So, he lay in front of the empty vault and wept.",
         "source": "action_deck_2"
     },
@@ -522,7 +522,7 @@
         "name": "Mass Transference",
         "phase": "Action",
         "window": "After you activate a system",
-        "text": "Remove any number of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
+        "text": "Remove up to 4 of your units from that system and place them on any planets you control or in any space areas that contain your ships.",
         "flavorText": "The Mentak crew handed out brochures, recruiting with promises of a grand new life on a distant world. In truth, we traded our quiet colony for a desperate land-grab on the front lines.",
         "source": "action_deck_2"
     },
@@ -1051,7 +1051,7 @@
     {
         "alias": "virulent_payload",
         "name": "Virulent Payload",
-        "phase": "Agenda",
+        "phase": "Action",
         "window": "After you produce a hit against units on a planet",
         "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 6 or greater, resolve this ability again.",
         "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
