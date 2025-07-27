@@ -33,14 +33,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
-import ti4.helpers.ButtonHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
-import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
-import ti4.helpers.RandomHelper;
-import ti4.helpers.Storage;
-import ti4.helpers.Units;
+import ti4.helpers.*;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.map.Game;
 import ti4.map.Planet;
@@ -807,12 +800,7 @@ public class TileGenerator {
                 }
             }
             case SpaceCannon -> {
-                if (game.isFowMode()) {
-                    break;
-                }
-                if (tile.getTileModel().isHyperlane()) {
-                    break;
-                }
+                Map<String, PdsCoverage> pdsCoverageMap = PdsCoverageHelper.calculatePdsCoverage(game, tile);
 
                 BufferedImage tileImage = ImageHelper.read(tile.getTilePath());
                 if (tileImage == null) {
@@ -821,82 +809,17 @@ public class TileGenerator {
 
                 int x = TILE_PADDING;
                 int y = TILE_PADDING;
-                String tilePos = tile.getPosition();
+
+
                 HashMap<String, List<Integer>> pdsDice = new HashMap<>();
-
-                for (Player player : game.getRealPlayers()) {
-                    List<Integer> diceCount = new ArrayList<>();
-                    List<Integer> diceCountMirveda = new ArrayList<>();
-                    int mod = (game.playerHasLeaderUnlockedOrAlliance(player, "kolumecommander") ? 1 : 0);
-
-                    if (player.hasAbility("starfall_gunnery")) {
-                        for (int i = ButtonHelper.checkNumberNonFighterShipsWithoutSpaceCannon(player, tile); i > 0; i--) {
-                            diceCount.add(8 - mod);
+                Map<String, PdsCoverage> pdsCoverageByFaction = new HashMap<>();
+                if (pdsCoverageMap != null) {
+                    for (Player player : game.getRealPlayers()) {
+                        PdsCoverage coverage = pdsCoverageMap.get(player.getFaction());
+                        if (coverage != null) {
+                            pdsDice.put(player.getUserID(), coverage.getDiceValues());
+                            pdsCoverageByFaction.put(player.getFaction(), coverage);
                         }
-                    }
-
-                    for (String adjTilePos : FoWHelper.getAdjacentTiles(game, tilePos, player, false, true)) {
-                        Tile adjTile = game.getTileByPosition(adjTilePos);
-                        if (adjTile == null) {
-                            continue;
-                        }
-                        boolean sameTile = tilePos.equalsIgnoreCase(adjTilePos);
-                        for (UnitHolder unitHolder : adjTile.getUnitHolders().values()) {
-                            if (sameTile && Constants.MECATOLS.contains(unitHolder.getName())) {
-                                if (player.controlsMecatol(false) && player.getTechs().contains("iihq")) {
-                                    diceCount.add(5 - mod);
-                                }
-                            }
-                            for (Map.Entry<Units.UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
-                                if (unitEntry.getValue() == 0) {
-                                    continue;
-                                }
-
-                                Units.UnitKey unitKey = unitEntry.getKey();
-                                if (game.getPlayerByColorID(unitKey.getColorID()).orElse(null) != player) {
-                                    continue;
-                                }
-
-                                UnitModel model = player.getUnitFromUnitKey(unitKey);
-                                if (model == null || (model.getId().equalsIgnoreCase("xxcha_mech")
-                                    && ButtonHelper.isLawInPlay(game, "articles_war"))) {
-                                    continue;
-                                }
-                                int tempMod = 0;
-                                if (model.getId().equalsIgnoreCase("bentor_flagship")) {
-                                    tempMod += player.getNumberOfBluePrints();
-                                }
-                                if (model.getDeepSpaceCannon() || sameTile) {
-                                    for (int i = model.getSpaceCannonDieCount() * unitEntry.getValue(); i > 0; i--) {
-                                        diceCount.add(model.getSpaceCannonHitsOn() - mod - tempMod);
-                                    }
-                                } else if (game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")) {
-                                    diceCountMirveda.add(model.getSpaceCannonHitsOn() - mod - tempMod);
-                                }
-                            }
-                            if (sameTile && player.getPlanets().contains(unitHolder.getName())) {
-                                Planet planet = game.getPlanetsInfo().get(unitHolder.getName());
-                                for (int i = planet.getSpaceCannonDieCount(); i > 0; i--) {
-                                    diceCount.add(planet.getSpaceCannonHitsOn() - mod);
-                                }
-                            }
-                        }
-                    }
-
-                    if (!diceCountMirveda.isEmpty()) {
-                        Collections.sort(diceCountMirveda);
-                        diceCount.add(diceCountMirveda.getFirst());
-                    }
-
-                    if (!diceCount.isEmpty()) {
-                        Collections.sort(diceCount);
-                        if (player.getTechs().contains("ps")) {
-                            diceCount.addFirst(diceCount.getFirst());
-                        }
-                        if (game.playerHasLeaderUnlockedOrAlliance(player, "argentcommander")) {
-                            diceCount.addFirst(diceCount.getFirst());
-                        }
-                        pdsDice.put(player.getUserID(), diceCount);
                     }
                 }
 
@@ -936,14 +859,11 @@ public class TileGenerator {
                     y += (int) ((300 - pdsDice.size() * 48 * scale) / 2);
                     for (String playerID : pdsDice.keySet()) {
                         Player player = game.getPlayer(playerID);
-                        int numberOfDice = pdsDice.get(playerID).size();
-                        boolean rerolls = game.playerHasLeaderUnlockedOrAlliance(player, "jolnarcommander");
-                        float expectedHits;
-                        if (rerolls) {
-                            expectedHits = (100.0f * numberOfDice - pdsDice.get(playerID).stream().mapToInt(value -> (value - 1) * (value - 1)).sum()) / 100;
-                        } else {
-                            expectedHits = (11.0f * numberOfDice - pdsDice.get(playerID).stream().mapToInt(Integer::intValue).sum()) / 10;
-                        }
+                        ti4.helpers.PdsCoverage coverage = pdsCoverageByFaction.get(player.getFaction());
+
+                        int numberOfDice = coverage.getCount();
+                        boolean rerolls = coverage.isHasRerolls();
+                        float expectedHits = coverage.getExpected();
                         if (DrawingUtil.getBlackWhiteFileSuffix(player.getColorID()).equals("_wht.png")) {
                             tileGraphics.setColor(Color.WHITE);
                         } else {
