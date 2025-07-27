@@ -1,12 +1,7 @@
 name: Generate TypeScript Data Files
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "src/main/resources/data/**"
-      - "src/main/resources/planets/**"
-      - "src/main/resources/systems/**"
+  workflow_dispatch:
 
 jobs:
   generate-data:
@@ -15,65 +10,33 @@ jobs:
     steps:
       - name: Checkout source repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2 # Need previous commit to compare changes
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - name: Detect changed data categories
-        id: detect-changes
-        run: |
-          echo "Detecting changes in data directories..."
-
-          # Initialize arrays to track changes
-          changed_categories=()
-
-          # Function to check if directory has changes
-          check_changes() {
-            local dir=$1
-            local category=$2
-            if git diff --name-only HEAD~1 HEAD | grep -q "^${dir}/"; then
-              echo "Changes detected in ${dir} -> ${category}"
-              changed_categories+=("$category")
-            fi
-          }
-
-          # Check each data category
-          check_changes "src/main/resources/data/technologies" "tech"
-          check_changes "src/main/resources/data/tokens" "tokens"
-          check_changes "src/main/resources/data/units" "units"
-          check_changes "src/main/resources/planets" "planets"
-          check_changes "src/main/resources/data/relics" "relics"
-          check_changes "src/main/resources/data/secret_objectives" "secret_objectives"
-          check_changes "src/main/resources/data/public_objectives" "public_objectives"
-          check_changes "src/main/resources/data/promissory_notes" "promissory_notes"
-          check_changes "src/main/resources/data/leaders" "leaders"
-          check_changes "src/main/resources/data/colors" "colors"
-          check_changes "src/main/resources/data/agendas" "agendas"
-          check_changes "src/main/resources/systems" "systems"
-
-          # Convert array to space-separated string
-          categories_string=$(IFS=' '; echo "${changed_categories[*]}")
-          echo "changed_categories=${categories_string}" >> $GITHUB_OUTPUT
-
-          if [ ${#changed_categories[@]} -eq 0 ]; then
-            echo "No data changes detected"
-            echo "has_changes=false" >> $GITHUB_OUTPUT
-          else
-            echo "Data changes detected in: ${categories_string}"
-            echo "has_changes=true" >> $GITHUB_OUTPUT
-          fi
-
       - name: Generate TypeScript files
-        if: steps.detect-changes.outputs.has_changes == 'true'
         run: |
-          echo "Generating TypeScript files for changed categories..."
-          categories="${{ steps.detect-changes.outputs.changed_categories }}"
+          echo "Generating TypeScript files for all categories..."
 
-          for category in $categories; do
+          # Define all categories to generate
+          categories=(
+            "tech"
+            "tokens"
+            "units"
+            "planets"
+            "relics"
+            "secret_objectives"
+            "public_objectives"
+            "promissory_notes"
+            "leaders"
+            "colors"
+            "agendas"
+            "systems"
+          )
+
+          for category in "${categories[@]}"; do
             echo "Generating $category..."
             python scripts/generate_data.py "$category"
           done
@@ -83,17 +46,14 @@ jobs:
           ls -la *.ts || echo "No .ts files found"
 
       - name: Set up Node.js
-        if: steps.detect-changes.outputs.has_changes == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "18"
 
       - name: Install Prettier
-        if: steps.detect-changes.outputs.has_changes == 'true'
         run: npm install --global prettier
 
       - name: Format TypeScript files with Prettier
-        if: steps.detect-changes.outputs.has_changes == 'true'
         run: |
           echo "Formatting TypeScript files with Prettier..."
 
@@ -122,7 +82,6 @@ jobs:
           ls -la *.ts || echo "No .ts files found"
 
       - name: Checkout target repository
-        if: steps.detect-changes.outputs.has_changes == 'true'
         uses: actions/checkout@v4
         with:
           repository: "AsyncTI4/ti4_web_new"
@@ -130,7 +89,6 @@ jobs:
           path: "target-repo"
 
       - name: Copy generated files to target repo
-        if: steps.detect-changes.outputs.has_changes == 'true'
         run: |
           echo "Copying generated TypeScript files to target repository..."
 
@@ -149,8 +107,27 @@ jobs:
           echo "Files in target repo data directory:"
           ls -la target-repo/src/data/
 
+      - name: Check for changes
+        id: check-changes
+        run: |
+          cd target-repo
+
+          # Check if there are any changes
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes detected in generated files"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected in generated files"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+
+            # Show what changed
+            echo "Changed files:"
+            git diff --name-only
+            git diff --cached --name-only
+          fi
+
       - name: Create Pull Request
-        if: steps.detect-changes.outputs.has_changes == 'true'
+        if: steps.check-changes.outputs.has_changes == 'true'
         run: |
           cd target-repo
 
@@ -177,7 +154,7 @@ jobs:
             --title "Auto-generated: Update data files" \
             --body "This pull request contains automatically generated TypeScript data files.
 
-          **Changed categories:** ${{ steps.detect-changes.outputs.changed_categories }}
+          **Generated categories:** tech, tokens, units, planets, relics, secret_objectives, public_objectives, promissory_notes, leaders, colors, agendas, systems
 
           **Source commit:** ${{ github.sha }}
           **Source repository:** ${{ github.repository }}
@@ -188,9 +165,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.TARGET_REPO_TOKEN }}
 
-      - name: Output PR details
-        if: steps.detect-changes.outputs.has_changes == 'true'
+      - name: Output results
         run: |
-          echo "✅ Data generation completed successfully!"
-          echo "📁 Changed categories: ${{ steps.detect-changes.outputs.changed_categories }}"
-          echo "🔄 Pull request created in ti4_web_new repository"
+          if [ "${{ steps.check-changes.outputs.has_changes }}" == "true" ]; then
+            echo "✅ Data generation completed successfully!"
+            echo "📁 Generated all data categories"
+            echo "🔄 Pull request created in ti4_web_new repository"
+          else
+            echo "✅ Data generation completed successfully!"
+            echo "📁 Generated all data categories"
+            echo "ℹ️ No changes detected - no pull request created"
+          fi
