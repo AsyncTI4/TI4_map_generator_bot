@@ -726,6 +726,15 @@
         "source": "action_deck_2"
     },
     {
+        "alias": "recusal",
+        "name": "Recusal",
+        "phase": "Agenda",
+        "window": "After an agenda is revealed",
+        "text": "During this agenda, you are treated as the speaker.",
+        "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
+        "source": "action_deck_2"
+    },
+    {
         "alias": "reengineer",
         "name": "Reengineer",
         "phase": "Any",

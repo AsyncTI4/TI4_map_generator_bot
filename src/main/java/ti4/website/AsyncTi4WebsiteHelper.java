@@ -214,12 +214,12 @@ public class AsyncTi4WebsiteHelper {
                 .build();
 
             EgressClientManager.getS3AsyncClient().putObject(req, AsyncRequestBody.fromFile(tempFile))
-                .whenComplete((result, e) -> {
+                .whenComplete((result, throwable) -> {
                     synchronized (completedUploads) {
                         completedUploads[0]++;
                         
-                        if (e != null) {
-                            BotLogger.error(String.format("Failed to upload game stats to S3 bucket %s.", bucketName), e);
+                        if (throwable != null) {
+                            BotLogger.error(String.format("Failed to upload game stats to S3 bucket %s.", bucketName), throwable);
                         } else {
                             BotLogger.info(String.format("Statistics upload to bucket %s complete.", bucketName));
                         }
