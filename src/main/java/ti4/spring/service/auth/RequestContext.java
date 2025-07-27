@@ -7,6 +7,7 @@ import ti4.map.Player;
 
 public class RequestContext {
 
+    // TODO: Debate combining this with the Command/Button processing context
     private static final ThreadLocal<Game> game = new ThreadLocal<>();
 
     @NotNull
