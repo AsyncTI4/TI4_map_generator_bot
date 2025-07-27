@@ -1,0 +1,28 @@
+package ti4.spring.service;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.map.Game;
+import ti4.map.Player;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class ActionCardDeckServiceTest {
+    private final ActionCardDeckService service = new ActionCardDeckService();
+
+    @Test
+    void shuffleCallsGameShuffle() {
+        Game game = Mockito.mock(Game.class);
+        Player player = Mockito.mock(Player.class);
+        MessageChannel channel = Mockito.mock(MessageChannel.class);
+        when(game.getActionsChannel()).thenReturn(channel);
+        when(player.getRepresentationNoPing()).thenReturn("p");
+
+        service.shuffle(game, player);
+
+        verify(game).shuffleActionCards();
+    }
+}
