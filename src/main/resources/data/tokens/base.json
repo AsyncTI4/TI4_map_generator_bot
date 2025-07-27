@@ -47,7 +47,8 @@
         "imagePath": "token_custvpc1.png",
         "spaceOrPlanet": "space",
         "aliasList": ["custvpc1"],
-        "source": "base"
+        "source": "base",
+        "placement": "center"
     }
 
 ]
