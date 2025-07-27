@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -30,7 +30,7 @@ public class UserLeaveServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
         if (!validateEvent(event)) return;
-        ExecutorManager.runAsync("UserLeaveServerListener task", () -> handleGuildMemberRemove(event));
+        ExecutorServiceManager.runAsync("UserLeaveServerListener task", () -> handleGuildMemberRemove(event));
     }
 
     private void handleGuildMemberRemove(GuildMemberRemoveEvent event) {

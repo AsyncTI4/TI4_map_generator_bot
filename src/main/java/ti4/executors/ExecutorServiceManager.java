@@ -1,7 +1,5 @@
 package ti4.executors;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -13,48 +11,32 @@ import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 
 @UtilityClass
-public class ExecutorManager {
+public class ExecutorServiceManager {
 
     private static final int SHUTDOWN_TIMEOUT_SECONDS = 20;
     private static final ExecutorService EXECUTOR_SERVICE = Executors.newVirtualThreadPerTaskExecutor();
-    private static final Set<String> executionLocks = ConcurrentHashMap.newKeySet();
 
     public static void runAsync(String name, String gameName, MessageChannel messageChannel, Runnable runnable) {
         if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(messageChannel)) {
             return;
         }
-        if (!canExecuteGameCommand(gameName, messageChannel)) {
+        if (!GameManager.isValid(gameName)) {
+            MessageHelper.sendMessageToChannel(messageChannel, "Invalid game '" + gameName + "'.");
             return;
         }
-        var lockReleaseRunnable = wrapWithLockRelease(gameName, runnable);
+
+        var lockReleaseRunnable = ExecutionLockManager.wrapWithTryLockAndRelease(
+            gameName, ExecutionLockManager.LockType.WRITE, runnable, messageChannel);
         var timedRunnable = new TimedRunnable(name, lockReleaseRunnable);
         runAsync(timedRunnable);
     }
 
-    private static boolean canExecuteGameCommand(String gameName, MessageChannel messageChannel) {
-        if (GameManager.isValid(gameName) && !executionLocks.add(gameName)) {
-            MessageHelper.sendMessageToChannel(messageChannel, "The bot hasn't finished processing the last command for this game. Please wait.");
-            return false;
-        }
-        return true;
-    }
-
-    private static Runnable wrapWithLockRelease(String gameName, Runnable runnable) {
-        return () -> {
-            try {
-                runnable.run();
-            } finally {
-                executionLocks.remove(gameName);
-            }
-        };
-    }
-
-    public static void runAsyncIfNotRunning(String name, Runnable runnable) {
-        if (CircuitBreaker.isOpen() || !executionLocks.add(name)) {
+    public static void runAsyncIfNotRunning(String taskName, Runnable runnable) {
+        if (CircuitBreaker.isOpen()) {
             return;
         }
-        var lockReleaseRunnable = wrapWithLockRelease(name, runnable);
-        var timedRunnable = new TimedRunnable(name, lockReleaseRunnable);
+        var lockReleaseRunnable = ExecutionLockManager.wrapWithTryLockAndRelease(taskName, ExecutionLockManager.LockType.WRITE, runnable);
+        var timedRunnable = new TimedRunnable(taskName, lockReleaseRunnable);
         runAsync(timedRunnable);
     }
 

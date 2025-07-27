@@ -1,4 +1,4 @@
-package ti4.website;
+package ti4.website.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.PlayerStatsHelper;
 import ti4.map.Game;
 import ti4.map.Player;

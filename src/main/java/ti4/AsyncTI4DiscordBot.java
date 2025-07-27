@@ -24,6 +24,8 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ti4.commands.CommandManager;
 import ti4.cron.AutoPingCron;
 import ti4.cron.CloseLaunchThreadsCron;
@@ -39,7 +41,7 @@ import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCacheCron;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -69,6 +71,7 @@ import ti4.settings.GlobalSettings.ImplementedSettings;
 
 import static org.reflections.scanners.Scanners.SubTypes;
 
+@SpringBootApplication
 public class AsyncTI4DiscordBot {
 
     public static final long START_TIME_MILLISECONDS = System.currentTimeMillis();
@@ -98,6 +101,8 @@ public class AsyncTI4DiscordBot {
     private static final List<Class<?>> classes = new ArrayList<>();
 
     public static void main(String[] args) {
+        SpringApplication.run(AsyncTI4DiscordBot.class, args);
+
         // guildPrimaryID must be set before initializing listeners that use webhook logging
         userID = args[1];
         guildPrimaryID = args[2];
@@ -291,7 +296,7 @@ public class AsyncTI4DiscordBot {
                 BotLogger.info("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-                if (ExecutorManager.shutdown()) { // will wait for up to an additional 20 seconds
+                if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
                 } else {
                     BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");

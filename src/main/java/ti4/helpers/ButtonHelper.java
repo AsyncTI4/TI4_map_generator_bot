@@ -107,7 +107,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
-import ti4.website.WebHelper;
+import ti4.website.AsyncTi4WebsiteHelper;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -1674,7 +1674,7 @@ public class ButtonHelper {
         MessageChannel channel, FileUpload fileUpload, String message,
         List<Button> buttons, Game game
     ) {
-        if (!WebHelper.sendingToWeb() || game.isFowMode()) {
+        if (!AsyncTi4WebsiteHelper.uploadsEnabled() || game.isFowMode()) {
             MessageHelper.sendFileToChannelAndAddLinkToButtons(channel, fileUpload, message, buttons);
         } else {
             MessageHelper.sendFileToChannelWithButtonsAfter(channel, fileUpload, message, buttons);

@@ -516,15 +516,6 @@
         "source": "action_deck_2_old"
     },
     {
-        "alias": "recusal",
-        "name": "Recusal",
-        "phase": "Agenda",
-        "window": "After an agenda is revealed",
-        "text": "During this agenda, voting begins with the player to your left and continues clockwise.",
-        "flavorText": "Elder Junn had seen many ruling parties come and go during his long years. This one, he knew, would be gone in the blink of an eye. He'd make sure of it.",
-        "source": "action_deck_2_old"
-    },
-    {
         "alias": "collaborative_planning",
         "name": "Collaboration",
         "phase": "Action",
@@ -1003,6 +994,15 @@
         "window": "When or after you research a technology",
         "text": "Ready up to 2 of your planets that have a technology specialty.",
         "flavorText": "The conference erupted in cheers as Doctor Sucaban announced his findings. Despite the countless sacrifices to reach these results, the wide range of applications made it difficult to feel regret.",
+        "source": "action_deck_2_old"
+    },
+    {
+        "alias": "virulent_payload",
+        "name": "Virulent Payload",
+        "phase": "Action",
+        "window": "After you produce a hit against units on a planet",
+        "text": "Produce 1 additional hit. Then, roll 1 die; on a result of 6 or greater, resolve this ability again.",
+        "flavorText": "As they cut through the ancient structure's wall, Dart's laser-cutter illuminated a canister close to the beam. Tai squealed, \"E-e-exterrix gas!\"—as Dart ran.",
         "source": "action_deck_2_old"
     }
 ]

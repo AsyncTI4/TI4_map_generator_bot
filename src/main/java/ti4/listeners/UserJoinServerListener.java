@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.helpers.Helper;
@@ -28,7 +28,7 @@ public class UserJoinServerListener extends ListenerAdapter {
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
         if (!validateEvent(event)) return;
-        ExecutorManager.runAsync("UserJoinServerListener task", () -> handleGuildMemberJoin(event));
+        ExecutorServiceManager.runAsync("UserJoinServerListener task", () -> handleGuildMemberJoin(event));
     }
 
     private static boolean validateEvent(GenericGuildEvent event) {

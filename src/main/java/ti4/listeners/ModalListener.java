@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.AsyncTI4DiscordBot;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.listeners.annotations.AnnotationHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.listeners.context.ModalContext;
@@ -43,7 +43,7 @@ public class ModalListener extends ListenerAdapter {
         event.deferEdit().queue();
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync("ModalListener task for  `" + gameName + "`", gameName, event.getMessageChannel(), () -> handleModal(event));
+        ExecutorServiceManager.runAsync("ModalListener task for  `" + gameName + "`", gameName, event.getMessageChannel(), () -> handleModal(event));
     }
 
     private void handleModal(@Nonnull ModalInteractionEvent event) {

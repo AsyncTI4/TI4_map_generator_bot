@@ -90,7 +90,6 @@ class GameLoadService {
                 .map(path -> {
                     File file = path.toFile();
                     try {
-                        //   System.out.println(file.getName());
                         Game game = readGame(file);
 
                         if (game == null || game.getName() == null) {
@@ -134,7 +133,6 @@ class GameLoadService {
             game.setOwnerID(gameFileLines.next());
             game.setOwnerName(gameFileLines.next());
             game.setName(gameFileLines.next());
-            //     System.out.println(game.getName() + " Start");
             while (gameFileLines.hasNext()) {
                 String data = gameFileLines.next();
                 if (MAPINFO.equals(data)) {
@@ -189,7 +187,6 @@ class GameLoadService {
                 return null;
             }
             game.setTileMap(tileMap);
-            //     System.out.println(game.getName() + " Finish");
             TransientGameInfoUpdater.update(game);
             game.setStoredValue("loadedGame", "yes");
             return game;
@@ -303,11 +300,9 @@ class GameLoadService {
 
     private static void readGameInfo(Game game, String data) {
         String[] tokenizer = data.split(" ", 2);
-        //System.out.println("Made it to reading data about " + game.getName());
         if (tokenizer.length == 2) {
             String identification = tokenizer[0];
             String info = tokenizer[1];
-            //System.out.println(identification);
             switch (identification) {
                 case Constants.LATEST_COMMAND -> game.setLatestCommand(info);
                 case Constants.LATEST_OUTCOME_VOTED_FOR -> game.setLatestOutcomeVotedFor(info);

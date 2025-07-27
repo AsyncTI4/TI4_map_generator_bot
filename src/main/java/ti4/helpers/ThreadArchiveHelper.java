@@ -6,7 +6,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.message.BotLogger;
 import ti4.settings.GlobalSettings;
 
@@ -15,7 +15,7 @@ public class ThreadArchiveHelper {
     public static void checkThreadLimitAndArchive(Guild guild) {
         if (guild == null) return;
 
-        ExecutorManager.runAsyncIfNotRunning("ThreadArchiveHelper task for `" + guild.getName() + "`", () -> {
+        ExecutorServiceManager.runAsyncIfNotRunning("ThreadArchiveHelper task for `" + guild.getName() + "`", () -> {
             try {
                 long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
                 int closeCount = GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.THREAD_AUTOCLOSE_COUNT.toString(), Integer.class, 25);

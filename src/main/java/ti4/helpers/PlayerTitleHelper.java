@@ -15,7 +15,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.statistics.StatisticOptIn;
 import ti4.settings.users.UserSettingsManager;
-import ti4.website.WebHelper;
+import ti4.website.UltimateStatisticsWebsiteHelper;
 
 public class PlayerTitleHelper {
 
@@ -308,11 +308,10 @@ public class PlayerTitleHelper {
             key = player.getFaction() + "optin" + "games";
             statisticsOpIn.setShowGames(game.getStoredValue(key).equalsIgnoreCase("yes"));
         }
-        WebHelper.sendStatisticsOptIn(statisticsOpIn);
-        String msg = "Successfully logged your decision. Feel free to check out stats at <https://www.ti4ultimate.com/community/async/>.";
-        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), msg);
-        ButtonHelper.deleteMessage(event);
 
+        UltimateStatisticsWebsiteHelper.sendStatisticsOptIn(statisticsOpIn, player.getCardsInfoThread());
+
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler(value = "bestowTitleStep1_", save = false)

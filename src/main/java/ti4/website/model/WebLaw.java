@@ -1,4 +1,4 @@
-package ti4.website;
+package ti4.website.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.Data;
 import ti4.image.Mapper;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.model.AgendaModel;
 
 @Data
