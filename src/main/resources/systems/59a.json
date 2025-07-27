@@ -1,0 +1,40 @@
+{
+    "id": "59",
+    "name": "Archon Fail",
+    "aliases": [
+        "59a",
+        "archonfail",
+        "archonf",
+        "arconfail",
+        "archonfeil",
+        "archon_fail",
+        "archon_feil",
+        "arcon_fail"
+    ],
+    "imagePath": "59a_ArchonFail.png",
+    "shipPositionsType": "TYPE04",
+    "spaceTokenLocations": [
+        {
+            "x": 195.0,
+            "y": 10.0
+        },
+        {
+            "x": 225.0,
+            "y": 75.0
+        },
+        {
+            "x": 225.0,
+            "y": 155.0
+        },
+        {
+            "x": 145.0,
+            "y": 205.0
+        }
+    ],
+    "wormholes": [],
+    "planets": [
+        "archonfail"
+    ],
+    "source": "pok",
+    "tileBack": "blue"
+}
