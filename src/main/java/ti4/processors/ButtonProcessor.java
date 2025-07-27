@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.buttons.Buttons;
 import ti4.buttons.UnfiledButtonHandlers;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperModifyUnits;
@@ -37,7 +37,7 @@ public class ButtonProcessor {
         BotLogger.logButton(event);
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorManager.runAsync(eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorServiceManager.runAsync(eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static String eventToString(ButtonInteractionEvent event, String gameName) {

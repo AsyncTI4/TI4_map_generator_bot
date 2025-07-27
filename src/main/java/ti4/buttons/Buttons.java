@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.Constants;
-import ti4.website.WebHelper;
+import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.message.BotLogger;
 import ti4.service.emoji.CardEmojis;
@@ -18,7 +18,7 @@ import ti4.service.emoji.LeaderEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.TechEmojis;
-import ti4.image.Mapper;
+import ti4.website.AsyncTi4WebsiteHelper;
 
 public class Buttons {
 
@@ -121,7 +121,7 @@ public class Buttons {
     public static List<Button> mapImageButtons(Game game) {
         List<Button> buttonsWeb = new ArrayList<>();
         if (game != null && !game.isFowMode()) {
-            if (WebHelper.sendingToWeb()) {
+            if (AsyncTi4WebsiteHelper.uploadsEnabled()) {
                 String baseUrl = "https://asyncti4.com/game/" + game.getName();
                 String url = isStandardPoKOrOnly444(game) ? baseUrl + "/newui" : baseUrl;
                 buttonsWeb.add(Button.link(url, "Website View"));

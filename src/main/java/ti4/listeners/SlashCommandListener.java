@@ -11,7 +11,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.Constants;
 import ti4.helpers.DateTimeHelper;
 import ti4.message.BotLogger;
@@ -40,7 +40,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static void queue(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
-        ExecutorManager.runAsync(eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
+        ExecutorServiceManager.runAsync(eventToString(event, gameName), gameName, event.getMessageChannel(), () -> process(event));
     }
 
     private static String eventToString(SlashCommandInteractionEvent event, String gameName) {

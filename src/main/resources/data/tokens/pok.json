@@ -62,14 +62,17 @@
         "spaceOrPlanet": "space",
         "tokenPlanetName": "mirage",
         "aliasList": ["mirage", "token_mirage"],
-        "source": "pok"
+        "source": "pok",
+        "isPlanet": true
     },
     {
         "id": "sleeper",
         "imagePath": "token_sleeper.png",
         "spaceOrPlanet": "planet",
         "aliasList": ["sleeper", "token_sleeper"],
-        "source": "pok"
+        "source": "pok",
+        "scale": 0.7,
+        "placement": "center"
     },
     {
         "id": "worlddestroyed",

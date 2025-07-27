@@ -28,7 +28,7 @@ import ti4.service.unit.AddUnitService;
 public class StartScenario extends GameStateSubcommand {
 
     public StartScenario() {
-        super(Constants.START_SCENARIO, "Start a codex scanerio", true, false);
+        super(Constants.START_SCENARIO, "Start a codex scenario", true, false);
         addOptions(new OptionData(OptionType.STRING, Constants.SCENARIO, "Scenario name").setAutoComplete(true).setRequired(true));
     }
 
