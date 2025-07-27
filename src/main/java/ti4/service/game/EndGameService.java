@@ -404,7 +404,11 @@ public class EndGameService {
             .map(player -> {
                 var tiglPlayerResult = new TiglPlayerResult();
                 tiglPlayerResult.setScore(player.getTotalVictoryPoints());
-                tiglPlayerResult.setFaction(player.getFaction());
+                if (player.getFactionModel() != null) {
+                    tiglPlayerResult.setFaction(player.getFactionModel().getFactionName());
+                } else {
+                    tiglPlayerResult.setFaction(player.getFaction());
+                }
                 tiglPlayerResult.setDiscordId(player.getUserID());
                 tiglPlayerResult.setDiscordTag(player.getUserName());
                 return tiglPlayerResult;
