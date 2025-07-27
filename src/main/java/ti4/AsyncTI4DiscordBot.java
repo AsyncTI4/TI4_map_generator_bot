@@ -41,7 +41,7 @@ import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCacheCron;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -296,7 +296,7 @@ public class AsyncTI4DiscordBot {
                 BotLogger.info("SHUTDOWN PROCESS STARTED");
                 GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
                 BotLogger.info("NO LONGER ACCEPTING COMMANDS");
-                if (ExecutorManager.shutdown()) { // will wait for up to an additional 20 seconds
+                if (ExecutorServiceManager.shutdown()) { // will wait for up to an additional 20 seconds
                     BotLogger.info("FINISHED PROCESSING ASYNC THREADPOOL");
                 } else {
                     BotLogger.info("DID NOT FINISH PROCESSING ASYNC THREADPOOL");

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
 import ti4.autocomplete.AutoCompleteProvider;
-import ti4.executors.ExecutorManager;
+import ti4.executors.ExecutorServiceManager;
 
 public class AutoCompleteListener extends ListenerAdapter {
 
@@ -19,7 +19,7 @@ public class AutoCompleteListener extends ListenerAdapter {
             return;
         }
 
-        ExecutorManager.runAsync("AutoCompleteListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS,
+        ExecutorServiceManager.runAsync("AutoCompleteListener task", EXECUTION_TIME_WARNING_THRESHOLD_SECONDS,
             () -> AutoCompleteProvider.handleAutoCompleteEvent(event));
     }
 }

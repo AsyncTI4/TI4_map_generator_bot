@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class InvalidGameNameException extends RuntimeException {
 
     public InvalidGameNameException(String gameName) {
-        super("Unable to find game with name '" + gameName + "'.");
+        super("Unable to find game '" + gameName + "'");
     }
 }

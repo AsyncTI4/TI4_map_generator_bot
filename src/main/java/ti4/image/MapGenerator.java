@@ -1,13 +1,6 @@
 package ti4.image;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -23,13 +16,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.Nullable;
-
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.ResourceHelper;
 import ti4.commands.CommandHelper;
 import ti4.helpers.ButtonHelper;
@@ -59,8 +51,8 @@ import ti4.model.StrategyCardModel;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
 import ti4.service.image.FileUploadService;
 import ti4.settings.GlobalSettings;
-import ti4.website.WebHelper;
-import ti4.website.WebsiteOverlay;
+import ti4.website.AsyncTi4WebsiteHelper;
+import ti4.website.model.WebsiteOverlay;
 
 public class MapGenerator implements AutoCloseable {
 
@@ -234,7 +226,7 @@ public class MapGenerator implements AutoCloseable {
         game.incrementMapImageGenerationCount();
         FileUpload fileUpload = FileUploadService.createFileUpload(mainImageBytes, game.getName());
         if (debug) debugDiscordTime.stop();
-        if (debug && !WebHelper.sendingToWeb())
+        if (debug && !AsyncTi4WebsiteHelper.uploadsEnabled())
             FileUploadService.saveLocalPng(mainImage, "MapDebug");
         return fileUpload;
     }
@@ -394,13 +386,13 @@ public class MapGenerator implements AutoCloseable {
     private void sendToWebsite() {
         String testing = System.getenv("TESTING");
         if (testing == null && displayTypeBasic == DisplayType.all && !isFoWPrivate) {
-            WebHelper.putMap(game.getName(), mainImageBytes, false, null);
-            WebHelper.putData(game.getName(), game);
-            WebHelper.putOverlays(game.getID(), websiteOverlays);
-            WebHelper.putPlayerData(game.getID(), game);
+            AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, false, null);
+            AsyncTi4WebsiteHelper.putData(game.getName(), game);
+            AsyncTi4WebsiteHelper.putOverlays(game.getID(), websiteOverlays);
+            AsyncTi4WebsiteHelper.putPlayerData(game.getID(), game);
         } else if (isFoWPrivate) {
             Player player = CommandHelper.getPlayerFromGame(game, event.getMember(), event.getUser().getId());
-            WebHelper.putMap(game.getName(), mainImageBytes, true, player);
+            AsyncTi4WebsiteHelper.putMap(game.getName(), mainImageBytes, true, player);
         }
     }
 

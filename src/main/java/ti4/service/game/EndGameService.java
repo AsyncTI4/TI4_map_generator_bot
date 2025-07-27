@@ -41,7 +41,7 @@ import ti4.service.statistics.game.WinningPathComparisonService;
 import ti4.service.statistics.game.WinningPathHelper;
 import ti4.service.tigl.TiglGameReport;
 import ti4.service.tigl.TiglPlayerResult;
-import ti4.website.WebHelper;
+import ti4.website.UltimateStatisticsWebsiteHelper;
 
 @UtilityClass
 public class EndGameService {
@@ -223,7 +223,7 @@ public class EndGameService {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
                     TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
                     if (!game.isReplacementMade()) {
-                        WebHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
+                        UltimateStatisticsWebsiteHelper.sendTiglGameReport(buildTiglReport(game), event.getMessageChannel());
                     } else {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             "This game had a replacement. Please report the results manually: https://www.ti4ultimate.com/community/tigl/report-game");

@@ -64,7 +64,7 @@ import ti4.model.TechnologyModel;
 import ti4.model.UnitModel;
 import ti4.service.fow.GMService;
 import ti4.service.user.AFKService;
-import ti4.website.WebsiteOverlay;
+import ti4.website.model.WebsiteOverlay;
 
 public class PlayerAreaGenerator {
 

@@ -1,4 +1,4 @@
-package ti4.website;
+package ti4.website.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units.UnitKey;
@@ -17,7 +16,6 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.map.Planet;
-import ti4.model.UnitModel;
 
 @Data
 public class WebTileUnitData {

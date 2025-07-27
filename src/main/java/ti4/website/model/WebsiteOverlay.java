@@ -1,4 +1,4 @@
-package ti4.website;
+package ti4.website.model;
 
 import java.util.List;
 

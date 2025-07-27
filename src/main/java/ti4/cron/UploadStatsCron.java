@@ -3,8 +3,8 @@ package ti4.cron;
 import java.time.ZoneId;
 
 import lombok.experimental.UtilityClass;
-import ti4.website.WebHelper;
 import ti4.message.BotLogger;
+import ti4.website.AsyncTi4WebsiteHelper;
 
 @UtilityClass
 public class UploadStatsCron {
@@ -15,7 +15,7 @@ public class UploadStatsCron {
 
     private static void uploadStats() {
         try {
-            WebHelper.putStats();
+            AsyncTi4WebsiteHelper.putStats();
         } catch (Exception e) {
             BotLogger.error("**UploadStatsCron failed.**", e);
         }

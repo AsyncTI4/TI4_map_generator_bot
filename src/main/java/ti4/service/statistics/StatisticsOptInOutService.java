@@ -2,7 +2,7 @@ package ti4.service.statistics;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.website.WebHelper;
+import ti4.website.UltimateStatisticsWebsiteHelper;
 
 public class StatisticsOptInOutService {
 
@@ -11,7 +11,7 @@ public class StatisticsOptInOutService {
         statisticsOpIn.setPlayerDiscordId(event.getUser().getId());
         statisticsOpIn.setExcludeFromAsyncStats(true);
 
-        WebHelper.sendStatisticsOptIn(statisticsOpIn);
+        UltimateStatisticsWebsiteHelper.sendStatisticsOptIn(statisticsOpIn, event.getChannel());
     }
 
     public static void optIn(SlashCommandInteractionEvent event) {
@@ -25,7 +25,7 @@ public class StatisticsOptInOutService {
         statisticsOpIn.setShowOpponents(getOption(event, "opponents"));
         statisticsOpIn.setShowGames(getOption(event, "games"));
 
-        WebHelper.sendStatisticsOptIn(statisticsOpIn);
+        UltimateStatisticsWebsiteHelper.sendStatisticsOptIn(statisticsOpIn, event.getChannel());
     }
 
     private static boolean getOption(SlashCommandInteractionEvent event, String optionName) {
