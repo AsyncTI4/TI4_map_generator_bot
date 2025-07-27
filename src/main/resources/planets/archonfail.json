@@ -1,0 +1,125 @@
+{
+    "id": "archonfail",
+    "tileId": "59a",
+    "name": "Archon Fail",
+    "shortNamePNAttach": "Archon F.",
+    "aliases": [
+        "archonfail",
+        "archonf",
+        "arconfail",
+        "archonfeil",
+        "archon_fail",
+        "archon_feil",
+        "arcon_fail",
+        "afail",
+        "fail",
+        "archon fail",
+        "59_1"
+    ],
+    "positionInTile": {
+        "x": 168.0,
+        "y": 152.0
+    },
+    "resources": 1,
+    "influence": 3,
+    "factionHomeworld": null,
+    "planetType": "HAZARDOUS",
+    "cardImagePath": null,
+    "techSpecialties": [
+        "PROPULSION"
+    ],
+    "legendaryAbilityName": null,
+    "legendaryAbilityText": null,
+    "unitPositions": {
+        "unitHolderName": "archonfail",
+        "coordinateMap": {
+            "control": [
+                {
+                    "x": 133.0,
+                    "y": 140.0
+                }
+            ],
+            "sd": [
+                {
+                    "x": 193.0,
+                    "y": 175.0
+                }
+            ],
+            "pd": [
+                {
+                    "x": 138.0,
+                    "y": 167.0
+                },
+                {
+                    "x": 155.0,
+                    "y": 167.0
+                },
+                {
+                    "x": 172.0,
+                    "y": 167.0
+                },
+                {
+                    "x": 147.0,
+                    "y": 178.0
+                },
+                {
+                    "x": 165.0,
+                    "y": 178.0
+                }
+            ],
+            "mf": [
+                {
+                    "x": 140.0,
+                    "y": 96.0
+                },
+                {
+                    "x": 158.0,
+                    "y": 96.0
+                },
+                {
+                    "x": 133.0,
+                    "y": 109.0
+                },
+                {
+                    "x": 151.0,
+                    "y": 109.0
+                },
+                {
+                    "x": 169.0,
+                    "y": 109.0
+                }
+            ],
+            "tkn_gf": [
+                {
+                    "x": 152.0,
+                    "y": 137.0
+                },
+                {
+                    "x": 119.0,
+                    "y": 137.0
+                }
+            ],
+            "att": [
+                {
+                    "x": 76.0,
+                    "y": 129.0
+                },
+                {
+                    "x": 84.0,
+                    "y": 98.0
+                },
+                {
+                    "x": 203.0,
+                    "y": 129.0
+                },
+                {
+                    "x": 195.0,
+                    "y": 98.0
+                }
+            ]
+        },
+        "removeUnitCoordinate": true
+    },
+    "flavourText": "*Gotta Try Harder Next Time*",
+    "source": "other"
+}
