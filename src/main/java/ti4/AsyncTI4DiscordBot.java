@@ -38,6 +38,7 @@ import ti4.cron.LogCacheStatsCron;
 import ti4.cron.OldUndoFileCleanupCron;
 import ti4.cron.ReuploadStaleEmojisCron;
 import ti4.cron.SabotageAutoReactCron;
+import ti4.cron.AddBothelperPermissionsCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCacheCron;
@@ -268,6 +269,7 @@ public class AsyncTI4DiscordBot {
 
         // START CRONS
         AutoPingCron.register();
+        AddBothelperPermissionsCron.register();
         ReuploadStaleEmojisCron.register();
         LogCacheStatsCron.register();
         WinningPathCacheCron.register();
