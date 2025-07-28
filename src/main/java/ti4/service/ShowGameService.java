@@ -51,7 +51,7 @@ public class ShowGameService {
                 buttonEvent.getHook().deleteOriginal().queue();
             }
         });
-        // TODO: Delete this? At least should probably be a cron or migration
+        // TODO: This should be a cron that runs every hour for any active games. When a game is created, it should schedule a task 5 minutes later to run this
         if (event instanceof ButtonInteractionEvent bEvent && game.getStoredValue("addedBothelpers").isEmpty() && !game.isFowMode()) {
             game.setStoredValue("addedBothelpers", "Yes");
             GameManager.save(game, "adding bothelper permissions");
