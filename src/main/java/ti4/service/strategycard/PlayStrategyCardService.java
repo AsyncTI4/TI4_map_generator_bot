@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -24,7 +23,7 @@ import ti4.helpers.CryypterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
-import ti4.helpers.Units.UnitType;
+import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -194,8 +193,7 @@ public class PlayStrategyCardService {
         }
 
         // Handle Kyro Hero
-        if (scToPlay == ButtonHelper.getKyroHeroSC(game)
-            && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
+        if (scToPlay == ButtonHelper.getKyroHeroSC(game) && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation()
                     + " this is a reminder that this strategy card is Kyro Cursed and therefore you should only do 1 of its clauses. ");
@@ -261,7 +259,6 @@ public class PlayStrategyCardService {
                     }
                 }
             }
-
         }
 
         if (!scModel.usesAutomationForSCID("pok1leadership")) {
@@ -356,85 +353,84 @@ public class PlayStrategyCardService {
         GenericInteractionCreateEvent event, int scToPlay, StrategyCardModel scModel, List<Button> scButtons
     ) {
         var mainGameChannel = game.getMainGameChannel();
-        Message message = mainGameChannel.sendMessage(toSend).complete();
-        Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
-        String stratCardName = Helper.getSCName(scToPlay, game);
-        if (reactionEmoji != null) {
-            message.addReaction(reactionEmoji).queue();
-            player.addFollowedSC(scToPlay, event);
-        }
-        if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode()
-            && scToPlay != 5 && !game.getName().equalsIgnoreCase("pbd100two")) {
-            for (Player p2 : game.getRealPlayers()) {
-                if (p2 == player) {
-                    continue;
-                }
-                if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
-                    && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
-                    && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
-                    && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")
-                    && scToPlay != 1) {
-                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
-                    if (reactionEmoji2 != null) {
-                        message.addReaction(reactionEmoji2).queue();
-                        p2.addFollowedSC(scToPlay, event);
-                        if (scToPlay == 8) {
-                            String key3 = "potentialBlockers";
-                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
-                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
-                            }
-
-                            String key = "factionsThatAreNotDiscardingSOs";
-                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
-                        }
-                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                            "You were automatically marked as not following **" + stratCardName
-                                + "**, because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
+        mainGameChannel.sendMessage(toSend).queue(message -> {
+            Emoji reactionEmoji = Helper.getPlayerReactionEmoji(game, player, message);
+            String stratCardName = Helper.getSCName(scToPlay, game);
+            if (reactionEmoji != null) {
+                message.addReaction(reactionEmoji).queue();
+                player.addFollowedSC(scToPlay, event);
+            }
+            if (!game.isFowMode() && !game.getName().equalsIgnoreCase("pbd1000") && !game.isHomebrewSCMode()
+                && scToPlay != 5 && !game.getName().equalsIgnoreCase("pbd100two")) {
+                for (Player p2 : game.getRealPlayers()) {
+                    if (p2 == player) {
+                        continue;
                     }
-                } else {
-                    if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship")
-                        && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock)
-                            .contains(p2.getHomeSystemTile())) {
-                        Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
-                        if (reactionEmoji2 != null) {
-                            message.addReaction(reactionEmoji2).queue();
-                            p2.addFollowedSC(scToPlay, event);
-                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                                "You were automatically marked as not following **"
-                                    + stratCardName
-                                    + "** because the bot does not believe you have a space dock in your home system.");
-                        }
-                    }
-                }
-                if (!p2.hasFollowedSC(scToPlay)
-                    && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction())
-                        .isEmpty()) {
-                    game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
-                    Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
-                    if (reactionEmoji2 != null) {
-                        message.addReaction(reactionEmoji2).queue();
-                        p2.addFollowedSC(scToPlay, event);
-                        if (scToPlay == 8) {
-                            String key3 = "potentialBlockers";
-                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
-                                game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
-                            }
-
-                            String key = "factionsThatAreNotDiscardingSOs";
-                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
-                        }
-                        MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                            "You were automatically marked as not following **"
-                                + stratCardName
-                                + "** because you told the bot earlier that you wished to pass on it.");
-                    }
-                } else {
-                    if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount()) {
+                    if (!player.ownsPromissoryNote("acq") && p2.getStrategicCC() == 0 && !p2.getUnfollowedSCs().contains(1)
+                        && (!p2.getTechs().contains("iihq") || !p2.getUnfollowedSCs().contains(8))
+                        && !p2.hasRelicReady("absol_emelpar") && !p2.hasRelicReady("emelpar")
+                        && !p2.hasUnexhaustedLeader("mahactagent") && !p2.hasUnexhaustedLeader("yssarilagent")
+                        && scToPlay != 1) {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {
                             message.addReaction(reactionEmoji2).queue();
                             p2.addFollowedSC(scToPlay, event);
                             if (scToPlay == 8) {
+                                String key3 = "potentialBlockers";
+                                if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                    game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                                }
+
+                                String key = "factionsThatAreNotDiscardingSOs";
+                                game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                            }
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
+                                "You were automatically marked as not following **" + stratCardName
+                                    + "**, because the bot believes you can't follow due to a lack of command tokens in your strategy pool.");
+                        }
+                    } else {
+                        if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship")
+                            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock)
+                            .contains(p2.getHomeSystemTile())) {
+                            Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                            if (reactionEmoji2 != null) {
+                                message.addReaction(reactionEmoji2).queue();
+                                p2.addFollowedSC(scToPlay, event);
+                                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
+                                    "You were automatically marked as not following **"
+                                        + stratCardName
+                                        + "** because the bot does not believe you have a space dock in your home system.");
+                            }
+                        }
+                    }
+                    if (!p2.hasFollowedSC(scToPlay)
+                        && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction())
+                        .isEmpty()) {
+                        game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
+                        Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                        if (reactionEmoji2 != null) {
+                            message.addReaction(reactionEmoji2).queue();
+                            p2.addFollowedSC(scToPlay, event);
+                            if (scToPlay == 8) {
+                                String key3 = "potentialBlockers";
+                                if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                    game.setStoredValue(key3, game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
+                                }
+
+                                String key = "factionsThatAreNotDiscardingSOs";
+                                game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                            }
+                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
+                                "You were automatically marked as not following **"
+                                    + stratCardName
+                                    + "** because you told the bot earlier that you wished to pass on it.");
+                        }
+                    } else {
+                        if (scToPlay == 8 && p2.getSoScored() == p2.getMaxSOCount()) {
+                            Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
+                            if (reactionEmoji2 != null) {
+                                message.addReaction(reactionEmoji2).queue();
+                                p2.addFollowedSC(scToPlay, event);
                                 String key3 = "potentialBlockers";
                                 if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
                                     game.setStoredValue(key3,
@@ -443,112 +439,112 @@ public class PlayStrategyCardService {
 
                                 String key = "factionsThatAreNotDiscardingSOs";
                                 game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                                MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
+                                    "You were automatically marked as not following **" + stratCardName
+                                        + "** because the bot believes you have already scored all " + p2.getSoScored() + " of your secret objectives.");
                             }
-                            MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
-                                "You were automatically marked as not following **" + stratCardName
-                                    + "** because the bot believes you have already scored all " + p2.getSoScored() + " of your secret objectives.");
                         }
                     }
                 }
             }
-        }
-        game.setStoredValue("scPlay" + scToPlay, message.getJumpUrl());
-        game.setStoredValue("scPlayMsgID" + scToPlay, message.getId());
-        game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, System.currentTimeMillis() + "");
-        for (Player p2 : game.getRealPlayers()) {
-            if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction()).isEmpty()) {
-                game.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());
+            game.setStoredValue("scPlay" + scToPlay, message.getJumpUrl());
+            game.setStoredValue("scPlayMsgID" + scToPlay, message.getId());
+            game.setStoredValue("scPlayMsgTime" + game.getRound() + scToPlay, System.currentTimeMillis() + "");
+            for (Player p2 : game.getRealPlayers()) {
+                if (!game.getStoredValue("scPlayPingCount" + scToPlay + p2.getFaction()).isEmpty()) {
+                    game.removeStoredValue("scPlayPingCount" + scToPlay + p2.getFaction());
+                }
             }
-        }
-        if (game.isFowMode()) {
-            // in fow, send a message back to the player that includes their emoji
-            String response = "Strategy card played.";
-            response += reactionEmoji != null ? " " + reactionEmoji.getFormatted()
-                : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
-            MessageHelper.sendPrivateMessageToPlayer(player, game, response);
-        } else {
-            // only do thread in non-fow games
-            String threadName = game.getName() + "-round-" + game.getRound() + "-" + scModel.getName();
-            ThreadChannelAction threadChannel = mainGameChannel.createThreadChannel(threadName, message.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            threadChannel.queue(m5 -> {
-                if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
-                    MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
-                    if (ShouldPrintFollowOrder(game, scModel)) {
-                        List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
-                        StringBuilder playerOrder = new StringBuilder(
-                            "__Order for performing the secondary ability:__\n");
-                        for (int i = 0; i < playersInOrder.size(); i++) {
-                            playerOrder.append("`").append(i + 1).append(".` ");
-                            if (game.hasFullPriorityTrackMode() && game.getPhaseOfGame().equals("action")) {
-                                int lowestSC = playersInOrder.get(i).getLowestSC();
-                                TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
-                                playerOrder.append(scEmoji);
+            if (game.isFowMode()) {
+                // in fow, send a message back to the player that includes their emoji
+                String response = "Strategy card played.";
+                response += reactionEmoji != null ? " " + reactionEmoji.getFormatted()
+                    : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
+                MessageHelper.sendPrivateMessageToPlayer(player, game, response);
+            } else {
+                // only do thread in non-fow games
+                String threadName = game.getName() + "-round-" + game.getRound() + "-" + scModel.getName();
+                ThreadChannelAction threadChannel = mainGameChannel.createThreadChannel(threadName, message.getId());
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+                threadChannel.queue(m5 -> {
+                    if (game.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE) && scModel.hasImageFile()) {
+                        MessageHelper.sendMessageToChannel(m5, Helper.getScImageUrl(scToPlay, game));
+                        if (ShouldPrintFollowOrder(game, scModel)) {
+                            List<Player> playersInOrder = getPlayersInFollowOrder(game, player);
+                            StringBuilder playerOrder = new StringBuilder(
+                                "__Order for performing the secondary ability:__\n");
+                            for (int i = 0; i < playersInOrder.size(); i++) {
+                                playerOrder.append("`").append(i + 1).append(".` ");
+                                if (game.hasFullPriorityTrackMode() && game.getPhaseOfGame().equals("action")) {
+                                    int lowestSC = playersInOrder.get(i).getLowestSC();
+                                    TI4Emoji scEmoji = CardEmojis.getSCFrontFromInteger(lowestSC);
+                                    playerOrder.append(scEmoji);
+                                }
+                                playerOrder.append(playersInOrder.get(i).getRepresentationNoPing());
+                                if (playersInOrder.get(i).isSpeaker()) {
+                                    playerOrder.append(MiscEmojis.SpeakerToken);
+                                }
+                                playerOrder.append("\n");
                             }
-                            playerOrder.append(playersInOrder.get(i).getRepresentationNoPing());
-                            if (playersInOrder.get(i).isSpeaker()) {
-                                playerOrder.append(MiscEmojis.SpeakerToken);
-                            }
-                            playerOrder.append("\n");
+                            MessageHelper.sendMessageToChannel(m5, playerOrder.toString());
                         }
-                        MessageHelper.sendMessageToChannel(m5, playerOrder.toString());
                     }
-                }
 
-                if (scModel.usesAutomationForSCID("pok5trade")) {
-                    Button transaction = Buttons.blue("transaction", "Transaction");
-                    scButtons.add(transaction);
-                    scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1 Trade Good"));
-                    String label = "Send 1 Debt";
-                    if (player.hasAbility("binding_debts")) {
-                        label += " (Binding Debts)";
+                    if (scModel.usesAutomationForSCID("pok5trade")) {
+                        Button transaction = Buttons.blue("transaction", "Transaction");
+                        scButtons.add(transaction);
+                        scButtons.add(Buttons.green("sendTradeHolder_tg_" + player.getFaction(), "Send 1 Trade Good"));
+                        String label = "Send 1 Debt";
+                        if (player.hasAbility("binding_debts")) {
+                            label += " (Binding Debts)";
+                        }
+                        scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), label));
                     }
-                    scButtons.add(Buttons.gray("sendTradeHolder_debt_" + player.getFaction(), label));
-                }
-                MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread.",
-                    scButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(m5, "These buttons will work inside the thread.",
+                        scButtons);
 
-                // Trade Neighbour Message
-                if (scModel.usesAutomationForSCID("pok5trade")) {
-                    if (player.hasAbility("guild_ships")) {
-                        MessageHelper.sendMessageToChannel(m5,
-                            "The **Trade** player has the **Guild Ships** ability, and thus may perform transactions with all players.");
-                    } else if (player.getPromissoryNotesInPlayArea().contains("convoys")) {
-                        MessageHelper.sendMessageToChannel(m5,
-                            "The **Trade** player has _Trade Convoys_, and thus may perform transactions with all players.");
-                    } else if (game.isAgeOfCommerceMode()) {
-                        MessageHelper.sendMessageToChannel(m5,
-                            "The Age of Commerce Galactic event is in play, and thus the **Trade** player may perform transactions with all players.");
-                    } else {
-                        StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");
-                        StringBuilder notNeighborsMsg = new StringBuilder(
-                            "__Not__ neighbors with the **Trade** holder:");
-                        boolean anyNeighbours = false;
-                        boolean allNeighbours = true;
-                        for (Player p2 : game.getRealPlayers()) {
-                            if (player != p2) {
-                                if (player.getNeighbouringPlayers(true).contains(p2)) {
-                                    neighborsMsg.append(" ").append(p2.getFactionEmoji());
-                                    anyNeighbours = true;
-                                } else {
-                                    notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
-                                    allNeighbours = false;
+                    // Trade Neighbour Message
+                    if (scModel.usesAutomationForSCID("pok5trade")) {
+                        if (player.hasAbility("guild_ships")) {
+                            MessageHelper.sendMessageToChannel(m5,
+                                "The **Trade** player has the **Guild Ships** ability, and thus may perform transactions with all players.");
+                        } else if (player.getPromissoryNotesInPlayArea().contains("convoys")) {
+                            MessageHelper.sendMessageToChannel(m5,
+                                "The **Trade** player has _Trade Convoys_, and thus may perform transactions with all players.");
+                        } else if (game.isAgeOfCommerceMode()) {
+                            MessageHelper.sendMessageToChannel(m5,
+                                "The Age of Commerce Galactic event is in play, and thus the **Trade** player may perform transactions with all players.");
+                        } else {
+                            StringBuilder neighborsMsg = new StringBuilder("__Are__ neighbors with the **Trade** holder:");
+                            StringBuilder notNeighborsMsg = new StringBuilder(
+                                "__Not__ neighbors with the **Trade** holder:");
+                            boolean anyNeighbours = false;
+                            boolean allNeighbours = true;
+                            for (Player p2 : game.getRealPlayers()) {
+                                if (player != p2) {
+                                    if (player.getNeighbouringPlayers(true).contains(p2)) {
+                                        neighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                        anyNeighbours = true;
+                                    } else {
+                                        notNeighborsMsg.append(" ").append(p2.getFactionEmoji());
+                                        allNeighbours = false;
+                                    }
                                 }
                             }
-                        }
-                        if (allNeighbours) {
-                            MessageHelper.sendMessageToChannel(m5,
-                                "The **Trade** player is neighbors with __all__ other players.");
-                        } else if (!anyNeighbours) {
-                            MessageHelper.sendMessageToChannel(m5,
-                                "The **Trade** player is neighbors with __no__ other players.");
-                        } else {
-                            MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
+                            if (allNeighbours) {
+                                MessageHelper.sendMessageToChannel(m5,
+                                    "The **Trade** player is neighbors with __all__ other players.");
+                            } else if (!anyNeighbours) {
+                                MessageHelper.sendMessageToChannel(m5,
+                                    "The **Trade** player is neighbors with __no__ other players.");
+                            } else {
+                                MessageHelper.sendMessageToChannel(m5, neighborsMsg + "\n" + notNeighborsMsg);
+                            }
                         }
                     }
-                }
-            });
-        }
+                });
+            }
+        });
     }
 
     private static List<Button> getSCButtons(int sc, Game game, boolean winnuHero, Player player) {
@@ -749,19 +745,19 @@ public class PlayStrategyCardService {
             if (!player.isSpeaker()) {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
+                    Button button;
                     if (!game.isFowMode()) {
-                        Button button = Buttons.gray(
+                        button = Buttons.gray(
                             politicsHolder.getFinsFactionCheckerPrefix()
                                 + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
                             " ", player.getFactionEmoji());
-                        assignSpeakerButtons.add(button);
                     } else {
-                        Button button = Buttons.gray(
+                        button = Buttons.gray(
                             politicsHolder.getFinsFactionCheckerPrefix()
                                 + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
                             player.getColor(), ColorEmojis.getColorEmoji(player.getColor()));
-                        assignSpeakerButtons.add(button);
                     }
+                    assignSpeakerButtons.add(button);
                 }
             }
         }
