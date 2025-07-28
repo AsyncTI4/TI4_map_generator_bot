@@ -123,7 +123,7 @@ public class PlayerAreaGenerator {
         }
     }
 
-    public Rectangle drawPlayerAreaNEW(Player player, Point topLeft) {
+    public Rectangle drawPlayerAreaNEW(Point topLeft) {
         return new Rectangle(topLeft);
     }
 
