@@ -731,9 +731,10 @@ public class ButtonHelperModifyUnits {
         }
         for (String pos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false)) {
             Tile tile = game.getTileByPosition(pos2);
-            if (pos1.equalsIgnoreCase(pos2) || (!Mapper.getFrontierTileIds().contains(tile.getTileID()) && tile.getPlanetUnitHolders().isEmpty() && tile.getUnitHolders().size() != 2)) {
-                continue; // TODO: Can we name the second half of this boolean to make it clear what it is doing?
-                // Pretty sure it's skipping over hyperlanes and the like
+            boolean skipNonFrontierEmptySystem = !Mapper.getFrontierTileIds().contains(tile.getTileID()) &&
+                tile.getPlanetUnitHolders().isEmpty() && tile.getUnitHolders().size() != 2;
+            if (pos1.equalsIgnoreCase(pos2) || skipNonFrontierEmptySystem) {
+                continue; // skip empty systems like hyperlanes
             }
             if (canRetreatTo(game, player, tile, skilled)) {
                 buttons.add(Buttons.gray(finChecker + "retreatUnitsFrom_" + pos1 + "_" + pos2 + skilledS,
