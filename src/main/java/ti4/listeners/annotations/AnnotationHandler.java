@@ -158,7 +158,6 @@ public class AnnotationHandler {
 
                 Object instance = null;
                 if (!Modifier.isStatic(method.getModifiers())) {
-                    // Fallback: try to get instance of declaring class
                     if (applicationContext != null) {
                         instance = applicationContext.getBean(method.getDeclaringClass());
                         if (instance == null) {
@@ -241,9 +240,6 @@ public class AnnotationHandler {
                     method.setAccessible(true);
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
                     if (handlers.isEmpty()) continue;
-
-                    String methodName = klass.getName() + "." + method.getName();
-                    // REMOVED: Static method requirement - now support both static and instance methods
 
                     Function<C, List<Object>> argGetter = getArgs(method, contextClass);
                     if (argGetter == null) {
