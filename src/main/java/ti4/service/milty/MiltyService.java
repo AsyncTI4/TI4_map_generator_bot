@@ -194,7 +194,7 @@ public class MiltyService {
                 } else {
                     DraftDisplayService.repostDraftInformation(event, draftManager, game);
                     game.setPhaseOfGame("miltydraft");
-                    GameManager.save(game, "Milty");
+                    GameManager.save(game, "Milty"); //TODO: We should be locking since we're saving
                 }
             });
         }
