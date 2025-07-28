@@ -7,8 +7,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.TimedRunnable;
-import ti4.map.persistence.GameManager;
-import ti4.message.MessageHelper;
 
 @UtilityClass
 public class ExecutorServiceManager {
@@ -20,11 +18,8 @@ public class ExecutorServiceManager {
         if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(messageChannel)) {
             return;
         }
-        if (!GameManager.isValid(gameName)) {
-            MessageHelper.sendMessageToChannel(messageChannel, "Invalid game '" + gameName + "'.");
-            return;
-        }
 
+        // TODO: We can do read/write based on if it is a save command
         var lockReleaseRunnable = ExecutionLockManager.wrapWithTryLockAndRelease(
             gameName, ExecutionLockManager.LockType.WRITE, runnable, messageChannel);
         var timedRunnable = new TimedRunnable(name, lockReleaseRunnable);

@@ -51,9 +51,9 @@ class ActionCardHandButtonHandler {
         }
     }
 
+    // TODO: bake this into /ac discard
     @ButtonHandler(value = "ac_discard_from_hand_")
-    static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player,
-        MessageChannel actionsChannel) {
+    static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel) {
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");
         boolean stalling = false;
         boolean drawReplacement = false;
@@ -141,6 +141,7 @@ class ActionCardHandButtonHandler {
         }
     }
 
+    // TODO: bake this into /ac play
     @ButtonHandler(Constants.AC_PLAY_FROM_HAND)
     static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
@@ -172,19 +173,20 @@ class ActionCardHandButtonHandler {
                 player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Counterstroke_.",
                 scButtons);
         }
-        if (channel != null) {
-            try {
-                String error = ActionCardHelper.playAC(event, game, player, acID, channel);
-                if (error != null) {
-                    event.getChannel().sendMessage(error).queue();
-                }
-            } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse AC ID: " + acID, e);
-                event.getChannel().asThreadChannel()
-                    .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.").queue();
-            }
-        } else {
+        if (channel == null) {
             event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
+            return;
+        }
+
+        try {
+            String error = ActionCardHelper.playAC(event, game, player, acID, channel);
+            if (error != null) {
+                event.getChannel().sendMessage(error).queue();
+            }
+        } catch (Exception e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse AC ID: " + acID, e);
+            event.getChannel().asThreadChannel()
+                .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.").queue();
         }
     }
 
@@ -238,6 +240,7 @@ class ActionCardHandButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + ", use buttons to discard an action card.",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
+
         ButtonHelper.deleteMessage(event);
         ButtonHelper.checkACLimit(game, player);
     }

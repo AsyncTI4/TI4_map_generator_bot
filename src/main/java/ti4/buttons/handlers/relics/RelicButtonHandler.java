@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
+import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
@@ -16,7 +17,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
-import ti4.service.button.ReactionService;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -29,7 +29,7 @@ class RelicButtonHandler {
     static void useRelic(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String relic = buttonID.replace("useRelic_", "");
         ButtonHelper.deleteTheOneButton(event);
-        if ("boon".equals(relic)) { // Sarween Tools
+        if ("boon".equals(relic)) {// Sarween Tools
             player.addSpentThing("boon");
             String exhaustedMessage = Helper.buildSpentThingsMessage(player, game, "res");
             event.getMessage().editMessage(exhaustedMessage).queue();
@@ -39,17 +39,17 @@ class RelicButtonHandler {
     @ButtonHandler("exhaustRelic_")
     static void exhaustRelic(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         String relic = buttonID.replace("exhaustRelic_", "");
-        if (player.hasRelicReady(relic)) {
-            player.addExhaustedRelic(relic);
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                player.getFactionEmoji() + " exhausted " + Mapper.getRelic(relic).getName());
-            ButtonHelper.deleteTheOneButton(event);
-            if ("absol_luxarchtreatise".equalsIgnoreCase(relic)) {
-                game.setStoredValue("absolLux", "true");
-            }
-        } else {
+        if (!player.hasRelicReady(relic)) {
             MessageHelper.sendMessageToChannel(event.getChannel(),
                 player.getFactionEmoji() + " doesn't have an unexhausted " + relic + ".");
+            return;
+        }
+        player.addExhaustedRelic(relic);
+        MessageHelper.sendMessageToChannel(event.getChannel(),
+            player.getFactionEmoji() + " exhausted " + Mapper.getRelic(relic).getName());
+        ButtonHelper.deleteTheOneButton(event);
+        if ("absol_luxarchtreatise".equalsIgnoreCase(relic)) {
+            game.setStoredValue("absolLux", "true");
         }
     }
 
@@ -83,7 +83,8 @@ class RelicButtonHandler {
     @ButtonHandler("drawRelicFromFrag")
     static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         RelicHelper.drawRelicAndNotify(player, event, game);
-        ReactionService.addReaction(event, game, player, "drew a relic.");
+        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
+        ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("neuraloopPart1")
