@@ -26,10 +26,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * // Instance method with Spring DI (recommended for new handlers)
  * {@code @ButtonHandler("myButton")}  // handlerClass auto-detected from declaring class
  * public void handleMyButton(ButtonInteractionEvent event, Player player, Game game) { ... }
- *
- * // Instance method with explicit handler class (rarely needed)
- * {@code @ButtonHandler(value = "myButton", handlerClass = MyHandler.class)}
- * public void handleMyButton(ButtonInteractionEvent event, Player player, Game game) { ... }
  * </pre>
  *
  * <p>Supported Variables:</p>
