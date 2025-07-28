@@ -27,20 +27,22 @@ public class AddBothelperPermissionsCron {
     }
 
     public static void scheduleForGame(@NotNull Game game) {
+        if (game.isFowMode()) {
+            return;
+        }
         CronManager.scheduleOnce(AddBothelperPermissionsCron.class, () -> addPermissions(game), 5, TimeUnit.MINUTES);
     }
 
     private static void handleActiveGames() {
         GameManager.getManagedGames().stream()
             .filter(not(ManagedGame::isHasEnded))
+            .filter(not(ManagedGame::isFowMode))
             .map(ManagedGame::getGame)
+            .filter(game -> game.getStoredValue("addedBothelpers").isEmpty())
             .forEach(AddBothelperPermissionsCron::addPermissions);
     }
 
     private static void addPermissions(Game game) {
-        if (game.isHasEnded() || game.isFowMode() || !game.getStoredValue("addedBothelpers").isEmpty()) {
-            return;
-        }
         game.setStoredValue("addedBothelpers", "Yes");
         GameManager.save(game, "adding bothelper permissions"); // TODO: Should lock
 
