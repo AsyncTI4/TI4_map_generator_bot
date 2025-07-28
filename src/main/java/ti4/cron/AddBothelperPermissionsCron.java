@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import org.jetbrains.annotations.NotNull;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -25,8 +26,7 @@ public class AddBothelperPermissionsCron {
         CronManager.schedulePeriodically(AddBothelperPermissionsCron.class, AddBothelperPermissionsCron::handleActiveGames, 5, 60, TimeUnit.MINUTES);
     }
 
-    public static void scheduleForGame(Game game) {
-        if (game == null) return;
+    public static void scheduleForGame(@NotNull Game game) {
         CronManager.scheduleOnce(AddBothelperPermissionsCron.class, () -> addPermissions(game), 5, TimeUnit.MINUTES);
     }
 
@@ -38,12 +38,11 @@ public class AddBothelperPermissionsCron {
     }
 
     private static void addPermissions(Game game) {
-        if (game == null) return;
-        if (!game.getStoredValue("addedBothelpers").isEmpty() || game.isFowMode()) {
+        if (game.isHasEnded() || game.isFowMode() || !game.getStoredValue("addedBothelpers").isEmpty()) {
             return;
         }
         game.setStoredValue("addedBothelpers", "Yes");
-        GameManager.save(game, "adding bothelper permissions");
+        GameManager.save(game, "adding bothelper permissions"); // TODO: Should lock
 
         Guild guild = game.getGuild();
         if (guild == null) {
@@ -55,7 +54,6 @@ public class AddBothelperPermissionsCron {
             return;
         }
 
-        long threadPermission = Permission.MANAGE_THREADS.getRawValue();
         List<Member> nonGameBothelpers = new ArrayList<>();
         for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
             boolean inGame = false;
@@ -71,12 +69,15 @@ public class AddBothelperPermissionsCron {
         }
 
         TextChannel actionsChannel = game.getMainGameChannel();
-        if (actionsChannel != null) {
-            for (Member botHelper : nonGameBothelpers) {
-                actionsChannel.getManager()
-                    .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
-                    .complete();
-            }
+        if (actionsChannel == null) {
+            return;
+        }
+
+        long threadPermission = Permission.MANAGE_THREADS.getRawValue();
+        for (Member botHelper : nonGameBothelpers) {
+            actionsChannel.getManager()
+                .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
+                .complete();
         }
     }
 }
