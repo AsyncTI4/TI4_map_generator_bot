@@ -1,6 +1,7 @@
 package ti4.buttons.handlers.relics;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.service.ComponentActionService;
@@ -21,6 +22,7 @@ public class DynamicRelicButtonHandler {
         this.messageService = messageService;
     }
 
+    @ButtonHandler(value = "drawRelicFromFrag", handlerClass = DynamicRelicButtonHandler.class)
     public void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
         relicService.drawRelicAndNotify(player, event, game);
         componentActionService.serveNextComponentActionButtons(event, game, player);

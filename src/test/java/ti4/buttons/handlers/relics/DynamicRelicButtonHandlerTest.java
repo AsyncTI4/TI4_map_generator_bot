@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.service.ComponentActionService;
 import ti4.service.MessageService;
 import ti4.service.RelicService;
+import ti4.service.ServiceRegistry;
 import ti4.testUtils.BaseTi4Test;
 import ti4.stubs.TestGame;
 import ti4.stubs.TestPlayer;
@@ -39,8 +40,8 @@ class DynamicRelicButtonHandlerTest extends BaseTi4Test {
     @BeforeEach
     void setUp() {
         handler = new DynamicRelicButtonHandler(relicService, componentActionService, messageService);
-        event = mock();
-        channel = mock();
+        event = mock(ButtonInteractionEvent.class);
+        channel = mock(TextChannel.class);
         game = new TestGame(channel);
         game.setName("testGame");
         player = new TestPlayer("testUserId", "testUserName", game, channel);
@@ -48,7 +49,7 @@ class DynamicRelicButtonHandlerTest extends BaseTi4Test {
     }
 
     @Test
-    void drawRelicFromFrag_shouldServeNextComponentActionButtons() {
+    void drawRelicFromFrag_shouldCallAllServices() {
         // When
         handler.drawRelicFromFrag(event, player, game);
 
@@ -57,4 +58,5 @@ class DynamicRelicButtonHandlerTest extends BaseTi4Test {
         verify(componentActionService).serveNextComponentActionButtons(event, game, player);
         verify(messageService).deleteMessage(event);
     }
+
 }

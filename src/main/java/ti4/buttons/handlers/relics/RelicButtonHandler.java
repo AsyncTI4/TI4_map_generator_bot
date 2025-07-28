@@ -16,7 +16,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
-import ti4.service.ServiceRegistry;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -78,12 +77,6 @@ class RelicButtonHandler {
         MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message,
             relic.getRepresentationEmbed());
         ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("drawRelicFromFrag")
-    static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
-        DynamicRelicButtonHandler handler = ServiceRegistry.getDynamicRelicButtonHandler();
-        handler.drawRelicFromFrag(event, player, game);
     }
 
     @ButtonHandler("neuraloopPart1")
