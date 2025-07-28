@@ -1736,7 +1736,6 @@ public class AgendaHelper {
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
-            String message = getSummaryOfVotes(game, true) + "\n" + realIdentity + " up to vote! Resolve using buttons.";
             int[] voteInfo = getVoteTotal(nextInLine, game);
             int counter = 0;
             boolean willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
@@ -1780,6 +1779,7 @@ public class AgendaHelper {
                 counter += 1;
             }
 
+            String message = getSummaryOfVotes(game, true) + "\n" + realIdentity + " up to vote! Resolve using buttons.";
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
             Button Vote = Buttons.green(finChecker + "vote", pFaction + " Choose To Vote");

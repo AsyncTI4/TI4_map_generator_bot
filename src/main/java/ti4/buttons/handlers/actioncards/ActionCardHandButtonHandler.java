@@ -232,7 +232,7 @@ class ActionCardHandButtonHandler {
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = "Drew 2 action cards with **Scheming**. Please discard 1 action card.";
+            message = "drew 2 action cards with **Scheming**. Please discard 1 action card.";
         }
         ReactionService.addReaction(event, game, player, true, false, message);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
@@ -246,8 +246,8 @@ class ActionCardHandButtonHandler {
     static void draw2AC(ButtonInteractionEvent event, Player player, Game game) {
         boolean hasSchemingAbility = player.hasAbility("scheming");
         String message = hasSchemingAbility
-            ? "Drew 3 Action Cards (**Scheming**) - please discard 1 action card from your hand"
-            : "Drew 2 Action cards";
+            ? "drew 3 Action Cards (**Scheming**) - please discard 1 action card from your hand"
+            : "drew 2 Action cards";
         int count = hasSchemingAbility ? 3 : 2;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);
