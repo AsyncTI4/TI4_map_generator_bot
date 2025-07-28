@@ -45,7 +45,7 @@ class WipeTurnTime extends Subcommand {
             if (player != null) {
                 player.setTotalTurnTime(0);
                 player.setNumberOfTurns(0);
-                GameManager.save(g, EventAuditService.getReason(event, g.isFowMode()));
+                GameManager.save(g, EventAuditService.getReason(event, g.isFowMode())); //TODO: We should be locking since we're saving
             }
         }
 
