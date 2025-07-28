@@ -9,6 +9,11 @@ import java.util.Set;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.draft.DraftBag;
 import ti4.draft.DraftItem;
 import ti4.helpers.Units;
@@ -16,8 +21,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.map.persistence.GameManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.service.game.CreateGameService;
 import ti4.service.fow.GMService;
 
 @UtilityClass
@@ -209,6 +216,47 @@ public class MigrationHelper {
         } else if (game.getTableTalkChannel() != null) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), playerMsg);
         }
+        return true;
+    }
+
+    public static boolean addBothelperPermissions(Game game) {
+        if (game.isHasEnded()) return false;
+        if (!game.getStoredValue("addedBothelpers").isEmpty()) return false;
+        if (game.isFowMode()) return false;
+
+        game.setStoredValue("addedBothelpers", "Yes");
+        GameManager.save(game, "adding bothelper permissions");
+
+        Guild guild = game.getGuild();
+        if (guild == null) return false;
+
+        Role bothelperRole = CreateGameService.getRole("Bothelper", guild);
+        if (bothelperRole == null) return false;
+
+        long threadPermission = Permission.MANAGE_THREADS.getRawValue();
+        List<Member> nonGameBothelpers = new ArrayList<>();
+        for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
+            boolean inGame = false;
+            for (Player member : game.getRealPlayers()) {
+                if (member.getUserID().equalsIgnoreCase(botHelper.getId())) {
+                    inGame = true;
+                    break;
+                }
+            }
+            if (!inGame) {
+                nonGameBothelpers.add(botHelper);
+            }
+        }
+
+        TextChannel actionsChannel = game.getMainGameChannel();
+        if (actionsChannel != null) {
+            for (Member botHelper : nonGameBothelpers) {
+                actionsChannel.getManager()
+                    .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
+                    .complete();
+            }
+        }
+
         return true;
     }
 }

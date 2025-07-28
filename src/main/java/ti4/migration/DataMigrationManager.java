@@ -48,6 +48,7 @@ public class DataMigrationManager {
         migrations.put("removeWekkersAbsolsPoliticalSecret_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecrets);
         migrations.put("removeWekkersAbsolsPoliticalSecretAgain_220125", MigrationHelper::removeWekkersAbsolsPoliticalSecretsAgain);
         migrations.put("warnGamesWithOldDisplaceMap_270525", MigrationHelper::warnGamesWithOldDisplaceMap);
+        migrations.put("addBothelperPermissions_280725", MigrationHelper::addBothelperPermissions);
         //migrations.put("exampleMigration_061023", DataMigrationManager::exampleMigration_061023);
     }
 
