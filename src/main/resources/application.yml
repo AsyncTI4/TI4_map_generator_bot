@@ -1,0 +1,13 @@
+bucket4j:
+  enabled: true
+  filter-order: 2
+  cache-to-use: caffeine
+  filters:
+    - url: /api/**
+      cache-name: buckets
+      rate-limits:
+        - expression: "request.getHeader('Authorization') != null ? request.getHeader('Authorization') : request.getRemoteAddr()"
+          bandwidths:
+            - capacity: 30
+              time: 1
+              unit: minutes
