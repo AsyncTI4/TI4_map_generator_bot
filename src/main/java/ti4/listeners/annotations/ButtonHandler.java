@@ -36,4 +36,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ButtonHandler {
     String value();
     boolean save() default true;
+    Class<?> handlerClass() default Void.class;
 }
