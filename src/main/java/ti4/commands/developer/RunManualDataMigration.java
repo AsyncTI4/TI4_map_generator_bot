@@ -39,7 +39,7 @@ class RunManualDataMigration extends Subcommand {
             Boolean changesMade = (Boolean) method.invoke(null, game);
             if (changesMade) {
                 game.addMigration(migrationName);
-                GameManager.save(game, "Migration ran: " + migrationName);
+                GameManager.save(game, "Migration ran: " + migrationName); //TODO: We should be locking since we're saving
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName());
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully ran migration " + migrationName + " for map " + game.getName() + " but no changes were required.");
