@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
@@ -17,6 +16,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.RelicModel;
+import ti4.service.ServiceRegistry;
 import ti4.service.emoji.ExploreEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -82,9 +82,8 @@ class RelicButtonHandler {
 
     @ButtonHandler("drawRelicFromFrag")
     static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
-        RelicHelper.drawRelicAndNotify(player, event, game);
-        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
-        ButtonHelper.deleteMessage(event);
+        DynamicRelicButtonHandler handler = ServiceRegistry.getDynamicRelicButtonHandler();
+        handler.drawRelicFromFrag(event, player, game);
     }
 
     @ButtonHandler("neuraloopPart1")
