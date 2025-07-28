@@ -6,31 +6,41 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.containsString;
 
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.spring.service.ActionCardDeckService;
 import ti4.spring.service.auth.RequestContext;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
+import ti4.spring.service.auth.GameSecurityService;
 
-@SpringBootTest(classes = ActionCardDeckController.class)
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@WebMvcTest(controllers = ActionCardDeckController.class)
+@AutoConfigureMockMvc
 class ActionCardDeckControllerTest {
 
     @MockBean
     private ActionCardDeckService deckService;
 
     @Autowired
-    private ActionCardDeckController controller;
+    private MockMvc mockMvc;
+
+    @MockBean(name = "security")
+    private GameSecurityService security;
     private Game game;
     private Player player;
 
@@ -54,10 +64,14 @@ class ActionCardDeckControllerTest {
     }
 
     @Test
-    void shuffleCallsServiceAndReturnsOk() {
-        ResponseEntity<String> response = controller.shuffle("game1");
+    void shuffleCallsServiceAndReturnsOk() throws Exception {
+        when(security.canAccessGame("game1")).thenReturn(true);
+
+        mockMvc.perform(post("/api/game/game1/action-card-deck/shuffle"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString("Shuffled")));
+
         verify(deckService).shuffle(game, player);
-        assertThat(response.getBody()).contains("Shuffled");
     }
 
     private static void setRequestContextGame(Game game) throws Exception {

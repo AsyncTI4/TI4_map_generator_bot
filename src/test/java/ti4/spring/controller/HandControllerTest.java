@@ -7,31 +7,38 @@ import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import ti4.map.Game;
 import ti4.map.Player;
-import ti4.spring.model.GetHandResponse;
 import ti4.spring.service.HandService;
 import ti4.spring.service.auth.RequestContext;
+import ti4.spring.service.auth.GameSecurityService;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = HandController.class)
+@WebMvcTest(controllers = HandController.class)
+@AutoConfigureMockMvc
 class HandControllerTest {
 
     @MockBean
     private HandService handService;
 
     @Autowired
-    private HandController controller;
+    private MockMvc mockMvc;
+
+    @MockBean(name = "security")
+    private GameSecurityService security;
     private Game game;
     private Player player;
 
@@ -59,11 +66,14 @@ class HandControllerTest {
     }
 
     @Test
-    void getReturnsPlayerHand() {
-        GetHandResponse response = controller.get("testGame");
-        assertThat(response.actionCards()).containsExactly("ac");
-        assertThat(response.secretObjectives()).containsExactly("so");
-        assertThat(response.promissoryNotes()).containsExactly("pn");
+    void getReturnsPlayerHand() throws Exception {
+        when(security.canAccessGame("testGame")).thenReturn(true);
+
+        mockMvc.perform(get("/api/game/testGame/hand"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.actionCards[0]").value("ac"))
+            .andExpect(jsonPath("$.secretObjectives[0]").value("so"))
+            .andExpect(jsonPath("$.promissoryNotes[0]").value("pn"));
     }
 
     private static void setRequestContextGame(Game game) throws Exception {
