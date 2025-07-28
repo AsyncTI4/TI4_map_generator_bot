@@ -2,6 +2,8 @@ package ti4.spring.service;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.map.Game;
@@ -10,8 +12,11 @@ import ti4.map.Player;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(classes = ActionCardDeckService.class)
 class ActionCardDeckServiceTest {
-    private final ActionCardDeckService service = new ActionCardDeckService();
+
+    @Autowired
+    private ActionCardDeckService service;
 
     @Test
     void shuffleCallsGameShuffle() {

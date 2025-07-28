@@ -7,6 +7,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -20,16 +23,19 @@ import ti4.spring.service.auth.RequestContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
+@SpringBootTest(classes = ActionCardDeckController.class)
 class ActionCardDeckControllerTest {
+
+    @MockBean
     private ActionCardDeckService deckService;
+
+    @Autowired
     private ActionCardDeckController controller;
     private Game game;
     private Player player;
 
     @BeforeEach
     void setup() throws Exception {
-        deckService = Mockito.mock(ActionCardDeckService.class);
-        controller = new ActionCardDeckController(deckService);
         game = new Game();
         game.setName("game1");
         player = new Player("uid", "user", game);

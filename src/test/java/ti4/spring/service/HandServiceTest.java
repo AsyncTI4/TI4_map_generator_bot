@@ -5,14 +5,19 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import ti4.map.Player;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(classes = HandService.class)
 class HandServiceTest {
-    private final HandService service = new HandService();
+
+    @Autowired
+    private HandService service;
 
     @Test
     void returnsActionCards() {

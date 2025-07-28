@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentMap;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,10 +23,14 @@ import ti4.spring.exception.UserNotInGameForbiddenException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@SpringBootTest(classes = GameSecurityService.class)
 class GameSecurityServiceTest {
     private Game game;
     private Player player;
     private ConcurrentMap<String, ManagedGame> gameMap;
+
+    @Autowired
+    private GameSecurityService service;
 
     @BeforeEach
     void setup() throws Exception {
@@ -54,7 +60,6 @@ class GameSecurityServiceTest {
     @Test
     void throwsForInvalidGame() {
         gameMap.remove("gameSec");
-        GameSecurityService service = new GameSecurityService();
         assertThatThrownBy(() -> service.canAccessGame("bad"))
             .isInstanceOf(InvalidGameNameException.class);
     }
@@ -62,14 +67,12 @@ class GameSecurityServiceTest {
     @Test
     void throwsWhenUserNotInGame() {
         game.setPlayers(Map.of());
-        GameSecurityService service = new GameSecurityService();
         assertThatThrownBy(() -> service.canAccessGame("gameSec"))
             .isInstanceOf(UserNotInGameForbiddenException.class);
     }
 
     @Test
     void returnsTrueForValidUser() {
-        GameSecurityService service = new GameSecurityService();
         assertThat(service.canAccessGame("gameSec")).isTrue();
     }
 }

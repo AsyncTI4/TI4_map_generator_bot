@@ -8,6 +8,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,16 +24,19 @@ import ti4.spring.service.auth.RequestContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(classes = HandController.class)
 class HandControllerTest {
+
+    @MockBean
     private HandService handService;
+
+    @Autowired
     private HandController controller;
     private Game game;
     private Player player;
 
     @BeforeEach
     void setup() throws Exception {
-        handService = Mockito.mock(HandService.class);
-        controller = new HandController(handService);
         game = new Game();
         game.setName("testGame");
         player = new Player("uid", "user", game);
