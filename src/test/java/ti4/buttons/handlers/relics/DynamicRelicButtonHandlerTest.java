@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.service.ComponentActionService;
 import ti4.service.MessageService;
 import ti4.service.RelicService;
-import ti4.service.ServiceRegistry;
 import ti4.testUtils.BaseTi4Test;
 import ti4.stubs.TestGame;
 import ti4.stubs.TestPlayer;
@@ -40,8 +39,8 @@ class DynamicRelicButtonHandlerTest extends BaseTi4Test {
     @BeforeEach
     void setUp() {
         handler = new DynamicRelicButtonHandler(relicService, componentActionService, messageService);
-        event = mock(ButtonInteractionEvent.class);
-        channel = mock(TextChannel.class);
+        event = mock();
+        channel = mock();
         game = new TestGame(channel);
         game.setName("testGame");
         player = new TestPlayer("testUserId", "testUserName", game, channel);

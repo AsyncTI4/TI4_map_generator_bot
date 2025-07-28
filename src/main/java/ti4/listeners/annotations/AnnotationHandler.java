@@ -19,6 +19,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+
+import org.springframework.context.ApplicationContext;
+
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.listeners.context.ButtonContext;
@@ -29,11 +32,10 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.BotLogger.LogMessageOrigin;
-import ti4.service.HandlerRegistry;
 
 public class AnnotationHandler {
     @Setter
-    private static HandlerRegistry handlerRegistry;
+    private static ApplicationContext applicationContext;
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
         boolean hasComponentID = false;
@@ -147,7 +149,7 @@ public class AnnotationHandler {
         };
     }
 
-    private static <T extends ListenerContext> Consumer<T> buildConsumer(Method method, Function<T, List<Object>> getArgs, boolean save, Class<?> handlerClassType) {
+    private static <T extends ListenerContext> Consumer<T> buildConsumer(Method method, Function<T, List<Object>> getArgs, boolean save) {
         return context -> {
             List<Object> args = getArgs.apply(context);
             try {
@@ -156,23 +158,16 @@ public class AnnotationHandler {
 
                 Object instance = null;
                 if (!Modifier.isStatic(method.getModifiers())) {
-                    // Instance method - get handler from registry
-                    if (handlerClassType != null && handlerClassType != Void.class) {
-                        if (handlerRegistry == null) {
-                            throw new IllegalStateException("HandlerRegistry not initialized. Call AnnotationHandler.setHandlerRegistry() during startup.");
+                    // Fallback: try to get instance of declaring class
+                    if (applicationContext != null) {
+                        instance = applicationContext.getBean(method.getDeclaringClass());
+                        if (instance == null) {
+                            throw new IllegalStateException("No Spring bean found for " +
+                                    method.getDeclaringClass().getName() +
+                                    ". Make sure it's annotated with @Component/@Service and Spring can find it.");
                         }
-                        instance = handlerRegistry.getHandler(handlerClassType);
                     } else {
-                        // Fallback: try to get instance of declaring class
-                        if (handlerRegistry != null) {
-                            instance = handlerRegistry.getHandler(method.getDeclaringClass());
-                        }
-                    }
-
-                    if (instance == null) {
-                        throw new IllegalStateException("No handler registered for " +
-                            (handlerClassType != null && handlerClassType != Void.class ? handlerClassType.getName() : method.getDeclaringClass().getName()) +
-                            ". Register it in ServiceRegistry.initialize() and make sure to call AnnotationHandler.setHandlerRegistry().");
+                        throw new IllegalStateException("ApplicationContext not initialized. Call AnnotationHandler.setApplicationContext() during startup.");
                     }
                 }
 
@@ -258,18 +253,16 @@ public class AnnotationHandler {
                     for (H handler : handlers) {
                         String val = null;
                         Boolean save = true;
-                        Class<?> handlerClassType = null;
 
                         if (handler instanceof ButtonHandler bh) {
                             val = bh.value();
                             save = bh.save();
-                            handlerClassType = bh.handlerClass();
                         }
                         if (handler instanceof SelectionHandler sh) val = sh.value();
                         if (handler instanceof ModalHandler mh) val = mh.value();
                         if (val == null) continue;
 
-                        Consumer<C> consumer = buildConsumer(method, argGetter, save, handlerClassType);
+                        Consumer<C> consumer = buildConsumer(method, argGetter, save);
                         consumers.put(val, consumer);
                     }
                 }

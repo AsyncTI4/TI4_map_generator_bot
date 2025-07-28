@@ -64,7 +64,6 @@ import ti4.map.persistence.GameManager;
 import ti4.message.BotLogger;
 import ti4.migration.DataMigrationManager;
 import ti4.selections.SelectionManager;
-import ti4.service.ServiceRegistry;
 import ti4.service.emoji.ApplicationEmojiService;
 import ti4.service.statistics.StatisticsPipeline;
 import ti4.settings.GlobalSettings;
@@ -255,9 +254,6 @@ public class AsyncTI4DiscordBot {
         SelectionManager.init();
         initializeWhitelistedRoles();
         TIGLHelper.validateTIGLness();
-
-        // Initialize service registry for dependency injection
-        ServiceRegistry.initialize();
 
         jda.getPresence().setActivity(Activity.customStatus("STARTING UP: Loading Games"));
 
