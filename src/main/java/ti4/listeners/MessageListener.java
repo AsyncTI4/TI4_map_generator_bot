@@ -135,7 +135,7 @@ public class MessageListener extends ListenerAdapter {
         Game game = GameManager.getManagedGame(gameName).getGame();
         Player player = getPlayer(event, game);
         RoundSummaryHelper.storeEndOfRoundSummary(game, player, messageBeginning, messageContent, true, event.getChannel());
-        GameManager.save(game, "End of round summary.");
+        GameManager.save(game, "End of round summary."); //TODO: We should be locking since we're saving. Convert to ListenerContext?
         return true;
     }
 
@@ -171,7 +171,7 @@ public class MessageListener extends ListenerAdapter {
 
         if ("futureme".equals(receivingColorOrFaction)) {
             whisperToFutureMe(event, game, sender);
-            GameManager.save(game, "Whisper to future by " + sender.getUserName());
+            GameManager.save(game, "Whisper to future by " + sender.getUserName()); //TODO: We should be locking since we're saving
             return true;
         }
 
@@ -211,7 +211,7 @@ public class MessageListener extends ListenerAdapter {
             WhisperService.sendWhisper(game, sender, receiver, messageContent, "n", event.getChannel(), event.getGuild());
             message.delete().queue();
         }
-        GameManager.save(game, "Whisper");
+        GameManager.save(game, "Whisper"); //TODO: We should be locking since we're saving
         return true;
     }
 
@@ -254,7 +254,7 @@ public class MessageListener extends ListenerAdapter {
                     });
             }
         }
-        if (managedGame == null || (!managedGame.isFactionReactMode() && !managedGame.isColorReactMode() && !managedGame.isStratReactMode()) || managedGame.isFowMode()) {
+        if (!managedGame.isFactionReactMode() && !managedGame.isColorReactMode() && !managedGame.isStratReactMode() || managedGame.isFowMode()) {
             return false;
         }
         Game game = managedGame.getGame();
