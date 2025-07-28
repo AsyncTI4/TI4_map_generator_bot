@@ -1,8 +1,13 @@
 package ti4.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,8 +19,10 @@ import ti4.helpers.DisplayType;
 import ti4.image.MapRenderPipeline;
 import ti4.map.Game;
 import ti4.map.Player;
+import ti4.map.persistence.GameManager;
 import ti4.message.MessageHelper;
 import ti4.service.fow.UserOverridenGenericInteractionCreateEvent;
+import ti4.service.game.CreateGameService;
 
 @UtilityClass
 public class ShowGameService {
@@ -44,6 +51,40 @@ public class ShowGameService {
                 buttonEvent.getHook().deleteOriginal().queue();
             }
         });
+        // TODO: Delete this? At least should probably be a cron or migration
+        if (event instanceof ButtonInteractionEvent bEvent && game.getStoredValue("addedBothelpers").isEmpty() && !game.isFowMode()) {
+            game.setStoredValue("addedBothelpers", "Yes");
+            GameManager.save(game, "adding bothelper permissions");
+            List<Member> nonGameBothelpers = new ArrayList<>();
+            Guild guild = bEvent.getGuild();
+            Role bothelperRole = CreateGameService.getRole("Bothelper", bEvent.getGuild());
+            long threadPermission = Permission.MANAGE_THREADS.getRawValue();
+            if (bothelperRole != null) {
+                for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
+                    boolean inGame = false;
+                    for (Player member : game.getRealPlayers()) {
+                        if (member.getUserID().equalsIgnoreCase(botHelper.getId())) {
+                            inGame = true;
+                        }
+                    }
+                    if (!inGame) {
+                        nonGameBothelpers.add(botHelper);
+                    }
+                }
+            }
+            // CREATE TABLETALK CHANNEL
+
+            // CREATE ACTIONS CHANNEL
+            TextChannel actionsChannel = game.getMainGameChannel();
+            if (actionsChannel != null) {
+                for (Member botHelper : nonGameBothelpers) {
+
+                    actionsChannel.getManager()
+                        .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
+                        .complete();
+                }
+            }
+        }
     }
 
     public static void ephemeralShowGame(Game game, GenericInteractionCreateEvent event, DisplayType displayType) {
