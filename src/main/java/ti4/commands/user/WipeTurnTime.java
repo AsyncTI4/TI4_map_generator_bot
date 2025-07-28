@@ -2,14 +2,12 @@ package ti4.commands.user;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.GameStateSubcommand;
+import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -19,10 +17,10 @@ import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
 import ti4.service.event.EventAuditService;
 
-class WipeTurnTime extends GameStateSubcommand {
+class WipeTurnTime extends Subcommand {
 
     public WipeTurnTime() {
-        super(Constants.WIPE_TURN_TIME, "Wipe your turn time in all games", false, false);
+        super(Constants.WIPE_TURN_TIME, "Wipe your turn time in all games");
     }
 
     @Override
@@ -38,7 +36,6 @@ class WipeTurnTime extends GameStateSubcommand {
             .distinct()
             .toList();
 
-        Map<String, Map.Entry<Integer, Long>> playerTurnTimes = new HashMap<>();
         for (ManagedGame game : userGames) {
             if (game.getGame().isFowMode()) {
                 continue;
