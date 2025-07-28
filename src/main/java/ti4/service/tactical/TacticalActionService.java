@@ -69,7 +69,7 @@ public class TacticalActionService {
             RegexService.runMatcher(rx, uhKey, matcher -> {
                 Tile tile = game.getTileByPosition(matcher.group("pos"));
                 reverseTileUnitMovement(event, game, player, tile, "Move", true);
-            }, event);
+            });
         }
 
         // Handle output
