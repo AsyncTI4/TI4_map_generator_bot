@@ -51,6 +51,7 @@ public class ShowGameService {
                 buttonEvent.getHook().deleteOriginal().queue();
             }
         });
+        // TODO: Delete this? At least should probably be a cron or migration
         if (event instanceof ButtonInteractionEvent bEvent && game.getStoredValue("addedBothelpers").isEmpty() && !game.isFowMode()) {
             game.setStoredValue("addedBothelpers", "Yes");
             GameManager.save(game, "adding bothelper permissions");

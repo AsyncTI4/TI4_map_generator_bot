@@ -35,6 +35,7 @@ import ti4.map.UnitHolder;
 import ti4.map.persistence.GameManager;
 import ti4.message.BotLogger;
 
+@Deprecated // old and probably broken
 public class ConvertTTPGtoAsync {
 
     private static final List<String> validColors = new ArrayList<>() {

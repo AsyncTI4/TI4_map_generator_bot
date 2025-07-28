@@ -44,7 +44,7 @@ public class EndOldGamesCron {
             BotLogger.info("Game: " + game.getName() + " has not been modified since ~" + lastModifiedDate +
                 " - the game flag `hasEnded` has been set to true");
             game.setHasEnded(true);
-            GameManager.save(game, "Game automatically ended");
+            GameManager.save(game, "Game automatically ended"); //TODO: We should be locking since we're saving
         }
     }
 }

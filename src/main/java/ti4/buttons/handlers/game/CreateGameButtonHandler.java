@@ -92,7 +92,7 @@ class CreateGameButtonHandler {
         event.getMessage().delete().queue();
         game = CreateGameService.createGameChannels(members, event, gameSillyName, gameName, gameOwner, categoryChannel);
         if (game != null) {
-            GameManager.save(game, "Created game channels");
+            GameManager.save(game, "Created game channels"); //TODO: We should be locking since we're saving? Maybe not here
         }
     }
 
