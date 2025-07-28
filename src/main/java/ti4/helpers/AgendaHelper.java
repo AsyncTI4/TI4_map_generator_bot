@@ -1736,7 +1736,7 @@ public class AgendaHelper {
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
-            String message = getSummaryOfVotes(game, true) + "\n" + realIdentity + " up to vote! Resolve using buttons.";
+
             int[] voteInfo = getVoteTotal(nextInLine, game);
             int counter = 0;
             boolean willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
@@ -1798,7 +1798,7 @@ public class AgendaHelper {
             } catch (Exception e) {
                 BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not update active player", e);
             }
-
+            String message = getSummaryOfVotes(game, true) + "\n" + realIdentity + " up to vote! Resolve using buttons.";
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
             if (game.isFowMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
