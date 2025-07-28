@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
-import ti4.helpers.ComponentActionHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.image.Mapper;
@@ -77,13 +76,6 @@ class RelicButtonHandler {
             + relic.getName() + "_.";
         MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), message,
             relic.getRepresentationEmbed());
-        ButtonHelper.deleteMessage(event);
-    }
-
-    @ButtonHandler("drawRelicFromFrag")
-    static void drawRelicFromFrag(ButtonInteractionEvent event, Player player, Game game) {
-        RelicHelper.drawRelicAndNotify(player, event, game);
-        ComponentActionHelper.serveNextComponentActionButtons(event, game, player);
         ButtonHelper.deleteMessage(event);
     }
 

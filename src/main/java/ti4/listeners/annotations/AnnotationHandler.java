@@ -13,11 +13,15 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import lombok.Setter;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+
+import org.springframework.context.ApplicationContext;
+
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.listeners.context.ButtonContext;
@@ -30,6 +34,8 @@ import ti4.message.BotLogger;
 import ti4.message.BotLogger.LogMessageOrigin;
 
 public class AnnotationHandler {
+    @Setter
+    private static ApplicationContext applicationContext;
 
     private static <C extends ListenerContext> boolean validateParams(Method method, Class<C> contextClass) {
         boolean hasComponentID = false;
@@ -149,7 +155,22 @@ public class AnnotationHandler {
             try {
                 method.setAccessible(true);
                 context.setShouldSave(save);
-                method.invoke(null, args.toArray());
+
+                Object instance = null;
+                if (!Modifier.isStatic(method.getModifiers())) {
+                    if (applicationContext != null) {
+                        instance = applicationContext.getBean(method.getDeclaringClass());
+                        if (instance == null) {
+                            throw new IllegalStateException("No Spring bean found for " +
+                                    method.getDeclaringClass().getName() +
+                                    ". Make sure it's annotated with @Component/@Service and Spring can find it.");
+                        }
+                    } else {
+                        throw new IllegalStateException("ApplicationContext not initialized. Call AnnotationHandler.setApplicationContext() during startup.");
+                    }
+                }
+
+                method.invoke(instance, args.toArray());
             } catch (InvocationTargetException e) {
                 LogMessageOrigin origin = null;
                 for (Object arg : args) {
@@ -220,12 +241,6 @@ public class AnnotationHandler {
                     List<H> handlers = Arrays.asList(method.getAnnotationsByType(handlerClass));
                     if (handlers.isEmpty()) continue;
 
-                    String methodName = klass.getName() + "." + method.getName();
-                    if (!Modifier.isStatic(method.getModifiers())) {
-                        BotLogger.warning("Method `" + methodName + "` is not static. Please fix it " + Constants.jazzPing());
-                        continue;
-                    }
-
                     Function<C, List<Object>> argGetter = getArgs(method, contextClass);
                     if (argGetter == null) {
                         continue;
@@ -234,6 +249,7 @@ public class AnnotationHandler {
                     for (H handler : handlers) {
                         String val = null;
                         Boolean save = true;
+
                         if (handler instanceof ButtonHandler bh) {
                             val = bh.value();
                             save = bh.save();
@@ -241,6 +257,7 @@ public class AnnotationHandler {
                         if (handler instanceof SelectionHandler sh) val = sh.value();
                         if (handler instanceof ModalHandler mh) val = mh.value();
                         if (val == null) continue;
+
                         Consumer<C> consumer = buildConsumer(method, argGetter, save);
                         consumers.put(val, consumer);
                     }

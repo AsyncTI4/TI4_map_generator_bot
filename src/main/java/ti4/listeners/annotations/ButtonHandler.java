@@ -16,6 +16,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * <p>ButtonHandler(string) where buttonID.startsWith(string)</p>
+ *
+ * <p><strong>Usage Examples:</strong></p>
+ * <pre>
+ * // Static method (traditional)
+ * {@code @ButtonHandler("myButton")}
+ * static void handleMyButton(ButtonInteractionEvent event, Player player, Game game) { ... }
+ *
+ * // Instance method with Spring DI (recommended for new handlers)
+ * {@code @ButtonHandler("myButton")}  // handlerClass auto-detected from declaring class
+ * public void handleMyButton(ButtonInteractionEvent event, Player player, Game game) { ... }
+ * </pre>
+ *
  * <p>Supported Variables:</p>
  * <ul>
  *   <li>events<ul>
