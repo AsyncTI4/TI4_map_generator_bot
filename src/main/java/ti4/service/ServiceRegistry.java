@@ -35,7 +35,6 @@ public class ServiceRegistry {
         handlerRegistry = new HandlerRegistry();
         handlerRegistry.registerHandler(DynamicRelicButtonHandler.class, dynamicRelicButtonHandler);
 
-        // Initialize the annotation system with our registry
         AnnotationHandler.setHandlerRegistry(handlerRegistry);
     }
 
