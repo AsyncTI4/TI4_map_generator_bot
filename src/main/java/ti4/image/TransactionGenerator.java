@@ -2,8 +2,8 @@ package ti4.image;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.function.Function;
 import java.util.List;
+import java.util.function.Function;
 
 import ti4.ResourceHelper;
 import ti4.helpers.Helper;
