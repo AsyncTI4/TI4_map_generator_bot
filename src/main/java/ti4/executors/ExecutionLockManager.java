@@ -5,6 +5,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -49,6 +50,8 @@ public class ExecutionLockManager {
                 if (messageChannel != null) {
                     MessageHelper.sendMessageToChannel(messageChannel,
                         "The bot hasn't finished processing the last task for " + lockName + ". Please wait.");
+                } else {
+                    BotLogger.warning("The bot hasn't finished processing the last task for " + lockName + ".");
                 }
                 return;
             }

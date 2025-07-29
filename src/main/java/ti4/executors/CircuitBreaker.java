@@ -49,12 +49,12 @@ public class CircuitBreaker {
     }
 
     public static boolean checkIsOpenAndPostWarningIfTrue(MessageChannel messageChannel) {
-        if (CircuitBreaker.isOpen()) {
+        if (open) {
             Duration durationUntilCircuitCloses = CircuitBreaker.getDurationUtilClose();
             MessageHelper.sendMessageToChannel(messageChannel, "The bot is taking a breather. Try again in " +
                 durationUntilCircuitCloses.toMinutes() + " minutes and " + durationUntilCircuitCloses.getSeconds() % 60 + " seconds.");
         }
-        return isOpen();
+        return open;
     }
 
     private static Duration getDurationUtilClose() {
