@@ -8,6 +8,8 @@ import java.util.Objects;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
+import ti4.executors.ExecutionLockManager;
+import ti4.executors.GameLockManager;
 import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -36,19 +38,27 @@ class WipeTurnTime extends Subcommand {
             .distinct()
             .toList();
 
-        for (ManagedGame game : userGames) {
-            if (game.getGame().isFowMode()) {
+        for (ManagedGame managedGame : userGames) {
+            boolean isFowMode = managedGame.isFowMode();
+            if (isFowMode) {
                 continue;
             }
-            Game g = game.getGame();
-            Player player = g.getPlayer(userP.getId());
-            if (player != null) {
-                player.setTotalTurnTime(0);
-                player.setNumberOfTurns(0);
-                GameManager.save(g, EventAuditService.getReason(event, g.isFowMode())); //TODO: We should be locking since we're saving
-            }
+            GameLockManager.runWithLockSaveAndRelease(
+                managedGame.getName(),
+                ExecutionLockManager.LockType.WRITE,
+                EventAuditService.getReason(event, isFowMode),
+                game -> wipeTurnTime(game, userP.getId(), event));
         }
 
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
+    }
+
+    private void wipeTurnTime(Game game, String playerId, SlashCommandInteractionEvent event) {
+        Player player = game.getPlayer(playerId);
+        if (player != null) {
+            player.setTotalTurnTime(0);
+            player.setNumberOfTurns(0);
+        }
         MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
     }
 }
