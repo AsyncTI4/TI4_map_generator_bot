@@ -26,11 +26,15 @@ public class FastScFollowCron {
     }
 
     private static void handleFastScFollow() {
+        BotLogger.info("Running FastScFollowCron");
+
         GameManager.getManagedGames().stream()
             .filter(not(ManagedGame::isHasEnded))
             .map(ManagedGame::getGame)
             .filter(Game::isFastSCFollowMode)
             .forEach(FastScFollowCron::handleFastScFollow);
+
+        BotLogger.info("Finished FastScFollowCron");
     }
 
     private static void handleFastScFollow(Game game) {

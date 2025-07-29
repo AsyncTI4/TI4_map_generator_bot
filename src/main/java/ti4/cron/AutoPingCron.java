@@ -88,6 +88,8 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
+        BotLogger.info("Running AutoPingCron.");
+
         removeEndedGamesFromAutoPingMetadata();
 
         GameManager.getManagedGames().stream()
@@ -95,6 +97,8 @@ public class AutoPingCron {
             .map(ManagedGame::getGame)
             .filter(game -> game.getAutoPingStatus() && !game.isTemporaryPingDisable())
             .forEach(AutoPingCron::autoPingGame);
+
+        BotLogger.info("Finished AutoPingCron.");
     }
 
     private static void removeEndedGamesFromAutoPingMetadata() {
