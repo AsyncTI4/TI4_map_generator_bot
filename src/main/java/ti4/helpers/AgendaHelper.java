@@ -900,6 +900,7 @@ public class AgendaHelper {
         TextChannel watchParty = watchPartyChannel(game);
         String watchPartyPing = watchPartyPing(game);
         List<MessageChannel> watchPartyList = publish && watchParty != null ? List.of(watchParty) : null;
+        List<String> altMessages = watchPartyPing == null ? null : List.of(watchPartyPing);
 
         int rand = 6 + ThreadLocalRandom.current().nextInt(6);
         if (ThreadLocalRandom.current().nextInt(5) == 0) { // random chance for an extra long wait
@@ -909,7 +910,7 @@ public class AgendaHelper {
             resolveIxthianRoll(futureGame, publish && watchParty != null);
             return false;
         };
-        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, List.of(watchPartyPing));
+        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, altMessages);
     }
 
     private static void resolveIxthianRoll(Game game, boolean publish) {
