@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -218,7 +219,11 @@ class GameSaveService {
         writeCards(game.getLaws(), writer, Constants.LAW);
         writeCards(game.getEventsInEffect(), writer, Constants.EVENTS_IN_EFFECT);
 
-        writer.write(Constants.EVENTS + " " + String.join(",", game.getEvents()));
+        List<String> events = game.getEvents();
+        if (events == null) {
+            events = Collections.emptyList();
+        }
+        writer.write(Constants.EVENTS + " " + String.join(",", events));
         writer.write(System.lineSeparator());
         writeCards(game.getDiscardedEvents(), writer, Constants.DISCARDED_EVENTS);
 
