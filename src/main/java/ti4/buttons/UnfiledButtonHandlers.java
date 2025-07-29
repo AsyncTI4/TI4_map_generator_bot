@@ -725,7 +725,7 @@ public class UnfiledButtonHandlers {
                     continue;
                 }
                 if (FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
-                    summary += "-# " + p2.getFactionEmoji() + " " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, p2, planet) + " currently\n";
+                    summary += "-# " + p2.getFactionEmoji() + " currently has " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, p2, planet) + "\n";
                     break;
                 }
             }
