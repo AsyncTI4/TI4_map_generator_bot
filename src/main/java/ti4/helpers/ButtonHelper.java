@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +16,11 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -35,10 +42,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -108,8 +111,6 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -4530,6 +4531,11 @@ public class ButtonHelper {
                 }
             }
         }
+        if (buttonID.contains("deleteTheseButtons") && event instanceof ButtonInteractionEvent bevent) {
+            ButtonHelper.deleteAllButtons(bevent);
+        } else {
+            game.removeStoredValue("assignedBombardment" + player.getFaction());
+        }
         CombatRollService.secondHalfOfCombatRoll(player, game, event, game.getTileByPosition(pos), unitHolderName,
             rollType);
         if (buttonID.contains("bombardment") && ButtonHelper.isLawInPlay(game, "conventions")) {
@@ -4545,9 +4551,10 @@ public class ButtonHelper {
                     "This is a reminder that _Conventions of War_ is in play, so using BOMBARDMENT on cultural planets is illegal.");
             }
         }
-        if (buttonID.contains("bombard")) {
-            ButtonHelper.deleteTheOneButton(event);
-        }
+        // if (buttonID.contains("bombard")) {
+        //     ButtonHelper.deleteTheOneButton(event);
+        // }
+
     }
 
     public static String putInfWithMechsForStarforge(
@@ -5281,10 +5288,8 @@ public class ButtonHelper {
         List<ColorModel> unusedColors = game.getUnusedColors();
 
         List<ColorModel> factionPrefColors = Mapper.getFaction(factionId).getPreferredColours().stream().map(Mapper::getColor).toList();
-        for (ColorModel color : factionPrefColors)
-        {
-            if (color != null && unusedColors.contains(color))
-            {
+        for (ColorModel color : factionPrefColors) {
+            if (color != null && unusedColors.contains(color)) {
                 String colorName = color.getName();
                 Emoji colorEmoji = color.getEmoji();
                 String step3id = "setupStep3_" + userId + "_" + factionId + "_" + colorName;
@@ -5295,8 +5300,7 @@ public class ButtonHelper {
         List<ColorModel> unusedPrefColors = game.getUnusedColorsPreferringBase();
         unusedPrefColors = ColourHelper.sortColours(factionId, unusedPrefColors);
         for (ColorModel color : unusedPrefColors) {
-            if (factionPrefColors.contains(color))
-            {
+            if (factionPrefColors.contains(color)) {
                 continue;
             }
             String colorName = color.getName();
@@ -5422,9 +5426,8 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         deleteMessage(event);
         List<Button> buttons = getFactionSetupButtons(game, buttonID);
-        if (buttons.size() <= 25)
-        {
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+        if (buttons.size() <= 25) {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                 "Please tell the bot the desired faction.", buttons);
             return;
         }
@@ -5447,7 +5450,7 @@ public class ButtonHelper {
         }
         newButtons.add(
             Buttons.gray("setupStep2_" + userId + "_" + (maxBefore + numberOfHomes) + "!", "Get More Factions"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             "Please tell the bot the desired faction.", newButtons);
     }
 
@@ -5950,12 +5953,9 @@ public class ButtonHelper {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
                 }
                 msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0)
-                {
+                if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
-                }
-                else
-                {
+                } else {
                     msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
                 }
             }
