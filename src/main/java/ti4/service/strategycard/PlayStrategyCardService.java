@@ -391,8 +391,7 @@ public class PlayStrategyCardService {
                     }
                 } else {
                     if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship")
-                        && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock)
-                        .contains(p2.getHomeSystemTile())) {
+                            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {
                             message.addReaction(reactionEmoji2).queue();
@@ -405,8 +404,7 @@ public class PlayStrategyCardService {
                     }
                 }
                 if (!p2.hasFollowedSC(scToPlay)
-                    && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction())
-                    .isEmpty()) {
+                    && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction()).isEmpty()) {
                     game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
