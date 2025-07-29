@@ -21,6 +21,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
+import ti4.commands.planet.PlanetExhaust;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -68,6 +70,18 @@ public class CombatRollService {
         Player player, Game game, GenericInteractionCreateEvent event, Tile tile,
         String unitHolderName, CombatRollType rollType
     ) {
+        if (CombatRollType.bombardment == rollType) {
+            if (game.getStoredValue("assignedBombardment" + player.getFaction()).isEmpty()) {
+                UnfiledButtonHandlers.autoAssignAllBombardmentToAPlanet(player, game);
+            }
+            for (String planet : UnfiledButtonHandlers.getBombardablePlanets(player, game, tile)) {
+                if (game.getStoredValue("assignedBombardment" + player.getFaction()).contains(planet)) {
+                    game.setStoredValue("bombardmentTarget" + player.getFaction(), planet);
+                    secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, false);
+                }
+            }
+            return 0;
+        }
         return secondHalfOfCombatRoll(player, game, event, tile, unitHolderName, rollType, false);
     }
 
@@ -91,6 +105,28 @@ public class CombatRollService {
 
         Map<UnitModel, Integer> playerUnitsByQuantity = getUnitsInCombat(tile, combatOnHolder, player, event, rollType,
             game);
+        String bombardPlanet = "";
+        if (rollType == CombatRollType.bombardment && !game.getStoredValue("bombardmentTarget" + player.getFaction()).isEmpty()) {
+            bombardPlanet = game.getStoredValue("bombardmentTarget" + player.getFaction());
+            String assignedUnits = game.getStoredValue("assignedBombardment" + player.getFaction());
+            int count = 0;
+            List<UnitModel> unitMods = new ArrayList<>();
+            unitMods.addAll(playerUnitsByQuantity.keySet());
+            for (UnitModel mod : unitMods) {
+                count = 0;
+                for (String assignedUnit : assignedUnits.split(";")) {
+                    if (assignedUnit.endsWith(bombardPlanet) && assignedUnit.contains(mod.getAsyncId() + "_")) {
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    playerUnitsByQuantity.put(mod, count);
+                } else {
+                    playerUnitsByQuantity.remove(mod);
+                }
+            }
+        }
+
         if (ButtonHelper.isLawInPlay(game, "articles_war")) {
             if (playerUnitsByQuantity.keySet().stream().anyMatch(unit -> "naaz_mech_space".equals(unit.getAlias()))) {
                 playerUnitsByQuantity = new HashMap<>(playerUnitsByQuantity.entrySet().stream()
@@ -157,6 +193,21 @@ public class CombatRollService {
         List<NamedCombatModifierModel> extraRolls = CombatModHelper.getModifiers(player, opponent,
             playerUnitsByQuantity, opponentUnitsByQuantity, tileModel, game, rollType,
             Constants.COMBAT_EXTRA_ROLLS);
+
+        List<NamedCombatModifierModel> extraRollsDup = new ArrayList<>();
+        extraRollsDup.addAll(extraRolls);
+        for (NamedCombatModifierModel mod : extraRollsDup) {
+            if (mod.getModifier().getAlias().equalsIgnoreCase("plus1_roll_plasmascoring")) {
+                if (!game.getStoredValue("assignedBombardment" + player.getFaction()).contains("plasma_99_" + bombardPlanet + ";")) {
+                    extraRolls.remove(mod);
+                }
+            }
+            if (mod.getModifier().getAlias().equalsIgnoreCase("plus1_roll_argent_commander_bombard")) {
+                if (!game.getStoredValue("assignedBombardment" + player.getFaction()).contains("argentcommander_99_" + bombardPlanet + ";")) {
+                    extraRolls.remove(mod);
+                }
+            }
+        }
 
         // Check for temp mods
         CombatTempModHelper.EnsureValidTempMods(player, tileModel, combatOnHolder);
@@ -414,7 +465,7 @@ public class CombatRollService {
                 if (p2 == player) {
                     continue;
                 }
-                if (FoWHelper.playerHasUnitsInSystem(p2, tile)) {
+                if (!bombardPlanet.isEmpty() && FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(bombardPlanet))) {
                     MessageHelper.sendMessageToChannelWithButtons(game.isFowMode() ? p2.getCorrectChannel() : event.getMessageChannel(),
                         p2.getRepresentation() + ", please assign the BOMBARDMENT hit" + (h == 1 ? "" : "s") + ".", buttons);
                 }
@@ -424,16 +475,25 @@ public class CombatRollService {
         if (rollType == CombatRollType.bombardment && h > 0
             && (player.hasAbility("meteor_slings") || player.getPromissoryNotes().containsKey("dspnkhra"))) {
             List<Button> buttons = new ArrayList<>();
-            for (UnitHolder uH : tile.getPlanetUnitHolders()) {
-                buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "meteorSlings_" + uH.getName(),
-                    "Infantry on " + Helper.getPlanetRepresentation(uH.getName(), game)));
-            }
+            String planet = game.getStoredValue("bombardmentTarget" + player.getFaction());
+            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "meteorSlings_" + planet,
+                "Infantry on " + Helper.getPlanetRepresentation(planet, game)));
+
             buttons.add(Buttons.red("deleteButtons", "Done"));
             String msg2 = player.getRepresentation() + " you could potentially cancel "
                 + (h == 1 ? "the BOMBARDMENT hit" : "some BOMBARDMENT hits")
                 + " to place infantry instead. Use these buttons to do so, and press done when done. The bot did not track how many hits you got. ";
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg2, buttons);
 
+        }
+        if (player.hasTech("x89c4") && rollType == CombatRollType.bombardment) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasPlanetReady(bombardPlanet)) {
+                    PlanetExhaust.doAction(p2, bombardPlanet, game);
+                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " your planet " + Helper.getPlanetRepresentation(bombardPlanet, game) + " was exhausted when an opponent with X-89 bombarded it.");
+                    break;
+                }
+            }
         }
         return h;
     }
