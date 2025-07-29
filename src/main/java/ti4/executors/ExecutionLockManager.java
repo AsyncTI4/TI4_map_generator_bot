@@ -74,11 +74,7 @@ public class ExecutionLockManager {
     public static Runnable wrapWithLockAndRelease(String lockName, LockType lockType, Runnable task) {
         return () -> {
             ExecutionLockManager.lock(lockName, ExecutionLockManager.LockType.WRITE);
-            try {
-                task.run();
-            } finally {
-                unlock(lockName, lockType);
-            }
+            runAndUnlock(lockName, lockType, task);
         };
     }
 
