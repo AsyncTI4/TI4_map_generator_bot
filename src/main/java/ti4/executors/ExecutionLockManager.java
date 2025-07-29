@@ -46,36 +46,25 @@ public class ExecutionLockManager {
     public static Runnable wrapWithTryLockAndRelease(String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
         return () -> {
             boolean gotLock = ExecutionLockManager.tryLock(lockName, ExecutionLockManager.LockType.WRITE);
-            if (gotLock) {
-                runAndUnlock(lockName, lockType, task);
+            if (!gotLock) {
+                if (messageChannel != null) {
+                    MessageHelper.sendMessageToChannel(messageChannel,
+                        "The bot hasn't finished processing the last task for " + lockName + ". Please wait.");
+                } else {
+                    BotLogger.warning("The bot hasn't finished processing the last task for " + lockName + ".");
+                }
                 return;
             }
-            if (messageChannel != null) {
-                MessageHelper.sendMessageToChannel(messageChannel,
-                    "The bot hasn't finished processing the last task for " + lockName + ". Please wait.");
-            } else {
-                BotLogger.warning("The bot hasn't finished processing the last task for " + lockName + ".");
+            try {
+                task.run();
+            } finally {
+                unlock(lockName, lockType);
             }
         };
-    }
-
-    private static void runAndUnlock(String lockName, LockType lockType, Runnable task) {
-        try {
-            task.run();
-        } finally {
-            unlock(lockName, lockType);
-        }
     }
 
     public static Runnable wrapWithTryLockAndRelease(String lockName, LockType lockType, Runnable task) {
         return wrapWithTryLockAndRelease(lockName, lockType, task, null);
-    }
-
-    public static Runnable wrapWithLockAndRelease(String lockName, LockType lockType, Runnable task) {
-        return () -> {
-            ExecutionLockManager.lock(lockName, ExecutionLockManager.LockType.WRITE);
-            runAndUnlock(lockName, lockType, task);
-        };
     }
 
     public enum LockType { READ, WRITE }

@@ -28,7 +28,6 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
     private final boolean factionReactMode;
     private final boolean colorReactMode;
     private final boolean stratReactMode;
-    private final boolean fastScFollowMode;
     private final boolean injectRules;
     private final String creationDate;
     private final long lastModifiedDate;
@@ -54,7 +53,6 @@ public class ManagedGame { // BE CAREFUL ADDING FIELDS TO THIS CLASS, AS IT CAN 
         factionReactMode = game.isBotFactionReacts();
         colorReactMode = game.isBotColorReacts();
         stratReactMode = game.isBotStratReacts();
-        fastScFollowMode = game.isFastSCFollowMode();
         injectRules = game.isInjectRulesLinks();
         creationDate = game.getCreationDate();
         lastModifiedDate = game.getLastModifiedDate();

@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 import ti4.helpers.GameLaunchThreadHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
-import ti4.message.BotLogger;
 
 @UtilityClass
 public class CloseLaunchThreadsCron {
@@ -16,11 +15,10 @@ public class CloseLaunchThreadsCron {
     }
 
     private static void closeLaunchThreads() {
-        BotLogger.info("Running CloneLaunchThreadsCron.");
+        // BotLogger.log("`CloneLaunchThreadsCron` is closing some game launch threads");
         for (ManagedGame game : GameManager.getManagedGames()) {
             if (game.getLaunchPostThread() == null) continue;
             GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game.getGame(), false);
         }
-        BotLogger.info("Finished CloneLaunchThreadsCron.");
     }
 }

@@ -88,8 +88,6 @@ public class AutoPingCron {
     }
 
     private static void autoPingGames() {
-        BotLogger.info("Running AutoPingCron.");
-
         removeEndedGamesFromAutoPingMetadata();
 
         GameManager.getManagedGames().stream()
@@ -97,8 +95,6 @@ public class AutoPingCron {
             .map(ManagedGame::getGame)
             .filter(game -> game.getAutoPingStatus() && !game.isTemporaryPingDisable())
             .forEach(AutoPingCron::autoPingGame);
-
-        BotLogger.info("Finished AutoPingCron.");
     }
 
     private static void removeEndedGamesFromAutoPingMetadata() {
@@ -242,10 +238,10 @@ public class AutoPingCron {
                     soMsg.append(player.getRepresentation()).append(", ");
                 }
             }
-            if (!game.isFowMode() && !poMsg.isEmpty()) {
+            if (!game.isFowMode() && (poMsg.length() > 0)) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), poMsg + "please indicate if you are scoring a public objective.");
             }
-            if (!game.isFowMode() && !soMsg.isEmpty()) {
+            if (!game.isFowMode() && (soMsg.length() > 0)) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), soMsg + "please indicate if you are scoring a secret objective.");
             }
             AutoPingMetadataManager.addPing(game.getName());
@@ -269,7 +265,7 @@ public class AutoPingCron {
                 }
 
             }
-            if (!game.isFowMode() && !msg.isEmpty()) {
+            if (!game.isFowMode() && (msg.length() > 0)) {
                 MessageHelper.sendMessageToChannel(game.getActionsChannel(), msg + "please draw action cards and allocate command tokens.\n");
             }
             AutoPingMetadataManager.addPing(game.getName());
@@ -300,6 +296,15 @@ public class AutoPingCron {
     }
 
     public static void pingMissingAgendaPlayers(Game game) {
+        // List<Player> missingPlayersWhens = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_WHEN)
+        //     .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
+        //     .orElse(Collections.emptyList());
+        // List<Player> missingPlayersAfters = GameMessageManager.getOne(game.getName(), GameMessageType.AGENDA_AFTER)
+        //     .map(gameMessage -> ButtonHelper.getPlayersWhoHaventReacted(gameMessage.messageId(), game))
+        //     .orElse(Collections.emptyList());
+        // if (missingPlayersAfters.isEmpty() && missingPlayersWhens.isEmpty()) {
+        //     return;
+        // }
         if (game.getStoredValue("queuedAgendasMode").isEmpty()) {
             return;
         }
@@ -323,5 +328,38 @@ public class AutoPingCron {
                 }
             }
         }
+
+        // if (game.isFowMode()) {
+        //     String messageWhens = ", please indicate \"No Whens\".";
+        //     String messageAfters = ", please indicate \"No Afters\".";
+        //     for (Player player : missingPlayersWhens) {
+        //         MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
+        //             player.getRepresentationUnfogged() + messageWhens);
+        //     }
+        //     for (Player player : missingPlayersAfters) {
+        //         MessageHelper.sendMessageToChannel(player.getPrivateChannel(),
+        //             player.getRepresentationUnfogged() + messageAfters);
+        //     }
+        //     MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
+        //         "Sent reminder pings to players who have not yet reacted.");
+        // } else {
+        //     StringBuilder messageBuilder = new StringBuilder();
+        //     for (Player player : missingPlayersWhens) {
+        //         messageBuilder.append(player.getRepresentationUnfogged()).append(", ");
+        //     }
+        //     if (!missingPlayersWhens.isEmpty()) {
+        //         messageBuilder.append("please indicate \"No Whens\".\n");
+        //     }
+
+        //     for (Player player : missingPlayersAfters) {
+        //         messageBuilder.append(player.getRepresentationUnfogged()).append(", ");
+        //     }
+        //     if (!missingPlayersAfters.isEmpty()) {
+        //         messageBuilder.append("please indicate \"No Afters\".");
+        //     }
+        //     if (messageBuilder.length() > 0) {
+        //     MessageHelper.sendMessageToChannel(game.getMainGameChannel(), messageBuilder.toString());
+        //     }
+        // }
     }
 }

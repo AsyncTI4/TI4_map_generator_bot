@@ -14,12 +14,11 @@ public class UploadStatsCron {
     }
 
     private static void uploadStats() {
-        BotLogger.info("Running UploadStatsCron.");
         try {
             AsyncTi4WebsiteHelper.putStats();
         } catch (Exception e) {
             BotLogger.error("**UploadStatsCron failed.**", e);
         }
-        BotLogger.info("Finished UploadStatsCron.");
+        BotLogger.info("Ran UploadStatsCron.");
     }
 }

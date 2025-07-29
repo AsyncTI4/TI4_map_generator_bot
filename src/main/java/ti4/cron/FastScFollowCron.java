@@ -3,8 +3,6 @@ package ti4.cron;
 import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
-import ti4.executors.ExecutionLockManager;
-import ti4.executors.GameLockManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -28,16 +26,11 @@ public class FastScFollowCron {
     }
 
     private static void handleFastScFollow() {
-        BotLogger.info("Running FastScFollowCron");
-
         GameManager.getManagedGames().stream()
             .filter(not(ManagedGame::isHasEnded))
-            .filter(ManagedGame::isFastScFollowMode)
-            .forEach(managedGame ->
-                GameLockManager.runWithLockSaveAndRelease(
-                    managedGame.getName(), ExecutionLockManager.LockType.WRITE, "FastScFollowCron", FastScFollowCron::handleFastScFollow));
-
-        BotLogger.info("Finished FastScFollowCron");
+            .map(ManagedGame::getGame)
+            .filter(Game::isFastSCFollowMode)
+            .forEach(FastScFollowCron::handleFastScFollow);
     }
 
     private static void handleFastScFollow(Game game) {
@@ -75,6 +68,7 @@ public class FastScFollowCron {
                         .append(" half you will be marked as not following.");
                     appendScMessages(game, player, sc, sb);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
+                    GameManager.save(game, "Fast SC Ping"); //TODO: We should be locking since we're saving
                 }
                 if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
                     String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game) +
@@ -83,6 +77,7 @@ public class FastScFollowCron {
                     ButtonHelper.sendMessageToRightStratThread(player, game, message, ButtonHelper.getStratName(sc));
                     player.addFollowedSC(sc);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "2");
+                    GameManager.save(game, "Fast SC Ping 2"); //TODO: We should be locking since we're saving
                     String messageID = game.getStoredValue("scPlayMsgID" + sc);
                     ReactionService.addReaction(player, true, "not following.", "", messageID, game);
 
@@ -111,17 +106,20 @@ public class FastScFollowCron {
         String key = "factionsThatAreNotDiscardingSOs";
         if (!game.getStoredValue(key).contains(player.getFaction() + "*")) {
             game.setStoredValue(key, game.getStoredValue(key) + player.getFaction() + "*");
+            GameManager.save(game, "Secret Objective Draw Order"); //TODO: We should be locking since we're saving
         }
 
         String key2 = "queueToDrawSOs";
         if (game.getStoredValue(key2).contains(player.getFaction() + "*")) {
             game.setStoredValue(key2, game.getStoredValue(key2).replace(player.getFaction() + "*", ""));
+            GameManager.save(game, "Secret Objective Draw Order"); //TODO: We should be locking since we're saving
         }
 
         String key3 = "potentialBlockers";
         if (game.getStoredValue(key3).contains(player.getFaction() + "*")) {
             game.setStoredValue(key3, game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
             Helper.resolveQueue(game);
+            GameManager.save(game, "Secret Objective Draw Order"); //TODO: We should be locking since we're saving
         }
     }
 }

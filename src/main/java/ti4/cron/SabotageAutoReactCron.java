@@ -28,14 +28,10 @@ public class SabotageAutoReactCron {
     }
 
     private static void autoReact() {
-        BotLogger.info("Running SabotageAutoReactCron.");
-
         GameManager.getManagedGames().stream()
             .filter(not(ManagedGame::isHasEnded))
             .map(ManagedGame::getGame)
             .forEach(SabotageAutoReactCron::autoReact);
-
-        BotLogger.info("Finished SabotageAutoReactCron.");
     }
 
     private static void autoReact(Game game) {

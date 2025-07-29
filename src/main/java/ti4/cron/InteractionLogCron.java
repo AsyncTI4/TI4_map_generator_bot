@@ -1,12 +1,5 @@
 package ti4.cron;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ti4.AsyncTI4DiscordBot;
@@ -14,12 +7,23 @@ import ti4.helpers.ThreadGetter;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
+import javax.annotation.Nonnull;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 public class InteractionLogCron {
 	@Nonnull
 	private static final ArrayDeque<BotLogger.AbstractEventLog> messageBuffer = new ArrayDeque<>(500);
 	private static TextChannel primaryBotLogChannel; // It is safe to store this channel as it should always exist
 	private static boolean isRegistered;
 
+	/**
+	 * Adds an AbstractEventLog to the message cache.
+	 * @param logMessage - The message to be added to the cache
+	 */
 	public static void addLogMessage(@Nonnull BotLogger.AbstractEventLog logMessage) {
 		synchronized (messageBuffer) {
 			messageBuffer.add(logMessage);

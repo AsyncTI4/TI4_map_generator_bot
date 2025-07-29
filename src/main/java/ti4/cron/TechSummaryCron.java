@@ -20,9 +20,7 @@ public class TechSummaryCron {
     }
 
     private static void postTechSummaries() {
-        BotLogger.info("Running TechSummaryCron.");
         TechSummariesMetadataManager.consumeAndPersist(TechSummaryCron::postTechSummaries);
-        BotLogger.info("Finished TechSummaryCron.");
     }
 
     private static void postTechSummaries(TechSummariesMetadataManager.TechSummaries techSummaries) {

@@ -1,10 +1,10 @@
 package ti4.cron;
 
-import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import ti4.message.BotLogger;
 import ti4.service.statistics.game.WinningPathCacheService;
+
+import java.util.concurrent.TimeUnit;
 
 @UtilityClass
 public class WinningPathCacheCron {
@@ -14,12 +14,10 @@ public class WinningPathCacheCron {
     }
 
     private static void precompute() {
-        BotLogger.info("Running WinningPathCacheCron.");
         try {
             WinningPathCacheService.recomputeCache();
         } catch (Exception e) {
             BotLogger.error("**WinningPathCacheCron failed.**", e);
         }
-        BotLogger.info("Finished WinningPathCacheCron.");
     }
 }
