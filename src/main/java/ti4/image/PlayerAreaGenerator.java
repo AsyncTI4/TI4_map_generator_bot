@@ -123,7 +123,7 @@ public class PlayerAreaGenerator {
         }
     }
 
-    public Rectangle drawPlayerAreaNEW(Player player, Point topLeft) {
+    public Rectangle drawPlayerAreaNEW(Point topLeft) {
         return new Rectangle(topLeft);
     }
 
@@ -1773,7 +1773,7 @@ public class PlayerAreaGenerator {
             Planet planet = planetsInfo.get(planetName);
             if (planet == null) {
                 player.removePlanet(planetName);
-                BotLogger.error(new BotLogger.LogMessageOrigin(player), "Planet " + planetName + " not found in game " + game.getName() + ". Removing planet from player.");
+                BotLogger.warning(new BotLogger.LogMessageOrigin(player), "Planet " + planetName + " not found in game " + game.getName() + ". Removing planet from player.");
                 return deltaX;
             }
             PlanetModel planetModel = planet.getPlanetModel();

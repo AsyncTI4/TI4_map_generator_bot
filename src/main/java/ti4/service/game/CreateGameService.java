@@ -37,6 +37,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
+import ti4.cron.AddBothelperPermissionsCron;
 import ti4.image.ImageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -210,6 +211,8 @@ public class CreateGameService {
         reportNewGameCreated(newGame);
 
         presentSetupToPlayers(newGame);
+
+        AddBothelperPermissionsCron.scheduleForGame(newGame);
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread

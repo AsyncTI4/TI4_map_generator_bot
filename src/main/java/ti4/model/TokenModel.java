@@ -23,6 +23,7 @@ public class TokenModel implements ModelInterface, EmbeddableModel {
     private ComponentSource source;
     private String placement;
     private Double scale;
+    private Boolean isPlanet;
 
     @Override
     public boolean isValid() {

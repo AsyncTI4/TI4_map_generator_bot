@@ -10,7 +10,7 @@ import ti4.map.Game;
 
 public class GamesPage {
 
-    public static final int PAGE_SIZE = 500;
+    public static final int PAGE_SIZE = 100;
 
     private GamesPage() {}
 
