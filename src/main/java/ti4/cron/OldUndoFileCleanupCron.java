@@ -21,11 +21,13 @@ public class OldUndoFileCleanupCron {
     }
 
     private static void cleanup() {
+        BotLogger.info("Running OldUndoFileCleanupCron");
         try {
             cleanupOldUndoFiles();
         } catch (Exception e) {
             BotLogger.error("**OldUndoFileCleanupCron failed.**", e);
         }
+        BotLogger.info("Finished OldUndoFileCleanupCron");
     }
 
     private static void cleanupOldUndoFiles() {
