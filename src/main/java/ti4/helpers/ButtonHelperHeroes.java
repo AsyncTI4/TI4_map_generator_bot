@@ -1,9 +1,7 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.*;
-
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,13 +9,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
@@ -57,6 +54,8 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperHeroes {
 
@@ -1328,21 +1327,20 @@ public class ButtonHelperHeroes {
                         int fighterCount = tileUnits.getOrDefault(Units.getUnitKey("ff", p2.getColor()), 0);
                         int mechCount = tileUnits.getOrDefault(Units.getUnitKey("mf", p2.getColor()), 0);
                         int infantryCount = tileUnits.getOrDefault(Units.getUnitKey("gf", p2.getColor()), 0);
-                        if (mechCount == 0 && infantryCount == 0)
-                        {
-                            message.append(p2.getRepresentationNoPing() + " has " + overCapacity 
-                                + " fighter" + (overCapacity == 1 ? "" : "s") + " in excess of their amended capacity; removing and capturing.\n");
+                        if (mechCount == 0 && infantryCount == 0) {
+                            message.append(p2.getRepresentationNoPing()).append(" has ").append(overCapacity).append(" fighter")
+                                .append(overCapacity == 1 ? "" : "s").append(" in excess of their amended capacity; removing and capturing.\n");
                             RemoveUnitService.removeUnit(event, tile, game, p2, unitHolder, UnitType.Fighter, overCapacity, false);
                             AddUnitService.addUnits(event, player.getNomboxTile(), game, p2.getColor(), overCapacity + " ff");
-                            for (int i=0; i<overCapacity; i++)
+                            for (int i = 0; i < overCapacity; i++)
                             {
                                 totalLosses.get(p2.getFactionEmoji()).add(UnitEmojis.fighter);
                             }
                         }
-                        else if (fighterCount == 0 && infantryCount == 0)
-                        {
-                            message.append(p2.getRepresentationNoPing() + " has " + overCapacity 
-                                + " mech" + (overCapacity == 1 ? "" : "s") + " in excess of their amended capacity; removing and capturing.\n");
+                        else if (fighterCount == 0 && infantryCount == 0) {
+                            message.append(p2.getRepresentationNoPing()).append(" has ")
+                                .append(overCapacity).append(" mech").append(overCapacity == 1 ? "" : "s")
+                                .append(" in excess of their amended capacity; removing and capturing.\n");
                             RemoveUnitService.removeUnit(event, tile, game, p2, unitHolder, UnitType.Mech, overCapacity, false);
                             AddUnitService.addUnits(event, player.getNomboxTile(), game, p2.getColor(), overCapacity + " mf");
                             for (int i=0; i<overCapacity; i++)
@@ -1350,33 +1348,28 @@ public class ButtonHelperHeroes {
                                 totalLosses.get(p2.getFactionEmoji()).add(UnitEmojis.mech);
                             }
                         }
-                        else if (fighterCount == 0 && mechCount == 0)
-                        {
-                            message.append(p2.getRepresentationNoPing() + " has " + overCapacity 
-                                + " infantry" + (overCapacity == 1 ? "" : "") + " in excess of their amended capacity; removing and capturing.\n");
+                        else if (fighterCount == 0 && mechCount == 0) {
+                            message.append(p2.getRepresentationNoPing()).append(" has ").append(overCapacity).append(" infantry in excess of their amended capacity; removing and capturing.\n");
                             RemoveUnitService.removeUnit(event, tile, game, p2, unitHolder, UnitType.Infantry, overCapacity, false);
                             AddUnitService.addUnits(event, player.getNomboxTile(), game, p2.getColor(), overCapacity + " gf");
-                            for (int i=0; i<overCapacity; i++)
-                            {
+                            for (int i=0; i<overCapacity; i++) {
                                 totalLosses.get(p2.getFactionEmoji()).add(UnitEmojis.infantry);
                             }
                         }
-                        else
-                        {
+                        else {
                             String unitListing;
-                            if (fighterCount * mechCount * infantryCount > 0)
-                            {
+                            if (fighterCount * mechCount * infantryCount > 0) {
                                 unitListing = "fighter" + (fighterCount == 1 ? "" : "s") + ", mech" + (mechCount == 1 ? "" : "s") + " and infantry";
                             }
-                            else
-                            {
+                            else {
                                 unitListing = (fighterCount >= 1 ? "fighter" : "") + (fighterCount >= 2 ? "s" : "") + (fighterCount > 0 ? " and " : "")
                                     + (mechCount >= 1 ? "mech" : "") + (mechCount >= 2 ? "s" : "") + (mechCount * infantryCount > 0 ? " and " : "")
                                     + (infantryCount >= 1 ? "infantry" : "");
                             }
-                            message.append(p2.getRepresentationNoPing() + " has a mixture of " + overCapacity + " " + unitListing
-                                + " in excess of their amended capacity. Please remove " + (overCapacity == 1 ? "this" : "these") + " excess manually (they are captured).\n");
-                            message.append("-# We hope to add buttons for this Soon™.\n");
+                            message.append(p2.getRepresentationNoPing()).append(" has a mixture of ").append(overCapacity).append(" ")
+                                .append(unitListing).append(" in excess of their amended capacity. Please remove ").append(overCapacity == 1 ? "this" : "these")
+                                .append(" excess manually (they are captured).\n")
+                                .append("-# We hope to add buttons for this Soon™.\n");
                             // TODO: Add buttons
                         }
                     }
