@@ -1799,7 +1799,6 @@ public class AgendaHelper {
             } catch (Exception e) {
                 BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not update active player", e);
             }
-
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
             if (game.isFowMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
