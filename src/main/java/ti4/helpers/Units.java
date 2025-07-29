@@ -265,6 +265,9 @@ public class Units {
 
     private static UnitKey lookupKey(UnitType type, String color) {
         String colorID = Mapper.getColorID(color);
+        if (type == null || colorID == null) {
+            return null;
+        }
         var map = keys.computeIfAbsent(type, k -> new ConcurrentHashMap<>());
         return map.computeIfAbsent(colorID, k -> new UnitKey(type, colorID));
     }
