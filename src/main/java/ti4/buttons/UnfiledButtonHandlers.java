@@ -648,13 +648,13 @@ public class UnfiledButtonHandlers {
                 for (String assignedUnit : assignedUnits.split(";")) {
                     if (assignedUnit.contains("plasma")) {
                         String planet = assignedUnit.split("_")[2];
-                        buttons.add(Buttons.red("unassignBombardUnit_" + assignedUnit, "Unassign Plasma Scoring Die from " + Helper.getPlanetRepresentationNoResInf(planet, game), TechEmojis.WarfareTech));
+                        buttons.add(Buttons.red("unassignBombardUnit_" + assignedUnit, "Unassign Plasma Scoring Die From " + Helper.getPlanetRepresentationNoResInf(planet, game), TechEmojis.WarfareTech));
                     }
 
                 }
             } else {
                 for (String planet : getBombardablePlanets(player, game, tile)) {
-                    buttons.add(Buttons.green("assignBombardUnit_plasma_99_" + planet, "Assign Plasma Scoring Die to " + Helper.getPlanetRepresentationNoResInf(planet, game), TechEmojis.WarfareTech));
+                    buttons.add(Buttons.green("assignBombardUnit_plasma_99_" + planet, "Assign Plasma Scoring Die To " + Helper.getPlanetRepresentationNoResInf(planet, game), TechEmojis.WarfareTech));
                 }
             }
         }
@@ -719,13 +719,13 @@ public class UnfiledButtonHandlers {
             return summary;
         }
         for (String planet : getBombardablePlanets(player, game, tile)) {
-            summary += "### " + player.getFactionEmoji() + " Bombarding " + Helper.getPlanetRepresentationNoResInf(planet, game) + ":\n";
+            summary += "### " + player.getFactionEmoji() + " bombarding " + Helper.getPlanetRepresentationNoResInf(planet, game) + ":\n";
             for (Player p2 : game.getRealAndEliminatedPlayers()) {
                 if (p2 == player) {
                     continue;
                 }
                 if (FoWHelper.playerHasUnitsOnPlanet(p2, game.getUnitHolderFromPlanet(planet))) {
-                    summary += "-# " + p2.getFactionEmoji() + " " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, p2, planet) + " currently\n\n";
+                    summary += "-# " + p2.getFactionEmoji() + " " + ExploreHelper.getUnitListEmojisOnPlanetForHazardousExplorePurposes(game, p2, planet) + " currently\n";
                     break;
                 }
             }
@@ -734,14 +734,14 @@ public class UnfiledButtonHandlers {
                 if (assignedUnit.endsWith(planet)) {
                     if (assignedUnit.contains("99")) {
                         if (assignedUnit.contains("argent")) {
-                            summary += "* Argent Commander Die\n";
+                            summary += "- Trrakan Aun Zulok die\n";
                         } else {
-                            summary += "* Plasma Scoring Die\n";
+                            summary += "- _Plasma Scoring_ die\n";
                         }
                     } else {
                         String asyncID = assignedUnit.split("_")[0];
                         UnitModel mod = player.getUnitFromAsyncID(asyncID);
-                        summary += "* " + mod.getUnitEmoji() + "\n";
+                        summary += "- " + mod.getUnitEmoji() + "\n";
                     }
 
                 }
@@ -759,7 +759,8 @@ public class UnfiledButtonHandlers {
         //     + ", please declare what units are bombarding what planet before hitting this button"
         //     + " (e.g. if you have two dreadnoughts and are splitting their BOMBADMENT across two planets, specify which planet the first one is hitting)."
         //     + " The bot does not track this.";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " assigning units to bombard as follows:\n\n" + getBombardmentSummary(player, game), getBombardmentAssignmentButtons(player, game));
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " is assigning units to bombard as follows:\n" 
+            + getBombardmentSummary(player, game), getBombardmentAssignmentButtons(player, game));
     }
 
     @ButtonHandler("deflectSC_")
