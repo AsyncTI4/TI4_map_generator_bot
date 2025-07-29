@@ -900,6 +900,7 @@ public class AgendaHelper {
         TextChannel watchParty = watchPartyChannel(game);
         String watchPartyPing = watchPartyPing(game);
         List<MessageChannel> watchPartyList = publish && watchParty != null ? List.of(watchParty) : null;
+        List<String> altMessages = watchPartyPing == null ? null : List.of(watchPartyPing);
 
         int rand = 6 + ThreadLocalRandom.current().nextInt(6);
         if (ThreadLocalRandom.current().nextInt(5) == 0) { // random chance for an extra long wait
@@ -909,7 +910,7 @@ public class AgendaHelper {
             resolveIxthianRoll(futureGame, publish && watchParty != null);
             return false;
         };
-        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, List.of(watchPartyPing));
+        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, altMessages);
     }
 
     private static void resolveIxthianRoll(Game game, boolean publish) {
@@ -1273,7 +1274,7 @@ public class AgendaHelper {
                     Helper.buildSpentThingsMessageForVoting(player, game, false));
             }
 
-            String message = " up to vote! Resolve using buttons.";
+            String message = " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
             Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
             String revoteMsg = "You may press this button to revote if you made a mistake, ignore it otherwise.";
             MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseAndReVote);
@@ -1736,7 +1737,6 @@ public class AgendaHelper {
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
-
             int[] voteInfo = getVoteTotal(nextInLine, game);
             int counter = 0;
             boolean willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
@@ -1780,6 +1780,7 @@ public class AgendaHelper {
                 counter += 1;
             }
 
+            String message = getSummaryOfVotes(game, true) + "\n" + realIdentity + " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
             Button Vote = Buttons.green(finChecker + "vote", pFaction + " Choose To Vote");

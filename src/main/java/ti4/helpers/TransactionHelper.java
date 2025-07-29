@@ -1555,7 +1555,7 @@ public class TransactionHelper {
             if (!game.isFowMode() && game.isNewTransactionMethod()) {
                 buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
                 if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
-                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(game, player, p2);
+                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2);
                     FileUpload upload = FileUploadService.createFileUpload(image, "transactable_items");
                     MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), upload);
                 }
