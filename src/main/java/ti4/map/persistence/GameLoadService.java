@@ -1129,8 +1129,10 @@ class GameLoadService {
         }
         for (int x = counts.size(); x < UnitState.values().length; x++)
             counts.add(0);
-        if (!tile.getUnitHolders().containsKey(spaceHolder))
+        if (!tile.getUnitHolders().containsKey(spaceHolder)) {
             BotLogger.error("Invalid unitHolder detected during load: " + tile.getTileID() + " / " + spaceHolder);
+            return;
+        }
         tile.getUnitHolders().get(spaceHolder).getUnitsByState().put(uk, counts);
     }
 
