@@ -48,7 +48,8 @@ class PingActivePlayer extends GameStateSubcommand {
         } else {
             String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
             if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    (game.getPlayersWithGMRole().contains(playerThatRanCommand) ? activePlayer.getRepresentationNoPing() : "Active player") + " has been pinged.");
                 MessageHelper.sendPrivateMessageToPlayer(activePlayer, game, ping);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
