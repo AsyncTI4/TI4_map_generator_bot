@@ -45,7 +45,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.franken.FrankenLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.leader.UnlockLeaderService;
@@ -1178,12 +1177,6 @@ public class ButtonHelperHeroes {
         }
 
         List<Tile> adjTiles = new ArrayList<>();
-
-        if (RiftSetModeService.isActive(game)) {
-            tiles = RiftSetModeService.getAllTilesWithRift(game);
-            adjTiles.addAll(tiles);
-        }
-
         for (Tile tile : tiles) {
             for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
                 Tile tileToAdd = game.getTileByPosition(pos);
@@ -1219,12 +1212,6 @@ public class ButtonHelperHeroes {
         }
 
         List<Tile> adjTiles = new ArrayList<>();
-
-        if (RiftSetModeService.isActive(game)) {
-            tiles = RiftSetModeService.getAllTilesWithRift(game);
-            adjTiles.addAll(tiles);
-        }
-
         for (Tile tile : tiles) {
             for (String pos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false)) {
                 Tile tileToAdd = game.getTileByPosition(pos);

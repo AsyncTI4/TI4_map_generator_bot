@@ -47,7 +47,6 @@ import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.objectives.RevealPublicObjectiveService;
@@ -408,7 +407,6 @@ class AgendaResolveButtonHandler {
                             + " Use the button to get a technology. You will need to remove any command tokens from your fleet pool manually.",
                         List.of(Buttons.GET_A_TECH));
                 }
-                RiftSetModeService.resolveRiftSetCrucible(agID, player2, game);
 
             } // "abolishment" || "absol_abolishment", "miscount" || "absol_miscount"
             if ("abolishment".equalsIgnoreCase(agID) || "absol_abolishment".equalsIgnoreCase(agID)) {
@@ -965,7 +963,7 @@ class AgendaResolveButtonHandler {
         }
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.blue("flip_agenda", "Flip Agenda #" + aCount));
-        RiftSetModeService.includeCrucibleAgendaButton(buttons, game);
+
         if (!game.isOmegaPhaseMode()) {
             buttons.add(Buttons.green("proceed_to_strategy", "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)"));
         } else {
