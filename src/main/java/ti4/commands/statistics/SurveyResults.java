@@ -31,8 +31,8 @@ class SurveyResults extends Subcommand {
             .forEach(user -> {
                 incrementCount(question1Data, user.getWhisperPref());
                 incrementCount(question2Data, user.getSupportPref());
-                incrementCount(question3Data, user.getWinmakingPref());
-                incrementCount(question4Data, user.getTakebackPref());
+                incrementCount(question3Data, user.getTakebackPref());
+                incrementCount(question4Data, user.getWinmakingPref());
                 incrementCount(question5Data, user.getMetaPref());
             });
 
