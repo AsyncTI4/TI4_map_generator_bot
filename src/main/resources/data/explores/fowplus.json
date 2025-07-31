@@ -1,10 +1,29 @@
 [
+      {
+        "id": "gamma2",
+        "name": "Gamma Relay",
+        "type": "Frontier",
+        "resolution": "Token",
+        "text": "Place a gamma wormhole token in this system. Then, purge this card.",
+        "attachmentId": "gamma",
+        "flavorText": "*Veteran spacers spoke in hushed tones of a dark portal drifting in the void beyond the outer edge of the Oort Cloud.*",
+        "source": "fowplus"
+    },
+    {
+        "id": "folderspace2",
+        "name": "Folded Space",
+        "type": "Frontier",
+        "resolution": "Instant",
+        "text": "Place 1 command token from your reinforcements in your fleet pool and move any number of your units in this system to the space area of another system that contains no other players' ships.",
+        "flavorText": "*Captain Kask gave the command to enter the shimmering gate. There was no return, but beyond it, allies awaited.*",
+        "source": "fowplus"
+    },
     {
         "id": "fowplus_wave",
         "name": "Gravity Wave",
         "type": "Frontier",
         "resolution": "Instant",
-        "text": "Remove all your non-infantry units from this system and place them in any adjacent system. Then place a Gravity Rift token in this system. [Note: Infantry will not survive.]",
+        "text": "Remove all your non-infantry units from this system and place them in any adjacent system that does not contain other players' ships. Then place a Gravity Rift token in this system. [Note: Infantry will not survive.]",
         "flavorText": "*Gravity twisted violently, ejecting vessels into nearby space.*",
         "source": "fowplus"
     },
@@ -45,7 +64,7 @@
         "source": "fowplus"
     },
 
-     {
+    {
         "id": "fowplus_sacrifice",
         "name": "Founder's Sacrifice",
         "type": "Industrial",
