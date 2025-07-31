@@ -226,7 +226,7 @@ public class FOWPlusService {
                 List<Button> waveButtons = new ArrayList<>();
                 for (String adjacentPos : FoWHelper.getAdjacentTiles(game, tile.getPosition(), player, false, false)) {
                     Tile adjacentTile = game.getTileByPosition(adjacentPos);
-                    if (!adjacentTile.getTileModel().isHyperlane()) {
+                    if (!adjacentTile.getTileModel().isHyperlane() && !FoWHelper.otherPlayersHaveShipsInSystem(player, adjacentTile, game)) {
                         waveButtons.add(Buttons.green("fowplus_wave_" + adjacentPos + "_" + tile.getPosition(),
                             adjacentTile.getRepresentationForButtons(game, player)));
                     }
