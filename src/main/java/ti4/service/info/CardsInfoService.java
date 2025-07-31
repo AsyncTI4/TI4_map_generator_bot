@@ -19,7 +19,6 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
-import ti4.service.fow.RiftSetModeService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -252,7 +251,6 @@ public class CardsInfoService {
         buttons.add(Buttons.POST_NOTEPAD);
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
-        RiftSetModeService.addCapturedUnitsButton(buttons, game);
 
         String message = "You may use these buttons to do various things:";
 

@@ -15,7 +15,6 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 class WeirdGameSetup extends GameStateSubcommand {
@@ -38,7 +37,6 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXTRA_SECRET_MODE, "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
-        addOptions(new OptionData(OptionType.BOOLEAN, FOWOption.RIFTSET_MODE.toString(), "True to enable Eronous RiftSet mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));
         addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game").setAutoComplete(true));
@@ -137,14 +135,13 @@ class WeirdGameSetup extends GameStateSubcommand {
         boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
-        boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), RiftSetModeService.isActive(game), OptionMapping::getAsBoolean);
-        return setGameMode(event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode, riftsetMode);
+        return setGameMode(event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
     // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
-    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode, boolean isTIGLGame, boolean votcMode, boolean riftsetMode) {
-        if (isTIGLGame && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode() || votcMode || riftsetMode)) {
+    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode, boolean isTIGLGame, boolean votcMode) {
+        if (isTIGLGame && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode() || votcMode)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
@@ -319,11 +316,6 @@ class WeirdGameSetup extends GameStateSubcommand {
                     player.addLeader(leaderID);
                 }
             }
-        }
-
-        //For Eronous to run fow300
-        if (riftsetMode) {
-            return RiftSetModeService.activate(event, game);
         }
 
         return true;

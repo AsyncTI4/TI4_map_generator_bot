@@ -58,7 +58,6 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
@@ -79,10 +78,6 @@ public class ExploreService {
         }
         game.setStoredValue(player.getFaction() + "planetsExplored",
             game.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
-
-        if (RiftSetModeService.willPlanetGetStellarConverted(planetName, player, game, event)) {
-            return;
-        }
 
         if (planetName.equalsIgnoreCase("garbozia")) {
             if (player.hasAbility("distant_suns")) {
@@ -934,7 +929,6 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
             }
         }
-        RiftSetModeService.resolveExplore(ogID, player, game);
         FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
@@ -1033,7 +1027,7 @@ public class ExploreService {
         List<String> types, MessageChannel channel, Player player, Game game,
         boolean overRide, boolean fullText
     ) {
-        if (!FOWPlusService.deckInfoAvailable(player, game) || !RiftSetModeService.deckInfoAvailable(player, game)) {
+        if (!FOWPlusService.deckInfoAvailable(player, game)) {
             return;
         }
         boolean isGM = player != null && game.getPlayersWithGMRole().contains(player);
