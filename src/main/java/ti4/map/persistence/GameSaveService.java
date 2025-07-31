@@ -919,7 +919,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             for (Entry<UnitKey, List<Integer>> entry : unitHolder.getUnitsByState().entrySet()) {
                 if (entry.getKey() != null) {
-                    String amtString = String.join(",", entry.getValue().stream().map(i -> i.toString()).toList());
+                    String amtString = String.join(",", entry.getValue().stream().map(Object::toString).toList());
                     writer.write(entry.getKey().outputForSave() + " " + amtString);
                     writer.write(System.lineSeparator());
                 }
