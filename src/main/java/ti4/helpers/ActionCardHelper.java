@@ -7,14 +7,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.commands.CommandHelper;
@@ -363,6 +364,12 @@ public class ActionCardHelper {
             if (!player.getFaction().equalsIgnoreCase("edyn") && !player.getFaction().contains("franken")) {
                 return player.getRepresentationUnfogged()
                     + ", the bot thinks it is the Action Phase and this is an Agenda Phase card. If this is a mistake, ping bothelper in the actions channel.";
+            }
+        }
+        if (game.isStellarAtomicsMode() && actionCard.getPhase().equalsIgnoreCase("agenda") && game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
+            if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
+                return player.getRepresentationUnfogged()
+                    + ", the bot thinks you no longer have your token on the stellar atomics card and thus cannot play action cards during the agenda phase.";
             }
         }
         if (actionCard.getPhase().equalsIgnoreCase("action") && game.getPhaseOfGame() != null && game.getPhaseOfGame().contains("agenda")) {

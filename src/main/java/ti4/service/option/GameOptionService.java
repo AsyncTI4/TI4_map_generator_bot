@@ -58,6 +58,26 @@ public class GameOptionService {
         } else {
             daneLinkButtons.add(Buttons.green("enableDaneMode_totalWar_enable", "Enable Total War"));
         }
+        if (game.isDangerousWildsMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_DangerousWilds_disable", "Disable Dangerous Wilds"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_DangerousWilds_enable", "Enable Dangerous Wilds"));
+        }
+        if (game.isAgeOfFightersMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_AgeOfFighters_disable", "Disable Age Of Fighters"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_AgeOfFighters_enable", "Enable Age Of Fighters"));
+        }
+        if (game.isCivilizedSocietyMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_CivilizedSociety_disable", "Disable Civilized Society"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_CivilizedSociety_enable", "Enable Civilized Society"));
+        }
+        if (game.isStellarAtomicsMode()) {
+            daneLinkButtons.add(Buttons.red("enableDaneMode_StellarAtomics_disable", "Disable Stellar Atomics"));
+        } else {
+            daneLinkButtons.add(Buttons.green("enableDaneMode_StellarAtomics_enable", "Enable Stellar Atomics"));
+        }
         if (game.isAgeOfCommerceMode()) {
             daneLinkButtons.add(Buttons.red("enableDaneMode_ageOfCommerce_disable", "Disable Age of Commerce"));
         } else {

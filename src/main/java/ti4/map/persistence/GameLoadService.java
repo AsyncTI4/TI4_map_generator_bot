@@ -1,6 +1,7 @@
 package ti4.map.persistence;
 
-import javax.annotation.Nullable;
+import static ti4.map.persistence.GamePersistenceKeys.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -24,13 +25,17 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import ti4.draft.BagDraft;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -55,27 +60,6 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
-
-import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITDAMAGE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.TILE;
-import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.UNITDAMAGE;
-import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
 @UtilityClass
 class GameLoadService {
@@ -701,6 +685,10 @@ class GameLoadService {
                 case Constants.HIDDEN_AGENDA_MODE -> game.setHiddenAgendaMode(loadBooleanOrDefault(info, false));
                 case Constants.AGE_OF_COMMERCE_MODE -> game.setAgeOfCommerceMode(loadBooleanOrDefault(info, false));
                 case Constants.TOTAL_WAR_MODE -> game.setTotalWarMode(loadBooleanOrDefault(info, false));
+                case Constants.STELLAR_ATOMICS_MODE -> game.setStellarAtomicsMode(loadBooleanOrDefault(info, false));
+                case Constants.DANGEROUS_WILDS_MODE -> game.setDangerousWildsMode(loadBooleanOrDefault(info, false));
+                case Constants.AGE_OF_FIGHTERS_MODE -> game.setAgeOfFightersMode(loadBooleanOrDefault(info, false));
+                case Constants.CIVILIZED_SOCIETY_MODE -> game.setCivilizedSocietyMode(loadBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(loadBooleanOrDefault(info, false));
                 case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(loadBooleanOrDefault(info, false));
                 case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(loadBooleanOrDefault(info, false));

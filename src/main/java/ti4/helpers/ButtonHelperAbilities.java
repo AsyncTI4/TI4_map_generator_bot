@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.commands.special.SetupNeutralPlayer;
 import ti4.helpers.DiceHelper.Die;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -27,7 +28,9 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.ColorModel;
 import ti4.model.ExploreModel;
+import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.UnitModel;
 import ti4.service.combat.StartCombatService;
 import ti4.service.emoji.CardEmojis;
@@ -1717,6 +1720,49 @@ public class ButtonHelperAbilities {
     }
 
     public static void giveKeleresCommsNTg(Game game, GenericInteractionCreateEvent event) {
+        if (game.isMinorFactionsMode()) {
+            for (Tile tile : game.getTileMap().values()) {
+                if (!tile.isHomeSystem(game)) {
+                    for (UnitHolder unitHolder : tile.getPlanetUnitHolders()) {
+                        Planet p = (Planet) unitHolder;
+                        if (p.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION)) {
+                            unitHolder.addToken("attachment_threetraits.png");
+                        }
+                    }
+                }
+            }
+        }
+        if (game.isDangerousWildsMode()) {
+            Player neutral = game.getPlayerFromColorOrFaction("neutral");
+            if (neutral == null) {
+                List<String> unusedColors = game.getUnusedColors().stream().map(ColorModel::getName).toList();
+                String color = new SetupNeutralPlayer().pickNeutralColor(unusedColors);
+                game.setupNeutralPlayer(color);
+                neutral = game.getPlayerFromColorOrFaction("neutral");
+            }
+
+            for (Tile tile : game.getTileMap().values()) {
+                for (UnitHolder uH : tile.getPlanetUnitHolders()) {
+                    if (ButtonHelper.getTypeOfPlanet(game, uH.getName()).contains("hazardous")) {
+                        boolean owned = false;
+                        for (Player p2 : game.getRealPlayers()) {
+                            if (p2.getPlanets().contains(uH.getName())) {
+                                owned = true;
+                                break;
+                            }
+                        }
+                        if (!owned) {
+                            int resource = Helper.getPlanetResources(uH.getName(), game);
+                            int neutralUnitsToAdd = resource - uH.getUnitCount(UnitType.Infantry, neutral);
+                            if (neutralUnitsToAdd > 0) {
+                                AddUnitService.addUnits(event, tile, game, neutral.getColor(), neutralUnitsToAdd + " infantry " + uH.getName());
+                            }
+                        }
+                    }
+                }
+            }
+            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Added neutral infantry to hazardous planets");
+        }
         for (Player player : game.getRealPlayers()) {
             if (player.hasAbility("divination")) {
                 rollOmenDiceAtStartOfStrat(game, player);
@@ -1730,6 +1776,7 @@ public class ButtonHelperAbilities {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + ", please choose your second Protocol.", buttons);
 
             }
+
             if (!player.hasAbility("council_patronage"))
                 continue;
             ButtonHelperStats.gainTGs(event, game, player, 1, true);
@@ -1740,6 +1787,7 @@ public class ButtonHelperAbilities {
 
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), sb);
         }
+
     }
 
     @ButtonHandler("starforgeTile_")
@@ -1984,8 +2032,7 @@ public class ButtonHelperAbilities {
                     + Helper.getPlanetRepresentation(planet, game) + " using **Indoctrination**.");
         } else if (RandomHelper.isOneInX(100) && colour.length() > 0 && "infantry".equals(unit)) {
             String poem = "";
-            switch (ThreadLocalRandom.current().nextInt(20))
-            {
+            switch (ThreadLocalRandom.current().nextInt(20)) {
                 case 0:
                 case 1:
                 case 2:
@@ -2023,9 +2070,9 @@ public class ButtonHelperAbilities {
                     poem += "\\> Lilacs are lilac\n";
                     break;
             }
-            poem += "\\> Infantry are " +  ColorEmojis.getColorEmojiWithName(colour) + "\n";
+            poem += "\\> Infantry are " + ColorEmojis.getColorEmojiWithName(colour) + "\n";
             poem += "\\> Wololo " + MiscEmojis.Wololo + "\n";
-            poem += "\\> Now infantry are " +  ColorEmojis.getColorEmojiWithName(player.getColor()) + "\n";
+            poem += "\\> Now infantry are " + ColorEmojis.getColorEmojiWithName(player.getColor()) + "\n";
             poem += "-# Yes, it doesn't rhyme (probably), but there's like, " + Mapper.getColors().size() + " available colours, and I'm not writing a unique poem for every possible pair.";
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), poem);
         } else {

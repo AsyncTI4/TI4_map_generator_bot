@@ -46,7 +46,10 @@ public class AddPlanetService {
         addPlanet(player, planet, game, null, false);
     }
 
-    public static void addPlanet(Player player, String planet, Game game, GenericInteractionCreateEvent event, boolean setup) {
+    public static void addPlanet(
+        Player player, String planet, Game game, GenericInteractionCreateEvent event,
+        boolean setup
+    ) {
         boolean doubleCheck = Helper.doesAllianceMemberOwnPlanet(game, planet, player);
         player.addPlanet(planet);
 
@@ -63,7 +66,8 @@ public class AddPlanetService {
         if (unitHolder.getTokenList().contains("token_tomb.png") && player.hasAbility("ancient_empire")) {
             unitHolder.removeToken("token_tomb.png");
             AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "2 inf");
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you captured 2 infantry from a tomb token.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentation() + " you captured 2 infantry from a tomb token.");
         }
 
         List<String> mecatols = Constants.MECATOLS;
@@ -87,7 +91,8 @@ public class AddPlanetService {
                     channel = player.getPrivateChannel();
                 }
                 MessageHelper.sendMessageToChannel(channel, "# " + player.getRepresentation() + " scored Custodians!");
-                String message2 = player.getRepresentationUnfogged() + ", choose the planets you wish to exhaust to spend " + MiscEmojis.Influence_6 + ".";
+                String message2 = player.getRepresentationUnfogged()
+                    + ", choose the planets you wish to exhaust to spend " + MiscEmojis.Influence_6 + ".";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
                 Button doneExhausting = Buttons.red("deleteButtons", "Done Exhausting Planets");
                 buttons.add(doneExhausting);
@@ -128,7 +133,8 @@ public class AddPlanetService {
                         if (relic.contains("shard")
                             && ButtonHelper.isPlanetLegendaryOrHome(planet, game, true, player_)
                             && !doubleCheck) {
-                            String msg2 = player_.getRepresentation() + " lost _Shard of the Throne_ and lost a victory point. "
+                            String msg2 = player_.getRepresentation()
+                                + " lost _Shard of the Throne_ and lost a victory point. "
                                 + player.getRepresentation()
                                 + " gained _Shard of the Throne_ and a victory point.";
                             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
@@ -150,7 +156,8 @@ public class AddPlanetService {
                     for (String pn : currentPns) {
                         PromissoryNoteModel pnModel = Mapper.getPromissoryNote(pn);
                         if (pnModel.getAttachment().isPresent()
-                            && unitHolder.getTokenList().stream().anyMatch(s -> s.contains(pnModel.getAttachment().get()))) {
+                            && unitHolder.getTokenList().stream()
+                                .anyMatch(s -> s.contains(pnModel.getAttachment().get()))) {
                             player_.removePromissoryNote(pn);
                             player.setPromissoryNote(pn);
                             player.addPromissoryNoteToPlayArea(pn);
@@ -165,7 +172,8 @@ public class AddPlanetService {
                                 ButtonHelperSCs.updateEmbassies(game, player_, tile);
                             }
                             if (token.contains("superweapon")) {
-                                player_.removeRelic(token.replace(".png", "").replace("attachment", "").replace("_", ""));
+                                player_.removeRelic(
+                                    token.replace(".png", "").replace("attachment", "").replace("_", ""));
                             }
                         }
                     }
@@ -199,11 +207,25 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
                 ButtonHelper.getScavengerExosButtons(player));
         }
-        if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer()
+        if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer() && !tile.isHomeSystem(game)
             && (unitHolder.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
             if (!p.getFactionHomeworld().equalsIgnoreCase(player.getFaction())) {
                 unitHolder.addToken("attachment_threetraits.png");
+            }
+        }
+        if (!alreadyOwned && game.isDangerousWildsMode() && player.isRealPlayer()
+            && ButtonHelper.getTypeOfPlanet(game, unitHolder.getName()).contains("hazardous")) {
+            if (!player.hasAbility("propagation")) {
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                    player.getRepresentationUnfogged() + ", you may use the button to research your technology. (reminder that you can ignore pre-reqs equal to the planet's resource value)",
+                    List.of(Buttons.GET_A_TECH));
+            } else {
+                List<Button> buttons = ButtonHelper.getGainCCButtons(player);
+                String message2 = player.getRepresentation() + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
+                    + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
+                game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
 
@@ -246,7 +268,8 @@ public class AddPlanetService {
             game.changeCommsOnPlanet(-comms, planet);
             game.changeCommsOnPlanet(comms, planet2);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                comms + " commodit" + (comms == 1 ? "y" : "ies") + " were moved from the planet of " + Helper.getPlanetRepresentation(planet, game)
+                comms + " commodit" + (comms == 1 ? "y" : "ies") + " were moved from the planet of "
+                    + Helper.getPlanetRepresentation(planet, game)
                     + " to the planet of " + Helper.getPlanetRepresentation(planet2, game) + ".");
 
         }
@@ -255,7 +278,8 @@ public class AddPlanetService {
             if (alreadyOwned && "mirage".equalsIgnoreCase(planet)) {
                 List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
                 if (buttons != null && !buttons.isEmpty()) {
-                    String message = player.getFactionEmoji() + ", click button to explore " + Helper.getPlanetRepresentation(planet, game) + ".";
+                    String message = player.getFactionEmoji() + ", click button to explore "
+                        + Helper.getPlanetRepresentation(planet, game) + ".";
                     MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
                 }
             }
@@ -266,8 +290,9 @@ public class AddPlanetService {
                 game.getStoredValue("planetsTakenThisRound") + "_" + planet);
         }
 
-        game.setStoredValue("currentActionSummary" + player.getFaction(), 
-            game.getStoredValue("currentActionSummary" + player.getFaction()) + " established control of " + Helper.getPlanetRepresentation(planet, game) + ".");
+        game.setStoredValue("currentActionSummary" + player.getFaction(),
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " established control of "
+                + Helper.getPlanetRepresentation(planet, game) + ".");
         if ((game.getPhaseOfGame().contains("agenda")
             || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
             && player.hasAbility("scavenge") && !doubleCheck && !setup) {
@@ -288,7 +313,8 @@ public class AddPlanetService {
                 boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
                 if (!containsDMZ) {
                     AddUnitService.addUnits(event, tile, game, player.getColor(), "inf " + planet);
-                    message = player.getFactionEmoji() + ColorEmojis.getColorEmojiWithName(player.getColor()) + UnitEmojis.infantry
+                    message = player.getFactionEmoji() + ColorEmojis.getColorEmojiWithName(player.getColor())
+                        + UnitEmojis.infantry
                         + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planet)
                         + " due to Absol's Daxcive, however this placement is __optional__.";
                 } else {
@@ -303,7 +329,8 @@ public class AddPlanetService {
         if (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))
             && player.hasUnexhaustedLeader("vaylerianagent") && !setup) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("exhaustAgent_vaylerianagent_" + player.getFaction(), "Use Vaylerian Agent", FactionEmojis.vaylerian));
+            buttons.add(Buttons.green("exhaustAgent_vaylerianagent_" + player.getFaction(), "Use Vaylerian Agent",
+                FactionEmojis.vaylerian));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
             String msg2 = player.getRepresentationUnfogged() + " you may use "
                 + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
@@ -334,9 +361,11 @@ public class AddPlanetService {
             && game.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander") && !tile.isHomeSystem()
             && FoWHelper.playerHasShipsInSystem(player, tile)) {
             List<Button> buttons = new ArrayList<>();
-            buttons.add(Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship", FactionEmojis.freesystems));
+            buttons.add(Buttons.green("produceOneUnitInTile_" + tile.getPosition() + "_sling", "Produce 1 Ship",
+                FactionEmojis.freesystems));
             buttons.add(Buttons.red("deleteButtons", "Decline"));
-            String msg2 = player.getRepresentationUnfogged() + ", you may produce 1 ship in the system due to President Cyhn, the Free Systems Commander.";
+            String msg2 = player.getRepresentationUnfogged()
+                + ", you may produce 1 ship in the system due to President Cyhn, the Free Systems Commander.";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg2, buttons);
         }
 
@@ -364,7 +393,8 @@ public class AddPlanetService {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                     player.getRepresentationUnfogged()
                         + ", if you have the correct amount of infantry (3 or 4), you may remove them and DEPLOY 1 space dock on "
-                        + planet + " using the buttons. Note that you will be able to build out of this space dock this action.",
+                        + planet
+                        + " using the buttons. Note that you will be able to build out of this space dock this action.",
                     buttons);
 
             }
@@ -372,7 +402,8 @@ public class AddPlanetService {
         if (ButtonHelper.isPlayerElected(game, player, "minister_exploration")) {
             String fac = player.getFactionEmoji();
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                fac + " gained 1 trade good from _Minister of Exploration_ (" + player.getTg() + "->" + (player.getTg() + 1)
+                fac + " gained 1 trade good from _Minister of Exploration_ (" + player.getTg() + "->"
+                    + (player.getTg() + 1)
                     + ").");
             player.setTg(player.getTg() + 1);
             ButtonHelperAbilities.pillageCheck(player, game);
@@ -380,10 +411,11 @@ public class AddPlanetService {
 
         }
 
-        if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode()) {
+        if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode() && player.isRealPlayer()) {
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (buttons != null && !buttons.isEmpty()) {
-                String message = player.getFactionEmoji() + " Click button to explore " + Helper.getPlanetRepresentation(planet, game) + ".";
+                String message = player.getFactionEmoji() + " Click button to explore "
+                    + Helper.getPlanetRepresentation(planet, game) + ".";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
             }
         }
@@ -401,7 +433,8 @@ public class AddPlanetService {
                 saarButton);
         }
         if (player.hasTech("ie") && unitHolder.getResources() > 0) {
-            String message = player.getRepresentation() + " Click the button to resolve an _Integrated Economy_ build on "
+            String message = player.getRepresentation()
+                + " Click the button to resolve an _Integrated Economy_ build on "
                 + Helper.getPlanetRepresentation(planet, game) + ".";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.blue("integratedBuild_" + planet,

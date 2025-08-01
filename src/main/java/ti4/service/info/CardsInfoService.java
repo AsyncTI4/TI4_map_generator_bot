@@ -124,6 +124,9 @@ public class CardsInfoService {
         if (player.hasUnexhaustedLeader("saaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_saaragent", "Use Saar Agent", FactionEmojis.Saar));
         }
+        if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
+        }
         if (player.hasAbility("military_industrial_complex")) {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
         }

@@ -32,6 +32,7 @@ public class GameCommand implements ParentCommand {
         new Swap(),
         new Observer(),
         new Tags(),
+        new GalacticEventsSetup(),
         new GameOptions(),
         new StartScenario()).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 
