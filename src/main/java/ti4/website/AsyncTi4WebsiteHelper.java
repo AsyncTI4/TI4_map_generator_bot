@@ -104,7 +104,6 @@ public class AsyncTi4WebsiteHelper {
                 strategyCards.add(webSC);
             }
 
-            BotLogger.warning(String.format("Assembling Hashmap: %s", gameId));
             Map<String, Object> webData = new HashMap<>();
             webData.put("versionSchema", 5);
             webData.put("objectives", webObjectives);
@@ -123,7 +122,6 @@ public class AsyncTi4WebsiteHelper {
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
-            BotLogger.warning(String.format("Starting put player data to the bucket for for game: %s", gameId));
             putObjectToAllBuckets(
                 String.format("webdata/%s/%s.json", gameId, gameId),
                 AsyncRequestBody.fromString(json),
