@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,6 +20,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -38,9 +42,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -2453,6 +2454,72 @@ public class Helper {
         }
     }
 
+    public static void checkEndGameCivilizedSociety(Game game) {
+        if (!game.getPhaseOfGame().equalsIgnoreCase("statusHomeWork")) {
+            return;
+        }
+
+        if (game.getHighestScore() < game.getVp()) {
+            return;
+        }
+
+        List<Player> tiedPs = new ArrayList<>();
+        int highestScore = game.getHighestScore();
+        int highestInf = 0;
+
+        for (Player player : game.getRealPlayers()) {
+
+            if (player.hasRelic("emphidia")) {
+                for (String pl : player.getPlanetsAllianceMode()) {
+                    Tile tile = game.getTile(AliasHandler.resolveTile(pl));
+                    if (tile == null) {
+                        continue;
+                    }
+                    UnitHolder unitHolder = tile.getUnitHolders().get(pl);
+                    if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                        player.removeRelic("emphidia");
+                        player.removeExhaustedRelic("emphidia");
+
+                        Integer poIndex = game.addCustomPO("The Crown of Emphidia", 1);
+                        game.scorePublicObjective(player.getUserID(), poIndex);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                            player.getRepresentation() + " scored _The Crown of Emphidia_.");
+                    }
+                }
+            }
+            if (player.getTotalVictoryPoints() > highestScore) {
+                tiedPs = new ArrayList<>();
+                highestScore = game.getHighestScore();
+                highestInf = 0;
+            }
+            if (player.getTotalVictoryPoints() == highestScore) {
+                tiedPs.add(player);
+                if (player.getTg() + Helper.getPlayerInfluenceTotal(player, game) > highestInf) {
+                    highestInf = player.getTg() + Helper.getPlayerInfluenceTotal(player, game);
+                }
+            }
+        }
+
+        for (Player player : tiedPs) {
+            if (player.getTg() + Helper.getPlayerInfluenceTotal(player, game) == highestInf) {
+                List<Button> buttons = new ArrayList<>();
+                if (!game.isFowMode()) {
+                    buttons.add(Buttons.green("gameEnd", "End Game"));
+                    buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+                } else {
+                    buttons.add(Buttons.green("gameEndConfirmation", "End and Delete Game"));
+                }
+                buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
+                    "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
+                        + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
+                    buttons);
+                return;
+            }
+        }
+
+    }
+
     public static void checkEndGame(Game game, Player player) {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
             if (game.isLiberationC4Mode()) {
@@ -2465,6 +2532,10 @@ public class Helper {
                         return;
                     }
                 }
+            }
+            if (game.isCivilizedSocietyMode()) {
+                checkEndGameCivilizedSociety(game);
+                return;
             }
             List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode()) {

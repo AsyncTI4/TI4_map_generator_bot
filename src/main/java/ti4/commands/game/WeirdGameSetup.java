@@ -28,11 +28,6 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNCHARTED_SPACE_STUFF, "True to add the Uncharted Space Stuff to the draft pool."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Codex 4."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Codex 4.."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.HIDDEN_AGENDA_MODE, "True to enable Hidden Agenda, per Dane Leek."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_COMMERCE_MODE, "True to enable the Age of Commerce, per Codex 4."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TOTAL_WAR_MODE, "True to enable Total War, per Codex 4."));
         //addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXTRA_SECRET_MODE, "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
@@ -59,9 +54,6 @@ class WeirdGameSetup extends GameStateSubcommand {
         // Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
         // if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
 
-        Boolean explorationMode = event.getOption(Constants.AGE_OF_EXPLORATION_MODE, null, OptionMapping::getAsBoolean);
-        if (explorationMode != null) game.setAgeOfExplorationMode(explorationMode);
-
         Boolean uncharted = event.getOption(Constants.UNCHARTED_SPACE_STUFF, null, OptionMapping::getAsBoolean);
         if (uncharted != null) {
             game.setUnchartedSpaceStuff(uncharted);
@@ -83,18 +75,6 @@ class WeirdGameSetup extends GameStateSubcommand {
                 }
             }
         }
-
-        Boolean minorMode = event.getOption(Constants.MINOR_FACTIONS_MODE, null, OptionMapping::getAsBoolean);
-        if (minorMode != null) game.setMinorFactionsMode(minorMode);
-
-        Boolean agendaMode = event.getOption(Constants.HIDDEN_AGENDA_MODE, null, OptionMapping::getAsBoolean);
-        if (agendaMode != null) game.setHiddenAgendaMode(agendaMode);
-
-        Boolean totalMode = event.getOption(Constants.TOTAL_WAR_MODE, null, OptionMapping::getAsBoolean);
-        if (totalMode != null) game.setTotalWarMode(totalMode);
-
-        Boolean commcerceMode = event.getOption(Constants.AGE_OF_COMMERCE_MODE, null, OptionMapping::getAsBoolean);
-        if (commcerceMode != null) game.setAgeOfCommerceMode(commcerceMode);
 
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
