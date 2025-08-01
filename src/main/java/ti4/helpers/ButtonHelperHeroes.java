@@ -1306,17 +1306,20 @@ public class ButtonHelperHeroes {
                         }
                     }
                     
-                    int capacity = ButtonHelper.checkFleetAndCapacity(p2, game, tile, false, false)[2];
-                    int capacityUsed = ButtonHelper.checkFleetAndCapacity(p2, game, tile, false, false)[1];
-                    if (capacityUsed > capacity)
+                    int[] capNCap = ButtonHelper.checkFleetAndCapacity(p2, game, tile, false, false);
+                    int capacityUsed = capNCap[1];
+                    int capacity = capNCap[2];
+                    int fightersIgnored = capNCap[3];
+                    int fighterCount = tileUnits.getOrDefault(Units.getUnitKey("ff", p2.getColor()), 0);
+                    int mechCount = tileUnits.getOrDefault(Units.getUnitKey("mf", p2.getColor()), 0);
+                    int infantryCount = tileUnits.getOrDefault(Units.getUnitKey("gf", p2.getColor()), 0);
+                    if (mechCount + infantryCount > capacity || mechCount + infantryCount + fighterCount > capacity + fightersIgnored)
                     {
-                        int overCapacity = capacityUsed - capacity;
-                        int fighterCount = tileUnits.getOrDefault(Units.getUnitKey("ff", p2.getColor()), 0);
-                        int mechCount = tileUnits.getOrDefault(Units.getUnitKey("mf", p2.getColor()), 0);
-                        int infantryCount = tileUnits.getOrDefault(Units.getUnitKey("gf", p2.getColor()), 0);
-                        if (mechCount == 0 && infantryCount == 0) {
-                            message.append(p2.getRepresentationNoPing()).append(" has ").append(overCapacity).append(" fighter")
-                                .append(overCapacity == 1 ? "" : "s").append(" in excess of their amended capacity; removing and capturing.\n");
+                        int overCapacity = Math.max(mechCount + infantryCount - capacity, mechCount + infantryCount + fighterCount - capacity - fightersIgnored);
+                        if (mechCount == 0 && infantryCount == 0)
+                        {
+                            message.append(p2.getRepresentationNoPing() + " has " + overCapacity 
+                                + " fighter" + (overCapacity == 1 ? "" : "s") + " in excess of their amended capacity; removing and capturing.\n");
                             RemoveUnitService.removeUnit(event, tile, game, p2, unitHolder, UnitType.Fighter, overCapacity, false);
                             AddUnitService.addUnits(event, player.getNomboxTile(), game, p2.getColor(), overCapacity + " ff");
                             for (int i = 0; i < overCapacity; i++)
@@ -1353,10 +1356,9 @@ public class ButtonHelperHeroes {
                                     + (mechCount >= 1 ? "mech" : "") + (mechCount >= 2 ? "s" : "") + (mechCount * infantryCount > 0 ? " and " : "")
                                     + (infantryCount >= 1 ? "infantry" : "");
                             }
-                            message.append(p2.getRepresentationNoPing()).append(" has a mixture of ").append(overCapacity).append(" ")
-                                .append(unitListing).append(" in excess of their amended capacity. Please remove ").append(overCapacity == 1 ? "this" : "these")
-                                .append(" excess manually (they are captured).\n")
-                                .append("-# We hope to add buttons for this Soon™.\n");
+                            message.append(p2.getRepresentationNoPing() + " has a mixture of " + overCapacity + " " + unitListing
+                                + " in excess of their amended capacity. Please remove " + (overCapacity == 1 ? "this" : "these") + " excess manually (they should be captured).\n");
+                            message.append("-# We hope to add buttons for this Soon™.\n");
                             // TODO: Add buttons
                         }
                     }
@@ -1410,6 +1412,7 @@ public class ButtonHelperHeroes {
             DisasterWatchHelper.sendMessageInDisasterWatch(game, player.getRepresentationUnfogged() 
                 + " purged It Feeds on Carrion, their hero, and captured... nothing " + MiscEmojis.TaDont + ".");
         }
+        message.append("\n-# Please report any bugs to `\\#bot-bugs-and-feature-requests`.");
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message.toString());
         ButtonHelper.deleteMessage(event);
     }

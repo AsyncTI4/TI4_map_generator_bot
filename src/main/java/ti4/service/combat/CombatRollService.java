@@ -490,7 +490,9 @@ public class CombatRollService {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasPlanetReady(bombardPlanet)) {
                     PlanetExhaust.doAction(p2, bombardPlanet, game);
-                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + " your planet " + Helper.getPlanetRepresentation(bombardPlanet, game) + " was exhausted when an opponent with X-89 bombarded it.");
+                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + ", your planet " 
+                        + Helper.getPlanetRepresentation(bombardPlanet, game) + " was exhausted when " 
+                        + (game.isFowMode() ? "another player" : player.getRepresentationNoPing()) + " bombarded it with _X-89 Bacterial Weapon ΩΩ_.");
                     break;
                 }
             }
