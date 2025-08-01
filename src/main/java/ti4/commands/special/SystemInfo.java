@@ -71,7 +71,7 @@ class SystemInfo extends GameStateSubcommand {
                 continue;
             }
             if (game.isFowMode() && !getPlayer().isGM() && !FoWHelper.getTilePositionsToShow(game, getPlayer()).contains(tile.getPosition())) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "You have no visibility to " + tile.getPosition());
+                MessageHelper.sendMessageToChannel(event.getChannel(), "You have no visibility to " + tile.getPosition() + ".");
                 continue;
             }
             String tileName = tile.getTilePath();

@@ -368,8 +368,8 @@ public class ActionCardHelper {
         }
         if (game.isStellarAtomicsMode() && actionCard.getPhase().equalsIgnoreCase("agenda") && game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
             if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
-                return player.getRepresentationUnfogged()
-                    + ", the bot thinks you no longer have your token on the stellar atomics card and thus cannot play action cards during the agenda phase.";
+                return player.getRepresentationUnfogged() + ", the bot thinks you have committed some light war crimes,"
+                    + " thus you no longer have your token on the _Stellar Atomics_ event card, and therefore cannot play action cards during the Agenda Phase.";
             }
         }
         if (actionCard.getPhase().equalsIgnoreCase("action") && game.getPhaseOfGame() != null && game.getPhaseOfGame().contains("agenda")) {

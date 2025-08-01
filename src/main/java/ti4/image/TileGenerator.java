@@ -449,9 +449,10 @@ public class TileGenerator {
                 for (Player player : game.getRealPlayers()) {
                     prodInSystem = Math.max(prodInSystem, Helper.getProductionValue(player, game, tile, false));
                     if (capacity == 0 && capacityUsed == 0) {
-                        ignoredFs = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[3];
-                        capacity = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[2];
-                        capacityUsed = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false)[1];
+                        int[] capNCap = ButtonHelper.checkFleetAndCapacity(player, game, tile, false, false);
+                        capacityUsed = capNCap[1];
+                        capacity = capNCap[2];
+                        ignoredFs = capNCap[3];
                     }
                 }
                 for (UnitHolder unitHolder : unitHolders) {
@@ -485,36 +486,24 @@ public class TileGenerator {
                     }
 
                     if (capacityUsed > 0 || capacity > 0 || ignoredFs > 0) {
-                        int textModifer = 0;
-                        if (capacity == 1) {
-                            textModifer = 7;
-                        }
-                        if (capacity > 9) {
-                            textModifer = -5;
-                        }
-                        if (capacity == 11) {
-                            textModifer = 0;
-                        }
-                        List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
                         BufferedImage carrierImage = ImageHelper.readScaled(ResourceHelper.getInstance().getTileFile("capacity_representation.png"), 64, 21);
 
-                        int xMod;
+                        int xMod = -155;
                         int yMod = -290;
+                        List<String> problematicTiles = java.util.List.of("25", "26", "64"); // quann, lodor, atlas
                         if (tile.getUnitHolders().size() != 4 || problematicTiles.contains(tile.getTileID())) {
                             xMod = -15;
-                        } else {
-                            xMod = -155;
                         }
                         Graphics2D g2d = (Graphics2D) tileGraphics;
                         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                         // Calculate water height
-                        double waterHeight;
-                        if (capacity + ignoredFs > 0) {
-                            waterHeight = 20.0 * capacityUsed / (capacity + ignoredFs);
-                        } else {
-                            waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
-                        }
+                        // double waterHeight;
+                        // if (capacity + ignoredFs > 0) {
+                            // waterHeight = 20.0 * capacityUsed / (capacity + ignoredFs);
+                        // } else {
+                            // waterHeight = 20.0 * Math.min(capacityUsed, 1.2);
+                        // }
 
                         // Draw brown box (3 sides)
 
