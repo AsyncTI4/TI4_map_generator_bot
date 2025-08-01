@@ -520,6 +520,8 @@ public class Player extends PlayerProperties {
 
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
+            if(PositionMapper.getReinforcementsPosition(unit) == null)
+                return 0;
             return PositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
             //return 0;
         }
