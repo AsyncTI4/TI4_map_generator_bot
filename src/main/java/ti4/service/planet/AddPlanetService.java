@@ -411,7 +411,7 @@ public class AddPlanetService {
 
         }
 
-        if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode()) {
+        if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode() && player.isRealPlayer()) {
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (buttons != null && !buttons.isEmpty()) {
                 String message = player.getFactionEmoji() + " Click button to explore "
