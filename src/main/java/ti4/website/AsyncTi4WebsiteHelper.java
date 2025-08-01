@@ -72,7 +72,6 @@ public class AsyncTi4WebsiteHelper {
     }
 
     public static void putPlayerData(String gameId, Game game) {
-        BotLogger.warning(String.format("Starting put player data for game: %s", gameId));
 
         if (!uploadsEnabled())  return;
 
@@ -105,6 +104,7 @@ public class AsyncTi4WebsiteHelper {
                 strategyCards.add(webSC);
             }
 
+            BotLogger.warning(String.format("Assembling Hashmap: %s", gameId));
             Map<String, Object> webData = new HashMap<>();
             webData.put("versionSchema", 5);
             webData.put("objectives", webObjectives);
@@ -132,6 +132,8 @@ public class AsyncTi4WebsiteHelper {
             );
         } catch (IOException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
+        } catch (Exception e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server (Non-IO Exception):", e);
         }
     }
 
