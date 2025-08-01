@@ -1180,7 +1180,7 @@ public class ButtonHelperAgents {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
-            if (!actionRow2.isEmpty() && !exhaustedMessage.contains("choose the user of the agent")
+            if (!actionRow2.isEmpty() && !exhaustedMessage.contains("choose the user of the agent") && !exhaustedMessage.contains("please choose the faction to give")
                 && !exhaustedMessage.contains("choose the target of the agent")) {
                 if (exhaustedMessage.contains("buttons to do an end of turn ability") && buttons == 1) {
                     buttonEvent.getMessage().delete().queue();
@@ -2221,7 +2221,7 @@ public class ButtonHelperAgents {
         List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(game, buttonID);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
             player.getRepresentationUnfogged() + ", please choose the faction to give " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
-                + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent, to.",
+                + "Brother Milor, the Yin" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent to.",
             buttons);
         String exhaustedMessage = event.getMessage().getContentRaw();
         if (exhaustedMessage.isEmpty()) {

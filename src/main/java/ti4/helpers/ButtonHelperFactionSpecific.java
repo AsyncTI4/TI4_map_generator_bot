@@ -1927,6 +1927,21 @@ public class ButtonHelperFactionSpecific {
             if (p2 == player || !p2.getPromissoryNotes().containsKey("ra") || p2.getTechs().contains(tech) || p2.getNotResearchedFactionTechs().contains(tech)) {
                 continue;
             }
+            boolean hasSpecialUpgrade = false;
+            if (Mapper.getTech(tech).isUnitUpgrade()) {
+                for (String factionTech : p2.getNotResearchedFactionTechs()) {
+                    TechnologyModel fTech = Mapper.getTech(factionTech);
+                    if (fTech != null && !fTech.getAlias().equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                        && fTech.isUnitUpgrade()
+                        && fTech.getBaseUpgrade().orElse("bleh")
+                            .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                        hasSpecialUpgrade = true;
+                    }
+                }
+            }
+            if (hasSpecialUpgrade) {
+                continue;
+            }
             String owner = game.getPNOwner("ra").getFaction().equalsIgnoreCase("jolnar") ? "Jol-Nar player" : "_Research Agreement_ owner";
             String msg = p2.getRepresentationUnfogged() + ", the " + owner + " has researched the technology "
                 + Mapper.getTech(AliasHandler.resolveTech(tech)).getRepresentation(false)
