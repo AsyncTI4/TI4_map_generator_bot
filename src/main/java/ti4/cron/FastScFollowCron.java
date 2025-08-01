@@ -4,7 +4,6 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.experimental.UtilityClass;
 import ti4.executors.ExecutionLockManager;
-import ti4.executors.GameLockManager;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Helper;
 import ti4.map.Game;
@@ -33,16 +32,20 @@ public class FastScFollowCron {
         GameManager.getManagedGames().stream()
             .filter(not(ManagedGame::isHasEnded))
             .filter(ManagedGame::isFastScFollowMode)
-            .forEach(managedGame ->
-                GameLockManager.runWithLockSaveAndRelease(
-                    managedGame.getName(), ExecutionLockManager.LockType.WRITE, "FastScFollowCron", FastScFollowCron::handleFastScFollow));
+            .map(ManagedGame::getName)
+            .forEach(gameName ->
+                ExecutionLockManager
+                    .wrapWithLockAndRelease(gameName, ExecutionLockManager.LockType.WRITE, () -> handleFastScFollow(gameName))
+                    .run());
 
         BotLogger.info("Finished FastScFollowCron");
     }
 
-    private static void handleFastScFollow(Game game) {
+    private static void handleFastScFollow(String gameName) {
+        Game game = GameManager.getManagedGame(gameName).getGame();
         try {
             handleFastScFollowMode(game);
+            GameManager.save(game, "FastScFollowCron"); // TODO: This should be a property outside game, as it can be UNDO'd
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "FastScFollowCron failed for game: " + game.getName(), e);
         }

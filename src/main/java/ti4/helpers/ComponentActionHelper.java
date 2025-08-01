@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -18,6 +19,7 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
@@ -32,6 +34,7 @@ import ti4.service.leader.ExhaustLeaderService;
 import ti4.service.leader.PlayHeroService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
+import ti4.service.unit.DestroyUnitService;
 
 public class ComponentActionHelper {
 
@@ -58,9 +61,11 @@ public class ComponentActionHelper {
                 compButtons.add(tButton);
             }
         }
+        if (game.isStellarAtomicsMode() && game.getRevealedPublicObjectives().get("Stellar Atomics") != null && game.getScoredPublicObjectives().get("Stellar Atomics").contains(p1.getUserID())) {
+            compButtons.add(Buttons.red(finChecker + prefix + "stellarAtomicsAction_", "Use Stellar Atomics"));
+        }
         if (ButtonHelper.getNumberOfStarCharts(p1) > 1) {
-            Button tButton = Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts ");
-            compButtons.add(tButton);
+            compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
         }
 
         if (game.isTotalWarMode() && game.changeCommsOnPlanet(0, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game)) > 9) {
@@ -560,6 +565,29 @@ public class ComponentActionHelper {
                 ButtonHelper.purge2StarCharters(p1);
                 DiscordantStarsHelper.drawBlueBackTiles(event, game, p1, 1);
             }
+            case "stellarAtomicsAction" -> {
+                game.unscorePublicObjective(p1.getUserID(), game.getRevealedPublicObjectives().get("Stellar Atomics"));
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
+                    + " removed their token from the stellar atomics card.");
+                List<Button> buttons = new ArrayList<>();
+                for (Player p2 : game.getRealPlayersNDummies()) {
+                    if (p2 == p1) {
+                        continue;
+                    }
+                    if (game.isFowMode()) {
+                        buttons.add(Buttons.gray("atomicsStep2_" + p2.getFaction(), p2.getColor()));
+                    } else {
+                        Button button = Buttons.gray("atomicsStep2_" + p2.getFaction(), " ");
+                        String factionEmojiString = p2.getFactionEmoji();
+                        button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                        buttons.add(button);
+                    }
+                }
+                ButtonHelper.deleteMessage(event);
+                MessageHelper.sendMessageToChannelWithButtons(p1.getCorrectChannel(),
+                    p1.getRepresentationUnfogged() + ", please choose which player owns the soon-to-be nuked planet.",
+                    buttons);
+            }
             case "doTotalWarPoint" -> {
                 int remaining = game.changeCommsOnPlanet(-10, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
@@ -581,6 +609,47 @@ public class ComponentActionHelper {
             serveNextComponentActionButtons(event, game, p1);
         }
         ButtonHelper.deleteMessage(event);
+    }
+
+    @ButtonHandler("atomicsStep2_")
+    public static void resolveAtomicsStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        List<Button> buttons = new ArrayList<>();
+        for (String planet : p2.getPlanets()) {
+            Tile tile = game.getTileFromPlanet(planet);
+            if (tile != null && !tile.isHomeSystem(game)) {
+                buttons.add(Buttons.gray("atomicsStep3_" + p2.getFaction() + "_" + planet,
+                    Helper.getPlanetRepresentation(planet, game)));
+            }
+        }
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + ", please choose the planet you wish to nuke.", buttons);
+    }
+
+    @ButtonHandler("atomicsStep3_")
+    public static void resolveAtomicsStep3(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
+        String planet = buttonID.split("_")[2];
+        String planetRep = Helper.getPlanetRepresentation(planet, game);
+        ButtonHelper.deleteMessage(event);
+
+        if (p2.hasAbility("data_recovery")) {
+            ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
+        }
+
+        DestroyUnitService.destroyAllUnits(event, game.getTileFromPlanet(planet), game, game.getUnitHolderFromPlanet(planet), false);
+        if (game.isFowMode()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " you destroyed all units on " + planetRep);
+            MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
+                p2.getRepresentationUnfogged() + ", your planet " + planetRep
+                    + " was nuked and all units were destroyed.");
+        } else {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + " has nuked " + planetRep + ", destroying every unit there belonging to " + p2.getRepresentationUnfogged() + ".");
+        }
+
     }
 
     private static void resolveRelicComponentAction(Game game, Player player, ButtonInteractionEvent event, String relicID) {

@@ -160,7 +160,7 @@ public class UnfiledButtonHandlers {
     }
 
     @ButtonHandler("enableDaneMode_")
-    public static void enableDaneMode(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
+    public static void enableDaneMode(ButtonInteractionEvent event, String buttonID, Game game) {
         String mode = buttonID.split("_")[1];
         boolean enable = buttonID.split("_")[2].equalsIgnoreCase("enable");
         String message = "Successfully " + buttonID.split("_")[2] + "d the ";
@@ -189,6 +189,49 @@ public class UnfiledButtonHandlers {
         if (mode.equalsIgnoreCase("totalWar")) {
             game.setTotalWarMode(enable);
             message += "Total War Mode. Nothing more needs to be done.";
+        }
+        if (mode.equalsIgnoreCase("DangerousWilds")) {
+            game.setDangerousWildsMode(enable);
+            message += "Dangerous Wilds Mode. Nothing more needs to be done.";
+            if (enable) {
+                message += " The game will automatically put down infantry upon the start of every strategy phase.";
+            }
+        }
+        if (mode.equalsIgnoreCase("CivilizedSociety")) {
+            game.setCivilizedSocietyMode(enable);
+            message += "Civilized Society Mode. Nothing more needs to be done.";
+        }
+        if (mode.equalsIgnoreCase("AgeOfFighters")) {
+            game.setAgeOfFightersMode(enable);
+            message += "Age Of Fighters Mode. Nothing more needs to be done.";
+            if (enable) {
+                for (Player player : game.getRealPlayers()) {
+                    String tech = "ff2";
+                    for (String factionTech : player.getNotResearchedFactionTechs()) {
+                        TechnologyModel fTech = Mapper.getTech(factionTech);
+                        if (fTech != null && !fTech.getAlias().equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                            && fTech.isUnitUpgrade()
+                            && fTech.getBaseUpgrade().orElse("bleh")
+                                .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                            tech = fTech.getAlias();
+                            break;
+                        }
+                    }
+                    player.addTech(tech);
+                    MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                        player.getRepresentation() + " gained the " + Mapper.getTech(tech).getNameRepresentation() + " technology due to the Age of Fighters Galactic Event.");
+                }
+            }
+        }
+        if (mode.equalsIgnoreCase("StellarAtomics")) {
+            if (enable) {
+                game.setStellarAtomicsMode(enable);
+                int poIndex = game.addCustomPO("Stellar Atomics", 0);
+                for (Player playerWL : game.getRealPlayers()) {
+                    game.scorePublicObjective(playerWL.getUserID(), poIndex);
+                }
+            }
+            message += "Stellar Atomics Mode. Nothing more needs to be done.";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
         List<Button> buttons = GameOptionService.getDaneLeakModeButtons(game);
@@ -1219,7 +1262,7 @@ public class UnfiledButtonHandlers {
             game.setStoredValue("revealedPOInRound" + game.getRound(), "Yes");
         }
         String revealedObjective = null;
-        if (!game.isRedTapeMode()) {
+        if (!game.isRedTapeMode() && !game.isCivilizedSocietyMode()) {
             if ("2".equalsIgnoreCase(stage)) {
                 RevealPublicObjectiveService.revealS2(game, event, event.getChannel());
             } else if ("2x2".equalsIgnoreCase(stage)) {
@@ -1231,7 +1274,7 @@ public class UnfiledButtonHandlers {
             }
         } else {
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-                "In Red Tape, no objective is revealed at this stage.");
+                "No objective is revealed at this stage in this mode.");
             int playersWithSCs = 0;
             for (Player player2 : game.getRealPlayers()) {
                 if (player2.getSCs() != null && !player2.getSCs().isEmpty() && !player2.getSCs().contains(0)) {
@@ -1962,8 +2005,8 @@ public class UnfiledButtonHandlers {
                 Button drawStage2 = Buttons.green("reveal_stage_2", "Reveal Stage 2");
                 Button drawStage1 = Buttons.green("reveal_stage_1", "Reveal Stage 1");
                 List<Button> buttons = new ArrayList<>();
-                if (game.isRedTapeMode()) {
-                    message2 = "All players have indicated scoring. This game is Red Tape mode, which means no objective is revealed at this stage."
+                if (game.isRedTapeMode() || game.isCivilizedSocietyMode()) {
+                    message2 = "All players have indicated scoring. In this game mode, no objective is revealed at this stage."
                         + " Please press one of the buttons below anyways though - don't worry, it won't reveal anything, it will just run cleanup.";
                 }
                 if (game.getRound() < 4 || !game.getPublicObjectives1Peakable().isEmpty()) {
@@ -2295,13 +2338,12 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("useLawsOrder")
     public static void useLawsOrder(ButtonInteractionEvent event, Player player, Game game) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), player.getFactionEmojiOrColor() + " is paying "
-            + MiscEmojis.Influence_1 + " influence to ignore laws for the turn.");
+        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmojiOrColor() + " is paying 1 trade good or 1 commodity to ignore laws for the turn.");
         List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(game, player, "inf");
         Button doneExhausting = Buttons.red("deleteButtons_spitItOut", "Done Exhausting Planets");
         buttons.add(doneExhausting);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-            "Please choose the planets you wish to exhaust to pay the 1 influence.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            "Please spend 1 commodity or 1 trade good.", buttons);
         ButtonHelper.deleteTheOneButton(event);
         game.setStoredValue("lawsDisabled", "yes");
     }
@@ -3069,7 +3111,12 @@ public class UnfiledButtonHandlers {
         } else {
             game.setStoredValue("revealedFlop" + game.getRound(), "Yes");
         }
-        RevealPublicObjectiveService.revealTwoStage1(game);
+
+        if (game.isCivilizedSocietyMode()) {
+            RevealPublicObjectiveService.revealAllObjectives(game);
+        } else {
+            RevealPublicObjectiveService.revealTwoStage1(game);
+        }
         StartPhaseService.startStrategyPhase(event, game);
         PlayerPreferenceHelper.offerSetAutoPassOnSaboButtons(game, null);
         ButtonHelper.deleteMessage(event);

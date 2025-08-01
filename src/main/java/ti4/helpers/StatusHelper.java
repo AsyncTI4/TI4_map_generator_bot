@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.collections4.ListUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.apache.commons.collections4.ListUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -128,11 +129,11 @@ public class StatusHelper {
         game.setStoredValue(key3, "");
         game.setStoredValue(key2b, "");
         game.setStoredValue(key3b, "");
-        if (game.getHighestScore() + 4 > game.getVp()) {
+        if (game.getHighestScore() + 4 > game.getVp() && !game.isCivilizedSocietyMode()) {
             game.setStoredValue("forcedScoringOrder", "true");
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("turnOffForcedScoring", "Turn Off Forced Scoring Order"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game   .getPing() +
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), game.getPing() +
                 ", players will be forced to score in order. Any preemptive scores will be queued. You may turn this off at any time by pressing this button.", buttons);
             for (Player player : GetPlayersInScoringOrder(game)) {
                 game.setStoredValue(key3, game.getStoredValue(key3) + player.getFaction() + "*");
@@ -162,7 +163,7 @@ public class StatusHelper {
                 messageText = player.getRepresentation() + ", the bot does not believe that you can score any public objectives.";
             } else {
                 if (Helper.canPlayerScorePOs(game, player)) {
-                    messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objective" 
+                    messageText = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following public objective"
                         + (scorables.size() == 1 ? "" : "s") + ":\n";
                     messageText += String.join("\n", scorables);
                 } else {
@@ -190,14 +191,14 @@ public class StatusHelper {
             String message3a = "";
             for (String soID : player.getSecretsUnscored().keySet()) {
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
-                        && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
-                        && !soID.equalsIgnoreCase("dp")) {
+                    && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player) > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
+                    && !soID.equalsIgnoreCase("dp")) {
                     message3a += "\n" + Mapper.getSecretObjective(soID).getRepresentation(false);
                     count++;
                 }
             }
             if (count > 0 && player.isRealPlayer()) {
-                message3a = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following secret objective" 
+                message3a = player.getRepresentation() + ", as a reminder, the bot believes you are capable of scoring the following secret objective"
                     + (count == 1 ? "" : "s") + ":" + message3a;
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message3a);
             } else if (player.getSo() == 0) {
@@ -216,7 +217,7 @@ public class StatusHelper {
                         game.getStoredValue(key3).replace(player.getFaction() + "*", ""));
                 }
             } else if (player.isRealPlayer()) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), 
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
                     player.getRepresentation() + ", the bot does not believe that you can score any of your secret objectives.");
             }
         }

@@ -2347,6 +2347,12 @@ public class AgendaHelper {
             voteCount = 0;
         }
 
+        if (game.isStellarAtomicsMode() && hasXxchaAlliance == 0 && game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
+            if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
+                voteCount = 0;
+            }
+        }
+
         return new int[] { voteCount, hasXxchaHero, hasXxchaAlliance };
     }
 
@@ -3007,6 +3013,9 @@ public class AgendaHelper {
             && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             sb.append(" __not__ voting due to **Galactic Threat**");
             return sb.toString();
+        } else if (game.isStellarAtomicsMode() && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") && game.getRevealedPublicObjectives().get("Stellar Atomics") != null && !game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
+            sb.append(" __not__ voting due to having used stellar atomics.");
+
         } else if (player.hasLeaderUnlocked("xxchahero")) {
             sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount);
         } else if (player.hasAbility("lithoids")) { // Vote with planet resources, not influence
@@ -3054,6 +3063,10 @@ public class AgendaHelper {
         // NEKRO unless XXCHA ALLIANCE
         if (player.hasAbility("galactic_threat")
             && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            return 0;
+        }
+
+        if (game.isStellarAtomicsMode() && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") && game.getRevealedPublicObjectives().get("Stellar Atomics") != null && !game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
             return 0;
         }
 
@@ -3898,35 +3911,47 @@ public class AgendaHelper {
     }
 
     public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("__**Top Agenda:**__");
-        String agendaID = game.lookAtTopAgenda(0);
-        MessageEmbed embed = null;
-        if (game.getSentAgendas().get(agendaID) != null) {
-            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
-                sb.append(
-                    "You are currently voting on _Covert Legislation_, and the top agenda is in the speaker's hand.");
-                sb.append(" Showing the next agenda because that's how it should be by the RULEZ\n");
-                agendaID = game.lookAtTopAgenda(1);
 
-                if (game.getSentAgendas().get(agendaID) != null) {
-                    embed = AgendaModel.agendaIsInSomeonesHandEmbed();
-                } else if (agendaID != null) {
-                    embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
-                }
+        sendTopAgendaToCardsInfoSkipCovert(game, player, 1);
+    }
+
+    public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player, int count) {
+
+        for (int x = 0; x < count; x++) {
+            StringBuilder sb = new StringBuilder();
+            if (x == 0) {
+                sb.append("__**Top Agenda:**__");
             } else {
-                sb.append(
-                    "The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard.");
+                sb.append("__**Agenda At Location " + (x + 1) + ":**__");
             }
-        } else if (agendaID != null) {
-            embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
-        } else {
-            sb.append("Could not find agenda.");
-        }
-        if (embed != null) {
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
-        } else {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+            String agendaID = game.lookAtTopAgenda(x);
+            MessageEmbed embed = null;
+            if (game.getSentAgendas().get(agendaID) != null) {
+                if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
+                    sb.append(
+                        "You are currently voting on _Covert Legislation_, and the top agenda is in the speaker's hand.");
+                    sb.append(" Showing the next agenda per rules\n");
+                    agendaID = game.lookAtTopAgenda(x + 1);
+
+                    if (game.getSentAgendas().get(agendaID) != null) {
+                        embed = AgendaModel.agendaIsInSomeonesHandEmbed();
+                    } else if (agendaID != null) {
+                        embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
+                    }
+                } else {
+                    sb.append(
+                        "The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard.");
+                }
+            } else if (agendaID != null) {
+                embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
+            } else {
+                sb.append("Could not find agenda.");
+            }
+            if (embed != null) {
+                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+            } else {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+            }
         }
     }
 
