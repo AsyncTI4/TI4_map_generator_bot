@@ -17,7 +17,6 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -46,6 +45,11 @@ public class AsyncTi4WebsiteHelper {
 
     public static void putData(String gameName, Game game) {
         if (!uploadsEnabled()) return;
+        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
+        if (bucket == null || bucket.isEmpty()) {
+            BotLogger.error("S3 bucket not configured.");
+            return;
+        }
 
         try {
             Map<String, Object> exportableFieldMap = game.getExportableFieldMap();
@@ -54,7 +58,7 @@ public class AsyncTi4WebsiteHelper {
             List<String> urls = getConfiguredUrls("gamestate.api.urls");
             for (String urlTemplate : urls) {
                 String url = urlTemplate.replace("{gameName}", gameName);
-                
+
                 HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .POST(HttpRequest.BodyPublishers.ofString(json))
@@ -66,14 +70,18 @@ public class AsyncTi4WebsiteHelper {
                         return null;
                     });
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
     }
 
     public static void putPlayerData(String gameId, Game game) {
-
         if (!uploadsEnabled())  return;
+        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
+        if (bucket == null || bucket.isEmpty()) {
+            BotLogger.error("S3 bucket not configured.");
+            return;
+        }
 
         try {
             List<WebPlayerArea> playerDataList = new ArrayList<>();
@@ -122,30 +130,36 @@ public class AsyncTi4WebsiteHelper {
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
-            putObjectToAllBuckets(
+            BotLogger.warning(String.format("Starting put player data to the bucket for for game: %s", gameId));
+            putObjectInBucket(
                 String.format("webdata/%s/%s.json", gameId, gameId),
                 AsyncRequestBody.fromString(json),
                 "application/json",
-                "no-cache, no-store, must-revalidate"
+                "no-cache, no-store, must-revalidate",
+                bucket
             );
-        } catch (IOException e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server (Non-IO Exception):", e);
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
     }
 
     public static void putOverlays(String gameId, List<WebsiteOverlay> overlays) {
         if (!uploadsEnabled()) return;
+        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
+        if (bucket == null || bucket.isEmpty()) {
+            BotLogger.error("S3 bucket not configured.");
+            return;
+        }
 
         try {
             String json = EgressClientManager.getObjectMapper().writeValueAsString(overlays);
 
-            putObjectToAllBuckets(
+            putObjectInBucket(
                 String.format("overlays/%s/%s.json", gameId, gameId),
                 AsyncRequestBody.fromString(json),
                 "application/json",
-                "no-cache, no-store, must-revalidate"
+                "no-cache, no-store, must-revalidate",
+                bucket
             );
         } catch (Exception e) {
             BotLogger.error("Could not put overlay to web server", e);
@@ -155,8 +169,7 @@ public class AsyncTi4WebsiteHelper {
     // If this becomes a resource hog again, the next step would probably be to switch to MultipartUpload
     public static void putStats() throws IOException {
         if (!uploadsEnabled()) return;
-
-        String bucket = EgressClientManager.getWebProperties().getProperty("bucket");
+        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
         if (bucket == null || bucket.isEmpty()) {
             BotLogger.error("S3 bucket not configured.");
             return;
@@ -169,7 +182,7 @@ public class AsyncTi4WebsiteHelper {
 
         Path tempFile = Files.createTempFile("statistics", ".json");
         try (OutputStream outputStream = Files.newOutputStream(tempFile);
-                SequenceWriter writer = EgressClientManager.getObjectMapper().writer().writeValuesAsArray(outputStream)) {
+            SequenceWriter writer = EgressClientManager.getObjectMapper().writer().writeValuesAsArray(outputStream)) {
             for (ManagedGame managedGame : GameManager.getManagedGames()) {
                 if (managedGame.getRound() <= 2 && (!managedGame.isHasEnded() || !managedGame.isHasWinner())) {
                     continue;
@@ -204,43 +217,36 @@ public class AsyncTi4WebsiteHelper {
         }
         BotLogger.info(msg);
 
-        List<String> buckets = getConfiguredBuckets();
-        int[] completedUploads = {0};
-        int totalUploads = buckets.size();
-        
-        for (String bucketName : buckets) {
-            PutObjectRequest req = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key("statistics/statistics.json")
-                .contentType("application/json")
-                .cacheControl("no-cache, no-store, must-revalidate")
-                .build();
+        PutObjectRequest req = PutObjectRequest.builder()
+            .bucket(bucket)
+            .key("statistics/statistics.json")
+            .contentType("application/json")
+            .cacheControl("no-cache, no-store, must-revalidate")
+            .build();
 
-            EgressClientManager.getS3AsyncClient().putObject(req, AsyncRequestBody.fromFile(tempFile))
-                .whenComplete((result, throwable) -> {
-                    synchronized (completedUploads) {
-                        completedUploads[0]++;
-                        
-                        if (throwable != null) {
-                            BotLogger.error(String.format("Failed to upload game stats to S3 bucket %s.", bucketName), throwable);
-                        } else {
-                            BotLogger.info(String.format("Statistics upload to bucket %s complete.", bucketName));
-                        }
-                        
-                        if (completedUploads[0] == totalUploads) {
-                            try {
-                                Files.deleteIfExists(tempFile);
-                            } catch (IOException e) {
-                                BotLogger.error("Failed to delete temporary stats file", e);
-                            }
-                        }
-                    }
-                });
-        }
+        EgressClientManager.getS3AsyncClient().putObject(req, AsyncRequestBody.fromFile(tempFile))
+            .whenComplete((result, throwable) -> {
+                if (throwable != null) {
+                    BotLogger.error(String.format("Failed to upload game stats to S3 bucket %s.", bucket), throwable);
+                } else {
+                    BotLogger.info(String.format("Statistics upload to bucket %s complete.", bucket));
+                }
+
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException e) {
+                    BotLogger.error("Failed to delete temporary stats file", e);
+                }
+            });
     }
 
     public static void putMap(String gameName, byte[] imageBytes, boolean frog, Player player) {
         if (!uploadsEnabled()) return;
+        String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
+        if (bucket == null || bucket.isEmpty()) {
+            BotLogger.error("S3 bucket not configured.");
+            return;
+        }
 
         try {
             String mapPath;
@@ -253,13 +259,14 @@ public class AsyncTi4WebsiteHelper {
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
-            putObjectToAllBuckets(
+            putObjectInBucket(
                 String.format(mapPath, gameName, dtstamp),
                 AsyncRequestBody.fromBytes(imageBytes),
                 "image/jpg",
-                null
+                null,
+                bucket
             );
-        } catch (SdkClientException e) {
+        } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
         }
     }
@@ -281,42 +288,24 @@ public class AsyncTi4WebsiteHelper {
         return urls;
     }
 
-    private static List<String> getConfiguredBuckets() {
-        List<String> buckets = new ArrayList<>();
-
-        String primaryBucket = EgressClientManager.getWebProperties().getProperty("bucket");
-        if (primaryBucket != null && !primaryBucket.isEmpty()) {
-            buckets.add(primaryBucket);
-        }
-
+    private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl, String bucket) {
         String websiteBucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
-        if (websiteBucket != null && !websiteBucket.isEmpty()) {
-            buckets.add(websiteBucket);
+
+        PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder()
+            .bucket(websiteBucket)
+            .key(key)
+            .contentType(contentType);
+
+        if (cacheControl != null) {
+            requestBuilder.cacheControl(cacheControl);
         }
 
-        return buckets;
-    }
+        PutObjectRequest request = requestBuilder.build();
 
-    private static void putObjectToAllBuckets(String key, AsyncRequestBody body, String contentType, String cacheControl) {
-        List<String> buckets = getConfiguredBuckets();
-
-        for (String bucket : buckets) {
-            PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .contentType(contentType);
-
-            if (cacheControl != null) {
-                requestBuilder.cacheControl(cacheControl);
-            }
-
-            PutObjectRequest request = requestBuilder.build();
-
-            
-            EgressClientManager.getS3AsyncClient().putObject(request, body).exceptionally(e -> {
-                    BotLogger.error(String.format("An exception occurred while performing an async send to bucket %s", bucket), e);
-                    return null;
-                });
-        }
+        EgressClientManager.getS3AsyncClient().putObject(request, body)
+            .exceptionally(e -> {
+                BotLogger.error(String.format("An exception occurred while performing an async send to bucket %s", websiteBucket), e);
+                return null;
+            });
     }
 }
