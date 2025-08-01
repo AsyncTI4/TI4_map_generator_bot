@@ -309,8 +309,9 @@ public class AsyncTi4WebsiteHelper {
 
             PutObjectRequest request = requestBuilder.build();
 
-            EgressClientManager.getS3AsyncClient().putObject(request, body)
-                .exceptionally(e -> {
+            BotLogger.warning(String.format("An request to put player data was processed for key: %s bucket: %s", key, bucket));
+
+            EgressClientManager.getS3AsyncClient().putObject(request, body).exceptionally(e -> {
                     BotLogger.error(String.format("An exception occurred while performing an async send to bucket %s", bucket), e);
                     return null;
                 });
