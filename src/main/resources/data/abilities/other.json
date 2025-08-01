@@ -47,8 +47,8 @@
         "id": "laws_order",
         "name": "Law's Order",
         "faction": "keleres",
-        "window": "At the start of your turn",
-        "windowEffect": "You may spend 1 influence to treat all laws as blank until the end of your turn.",
+        "window": "At the start of any player's turn",
+        "windowEffect": "You may spend 1 trade good or 1 commodity to treat all laws as blank until the end of that turn.",
         "source": "codex3"
     },
     {

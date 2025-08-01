@@ -87,7 +87,7 @@ public class RelicHelper {
         StringBuilder helpMessage = new StringBuilder();
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case "obsidian" -> {
+            case "obsidian", "absol_obsidian" -> {
                 game.drawSecretObjective(player.getUserID());
 
                 if (game.isFowMode()) {

@@ -3085,6 +3085,16 @@ public class ButtonHelper {
             && player == game.getActivePlayer()) {
             capacity += 2;
         }
+        int ageOfFightersFleet = 0;
+        if (game.isAgeOfFightersMode()) {
+            if (player.hasTech("hcf2")) {
+                ageOfFightersFleet = Math.min(numFighter2s, fleetCap - numOfCapitalShips);
+            } else {
+                ageOfFightersFleet = Math.min(numFighter2s, (fleetCap - numOfCapitalShips) / 2);
+            }
+            capacity += ageOfFightersFleet;
+        }
+
         if (numInfNFightersNMechs > capacity) {
             if (numInfNFightersNMechs - numFighter2s > capacity) {
                 capacityViolated = true;
@@ -3511,13 +3521,50 @@ public class ButtonHelper {
                 inBoth = pos3;
             }
         }
+        List<String> redTilesToPullFrom = new ArrayList<>(List.of(
+            //Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
+            //         https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx
+
+            "39",
+            "40",
+            "41",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "47",
+            "48",
+            "49",
+            "67",
+            "68",
+            "77",
+            "78",
+            "79",
+            "80",
+            "d117",
+            "d118",
+            "d119",
+            "d120",
+            "d121",
+            "d122",
+            "d123"));
+
+        // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile -> !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
+        redTilesToPullFrom.removeAll(game.getTileMap().values().stream().map(Tile::getTileID).toList());
+        if (!game.isDiscordantStarsMode() && !game.isUnchartedSpaceStuff()) {
+            redTilesToPullFrom.removeAll(redTilesToPullFrom.stream().filter(tileID -> tileID.contains("d")).toList());
+        }
 
         if (newTileID.equalsIgnoreCase("unknown")) {
             DiceHelper.Die d1 = new DiceHelper.Die(5);
 
             String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
-            if (d1.getResult() > 4) {
+            if (d1.getResult() > 4 || redTilesToPullFrom.isEmpty()) {
                 message += "blue backed tile.";
+                if (d1.getResult() < 5) {
+                    message += " (All red backed tiles were already placed)";
+                }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
                     .filter(tile -> tile.getTierList().isBlue())
@@ -3546,44 +3593,11 @@ public class ButtonHelper {
             } else {
                 message += "red backed tile.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                List<String> tilesToPullFrom = new ArrayList<>(List.of(
-                    //Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
-                    //         https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx
 
-                    "39",
-                    "40",
-                    "41",
-                    "42",
-                    "43",
-                    "44",
-                    "45",
-                    "46",
-                    "47",
-                    "48",
-                    "49",
-                    "67",
-                    "68",
-                    "77",
-                    "78",
-                    "79",
-                    "80",
-                    "d117",
-                    "d118",
-                    "d119",
-                    "d120",
-                    "d121",
-                    "d122",
-                    "d123"));
+                List<String> tileToPullFromUnshuffled = new ArrayList<>(redTilesToPullFrom);
+                Collections.shuffle(redTilesToPullFrom);
 
-                // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile -> !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
-                tilesToPullFrom.removeAll(game.getTileMap().values().stream().map(Tile::getTileID).toList());
-                if (!game.isDiscordantStarsMode() && !game.isUnchartedSpaceStuff()) {
-                    tilesToPullFrom.removeAll(tilesToPullFrom.stream().filter(tileID -> tileID.contains("d")).toList());
-                }
-                List<String> tileToPullFromUnshuffled = new ArrayList<>(tilesToPullFrom);
-                Collections.shuffle(tilesToPullFrom);
-
-                if (tilesToPullFrom.size() < 1) {
+                if (redTilesToPullFrom.size() < 1) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
                     return;
                 }
@@ -3591,7 +3605,7 @@ public class ButtonHelper {
                 List<MessageEmbed> tileEmbeds = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
 
-                String tileID = tilesToPullFrom.get(0);
+                String tileID = redTilesToPullFrom.get(0);
                 ids.add(tileID);
                 TileModel tile = TileHelper.getTileById(tileID);
                 tileEmbeds.add(tile.getRepresentationEmbed(false));

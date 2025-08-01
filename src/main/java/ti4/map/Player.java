@@ -55,6 +55,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.map.pojo.PlayerProperties;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -519,7 +520,8 @@ public class Player extends PlayerProperties {
 
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
-            return 0;
+            return PositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
+            //return 0;
         }
         return unitCaps.get(unit);
     }
