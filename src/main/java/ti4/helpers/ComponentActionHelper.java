@@ -568,7 +568,7 @@ public class ComponentActionHelper {
             case "stellarAtomicsAction" -> {
                 game.unscorePublicObjective(p1.getUserID(), game.getRevealedPublicObjectives().get("Stellar Atomics"));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
-                    + " removed their token from the stellar atomics card.");
+                    + " removed their token from the _Stellar Atomics_ card.");
                 List<Button> buttons = new ArrayList<>();
                 for (Player p2 : game.getRealPlayersNDummies()) {
                     if (p2 == p1) {
@@ -591,7 +591,7 @@ public class ComponentActionHelper {
             case "doTotalWarPoint" -> {
                 int remaining = game.changeCommsOnPlanet(-10, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game));
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
-                    + " has used to the Total War ability to spend 10 commodities from their home planets to score 1 victory point."
+                    + " has used to the _Total War_ ability to spend 10 commodities from their home planets to score 1 victory point."
                     + " They have " + remaining + " commodit" + (remaining == 1 ? "y" : "ies") + " remaining.");
                 String customPOName = "Total War VPs (" + p1.getFaction() + ")";
                 int vp = 1;
@@ -637,17 +637,23 @@ public class ComponentActionHelper {
         if (p2.hasAbility("data_recovery")) {
             ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
         }
-
+        if (!game.isFowMode())
+        {
+            DisasterWatchHelper.postTileInDisasterWatch(game, event, game.getTileFromPlanet(planet), 1, 
+                player.getRepresentationUnfogged() + " is about to unleash the power of the atom upon " + planetRep + " in " + game.getName() + ".");
+        }
         DestroyUnitService.destroyAllUnits(event, game.getTileFromPlanet(planet), game, game.getUnitHolderFromPlanet(planet), false);
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " you destroyed all units on " + planetRep);
+                player.getRepresentationUnfogged() + " you destroyed all units on " + planetRep + ".");
             MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                 p2.getRepresentationUnfogged() + ", your planet " + planetRep
                     + " was nuked and all units were destroyed.");
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has nuked " + planetRep + ", destroying every unit there belonging to " + p2.getRepresentationUnfogged() + ".");
+            DisasterWatchHelper.postTileInDisasterWatch(game, event, game.getTileFromPlanet(planet), 0, 
+                planetRep + ", post war crimes.");
         }
 
     }
