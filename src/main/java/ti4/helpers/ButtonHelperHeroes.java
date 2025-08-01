@@ -1307,14 +1307,16 @@ public class ButtonHelperHeroes {
                         }
                     }
                     
-                    int capacity = ButtonHelper.checkFleetAndCapacity(p2, game, tile, false, false)[2];
-                    int capacityUsed = ButtonHelper.checkFleetAndCapacity(p2, game, tile, false, false)[1];
-                    if (capacityUsed > capacity)
+                    int[] capNCap = ButtonHelper.checkFleetAndCapacity(p2, game, tile, false, false);
+                    int capacityUsed = capNCap[1];
+                    int capacity = capNCap[2];
+                    int fightersIgnored = capNCap[3];
+                    int fighterCount = tileUnits.getOrDefault(Units.getUnitKey("ff", p2.getColor()), 0);
+                    int mechCount = tileUnits.getOrDefault(Units.getUnitKey("mf", p2.getColor()), 0);
+                    int infantryCount = tileUnits.getOrDefault(Units.getUnitKey("gf", p2.getColor()), 0);
+                    if (mechCount + infantryCount > capacity || mechCount + infantryCount + fighterCount > capacity + fightersIgnored)
                     {
-                        int overCapacity = capacityUsed - capacity;
-                        int fighterCount = tileUnits.getOrDefault(Units.getUnitKey("ff", p2.getColor()), 0);
-                        int mechCount = tileUnits.getOrDefault(Units.getUnitKey("mf", p2.getColor()), 0);
-                        int infantryCount = tileUnits.getOrDefault(Units.getUnitKey("gf", p2.getColor()), 0);
+                        int overCapacity = Math.max(mechCount + infantryCount - capacity, mechCount + infantryCount + fighterCount - capacity - fightersIgnored);
                         if (mechCount == 0 && infantryCount == 0)
                         {
                             message.append(p2.getRepresentationNoPing() + " has " + overCapacity 
@@ -1362,7 +1364,7 @@ public class ButtonHelperHeroes {
                                     + (infantryCount >= 1 ? "infantry" : "");
                             }
                             message.append(p2.getRepresentationNoPing() + " has a mixture of " + overCapacity + " " + unitListing
-                                + " in excess of their amended capacity. Please remove " + (overCapacity == 1 ? "this" : "these") + " excess manually (they are captured).\n");
+                                + " in excess of their amended capacity. Please remove " + (overCapacity == 1 ? "this" : "these") + " excess manually (they should be captured).\n");
                             message.append("-# We hope to add buttons for this Soon™.\n");
                             // TODO: Add buttons
                         }
