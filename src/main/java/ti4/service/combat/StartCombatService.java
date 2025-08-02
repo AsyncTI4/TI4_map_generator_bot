@@ -1332,10 +1332,10 @@ public class StartCombatService {
             }
             if ("space".equalsIgnoreCase(nameOfHolder) && isSpaceCombat) {
                 buttons.add(Buttons.gray("combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat"));
-                if (p1.isDummy()) {
+                if (p1.isDummy() || p1.isAllowOthersToPressButtons()) {
                     buttons.add(Buttons.gray(p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat For Dummy").withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
                 }
-                if (p2.isDummy()) {
+                if (p2.isDummy() || p2.isAllowOthersToPressButtons()) {
                     buttons.add(Buttons.gray(p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Space Combat For Dummy").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                 }
             } else {
@@ -1346,10 +1346,10 @@ public class StartCombatService {
                     if (p1 == game.getActivePlayer()) {
                         nonActive = p2;
                     }
-                    if (p1.isDummy()) {
+                    if (p1.isDummy() || p1.isAllowOthersToPressButtons()) {
                         buttons.add(Buttons.gray(p1.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + " for Dummy").withEmoji(Emoji.fromFormatted(p1.getFactionEmoji())));
                     }
-                    if (p2.isDummy()) {
+                    if (p2.isDummy() || p2.isAllowOthersToPressButtons()) {
                         buttons.add(Buttons.gray(p2.dummyPlayerSpoof() + "combatRoll_" + pos + "_" + unitH.getName(), "Roll Ground Combat for " + nameOfHolder + " for Dummy").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                     }
                     if (CombatRollService.checkIfUnitsOfType(nonActive, game, null, tile, unitH.getName(),

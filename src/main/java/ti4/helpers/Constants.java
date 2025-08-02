@@ -544,6 +544,7 @@ public class Constants {
     public static final String TURN_END = "turn_end";
     public static final String TURN_START = "turn_start";
     public static final String SPEAKER = "speaker";
+    public static final String ENABLE = "enable";
     public static final String ACTIVE_PLAYER = "active_player";
     public static final String ACTIVE_SYSTEM = "active_system";
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
@@ -601,6 +602,7 @@ public class Constants {
     public static final String SAMPLE_COLORS = "sample_colors";
     public static final String SAMPLE_DECALS = "sample_decals";
     public static final String CORRECT_FACTION = "correct_faction";
+    public static final String ALLOW_BUTTON_PRESSES = "allow_button_presses";
     public static final String GAME_CHANNEL_SETUP = "game_channel_setup";
     public static final String PLANETS = "planets";
     public static final String PLANETS_EXHAUSTED = "planets_exhausted";

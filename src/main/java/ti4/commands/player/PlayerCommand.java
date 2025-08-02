@@ -35,6 +35,7 @@ public class PlayerCommand implements ParentCommand {
             new AddTeamMate(),
             new RemoveTeamMate(),
             new SetStatsAnchor(),
+            new AllowButtonPresses(),
             new CCsButton()
     ).collect(Collectors.toMap(Subcommand::getName, subcommand -> subcommand));
 

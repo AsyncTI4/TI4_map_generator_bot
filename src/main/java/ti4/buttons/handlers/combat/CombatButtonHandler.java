@@ -37,7 +37,7 @@ class CombatButtonHandler {
             opponent = p2;
         }
         ButtonHelper.deleteTheOneButton(event);
-        if (opponent == null || opponent.isDummy() || confirmed.equalsIgnoreCase("confirmed")) {
+        if (opponent == null || opponent.isDummy() || opponent.isAllowOthersToPressButtons() || confirmed.equalsIgnoreCase("confirmed")) {
             ButtonHelperModifyUnits.automateGroundCombat(p1, p2, planet, game, event);
         } else if (p1 != null && p2 != null) {
             Button automate = Buttons.green(opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_"

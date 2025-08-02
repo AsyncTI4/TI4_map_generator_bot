@@ -281,7 +281,7 @@ public class CombatRollService {
                     String msg = opponent.getRepresentationUnfogged() + " you may autoassign " + h + " hit"
                         + (h == 1 ? "" : "s") + ".";
                     List<Button> buttons = new ArrayList<>();
-                    if (opponent.isDummy()) {
+                    if (opponent.isDummy() || opponent.isAllowOthersToPressButtons()) {
                         if (round2 > round) {
                             buttons.add(Buttons.blue(
                                 opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
@@ -323,7 +323,7 @@ public class CombatRollService {
                     String msg = opponent.getRepresentationUnfogged() + " you may roll dice for Combat Round #"
                         + (round + 1) + ".";
                     List<Button> buttons = new ArrayList<>();
-                    if (opponent.isDummy()) {
+                    if (opponent.isDummy() || opponent.isAllowOthersToPressButtons()) {
                         if (round2 > round) {
                             buttons.add(Buttons.blue(
                                 opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
@@ -351,7 +351,7 @@ public class CombatRollService {
             List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode() && rollType == CombatRollType.combatround && opponent != player) {
                 if (round2 > round) {
-                    if (opponent.isDummy()) {
+                    if (opponent.isDummy() || opponent.isAllowOthersToPressButtons()) {
                         buttons.add(Buttons.blue(
                             opponent.dummyPlayerSpoof() + "combatRoll_" + tile.getPosition() + "_"
                                 + combatOnHolder.getName(),
@@ -366,7 +366,7 @@ public class CombatRollService {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
                 if (h > 0) {
                     String finChecker = "FFCC_" + opponent.getFaction() + "_";
-                    if (opponent.isDummy()) {
+                    if (opponent.isDummy() || opponent.isAllowOthersToPressButtons()) {
                         buttons.add(Buttons.green(
                             opponent.dummyPlayerSpoof() + "autoAssignSpaceHits_" + tile.getPosition() + "_" + h,
                             "Auto-assign Hit" + (h == 1 ? "" : "s") + " For Dummy"));
@@ -393,7 +393,7 @@ public class CombatRollService {
                 }
 
             } else {
-                if (game.isFowMode() && opponent.isDummy() && h > 0) {
+                if (game.isFowMode() && (opponent.isDummy() || opponent.isAllowOthersToPressButtons()) && h > 0) {
                     if (combatOnHolder instanceof Planet) {
                         if (round2 > round) {
                             buttons.add(Buttons.blue(

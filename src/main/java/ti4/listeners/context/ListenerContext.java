@@ -81,6 +81,11 @@ public abstract class ListenerContext {
             if (componentID.contains("dummyPlayerSpoof")) {
                 String identity = StringUtils.substringBefore(componentID, "_").replace("dummyPlayerSpoof", "");
                 player = game.getPlayerFromColorOrFaction(identity);
+                if (player == null || (!player.isDummy() && !player.isAllowOthersToPressButtons())) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player has not allowed others to press buttons");
+                    contextIsValid = false;
+                    return;
+                }
                 componentID = componentID.replace("dummyPlayerSpoof" + identity + "_", "");
             }
 
