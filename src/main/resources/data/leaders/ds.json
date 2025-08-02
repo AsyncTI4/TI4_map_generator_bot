@@ -868,8 +868,8 @@
         "type": "commander",
         "name": " Ciphus Gault",
         "title": "Mercenary Demon",
-        "abilityWindow": "During each round of space combat:",
-        "abilityText": "Each of your units may use ANTI-FIGHTER BARRAGE instead of making a combat roll during that round of combat. [Note: not applicable to first round of combat, where both occur. Also note that the bot will not know to not roll for certain units. Just ignore any hits they produce if you chose to use AFB instead.]",
+        "abilityWindow": "When one of your units would make a combat roll:",
+        "abilityText": "You may use that unit’s ANTI-FIGHTER BARRAGE instead. You cannot use this ability during the first round of space combat.",
         "unlockCondition": "Have 1 superweapon in your play area.",
         "source": "ds"
     },

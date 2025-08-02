@@ -207,14 +207,14 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
                 ButtonHelper.getScavengerExosButtons(player));
         }
-        if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer() && !tile.isHomeSystem(game)
+        if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer() && tile != null && unitHolder != null && !tile.isHomeSystem(game)
             && (unitHolder.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
             if (!p.getFactionHomeworld().equalsIgnoreCase(player.getFaction())) {
                 unitHolder.addToken("attachment_threetraits.png");
             }
         }
-        if (!alreadyOwned && game.isDangerousWildsMode() && player.isRealPlayer()
+        if (!alreadyOwned && game.isDangerousWildsMode() && player.isRealPlayer() && tile != null && unitHolder != null
             && ButtonHelper.getTypeOfPlanet(game, unitHolder.getName()).contains("hazardous")) {
             if (!player.hasAbility("propagation")) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
@@ -230,8 +230,8 @@ public class AddPlanetService {
             }
         }
 
-        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")
-            && player.isRealPlayer() && tile != null) {
+        if (game.isMinorFactionsMode() && tile != null && unitHolder != null && unitHolder.getTokenList().contains("attachment_threetraits.png")
+            && player.isRealPlayer()) {
             boolean ownsThemAll = true;
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (!player.getPlanets().contains(uH.getName())) {

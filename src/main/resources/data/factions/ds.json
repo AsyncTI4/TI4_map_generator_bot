@@ -1169,7 +1169,7 @@
         "alias": "atokera",
         "factionName": "Atokera Legacy",
         "homeSystem": "br4",
-        "startingFleet": "1 cv,5 ff,3 inf m, 1 sd m, 1 dn",
+        "startingFleet": "1 cv,5 ff,3 inf m, 1 sd m, 1 dn, 1 dd",
         "commodities": 3,
         "factionTech": ["dsatoky", "dsatokcr"],
         "startingTech": ["gls","md"],
