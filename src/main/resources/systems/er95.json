@@ -5,7 +5,7 @@
   "imagePath": "er_95_async.png",
   "planets": ["kytos", "prymis"],
   "shipPositionsType": "TYPE05",
-  "wormholes": ["ALPHA", " BETA"],
+  "wormholes": ["ALPHA", "BETA"],
   "tileBack": "blue",
   "source": "eronous"
 }
