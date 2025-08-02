@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.NotNull;
 import ti4.executors.ExecutionLockManager;
-import ti4.executors.GameLockManager;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -33,7 +32,7 @@ public class AddBothelperPermissionsCron {
         if (game.isFowMode()) {
             return;
         }
-        CronManager.scheduleOnce(AddBothelperPermissionsCron.class, () -> addPermissions(game), 5, TimeUnit.MINUTES);
+        CronManager.scheduleOnce(AddBothelperPermissionsCron.class, () -> addPermissions(game.getName()), 5, TimeUnit.MINUTES);
     }
 
     private static void handleActiveGames() {
@@ -42,15 +41,18 @@ public class AddBothelperPermissionsCron {
         GameManager.getManagedGames().stream()
             .filter(not(ManagedGame::isHasEnded))
             .filter(not(ManagedGame::isFowMode))
-            .forEach(managedGame ->
-                GameLockManager.runWithLockSaveAndRelease(
-                    managedGame.getName(), ExecutionLockManager.LockType.WRITE, "AddBothelperPermissionsCron", AddBothelperPermissionsCron::addPermissions));
+            .map(ManagedGame::getName)
+            .forEach(gameName ->
+                    ExecutionLockManager
+                        .wrapWithLockAndRelease(gameName, ExecutionLockManager.LockType.WRITE, () -> addPermissions(gameName))
+                        .run());
 
         BotLogger.info("Finished AddBothelperPermissionsCron");
     }
 
-    private static void addPermissions(Game game) {
-        if (!game.getStoredValue("addedBothelpers").isEmpty()) {
+    private static void addPermissions(String gameName) {
+        Game game = GameManager.getManagedGame(gameName).getGame();
+        if (!game.getStoredValue("addedBothelpers").isEmpty()) { // TODO: This should be a property outside game, as it can be UNDO'd
             return;
         }
         BotLogger.info("Adding Bothelper permissions for " + game.getName());
@@ -63,8 +65,6 @@ public class AddBothelperPermissionsCron {
     }
 
     private static void handleAddingPermissions(Game game) {
-        game.setStoredValue("addedBothelpers", "Yes"); // TODO: This should be a property outside game, as it can be UNDO'd
-
         Guild guild = game.getGuild();
         if (guild == null) {
             return;
@@ -100,5 +100,8 @@ public class AddBothelperPermissionsCron {
                 .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
                 .queue();
         }
+
+        game.setStoredValue("addedBothelpers", "Yes"); // TODO: This should be a property outside game, as it can be UNDO'd
+        GameManager.save(game, "Added Bothelper permissions.");
     }
 }

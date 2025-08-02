@@ -1,9 +1,9 @@
 package ti4.helpers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +21,7 @@ public class Units {
 
     private static final String EMDASH = "—";
     private static final Pattern UNIT_PATTERN = Pattern.compile(RegexHelper.colorRegex(null) + EMDASH + RegexHelper.unitTypeRegex());
-    private static final Map<UnitType, Map<String, UnitKey>> keys = new HashMap<>();
+    private static final Map<UnitType, Map<String, UnitKey>> keys = new ConcurrentHashMap<>();
 
     /**
      * <H3> DO NOT ADD NEW VALUES TO THIS OBJECT. </H3>
@@ -264,10 +264,12 @@ public class Units {
     }
 
     private static UnitKey lookupKey(UnitType type, String color) {
-        String colorID = Mapper.getColorID(color); // trust, but verify
-        keys.putIfAbsent(type, new HashMap<>());
-        keys.get(type).putIfAbsent(colorID, new UnitKey(type, colorID));
-        return keys.get(type).get(colorID);
+        String colorID = Mapper.getColorID(color);
+        if (type == null || colorID == null) {
+            return null;
+        }
+        var map = keys.computeIfAbsent(type, k -> new ConcurrentHashMap<>());
+        return map.computeIfAbsent(colorID, k -> new UnitKey(type, colorID));
     }
 
     @Nullable

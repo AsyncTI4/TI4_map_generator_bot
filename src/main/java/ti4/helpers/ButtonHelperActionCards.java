@@ -1242,7 +1242,7 @@ public class ButtonHelperActionCards {
     public static void resolveDiplomaticPressureStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
-        String message = "# " + p2.getRepresentationUnfogged() + ", you have been forced to give a promissory note. Please choose which promissory note you wish to send.";
+        String message = p2.getRepresentationUnfogged() + ", you are being forced to give a promissory note. Please choose which promissory note you wish to send.";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + ", buttons to send a promissory note have been given to " + p2.getFactionEmojiOrColor() + ".");

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -16,9 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import lombok.Data;
-
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
@@ -74,7 +72,7 @@ abstract public class UnitHolder {
 
         unitsByState.compute(unit, (uk, ls) -> {
             if (ls == null) ls = UnitState.emptyList();
-            ls.set(0, ls.get(0) + count);
+            ls.set(0, ls.getFirst() + count);
             return ls;
         });
     }
@@ -315,12 +313,12 @@ abstract public class UnitHolder {
     public int getUnitCount(String colorID) {
         return unitsByState.entrySet().stream()
             .filter(e -> e.getKey().getColorID().equals(colorID))
-            .collect(Collectors.summingInt(e -> getTotalUnitCount(e.getValue())));
+            .mapToInt(e -> getTotalUnitCount(e.getValue()))
+            .sum();
     }
 
     @JsonIgnore
     public boolean hasUnits() {
-        if (unitsByState == null) return false;
         for (List<Integer> counts : unitsByState.values())
             if (getTotalUnitCount(counts) > 0) return true;
         return false;
@@ -328,7 +326,7 @@ abstract public class UnitHolder {
 
     @JsonIgnore
     public int getTotalDamagedCount() {
-        return unitsByState.values().stream().collect(Collectors.summingInt(UnitHolder::getDamagedUnitStateCount));
+        return unitsByState.values().stream().mapToInt(UnitHolder::getDamagedUnitStateCount).sum();
     }
 
     public int getDamagedUnitCount(UnitKey unitKey) {
@@ -343,7 +341,8 @@ abstract public class UnitHolder {
     public int getDamagedUnitCount(String colorID) {
         return unitsByState.entrySet().stream()
             .filter(e -> e.getKey().getColorID().equals(colorID))
-            .collect(Collectors.summingInt(e -> getDamagedUnitStateCount(e.getValue())));
+            .mapToInt(e -> getDamagedUnitStateCount(e.getValue()))
+            .sum();
     }
 
     public Point getHolderCenterPosition() {
@@ -372,7 +371,7 @@ abstract public class UnitHolder {
     public Map<String, Integer> getUnitAsyncIdsOnHolder(String colorID) {
         return new HashMap<>(getUnitsByState().keySet().stream()
             .filter(uk -> uk.getColorID().equals(Mapper.getColorID(colorID)))
-            .collect(Collectors.toMap(uk -> uk.asyncID(), this::getUnitCount)));
+            .collect(Collectors.toMap(UnitKey::asyncID, this::getUnitCount)));
     }
 
     public String getPlayersUnitListOnHolder(Player player) {
@@ -418,6 +417,7 @@ abstract public class UnitHolder {
         return getUnits().entrySet().stream()
             .filter(e -> e.getValue() > 0 && p.unitBelongsToPlayer(e.getKey()))
             .filter(e -> Optional.ofNullable(p.getUnitFromUnitKey(e.getKey())).map(condition::test).orElse(false))
-            .collect(Collectors.summingInt(Entry::getValue));
+            .mapToInt(Entry::getValue)
+            .sum();
     }
 }
