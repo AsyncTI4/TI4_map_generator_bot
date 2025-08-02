@@ -400,7 +400,7 @@
         "color": "",
         "playArea": true,
         "source": "ds",
-        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nWhen 1 of your opponent’s units would be destroyed during combat, you may exhaust this card to replace that unit with 1 ground force of the same unit type from your reinforcements instead. Then, the Pharad'n player captures 1 infantry from their reinforcements."
+        "text": "When you receive this card, if you are not the Pharad'n player, you must place it face up in your play area.\nAfter 1 of your opponent’s infantry is destroyed during ground combat, you may exhaust this card to place 1 infantry from your reinforcements on that planet. Then, the Pharad'n player captures 1 infantry from their reinforcements."
     },
     {
         "alias": "dspnqhet",
@@ -437,6 +437,6 @@
         "playArea": true,
         "playImmediately": false,
         "source": "ds",
-        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. If you activate a system that contains the Toldar player's units, purge 1 of your command tokens and return this card to that player."
+        "text": "ACTION: Place this card face up in your play area. Once per action, when you win a combat against a player with more victory points than you, gain 3 commodities. If you activate a system that contains the Toldar player's units, purge 1 of your command tokens  from your reinforcements and return this card to that player."
     }
 ]

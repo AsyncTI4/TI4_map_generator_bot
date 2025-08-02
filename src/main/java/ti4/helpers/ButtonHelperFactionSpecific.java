@@ -1506,12 +1506,9 @@ public class ButtonHelperFactionSpecific {
         if (!hasInf) {
             return buttons;
         }
-        for (Tile tile : game.getTileMap().values()) {
-            if (ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile)) {
-                for (Planet planet : tile.getPlanetUnitHolders()) {
-                    buttons.add(Buttons.green(player.finChecker() + "pharadnInf2Revive_" + planet.getName(), planet.getPlanetModel().getAutoCompleteName()));
-                }
-            }
+        for (String planet : player.getPlanetsAllianceMode()) {
+            buttons.add(Buttons.green(player.finChecker() + "pharadnInf2Revive_" + planet, Helper.getPlanetName(planet)));
+
         }
         return buttons;
     }
