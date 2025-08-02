@@ -546,7 +546,7 @@ public class MiltyService {
             }
             player.addTech(tech);
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " gained the " + Mapper.getTech(tech).getNameRepresentation() + " technology due to the Age of Fighters Galactic Event.");
+                player.getRepresentation() + " gained the " + Mapper.getTech(tech).getNameRepresentation() + " technology due to the _Age of Fighters_ galactic event.");
 
         }
         if (game.isStellarAtomicsMode()) {

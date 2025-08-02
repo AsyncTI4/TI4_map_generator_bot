@@ -3014,7 +3014,7 @@ public class AgendaHelper {
             sb.append(" __not__ voting due to **Galactic Threat**");
             return sb.toString();
         } else if (game.isStellarAtomicsMode() && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") && game.getRevealedPublicObjectives().get("Stellar Atomics") != null && !game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
-            sb.append(" __not__ voting due to having used stellar atomics.");
+            sb.append(" __cannot__ voting due to having used _Stellar Atomics_.");
 
         } else if (player.hasLeaderUnlocked("xxchahero")) {
             sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount);
@@ -3930,7 +3930,7 @@ public class AgendaHelper {
                 if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
                     sb.append(
                         "You are currently voting on _Covert Legislation_, and the top agenda is in the speaker's hand.");
-                    sb.append(" Showing the next agenda per rules\n");
+                    sb.append(" Showing the next agenda per the rules.\n");
                     agendaID = game.lookAtTopAgenda(x + 1);
 
                     if (game.getSentAgendas().get(agendaID) != null) {

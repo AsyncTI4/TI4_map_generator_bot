@@ -267,8 +267,9 @@ public class DestroyUnitService {
                 player.setUnitCap(unitID, player.getUnitCap(unitID) - 1);
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationNoPing() + " purged 1 "
-                        + unit.unitKey().getUnitType().getUnitTypeEmoji() + " (reducing total limit to " + player.getUnitCap(unitID) + ") due to the Age of Fighters rules." +
-                        "\nIf this was a mistake, adjust the limit with /game set_unit_cap.");
+                        + unit.unitKey().getUnitType().getUnitTypeEmoji() + " due to _Age of Fighters_."
+                        +" You now have a total of " + player.getUnitCap(unitID) + " available to you  (on the game board or in your reinforcements)." +
+                        "\n-# If this was a mistake, readjust the limit with `/game set_unit_cap`.");
             }
 
         }

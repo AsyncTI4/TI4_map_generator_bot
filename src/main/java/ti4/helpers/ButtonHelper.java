@@ -2993,10 +2993,8 @@ public class ButtonHelper {
                     } else if (player.ownsUnit("absol_spacedock2")) {
                         fightersIgnored += 5;
                         fleetCap += 2;
-                    } else {
-                        if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
-                            fightersIgnored += 3;
-                        }
+                    } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
+                        fightersIgnored += 3;
                     }
                 }
             }
@@ -3026,11 +3024,8 @@ public class ButtonHelper {
                                 fightersIgnored += 6;
                             } else if (p2.ownsUnit("cabal_spacedock2")) {
                                 fightersIgnored += 12;
-                            } else {
-                                if (!p2.hasUnit("mykomentori_spacedock") && !p2.hasUnit("mykomentori_spacedock2")) {
-                                    fightersIgnored += 3;
-                                }
-
+                            } else if (!p2.hasUnit("mykomentori_spacedock") && !p2.hasUnit("mykomentori_spacedock2")) {
+                                fightersIgnored += 3;
                             }
                         }
                     }

@@ -67,7 +67,7 @@ public class AddPlanetService {
             unitHolder.removeToken("token_tomb.png");
             AddUnitService.addUnits(event, player.getNomboxTile(), game, player.getColor(), "2 inf");
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " you captured 2 infantry from a tomb token.");
+                player.getRepresentation() + ", you captured 2 infantry from a Tomb token.");
         }
 
         List<String> mecatols = Constants.MECATOLS;
@@ -218,7 +218,8 @@ public class AddPlanetService {
             && ButtonHelper.getTypeOfPlanet(game, unitHolder.getName()).contains("hazardous")) {
             if (!player.hasAbility("propagation")) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you may use the button to research your technology. (reminder that you can ignore pre-reqs equal to the planet's resource value)",
+                    player.getRepresentationUnfogged() + ", you may use the button to research your technology. You may ignore up to " 
+                        + unitHolder.getResources() + " prerequisites.",
                     List.of(Buttons.GET_A_TECH));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
