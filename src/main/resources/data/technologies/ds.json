@@ -896,7 +896,7 @@
         "faction": "pharadn",
         "baseUpgrade": "inf2",
         "source": "ds",
-        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. At the start of your turn, you may produce 1 infantry on a planet you control in a system that contains 1 of your structures. "
+        "text": "Cost 1(x2), Combat 7\n After this unit is destroyed or removed, capture this unit. DEPLOY: At the start of your turn, you may place 1 infantry on a planet you control. "
     },
     {
         "alias": "dspharb",
@@ -919,7 +919,7 @@
         "faction": "qhet",
         "baseUpgrade": "inf2",
         "source": "ds",
-        "text": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the end of your turn, place up to 2 units that are on this card on 1 planet that contains your units..1(x2) 7; PLANETARY SHIELD"
+        "text": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the start of your turn, place each unit that is on this card on planets that contain your space docks. 1(x2) 7;"
     },
     {
         "alias": "dsqhetcr",
