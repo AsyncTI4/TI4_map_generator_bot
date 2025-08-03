@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 public class Special2Command implements ParentCommand {
 
     private final Map<String, Subcommand> subcommands = Stream.of(
+            new AllowButtonPresses(),
             new SetupNeutralPlayer(),
             new GeneratePainBoxMapString(),
             new SearchWinningPath()
