@@ -130,7 +130,6 @@ public class AsyncTi4WebsiteHelper {
 
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
-            BotLogger.warning(String.format("Starting put player data to the bucket for for game: %s", gameId));
             putObjectInBucket(
                 String.format("webdata/%s/%s.json", gameId, gameId),
                 AsyncRequestBody.fromString(json),
