@@ -3,12 +3,12 @@ package ti4.commands.game;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -139,11 +139,8 @@ class Replace extends GameStateSubcommand {
             long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
             TextChannel privateChannel = (TextChannel) replacedPlayer.getPrivateChannel();
 
-            PermissionOverride oldOverride = privateChannel.getMemberPermissionOverrides().stream()
-                .filter(override -> override.getMember().equals(oldMember)).findFirst().orElse(null);
-            if (oldOverride != null) {
-                oldOverride.delete().queue();
-            }
+            privateChannel.getMemberPermissionOverrides().stream()
+                .filter(override -> Objects.equals(override.getMember(), oldMember)).findFirst().ifPresent(oldOverride -> oldOverride.delete().queue());
 
             //Update private channel
             if (oldMember != null) {
@@ -155,14 +152,12 @@ class Replace extends GameStateSubcommand {
 
             //Update Cards Info
             ThreadChannel cardsInfo = replacedPlayer.getCardsInfoThread();
-            if (cardsInfo != null) {
-                String newCardsInfoName = cardsInfo.getName().replace(oldPlayerUserName.replace("/", ""), replacedPlayer.getUserName().replace("/", ""));
-                cardsInfo.getManager().setName(newCardsInfoName).queue();
-                if (oldMember != null) {
-                    cardsInfo.removeThreadMember(oldMember).queue();
-                }
-                cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
+            String newCardsInfoName = cardsInfo.getName().replace(oldPlayerUserName.replace("/", ""), replacedPlayer.getUserName().replace("/", ""));
+            cardsInfo.getManager().setName(newCardsInfoName).queue();
+            if (oldMember != null) {
+                cardsInfo.removeThreadMember(oldMember).queue();
             }
+            cardsInfo.addThreadMember(newMember).queue(success -> accessMessage(cardsInfo, newMember));
 
             //Update private threads
             if (oldMember != null) {

@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import ti4.executors.ExecutionLockManager;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -25,14 +25,7 @@ import static java.util.function.Predicate.not;
 public class AddBothelperPermissionsCron {
 
     public static void register() {
-        CronManager.schedulePeriodically(AddBothelperPermissionsCron.class, AddBothelperPermissionsCron::handleActiveGames, 5, 60, TimeUnit.MINUTES);
-    }
-
-    public static void scheduleForGame(@NotNull Game game) {
-        if (game.isFowMode()) {
-            return;
-        }
-        CronManager.scheduleOnce(AddBothelperPermissionsCron.class, () -> addPermissions(game.getName()), 5, TimeUnit.MINUTES);
+        CronManager.scheduleOnce(AddBothelperPermissionsCron.class, AddBothelperPermissionsCron::handleActiveGames, 5, TimeUnit.MINUTES);
     }
 
     private static void handleActiveGames() {
@@ -52,9 +45,6 @@ public class AddBothelperPermissionsCron {
 
     private static void addPermissions(String gameName) {
         Game game = GameManager.getManagedGame(gameName).getGame();
-        if (!game.getStoredValue("addedBothelpers").isEmpty()) { // TODO: This should be a property outside game, as it can be UNDO'd
-            return;
-        }
         BotLogger.info("Adding Bothelper permissions for " + game.getName());
         try {
             handleAddingPermissions(game);
@@ -95,13 +85,10 @@ public class AddBothelperPermissionsCron {
         }
 
         long threadPermission = Permission.MANAGE_THREADS.getRawValue();
+        TextChannelManager manager = actionsChannel.getManager();
         for (Member botHelper : nonGameBothelpers) {
-            actionsChannel.getManager()
-                .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
-                .queue();
+            manager = manager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
         }
-
-        game.setStoredValue("addedBothelpers", "Yes"); // TODO: This should be a property outside game, as it can be UNDO'd
-        GameManager.save(game, "Added Bothelper permissions.");
+        manager.queue();
     }
 }
