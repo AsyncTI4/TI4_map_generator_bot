@@ -613,6 +613,9 @@ class GameSaveService {
             writer.write(Constants.DUMMY + " " + player.isDummy());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.ALLOW_OTHERS_TO_PRESS_BUTTONS + " " + player.isAllowOthersToPressButtons());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.ELIMINATED + " " + player.isEliminated());
             writer.write(System.lineSeparator());
 
