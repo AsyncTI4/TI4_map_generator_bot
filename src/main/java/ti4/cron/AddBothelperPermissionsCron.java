@@ -25,7 +25,7 @@ import static java.util.function.Predicate.not;
 public class AddBothelperPermissionsCron {
 
     public static void register() {
-        CronManager.schedulePeriodically(AddBothelperPermissionsCron.class, AddBothelperPermissionsCron::handleActiveGames, 5, 60, TimeUnit.MINUTES);
+        CronManager.scheduleOnce(AddBothelperPermissionsCron.class, AddBothelperPermissionsCron::handleActiveGames, 5, TimeUnit.MINUTES);
     }
 
     private static void handleActiveGames() {
