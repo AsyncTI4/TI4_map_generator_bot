@@ -98,7 +98,7 @@ public class AddBothelperPermissionsCron {
         for (Member botHelper : nonGameBothelpers) {
             actionsChannel.getManager()
                 .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
-                .queue();
+                .complete();
         }
 
         game.setStoredValue("addedBothelpers", "Yes"); // TODO: This should be a property outside game, as it can be UNDO'd
