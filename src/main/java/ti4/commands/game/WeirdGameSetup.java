@@ -34,6 +34,7 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIMITED_WHISPERS_MODE, "True to enable hiding the details of written deals"));
         addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game").setAutoComplete(true));
     }
 
@@ -84,6 +85,9 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean noSwapMode = event.getOption(Constants.NO_SWAP_MODE, null, OptionMapping::getAsBoolean);
         if (noSwapMode != null) game.setNoSwapMode(noSwapMode);
+
+        Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
+        if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);
 
         Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
         if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");

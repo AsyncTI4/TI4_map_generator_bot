@@ -194,13 +194,13 @@ public class CombatModHelper {
         Game game,
         List<UnitModel> playerUnits,
         CombatRollType rollType,
-        Tile tile
+        Tile tile, UnitHolder unitHolder
     ) {
         int modsValue = 0;
         for (NamedCombatModifierModel namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
             if (modifier.isInScopeForUnit(unit, playerUnits, rollType, game, player)) {
-                Integer modValue = getVariableModValue(modifier, player, opponent, game, unit, tile);
+                Integer modValue = getVariableModValue(modifier, player, opponent, game, unit, tile, unitHolder);
                 Integer perUnitCount = 1;
                 if (modifier.getApplyEachForQuantity()) {
                     perUnitCount = numOfUnit;
@@ -439,7 +439,7 @@ public class CombatModHelper {
         Player opponent,
         Game game,
         UnitModel origUnit,
-        Tile activeSystem
+        Tile activeSystem, UnitHolder unitHolder
     ) {
         double value = mod.getValue().doubleValue();
         double multiplier = 1.0;
@@ -518,7 +518,7 @@ public class CombatModHelper {
                 }
                 case "combat_round" -> {
                     int round;
-                    String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition() + "space";
+                    String combatName = "combatRoundTracker" + player.getFaction() + activeSystem.getPosition() + unitHolder.getName();
                     if (game.getStoredValue(combatName).isEmpty()) {
                         round = 0;
                     } else {
@@ -526,6 +526,7 @@ public class CombatModHelper {
                     }
                     scalingCount += round;
                 }
+
                 case "adjacent_mech" -> {
                     for (String pos : FoWHelper.getAdjacentTiles(game, activeSystem.getPosition(), player, false, true)) {
                         Tile tile = game.getTileByPosition(pos);

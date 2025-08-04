@@ -1189,9 +1189,7 @@ public class AgendaHelper {
 
             }
             return;
-        } else
-
-        {
+        } else {
             game.setStoredValue("preVoting" + player.getFaction(), "");
         }
         if (!buttonID.contains("outcomeTie*")) {
@@ -1395,6 +1393,7 @@ public class AgendaHelper {
         } else {
             resolveTime = true;
             winner = buttonID.substring(buttonID.lastIndexOf("*") + 2);
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "## The speaker has broken the tie.");
         }
         if (resolveTime) {
             resolveTime(game, winner);

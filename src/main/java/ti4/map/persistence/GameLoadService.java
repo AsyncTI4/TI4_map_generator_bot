@@ -690,6 +690,7 @@ class GameLoadService {
                 case Constants.AGE_OF_FIGHTERS_MODE -> game.setAgeOfFightersMode(loadBooleanOrDefault(info, false));
                 case Constants.CIVILIZED_SOCIETY_MODE -> game.setCivilizedSocietyMode(loadBooleanOrDefault(info, false));
                 case Constants.NO_SWAP_MODE -> game.setNoSwapMode(loadBooleanOrDefault(info, false));
+                case Constants.LIMITED_WHISPERS_MODE -> game.setLimitedWhispersMode(loadBooleanOrDefault(info, false));
                 case Constants.ORDINIAN_C1_MODE -> game.setOrdinianC1Mode(loadBooleanOrDefault(info, false));
                 case Constants.LIBERATION_C4_MODE -> game.setLiberationC4Mode(loadBooleanOrDefault(info, false));
                 case Constants.VOTC_MODE -> game.setVotcMode(loadBooleanOrDefault(info, false));

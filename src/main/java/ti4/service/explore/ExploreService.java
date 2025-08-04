@@ -463,9 +463,9 @@ public class ExploreService {
                         tile.addToken(tokenFilename, Constants.SPACE);
                         message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
                         if ("gamma".equalsIgnoreCase(token) && "mallice".equals(planetID) && !game.isFowMode()) {
-                            DisasterWatchHelper.sendMessageInDisasterWatch(game, 
+                            DisasterWatchHelper.sendMessageInDisasterWatch(game,
                                 player.getRepresentation() + " has explored Mallice in " + game.getName() + ", and discovered the _Gamma Wormhole_.");
-                        } 
+                        }
                     }
 
                     if (Constants.MIRAGE.equalsIgnoreCase(token)) {
@@ -768,7 +768,10 @@ public class ExploreService {
                 }
                 CommanderUnlockCheckService.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                message += "\n" + player.getRepresentationUnfogged() + ", your current command tokens are "
+                if (!message.isEmpty()) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                }
+                message += player.getRepresentationUnfogged() + ", your current command tokens are "
                     + player.getCCRepresentation()
                     + ". Use buttons to gain " + ccsToGain + " command token" + (ccsToGain > 1 ? "s" : "") + ".";
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
