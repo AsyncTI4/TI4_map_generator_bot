@@ -2389,7 +2389,7 @@ public class ButtonHelperActionCards {
 
         for (String planet : player.getPlanets()) {
             Planet p = game.getPlanetsInfo().get(planet);
-            if (p != null && p.getResources() > count) {
+            if (p != null) {
                 if (game.getTileFromPlanet(planet) == player.getHomeSystemTile() && count > 0) {
                     int amount = game.changeCommsOnPlanet(0, planet);
                     game.changeCommsOnPlanet(-Math.min(amount, count), planet);
