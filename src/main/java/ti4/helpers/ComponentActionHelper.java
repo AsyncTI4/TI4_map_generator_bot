@@ -19,7 +19,6 @@ import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.LeaderModel;
 import ti4.model.PromissoryNoteModel;
@@ -68,7 +67,7 @@ public class ComponentActionHelper {
             compButtons.add(Buttons.red(finChecker + prefix + "doStarCharts_", "Purge 2 Star Charts"));
         }
 
-        if (game.isTotalWarMode() && game.changeCommsOnPlanet(0, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game)) > 9) {
+        if (game.isTotalWarMode() && ButtonHelperActionCards.getAllCommsInHS(p1, game) > 9) {
             Button tButton = Buttons.gray(finChecker + prefix + "doTotalWarPoint_", "Gain 1 Victory Point (Total War)");
             compButtons.add(tButton);
         }
@@ -452,7 +451,7 @@ public class ComponentActionHelper {
                     List<Button> acButtons = ActionCardHelper.getDiscardActionCardButtons(p1, true);
                     if (!acButtons.isEmpty()) {
                         MessageHelper.sendMessageToChannel(p1.getCorrectChannel(),
-                            p1.getRepresentation() + " is doing nothing with their **Stall Tactics** ability.");
+                            p1.getRepresentation() + " is stalling with their **Stall Tactics** ability.");
                         MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(),
                             p1.getRepresentationUnfogged() + ", please discard an action card.", acButtons);
                     } else {
@@ -589,7 +588,8 @@ public class ComponentActionHelper {
                     buttons);
             }
             case "doTotalWarPoint" -> {
-                int remaining = game.changeCommsOnPlanet(-10, ButtonHelperActionCards.getBestResPlanetInHomeSystem(p1, game));
+                ButtonHelperActionCards.decrease10CommsinHS(p1, game);
+                int remaining = ButtonHelperActionCards.getAllCommsInHS(p1, game);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), p1.getFactionEmoji()
                     + " has used to the _Total War_ ability to spend 10 commodities from their home planets to score 1 victory point."
                     + " They have " + remaining + " commodit" + (remaining == 1 ? "y" : "ies") + " remaining.");
@@ -637,9 +637,8 @@ public class ComponentActionHelper {
         if (p2.hasAbility("data_recovery")) {
             ButtonHelperAbilities.dataRecovery(p2, game, event, "dataRecovery_" + player.getColor());
         }
-        if (!game.isFowMode())
-        {
-            DisasterWatchHelper.postTileInDisasterWatch(game, event, game.getTileFromPlanet(planet), 1, 
+        if (!game.isFowMode()) {
+            DisasterWatchHelper.postTileInDisasterWatch(game, event, game.getTileFromPlanet(planet), 1,
                 player.getRepresentationUnfogged() + " is about to unleash the power of the atom upon " + planetRep + " in " + game.getName() + ".");
         }
         DestroyUnitService.destroyAllUnits(event, game.getTileFromPlanet(planet), game, game.getUnitHolderFromPlanet(planet), false);
@@ -652,7 +651,7 @@ public class ComponentActionHelper {
         } else {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " has nuked " + planetRep + ", destroying every unit there belonging to " + p2.getRepresentationUnfogged() + ".");
-            DisasterWatchHelper.postTileInDisasterWatch(game, event, game.getTileFromPlanet(planet), 0, 
+            DisasterWatchHelper.postTileInDisasterWatch(game, event, game.getTileFromPlanet(planet), 0,
                 planetRep + ", post war crimes.");
         }
 

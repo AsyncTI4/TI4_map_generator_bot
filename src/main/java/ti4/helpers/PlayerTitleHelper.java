@@ -138,6 +138,13 @@ public class PlayerTitleHelper {
         MessageHelper.sendMessageToChannel(event.getChannel(), "Made it so you cannot swap _Supports For The Thrones_ in this game.");
     }
 
+    @ButtonHandler(value = "setLimitedWhispers")
+    public static void setLimitedWhispers(ButtonInteractionEvent event, String buttonID, Game game) {
+        game.setLimitedWhispersMode(true);
+        ButtonHelper.deleteMessage(event);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Made it so you can send hidden (redacted) deals via the transaction button.");
+    }
+
     @ButtonHandler(value = "answerSurvey_", save = false)
     public static void answerSurvey(GenericInteractionCreateEvent event, String buttonID) {
         String questionNum = buttonID.split("_")[2];

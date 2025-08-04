@@ -6342,6 +6342,10 @@ public class ButtonHelper {
             youCanSpend.append("and ").append(player.getTg()).append(" trade good")
                 .append(player.getTg() == 1 ? "" : "s").append(".");
             resourcesAvailable += (player.hasTech("mc") ? 2 : 1) * player.getTg();
+            if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 0) {
+                youCanSpend.append("and ").append(player.getTg()).append(" commodities");
+                resourcesAvailable += (player.hasTech("mc") ? 2 : 1) * player.getCommodities();
+            }
         }
         if (production) {
             if (player.hasTech("st")) {
