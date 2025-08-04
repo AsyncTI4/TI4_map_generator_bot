@@ -381,7 +381,7 @@ public class ActionCardHelper {
 
         CryypterHelper.checkForAssigningYssarilEnvoy(event, game, player, acID);
 
-        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played _" + actionCardTitle + "_ action card.");
+        game.setStoredValue("currentActionSummary" + player.getFaction(), game.getStoredValue("currentActionSummary" + player.getFaction()) + " Played the _" + actionCardTitle + "_ action card.");
 
         if (player.hasAbility("cybernetic_madness")) {
             game.purgedActionCard(player.getUserID(), acIndex);

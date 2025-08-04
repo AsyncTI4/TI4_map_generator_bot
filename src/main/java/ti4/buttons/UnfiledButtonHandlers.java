@@ -55,6 +55,7 @@ import ti4.helpers.PromissoryNoteHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.helpers.StatusHelper;
 import ti4.helpers.Units.UnitKey;
+import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.Mapper;
 import ti4.image.TileGenerator;
@@ -485,6 +486,27 @@ public class UnfiledButtonHandlers {
         ButtonHelper.deleteMessage(event);
     }
 
+    public static void startGlimmersRedTech(Player player, Game game) {
+        Set<UnitType> allowedUnits = Set.of(UnitType.Fighter, UnitType.Destroyer, UnitType.Cruiser, UnitType.Carrier,
+            UnitType.Dreadnought, UnitType.Flagship, UnitType.Warsun);
+
+        List<Button> buttons = new ArrayList<>();
+        for (UnitType unit : allowedUnits) {
+            buttons.add(Buttons.green("endGlimmersRedTech_" + unit.plainName(), unit.plainName(), unit.getUnitTypeEmoji()));
+        }
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " select the unit that was destroyed and that you will be placing via your tech", buttons);
+    }
+
+    @ButtonHandler("endGlimmersRedTech_")
+    public static void endGlimmersRedTech(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+        if (event != null) {
+            ButtonHelper.deleteMessage(event);
+        }
+        String unit = buttonID.split("_")[1];
+
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " select the system adjacent to your destroyed unit that you wish to place the unit. [Note that not all options displayed are legal options. The bot did not check where the unit was destroyed.]", Helper.getTileWithShipsPlaceUnitButtons(player, game, unit, "placeOneNDone_skipbuild"));
+    }
+
     @ButtonHandler("getReleaseButtons")
     public static void getReleaseButtons(ButtonInteractionEvent event, Player player, Game game) {
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
@@ -802,7 +824,7 @@ public class UnfiledButtonHandlers {
         //     + ", please declare what units are bombarding what planet before hitting this button"
         //     + " (e.g. if you have two dreadnoughts and are splitting their BOMBADMENT across two planets, specify which planet the first one is hitting)."
         //     + " The bot does not track this.";
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " is assigning units to bombard as follows:\n" 
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " is assigning units to bombard as follows:\n"
             + getBombardmentSummary(player, game), getBombardmentAssignmentButtons(player, game));
     }
 
@@ -1466,6 +1488,16 @@ public class UnfiledButtonHandlers {
         String message = player.getRepresentationUnfogged() + ", please choose a system to move to.";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
             ButtonHelperModifyUnits.getRetreatSystemButtons(player, game, pos, skilled));
+
+        if (game.getTileByPosition(pos).isGravityRift() && !player.hasRelic("circletofthevoid")) {
+            Button rift = Buttons.green(player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos,
+                "Rift Units", MiscEmojis.GravityRift);
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(rift);
+            String message2 = player.getRepresentationUnfogged()
+                + ", if applicable, use this button to rift retreating units.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
+        }
     }
 
     @ButtonHandler("retreatUnitsFrom_")
@@ -1483,15 +1515,7 @@ public class UnfiledButtonHandlers {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message,
             ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, game, pos1, pos2));
         ButtonHelper.deleteMessage(event);
-        if (game.getTileByPosition(pos1).isGravityRift()) {
-            Button rift = Buttons.green(player.getFinsFactionCheckerPrefix() + "getRiftButtons_" + pos2,
-                "Rift Units", MiscEmojis.GravityRift);
-            List<Button> buttons = new ArrayList<>();
-            buttons.add(rift);
-            String message2 = player.getRepresentationUnfogged()
-                + ", if applicable, use this button to rift retreating units.";
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
-        }
+
     }
 
     @ButtonHandler("getPsychoButtons")

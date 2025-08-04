@@ -10,7 +10,7 @@
     {
         "alias": "circletofthevoid",
         "name": "Circlet of the Void",
-        "text": "Your units do not roll for gravity rifts, and you ignore the effects of all other anomalies on movement.\n\nACTION: Exhaust this card to explore a frontier token in a system that does not contain any other players' ships.",
+        "text": "Your units do not roll for gravity rifts, and you ignore the effects of all other anomalies on movement.\n\nACTION: Exhaust this card to explore a frontier token in a system that does not contain any other players' ships. [Note: you must have an available DET token in order to use this action. It cannot just be a stall]",
         "flavourText": "Xuange touched the silver circlet that sat upon their temple. The pride of the Archive. Knowledge of the stars, passed down from the First, fated for the Last.",
         "imageURL": "https://cdn.statically.io/gh/AsyncTI4/TI4_map_generator_bot/master/src/main/resources/hover_images/relics/pok/circlet_of_the_void.jpg?raw=true",
         "source": "codex4"

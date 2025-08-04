@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -19,7 +21,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -248,7 +249,13 @@ public class TransactionHelper {
                     case "Technology" -> trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "Planets", "AlliancePlanets", "dmz" -> trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
                     case "action" -> trans.append("An in-game ").append(furtherDetail).append(" action");
-                    case "details" -> trans.append(furtherDetail.replace("fin777", " "));
+                    case "details" -> {
+                        if (hidePrivateCardText && game.isLimitedWhispersMode()) {
+                            trans.append("[REDACTED]");
+                        } else {
+                            trans.append(furtherDetail.replace("fin777", " "));
+                        }
+                    }
                     default -> trans.append(" some odd thing: `").append(item).append("`");
                 }
                 trans.append("\n");
@@ -1204,7 +1211,7 @@ public class TransactionHelper {
                 }
                 if (game.isNoSwapMode()) {
                     if (id.endsWith("sftt") && p1.getPromissoryNotesInPlayArea().contains(p2.getColor() + "_sftt")) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             p1.getRepresentation() + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
                         return;
                     }

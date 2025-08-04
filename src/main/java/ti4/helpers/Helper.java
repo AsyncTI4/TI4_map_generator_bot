@@ -1319,18 +1319,21 @@ public class Helper {
         } else {
             int productionLimit = 0;
             if (tile != null && activeSystem != null && tile == activeSystem && Helper.getProductionValue(player, game, tile, false) > 0) {
-                productionLimit = Helper.getProductionValue(player, game, tile, false);
-                boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
-                if (warM) {
-                    productionLimit = productionLimit + 4;
-                }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
-                    productionLimit = productionLimit + 2;
-                }
-                msg.append("Producing a total of ").append(unitCount).append(" units (PRODUCTION limit is " + productionLimit + ")")
-                    .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
-                if (productionLimit < unitCount) {
-                    msg.append("\n### Warning! Exceeding PRODUCTION limit of " + productionLimit + "!");
+                if (!player.hasUnit("arborec_mech") && !player.hasUnit("arborec_infantry") && !player.hasUnit("arborec_infantry2")) {
+
+                    productionLimit = Helper.getProductionValue(player, game, tile, false);
+                    boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
+                    if (warM) {
+                        productionLimit = productionLimit + 4;
+                    }
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+                        productionLimit = productionLimit + 2;
+                    }
+                    msg.append("Producing a total of ").append(unitCount).append(" units (PRODUCTION limit is " + productionLimit + ")")
+                        .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
+                    if (productionLimit < unitCount) {
+                        msg.append("\n### Warning! Exceeding PRODUCTION limit of " + productionLimit + "!");
+                    }
                 }
             } else {
                 msg.append("Producing a total of ").append(unitCount).append(" unit").append(unitCount == 1 ? "" : "s")
