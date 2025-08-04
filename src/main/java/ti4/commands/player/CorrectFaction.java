@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.AsyncTI4DiscordBot;
+import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -22,7 +24,7 @@ import ti4.model.FactionModel;
 class CorrectFaction extends GameStateSubcommand {
 
     public CorrectFaction() {
-        super(Constants.CORRECT_FACTION, "For Correcting A Players Faction", true, true);
+        super(Constants.CORRECT_FACTION, "FOR BOTHELPER USE ONLY", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "New faction").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -30,15 +32,16 @@ class CorrectFaction extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
+        if (CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.bothelperRoles)) {
+            String newFaction = AliasHandler.resolveColor(event.getOption(Constants.FACTION).getAsString().toLowerCase());
+            newFaction = AliasHandler.resolveFaction(newFaction);
+            if (!Mapper.isValidFaction(newFaction)) {
+                MessageHelper.sendMessageToEventChannel(event, "Faction not valid");
+                return;
+            }
 
-        String newFaction = AliasHandler.resolveColor(event.getOption(Constants.FACTION).getAsString().toLowerCase());
-        newFaction = AliasHandler.resolveFaction(newFaction);
-        if (!Mapper.isValidFaction(newFaction)) {
-            MessageHelper.sendMessageToEventChannel(event, "Faction not valid");
-            return;
+            changeFactionSheetAndComponents(event, game, getPlayer(), newFaction);
         }
-
-        changeFactionSheetAndComponents(event, game, getPlayer(), newFaction);
     }
 
     public void changeFactionSheetAndComponents(GenericInteractionCreateEvent event, Game game, Player player, String newFaction) {

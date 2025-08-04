@@ -1082,6 +1082,7 @@ public class Constants {
     public static final String AGE_OF_FIGHTERS_MODE = "age_of_fighters_mode";
     public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
+    public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";
     public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
     public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";

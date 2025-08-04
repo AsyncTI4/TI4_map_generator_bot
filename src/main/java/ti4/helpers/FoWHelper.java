@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import software.amazon.awssdk.utils.StringUtils;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -766,6 +767,29 @@ public class FoWHelper {
         return false;
     }
 
+    public static boolean otherPlayersHaveMovementBlockersInSystem(Player player, Tile tile, Game game) {
+        if (player.hasTech("dsrhody")) {
+            return false;
+        }
+        for (Player p2 : game.getRealPlayersNDummies()) {
+            if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
+                continue;
+            }
+            if (p2.hasTech("ahl") && ButtonHelperAgents.doesTileHaveAStructureInIt(p2, tile)) {
+                return true;
+            }
+            if (p2.hasAbility("decree") && tile.isAnomaly(game)) {
+                List<Tile> tiles = new ArrayList<>();
+                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Infantry));
+                tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Mech));
+                if (tiles.contains(tile)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean otherPlayersHaveUnitsInSystem(Player player, Tile tile, Game game) {
         for (Player p2 : game.getRealPlayersNDummies()) {
             if (p2 == player || player.getAllianceMembers().contains(p2.getFaction())) {
@@ -801,6 +825,19 @@ public class FoWHelper {
             Tile tile2 = game.getTileByPosition(pos);
             UnitHolder unitHolder = tile2.getUnitHolders().get(Constants.SPACE);
             if (unitHolder.getUnitCount(UnitType.Fighter, player.getColor()) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean playerHasShipsInAdjacentSystems(Player player, Tile tile, Game game) {
+        String colorID = Mapper.getColorID(player.getColor());
+        if (tile == null || colorID == null) return false;
+
+        for (String pos : getAdjacentTilesAndNotThisTile(game, tile.getPosition(), player, false)) {
+            Tile tile2 = game.getTileByPosition(pos);
+            if (FoWHelper.playerHasActualShipsInSystem(player, tile2)) {
                 return true;
             }
         }

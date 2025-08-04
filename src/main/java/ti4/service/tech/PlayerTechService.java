@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.buttons.UnfiledButtonHandlers;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AliasHandler;
@@ -112,8 +113,8 @@ public class PlayerTechService {
             }
         }
         String exhaustMessage = player.getRepresentation(false, false) + " exhausted technology " + techModel.getRepresentation(false) + ".";
-        game.setStoredValue("currentActionSummary" + player.getFaction(), 
-            game.getStoredValue("currentActionSummary" + player.getFaction()) + " exhausted the _" + techModel.getName() + "_ technology.");
+        game.setStoredValue("currentActionSummary" + player.getFaction(),
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " Exhausted the _" + techModel.getName() + "_ technology.");
         if (game.isShowFullComponentTextEmbeds()) {
             MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(), exhaustMessage, techModel.getRepresentationEmbed());
         } else {
@@ -147,6 +148,10 @@ public class PlayerTechService {
             case "dsbenty" -> {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation()
                     + " exhausted _Merged Replicators_ to increase the PRODUCTION value of one of their units by 2, or to match the largest PRODUCTION value on the game board.");
+                deleteTheOneButtonIfButtonEvent(event);
+            }
+            case "dsmortr" -> {
+                UnfiledButtonHandlers.startGlimmersRedTech(player, game);
                 deleteTheOneButtonIfButtonEvent(event);
             }
             case "dsceldr" -> {
@@ -542,19 +547,16 @@ public class PlayerTechService {
                     String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn()
                         ? nextPlayer.getRepresentationUnfogged()
                         : nextPlayer.getRepresentationNoPing();
-                        int numUnpassed = -2;
-                        for (Player p2 : game.getPlayers().values()) {
-                            numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
-                        }
-                        text += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                        if (numUnpassed == 0)
-                        {
-                            text += "No other players are unpassed.";
-                        }
-                        else
-                        {
-                            text += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
-                        }
+                    int numUnpassed = -2;
+                    for (Player p2 : game.getPlayers().values()) {
+                        numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
+                    }
+                    text += "\n-# " + ping + " will start their turn once you've ended yours. ";
+                    if (numUnpassed == 0) {
+                        text += "No other players are unpassed.";
+                    } else {
+                        text += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                    }
                 }
             }
             String buttonText = "Use buttons to do your turn. ";
