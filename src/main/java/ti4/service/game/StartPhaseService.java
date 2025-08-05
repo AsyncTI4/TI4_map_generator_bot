@@ -785,7 +785,11 @@ public class StartPhaseService {
                 buttons.add(Buttons.blue("setLimitedWhispers", "Allow Limited Whispers"));
 
                 buttons.add(Buttons.gray("deleteButtons", "Dismiss these buttons"));
-                MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), "If you wish to do play with limited whispers, you can use these buttons. Limited whispers is a mode where the text content (which you can fill in with the 'Specify Deal' button in a transaction) of your deals/transactions are hidden (redacted), so you can have limited secret communication. Players are not allowed to send more than one hidden deal in a turn.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), 
+                    "If you wish to do play with limited whispers, you can use these buttons." 
+                        + " Limited whispers is a mode where the text content (which you can fill in with the \"Specify Deal\" button in a transaction)" 
+                        + " of your deals/transactions are hidden (redacted), so you can have limited secret communication."
+                        + " Players are not allowed to send more than one hidden deal in a turn.", buttons);
             }
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "You are encouraged to discuss these results if there appears to be any disagreement on questions 1-3,"
                 + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
