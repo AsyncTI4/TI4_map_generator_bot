@@ -494,7 +494,8 @@ public class UnfiledButtonHandlers {
         for (UnitType unit : allowedUnits) {
             buttons.add(Buttons.green("endGlimmersRedTech_" + unit.plainName(), unit.plainName(), unit.getUnitTypeEmoji()));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " select the unit that was destroyed and that you will be placing via your tech", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() 
+            + ", please choose the unit that was destroyed, and that you will be placing via _Fractal Plating_.", buttons);
     }
 
     @ButtonHandler("endGlimmersRedTech_")
@@ -504,7 +505,11 @@ public class UnfiledButtonHandlers {
         }
         String unit = buttonID.split("_")[1];
 
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() + " select the system adjacent to your destroyed unit that you wish to place the unit. [Note that not all options displayed are legal options. The bot did not check where the unit was destroyed.]", Helper.getTileWithShipsPlaceUnitButtons(player, game, unit, "placeOneNDone_skipbuild"));
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+            player.getRepresentation() 
+                + ", please choose the system adjacent to your destroyed unit that you wish to place the unit."
+                + "\n-# Note that not all options displayed are legal options. The bot did not check where the unit was destroyed.",
+            Helper.getTileWithShipsPlaceUnitButtons(player, game, unit, "placeOneNDone_skipbuild"));
     }
 
     @ButtonHandler("getReleaseButtons")

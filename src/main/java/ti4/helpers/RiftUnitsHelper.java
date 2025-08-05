@@ -238,10 +238,17 @@ public class RiftUnitsHelper {
         String tilePosition = buttonID.replace("getRiftButtons_", "");
         Tile tile = game.getTileByPosition(tilePosition);
         MessageChannel channel = player.getCorrectChannel();
-        String msg = player.getRepresentationNoPing() + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.";
-        MessageHelper.sendMessageToChannelWithButtons(channel, msg, RiftUnitsHelper.getButtonsForRiftingUnitsInSystem(player, game, tile));
-        if (player.hasRelic("circletofthevoid") || player.hasAbility("celestial_guides")) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), "## Reminder that you do not roll for rifts (due to either circlet of the void or celestial guides)");
+        String msg = player.getRepresentationNoPing() + " is rifting some units.";
+        if (player.hasAbility("celestial_guides")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " is rifting some units. However, because of their **Celestial Guides** ability, they do not roll.");
+        } else if (player.hasRelic("circletofthevoid")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " is rifting some units. However, because of their _Circlet of the Void_ relic, they do not roll.");
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(channel, 
+                player.getRepresentationNoPing() + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.", 
+                RiftUnitsHelper.getButtonsForRiftingUnitsInSystem(player, game, tile));
         }
     }
 }
