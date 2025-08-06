@@ -35,7 +35,7 @@ class CheckChannels extends GameStateSubcommand {
                 output.append("No private channel");
             } else {
                 output.append(channel.getAsMention());
-                if (!((TextChannel)channel).getMembers().contains(player.getMember())) {
+                if (!((TextChannel) channel).canTalk(player.getMember())) {
                     output.append(" - No access");
                 }
             }
