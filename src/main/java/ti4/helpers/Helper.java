@@ -2282,7 +2282,7 @@ public class Helper {
     }
 
     private static void addGameRoleToMapPlayers(Guild guild, Role role, Game game) {
-        for (Player player : game.getPlayers()) {
+        for (Player player : game.getPlayers().values()) {
             if (game.getRound() > 1 && !player.isRealPlayer()) {
                 continue;
             }
