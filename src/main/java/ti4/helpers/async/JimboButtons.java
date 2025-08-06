@@ -94,7 +94,6 @@ public class JimboButtons {
         try {
             int pagenum;
             String prefix;
-            System.out.println("pagination: " + all.size() + " - " + buttonID);
             Matcher page = Pattern.compile(RegexHelper.pageRegex()).matcher(buttonID);
             if (!page.find()) return false; // no pagenum, don't paginate
             pagenum = Integer.parseInt(page.group("page"));

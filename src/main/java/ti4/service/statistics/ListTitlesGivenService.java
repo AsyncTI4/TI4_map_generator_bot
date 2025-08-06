@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lombok.experimental.UtilityClass;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.helpers.Constants;
 import ti4.helpers.SortHelper;
+import ti4.jda.MemberHelper;
 import ti4.map.Game;
 import ti4.map.persistence.GamesPage;
 import ti4.message.MessageHelper;
@@ -40,10 +42,11 @@ public class ListTitlesGivenService {
         longMsg.append("\nThe number of titles each player has: \n");
         Map<String, Integer> sortedMapAscPlayers = SortHelper.sortByValue(titlesAPersonHas, false);
         for (String person : sortedMapAscPlayers.keySet()) {
-            if (event.getGuild().getMemberById(person) == null) {
+            Member member = MemberHelper.getMember(event.getGuild(), person);
+            if (member == null) {
                 continue;
             }
-            longMsg.append(event.getGuild().getMemberById(person).getEffectiveName()).append(": ").append(sortedMapAscPlayers.get(person)).append(" \n");
+            longMsg.append(member.getEffectiveName()).append(": ").append(sortedMapAscPlayers.get(person)).append(" \n");
         }
         if (titleOnly) {
             Map<String, Integer> sortedMapAscPlayersNTitles = SortHelper.sortByValue(timesPersonHasGottenSpecificTitle, false);
@@ -53,10 +56,11 @@ public class ListTitlesGivenService {
                     continue;
                 }
                 String person = personNTitle.split("_")[0];
-                if (event.getGuild().getMemberById(person) == null) {
+                Member member = MemberHelper.getMember(event.getGuild(), person);
+                if (member == null) {
                     continue;
                 }
-                longMsg.append(event.getGuild().getMemberById(person).getEffectiveName()).append(": ").append(sortedMapAscPlayersNTitles.get(personNTitle)).append(" \n");
+                longMsg.append(member.getEffectiveName()).append(": ").append(sortedMapAscPlayersNTitles.get(personNTitle)).append(" \n");
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), longMsg.toString());

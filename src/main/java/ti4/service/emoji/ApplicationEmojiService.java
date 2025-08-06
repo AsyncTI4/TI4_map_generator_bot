@@ -14,12 +14,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.collections4.SetUtils;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.emoji.ApplicationEmoji;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import org.apache.commons.collections4.SetUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -246,10 +245,6 @@ public class ApplicationEmojiService {
     }
 
     public static CachedEmoji getApplicationEmoji(String name) {
-        CachedEmoji fin = emojis.get(name);
-        if (fin == null) {
-            System.out.println("AJAHHAHHAHSFKLNFLKE - " + name);
-        }
         return emojis.getOrDefault(name, null);
     }
 

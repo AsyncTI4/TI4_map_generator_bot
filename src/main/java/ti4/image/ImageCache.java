@@ -26,11 +26,13 @@ public class ImageCache {
         fileImageCache = Caffeine.newBuilder()
                 .maximumSize(FILE_IMAGE_CACHE_SIZE)
                 .expireAfterAccess(FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
+                .softValues()
                 .recordStats()
                 .build();
         urlImageCache = Caffeine.newBuilder()
                 .maximumSize(URL_IMAGE_CACHE_SIZE)
                 .expireAfterWrite(URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, TimeUnit.MINUTES)
+                .softValues()
                 .recordStats()
                 .build();
         CacheManager.registerCache("fileImageCache", fileImageCache);

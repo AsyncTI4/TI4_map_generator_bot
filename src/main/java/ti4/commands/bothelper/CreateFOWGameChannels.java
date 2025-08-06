@@ -3,7 +3,6 @@ package ti4.commands.bothelper;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -11,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.jda.MemberHelper;
 import ti4.message.MessageHelper;
 import ti4.service.fow.CreateFoWGameService;
 
@@ -52,15 +52,15 @@ class CreateFOWGameChannels extends Subcommand {
         }
 
         //CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
+        List<Member> playersNotInGuild = members.stream()
+            .filter(member -> !MemberHelper.hasMember(guild, member.getId()))
+            .toList();
         boolean sendInviteLink = false;
         int count = 0;
-        for (Member member : members) {
-            if (!guildMemberIDs.contains(member.getId())) {
-                MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
-                sendInviteLink = true;
-                count++;
-            }
+        for (Member member : playersNotInGuild) {
+            MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
+            sendInviteLink = true;
+            count++;
         }
         if (sendInviteLink) {
             MessageHelper.sendMessageToEventChannel(event, Helper.getGuildInviteURL(guild, count + 1));

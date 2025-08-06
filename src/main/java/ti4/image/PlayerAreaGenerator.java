@@ -41,6 +41,8 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
+import ti4.jda.MemberHelper;
+import ti4.jda.UserHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -167,7 +169,7 @@ public class PlayerAreaGenerator {
 
         // Player/Teammate Names
         for (String teammateID : teammateIDs) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(teammateID);
+            User user = UserHelper.getUser(teammateID);
 
             int leftJustified = x;
             int topOfName = y + 10;
@@ -175,9 +177,9 @@ public class PlayerAreaGenerator {
             StringBuilder userName = new StringBuilder();
             if (!game.hideUserNames()) {
                 Guild guild = game.getGuild();
-                Member member = guild != null ? guild.getMemberById(teammateID) : null;
+                Member member = guild != null ? MemberHelper.getMember(guild, teammateID) : null;
                 if (member == null) {
-                    member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                    member = MemberHelper.getMember(AsyncTI4DiscordBot.guildPrimary, teammateID);
                 }
                 userName.append(" ");
 
@@ -1141,9 +1143,7 @@ public class PlayerAreaGenerator {
             }
 
             AbilityModel abilityModel = Mapper.getAbility(abilityID);
-            if (abilityModel == null) {
-                System.out.println("Ability null: " + abilityID);
-            } else {
+            if (abilityModel != null) {
                 if (abilityFileName != null) {
                     String status = isExhaustedLocked ? "_exh" : "_rdy";
                     abilityFileName += status + ".png";

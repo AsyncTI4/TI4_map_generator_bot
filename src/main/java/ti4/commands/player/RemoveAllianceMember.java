@@ -1,9 +1,9 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -37,8 +37,14 @@ class RemoveAllianceMember extends GameStateSubcommand {
             player.removeAllianceMember(targetPlayer.getFaction());
         }
 
-        player.getCardsInfoThread().removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(targetPlayer.getUserID())).queue();
-        targetPlayer.getCardsInfoThread().removeThreadMember(AsyncTI4DiscordBot.jda.getUserById(player.getUserID())).queue();
+        User allyUser = targetPlayer.getUser();
+        if (allyUser != null) {
+            player.getCardsInfoThread().removeThreadMember(allyUser).queue();
+        }
+        User playerUser = player.getUser();
+        if (playerUser != null) {
+            targetPlayer.getCardsInfoThread().removeThreadMember(playerUser).queue();
+        }
 
         MessageHelper.sendMessageToEventChannel(event, "Removed " + targetPlayer.getFaction() + " as part of " + player.getFaction()
             + "'s alliance. This worked both ways. You will have to /franken leader_remove to remove the commanders");

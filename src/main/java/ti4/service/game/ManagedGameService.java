@@ -1,10 +1,7 @@
 package ti4.service.game;
 
 import lombok.experimental.UtilityClass;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import org.apache.commons.lang3.StringUtils;
-import ti4.AsyncTI4DiscordBot;
 import ti4.map.persistence.ManagedGame;
 
 @UtilityClass
@@ -19,19 +16,5 @@ public class ManagedGameService {
             return StringUtils.leftPad(gameName, 10, "1");
         }
         return gameName;
-    }
-
-    public String getPingAllPlayers(ManagedGame game) {
-        Role role = game.getGuild() == null ? null :
-            game.getGuild().getRoles().stream().filter(r -> game.getName().equals(r.getName().toLowerCase())).findFirst().orElse(null);
-        if (role != null) {
-            return role.getAsMention();
-        }
-        StringBuilder sb = new StringBuilder(game.getName()).append(" ");
-        for (var player : game.getPlayers()) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(player.getId());
-            if (user != null) sb.append(user.getAsMention()).append(" ");
-        }
-        return sb.toString();
     }
 }

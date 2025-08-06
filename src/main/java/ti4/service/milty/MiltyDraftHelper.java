@@ -1,10 +1,6 @@
 package ti4.service.milty;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -314,13 +310,11 @@ public class MiltyDraftHelper {
         for (TileModel tileModel : allTiles) {
 
             if (isInvalid(tileModel)) continue;
-            //  System.out.println(tileModel.getSource() + tileModel.getName());
             if (!sources.contains(tileModel.getSource())) continue;
             if (tileModel.getTileBack() == TileBack.GREEN || tileModel.isHyperlane()) continue;
 
             MiltyDraftTile draftTile = getDraftTileFromModel(tileModel);
             draftManager.addDraftTile(draftTile);
-            // System.out.println("yes");
         }
     }
 

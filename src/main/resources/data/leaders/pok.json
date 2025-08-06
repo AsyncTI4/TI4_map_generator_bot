@@ -517,7 +517,7 @@
         "name": "M'aban",
         "title": "Crystalline Sorceress",
         "abilityWindow": "At any time:",
-        "abilityText": "You may look at your neighbors' hands of promissory notes and the top and bottom card of the agenda deck.",
+        "abilityText": "You may look at your neighbors' hands of promissory notes and the top and bottom cards of the agenda deck.",
         "unlockCondition": "Have ground forces in or adjacent to the Mecatol Rex system.",
         "source": "pok"
     },
@@ -959,7 +959,7 @@
         "title": "High Priest of Yin",
         "abilityName": "Quantum Dissemination: Blessing of the Yin",
         "abilityWindow": "ACTION:",
-        "abilityText": "Commit up to 3 infantry from your reinforcements to any non-home planets and resolve ground combats on those planets. Players cannot use SPACE CANNON against these units. Then, purge this card.",
+        "abilityText": "Commit up to 3 infantry from your reinforcements to any non-home planets and resolve ground combats on those planets; players cannot use SPACE CANNON against these units. Then, purge this card.",
         "unlockCondition": "Have 3 scored objectives.",
         "source": "pok"
     },

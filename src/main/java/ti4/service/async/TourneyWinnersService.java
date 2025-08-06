@@ -3,13 +3,12 @@ package ti4.service.async;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
-import ti4.AsyncTI4DiscordBot;
+import org.jetbrains.annotations.NotNull;
+import ti4.jda.UserHelper;
 import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
 
@@ -43,7 +42,7 @@ public class TourneyWinnersService {
     public static String tournamentWinnersOutputString() {
         StringBuilder sb = new StringBuilder("__**All Async TI4 Tournament Winners:**__");
         for (TournamentWinner w : readWinnerList()) {
-            User winner = AsyncTI4DiscordBot.jda.getUserById(w.getId());
+            User winner = UserHelper.getUser(w.getId());
             String name = winner != null ? winner.getEffectiveName() : w.getName();
             sb.append("\n> ").append(name).append(" won ").append(w.getTourneyName());
         }
@@ -53,8 +52,7 @@ public class TourneyWinnersService {
     private static List<TournamentWinner> readWinnerList() {
         if (winnerCache == null) {
             try {
-                List<TournamentWinner> reserved = PersistenceManager.readListFromJsonFile(fileName, TournamentWinner.class);
-                winnerCache = reserved;
+                winnerCache = PersistenceManager.readListFromJsonFile(fileName, TournamentWinner.class);
             } catch (Exception e) {
                 BotLogger.error("Failed to read json data for Reserved Game Cache.", e);
                 winnerCache = new ArrayList<>();
