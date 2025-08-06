@@ -2070,7 +2070,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isGroundForce": true,
-        "ability": "After this unit is destroyed or removed, capture this unit. At the start of your turn, place up to 1 of your captured infantry on a planet in a system that contains your structures, as if they were your own."
+        "ability": "After this unit is destroyed or removed, capture this unit. DEPLOY: At the start of your turn, you may place 1 infantry on a planet you control."
     },
     {
         "id": "qhet_infantry",
@@ -2100,9 +2100,9 @@
         "cost": 0.5,
         "combatHitsOn": 7,
         "combatDieCount": 1,
-        "planetaryShield": true,
+        "planetaryShield": false,
         "isGroundForce": true,
-        "ability": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the end of your turn, place up to 2 units that are on this card on 1 planet that contains your units."
+        "ability": "Units cannot use SPACE CANNON against this unit. After this unit is destroyed, place the unit on this card. At the start of your turn, place each unit that is on this card on planets that contain your space docks."
     },
     {
         "id": "qhet_cruiser",

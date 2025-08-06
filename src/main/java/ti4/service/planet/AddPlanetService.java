@@ -207,31 +207,36 @@ public class AddPlanetService {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg10,
                 ButtonHelper.getScavengerExosButtons(player));
         }
-        if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer() && !tile.isHomeSystem(game)
+        if (!alreadyOwned && game.isMinorFactionsMode() && player.isRealPlayer() && tile != null && unitHolder != null
+            && !tile.isHomeSystem(game)
             && (unitHolder.getPlanetModel().getPlanetTypes().contains(PlanetType.FACTION))) {
             PlanetModel p = Mapper.getPlanet(unitHolder.getName());
             if (!p.getFactionHomeworld().equalsIgnoreCase(player.getFaction())) {
                 unitHolder.addToken("attachment_threetraits.png");
             }
         }
-        if (!alreadyOwned && game.isDangerousWildsMode() && player.isRealPlayer()
+        if (!alreadyOwned && game.isDangerousWildsMode() && player.isRealPlayer() && tile != null && unitHolder != null
             && ButtonHelper.getTypeOfPlanet(game, unitHolder.getName()).contains("hazardous")) {
             if (!player.hasAbility("propagation")) {
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", you may use the button to research your technology. You may ignore up to " 
+                    player.getRepresentationUnfogged()
+                        + ", you may use the button to research your technology (after all combats are done). You may ignore up to "
                         + unitHolder.getResources() + " prerequisites.",
                     List.of(Buttons.GET_A_TECH));
             } else {
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                String message2 = player.getRepresentation() + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
-                    + " Your current command tokens are " + player.getCCRepresentation() + ". Use buttons to gain command tokens.";
+                String message2 = player.getRepresentation()
+                    + ", you would research a technology, but because of **Propagation**, you instead gain 3 command tokens."
+                    + " Your current command tokens are " + player.getCCRepresentation()
+                    + ". Use buttons to gain command tokens.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
             }
         }
 
-        if (game.isMinorFactionsMode() && unitHolder.getTokenList().contains("attachment_threetraits.png")
-            && player.isRealPlayer() && tile != null) {
+        if (game.isMinorFactionsMode() && tile != null && unitHolder != null
+            && unitHolder.getTokenList().contains("attachment_threetraits.png")
+            && player.isRealPlayer()) {
             boolean ownsThemAll = true;
             for (UnitHolder uH : tile.getPlanetUnitHolders()) {
                 if (!player.getPlanets().contains(uH.getName())) {
@@ -292,7 +297,7 @@ public class AddPlanetService {
         }
 
         game.setStoredValue("currentActionSummary" + player.getFaction(),
-            game.getStoredValue("currentActionSummary" + player.getFaction()) + " established control of "
+            game.getStoredValue("currentActionSummary" + player.getFaction()) + " Established control of "
                 + Helper.getPlanetRepresentation(planet, game) + ".");
         if ((game.getPhaseOfGame().contains("agenda")
             || (game.getActivePlayerID() != null && !("".equalsIgnoreCase(game.getActivePlayerID()))))
@@ -412,7 +417,8 @@ public class AddPlanetService {
 
         }
 
-        if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode() && player.isRealPlayer()) {
+        if (!alreadyOwned && !doubleCheck && (!"mirage".equals(planet)) && !game.isBaseGameMode()
+            && player.isRealPlayer()) {
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(game, unitHolder, player);
             if (buttons != null && !buttons.isEmpty()) {
                 String message = player.getFactionEmoji() + " Click button to explore "
