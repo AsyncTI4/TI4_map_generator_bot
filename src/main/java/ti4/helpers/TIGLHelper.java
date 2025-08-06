@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
-import ti4.jda.MemberHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -216,7 +215,7 @@ public class TIGLHelper {
     }
 
     public static List<TIGLRank> getUsersTIGLRanks(User user) {
-        Member hubMember = MemberHelper.getMember(AsyncTI4DiscordBot.guildPrimary, user.getId());
+        Member hubMember = AsyncTI4DiscordBot.guildPrimary.getMemberById(user.getId());
         if (hubMember == null) {
             return new ArrayList<>();
         }
@@ -238,7 +237,7 @@ public class TIGLHelper {
 
     private static boolean allUsersAreMembersOfHubServer(List<User> users) {
         for (User user : users) {
-            Member hubMember = MemberHelper.getMember(AsyncTI4DiscordBot.guildPrimary, user.getId());
+            Member hubMember = AsyncTI4DiscordBot.guildPrimary.getMemberById(user.getId());
             if (hubMember == null) {
                 return false;
             }
@@ -265,7 +264,7 @@ public class TIGLHelper {
         Role heroRole = heroRank.getRole();
         StringBuilder sb = new StringBuilder(user.getAsMention());
         sb.append(" has taken ").append(heroRole.getAsMention());
-        List<Member> membersWithRole = MemberHelper.getMembersWithRoles(AsyncTI4DiscordBot.guildPrimary, heroRole);
+        List<Member> membersWithRole = AsyncTI4DiscordBot.guildPrimary.getMembersWithRoles(heroRole);
         if (membersWithRole.isEmpty()) {
             sb.append("!");
         } else {

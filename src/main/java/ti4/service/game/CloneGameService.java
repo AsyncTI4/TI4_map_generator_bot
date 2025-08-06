@@ -32,7 +32,7 @@ public class CloneGameService {
             .setMentionable(true)
             .complete();
         for (Player player : game.getRealPlayers()) {
-            Member member = player.getMember();
+            Member member = guild.getMemberById(player.getUserID());
             if (member != null) {
                 guild.addRoleToMember(member, gameRole).complete();
             }

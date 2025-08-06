@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
-import ti4.jda.MemberHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
@@ -64,9 +63,9 @@ class CreateGameButtonHandler {
             if (StringUtils.countMatches(buttonMsg, ":") < (i)) {
                 break;
             }
-            String memberId = buttonMsg.split(":")[i];
-            memberId = StringUtils.substringBefore(memberId, ".");
-            Member member2 = MemberHelper.getMember(event.getGuild(), memberId);
+            String user = buttonMsg.split(":")[i];
+            user = StringUtils.substringBefore(user, ".");
+            Member member2 = event.getGuild().getMemberById(user);
             if (member2 != null)
                 members.add(member2);
             if (gameOwner == null)
