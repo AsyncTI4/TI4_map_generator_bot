@@ -3,12 +3,12 @@ package ti4.commands.game;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.PermissionOverride;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -24,7 +24,6 @@ import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.jda.MemberHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -83,14 +82,14 @@ class Replace extends GameStateSubcommand {
         }
 
         Guild guild = game.getGuild();
-        Member newMember = MemberHelper.getMember(guild, replacementUser.getId());
+        Member newMember = guild.getMemberById(replacementUser.getId());
         if (newMember == null) {
             MessageHelper.replyToMessage(event, "Added player must be on the game's server.");
             return;
         }
 
         //REMOVE ROLE
-        Member oldMember = replacedPlayer.getMember();
+        Member oldMember = guild.getMemberById(replacedPlayer.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (oldMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(oldMember, roles.getFirst()).queue();
@@ -140,13 +139,11 @@ class Replace extends GameStateSubcommand {
             long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
             TextChannel privateChannel = (TextChannel) replacedPlayer.getPrivateChannel();
 
-            if (oldMember != null) {
-                privateChannel.getPermissionOverrides().stream()
-                    .filter(PermissionOverride::isMemberOverride)
-                    .filter(override -> override.getIdLong() == oldMember.getIdLong())
-                    .findFirst()
-                    .ifPresent(permissionOverride -> permissionOverride.delete().queue());
+            privateChannel.getMemberPermissionOverrides().stream()
+                .filter(override -> Objects.equals(override.getMember(), oldMember)).findFirst().ifPresent(oldOverride -> oldOverride.delete().queue());
 
+            //Update private channel
+            if (oldMember != null) {
                 String newPrivateChannelName = privateChannel.getName().replace(getNormalizedName(oldMember), getNormalizedName(newMember));
                 privateChannel.getManager().setName(newPrivateChannelName).queue();
             }

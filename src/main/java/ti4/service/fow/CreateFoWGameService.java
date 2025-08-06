@@ -24,7 +24,6 @@ import ti4.AsyncTI4DiscordBot;
 import ti4.ResourceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.jda.MemberHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -78,7 +77,7 @@ public class CreateFoWGameService {
         //Get GM
         String gmLine = StringUtils.substringBetween(buttonMsg, "GM: ", "\n");
         String gmId = StringUtils.substringBefore(gmLine, ".");
-        Member gm = MemberHelper.getMember(event.getGuild(), gmId);
+        Member gm = event.getGuild().getMemberById(gmId);
 
         //Get Members
         List<Member> members = new ArrayList<>();
@@ -100,7 +99,7 @@ public class CreateFoWGameService {
                 // Example line: 1:[userid].([username]])
                 String userId = StringUtils.substringBetween(line, ":", ".");
                 if (userId != null) {
-                    Member member = MemberHelper.getMember(event.getGuild(), userId);
+                    Member member = event.getGuild().getMemberById(userId);
                     if (member != null) {
                         members.add(member);
                     }

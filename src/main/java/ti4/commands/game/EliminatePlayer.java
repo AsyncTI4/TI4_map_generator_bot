@@ -160,7 +160,7 @@ class EliminatePlayer extends GameStateSubcommand {
         }
 
         Guild guild = event.getGuild();
-        Member removedMember = player.getMember();
+        Member removedMember = guild.getMemberById(player.getUserID());
         List<Role> roles = guild.getRolesByName(game.getName(), true);
         if (removedMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(removedMember, roles.getFirst()).queue();

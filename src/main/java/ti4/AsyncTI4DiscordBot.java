@@ -2,7 +2,6 @@ package ti4;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +20,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -111,21 +109,20 @@ public class AsyncTI4DiscordBot {
 
         GlobalSettings.loadSettings();
         GlobalSettings.setSetting(ImplementedSettings.READY_TO_RECEIVE_COMMANDS, false);
-        jda = JDABuilder.createLight(args[0])
-            .enableIntents(
-                // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
-                // This is required to cache all members of a guild (including chunking)
-                GatewayIntent.GUILD_MEMBERS,
-                // This is a privileged gateway intent this is only used to enable access to the user content in messages
-                // (also including embeds/attachments/components).
-                GatewayIntent.MESSAGE_CONTENT
-            )
-            .setMemberCachePolicy(MemberCachePolicy.lru(1000))
-            .setChunkingFilter(ChunkingFilter.NONE)
-            .enableCache(EnumSet.of(
-                // Do we really need this?
-                CacheFlag.EMOJI
-            ))
+        jda = JDABuilder.createDefault(args[0])
+            // This is a privileged gateway intent that is used to update user information and join/leaves (including kicks).
+            // This is required to cache all members of a guild (including chunking)
+            .enableIntents(GatewayIntent.GUILD_MEMBERS)
+            // This is a privileged gateway intent this is only used to enable access to the user content in messages
+            // (also including embeds/attachments/components).
+            .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+            // not 100 sure this is needed? It may be for the Emoji cache... but do we actually need that?
+            .enableIntents(GatewayIntent.GUILD_EXPRESSIONS)
+            // It *appears* we need to pull all members or else the bot has trouble pinging players
+            // but that may be a misunderstanding, in case we want to try to use an LRU cache in the future
+            // and avoid loading every user at startup
+            .setMemberCachePolicy(MemberCachePolicy.ALL)
+            .setChunkingFilter(ChunkingFilter.ALL)
             // This allows us to use our own ShutdownHook, created below
             .setEnableShutdownHook(false)
             .build();
