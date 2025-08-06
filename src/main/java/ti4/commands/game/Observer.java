@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.Subcommand;
 import ti4.helpers.Constants;
+import ti4.jda.MemberHelper;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.message.MessageHelper;
@@ -46,7 +47,7 @@ class Observer extends Subcommand {
 
         ManagedGame game = GameManager.getManagedGame(gameName);
         Guild guild = game.getGuild();
-        Member member = guild.getMemberById(user.getId());
+        Member member = MemberHelper.getMember(guild, user.getId());
 
         // INVITE TO GAME SERVER IF MISSING
         if (!CreateGameService.inviteUsersToServer(guild, List.of(member), event.getChannel()).isEmpty()) {
@@ -85,7 +86,7 @@ class Observer extends Subcommand {
     private void addObserver(SlashCommandInteractionEvent event, String userID, GuildChannel channel, boolean skipMessage) {
         if (channel == null) return;
         Guild guild = channel.getGuild();
-        Member user = guild.getMemberById(userID);
+        Member user = MemberHelper.getMember(guild, userID);
         channel.getPermissionContainer().upsertPermissionOverride(user).grant(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
         if (!skipMessage) {
             MessageHelper.sendMessageToEventChannel(event, "Observer permissions granted on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());
@@ -98,7 +99,7 @@ class Observer extends Subcommand {
         // This resets the member's perms to the default value,
         //   -> -> ->  SO IF THE USER IS IN THE GAME, THEY DON'T GET REMOVED
         Guild guild = channel.getGuild();
-        Member user = guild.getMemberById(userID);
+        Member user = MemberHelper.getMember(guild, userID);
         channel.getPermissionContainer().upsertPermissionOverride(user).clear(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND).queue();
         if (!skipMessage) {
             MessageHelper.sendMessageToEventChannel(event, "Observer permissions revoked on " + user.getAsMention() + " to channel " + channel.getName() + ": " + channel.getJumpUrl());

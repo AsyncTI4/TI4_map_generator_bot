@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
@@ -39,6 +38,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
 import ti4.image.ImageHelper;
+import ti4.jda.MemberHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -168,7 +168,7 @@ public class CreateGameService {
         Role bothelperRole = getRole("Bothelper", guild);
         List<Member> nonGameBothelpers = new ArrayList<>();
         if (bothelperRole != null) {
-            for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
+            for (Member botHelper : MemberHelper.getMembersWithRoles(guild, bothelperRole)) {
                 boolean inGame = members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
                 if (!inGame) {
                     nonGameBothelpers.add(botHelper);
@@ -216,8 +216,7 @@ public class CreateGameService {
             ThreadChannelManager manager = thread.getManager()
                 .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
                 .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            if (thread.getName().toLowerCase().contains("tigl")
-                || newGame.getCustomName().toLowerCase().contains("tigl")) {
+            if (thread.getName().toLowerCase().contains("tigl") || newGame.getCustomName().toLowerCase().contains("tigl")) {
                 TIGLHelper.initializeTIGLGame(newGame);
             }
             if (missingMembers.isEmpty()) {
@@ -365,13 +364,9 @@ public class CreateGameService {
      * @return the list of missing members
      */
     public static List<Member> inviteUsersToServer(Guild guild, List<Member> members, MessageChannel channel) {
-        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
-        List<Member> missingMembers = new ArrayList<>();
-        for (Member member : members) {
-            if (!guildMemberIDs.contains(member.getId())) {
-                missingMembers.add(member);
-            }
-        }
+        List<Member> missingMembers = members.stream()
+            .filter(member -> !MemberHelper.hasMember(guild, member.getId()))
+            .toList();
         if (!missingMembers.isEmpty()) {
             StringBuilder sb = new StringBuilder();
             sb.append(

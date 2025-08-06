@@ -267,10 +267,9 @@ public class EndGameService {
 
     private static void sendFeedbackMessage(ThreadChannel t, Game game) {
         StringBuilder message = new StringBuilder();
-        for (String playerID : game.getRealPlayerIDs()) { // GET ALL PLAYER PINGS
-            Member member = game.getGuild().getMemberById(playerID);
-            if (member != null)
-                message.append(member.getAsMention()).append(" ");
+        for (Player player : game.getRealPlayers()) { // GET ALL PLAYER PINGS
+            Member member = player.getMember();
+            if (member != null) message.append(member.getAsMention()).append(" ");
         }
         message.append("\nPlease provide a summary of the game below. You can also leave anonymous feedback on the bot [here](https://forms.gle/EvoWpRS4xEXqtNRa9)");
 

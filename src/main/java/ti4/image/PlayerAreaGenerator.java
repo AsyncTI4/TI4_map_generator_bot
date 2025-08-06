@@ -41,6 +41,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
+import ti4.jda.MemberHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -175,9 +176,9 @@ public class PlayerAreaGenerator {
             StringBuilder userName = new StringBuilder();
             if (!game.hideUserNames()) {
                 Guild guild = game.getGuild();
-                Member member = guild != null ? guild.getMemberById(teammateID) : null;
+                Member member = guild != null ? MemberHelper.getMember(guild, teammateID) : null;
                 if (member == null) {
-                    member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                    member = MemberHelper.getMember(AsyncTI4DiscordBot.guildPrimary, teammateID);
                 }
                 userName.append(" ");
 

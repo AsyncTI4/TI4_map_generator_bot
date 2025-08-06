@@ -22,6 +22,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
+import ti4.jda.MemberHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -66,7 +67,7 @@ public class RematchService {
                 .setMentionable(true)
                 .complete();
             for (Player player : game.getRealPlayers()) {
-                Member member = guild.getMemberById(player.getUserID());
+                Member member = player.getMember();
                 if (member != null) {
                     guild.addRoleToMember(member, gameRole).complete();
                 }
@@ -78,23 +79,19 @@ public class RematchService {
         }
 
         // CLOSE THREADS IN CHANNELS
-        if (tableTalkChannel != null) {
-            for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
-                threadChannel.getManager().setArchived(true).queue();
-            }
-            String newTableName = tableTalkChannel.getName().replace(name, newName);
-            game.getTableTalkChannel().getManager().setName(newTableName).queue();
+        for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
+            threadChannel.getManager().setArchived(true).queue();
         }
-        if (actionsChannel != null) {
-            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
-                threadChannel.getManager().setArchived(true).queue();
-            }
-            game.getActionsChannel().getManager().setName(newName + "-actions").queue();
+        String newTableName = tableTalkChannel.getName().replace(name, newName);
+        game.getTableTalkChannel().getManager().setName(newTableName).queue();
+        for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+            threadChannel.getManager().setArchived(true).queue();
         }
-        Member gameOwner = guild.getMemberById(game.getOwnerID());
+        game.getActionsChannel().getManager().setName(newName + "-actions").queue();
+        Member gameOwner = MemberHelper.getMember(guild, game.getOwnerID());
         if (gameOwner == null) {
-            for (Player player : game.getPlayers().values()) {
-                gameOwner = guild.getMemberById(player.getUserID());
+            for (Player player : game.getRealPlayers()) {
+                gameOwner = player.getMember();
                 break;
             }
         }
