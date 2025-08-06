@@ -1109,7 +1109,7 @@
         "name": "Plagiarize",
         "phase": "Action",
         "window": "Action",
-        "text": "Spend 5 influence and choose a non-faction technology owned by 1 of your neighbors. Gain that technology.",
+        "text": "Spend 5 influence and choose a non-faction technology owned by one of your neighbors; gain that technology.",
         "automationID": "plagiarize",
         "flavorText": "The Yssaril spies handed over their prize to Connor, who in turn passed it to the Sol engineers with a grim smile. \"Now then, boys,\" he said, one hand on his rifle, \"about those loose ends...\"",
         "source": "codex1"
