@@ -22,6 +22,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.StringHelper;
 import ti4.helpers.TIGLHelper;
+import ti4.jda.MemberHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.persistence.GameManager;
@@ -87,7 +88,7 @@ public class RematchService {
             threadChannel.getManager().setArchived(true).queue();
         }
         game.getActionsChannel().getManager().setName(newName + "-actions").queue();
-        Member gameOwner = guild.getMemberById(game.getOwnerID());
+        Member gameOwner = MemberHelper.getMember(guild, game.getOwnerID());
         if (gameOwner == null) {
             for (Player player : game.getRealPlayers()) {
                 gameOwner = player.getMember();

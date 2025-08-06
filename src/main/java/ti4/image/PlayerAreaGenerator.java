@@ -178,7 +178,7 @@ public class PlayerAreaGenerator {
                 Guild guild = game.getGuild();
                 Member member = guild != null ? MemberHelper.getMember(guild, teammateID) : null;
                 if (member == null) {
-                    member = AsyncTI4DiscordBot.guildPrimary.getMemberById(teammateID);
+                    member = MemberHelper.getMember(AsyncTI4DiscordBot.guildPrimary, teammateID);
                 }
                 userName.append(" ");
 
