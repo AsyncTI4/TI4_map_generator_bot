@@ -1113,7 +1113,6 @@ public class Player extends PlayerProperties {
     @JsonIgnore
     public Member getMember() {
         Game game = getGame();
-        if (game == null) return null;
         Guild guild = game.getGuild();
         if (guild == null) return null;
         return MemberHelper.getMember(guild, getUserID());
