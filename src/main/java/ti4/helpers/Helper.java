@@ -47,6 +47,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
 import ti4.image.Mapper;
+import ti4.jda.MemberHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -2260,7 +2261,7 @@ public class Helper {
         if (textChannel != null) {
             TextChannelManager textChannelManager = textChannel.getManager();
             for (String playerID : playerIds) {
-                Member member = guild.getMemberById(playerID);
+                Member member = MemberHelper.getMember(guild, playerID);
                 if (member == null)
                     continue;
                 long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
@@ -2281,11 +2282,11 @@ public class Helper {
     }
 
     private static void addGameRoleToMapPlayers(Guild guild, Role role, Game game) {
-        for (var playerId : game.getPlayerIDs()) {
-            if (game.getRound() > 1 && !game.getPlayer(playerId).isRealPlayer()) {
+        for (Player player : game.getPlayers()) {
+            if (game.getRound() > 1 && !player.isRealPlayer()) {
                 continue;
             }
-            Member member = guild.getMemberById(playerId);
+            Member member = player.getMember();
             if (member != null && !member.getRoles().contains(role)) guild.addRoleToMember(member, role).queue();
         }
     }
