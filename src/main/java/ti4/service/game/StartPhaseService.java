@@ -745,6 +745,7 @@ public class StartPhaseService {
             randomPlayers.addAll(game.getRealPlayers());
             boolean anyoneWantsToBan = false;
             boolean anyoneWantsNoSwaps = false;
+            boolean anyoneWantsLimitedWhispers = false;
             Collections.shuffle(randomPlayers);
             for (Player player : randomPlayers) {
                 var userSettings = UserSettingsManager.get(player.getUserID());
@@ -758,6 +759,9 @@ public class StartPhaseService {
                 }
                 if (userSettings.getSupportPref().contains("Swap")) {
                     anyoneWantsNoSwaps = true;
+                }
+                if (userSettings.getWhisperPref().contains("Limited")) {
+                    anyoneWantsLimitedWhispers = true;
                 }
                 question4 += "* " + userSettings.getWinmakingPref() + "\n";
                 question3 += "* " + userSettings.getTakebackPref() + "\n";
@@ -775,6 +779,17 @@ public class StartPhaseService {
                 }
                 buttons.add(Buttons.gray("deleteButtons", "Stay With Rules as Written Supports"));
                 MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), "If you wish to do anything unusual with _Supports For The Thrones_, you can use these buttons.", buttons);
+            }
+            if (anyoneWantsLimitedWhispers) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.blue("setLimitedWhispers", "Allow Limited Whispers"));
+
+                buttons.add(Buttons.gray("deleteButtons", "Dismiss these buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), 
+                    "If you wish to do play with limited whispers, you can use these buttons." 
+                        + " Limited whispers is a mode where the text content (which you can fill in with the \"Specify Deal\" button in a transaction)" 
+                        + " of your deals/transactions are hidden (redacted), so you can have limited secret communication."
+                        + " Players are not allowed to send more than one hidden deal in a turn.", buttons);
             }
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "You are encouraged to discuss these results if there appears to be any disagreement on questions 1-3,"
                 + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
@@ -869,17 +884,13 @@ public class StartPhaseService {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
                 }
                 msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0)
-                {
+                if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
-                }
-                else
-                {
+                } else {
                     msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
                 }
             }
-            if (!hold.isEmpty())
-            {
+            if (!hold.isEmpty()) {
                 msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);

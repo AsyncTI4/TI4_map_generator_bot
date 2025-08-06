@@ -2370,6 +2370,36 @@ public class ButtonHelperActionCards {
         ButtonHelper.deleteMessage(event);
     }
 
+    public static int getAllCommsInHS(Player player, Game game) {
+        int count = 0;
+
+        for (String planet : player.getPlanets()) {
+            Planet p = game.getPlanetsInfo().get(planet);
+            if (p != null && p.getResources() > count) {
+                if (game.getTileFromPlanet(planet) == player.getHomeSystemTile()) {
+                    count += game.changeCommsOnPlanet(0, planet);
+                }
+            }
+        }
+        return count;
+    }
+
+    public static void decrease10CommsinHS(Player player, Game game) {
+        int count = 10;
+
+        for (String planet : player.getPlanets()) {
+            Planet p = game.getPlanetsInfo().get(planet);
+            if (p != null) {
+                if (game.getTileFromPlanet(planet) == player.getHomeSystemTile() && count > 0) {
+                    int amount = game.changeCommsOnPlanet(0, planet);
+                    game.changeCommsOnPlanet(-Math.min(amount, count), planet);
+                    count = count - Math.min(amount, count);
+                }
+            }
+        }
+
+    }
+
     public static String getBestResPlanetInHomeSystem(Player player, Game game) {
         String planetName = "";
         int count = 0;

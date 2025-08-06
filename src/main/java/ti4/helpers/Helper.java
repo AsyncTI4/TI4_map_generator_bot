@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.Point;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -20,10 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -42,6 +38,9 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.helpers.Units.UnitKey;
@@ -1319,18 +1318,21 @@ public class Helper {
         } else {
             int productionLimit = 0;
             if (tile != null && activeSystem != null && tile == activeSystem && Helper.getProductionValue(player, game, tile, false) > 0) {
-                productionLimit = Helper.getProductionValue(player, game, tile, false);
-                boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
-                if (warM) {
-                    productionLimit = productionLimit + 4;
-                }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
-                    productionLimit = productionLimit + 2;
-                }
-                msg.append("Producing a total of ").append(unitCount).append(" units (PRODUCTION limit is " + productionLimit + ")")
-                    .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
-                if (productionLimit < unitCount) {
-                    msg.append("\n### Warning! Exceeding PRODUCTION limit of " + productionLimit + "!");
+                if (!player.hasUnit("arborec_mech") && !player.hasUnit("arborec_infantry") && !player.hasUnit("arborec_infantry2")) {
+
+                    productionLimit = Helper.getProductionValue(player, game, tile, false);
+                    boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
+                    if (warM) {
+                        productionLimit = productionLimit + 4;
+                    }
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+                        productionLimit = productionLimit + 2;
+                    }
+                    msg.append("Producing a total of ").append(unitCount).append(" units (PRODUCTION limit is " + productionLimit + ")")
+                        .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
+                    if (productionLimit < unitCount) {
+                        msg.append("\n### Warning! Exceeding PRODUCTION limit of " + productionLimit + "!");
+                    }
                 }
             } else {
                 msg.append("Producing a total of ").append(unitCount).append(" unit").append(unitCount == 1 ? "" : "s")
@@ -2262,7 +2264,7 @@ public class Helper {
                 if (member == null)
                     continue;
                 long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
+                textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
             textChannelManager.queue();
         }

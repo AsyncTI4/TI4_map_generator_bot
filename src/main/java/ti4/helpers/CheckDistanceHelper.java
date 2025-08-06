@@ -81,6 +81,8 @@ public class CheckDistanceHelper {
                     if (tile == null
                         || (tile.isNebula() && player != null && !player.hasAbility("celestial_being") && !player.getRelics().contains("circletofthevoid") && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research"))
                         || (tile.isSupernova() && player != null && !player.hasAbility("celestial_being") && !player.getRelics().contains("circletofthevoid") && !player.getAbilities().contains("gashlai_physiology"))
+                        || (player != null && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game) && !player.hasTech("lwd") && !player.hasTech("absol_lwd"))
+                        || (player != null && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                         || (tile.isAsteroidField() && player != null && !player.hasAbility("celestial_being") && !player.getTechs().contains("amd") && !player.getRelics().contains("circletofthevoid") && !player.getTechs().contains("absol_amd"))) {
                         continue;
                     }

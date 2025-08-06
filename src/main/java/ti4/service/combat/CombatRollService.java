@@ -490,8 +490,8 @@ public class CombatRollService {
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasPlanetReady(bombardPlanet)) {
                     PlanetExhaust.doAction(p2, bombardPlanet, game);
-                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + ", your planet " 
-                        + Helper.getPlanetRepresentation(bombardPlanet, game) + " was exhausted when " 
+                    MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), p2.getRepresentation() + ", your planet "
+                        + Helper.getPlanetRepresentation(bombardPlanet, game) + " was exhausted when "
                         + (game.isFowMode() ? "another player" : player.getRepresentationNoPing()) + " bombarded it with _X-89 Bacterial Weapon ΩΩ_.");
                     break;
                 }
@@ -547,9 +547,9 @@ public class CombatRollService {
             int toHit = unitModel.getCombatDieHitsOnForAbility(rollType, player, game);
             int modifierToHit = CombatModHelper.getCombinedModifierForUnit(unitModel, numOfUnit, mods, player, opponent,
                 game,
-                playerUnitsList, rollType, activeSystem);
+                playerUnitsList, rollType, activeSystem, unitHolder);
             int extraRollsForUnit = CombatModHelper.getCombinedModifierForUnit(unitModel, numOfUnit, extraRolls, player,
-                opponent, game, playerUnitsList, rollType, activeSystem);
+                opponent, game, playerUnitsList, rollType, activeSystem, unitHolder);
             int numRollsPerUnit = unitModel.getCombatDieCountForAbility(rollType, player, game);
             boolean extraRollsCount = false;
             if ((numRollsPerUnit > 1 || extraRollsForUnit > 0)
