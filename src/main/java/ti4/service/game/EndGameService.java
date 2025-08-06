@@ -192,7 +192,7 @@ public class EndGameService {
     }
 
     private static void writeChronicle(Game game, GenericInteractionCreateEvent event, boolean publish) {
-        String gameEndText = getGameEndText(game, event);
+        String gameEndText = getGameEndText(game);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), gameEndText);
         TextChannel summaryChannel = getGameSummaryChannel(game);
         if (!game.isFowMode()) {
@@ -219,7 +219,7 @@ public class EndGameService {
 
                 // TIGL Extras
                 if (game.isCompetitiveTIGLGame() && game.getWinner().isPresent()) {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game, event));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), getTIGLFormattedGameEndText(game));
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), MiscEmojis.BLT + Constants.bltPing());
                     TIGLHelper.checkIfTIGLRankUpOnGameEnd(game);
                     if (!game.isReplacementMade()) {
@@ -288,8 +288,8 @@ public class EndGameService {
         return textChannels.isEmpty() ? null : textChannels.getFirst();
     }
 
-    private static void appendUserName(StringBuilder sb, Player player, GenericInteractionCreateEvent event) {
-        Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
+    private static void appendUserName(StringBuilder sb, Player player) {
+        Optional<User> user = Optional.ofNullable(player.getUser());
         if (user.isPresent()) {
             sb.append(user.get().getAsMention());
         } else {
@@ -297,7 +297,7 @@ public class EndGameService {
         }
     }
 
-    public static String getGameEndText(Game game, GenericInteractionCreateEvent event) {
+    public static String getGameEndText(Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("**Game: __").append(game.getName()).append("__**");
         if (!game.getCustomName().isEmpty()) {
@@ -314,7 +314,7 @@ public class EndGameService {
             sb.append("> `").append(index).append(".` ");
             sb.append(player.getFactionEmoji());
             sb.append(ColorEmojis.getColorEmojiWithName(player.getColor())).append(" ");
-            appendUserName(sb, player, event);
+            appendUserName(sb, player);
             sb.append(" - *");
             if (player.isEliminated()) {
                 sb.append("ELIMINATED*");
@@ -335,7 +335,7 @@ public class EndGameService {
         if (game.isFowMode()) {
             sb.append("**GM:** ");
             for (Player gm : game.getPlayersWithGMRole()) {
-                appendUserName(sb, gm, event);
+                appendUserName(sb, gm);
                 sb.append(" ");
             }
             sb.append("\n");
@@ -360,7 +360,7 @@ public class EndGameService {
         return sb.toString();
     }
 
-    public static String getTIGLFormattedGameEndText(Game game, GenericInteractionCreateEvent event) {
+    public static String getTIGLFormattedGameEndText(Game game) {
         StringBuilder sb = new StringBuilder();
         sb.append("# ").append(MiscEmojis.TIGL).append("TIGL\n\n");
         sb.append("This was a TIGL game! 👑").append(game.getWinner().get().getPing())
@@ -372,7 +372,7 @@ public class EndGameService {
         int index = 1;
         for (Player player : game.getRealPlayers()) {
             int playerVP = player.getTotalVictoryPoints();
-            Optional<User> user = Optional.ofNullable(event.getJDA().getUserById(player.getUserID()));
+            Optional<User> user = Optional.ofNullable(player.getUser());
             sb.append("  ").append(index).append(". ");
             sb.append(player.getFaction()).append(" - ");
             if (user.isPresent()) {

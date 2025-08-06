@@ -42,6 +42,7 @@ import ti4.helpers.Units.UnitType;
 import ti4.image.MapGenerator.HorizontalAlign;
 import ti4.image.MapGenerator.VerticalAlign;
 import ti4.jda.MemberHelper;
+import ti4.jda.UserHelper;
 import ti4.map.Game;
 import ti4.map.Leader;
 import ti4.map.Planet;
@@ -168,7 +169,7 @@ public class PlayerAreaGenerator {
 
         // Player/Teammate Names
         for (String teammateID : teammateIDs) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(teammateID);
+            User user = UserHelper.getUser(teammateID);
 
             int leftJustified = x;
             int topOfName = y + 10;

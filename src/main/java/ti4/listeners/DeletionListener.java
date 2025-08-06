@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.AsyncTI4DiscordBot;
 import ti4.executors.ExecutorServiceManager;
+import ti4.jda.UserHelper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -48,7 +49,7 @@ public class DeletionListener extends ListenerAdapter {
 
                     if (relevantLog != null) {
                         String deleter = relevantLog.getUser().getName();
-                        String deletedMessageAuthor = event.getJDA().getUserById(relevantLog.getChanges().get(0).getOldValue()).getName();
+                        String deletedMessageAuthor = UserHelper.getUser(relevantLog.getChanges().get(0).getOldValue()).getName();
                         MessageHelper.sendMessageToChannel(deletionLogChannel, "Message " + messageId + " deleted in channel " + channelId + " by " + deleter + " message was authored by " + deletedMessageAuthor + "\nHere: " + event.getJumpUrl());
                     }
                 });

@@ -3338,10 +3338,9 @@ public class Game extends GameProperties {
             return role.getAsMention();
         }
         StringBuilder sb = new StringBuilder(getName()).append(" ");
-        for (String playerID : getPlayerIDs()) {
-            User user = AsyncTI4DiscordBot.jda.getUserById(playerID);
-            if (user != null)
-                sb.append(user.getAsMention()).append(" ");
+        for (Player player : getPlayers().values()) {
+            User user = player.getUser();
+            if (user != null) sb.append(user.getAsMention()).append(" ");
         }
         return sb.toString();
     }

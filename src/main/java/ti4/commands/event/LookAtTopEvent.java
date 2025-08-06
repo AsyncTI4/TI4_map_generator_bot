@@ -45,8 +45,8 @@ class LookAtTopEvent extends GameStateSubcommand {
         sb.append("-----------\n");
 
         Player player = getPlayer();
-        User userById = event.getJDA().getUserById(player.getUserID());
-        if (userById != null) {
+        User user = player.getUser();
+        if (user != null) {
             if (game.isCommunityMode() && player.getPrivateChannel() != null) {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), sb.toString());
             } else {

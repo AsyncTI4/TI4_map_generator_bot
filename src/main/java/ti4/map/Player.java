@@ -55,6 +55,7 @@ import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
 import ti4.image.PositionMapper;
 import ti4.jda.MemberHelper;
+import ti4.jda.UserHelper;
 import ti4.map.pojo.PlayerProperties;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -1120,20 +1121,25 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public User getUser() {
-        return AsyncTI4DiscordBot.jda.getUserById(getUserID());
+        return UserHelper.getUser(getUserID());
     }
 
     @Override
     public String getUserName() {
-        User userById = getUser();
-        if (userById != null) {
-            Member member = MemberHelper.getMember(AsyncTI4DiscordBot.guildPrimary, getUserID());
-            if (member != null) {
-                setUserName(member.getEffectiveName());
-            } else {
-                setUserName(userById.getName());
-            }
+        Member member = getMember();
+        if (member != null) {
+            String name = member.getEffectiveName();
+            setUserName(name);
+            return name;
         }
+
+        User user = getUser();
+        if (user != null) {
+            String name = user.getName();
+            setUserName(name);
+            return name;
+        }
+
         return super.getUserName();
     }
 
@@ -1203,7 +1209,7 @@ public class Player extends PlayerProperties {
             if (roleForCommunity == null && !getTeamMateIDs().isEmpty()) {
                 StringBuilder sb = new StringBuilder((noFactionIcon ? "" : getFactionEmoji()));
                 for (String userID : getTeamMateIDs()) {
-                    User userById = AsyncTI4DiscordBot.jda.getUserById(userID);
+                    User userById = UserHelper.getUser(userID);
                     if (userById == null) {
                         continue;
                     }
