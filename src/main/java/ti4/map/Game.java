@@ -707,7 +707,6 @@ public class Game extends GameProperties {
                 setTableTalkChannelID(tableTalkChannel.getId());
                 return tableTalkChannel;
             }
-            // BotLogger.log("Could not retrieve TableTalkChannel for " + getName(), e);
         }
         return null;
     }

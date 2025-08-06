@@ -252,12 +252,10 @@ public class CreateFoWGameService {
     }
 
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         ArrayList<Integer> fowNumbers = new ArrayList<>();
 
         // GET ALL FOW ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
-            System.out.println(guild.getName());
+        for (Guild guild : AsyncTI4DiscordBot.guilds) {
             List<Role> fowRoles = guild.getRoles().stream()
                 .filter(r -> r.getName().startsWith("fow"))
                 .toList();

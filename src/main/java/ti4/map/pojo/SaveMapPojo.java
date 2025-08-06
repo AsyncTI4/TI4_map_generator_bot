@@ -2,7 +2,6 @@ package ti4.map.pojo;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,8 +61,6 @@ public class SaveMapPojo { //
             Object value = objectMapper.readValue(stringValue, field.getClass());
             field.set(object, value);
         } catch (NoSuchFieldException e) {
-            System.out.println("Failed to find field `" + fieldName + "` for class `" + clazz.getName() + "`");
-            System.out.println(String.join(", ", Arrays.asList(clazz.getFields()).stream().map(Field::getName).toList()));
             throw e;
         } catch (Exception e) {}
     }
@@ -77,7 +74,7 @@ public class SaveMapPojo { //
             String strVal = getOutputFromField(val, name);
             return name + " " + strVal;
         } catch (Exception e) {
-            System.out.println(e);
+            BotLogger.error("Error saving pojo", e);
         }
         return null;
     }
@@ -86,7 +83,6 @@ public class SaveMapPojo { //
         try {
             return objectMapper.writeValueAsString(value);
         } catch (Exception e) {
-            System.out.println("Jackson failed for field: " + fieldName);
             BotLogger.error("Jackson failed for field: " + fieldName);
             return "";
         }

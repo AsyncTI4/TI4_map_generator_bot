@@ -20,13 +20,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -1052,7 +1050,6 @@ public class Mapper {
             if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key))
                 return key;
         }
-        System.out.println("Could not resolve token: " + tokenID);
         return tokenID;
     }
 

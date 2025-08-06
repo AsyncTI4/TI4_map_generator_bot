@@ -2979,7 +2979,6 @@ public class ButtonHelper {
                 if ("space".equalsIgnoreCase(capChecker.getName())) {
                     capacity += unit.getCapacityValue() * unitsByQuantity.get(unit);
                 }
-                // System.out.println(unit.getBaseType());
                 if ("spacedock".equalsIgnoreCase(unit.getBaseType())
                     && !"space".equalsIgnoreCase(capChecker.getName())) {
                     if (player.ownsUnit("cabal_spacedock")) {

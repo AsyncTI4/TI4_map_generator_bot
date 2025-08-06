@@ -406,11 +406,10 @@ public class CreateGameService {
     }
 
     public static boolean gameOrRoleAlreadyExists(String name) {
-        List<Guild> guilds = AsyncTI4DiscordBot.jda.getGuilds();
         List<String> gameAndRoleNames = new ArrayList<>();
 
         // GET ALL PBD ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
+        for (Guild guild : AsyncTI4DiscordBot.guilds) {
             // EXISTING ROLE NAMES
             for (Role role : guild.getRoles()) {
                 gameAndRoleNames.add(role.getName());

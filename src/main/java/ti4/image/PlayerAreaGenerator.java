@@ -1143,9 +1143,7 @@ public class PlayerAreaGenerator {
             }
 
             AbilityModel abilityModel = Mapper.getAbility(abilityID);
-            if (abilityModel == null) {
-                System.out.println("Ability null: " + abilityID);
-            } else {
+            if (abilityModel != null) {
                 if (abilityFileName != null) {
                     String status = isExhaustedLocked ? "_exh" : "_rdy";
                     abilityFileName += status + ".png";
