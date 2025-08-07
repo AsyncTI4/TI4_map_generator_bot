@@ -83,6 +83,8 @@ import ti4.settings.users.UserSettingsManager;
 
 public class Player extends PlayerProperties {
 
+    private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
+
     private final Game game;
 
     private DraftBag draftHand = new DraftBag();
@@ -2493,7 +2495,7 @@ public class Player extends PlayerProperties {
             AbilityModel model = Mapper.getAbility(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Abilities__", sb.toString(), true);
+        addFieldSafely(eb, "__Abilities__", sb.toString(), true);
 
         // Faction Tech
         sb = new StringBuilder();
@@ -2501,7 +2503,7 @@ public class Player extends PlayerProperties {
             TechnologyModel model = Mapper.getTech(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Faction Technologies__", sb.toString(), true);
+        addFieldSafely(eb, "__Faction Technologies__", sb.toString(), true);
 
         // Techs
         sb = new StringBuilder();
@@ -2509,7 +2511,7 @@ public class Player extends PlayerProperties {
             TechnologyModel model = Mapper.getTech(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Technologies__", sb.toString(), true);
+        addFieldSafely(eb, "__Technologies__", sb.toString(), true);
 
         // Special Units
         sb = new StringBuilder();
@@ -2517,7 +2519,7 @@ public class Player extends PlayerProperties {
             UnitModel model = Mapper.getUnit(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Units__", sb.toString(), true);
+        addFieldSafely(eb, "__Units__", sb.toString(), true);
 
         // Promissory Notes
         sb = new StringBuilder();
@@ -2525,7 +2527,7 @@ public class Player extends PlayerProperties {
             PromissoryNoteModel model = Mapper.getPromissoryNote(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Promissory Notes__", sb.toString(), true);
+        addFieldSafely(eb, "__Promissory Notes__", sb.toString(), true);
 
         // Leaders
         sb = new StringBuilder();
@@ -2533,11 +2535,18 @@ public class Player extends PlayerProperties {
             LeaderModel model = Mapper.getLeader(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Leaders__", sb.toString(), false);
+        addFieldSafely(eb, "__Leaders__", sb.toString(), false);
 
         // Add avatar, color and footer
         applyEmbedDefaults(eb);
         return eb.build();
+    }
+
+    private void addFieldSafely(EmbedBuilder eb, String name, String value, boolean inline) {
+        if (value.length() > EMBED_FIELD_VALUE_LIMIT) {
+            value = value.substring(0, EMBED_FIELD_VALUE_LIMIT - 3) + "...";
+        }
+        eb.addField(name, value, inline);
     }
 
     private void applyEmbedDefaults(EmbedBuilder eb) {
