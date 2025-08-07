@@ -228,7 +228,7 @@ public class MiltyService {
         int i = 0;
         List<String> output = new ArrayList<>();
         while (output.size() < factionCount) {
-            if (i > randomOrder.size()) return output;
+            if (i >= randomOrder.size()) return output;
             String f = randomOrder.get(i);
             i++;
             if (output.contains(f)) continue;
