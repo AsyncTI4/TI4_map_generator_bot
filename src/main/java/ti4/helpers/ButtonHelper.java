@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +16,11 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Consumers;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import lombok.Data;
 import net.dv8tion.jda.api.entities.Message;
@@ -35,10 +42,6 @@ import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Consumers;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import ti4.ResourceHelper;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
@@ -108,8 +111,6 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.RemoveUnitService;
 import ti4.settings.users.UserSettingsManager;
 import ti4.website.AsyncTi4WebsiteHelper;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelper {
 
@@ -2661,7 +2662,7 @@ public class ButtonHelper {
     }
 
     public static void deleteButtonsWithPartialID(GenericInteractionCreateEvent event, String partialID) {
-        if (event != null && event instanceof ButtonInteractionEvent bevent) {
+        if (event instanceof ButtonInteractionEvent bevent) {
             boolean containsRealButton = false;
             List<Button> buttons = new ArrayList<>(bevent.getMessage().getButtons());
             List<Button> newButtons = new ArrayList<>();
@@ -2992,10 +2993,8 @@ public class ButtonHelper {
                     } else if (player.ownsUnit("absol_spacedock2")) {
                         fightersIgnored += 5;
                         fleetCap += 2;
-                    } else {
-                        if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
-                            fightersIgnored += 3;
-                        }
+                    } else if (!player.hasUnit("mykomentori_spacedock") && !player.hasUnit("mykomentori_spacedock2")) {
+                        fightersIgnored += 3;
                     }
                 }
             }
@@ -3025,11 +3024,8 @@ public class ButtonHelper {
                                 fightersIgnored += 6;
                             } else if (p2.ownsUnit("cabal_spacedock2")) {
                                 fightersIgnored += 12;
-                            } else {
-                                if (!p2.hasUnit("mykomentori_spacedock") && !p2.hasUnit("mykomentori_spacedock2")) {
-                                    fightersIgnored += 3;
-                                }
-
+                            } else if (!p2.hasUnit("mykomentori_spacedock") && !p2.hasUnit("mykomentori_spacedock2")) {
+                                fightersIgnored += 3;
                             }
                         }
                     }
@@ -3084,6 +3080,16 @@ public class ButtonHelper {
             && player == game.getActivePlayer()) {
             capacity += 2;
         }
+        int ageOfFightersFleet = 0;
+        if (game.isAgeOfFightersMode()) {
+            if (player.hasTech("hcf2")) {
+                ageOfFightersFleet = Math.min(numFighter2s, fleetCap - numOfCapitalShips);
+            } else {
+                ageOfFightersFleet = Math.min(numFighter2s, (fleetCap - numOfCapitalShips) / 2);
+            }
+            capacity += ageOfFightersFleet;
+        }
+
         if (numInfNFightersNMechs > capacity) {
             if (numInfNFightersNMechs - numFighter2s > capacity) {
                 capacityViolated = true;
@@ -3510,13 +3516,50 @@ public class ButtonHelper {
                 inBoth = pos3;
             }
         }
+        List<String> redTilesToPullFrom = new ArrayList<>(List.of(
+            //Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
+            //         https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx
+
+            "39",
+            "40",
+            "41",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "47",
+            "48",
+            "49",
+            "67",
+            "68",
+            "77",
+            "78",
+            "79",
+            "80",
+            "d117",
+            "d118",
+            "d119",
+            "d120",
+            "d121",
+            "d122",
+            "d123"));
+
+        // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile -> !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
+        redTilesToPullFrom.removeAll(game.getTileMap().values().stream().map(Tile::getTileID).toList());
+        if (!game.isDiscordantStarsMode() && !game.isUnchartedSpaceStuff()) {
+            redTilesToPullFrom.removeAll(redTilesToPullFrom.stream().filter(tileID -> tileID.contains("d")).toList());
+        }
 
         if (newTileID.equalsIgnoreCase("unknown")) {
             DiceHelper.Die d1 = new DiceHelper.Die(5);
 
             String message = player.getRepresentation() + " Rolled a " + d1.getResult() + " and will thus place a ";
-            if (d1.getResult() > 4) {
+            if (d1.getResult() > 4 || redTilesToPullFrom.isEmpty()) {
                 message += "blue backed tile.";
+                if (d1.getResult() < 5) {
+                    message += " (All red backed tiles were already placed)";
+                }
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
                 List<MiltyDraftTile> unusedBlueTiles = new ArrayList<>(Helper.getUnusedTiles(game).stream()
                     .filter(tile -> tile.getTierList().isBlue())
@@ -3545,44 +3588,11 @@ public class ButtonHelper {
             } else {
                 message += "red backed tile.";
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), message);
-                List<String> tilesToPullFrom = new ArrayList<>(List.of(
-                    //Source:  https://discord.com/channels/943410040369479690/1009507056606249020/1140518249088434217
-                    //         https://cdn.discordapp.com/attachments/1009507056606249020/1140518248794820628/Starmap_Roll_Helper.xlsx
 
-                    "39",
-                    "40",
-                    "41",
-                    "42",
-                    "43",
-                    "44",
-                    "45",
-                    "46",
-                    "47",
-                    "48",
-                    "49",
-                    "67",
-                    "68",
-                    "77",
-                    "78",
-                    "79",
-                    "80",
-                    "d117",
-                    "d118",
-                    "d119",
-                    "d120",
-                    "d121",
-                    "d122",
-                    "d123"));
+                List<String> tileToPullFromUnshuffled = new ArrayList<>(redTilesToPullFrom);
+                Collections.shuffle(redTilesToPullFrom);
 
-                // if (includeAllTiles) tilesToPullFrom = TileHelper.getAllTiles().values().stream().filter(tile -> !tile.isAnomaly() && !tile.isHomeSystem() && !tile.isHyperlane()).map(TileModel::getId).toList();
-                tilesToPullFrom.removeAll(game.getTileMap().values().stream().map(Tile::getTileID).toList());
-                if (!game.isDiscordantStarsMode() && !game.isUnchartedSpaceStuff()) {
-                    tilesToPullFrom.removeAll(tilesToPullFrom.stream().filter(tileID -> tileID.contains("d")).toList());
-                }
-                List<String> tileToPullFromUnshuffled = new ArrayList<>(tilesToPullFrom);
-                Collections.shuffle(tilesToPullFrom);
-
-                if (tilesToPullFrom.size() < 1) {
+                if (redTilesToPullFrom.size() < 1) {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Not enough tiles to draw from.");
                     return;
                 }
@@ -3590,7 +3600,7 @@ public class ButtonHelper {
                 List<MessageEmbed> tileEmbeds = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
 
-                String tileID = tilesToPullFrom.get(0);
+                String tileID = redTilesToPullFrom.get(0);
                 ids.add(tileID);
                 TileModel tile = TileHelper.getTileById(tileID);
                 tileEmbeds.add(tile.getRepresentationEmbed(false));
@@ -4530,6 +4540,11 @@ public class ButtonHelper {
                 }
             }
         }
+        if (buttonID.contains("deleteTheseButtons") && event instanceof ButtonInteractionEvent bevent) {
+            ButtonHelper.deleteAllButtons(bevent);
+        } else {
+            game.removeStoredValue("assignedBombardment" + player.getFaction());
+        }
         CombatRollService.secondHalfOfCombatRoll(player, game, event, game.getTileByPosition(pos), unitHolderName,
             rollType);
         if (buttonID.contains("bombardment") && ButtonHelper.isLawInPlay(game, "conventions")) {
@@ -4545,9 +4560,10 @@ public class ButtonHelper {
                     "This is a reminder that _Conventions of War_ is in play, so using BOMBARDMENT on cultural planets is illegal.");
             }
         }
-        if (buttonID.contains("bombard")) {
-            ButtonHelper.deleteTheOneButton(event);
-        }
+        // if (buttonID.contains("bombard")) {
+        //     ButtonHelper.deleteTheOneButton(event);
+        // }
+
     }
 
     public static String putInfWithMechsForStarforge(
@@ -5281,10 +5297,8 @@ public class ButtonHelper {
         List<ColorModel> unusedColors = game.getUnusedColors();
 
         List<ColorModel> factionPrefColors = Mapper.getFaction(factionId).getPreferredColours().stream().map(Mapper::getColor).toList();
-        for (ColorModel color : factionPrefColors)
-        {
-            if (color != null && unusedColors.contains(color))
-            {
+        for (ColorModel color : factionPrefColors) {
+            if (color != null && unusedColors.contains(color)) {
                 String colorName = color.getName();
                 Emoji colorEmoji = color.getEmoji();
                 String step3id = "setupStep3_" + userId + "_" + factionId + "_" + colorName;
@@ -5295,8 +5309,7 @@ public class ButtonHelper {
         List<ColorModel> unusedPrefColors = game.getUnusedColorsPreferringBase();
         unusedPrefColors = ColourHelper.sortColours(factionId, unusedPrefColors);
         for (ColorModel color : unusedPrefColors) {
-            if (factionPrefColors.contains(color))
-            {
+            if (factionPrefColors.contains(color)) {
                 continue;
             }
             String colorName = color.getName();
@@ -5422,9 +5435,8 @@ public class ButtonHelper {
         String userId = buttonID.split("_")[1];
         deleteMessage(event);
         List<Button> buttons = getFactionSetupButtons(game, buttonID);
-        if (buttons.size() <= 25)
-        {
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+        if (buttons.size() <= 25) {
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
                 "Please tell the bot the desired faction.", buttons);
             return;
         }
@@ -5447,7 +5459,7 @@ public class ButtonHelper {
         }
         newButtons.add(
             Buttons.gray("setupStep2_" + userId + "_" + (maxBefore + numberOfHomes) + "!", "Get More Factions"));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
             "Please tell the bot the desired faction.", newButtons);
     }
 
@@ -5950,12 +5962,9 @@ public class ButtonHelper {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
                 }
                 msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0)
-                {
+                if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
-                }
-                else
-                {
+                } else {
                     msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
                 }
             }
@@ -6333,6 +6342,10 @@ public class ButtonHelper {
             youCanSpend.append("and ").append(player.getTg()).append(" trade good")
                 .append(player.getTg() == 1 ? "" : "s").append(".");
             resourcesAvailable += (player.hasTech("mc") ? 2 : 1) * player.getTg();
+            if (player.hasUnexhaustedLeader("keleresagent") && player.getCommodities() > 0) {
+                youCanSpend.append("and ").append(player.getTg()).append(" commodities");
+                resourcesAvailable += (player.hasTech("mc") ? 2 : 1) * player.getCommodities();
+            }
         }
         if (production) {
             if (player.hasTech("st")) {

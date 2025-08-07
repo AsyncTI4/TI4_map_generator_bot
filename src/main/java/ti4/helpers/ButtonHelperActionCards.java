@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.commands.commandcounter.RemoveCommandCounterService;
 import ti4.helpers.DiceHelper.Die;
-import ti4.helpers.DisasterWatchHelper;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.Mapper;
@@ -1165,7 +1164,7 @@ public class ButtonHelperActionCards {
     @ButtonHandler("resolveUnstableStep1")
     public static void resolveUnstableStep1(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersNDummies()) {
             if (p2 == player) {
                 continue;
             }
@@ -1243,7 +1242,7 @@ public class ButtonHelperActionCards {
     public static void resolveDiplomaticPressureStep2(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
         List<Button> stuffToTransButtons = ButtonHelper.getForcedPNSendButtons(game, player, p2);
-        String message = p2.getRepresentationUnfogged() + ", you have been forced to give a promissory note. Please choose which promissory note you wish to send.";
+        String message = p2.getRepresentationUnfogged() + ", you are being forced to give a promissory note. Please choose which promissory note you wish to send.";
         MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(), message, stuffToTransButtons);
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
             player.getRepresentationUnfogged() + ", buttons to send a promissory note have been given to " + p2.getFactionEmojiOrColor() + ".");
@@ -1272,24 +1271,18 @@ public class ButtonHelperActionCards {
         int comm = p2.getCommodities();
         p2.setCommodities(0);
         player.setTg(player.getTg() + comm);
-        if (comm == 0)
-        {
+        if (comm == 0) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentationUnfogged() + " attempted to steal commodities from "
-                     + p2.getFactionEmojiOrColor() + ", but fortuitously, it turns out they didn't have any.");
-        }
-        else
-        {
-            if (game.isFowMode())
-            {
+                    + p2.getFactionEmojiOrColor() + ", but fortuitously, it turns out they didn't have any.");
+        } else {
+            if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " has stolen " + comm + " commodit" + (comm == 1 ? "y" : "ies")
                         + " from " + p2.getFactionEmojiOrColor() + " with _Salvage_.");
                 MessageHelper.sendMessageToChannel(p2.getCorrectChannel(),
                     p2.getRepresentationUnfogged() + ", your commodities were somehow stolen with _Salvage_.");
-            }
-            else
-            {
+            } else {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + " has somehow managed to use _Salvage_ to steal "
                         + comm + " commodit" + (comm == 1 ? "y" : "ies") + " from " + p2.getRepresentationUnfogged() + ".");
@@ -1297,7 +1290,13 @@ public class ButtonHelperActionCards {
             DisasterWatchHelper.sendMessageInDisasterWatch(game,
                 player.getRepresentationUnfogged() + " has stolen " + comm + " commodit" + (comm == 1 ? "y" : "ies")
                     + " from " + p2.getRepresentationUnfogged() + " in " + game.getName() + " with _Salvage_. "
-                    + switch(ThreadLocalRandom.current().nextInt(0, 5)) {case 0 -> "Amazing"; case 1 -> "Incredible"; case 2 -> "Unbelievable"; case 3 -> "Remarkable"; default -> "Phenomenal";} + "!");
+                    + switch (ThreadLocalRandom.current().nextInt(0, 5)) {
+                        case 0 -> "Amazing";
+                        case 1 -> "Incredible";
+                        case 2 -> "Unbelievable";
+                        case 3 -> "Remarkable";
+                        default -> "Phenomenal";
+                    } + "!");
         }
         ButtonHelper.deleteMessage(event);
     }
@@ -1348,8 +1347,8 @@ public class ButtonHelperActionCards {
 
     @ButtonHandler("resolveInsiderInformation")
     public static void resolveInsiderInformation(Player player, Game game, ButtonInteractionEvent event) {
-        AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent info for the top card of the agenda deck to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
+        AgendaHelper.sendTopAgendaToCardsInfoSkipCovert(game, player, 3);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Sent info for the top 3 cards of the agenda deck to " + player.getFactionEmojiOrColor() + " `#cards-info` thread.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -1753,7 +1752,7 @@ public class ButtonHelperActionCards {
         buttons.add(Buttons.blue("olradinPreserveStep2_cultural_prof", "Explore Cultural"));
         buttons.add(Buttons.red("olradinPreserveStep2_hazardous_prof", "Explore Hazardous"));
         buttons.add(Buttons.gray("olradinPreserveStep2_frontier_prof", "Explore Frontier"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), 
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
             player.getRepresentation() + ", please use buttons to resolve the action card.", buttons);
 
     }
@@ -2329,12 +2328,9 @@ public class ButtonHelperActionCards {
                 }
             }
         }
-        if (message.isEmpty())
-        {
+        if (message.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " would have readied each of their cultural planets, but they have none.");
-        }
-        else
-        {
+        } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationUnfogged() + " readied each of their cultural planets." + message);
         }
         ButtonHelper.deleteMessage(event);
@@ -2372,6 +2368,36 @@ public class ButtonHelperActionCards {
         ButtonHelperAbilities.pillageCheck(player, game);
         ButtonHelperAgents.resolveArtunoCheck(player, count);
         ButtonHelper.deleteMessage(event);
+    }
+
+    public static int getAllCommsInHS(Player player, Game game) {
+        int count = 0;
+
+        for (String planet : player.getPlanets()) {
+            Planet p = game.getPlanetsInfo().get(planet);
+            if (p != null && p.getResources() > count) {
+                if (game.getTileFromPlanet(planet) == player.getHomeSystemTile()) {
+                    count += game.changeCommsOnPlanet(0, planet);
+                }
+            }
+        }
+        return count;
+    }
+
+    public static void decrease10CommsinHS(Player player, Game game) {
+        int count = 10;
+
+        for (String planet : player.getPlanets()) {
+            Planet p = game.getPlanetsInfo().get(planet);
+            if (p != null) {
+                if (game.getTileFromPlanet(planet) == player.getHomeSystemTile() && count > 0) {
+                    int amount = game.changeCommsOnPlanet(0, planet);
+                    game.changeCommsOnPlanet(-Math.min(amount, count), planet);
+                    count = count - Math.min(amount, count);
+                }
+            }
+        }
+
     }
 
     public static String getBestResPlanetInHomeSystem(Player player, Game game) {

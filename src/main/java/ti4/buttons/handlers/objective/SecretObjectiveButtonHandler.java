@@ -99,16 +99,16 @@ class SecretObjectiveButtonHandler {
             }
         }
         boolean allPlayersSetup = true;
-        String message = "🛑 Cannot deal secret objectives yet as some players still need to pick their starting technologies. If you wish to proceed anyways, just press the button again.";
+        StringBuilder message = new StringBuilder("🛑 Cannot deal secret objectives yet as some players still need to pick their starting technologies. If you wish to proceed anyways, just press the button again.");
         for (Player p : game.getRealPlayers()) {
             if (p.getTechs().size() < p.getFactionModel().finalStartingTechAmount()) {
-                message += "\n> " + p.getRepresentation();
+                message.append("\n> ").append(p.getRepresentation());
                 allPlayersSetup = false;
             }
         }
         if (!allPlayersSetup && !game.getStoredValue("overrideSORes").contains(player.getFaction())) {
             game.setStoredValue("overrideSORes", game.getStoredValue("overrideSORes") + player.getFaction());
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
             return;
         }
 

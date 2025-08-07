@@ -1,17 +1,21 @@
 package ti4.map.persistence;
 
+import static ti4.map.persistence.GamePersistenceKeys.*;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
@@ -32,25 +36,6 @@ import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
-
-import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
-import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
-import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
-import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
-import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
-import static ti4.map.persistence.GamePersistenceKeys.TILE;
-import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
-import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
-import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
 @UtilityClass
 class GameSaveService {
@@ -218,7 +203,11 @@ class GameSaveService {
         writeCards(game.getLaws(), writer, Constants.LAW);
         writeCards(game.getEventsInEffect(), writer, Constants.EVENTS_IN_EFFECT);
 
-        writer.write(Constants.EVENTS + " " + String.join(",", game.getEvents()));
+        List<String> events = game.getEvents();
+        if (events == null) {
+            events = Collections.emptyList();
+        }
+        writer.write(Constants.EVENTS + " " + String.join(",", events));
         writer.write(System.lineSeparator());
         writeCards(game.getDiscardedEvents(), writer, Constants.DISCARDED_EVENTS);
 
@@ -438,7 +427,17 @@ class GameSaveService {
         writer.write(System.lineSeparator());
         writer.write(Constants.TOTAL_WAR_MODE + " " + game.isTotalWarMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.DANGEROUS_WILDS_MODE + " " + game.isDangerousWildsMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.STELLAR_ATOMICS_MODE + " " + game.isStellarAtomicsMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.AGE_OF_FIGHTERS_MODE + " " + game.isAgeOfFightersMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CIVILIZED_SOCIETY_MODE + " " + game.isCivilizedSocietyMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.NO_SWAP_MODE + " " + game.isNoSwapMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.LIMITED_WHISPERS_MODE + " " + game.isLimitedWhispersMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.AGE_OF_COMMERCE_MODE + " " + game.isAgeOfCommerceMode());
         writer.write(System.lineSeparator());
@@ -914,7 +913,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             for (Entry<UnitKey, List<Integer>> entry : unitHolder.getUnitsByState().entrySet()) {
                 if (entry.getKey() != null) {
-                    String amtString = String.join(",", entry.getValue().stream().map(i -> i.toString()).toList());
+                    String amtString = String.join(",", entry.getValue().stream().map(Object::toString).toList());
                     writer.write(entry.getKey().outputForSave() + " " + amtString);
                     writer.write(System.lineSeparator());
                 }

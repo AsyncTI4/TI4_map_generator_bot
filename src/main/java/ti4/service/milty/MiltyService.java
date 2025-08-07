@@ -8,11 +8,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.commands.tokens.AddTokenCommand;
 import ti4.helpers.AliasHandler;
@@ -194,7 +195,7 @@ public class MiltyService {
                 } else {
                     DraftDisplayService.repostDraftInformation(event, draftManager, game);
                     game.setPhaseOfGame("miltydraft");
-                    GameManager.save(game, "Milty");
+                    GameManager.save(game, "Milty"); //TODO: We should be locking since we're saving
                 }
             });
         }
@@ -530,6 +531,27 @@ public class MiltyService {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 "Set mech unit maximum to 6 for " + player.getRepresentation()
                     + ", due to their **Machine Cult** ability.");
+        }
+        if (game.isAgeOfFightersMode()) {
+            String tech = "ff2";
+            for (String factionTech : player.getNotResearchedFactionTechs()) {
+                TechnologyModel fTech = Mapper.getTech(factionTech);
+                if (fTech != null && !fTech.getAlias().equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                    && fTech.isUnitUpgrade()
+                    && fTech.getBaseUpgrade().orElse("bleh")
+                        .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                    tech = fTech.getAlias();
+                    break;
+                }
+            }
+            player.addTech(tech);
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentation() + " gained the " + Mapper.getTech(tech).getNameRepresentation() + " technology due to the _Age of Fighters_ galactic event.");
+
+        }
+        if (game.isStellarAtomicsMode()) {
+            int stellarID = game.getRevealedPublicObjectives().get("Stellar Atomics");
+            game.scorePublicObjective(player.getUserID(), stellarID);
         }
         if (player.hasAbility("policies")) {
             player.removeAbility("policies");

@@ -17,7 +17,6 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.CombatModifierModel;
 import ti4.model.NamedCombatModifierModel;
@@ -102,8 +101,7 @@ public class CombatMessageHelper {
         }
 
         String nice = "";
-        if (resultRolls.size() == 2 && resultRolls.get(0).getResult() == 6 && resultRolls.get(1).getResult() == 9)
-        {
+        if (resultRolls.size() == 2 && resultRolls.get(0).getResult() == 6 && resultRolls.get(1).getResult() == 9) {
             nice = " (nice)";
         }
 
@@ -216,6 +214,11 @@ public class CombatMessageHelper {
                     game.setStoredValue("letnevagent", "");
                 }
             }
+        }
+        if (rollType == CombatRollType.bombardment && !player.getGame().getStoredValue("bombardmentTarget" + player.getFaction()).isEmpty()) {
+            String planet = player.getGame().getStoredValue("bombardmentTarget" + player.getFaction());
+            return String.format("%s rolls for %s on %s %s :\n",
+                player.getFactionEmoji(), combatTypeName.toLowerCase(), Helper.getPlanetRepresentationNoResInf(planet, player.getGame()), MiscEmojis.RollDice);
         }
         return String.format("%s rolls for %s %s :\n",
             player.getFactionEmoji(), combatTypeName.toLowerCase(), MiscEmojis.RollDice);

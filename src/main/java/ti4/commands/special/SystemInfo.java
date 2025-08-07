@@ -35,7 +35,7 @@ import ti4.service.emoji.ColorEmojis;
 class SystemInfo extends GameStateSubcommand {
 
     public SystemInfo() {
-        super(Constants.SYSTEM_INFO, "Info for system (all units)", true, false);
+        super(Constants.SYSTEM_INFO, "Info for system (all units)", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.EXTRA_RINGS, "Show additional rings around the selected system for context (Max 2)"));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setAutoComplete(true));
@@ -68,6 +68,10 @@ class SystemInfo extends GameStateSubcommand {
             Tile tile = TileHelper.getTile(event, tileID, game);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
+                continue;
+            }
+            if (game.isFowMode() && !getPlayer().isGM() && !FoWHelper.getTilePositionsToShow(game, getPlayer()).contains(tile.getPosition())) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "You have no visibility to " + tile.getPosition() + ".");
                 continue;
             }
             String tileName = tile.getTilePath();

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.function.Consumers;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperActionCards;
@@ -188,7 +189,7 @@ public class DestroyUnitService {
                     for (Player player_ : game.getPlayers().values()) {
                         DestroyUnitService.destroyAllPlayerNonStructureUnits(event, game, player_, unit.tile(), uh, combat);
                     }
-                    DisasterWatchHelper.postTileInDisasterWatch(game, event, unit.tile(), 0, 
+                    DisasterWatchHelper.postTileInDisasterWatch(game, event, unit.tile(), 0,
                         player.getRepresentation() + " has detonated the bomb.");
 
                 }
@@ -258,6 +259,19 @@ public class DestroyUnitService {
                         + unit.unitKey().getUnitType().getUnitTypeEmoji() +
                         "\nIf this was a mistake, adjust the commodities with `/ds set_planet_comms`.");
             }
+        }
+        if (game.isAgeOfFightersMode() && player != null) {
+            UnitModel uni = player.getUnitFromUnitKey(unit.unitKey());
+            if (uni != null && uni.getIsShip() && uni.getUnitType() != UnitType.Fighter) {
+                String unitID = AliasHandler.resolveUnit(uni.getBaseType());
+                player.setUnitCap(unitID, player.getUnitCap(unitID) - 1);
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + " purged 1 "
+                        + unit.unitKey().getUnitType().getUnitTypeEmoji() + " due to _Age of Fighters_."
+                        +" You now have a total of " + player.getUnitCap(unitID) + " available to you  (on the game board or in your reinforcements)." +
+                        "\n-# If this was a mistake, readjust the limit with `/game set_unit_cap`.");
+            }
+
         }
     }
 

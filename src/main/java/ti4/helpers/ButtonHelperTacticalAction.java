@@ -27,7 +27,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
 import ti4.service.fow.LoreService;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.tactical.TacticalActionService;
 import ti4.service.turn.StartTurnService;
@@ -38,7 +37,6 @@ public class ButtonHelperTacticalAction {
     @ButtonHandler("doneWithTacticalAction")
     public static void concludeTacticalAction(Player player, Game game, ButtonInteractionEvent event) {
         if (!game.isL1Hero() && !FOWPlusService.isVoid(game, game.getActiveSystem())) {
-            RiftSetModeService.concludeTacticalAction(player, game, event);
             ButtonHelper.exploreDET(player, game, event);
             ButtonHelperFactionSpecific.cleanCavUp(game, event);
             if (player.hasAbility("cunning")) {

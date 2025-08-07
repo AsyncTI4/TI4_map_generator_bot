@@ -70,17 +70,17 @@ public enum PlanetEmojis implements TI4Emoji {
     Veyhrune, Viliguard, Violence, Volgan, Volra, VygarII, Vylanua, Xyon, Yncranti, Ynnis, Zhgen, //
 
     // Bonus Semlores
-    SemLor, SemLord, SemiLor;
-
-    public static List<TI4Emoji> semLores() {
-        return new ArrayList<>(List.of(SemLor, SemLord, SemiLor, SemLore));
-    }
+    SemLor, SemLord, SemiLor, ArchonFail;
 
     public static TI4Emoji getRandomSemLore() {
-        List<TI4Emoji> semLores = new ArrayList<>(semLores());
+        List<TI4Emoji> semLores = new ArrayList<>(List.of(SemLor, SemLord, SemiLor, SemLore));
         Random seed = ThreadLocalRandom.current();
         Collections.shuffle(semLores, seed);
         return semLores.getFirst();
+    }
+
+    public static TI4Emoji getRandomArchonVail() {
+        return ThreadLocalRandom.current().nextInt() % 2 == 0 ? ArchonVail : ArchonFail;
     }
 
     @NotNull
@@ -108,7 +108,7 @@ public enum PlanetEmojis implements TI4Emoji {
             case "arcprime" -> ArcPrime;
             case "archonren", "archonrenk" -> ArchonRen;
             case "archontau", "archontauk" -> ArchonTau;
-            case "archonvail" -> ArchonVail;
+            case "archonvail" -> getRandomArchonVail();
             case "arcturus" -> Arcturus;
             case "arinam" -> Arinam;
             case "arnor" -> Arnor;

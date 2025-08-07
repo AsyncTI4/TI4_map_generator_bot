@@ -7,6 +7,7 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.metadata.AutoPingMetadataManager;
+import ti4.service.fow.GMService;
 
 class PingActivePlayer extends GameStateSubcommand {
 
@@ -48,7 +49,8 @@ class PingActivePlayer extends GameStateSubcommand {
         } else {
             String ping = activePlayer.getRepresentationUnfogged() + " this is a gentle reminder that it is your turn.";
             if (game.isFowMode()) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+                    (event.getChannelIdLong() == GMService.getGMChannel(game).getIdLong() ? activePlayer.getRepresentationUnfoggedNoPing() : "Active player") + " has been pinged.");
                 MessageHelper.sendPrivateMessageToPlayer(activePlayer, game, ping);
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);

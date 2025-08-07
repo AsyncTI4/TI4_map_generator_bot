@@ -1318,18 +1318,21 @@ public class Helper {
         } else {
             int productionLimit = 0;
             if (tile != null && activeSystem != null && tile == activeSystem && Helper.getProductionValue(player, game, tile, false) > 0) {
-                productionLimit = Helper.getProductionValue(player, game, tile, false);
-                boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
-                if (warM) {
-                    productionLimit = productionLimit + 4;
-                }
-                if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
-                    productionLimit = productionLimit + 2;
-                }
-                msg.append("Producing a total of ").append(unitCount).append(" units (PRODUCTION limit is " + productionLimit + ")")
-                    .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
-                if (productionLimit < unitCount) {
-                    msg.append("\n### Warning! Exceeding PRODUCTION limit of " + productionLimit + "!");
+                if (!player.hasUnit("arborec_mech") && !player.hasUnit("arborec_infantry") && !player.hasUnit("arborec_infantry2")) {
+
+                    productionLimit = Helper.getProductionValue(player, game, tile, false);
+                    boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
+                    if (warM) {
+                        productionLimit = productionLimit + 4;
+                    }
+                    if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
+                        productionLimit = productionLimit + 2;
+                    }
+                    msg.append("Producing a total of ").append(unitCount).append(" units (PRODUCTION limit is " + productionLimit + ")")
+                        .append(" for a total cost of ").append(cost).append(" resource").append(cost == 1 ? "" : "s").append(".");
+                    if (productionLimit < unitCount) {
+                        msg.append("\n### Warning! Exceeding PRODUCTION limit of " + productionLimit + "!");
+                    }
                 }
             } else {
                 msg.append("Producing a total of ").append(unitCount).append(" unit").append(unitCount == 1 ? "" : "s")
@@ -2261,7 +2264,7 @@ public class Helper {
                 if (member == null)
                     continue;
                 long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
+                textChannelManager = textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
             textChannelManager.queue();
         }
@@ -2453,6 +2456,72 @@ public class Helper {
         }
     }
 
+    public static void checkEndGameCivilizedSociety(Game game) {
+        if (!game.getPhaseOfGame().equalsIgnoreCase("statusHomeWork")) {
+            return;
+        }
+
+        if (game.getHighestScore() < game.getVp()) {
+            return;
+        }
+
+        List<Player> tiedPs = new ArrayList<>();
+        int highestScore = game.getHighestScore();
+        int highestInf = 0;
+
+        for (Player player : game.getRealPlayers()) {
+
+            if (player.hasRelic("emphidia")) {
+                for (String pl : player.getPlanetsAllianceMode()) {
+                    Tile tile = game.getTile(AliasHandler.resolveTile(pl));
+                    if (tile == null) {
+                        continue;
+                    }
+                    UnitHolder unitHolder = tile.getUnitHolders().get(pl);
+                    if (unitHolder != null && unitHolder.getTokenList() != null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
+                        player.removeRelic("emphidia");
+                        player.removeExhaustedRelic("emphidia");
+
+                        Integer poIndex = game.addCustomPO("The Crown of Emphidia", 1);
+                        game.scorePublicObjective(player.getUserID(), poIndex);
+                        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                            player.getRepresentation() + " scored _The Crown of Emphidia_.");
+                    }
+                }
+            }
+            if (player.getTotalVictoryPoints() > highestScore) {
+                tiedPs = new ArrayList<>();
+                highestScore = game.getHighestScore();
+                highestInf = 0;
+            }
+            if (player.getTotalVictoryPoints() == highestScore) {
+                tiedPs.add(player);
+                if (player.getTg() + Helper.getPlayerInfluenceTotal(player, game) > highestInf) {
+                    highestInf = player.getTg() + Helper.getPlayerInfluenceTotal(player, game);
+                }
+            }
+        }
+
+        for (Player player : tiedPs) {
+            if (player.getTg() + Helper.getPlayerInfluenceTotal(player, game) == highestInf) {
+                List<Button> buttons = new ArrayList<>();
+                if (!game.isFowMode()) {
+                    buttons.add(Buttons.green("gameEnd", "End Game"));
+                    buttons.add(Buttons.blue("rematch", "Rematch (make new game with same players/channels)"));
+                } else {
+                    buttons.add(Buttons.green("gameEndConfirmation", "End and Delete Game"));
+                }
+                buttons.add(Buttons.red("deleteButtons", "Mistake, delete these"));
+                MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(),
+                    "# " + game.getPing() + " it appears as though " + player.getRepresentationNoPing()
+                        + " has won the game!\nPress the **End Game** button when you are done with the channels, or ignore this if it was a mistake/more complicated.",
+                    buttons);
+                return;
+            }
+        }
+
+    }
+
     public static void checkEndGame(Game game, Player player) {
         if (player.getTotalVictoryPoints() >= game.getVp()) {
             if (game.isLiberationC4Mode()) {
@@ -2465,6 +2534,10 @@ public class Helper {
                         return;
                     }
                 }
+            }
+            if (game.isCivilizedSocietyMode()) {
+                checkEndGameCivilizedSociety(game);
+                return;
             }
             List<Button> buttons = new ArrayList<>();
             if (!game.isFowMode()) {

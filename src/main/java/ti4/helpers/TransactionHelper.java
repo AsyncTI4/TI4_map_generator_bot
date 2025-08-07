@@ -249,7 +249,13 @@ public class TransactionHelper {
                     case "Technology" -> trans.append(Mapper.getTech(furtherDetail).getRepresentation(false));
                     case "Planets", "AlliancePlanets", "dmz" -> trans.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(furtherDetail, game));
                     case "action" -> trans.append("An in-game ").append(furtherDetail).append(" action");
-                    case "details" -> trans.append(furtherDetail.replace("fin777", " "));
+                    case "details" -> {
+                        if (hidePrivateCardText && game.isLimitedWhispersMode()) {
+                            trans.append("[REDACTED]");
+                        } else {
+                            trans.append(furtherDetail.replace("fin777", " "));
+                        }
+                    }
                     default -> trans.append(" some odd thing: `").append(item).append("`");
                 }
                 trans.append("\n");
@@ -714,11 +720,7 @@ public class TransactionHelper {
         if (receiver.getTechs().contains(tech)) {
             return false;
         }
-        if (receiver.getNotResearchedFactionTechs().contains(tech)) {
-            return false;
-        }
-
-        return true;
+        return !receiver.getNotResearchedFactionTechs().contains(tech);
 
     }
 
@@ -1209,7 +1211,7 @@ public class TransactionHelper {
                 }
                 if (game.isNoSwapMode()) {
                     if (id.endsWith("sftt") && p1.getPromissoryNotesInPlayArea().contains(p2.getColor() + "_sftt")) {
-                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), 
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                             p1.getRepresentation() + ", you cannot swap _Supports For The Thrones_ in this game (it has banned _Support For The Throne_ swaps).");
                         return;
                     }
@@ -1555,7 +1557,7 @@ public class TransactionHelper {
             if (!game.isFowMode() && game.isNewTransactionMethod()) {
                 buttons = TransactionHelper.getStuffToTransButtonsNew(game, player, player, p2);
                 if (player.getUserSettings().isShowTransactables() && buttonID.startsWith("transactWith_")) {
-                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(game, player, p2);
+                    BufferedImage image = TransactionGenerator.drawTransactableStuffImage(player, p2);
                     FileUpload upload = FileUploadService.createFileUpload(image, "transactable_items");
                     MessageHelper.sendFileUploadToChannel(event.getMessageChannel(), upload);
                 }

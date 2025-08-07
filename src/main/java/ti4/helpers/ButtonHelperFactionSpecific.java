@@ -1506,12 +1506,9 @@ public class ButtonHelperFactionSpecific {
         if (!hasInf) {
             return buttons;
         }
-        for (Tile tile : game.getTileMap().values()) {
-            if (ButtonHelperAgents.doesTileHaveAStructureInIt(player, tile)) {
-                for (Planet planet : tile.getPlanetUnitHolders()) {
-                    buttons.add(Buttons.green(player.finChecker() + "pharadnInf2Revive_" + planet.getName(), planet.getPlanetModel().getAutoCompleteName()));
-                }
-            }
+        for (String planet : player.getPlanetsAllianceMode()) {
+            buttons.add(Buttons.green(player.finChecker() + "pharadnInf2Revive_" + planet, Helper.getPlanetName(planet)));
+
         }
         return buttons;
     }
@@ -1925,6 +1922,21 @@ public class ButtonHelperFactionSpecific {
         }
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player || !p2.getPromissoryNotes().containsKey("ra") || p2.getTechs().contains(tech) || p2.getNotResearchedFactionTechs().contains(tech)) {
+                continue;
+            }
+            boolean hasSpecialUpgrade = false;
+            if (Mapper.getTech(tech).isUnitUpgrade()) {
+                for (String factionTech : p2.getNotResearchedFactionTechs()) {
+                    TechnologyModel fTech = Mapper.getTech(factionTech);
+                    if (fTech != null && !fTech.getAlias().equalsIgnoreCase(Mapper.getTech(tech).getAlias())
+                        && fTech.isUnitUpgrade()
+                        && fTech.getBaseUpgrade().orElse("bleh")
+                            .equalsIgnoreCase(Mapper.getTech(tech).getAlias())) {
+                        hasSpecialUpgrade = true;
+                    }
+                }
+            }
+            if (hasSpecialUpgrade) {
                 continue;
             }
             String owner = game.getPNOwner("ra").getFaction().equalsIgnoreCase("jolnar") ? "Jol-Nar player" : "_Research Agreement_ owner";

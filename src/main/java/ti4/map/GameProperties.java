@@ -16,7 +16,7 @@ public class GameProperties {
     private @ExportableField String ownerID;
     private @ExportableField String ownerName = "";
     private @ExportableField String creationDate;
-    private @ExportableField String name; //pbdXXXX
+    private @ExportableField String name; // pbdXXXX
     private @ExportableField String customName = "";
     private @ExportableField String mapTemplateID;
     private @ExportableField String phaseOfGame = "";
@@ -100,7 +100,12 @@ public class GameProperties {
     private @ExportableField boolean facilitiesMode;
     private @ExportableField boolean minorFactionsMode;
     private @ExportableField boolean totalWarMode;
+    private @ExportableField boolean dangerousWildsMode;
+    private @ExportableField boolean civilizedSocietyMode;
+    private @ExportableField boolean ageOfFightersMode;
+    private @ExportableField boolean stellarAtomicsMode;
     private @ExportableField boolean noSwapMode;
+    private @ExportableField boolean limitedWhispersMode;
     private @ExportableField boolean ageOfCommerceMode;
     private @ExportableField boolean hiddenAgendaMode;
     private @ExportableField boolean ordinianC1Mode;

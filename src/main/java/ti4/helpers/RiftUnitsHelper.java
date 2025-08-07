@@ -24,7 +24,6 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.UnitModel;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
 
@@ -151,8 +150,6 @@ public class RiftUnitsHelper {
             if (cabal != null && cabal != player
                 && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, game, cabal)) {
                 ButtonHelperFactionSpecific.cabalEatsUnit(player, game, cabal, 1, unit, event);
-            } else if (RiftSetModeService.isActive(game)) {
-                msg = RiftSetModeService.riftSetCabalEatsUnit(msg, player, game, unit, event);
             }
         }
 
@@ -241,7 +238,17 @@ public class RiftUnitsHelper {
         String tilePosition = buttonID.replace("getRiftButtons_", "");
         Tile tile = game.getTileByPosition(tilePosition);
         MessageChannel channel = player.getCorrectChannel();
-        String msg = player.getRepresentationNoPing() + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.";
-        MessageHelper.sendMessageToChannelWithButtons(channel, msg, RiftUnitsHelper.getButtonsForRiftingUnitsInSystem(player, game, tile));
+        String msg = player.getRepresentationNoPing() + " is rifting some units.";
+        if (player.hasAbility("celestial_guides")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " is rifting some units. However, because of their **Celestial Guides** ability, they do not roll.");
+        } else if (player.hasRelic("circletofthevoid")) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
+                player.getRepresentationNoPing() + " is rifting some units. However, because of their _Circlet of the Void_ relic, they do not roll.");
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(channel, 
+                player.getRepresentationNoPing() + " is rifting some units. Please use the the buttons to choose the units you wish to risk in the gravity rift.", 
+                RiftUnitsHelper.getButtonsForRiftingUnitsInSystem(player, game, tile));
+        }
     }
 }

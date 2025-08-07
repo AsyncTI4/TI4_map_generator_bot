@@ -885,6 +885,13 @@ public class StartCombatService {
             }
         }
 
+        if (p1.hasTechReady("dsmortr") && isSpaceCombat && FoWHelper.playerHasShipsInAdjacentSystems(p1, tile, game)) {
+            buttons.add(Buttons.green(p1.getFinsFactionCheckerPrefix() + "exhaustTech_dsmortr", "Exhaust Fractal Plating (Upon Destroy)", FactionEmojis.mortheus));
+        }
+        if (p2.hasTechReady("dsmortr") && isSpaceCombat && FoWHelper.playerHasShipsInAdjacentSystems(p2, tile, game)) {
+            buttons.add(Buttons.green(p2.getFinsFactionCheckerPrefix() + "exhaustTech_dsmortr", "Exhaust Fractal Plating (Upon Destroy)", FactionEmojis.mortheus));
+        }
+
         for (Player agentHolder : game.getRealPlayers()) {
             String finChecker = "FFCC_" + agentHolder.getFaction() + "_";
 

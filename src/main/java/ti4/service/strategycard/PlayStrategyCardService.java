@@ -24,7 +24,7 @@ import ti4.helpers.CryypterHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.ThreadArchiveHelper;
-import ti4.helpers.Units.UnitType;
+import ti4.helpers.Units;
 import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -40,7 +40,6 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.TI4Emoji;
 import ti4.service.emoji.UnitEmojis;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.turn.StartTurnService;
 
 @UtilityClass
@@ -194,8 +193,7 @@ public class PlayStrategyCardService {
         }
 
         // Handle Kyro Hero
-        if (scToPlay == ButtonHelper.getKyroHeroSC(game)
-            && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
+        if (scToPlay == ButtonHelper.getKyroHeroSC(game) && !player.getFaction().equalsIgnoreCase(game.getStoredValue("kyroHeroPlayer"))) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
                 player.getRepresentation()
                     + " this is a reminder that this strategy card is Kyro Cursed and therefore you should only do 1 of its clauses. ");
@@ -223,10 +221,6 @@ public class PlayStrategyCardService {
         // Red Tape Diplomacy
         if (scToPlay == 2 && game.isRedTapeMode()) {
             ButtonHelper.offerRedTapeButtons(game, player);
-        }
-
-        if (scToPlay == 9 && RiftSetModeService.isActive(game)) {
-            RiftSetModeService.resolveSacrifice(event, game, player);
         }
 
         if (scModel.usesAutomationForSCID("pok5trade")) {
@@ -261,7 +255,6 @@ public class PlayStrategyCardService {
                     }
                 }
             }
-
         }
 
         if (!scModel.usesAutomationForSCID("pok1leadership")) {
@@ -393,8 +386,7 @@ public class PlayStrategyCardService {
                     }
                 } else {
                     if (scToPlay == 6 && !p2.hasUnit("ghoti_flagship")
-                        && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock)
-                            .contains(p2.getHomeSystemTile())) {
+                            && !ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, Units.UnitType.Spacedock).contains(p2.getHomeSystemTile())) {
                         Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                         if (reactionEmoji2 != null) {
                             message.addReaction(reactionEmoji2).queue();
@@ -406,9 +398,7 @@ public class PlayStrategyCardService {
                         }
                     }
                 }
-                if (!p2.hasFollowedSC(scToPlay)
-                    && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction())
-                        .isEmpty()) {
+                if (!p2.hasFollowedSC(scToPlay) && !game.getStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction()).isEmpty()) {
                     game.removeStoredValue("prePassOnSC" + scToPlay + "Round" + game.getRound() + p2.getFaction());
                     Emoji reactionEmoji2 = Helper.getPlayerReactionEmoji(game, p2, message);
                     if (reactionEmoji2 != null) {
@@ -434,16 +424,14 @@ public class PlayStrategyCardService {
                         if (reactionEmoji2 != null) {
                             message.addReaction(reactionEmoji2).queue();
                             p2.addFollowedSC(scToPlay, event);
-                            if (scToPlay == 8) {
-                                String key3 = "potentialBlockers";
-                                if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
-                                    game.setStoredValue(key3,
-                                        game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
-                                }
-
-                                String key = "factionsThatAreNotDiscardingSOs";
-                                game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
+                            String key3 = "potentialBlockers";
+                            if (game.getStoredValue(key3).contains(p2.getFaction() + "*")) {
+                                game.setStoredValue(key3,
+                                    game.getStoredValue(key3).replace(p2.getFaction() + "*", ""));
                             }
+
+                            String key = "factionsThatAreNotDiscardingSOs";
+                            game.setStoredValue(key, game.getStoredValue(key) + p2.getFaction() + "*");
                             MessageHelper.sendMessageToChannel(p2.getCardsInfoThread(),
                                 "You were automatically marked as not following **" + stratCardName
                                     + "** because the bot believes you have already scored all " + p2.getSoScored() + " of your secret objectives.");
@@ -597,9 +585,6 @@ public class PlayStrategyCardService {
             // monuments
             case "monuments4construction" -> getMonumentsConstructionButtons(sc, game);
 
-            // riftset
-            case "riftset_9" -> RiftSetModeService.getSacrificeButtons();
-
             // unhandled
             default -> getGenericButtons(sc);
         };
@@ -749,19 +734,19 @@ public class PlayStrategyCardService {
             if (!player.isSpeaker()) {
                 String faction = player.getFaction();
                 if (Mapper.isValidFaction(faction)) {
+                    Button button;
                     if (!game.isFowMode()) {
-                        Button button = Buttons.gray(
+                        button = Buttons.gray(
                             politicsHolder.getFinsFactionCheckerPrefix()
                                 + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
                             " ", player.getFactionEmoji());
-                        assignSpeakerButtons.add(button);
                     } else {
-                        Button button = Buttons.gray(
+                        button = Buttons.gray(
                             politicsHolder.getFinsFactionCheckerPrefix()
                                 + Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction,
                             player.getColor(), ColorEmojis.getColorEmoji(player.getColor()));
-                        assignSpeakerButtons.add(button);
                     }
+                    assignSpeakerButtons.add(button);
                 }
             }
         }

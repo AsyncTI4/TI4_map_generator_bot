@@ -114,7 +114,7 @@ public class DataMigrationManager {
 
             var changesMade = migrationMethod.apply(game);
             game.addMigration(migrationName);
-            GameManager.save(game, "Data Migration - " + migrationName);
+            GameManager.save(game, "Data Migration - " + migrationName); //TODO: We should be locking since we're saving
             if (changesMade) {
                 migrationsApplied.add(game.getName());
             }

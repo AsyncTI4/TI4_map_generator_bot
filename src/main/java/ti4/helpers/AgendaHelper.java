@@ -72,7 +72,6 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
 import ti4.service.fow.FowCommunicationThreadService;
 import ti4.service.fow.GMService;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.option.FOWOptionService.FOWOption;
@@ -900,6 +899,7 @@ public class AgendaHelper {
         TextChannel watchParty = watchPartyChannel(game);
         String watchPartyPing = watchPartyPing(game);
         List<MessageChannel> watchPartyList = publish && watchParty != null ? List.of(watchParty) : null;
+        List<String> altMessages = watchPartyPing == null ? null : List.of(watchPartyPing);
 
         int rand = 6 + ThreadLocalRandom.current().nextInt(6);
         if (ThreadLocalRandom.current().nextInt(5) == 0) { // random chance for an extra long wait
@@ -909,7 +909,7 @@ public class AgendaHelper {
             resolveIxthianRoll(futureGame, publish && watchParty != null);
             return false;
         };
-        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, List.of(watchPartyPing));
+        DrumrollService.doDrumrollMultiChannel(game.getMainGameChannel(), activeGamePing, rand, game.getName(), resolve, watchPartyList, altMessages);
     }
 
     private static void resolveIxthianRoll(Game game, boolean publish) {
@@ -1189,9 +1189,7 @@ public class AgendaHelper {
 
             }
             return;
-        } else
-
-        {
+        } else {
             game.setStoredValue("preVoting" + player.getFaction(), "");
         }
         if (!buttonID.contains("outcomeTie*")) {
@@ -1273,7 +1271,7 @@ public class AgendaHelper {
                     Helper.buildSpentThingsMessageForVoting(player, game, false));
             }
 
-            String message = " up to vote! Resolve using buttons.";
+            String message = " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
             Button eraseAndReVote = Buttons.red("eraseMyVote", "Erase my vote & have me vote again");
             String revoteMsg = "You may press this button to revote if you made a mistake, ignore it otherwise.";
             MessageHelper.sendMessageToChannelWithButton(player.getCardsInfoThread(), revoteMsg, eraseAndReVote);
@@ -1395,6 +1393,7 @@ public class AgendaHelper {
         } else {
             resolveTime = true;
             winner = buttonID.substring(buttonID.lastIndexOf("*") + 2);
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), "## The speaker has broken the tie.");
         }
         if (resolveTime) {
             resolveTime(game, winner);
@@ -1736,7 +1735,6 @@ public class AgendaHelper {
                 return;
             }
             String realIdentity = nextInLine.getRepresentationUnfogged();
-            String message = getSummaryOfVotes(game, true) + "\n" + realIdentity + " up to vote! Resolve using buttons.";
             int[] voteInfo = getVoteTotal(nextInLine, game);
             int counter = 0;
             boolean willPrevote = !game.getStoredValue("preVoting" + nextInLine.getFaction()).isEmpty() && !game.getStoredValue("preVoting" + nextInLine.getFaction()).equalsIgnoreCase("0");
@@ -1780,6 +1778,7 @@ public class AgendaHelper {
                 counter += 1;
             }
 
+            String message = getSummaryOfVotes(game, true) + "\n" + realIdentity + " up to vote! Please use the buttons to choose the outcome you wish to vote for.";
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
             String finChecker = "FFCC_" + nextInLine.getFaction() + "_";
             Button Vote = Buttons.green(finChecker + "vote", pFaction + " Choose To Vote");
@@ -1798,7 +1797,6 @@ public class AgendaHelper {
             } catch (Exception e) {
                 BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not update active player", e);
             }
-
             List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
             if (game.isFowMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
@@ -2346,6 +2344,12 @@ public class AgendaHelper {
             && (game.getStoredValue("AssassinatedReps").contains(player.getFaction())
                 || game.getStoredValue("PublicExecution").contains(player.getFaction()))) {
             voteCount = 0;
+        }
+
+        if (game.isStellarAtomicsMode() && hasXxchaAlliance == 0 && game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
+            if (!game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
+                voteCount = 0;
+            }
         }
 
         return new int[] { voteCount, hasXxchaHero, hasXxchaAlliance };
@@ -3008,6 +3012,9 @@ public class AgendaHelper {
             && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             sb.append(" __not__ voting due to **Galactic Threat**");
             return sb.toString();
+        } else if (game.isStellarAtomicsMode() && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") && game.getRevealedPublicObjectives().get("Stellar Atomics") != null && !game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
+            sb.append(" __cannot__ voting due to having used _Stellar Atomics_.");
+
         } else if (player.hasLeaderUnlocked("xxchahero")) {
             sb.append(" vote count: **" + MiscEmojis.ResInf + " ").append(voteCount);
         } else if (player.hasAbility("lithoids")) { // Vote with planet resources, not influence
@@ -3055,6 +3062,10 @@ public class AgendaHelper {
         // NEKRO unless XXCHA ALLIANCE
         if (player.hasAbility("galactic_threat")
             && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            return 0;
+        }
+
+        if (game.isStellarAtomicsMode() && !game.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") && game.getRevealedPublicObjectives().get("Stellar Atomics") != null && !game.getScoredPublicObjectives().get("Stellar Atomics").contains(player.getUserID())) {
             return 0;
         }
 
@@ -3814,9 +3825,6 @@ public class AgendaHelper {
     }
 
     public static void showDiscards(Game game, GenericInteractionCreateEvent event) {
-        if (!RiftSetModeService.deckInfoAvailable(game.getPlayer(event.getUser().getId()), game)) {
-            return;
-        }
         StringBuilder sb2 = new StringBuilder();
         String sb = "### __**Discarded Agendas:**__";
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
@@ -3902,35 +3910,47 @@ public class AgendaHelper {
     }
 
     public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("__**Top Agenda:**__");
-        String agendaID = game.lookAtTopAgenda(0);
-        MessageEmbed embed = null;
-        if (game.getSentAgendas().get(agendaID) != null) {
-            if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
-                sb.append(
-                    "You are currently voting on _Covert Legislation_, and the top agenda is in the speaker's hand.");
-                sb.append(" Showing the next agenda because that's how it should be by the RULEZ\n");
-                agendaID = game.lookAtTopAgenda(1);
 
-                if (game.getSentAgendas().get(agendaID) != null) {
-                    embed = AgendaModel.agendaIsInSomeonesHandEmbed();
-                } else if (agendaID != null) {
-                    embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
-                }
+        sendTopAgendaToCardsInfoSkipCovert(game, player, 1);
+    }
+
+    public static void sendTopAgendaToCardsInfoSkipCovert(Game game, Player player, int count) {
+
+        for (int x = 0; x < count; x++) {
+            StringBuilder sb = new StringBuilder();
+            if (x == 0) {
+                sb.append("__**Top Agenda:**__");
             } else {
-                sb.append(
-                    "The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard.");
+                sb.append("__**Agenda At Location " + (x + 1) + ":**__");
             }
-        } else if (agendaID != null) {
-            embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
-        } else {
-            sb.append("Could not find agenda.");
-        }
-        if (embed != null) {
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
-        } else {
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+            String agendaID = game.lookAtTopAgenda(x);
+            MessageEmbed embed = null;
+            if (game.getSentAgendas().get(agendaID) != null) {
+                if (game.getCurrentAgendaInfo().contains("_CL_") && game.getPhaseOfGame().startsWith("agenda")) {
+                    sb.append(
+                        "You are currently voting on _Covert Legislation_, and the top agenda is in the speaker's hand.");
+                    sb.append(" Showing the next agenda per the rules.\n");
+                    agendaID = game.lookAtTopAgenda(x + 1);
+
+                    if (game.getSentAgendas().get(agendaID) != null) {
+                        embed = AgendaModel.agendaIsInSomeonesHandEmbed();
+                    } else if (agendaID != null) {
+                        embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
+                    }
+                } else {
+                    sb.append(
+                        "The top agenda is currently in somebody's hand. As per the RULEZ, you should not be able to see the next agenda until they are finished deciding top/bottom/discard.");
+                }
+            } else if (agendaID != null) {
+                embed = Mapper.getAgenda(agendaID).getRepresentationEmbed();
+            } else {
+                sb.append("Could not find agenda.");
+            }
+            if (embed != null) {
+                MessageHelper.sendMessageToChannelWithEmbed(player.getCardsInfoThread(), sb.toString(), embed);
+            } else {
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), sb.toString());
+            }
         }
     }
 

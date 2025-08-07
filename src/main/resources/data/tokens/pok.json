@@ -13,7 +13,8 @@
         "spaceOrPlanet": "planet",
         "attachmentID": "dmz",
         "aliasList": ["dmz_large", "token_dmz_large", "dmz"],
-        "source": "pok"
+        "source": "pok",
+        "placement": "center"
     },
     {
         "id": "frontier",

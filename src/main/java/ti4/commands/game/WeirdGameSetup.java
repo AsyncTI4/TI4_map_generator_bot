@@ -15,7 +15,6 @@ import ti4.image.Mapper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.option.FOWOptionService.FOWOption;
 
 class WeirdGameSetup extends GameStateSubcommand {
@@ -29,18 +28,13 @@ class WeirdGameSetup extends GameStateSubcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's "));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.UNCHARTED_SPACE_STUFF, "True to add the Uncharted Space Stuff to the draft pool."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_EXPLORATION_MODE, "True to enable the Age of Exploration, per Codex 4."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.MINOR_FACTIONS_MODE, "True to enable the Minor Factions, per Codex 4.."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.HIDDEN_AGENDA_MODE, "True to enable Hidden Agenda, per Dane Leek."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.AGE_OF_COMMERCE_MODE, "True to enable the Age of Commerce, per Codex 4."));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TOTAL_WAR_MODE, "True to enable Total War, per Codex 4."));
         //addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.INTEGER, Constants.CC_LIMIT, "Command token limit each player should have, default 16."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.EXTRA_SECRET_MODE, "True to allow each player to start with 2 secret objectives. Great for SftT-less games!"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.VOTC_MODE, "True to enable Voices of the Council homebrew mod."));
-        addOptions(new OptionData(OptionType.BOOLEAN, FOWOption.RIFTSET_MODE.toString(), "True to enable Eronous RiftSet mode"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.FACILITIES_MODE, "True to enable Cacotopos Facilities"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.NO_SWAP_MODE, "True to enable No Support Swaps"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.LIMITED_WHISPERS_MODE, "True to enable hiding the details of written deals"));
         addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_TRACK, "Enable the Priority Track for this game").setAutoComplete(true));
     }
 
@@ -60,9 +54,6 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         // Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
         // if (betaTestMode != null) game.setTestBetaFeaturesMode(betaTestMode);
-
-        Boolean explorationMode = event.getOption(Constants.AGE_OF_EXPLORATION_MODE, null, OptionMapping::getAsBoolean);
-        if (explorationMode != null) game.setAgeOfExplorationMode(explorationMode);
 
         Boolean uncharted = event.getOption(Constants.UNCHARTED_SPACE_STUFF, null, OptionMapping::getAsBoolean);
         if (uncharted != null) {
@@ -86,18 +77,6 @@ class WeirdGameSetup extends GameStateSubcommand {
             }
         }
 
-        Boolean minorMode = event.getOption(Constants.MINOR_FACTIONS_MODE, null, OptionMapping::getAsBoolean);
-        if (minorMode != null) game.setMinorFactionsMode(minorMode);
-
-        Boolean agendaMode = event.getOption(Constants.HIDDEN_AGENDA_MODE, null, OptionMapping::getAsBoolean);
-        if (agendaMode != null) game.setHiddenAgendaMode(agendaMode);
-
-        Boolean totalMode = event.getOption(Constants.TOTAL_WAR_MODE, null, OptionMapping::getAsBoolean);
-        if (totalMode != null) game.setTotalWarMode(totalMode);
-
-        Boolean commcerceMode = event.getOption(Constants.AGE_OF_COMMERCE_MODE, null, OptionMapping::getAsBoolean);
-        if (commcerceMode != null) game.setAgeOfCommerceMode(commcerceMode);
-
         Boolean extraSecretMode = event.getOption("extra_secret_mode", null, OptionMapping::getAsBoolean);
         if (extraSecretMode != null) game.setExtraSecretMode(extraSecretMode);
 
@@ -106,6 +85,9 @@ class WeirdGameSetup extends GameStateSubcommand {
 
         Boolean noSwapMode = event.getOption(Constants.NO_SWAP_MODE, null, OptionMapping::getAsBoolean);
         if (noSwapMode != null) game.setNoSwapMode(noSwapMode);
+
+        Boolean limitedMode = event.getOption(Constants.LIMITED_WHISPERS_MODE, null, OptionMapping::getAsBoolean);
+        if (limitedMode != null) game.setLimitedWhispersMode(limitedMode);
 
         Integer cclimit = event.getOption(Constants.CC_LIMIT, null, OptionMapping::getAsInt);
         if (cclimit != null) game.setStoredValue("ccLimit", cclimit + "");
@@ -137,14 +119,13 @@ class WeirdGameSetup extends GameStateSubcommand {
         boolean discordantStarsMode = event.getOption(Constants.DISCORDANT_STARS_MODE, game.isDiscordantStarsMode(), OptionMapping::getAsBoolean);
         boolean baseGameMode = event.getOption(Constants.BASE_GAME_MODE, game.isBaseGameMode(), OptionMapping::getAsBoolean);
         boolean votcMode = event.getOption(Constants.VOTC_MODE, game.isVotcMode(), OptionMapping::getAsBoolean);
-        boolean riftsetMode = event.getOption(FOWOption.RIFTSET_MODE.toString(), RiftSetModeService.isActive(game), OptionMapping::getAsBoolean);
-        return setGameMode(event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode, riftsetMode);
+        return setGameMode(event, game, baseGameMode, absolMode, miltyModMode, discordantStarsMode, isTIGLGame, votcMode);
     }
 
     // TODO: find a better way to handle this - this is annoying
     // NOTE: (Jazz) This seems okay. Could use improvements to reduce manual handling, but it's fine for now.
-    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode, boolean isTIGLGame, boolean votcMode, boolean riftsetMode) {
-        if (isTIGLGame && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode() || votcMode || riftsetMode)) {
+    public static boolean setGameMode(GenericInteractionCreateEvent event, Game game, boolean baseGameMode, boolean absolMode, boolean miltyModMode, boolean discordantStarsMode, boolean isTIGLGame, boolean votcMode) {
+        if (isTIGLGame && (baseGameMode || absolMode || discordantStarsMode || game.isHomebrewSCMode() || game.isFowMode() || game.isAllianceMode() || game.isCommunityMode() || votcMode)) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "TIGL Games can not be mixed with other game modes.");
             return false;
         } else if (isTIGLGame) {
@@ -319,11 +300,6 @@ class WeirdGameSetup extends GameStateSubcommand {
                     player.addLeader(leaderID);
                 }
             }
-        }
-
-        //For Eronous to run fow300
-        if (riftsetMode) {
-            return RiftSetModeService.activate(event, game);
         }
 
         return true;

@@ -58,7 +58,6 @@ import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.fow.FOWPlusService;
-import ti4.service.fow.RiftSetModeService;
 import ti4.service.info.SecretObjectiveInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.planet.AddPlanetService;
@@ -79,10 +78,6 @@ public class ExploreService {
         }
         game.setStoredValue(player.getFaction() + "planetsExplored",
             game.getStoredValue(player.getFaction() + "planetsExplored") + planetName + "*");
-
-        if (RiftSetModeService.willPlanetGetStellarConverted(planetName, player, game, event)) {
-            return;
-        }
 
         if (planetName.equalsIgnoreCase("garbozia")) {
             if (player.hasAbility("distant_suns")) {
@@ -468,9 +463,9 @@ public class ExploreService {
                         tile.addToken(tokenFilename, Constants.SPACE);
                         message = "Token `" + token + "` added to tile " + tile.getAutoCompleteName() + ".";
                         if ("gamma".equalsIgnoreCase(token) && "mallice".equals(planetID) && !game.isFowMode()) {
-                            DisasterWatchHelper.sendMessageInDisasterWatch(game, 
+                            DisasterWatchHelper.sendMessageInDisasterWatch(game,
                                 player.getRepresentation() + " has explored Mallice in " + game.getName() + ", and discovered the _Gamma Wormhole_.");
-                        } 
+                        }
                     }
 
                     if (Constants.MIRAGE.equalsIgnoreCase(token)) {
@@ -773,7 +768,10 @@ public class ExploreService {
                 }
                 CommanderUnlockCheckService.checkPlayer(player, "hacan");
                 List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-                message += "\n" + player.getRepresentationUnfogged() + ", your current command tokens are "
+                if (!message.isEmpty()) {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                }
+                message += player.getRepresentationUnfogged() + ", your current command tokens are "
                     + player.getCCRepresentation()
                     + ". Use buttons to gain " + ccsToGain + " command token" + (ccsToGain > 1 ? "s" : "") + ".";
                 game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
@@ -934,7 +932,6 @@ public class ExploreService {
                 MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), "", button);
             }
         }
-        RiftSetModeService.resolveExplore(ogID, player, game);
         FOWPlusService.resolveExplore(event, ogID, tile, planetID, player, game);
         CommanderUnlockCheckService.checkPlayer(player, "hacan");
 
@@ -1033,7 +1030,7 @@ public class ExploreService {
         List<String> types, MessageChannel channel, Player player, Game game,
         boolean overRide, boolean fullText
     ) {
-        if (!FOWPlusService.deckInfoAvailable(player, game) || !RiftSetModeService.deckInfoAvailable(player, game)) {
+        if (!FOWPlusService.deckInfoAvailable(player, game)) {
             return;
         }
         boolean isGM = player != null && game.getPlayersWithGMRole().contains(player);

@@ -2,8 +2,8 @@ package ti4.image;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.function.Function;
 import java.util.List;
+import java.util.function.Function;
 
 import ti4.ResourceHelper;
 import ti4.helpers.Helper;
@@ -25,7 +25,7 @@ public class TransactionGenerator {
     private static final BasicStroke stroke2 = new BasicStroke(2.0f);
     private static final BasicStroke stroke5 = new BasicStroke(5.0f);
 
-    public static BufferedImage drawTransactableStuffImage(Game game, Player p1, Player p2) {
+    public static BufferedImage drawTransactableStuffImage(Player p1, Player p2) {
         int width = 500, height = 160;
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = (Graphics2D) img.getGraphics();

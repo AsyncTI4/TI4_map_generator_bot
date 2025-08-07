@@ -6,6 +6,7 @@ import java.time.Period;
 import java.time.ZoneId;
 
 import lombok.experimental.UtilityClass;
+import ti4.executors.ExecutionLockManager;
 import ti4.map.Game;
 import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
@@ -23,17 +24,23 @@ public class EndOldGamesCron {
     }
 
     private static void endOldGames() {
+        BotLogger.info("Running EndOldGamesCron.");
         try {
             GameManager.getManagedGames().stream()
                 .filter(not(ManagedGame::isHasEnded))
-                .map(ManagedGame::getGame)
-                .forEach(EndOldGamesCron::endIfOld);
+                .map(ManagedGame::getName)
+                .forEach(gameName ->
+                    ExecutionLockManager
+                        .wrapWithLockAndRelease(gameName, ExecutionLockManager.LockType.WRITE, () -> endIfOld(gameName))
+                        .run());
         } catch (Exception e) {
             BotLogger.error("**Error ending inactive games!**", e);
         }
+        BotLogger.info("Finished EndOldGamesCron.");
     }
 
-    private void endIfOld(Game game) {
+    private void endIfOld(String gameName) {
+        Game game = GameManager.getManagedGame(gameName).getGame();
         LocalDate lastModifiedDate = Instant.ofEpochMilli(game.getLastModifiedDate())
             .atZone(ZoneId.systemDefault())
             .toLocalDate();
@@ -44,7 +51,7 @@ public class EndOldGamesCron {
             BotLogger.info("Game: " + game.getName() + " has not been modified since ~" + lastModifiedDate +
                 " - the game flag `hasEnded` has been set to true");
             game.setHasEnded(true);
-            GameManager.save(game, "Game automatically ended");
+            GameManager.save(game, "Ended old game.");
         }
     }
 }

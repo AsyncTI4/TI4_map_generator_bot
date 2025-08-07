@@ -19,7 +19,6 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.CardEmojis;
 import ti4.service.emoji.FactionEmojis;
 import ti4.service.emoji.TechEmojis;
-import ti4.service.fow.RiftSetModeService;
 
 @UtilityClass
 public class CardsInfoService {
@@ -124,6 +123,9 @@ public class CardsInfoService {
         }
         if (player.hasUnexhaustedLeader("saaragent")) {
             buttons.add(Buttons.gray("getAgentSelection_saaragent", "Use Saar Agent", FactionEmojis.Saar));
+        }
+        if (player.hasAbility("laws_order") && !game.getLaws().isEmpty()) {
+            buttons.add(Buttons.gray(player.getFinsFactionCheckerPrefix() + "useLawsOrder", "Pay To Ignore Laws", FactionEmojis.Keleres));
         }
         if (player.hasAbility("military_industrial_complex")) {
             buttons.add(Buttons.gray("getAxisOrderReturns", "Un-Buy Axis Order (Fix Mistake)", FactionEmojis.axis));
@@ -252,7 +254,6 @@ public class CardsInfoService {
         buttons.add(Buttons.POST_NOTEPAD);
         buttons.add(Buttons.EDIT_NOTEPAD);
         buttons.add(Buttons.green("cardsInfo", "Cards Info Refresh"));
-        RiftSetModeService.addCapturedUnitsButton(buttons, game);
 
         String message = "You may use these buttons to do various things:";
 

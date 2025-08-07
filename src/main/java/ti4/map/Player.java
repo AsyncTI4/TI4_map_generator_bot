@@ -18,13 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -39,6 +33,10 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
@@ -55,6 +53,7 @@ import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.image.DrawingUtil;
 import ti4.image.Mapper;
+import ti4.image.PositionMapper;
 import ti4.map.pojo.PlayerProperties;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -519,7 +518,10 @@ public class Player extends PlayerProperties {
 
     public int getUnitCap(String unit) {
         if (unitCaps.get(unit) == null) {
-            return 0;
+            if(PositionMapper.getReinforcementsPosition(unit) == null)
+                return 0;
+            return PositionMapper.getReinforcementsPosition(unit).getPositionCount(unit);
+            //return 0;
         }
         return unitCaps.get(unit);
     }
@@ -1495,7 +1497,8 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public String getColorID() {
-        return (getColor() != null && !getColor().equals("null")) ? Mapper.getColorID(getColor()) : "null";
+        String color = getColor();
+        return (color != null && !color.equals("null")) ? Mapper.getColorID(color) : "null";
     }
 
     public void addAllianceMember(String color) {
@@ -1824,11 +1827,7 @@ public class Player extends PlayerProperties {
 
         if (getGame().isOrdinianC1Mode()) {
             Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(getGame());
-            if (p2 != null && p2.getFaction().equalsIgnoreCase(getFaction())) {
-                return true;
-            } else {
-                return false;
-            }
+            return p2 != null && p2.getFaction().equalsIgnoreCase(getFaction());
         }
         if (includeAlliance)
             return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);

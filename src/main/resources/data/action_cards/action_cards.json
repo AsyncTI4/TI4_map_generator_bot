@@ -1061,7 +1061,7 @@
         "name": "Insider Information",
         "phase": "Agenda",
         "window": "After an agenda is revealed",
-        "text": "Look at the top card of the agenda deck.",
+        "text": "Look at the top 3 cards of the agenda deck.",
         "automationID": "insider",
         "flavorText": "M'aban yawned. Another filibuster. Politics could be so flavorless at times. Besides, she already knew how this one was going to turn out. Not well. Not well at all...",
         "source": "codex1"
@@ -1250,7 +1250,7 @@
     },
     {
         "alias": "coup",
-        "name": "Coup Detat",
+        "name": "Coup D'etat",
         "phase": "Action",
         "window": "When another player would perform a strategic action",
         "text": "End that player's turn, the strategic action is not resolved and the strategy card is not exhausted.",

@@ -595,6 +595,7 @@ public class Constants {
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
     public static final String WEIRD_GAME_SETUP = "weird_game_setup";
+    public static final String GALACTIC_EVENTS_SETUP = "galactic_events_setup";
     public static final String CUSTOMIZATION = "customization";
     public static final String CHANGE_COLOR = "change_color";
     public static final String SAMPLE_COLORS = "sample_colors";
@@ -1076,7 +1077,12 @@ public class Constants {
     public static final String HIDDEN_AGENDA_MODE = "hidden_agenda_mode";
     public static final String AGE_OF_COMMERCE_MODE = "age_of_commerce_mode";
     public static final String TOTAL_WAR_MODE = "total_war_mode";
+    public static final String DANGEROUS_WILDS_MODE = "dangerous_wilds_mode";
+    public static final String CIVILIZED_SOCIETY_MODE = "civilized_society_mode";
+    public static final String AGE_OF_FIGHTERS_MODE = "age_of_fighters_mode";
+    public static final String STELLAR_ATOMICS_MODE = "stellar_atomics_mode";
     public static final String NO_SWAP_MODE = "no_swap_mode";
+    public static final String LIMITED_WHISPERS_MODE = "limited_whispers_mode";
     public static final String ORDINIAN_C1_MODE = "ordinian_c1_mode";
     public static final String LIBERATION_C4_MODE = "liberation_c4_mode";
     public static final String FAKE_COMMANDERS = "fake_commanders";

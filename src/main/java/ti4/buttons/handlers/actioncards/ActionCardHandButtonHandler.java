@@ -51,9 +51,9 @@ class ActionCardHandButtonHandler {
         }
     }
 
+    // TODO: bake this into /ac discard
     @ButtonHandler(value = "ac_discard_from_hand_")
-    static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player,
-        MessageChannel actionsChannel) {
+    static void acDiscardFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player, MessageChannel actionsChannel) {
         String acIndex = buttonID.replace("ac_discard_from_hand_", "");
         boolean stalling = false;
         boolean drawReplacement = false;
@@ -141,6 +141,7 @@ class ActionCardHandButtonHandler {
         }
     }
 
+    // TODO: bake this into /ac play
     @ButtonHandler(Constants.AC_PLAY_FROM_HAND)
     static void acPlayFromHand(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
@@ -172,19 +173,20 @@ class ActionCardHandButtonHandler {
                 player.getRepresentation() + ", after checking for Sabos, use buttons to resolve _Counterstroke_.",
                 scButtons);
         }
-        if (channel != null) {
-            try {
-                String error = ActionCardHelper.playAC(event, game, player, acID, channel);
-                if (error != null) {
-                    event.getChannel().sendMessage(error).queue();
-                }
-            } catch (Exception e) {
-                BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse AC ID: " + acID, e);
-                event.getChannel().asThreadChannel()
-                    .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.").queue();
-            }
-        } else {
+        if (channel == null) {
             event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
+            return;
+        }
+
+        try {
+            String error = ActionCardHelper.playAC(event, game, player, acID, channel);
+            if (error != null) {
+                event.getChannel().sendMessage(error).queue();
+            }
+        } catch (Exception e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(event, player), "Could not parse AC ID: " + acID, e);
+            event.getChannel().asThreadChannel()
+                .sendMessage("Could not parse action card ID: " + acID + ". Please play manually.").queue();
         }
     }
 
@@ -232,12 +234,13 @@ class ActionCardHandButtonHandler {
             game.drawActionCard(player.getUserID());
             CommanderUnlockCheckService.checkPlayer(player, "yssaril");
             ActionCardHelper.sendActionCardInfo(game, player, event);
-            message = "Drew 2 action cards with **Scheming**. Please discard 1 action card.";
+            message = "drew 2 action cards with **Scheming**. Please discard 1 action card.";
         }
         ReactionService.addReaction(event, game, player, true, false, message);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
             player.getRepresentationUnfogged() + ", use buttons to discard an action card.",
             ActionCardHelper.getDiscardActionCardButtons(player, false));
+
         ButtonHelper.deleteMessage(event);
         ButtonHelper.checkACLimit(game, player);
     }
@@ -246,8 +249,8 @@ class ActionCardHandButtonHandler {
     static void draw2AC(ButtonInteractionEvent event, Player player, Game game) {
         boolean hasSchemingAbility = player.hasAbility("scheming");
         String message = hasSchemingAbility
-            ? "Drew 3 Action Cards (**Scheming**) - please discard 1 action card from your hand"
-            : "Drew 2 Action cards";
+            ? "drew 3 Action Cards (**Scheming**) - please discard 1 action card from your hand"
+            : "drew 2 Action cards";
         int count = hasSchemingAbility ? 3 : 2;
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count);

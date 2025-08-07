@@ -629,6 +629,10 @@ public class Game extends GameProperties {
         gameModes.put("Age of Exploration", isAgeOfExplorationMode());
         gameModes.put("Hidden Agenda", isHiddenAgendaMode());
         gameModes.put("Total War", isTotalWarMode());
+        gameModes.put("Dangerous Wilds", isDangerousWildsMode());
+        gameModes.put("Stellar Atomics", isStellarAtomicsMode());
+        gameModes.put("Civilized Society", isCivilizedSocietyMode());
+        gameModes.put("Age Of Fighters", isAgeOfFightersMode());
         gameModes.put("No Support Swaps", isNoSwapMode());
         gameModes.put("Age Of Commerce", isAgeOfCommerceMode());
         gameModes.put("Liberation", isLiberationC4Mode());
@@ -3418,43 +3422,45 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<Player> getRealPlayers() {
-        return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(Player::isRealPlayer).toList();
     }
 
     @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return getPlayers().values().stream()
             .filter(p -> p.isRealPlayer() || (p.getFaction() != null && p.getFaction().equals("neutral")))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @JsonIgnore
     public List<Player> getRealPlayersNDummies() {
-        return getPlayers().values().stream().filter(player -> player.isRealPlayer() || player.isDummy() && player.getColor() != null && !"null".equals(player.getColor()))
+        return getPlayers().values().stream()
+            .filter(player -> player.isRealPlayer() || player.isDummy() && player.getColor() != null && !"null".equals(player.getColor()))
             .collect(Collectors.toList());
     }
 
     @JsonIgnore
     public List<Player> getRealAndEliminatedPlayers() {
-        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isEliminated()))
-            .collect(Collectors.toList());
+        return getPlayers().values().stream()
+            .filter(player -> (player.isRealPlayer() || player.isEliminated()))
+            .toList();
     }
 
     @JsonIgnore
     public List<Player> getRealAndEliminatedAndDummyPlayers() {
         return getPlayers().values().stream()
             .filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @JsonIgnore
     public List<Player> getDummies() {
-        return getPlayers().values().stream().filter(Player::isDummy).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(Player::isDummy).toList();
     }
 
     @JsonIgnore
     public List<Player> getNotRealPlayers() {
-        return getPlayers().values().stream().filter(not(Player::isRealPlayer)).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(not(Player::isRealPlayer)).toList();
     }
 
     @JsonIgnore

@@ -745,6 +745,7 @@ public class StartPhaseService {
             randomPlayers.addAll(game.getRealPlayers());
             boolean anyoneWantsToBan = false;
             boolean anyoneWantsNoSwaps = false;
+            boolean anyoneWantsLimitedWhispers = false;
             Collections.shuffle(randomPlayers);
             for (Player player : randomPlayers) {
                 var userSettings = UserSettingsManager.get(player.getUserID());
@@ -758,6 +759,9 @@ public class StartPhaseService {
                 }
                 if (userSettings.getSupportPref().contains("Swap")) {
                     anyoneWantsNoSwaps = true;
+                }
+                if (userSettings.getWhisperPref().contains("Limited")) {
+                    anyoneWantsLimitedWhispers = true;
                 }
                 question4 += "* " + userSettings.getWinmakingPref() + "\n";
                 question3 += "* " + userSettings.getTakebackPref() + "\n";
@@ -775,6 +779,17 @@ public class StartPhaseService {
                 }
                 buttons.add(Buttons.gray("deleteButtons", "Stay With Rules as Written Supports"));
                 MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), "If you wish to do anything unusual with _Supports For The Thrones_, you can use these buttons.", buttons);
+            }
+            if (anyoneWantsLimitedWhispers) {
+                buttons = new ArrayList<>();
+                buttons.add(Buttons.blue("setLimitedWhispers", "Allow Limited Whispers"));
+
+                buttons.add(Buttons.gray("deleteButtons", "Dismiss these buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), 
+                    "If you wish to do play with limited whispers, you can use these buttons." 
+                        + " Limited whispers is a mode where the text content (which you can fill in with the \"Specify Deal\" button in a transaction)" 
+                        + " of your deals/transactions are hidden (redacted), so you can have limited secret communication."
+                        + " Players are not allowed to send more than one hidden deal in a turn.", buttons);
             }
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "You are encouraged to discuss these results if there appears to be any disagreement on questions 1-3,"
                 + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
@@ -806,6 +821,20 @@ public class StartPhaseService {
             nextPlayer.setInRoundTurnCount(1);
         }
         if (isFowPrivateGame) {
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + ", you have the opportunity to use _Quantum Datahub Node_.", buttons);
+                }
+                if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.", buttons);
+                }
+            }
             if (game.isShowBanners()) {
                 BannerGenerator.drawFactionBanner(nextPlayer);
             }
@@ -817,8 +846,25 @@ public class StartPhaseService {
             MessageHelper.sendMessageToChannelWithButtons(nextPlayer.getPrivateChannel(), msgExtra + "\n Use buttons to do turn.", StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
             FowCommunicationThreadService.checkNewNeighbors(game, nextPlayer);
         } else {
+            String hold = "";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.\n"
                 + nextPlayer.getRepresentation() + " is first in initiative order.");
+            for (Player p2 : game.getRealPlayers()) {
+                if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + ", you have the opportunity to use _Quantum Datahub Node_.", buttons);
+                    hold = "_Quantum Datahub Node_";
+                }
+                if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
+                    buttons.add(Buttons.red("deleteButtons", "Decline"));
+                    MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.", buttons);
+                    hold += (hold.isEmpty() ? "" : " or ") + "_Imperial Arbiter_";
+                }
+            }
             if (game.isShowBanners()) {
                 BannerGenerator.drawPhaseBanner("action", game.getRound(), game.getActionsChannel());
             }
@@ -838,14 +884,14 @@ public class StartPhaseService {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
                 }
                 msgExtra += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0)
-                {
+                if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
-                }
-                else
-                {
+                } else {
                     msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
                 }
+            }
+            if (!hold.isEmpty()) {
+                msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
 
@@ -853,18 +899,6 @@ public class StartPhaseService {
             MessageHelper.sendMessageToChannelWithButtons(game.getMainGameChannel(), "Use buttons to do turn.", StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
         }
         for (Player p2 : game.getRealPlayers()) {
-            List<Button> buttons = new ArrayList<>();
-            if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
-                buttons.add(Buttons.green("startQDN", "Use Quantum Datahub Node", TechEmojis.CyberneticTech));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Quantum Datahub Node_", buttons);
-            }
-            buttons = new ArrayList<>();
-            if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
-                buttons.add(Buttons.green("startArbiter", "Use Imperial Arbiter", CardEmojis.Agenda));
-                buttons.add(Buttons.red("deleteButtons", "Decline"));
-                MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), p2.getRepresentationUnfogged() + " you have the opportunity to use _Imperial Arbiter_", buttons);
-            }
             if (!game.isFowMode()) {
                 String preDeclineMsg = p2.getRepresentationUnfogged() + ", in order to resolve strategy cards faster,"
                     + " you have the opportunity now to pre-decline various strategy cards if you know you will not follow them."
@@ -881,7 +915,6 @@ public class StartPhaseService {
                         "Use this to decide for **" + game.getStrategyCardModelByInitiative(sc).get().getName() + "**.", scButtons);
                 }
             }
-
         }
         GameLaunchThreadHelper.checkIfCanCloseGameLaunchThread(game, false);
         if (!game.isFowMode()) {
