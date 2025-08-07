@@ -1,9 +1,6 @@
 package ti4.map;
 
-import static java.util.function.Predicate.*;
-import static org.apache.commons.collections4.CollectionUtils.*;
-
-import java.awt.Point;
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -25,10 +22,6 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -36,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
@@ -49,6 +41,9 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.planet.PlanetRemove;
 import ti4.draft.BagDraft;
@@ -101,6 +96,9 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.leader.CommanderUnlockCheckService;
 import ti4.service.milty.MiltyDraftManager;
 import ti4.service.option.FOWOptionService.FOWOption;
+
+import static java.util.function.Predicate.not;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 public class Game extends GameProperties {
 
@@ -3424,43 +3422,45 @@ public class Game extends GameProperties {
 
     @JsonIgnore
     public List<Player> getRealPlayers() {
-        return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(Player::isRealPlayer).toList();
     }
 
     @JsonIgnore
     public List<Player> getRealPlayersNNeutral() {
         return getPlayers().values().stream()
             .filter(p -> p.isRealPlayer() || (p.getFaction() != null && p.getFaction().equals("neutral")))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @JsonIgnore
     public List<Player> getRealPlayersNDummies() {
-        return getPlayers().values().stream().filter(player -> player.isRealPlayer() || player.isDummy() && player.getColor() != null && !"null".equals(player.getColor()))
+        return getPlayers().values().stream()
+            .filter(player -> player.isRealPlayer() || player.isDummy() && player.getColor() != null && !"null".equals(player.getColor()))
             .collect(Collectors.toList());
     }
 
     @JsonIgnore
     public List<Player> getRealAndEliminatedPlayers() {
-        return getPlayers().values().stream().filter(player -> (player.isRealPlayer() || player.isEliminated()))
-            .collect(Collectors.toList());
+        return getPlayers().values().stream()
+            .filter(player -> (player.isRealPlayer() || player.isEliminated()))
+            .toList();
     }
 
     @JsonIgnore
     public List<Player> getRealAndEliminatedAndDummyPlayers() {
         return getPlayers().values().stream()
             .filter(player -> (player.isRealPlayer() || player.isEliminated() || player.isDummy()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @JsonIgnore
     public List<Player> getDummies() {
-        return getPlayers().values().stream().filter(Player::isDummy).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(Player::isDummy).toList();
     }
 
     @JsonIgnore
     public List<Player> getNotRealPlayers() {
-        return getPlayers().values().stream().filter(not(Player::isRealPlayer)).collect(Collectors.toList());
+        return getPlayers().values().stream().filter(not(Player::isRealPlayer)).toList();
     }
 
     @JsonIgnore
