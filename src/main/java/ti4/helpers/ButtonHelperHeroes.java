@@ -1,5 +1,7 @@
 package ti4.helpers;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,12 +11,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.buttons.handlers.agenda.VoteButtonHandler;
 import ti4.helpers.DiceHelper.Die;
@@ -53,8 +56,6 @@ import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
 import ti4.service.unit.ParsedUnit;
 import ti4.service.unit.RemoveUnitService;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class ButtonHelperHeroes {
 
@@ -1200,12 +1201,11 @@ public class ButtonHelperHeroes {
         Map<String, List<TI4Emoji>> totalLosses = new HashMap();
         for (Player p2 : game.getRealPlayers()) {
             if (p2.hasTech("dt2") || p2.getUnitsOwned().contains("cabal_spacedock")
-                    || p2.getUnitsOwned().contains("cabal_spacedock2") || p2.hasTech("absol_dt2") || p2.getUnitsOwned().contains("absol_cabal_spacedock")
-                    || p2.getUnitsOwned().contains("absol_cabal_spacedock2")) {
+                || p2.getUnitsOwned().contains("cabal_spacedock2") || p2.hasTech("absol_dt2") || p2.getUnitsOwned().contains("absol_cabal_spacedock")
+                || p2.getUnitsOwned().contains("absol_cabal_spacedock2")) {
                 tiles.addAll(ButtonHelper.getTilesOfPlayersSpecificUnits(game, p2, UnitType.Spacedock));
             }
-            if (p2 != player)
-            {
+            if (p2 != player) {
                 totalLosses.put(p2.getFactionEmoji(), new ArrayList<>());
             }
         }
@@ -1220,11 +1220,11 @@ public class ButtonHelperHeroes {
             }
         }
         adjTiles.sort((t1, t2) -> t1.getPosition().compareToIgnoreCase(t2.getPosition()));
-        
+
         StringBuilder message = new StringBuilder();
         for (Tile tile : adjTiles) {
-            boolean content = false;   
-            message.append("### Resolving for tile " + tile.getRepresentationForButtons() + "\n");     
+            boolean content = false;
+            message.append("### Resolving for tile " + tile.getRepresentationForButtons() + "\n");
             for (Player p2 : game.getRealPlayers()) {
                 if (p2 == player) {
                     continue;
@@ -1238,7 +1238,7 @@ public class ButtonHelperHeroes {
                 if (!FoWHelper.playerHasShipsInSystem(p2, tile)) {
                     continue;
                 }
-                    
+
                 for (Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                     UnitHolder unitHolder = entry.getValue();
                     if ((unitHolder instanceof Planet)) {
@@ -1246,21 +1246,19 @@ public class ButtonHelperHeroes {
                     }
                     Map<UnitKey, Integer> tileUnits = new HashMap<>(unitHolder.getUnits());
                     for (Map.Entry<UnitKey, Integer> unitEntry : tileUnits.entrySet()) {
-                        if (!p2.unitBelongsToPlayer(unitEntry.getKey()))
-                        {
+                        if (!p2.unitBelongsToPlayer(unitEntry.getKey())) {
                             continue;
                         }
                         UnitModel unitModel = p2.getUnitFromUnitKey(unitEntry.getKey());
-                        if (unitModel == null)
-                        {
+                        if (unitModel == null) {
                             continue;
                         }
 
                         UnitKey key = unitEntry.getKey();
                         if (key.getUnitType() == UnitType.Infantry
-                                || key.getUnitType() == UnitType.Mech
-                                || key.getUnitType() == UnitType.Fighter
-                                || key.getUnitType() == UnitType.Spacedock) {
+                            || key.getUnitType() == UnitType.Mech
+                            || key.getUnitType() == UnitType.Fighter
+                            || key.getUnitType() == UnitType.Spacedock) {
                             continue;
                         }
 
@@ -1270,12 +1268,10 @@ public class ButtonHelperHeroes {
                         if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null) {
                             damagedUnits = unitHolder.getUnitDamage().get(key);
                         }
-                        if (damagedUnits > 0)
-                        {
-                            message.append("Rolling for " + p2.getRepresentationNoPing() + " damaged " + unitModel.getBaseType() 
+                        if (damagedUnits > 0) {
+                            message.append("Rolling for " + p2.getRepresentationNoPing() + " damaged " + unitModel.getBaseType()
                                 + (damagedUnits == 1 ? "" : "s") + " :boom:" + unitModel.getUnitEmoji() + ": ");
-                            for (int i = 0; i < damagedUnits; i++)
-                            {
+                            for (int i = 0; i < damagedUnits; i++) {
                                 Die dice = new Die(4);
                                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                                 if (!dice.isSuccess()) {
@@ -1287,12 +1283,10 @@ public class ButtonHelperHeroes {
                             message.append("\n");
                             content = true;
                         }
-                        if (totalUnits > damagedUnits)
-                        {
-                            message.append("Rolling for " + p2.getRepresentationNoPing() + " " + unitModel.getBaseType() 
+                        if (totalUnits > damagedUnits) {
+                            message.append("Rolling for " + p2.getRepresentationNoPing() + " " + unitModel.getBaseType()
                                 + (totalUnits - damagedUnits == 1 ? "" : "s") + " " + unitModel.getUnitEmoji() + ": ");
-                            for (int i = 0; i < totalUnits - damagedUnits; i++)
-                            {
+                            for (int i = 0; i < totalUnits - damagedUnits; i++) {
                                 Die dice = new Die(4);
                                 message.append(dice.getGreenDieIfSuccessOrRedDieIfFailure());
                                 if (!dice.isSuccess()) {
@@ -1305,7 +1299,7 @@ public class ButtonHelperHeroes {
                             content = true;
                         }
                     }
-                    
+
                     int[] capNCap = ButtonHelper.checkFleetAndCapacity(p2, game, tile, false, false);
                     int capacityUsed = capNCap[1];
                     int capacity = capNCap[2];
@@ -1313,45 +1307,37 @@ public class ButtonHelperHeroes {
                     int fighterCount = tileUnits.getOrDefault(Units.getUnitKey("ff", p2.getColor()), 0);
                     int mechCount = tileUnits.getOrDefault(Units.getUnitKey("mf", p2.getColor()), 0);
                     int infantryCount = tileUnits.getOrDefault(Units.getUnitKey("gf", p2.getColor()), 0);
-                    if (mechCount + infantryCount > capacity || mechCount + infantryCount + fighterCount > capacity + fightersIgnored)
-                    {
+                    if (mechCount + infantryCount > capacity || mechCount + infantryCount + fighterCount > capacity + fightersIgnored) {
                         int overCapacity = Math.max(mechCount + infantryCount - capacity, mechCount + infantryCount + fighterCount - capacity - fightersIgnored);
-                        if (mechCount == 0 && infantryCount == 0)
-                        {
-                            message.append(p2.getRepresentationNoPing() + " has " + overCapacity 
+                        if (mechCount == 0 && infantryCount == 0) {
+                            message.append(p2.getRepresentationNoPing() + " has " + overCapacity
                                 + " fighter" + (overCapacity == 1 ? "" : "s") + " in excess of their amended capacity; removing and capturing.\n");
                             RemoveUnitService.removeUnit(event, tile, game, p2, unitHolder, UnitType.Fighter, overCapacity, false);
                             AddUnitService.addUnits(event, player.getNomboxTile(), game, p2.getColor(), overCapacity + " ff");
-                            for (int i = 0; i < overCapacity; i++)
-                            {
+                            for (int i = 0; i < overCapacity; i++) {
                                 totalLosses.get(p2.getFactionEmoji()).add(UnitEmojis.fighter);
                             }
-                        }
-                        else if (fighterCount == 0 && infantryCount == 0) {
+                        } else if (fighterCount == 0 && infantryCount == 0) {
                             message.append(p2.getRepresentationNoPing()).append(" has ")
                                 .append(overCapacity).append(" mech").append(overCapacity == 1 ? "" : "s")
                                 .append(" in excess of their amended capacity; removing and capturing.\n");
                             RemoveUnitService.removeUnit(event, tile, game, p2, unitHolder, UnitType.Mech, overCapacity, false);
                             AddUnitService.addUnits(event, player.getNomboxTile(), game, p2.getColor(), overCapacity + " mf");
-                            for (int i=0; i<overCapacity; i++)
-                            {
+                            for (int i = 0; i < overCapacity; i++) {
                                 totalLosses.get(p2.getFactionEmoji()).add(UnitEmojis.mech);
                             }
-                        }
-                        else if (fighterCount == 0 && mechCount == 0) {
+                        } else if (fighterCount == 0 && mechCount == 0) {
                             message.append(p2.getRepresentationNoPing()).append(" has ").append(overCapacity).append(" infantry in excess of their amended capacity; removing and capturing.\n");
                             RemoveUnitService.removeUnit(event, tile, game, p2, unitHolder, UnitType.Infantry, overCapacity, false);
                             AddUnitService.addUnits(event, player.getNomboxTile(), game, p2.getColor(), overCapacity + " gf");
-                            for (int i=0; i<overCapacity; i++) {
+                            for (int i = 0; i < overCapacity; i++) {
                                 totalLosses.get(p2.getFactionEmoji()).add(UnitEmojis.infantry);
                             }
-                        }
-                        else {
+                        } else {
                             String unitListing;
                             if (fighterCount * mechCount * infantryCount > 0) {
                                 unitListing = "fighter" + (fighterCount == 1 ? "" : "s") + ", mech" + (mechCount == 1 ? "" : "s") + " and infantry";
-                            }
-                            else {
+                            } else {
                                 unitListing = (fighterCount >= 1 ? "fighter" : "") + (fighterCount >= 2 ? "s" : "") + (fighterCount > 0 ? " and " : "")
                                     + (mechCount >= 1 ? "mech" : "") + (mechCount >= 2 ? "s" : "") + (mechCount * infantryCount > 0 ? " and " : "")
                                     + (infantryCount >= 1 ? "infantry" : "");
@@ -1364,52 +1350,42 @@ public class ButtonHelperHeroes {
                     }
                 }
             }
-            if (!content)
-            {
+            if (!content) {
                 message.append("No enemy units found in this system.\n");
             }
         }
 
         message.append("## Capture Summary");
         boolean nothing = true;
-        for (String faction :  totalLosses.keySet())
-        {
+        for (String faction : totalLosses.keySet()) {
             List<TI4Emoji> captured = totalLosses.get(faction);
-            if (captured.isEmpty())
-            {
+            if (captured.isEmpty()) {
                 message.append("\n> " + faction + " - nothing.");
-            }
-            else
-            {
+            } else {
                 message.append("\n> " + faction + " - ");
-                List<TI4Emoji> orderedEmoji = Arrays.asList(UnitEmojis.warsun, UnitEmojis.flagship, UnitEmojis.dreadnought, 
-                    UnitEmojis.carrier, UnitEmojis.cruiser, UnitEmojis.destroyer, 
+                List<TI4Emoji> orderedEmoji = Arrays.asList(UnitEmojis.warsun, UnitEmojis.flagship, UnitEmojis.dreadnought,
+                    UnitEmojis.carrier, UnitEmojis.cruiser, UnitEmojis.destroyer,
                     UnitEmojis.fighter, UnitEmojis.mech, UnitEmojis.infantry);
-                for (TI4Emoji emoji : orderedEmoji)
-                {
+                for (TI4Emoji emoji : orderedEmoji) {
                     int count = Collections.frequency(captured, emoji);
-                    for (int i=0; i<count; i++)
-                    {
+                    for (int i = 0; i < count; i++) {
                         message.append(emoji);
                         captured.remove(emoji);
                     }
-                    if (count > 0)
-                    {
+                    if (count > 0) {
                         message.append(Character.toString(8194));
                     }
                 }
                 // for any non-standard captures
                 captured.sort((e1, e2) -> e1.toString().compareToIgnoreCase(e2.toString()));
-                for (TI4Emoji emoji : captured)
-                {
+                for (TI4Emoji emoji : captured) {
                     message.append(emoji);
                 }
                 nothing = false;
             }
         }
-        if (nothing)
-        {
-            DisasterWatchHelper.sendMessageInDisasterWatch(game, player.getRepresentationUnfogged() 
+        if (nothing) {
+            DisasterWatchHelper.sendMessageInDisasterWatch(game, player.getRepresentationUnfogged()
                 + " purged It Feeds on Carrion, their hero, and captured... nothing " + MiscEmojis.TaDont + ".");
         }
         message.append("\n-# Please report any bugs to `\\#bot-bugs-and-feature-requests`.");
@@ -1558,7 +1534,7 @@ public class ButtonHelperHeroes {
         ButtonHelper.deleteMessage(event);
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
-        String relic = buttonID.split("_")[2];
+        String relic = buttonID.replace("stealRelic_" + faction + "_", "");
         String msg = player.getFactionEmojiOrColor() + " stole " + Mapper.getRelic(relic).getName()
             + " from " + p2.getFactionEmojiOrColor();
         if (game.isFowMode()) {
