@@ -175,11 +175,11 @@ public class UserLeaveServerListener extends ListenerAdapter {
                 var userSettings = UserSettingsManager.get(player.getId());
                 String prevRecord = userSettings.getTrackRecord();
                 for (Game game : games) {
-                    userSettings.setTrackRecord(userSettings.getTrackRecord() + "Dropped out of  " + game.getName() + ". ");
+                    userSettings.setTrackRecord(userSettings.getTrackRecord() + "Dropped out of " + game.getName() + ". ");
                 }
                 UserSettingsManager.save(userSettings);
                 if (!prevRecord.isEmpty()) {
-                    msg += "\n User had a previous track record of the following: " + prevRecord;
+                    msg += "\nUser had a previous track record of the following: " + prevRecord;
                 }
                 MessageHelper.sendMessageToChannel(moderationLogChannel, msg);
             } else {
