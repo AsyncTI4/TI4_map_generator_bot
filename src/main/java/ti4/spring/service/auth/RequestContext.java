@@ -1,10 +1,12 @@
 package ti4.spring.service.auth;
 
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import ti4.map.Game;
 import ti4.map.Player;
 
+@UtilityClass
 public class RequestContext {
 
     // TODO: Debate combining this with the Command/Button processing context
