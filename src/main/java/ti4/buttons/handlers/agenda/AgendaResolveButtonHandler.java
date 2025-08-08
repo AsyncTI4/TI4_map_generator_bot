@@ -7,13 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
-import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
@@ -386,15 +387,11 @@ class AgendaResolveButtonHandler {
                     ActionCardHelper.discardRandomAC(event, game, player2, player2.getAc());
                     game.setStoredValue("PublicExecution", player2.getFaction());
                     if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
-                        boolean foundSpeaker = false;
-                        for (Player p4 : game.getRealPlayers()) {
-                            if (foundSpeaker) {
+                        for (Player p4 : Helper.getSpeakerOrFullPriorityOrderFromPlayer(player2, game)) {
+                            if (p4 != player2) {
                                 game.setSpeakerUserID(p4.getUserID());
                                 message += " Also passed the Speaker token to " + p4.getRepresentation() + ".";
                                 break;
-                            }
-                            if (p4 == player2) {
-                                foundSpeaker = true;
                             }
                         }
                     }
@@ -824,10 +821,8 @@ class AgendaResolveButtonHandler {
                     }
                 }
                 MessageHelper.sendMessageToChannel(game.getMainGameChannel(), game.getPing() + ", all players' trade goods have been set to " + finalTG + ".");
-                if (!comrades.isEmpty())
-                {
-                    for (Player playerB : comrades)
-                    {
+                if (!comrades.isEmpty()) {
+                    for (Player playerB : comrades) {
                         DisasterWatchHelper.sendMessageInDisasterWatch(game,
                             "The Galactic Council of " + game.getName() + " have generously volunteered " + playerB.getRepresentation() + " to donate "
                                 + maxLoss + " trade goods to the less economically fortunate citizens of the galaxy.");
