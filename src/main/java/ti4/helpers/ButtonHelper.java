@@ -3477,8 +3477,12 @@ public class ButtonHelper {
                     + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() + ", please choose an edge tile that the new tile will be adjacent to.", buttons);
+        if (buttons.isEmpty()) {
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you cannot do this action at this time, as there are no valid locations. Reminder that you need a non-home system on the edge of the game board with your ships in it before you can do this action.");
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
+                player.getRepresentation() + ", please choose an edge tile that the new tile will be adjacent to.", buttons);
+        }
     }
 
     @ButtonHandler("starChartsStep2_")
