@@ -16,9 +16,9 @@ class CardsInfoButtonHandler {
         if (player == null) {
             return;
         }
-        ThreadChannel channel = player.getCardsInfoThread();
-        if (channel != null && !game.isFowMode()) {
-            channel.getManager().setArchived(true).complete(); // archiving it to combat a common bug that is solved via archiving
+        if (!game.isFowMode()) {
+            ThreadChannel channel = player.getCardsInfoThread();
+            channel.getManager().setArchived(true).queue(); // archiving it to combat a common bug that is solved via archiving
         }
         CardsInfoService.sendCardsInfo(game, player, event);
     }
