@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -37,7 +38,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.TIGLHelper;
 import ti4.helpers.ThreadArchiveHelper;
-import ti4.cron.AddBothelperPermissionsCron;
 import ti4.image.ImageHelper;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -150,22 +150,7 @@ public class CreateGameService {
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-        Role bothelperRole = getRole("Bothelper", guild);
-        long threadPermission = Permission.MANAGE_THREADS.getRawValue();
-        List<Member> nonGameBothelpers = new ArrayList<>();
-        if (bothelperRole != null) {
-            for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
-                boolean inGame = false;
-                for (Member member : members) {
-                    if (member.getId().equalsIgnoreCase(botHelper.getId())) {
-                        inGame = true;
-                    }
-                }
-                if (!inGame) {
-                    nonGameBothelpers.add(botHelper);
-                }
-            }
-        }
+
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, categoryChannel)
             .syncPermissionOverrides()
@@ -179,15 +164,27 @@ public class CreateGameService {
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
         newGame.setMainChannelID(actionsChannel.getId());
-        for (Member botHelper : nonGameBothelpers) {
-            chatChannel.getManager()
-                .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
-                .queue();
 
-            actionsChannel.getManager()
-                .putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0)
-                .queue();
+        Role bothelperRole = getRole("Bothelper", guild);
+        List<Member> nonGameBothelpers = new ArrayList<>();
+        if (bothelperRole != null) {
+            for (Member botHelper : guild.getMembersWithRoles(bothelperRole)) {
+                boolean inGame = members.stream().anyMatch(member -> member.getId().equals(botHelper.getId()));
+                if (!inGame) {
+                    nonGameBothelpers.add(botHelper);
+                }
+            }
         }
+        long threadPermission = Permission.MANAGE_THREADS.getRawValue();
+        TextChannelManager chatChannelManager = chatChannel.getManager();
+        TextChannelManager actionsChannelManager = actionsChannel.getManager();
+        for (Member botHelper : nonGameBothelpers) {
+            chatChannelManager = chatChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
+            actionsChannelManager = actionsChannelManager.putMemberPermissionOverride(botHelper.getIdLong(), threadPermission, 0);
+        }
+        chatChannelManager.queue();
+        actionsChannelManager.queue();
+
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
@@ -211,8 +208,6 @@ public class CreateGameService {
         reportNewGameCreated(newGame);
 
         presentSetupToPlayers(newGame);
-
-        AddBothelperPermissionsCron.scheduleForGame(newGame);
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread

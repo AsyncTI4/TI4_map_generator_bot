@@ -19,3 +19,4 @@ __**Action Card Tips:**__
 __**Combat Tips:**__
 > Each participant gets their own combat thread; spectators get a thread to spectate the interraction.
 > Messages in the combat thread relay between threads, so you can talk normally; no need to whisper.
+> Spectators see the same things participants do, including their chat.

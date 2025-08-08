@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.ActionCardHelper;
 import ti4.helpers.AgendaHelper;
@@ -584,33 +583,7 @@ class AgendaResolveButtonHandler {
                 }
             }
             if ("mutiny".equalsIgnoreCase(agID)) {
-                List<Player> winOrLose;
-                StringBuilder message = new StringBuilder();
-                Integer poIndex;
-                if ("for".equalsIgnoreCase(winner)) {
-                    winOrLose = AgendaHelper.getWinningVoters(winner, game);
-                    poIndex = game.addCustomPO("Mutiny", 1);
-
-                } else {
-                    winOrLose = AgendaHelper.getLosingVoters(winner, game);
-                    poIndex = game.addCustomPO("Mutiny", -1);
-                }
-                message.append("Custom objective _Mutiny_ has been added.\n");
-                for (Player playerWL : winOrLose) {
-                    if (playerWL.getTotalVictoryPoints() < 1 && !"for".equalsIgnoreCase(winner)) {
-                        continue;
-                    }
-                    game.scorePublicObjective(playerWL.getUserID(), poIndex);
-                    if (!game.isFowMode()) {
-                        message.append(playerWL.getRepresentation()).append(" scored _Mutiny_.\n");
-                    }
-                    Helper.checkEndGame(game, playerWL);
-                    if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
-                        break;
-                    }
-
-                }
-                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
+                handleMutiny(game, winner);
             }
             if ("constitution".equalsIgnoreCase(agID)) {
                 if ("for".equalsIgnoreCase(winner)) {
@@ -1026,5 +999,32 @@ class AgendaResolveButtonHandler {
         }
 
         ButtonHelper.deleteMessage(event);
+    }
+
+    private static void handleMutiny(Game game, String winner) {
+        boolean agendaWentFor = "for".equalsIgnoreCase(winner);
+        List<Player> winOrLose = agendaWentFor ? AgendaHelper.getWinningVoters(winner, game) : AgendaHelper.getLosingVoters(winner, game);
+        if (winOrLose.isEmpty()) {
+            return;
+        }
+
+        Integer poIndex = game.addCustomPO("Mutiny", 1);
+
+        StringBuilder message = new StringBuilder();
+        message.append("Custom objective _Mutiny_ has been added.\n");
+        for (Player playerWL : winOrLose) {
+            if (playerWL.getTotalVictoryPoints() < 1 && !agendaWentFor) {
+                continue;
+            }
+            game.scorePublicObjective(playerWL.getUserID(), poIndex);
+            if (!game.isFowMode()) {
+                message.append(playerWL.getRepresentation()).append(" scored _Mutiny_.\n");
+            }
+            Helper.checkEndGame(game, playerWL);
+            if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
+                break;
+            }
+        }
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), message.toString());
     }
 }

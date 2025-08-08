@@ -18,13 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -39,6 +33,10 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.buttons.Buttons;
 import ti4.draft.DraftBag;
@@ -84,6 +82,8 @@ import ti4.settings.users.UserSettings;
 import ti4.settings.users.UserSettingsManager;
 
 public class Player extends PlayerProperties {
+
+    private static final int EMBED_FIELD_VALUE_LIMIT = 1024;
 
     private final Game game;
 
@@ -1499,7 +1499,8 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public String getColorID() {
-        return (getColor() != null && !getColor().equals("null")) ? Mapper.getColorID(getColor()) : "null";
+        String color = getColor();
+        return (color != null && !color.equals("null")) ? Mapper.getColorID(color) : "null";
     }
 
     public void addAllianceMember(String color) {
@@ -1828,11 +1829,7 @@ public class Player extends PlayerProperties {
 
         if (getGame().isOrdinianC1Mode()) {
             Player p2 = ButtonHelper.getPlayerWhoControlsCoatl(getGame());
-            if (p2 != null && p2.getFaction().equalsIgnoreCase(getFaction())) {
-                return true;
-            } else {
-                return false;
-            }
+            return p2 != null && p2.getFaction().equalsIgnoreCase(getFaction());
         }
         if (includeAlliance)
             return CollectionUtils.containsAny(getPlanetsAllianceMode(), Constants.MECATOLS);
@@ -2498,7 +2495,7 @@ public class Player extends PlayerProperties {
             AbilityModel model = Mapper.getAbility(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Abilities__", sb.toString(), true);
+        addFieldSafely(eb, "__Abilities__", sb.toString(), true);
 
         // Faction Tech
         sb = new StringBuilder();
@@ -2506,7 +2503,7 @@ public class Player extends PlayerProperties {
             TechnologyModel model = Mapper.getTech(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Faction Technologies__", sb.toString(), true);
+        addFieldSafely(eb, "__Faction Technologies__", sb.toString(), true);
 
         // Techs
         sb = new StringBuilder();
@@ -2514,7 +2511,7 @@ public class Player extends PlayerProperties {
             TechnologyModel model = Mapper.getTech(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Technologies__", sb.toString(), true);
+        addFieldSafely(eb, "__Technologies__", sb.toString(), true);
 
         // Special Units
         sb = new StringBuilder();
@@ -2522,7 +2519,7 @@ public class Player extends PlayerProperties {
             UnitModel model = Mapper.getUnit(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Units__", sb.toString(), true);
+        addFieldSafely(eb, "__Units__", sb.toString(), true);
 
         // Promissory Notes
         sb = new StringBuilder();
@@ -2530,7 +2527,7 @@ public class Player extends PlayerProperties {
             PromissoryNoteModel model = Mapper.getPromissoryNote(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Promissory Notes__", sb.toString(), true);
+        addFieldSafely(eb, "__Promissory Notes__", sb.toString(), true);
 
         // Leaders
         sb = new StringBuilder();
@@ -2538,11 +2535,18 @@ public class Player extends PlayerProperties {
             LeaderModel model = Mapper.getLeader(id);
             sb.append(model.getNameRepresentation()).append("\n");
         }
-        eb.addField("__Leaders__", sb.toString(), false);
+        addFieldSafely(eb, "__Leaders__", sb.toString(), false);
 
         // Add avatar, color and footer
         applyEmbedDefaults(eb);
         return eb.build();
+    }
+
+    private void addFieldSafely(EmbedBuilder eb, String name, String value, boolean inline) {
+        if (value.length() > EMBED_FIELD_VALUE_LIMIT) {
+            value = value.substring(0, EMBED_FIELD_VALUE_LIMIT - 3) + "...";
+        }
+        eb.addField(name, value, inline);
     }
 
     private void applyEmbedDefaults(EmbedBuilder eb) {
