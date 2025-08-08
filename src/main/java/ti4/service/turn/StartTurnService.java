@@ -84,12 +84,9 @@ public class StartTurnService {
                     numUnpassed += p2.isPassed() || p2.isEliminated() ? 0 : 1;
                 }
                 text += "\n-# " + ping + " will start their turn once you've ended yours. ";
-                if (numUnpassed == 0)
-                {
+                if (numUnpassed == 0) {
                     text += "No other players are unpassed.";
-                }
-                else
-                {
+                } else {
                     text += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
                 }
             }
@@ -221,6 +218,9 @@ public class StartTurnService {
         if (!game.isStratPings())
             return null;
         boolean sendReminder = false;
+
+        if (!player.isRealPlayer())
+            return "";
 
         StringBuilder sb = new StringBuilder();
         sb.append(player.getRepresentationUnfogged());

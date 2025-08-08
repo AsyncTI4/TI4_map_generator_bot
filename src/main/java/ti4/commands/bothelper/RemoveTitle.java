@@ -3,6 +3,9 @@ package ti4.commands.bothelper;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
@@ -31,4 +34,5 @@ class RemoveTitle extends GameStateSubcommand {
         game.setStoredValue("TitlesFor" + userId, game.getStoredValue("TitlesFor" + userId).replace(title, ""));
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Removed the title " + title + " in game " + game.getName());
     }
+
 }

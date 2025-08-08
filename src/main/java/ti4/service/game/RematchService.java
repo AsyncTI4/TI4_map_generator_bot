@@ -1,7 +1,5 @@
 package ti4.service.game;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,8 +13,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.RegexHelper;
@@ -134,20 +130,6 @@ public class RematchService {
         newGame.setUpPeakableObjectives(5, 1);
         newGame.setUpPeakableObjectives(5, 2);
         // INTRODUCTION TO TABLETALK CHANNEL
-        String tabletalkGetStartedMessage = gameRole.getAsMention() + " - table talk channel\n" +
-            "This channel is for typical over the table converstion, as you would over the table while playing the game in real life.\n"
-            +
-            "If this group has agreed to whispers (secret conversations), you may create private threads off this channel.\n"
-            +
-            "Typical things that go here are: general conversation, deal proposals, memes - everything that isn't either an actual action in the game or a bot command\n";
-        MessageHelper.sendMessageToChannelAndPin(tableTalkChannel, tabletalkGetStartedMessage);
-
-        // INTRODUCTION TO ACTIONS CHANNEL
-        String actionsGetStartedMessage = gameRole.getAsMention() + " - actions channel\n" +
-            "This channel is for taking actions in the game, primarily using buttons or the odd slash command.\n" +
-            "Please keep this channel clear of any chat with other players. Ideally this channel is a nice clean ledger of what has physically happened in the game.\n";
-        MessageHelper.sendMessageToChannelAndPin(actionsChannel, actionsGetStartedMessage);
-        ButtonHelper.offerPlayerSetupButtons(actionsChannel, newGame);
 
         // INTRODUCTION TO BOT-MAP THREAD
         String botGetStartedMessage = gameRole.getAsMention() + " - bot/map channel\n" +
@@ -164,13 +146,10 @@ public class RematchService {
         MessageHelper.sendMessageToChannelAndPin(botThread, botGetStartedMessage);
         MessageHelper.sendMessageToChannelAndPin(botThread, "Website Live Map: https://asyncti4.com/game/" + newName);
 
-        List<Button> buttons2 = new ArrayList<>();
-        buttons2.add(Buttons.green("getHomebrewButtons", "Yes, have homebrew"));
-        buttons2.add(Buttons.red("deleteButtons", "No Homebrew"));
-        MessageHelper.sendMessageToChannelWithButtons(actionsChannel, "If you plan to have a supported homebrew mode in this game, " +
-            "please indicate so with these buttons", buttons2);
         if (game.isCompetitiveTIGLGame())
             TIGLHelper.initializeTIGLGame(newGame);
+
+        CreateGameService.presentSetupToPlayers(newGame);
         GameManager.save(newGame, "Rematch");
         if (event instanceof ButtonInteractionEvent event2) {
             event2.getMessage().delete().queue();

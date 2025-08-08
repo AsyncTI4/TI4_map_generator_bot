@@ -70,7 +70,7 @@ public class CheckDistanceHelper {
     public static Map<String, Integer> getTileDistances(Game game, Player player, String tilePosition, int maxDistance, boolean forMap) {
         Map<String, Integer> distances = new HashMap<>();
         distances.put(tilePosition, 0);
-
+        Tile tile2 = game.getTileByPosition(tilePosition);
         for (int i = 1; i <= maxDistance; i++) {
             Map<String, Integer> distancesCopy = new HashMap<>(distances);
             for (String existingPosition : distancesCopy.keySet()) {
@@ -82,6 +82,7 @@ public class CheckDistanceHelper {
                         || (tile.isNebula() && player != null && !player.hasAbility("celestial_being") && !player.getRelics().contains("circletofthevoid") && !player.getAbilities().contains("voidborn") && !ButtonHelper.isLawInPlay(game, "shared_research"))
                         || (tile.isSupernova() && player != null && !player.hasAbility("celestial_being") && !player.getRelics().contains("circletofthevoid") && !player.getAbilities().contains("gashlai_physiology"))
                         || (player != null && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game) && !player.hasTech("lwd") && !player.hasTech("absol_lwd"))
+                        || (player != null && tile2 != null && ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2))
                         || (player != null && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                         || (tile.isAsteroidField() && player != null && !player.hasAbility("celestial_being") && !player.getTechs().contains("amd") && !player.getRelics().contains("circletofthevoid") && !player.getTechs().contains("absol_amd"))) {
                         continue;

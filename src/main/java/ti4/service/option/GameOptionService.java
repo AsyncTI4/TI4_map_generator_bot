@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
+import ti4.service.game.StartPhaseService;
 
 @UtilityClass
 public class GameOptionService {
@@ -30,6 +31,7 @@ public class GameOptionService {
         //sendShowOwnedPNsInPlayerAreaButton(game, channel);
         List<Button> daneLinkButtons = getDaneLeakModeButtons(game);
         MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(channel, "Enable or Disable Galactic Events.", daneLinkButtons);
+        StartPhaseService.postSurveyResults(game);
     }
 
     public static final Button showOwnedPNs_ON = Buttons.green("showOwnedPNsInPlayerArea_turnOFF", "ON");
