@@ -1,13 +1,15 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
@@ -22,7 +24,7 @@ public class SlashCommandListener extends ListenerAdapter {
 
     private static final long DELAY_THRESHOLD_MILLISECONDS = 1500;
 
-    private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(Constants.ADD_TILE_LIST, Constants.ADD_TILE_LIST_RANDOM);
+    private static final List<String> SLASHCOMMANDS_WITH_MODALS = Arrays.asList(Constants.ADD_TILE_LIST, Constants.ADD_TILE_LIST_RANDOM, Constants.EDIT_TRACK_RECORD);
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {

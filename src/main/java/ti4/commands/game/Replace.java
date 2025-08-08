@@ -30,6 +30,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.milty.DraftDisplayService;
 import ti4.service.milty.MiltyDraftManager;
+import ti4.settings.users.UserSettingsManager;
 
 class Replace extends GameStateSubcommand {
 
@@ -94,6 +95,10 @@ class Replace extends GameStateSubcommand {
         if (oldMember != null && roles.size() == 1) {
             guild.removeRoleFromMember(oldMember, roles.getFirst()).queue();
         }
+
+        var userSettings = UserSettingsManager.get(replacedPlayer.getUserID());
+        userSettings.setTrackRecord(userSettings.getTrackRecord() + "Got replaced in game " + game.getName() + ". ");
+        UserSettingsManager.save(userSettings);
 
         //ADD ROLE
         if (roles.size() == 1) {

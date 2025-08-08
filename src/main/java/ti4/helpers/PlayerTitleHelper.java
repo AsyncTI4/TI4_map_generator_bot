@@ -122,13 +122,21 @@ public class PlayerTitleHelper {
 
     @ButtonHandler(value = "purgeSupports")
     public static void purgeSupports(ButtonInteractionEvent event, String buttonID, Game game) {
-        for (Player p2 : game.getRealPlayers()) {
-            p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
-            p2.removePromissoryNote(p2.getColor() + "_sftt");
-        }
-        game.setStoredValue("removeSupports", "true");
         ButtonHelper.deleteMessage(event);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Purged _Supports For The Thrones_ from the game.");
+        if (buttonID.contains("confirmed")) {
+            for (Player p2 : game.getRealPlayers()) {
+                p2.removeOwnedPromissoryNoteByID(p2.getColor() + "_sftt");
+                p2.removePromissoryNote(p2.getColor() + "_sftt");
+            }
+            game.setStoredValue("removeSupports", "true");
+
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Purged _Supports For The Thrones_ from the game.");
+        } else {
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Buttons.red("purgeSupportsconfirmed", "Purge Supports"));
+            buttons.add(Buttons.gray("deleteButtons", "Oops Mistake"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please confirm that you are pressing this button to purge supports from the game.", buttons);
+        }
     }
 
     @ButtonHandler(value = "noSupportSwaps")

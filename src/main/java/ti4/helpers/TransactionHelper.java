@@ -40,6 +40,7 @@ import ti4.service.emoji.SourceEmojis;
 import ti4.service.image.FileUploadService;
 import ti4.service.info.CardsInfoService;
 import ti4.service.leader.CommanderUnlockCheckService;
+import ti4.settings.users.UserSettingsManager;
 
 public class TransactionHelper {
 
@@ -686,7 +687,7 @@ public class TransactionHelper {
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
                     .setPlaceholder("Edit your deals details here.")
-                    .setValue("The deal is that I...")
+                    .setValue("The deal is that I ")
                     .build();
                 Modal modal = Modal.create(modalId, "Deal Details").addActionRow(summary).build();
                 event.replyModal(modal).queue();
@@ -702,7 +703,7 @@ public class TransactionHelper {
                 String fieldID = "details";
                 TextInput summary = TextInput.create(fieldID, "Edit deal details", TextInputStyle.PARAGRAPH)
                     .setPlaceholder("Edit your deals details here.")
-                    .setValue("The deal is that you...")
+                    .setValue("The deal is that you ")
                     .build();
                 Modal modal = Modal.create(modalId, "Deal Details").addActionRow(summary).build();
                 event.replyModal(modal).queue();
@@ -733,6 +734,17 @@ public class TransactionHelper {
         String message = "Current transaction offer is:\n" + TransactionHelper.buildTransactionOffer(player, opposing, game, false)
             + "### Click something that you wish to __offer to__ " + opposing.getRepresentation(false, false);
         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, getStuffToTransButtonsNew(game, player, player, opposing));
+    }
+
+    @ModalHandler("finishTrackRecord_")
+    public static void finishTrackRecord(ModalInteractionEvent event, Game game, Player player, String modalID) {
+        ModalMapping mapping = event.getValue("record");
+        String thoughts = mapping.getAsString();
+        String userId = modalID.split("_")[1];
+        var userSettings = UserSettingsManager.get(userId);
+        userSettings.setTrackRecord(thoughts.replace("\n", ""));
+        UserSettingsManager.save(userSettings);
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully edited the players track record");
     }
 
     @ModalHandler("finishDealDetailsInvert_")

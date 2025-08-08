@@ -229,7 +229,7 @@ public class CreateGameService {
         return newGame;
     }
 
-    private static void presentSetupToPlayers(Game game) {
+    public static void presentSetupToPlayers(Game game) {
         introductionToTableTalkChannel(game);
         introductionToActionsChannel(game);
         // sendMessageAboutAggressionMetas(game);

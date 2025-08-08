@@ -69,5 +69,8 @@ public class SusSlashCommandService {
         if (moderationLogChannel == null) return;
         String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
         MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
+        if (event.getInteraction().getSubcommandName() != null && event.getInteraction().getSubcommandName().equalsIgnoreCase("replace")) {
+
+        }
     }
 }
