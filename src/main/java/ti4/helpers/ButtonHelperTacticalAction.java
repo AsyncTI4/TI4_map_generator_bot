@@ -208,7 +208,7 @@ public class ButtonHelperTacticalAction {
             if (playersWithPds2.size() > 1 || !playersWithPds2.contains(player)) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), title
                         + "There are players with Space Cannon Offence coverage in this system.\n"
-                        + "Please resolve those before continuing or float the window if unrelevant.");
+                        + "Please resolve those before continuing, or float the window if irrelevant.");
             }
             List<Button> spaceCannonButtons = StartCombatService.getSpaceCannonButtons(game, player, tile);
             spaceCannonButtons
@@ -216,7 +216,7 @@ public class ButtonHelperTacticalAction {
             for (Player playerWithPds : playersWithPds2) {
                 MessageHelper.sendMessageToChannelWithButtons(playerWithPds.getCorrectChannel(),
                         title + playerWithPds.getRepresentationUnfogged()
-                                + " you have PDS coverage in " + tile.getRepresentation() + ", use buttons to resolve:",
+                                + ", you have SPACE CANNON coverage in " + tile.getRepresentation() + ", use buttons to resolve:",
                         spaceCannonButtons);
             }
         } else {

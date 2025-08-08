@@ -147,7 +147,7 @@ class RelicButtonHandler {
         player.removeExhaustedRelic(relicId);
         String relicName = Mapper.getRelic(relicId).getName();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            "Purged " + ExploreEmojis.Relic + " relic: " + relicName);
+            player.getRepresentationNoPing() + " has purged the _Eye of Vogul_.");
         ButtonHelper.deleteTheOneButton(event);
     }
 

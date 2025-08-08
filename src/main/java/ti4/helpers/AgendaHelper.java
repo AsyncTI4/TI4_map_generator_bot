@@ -155,7 +155,7 @@ public class AgendaHelper {
         List<String> whens = getPossibleWhenNames(player);
         List<String> afters = getPossibleAfterNames(player);
         StringBuilder msg = new StringBuilder(player.getRepresentation()
-            + " if you wish, to speed up the Agenda Phase, you can choose now to secretly pass on all \"whens\" and \"afters\" for both agendas in the upcoming Agenda Phase. "
+            + " if you wish, to speed up the Agenda Phase, you can choose now to secretly pass on all \"when\"s and \"after\"s for both agendas in the upcoming Agenda Phase. "
             + "You may currently play " + whens.size() + " \"when\"" + (whens.size() == 1 ? "" : "s") + " and " + afters.size() + " \"after\"" + (afters.size() == 1 ? "" : "s")
             + ". You will be able to change your mind during the agendas themselves if something unexpected occurs.");
         if (!whens.isEmpty()) {
@@ -275,23 +275,23 @@ public class AgendaHelper {
     @ButtonHandler("explainQueue")
     public static void explainQueue(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         String msg = """
-            "Whens" are any action card or ability that has a timing window of "When an agenda is revealed" and \
-            "Afters" are any action card or ability that has a timing window of "After an agenda is revealed". All whens need to be played (or declined to be played) \
-            before all afters, and all afters need to be played (or declined to be played) before voting can start. The bot attempts to facilitate this process \
-            via a queue system, so you can queue an after to play while the game is still waiting on everyone to decline on whens. Or you can queue a pre-vote \
-            or pre-abstain while the game is waiting on whens/afters to clear.
+            "When"s are any action card or ability that has a timing window of "when an agenda is revealed" and \
+            "after"s are any action card or ability that has a timing window of "after an agenda is revealed". All "when"s need to be played (or declined to be played) \
+            before any "after"s, and all "after"s need to be played (or declined to be played) before any votes are cast. The bot attempts to facilitate this process \
+            via a queue system, so you can queue an "after" to automatically play later, while the game is still waiting on everyone to decline on "when"s. Or you can queue a pre-vote \
+            or pre-abstain while the game is waiting on "when"s or "after"s to clear.
 
-            Per rules, whens and afters get played in a certain order (speaker order). This order \
-            can often be relevant (if someone plays a rider before you, that may influence where you play your rider, or even if you play a rider at all.)
+            Per rules, "when"s and "after"s get played in a certain order (speaker order). This order \
+            can often be relevant (if someone plays a rider before you, that may influence where you play your rider, or even if you play a rider at all).
 
-            This queue system is asking you "If no-one who was in front of you in speaker order played anything, would you play anything?". \
-            If your answer is yes, then it will play your chosen ability/action card when everyone in front of you officially declines to play anything. \
-            If they do decide to play something, then your answer will be discarded and you will be asked to reconsider if you wish to play something. \
-            If your answer was no then by default the system will assume that your answer will remain no, but you can instruct it to ask you again. After you decide on whens \
-            the system will ask you about afters.
+            This queue system is asking you "if no-one who was in front of you in speaker order played anything, would you play anything?". \
+            If your answer is "yes", then it will play your chosen ability when everyone in front of you officially declines to play anything. \
+            If someone else in front of you does decide to play something, then your answer will be discarded and you will be asked to reconsider if you wish to play something. \
+            If your answer was "no" then by default the system will assume that your answer will remain no, but you can instruct it to ask you again. After you decide on "when"s \
+            the system will ask you about "after"s.
 
             It should be understood that there is little benefit in stalling your decision here. \
-            You have as much information as you need to answer the bot's queuestion, and if others provide more information (by playing any whens/afters) \
+            You have as much information as you need to answer the bot's queuestion, and if others provide more information (by playing any "when"s or "after"s) \
             you will be asked to privately decide again at that later point.""";
 
         MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
