@@ -20,13 +20,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -100,6 +100,10 @@ public class Mapper {
     private static final Map<String, TechnologyModel> technologies = new HashMap<>();
     private static final Map<String, TokenModel> tokens = new HashMap<>();
     private static final Map<String, UnitModel> units = new HashMap<>();
+
+    private static final Cache<String, ColorModel> colorToColorModelCache = Caffeine.newBuilder()
+        .maximumSize(1000)
+        .build();
 
     public static void init() {
         try {
@@ -484,12 +488,15 @@ public class Mapper {
     }
 
     public static ColorModel getColor(String color) {
-        for (ColorModel col : colors.values()) {
-            if (col.getAlias().equals(color)) return col;
-            if (col.getName().equals(color)) return col;
-            if (col.getAliases().contains(color)) return col;
-        }
-        return null;
+        if (color == null || color.equals("null")) return null;
+        return colorToColorModelCache.get(color, c -> {
+            for (ColorModel col : colors.values()) {
+                if (col.getAlias().equals(color)) return col;
+                if (col.getName().equals(color)) return col;
+                if (col.getAliases().contains(color)) return col;
+            }
+            return null;
+        });
     }
 
     public static boolean isValidColor(String color) {
@@ -513,11 +520,15 @@ public class Mapper {
     }
 
     public static String getColorID(String color) {
-        return Optional.ofNullable(getColor(color)).map(ColorModel::getAlias).orElse(null);
+        ColorModel colorModel = getColor(color);
+        if (colorModel == null) return null;
+        return colorModel.getAlias();
     }
 
     public static String getColorName(String color) {
-        return Optional.ofNullable(getColor(color)).map(ColorModel::getName).orElse(null);
+        ColorModel colorModel = getColor(color);
+        if (colorModel == null) return null;
+        return colorModel.getName();
     }
 
     // ####################
