@@ -41,6 +41,7 @@ import ti4.cron.SabotageAutoReactCron;
 import ti4.cron.TechSummaryCron;
 import ti4.cron.UploadStatsCron;
 import ti4.cron.WinningPathCacheCron;
+import ti4.cron.ThreadArchiveCron;
 import ti4.executors.ExecutorServiceManager;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -280,6 +281,7 @@ public class AsyncTI4DiscordBot {
         //AgendaPhaseAutoReactCron.register();  Disabled due to new afters/whens handling
         FastScFollowCron.register();
         CloseLaunchThreadsCron.register();
+        ThreadArchiveCron.register();
         InteractionLogCron.register();
 
         // BOT IS READY
