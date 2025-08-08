@@ -494,7 +494,7 @@ public class UnfiledButtonHandlers {
         for (UnitType unit : allowedUnits) {
             buttons.add(Buttons.green("endGlimmersRedTech_" + unit.plainName(), unit.plainName(), unit.getUnitTypeEmoji()));
         }
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation() 
+        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), player.getRepresentation()
             + ", please choose the unit that was destroyed, and that you will be placing via _Fractal Plating_.", buttons);
     }
 
@@ -506,7 +506,7 @@ public class UnfiledButtonHandlers {
         String unit = buttonID.split("_")[1];
 
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-            player.getRepresentation() 
+            player.getRepresentation()
                 + ", please choose the system adjacent to your destroyed unit that you wish to place the unit."
                 + "\n-# Note that not all options displayed are legal options. The bot did not check where the unit was destroyed.",
             Helper.getTileWithShipsPlaceUnitButtons(player, game, unit, "placeOneNDone_skipbuild"));
@@ -823,12 +823,13 @@ public class UnfiledButtonHandlers {
     @ButtonHandler("bombardConfirm_")
     public static void bombardConfirm(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
         //List<Button> buttons = new ArrayList<>();
+
+        if (getBombardablePlanets(player, game, game.getTileByPosition(game.getActiveSystem())).isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentation() + " there are no planets in this system that you can legally bombard. " +
+                "You cannot bombard planets you own, and you cannot bombard cultural planets if conventions of war law is in play");
+            return;
+        }
         autoAssignAllBombardmentToAPlanet(player, game);
-        //buttons.add(Buttons.gray(buttonID.replace("bombardConfirm_", ""), "Roll Bombardment"));
-        // String message = player.getRepresentationUnfogged()
-        //     + ", please declare what units are bombarding what planet before hitting this button"
-        //     + " (e.g. if you have two dreadnoughts and are splitting their BOMBADMENT across two planets, specify which planet the first one is hitting)."
-        //     + " The bot does not track this.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentation() + " is assigning units to bombard as follows:\n"
             + getBombardmentSummary(player, game), getBombardmentAssignmentButtons(player, game));
     }
