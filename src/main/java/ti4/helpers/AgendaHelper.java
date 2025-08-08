@@ -275,14 +275,24 @@ public class AgendaHelper {
     @ButtonHandler("explainQueue")
     public static void explainQueue(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
         String msg = """
+            First, welcome to the idea of "whens" and "afters". "Whens" are any action card or ability that has a timing window of "When an agenda is revealed" and \
+            "Afters" are any action card or ability that has a timing window of "After an agenda is revealed". All whens need to be played (or declined to be played) \
+            before all afters, and all afters need to be played (or declined to be played) before voting can start. The bot attempts to facilitate this process \
+            via a queue system, so you can queue an after to play while the game is still waiting on everyone to decline on whens. Or you can queue a pre-vote \
+            or pre-abstain while the game is waiting on whens/afters to clear.
+
+            According to game rules, whens and afters get played in a certain order (speaker order, also known as clockwise from the speaker). This order \
+            can often be relevant (if someone plays a rider before you, that may influence where you play your rider, or even if you play a rider at all.)
+
             This queue system is basically asking you "If no-one who was in front of you in speaker order played anything, would you play anything?". \
             If your answer is yes, then it will play your chosen ability/action card when everyone in front of you officially declines on playing anything. \
             If they do decide to play something, then your answer will be tossed out and you will be asked to reconsider if you wish to play something, now that you have more information. \
             If your answer was no then by default the system will assume that your answer will remain no, but after saying no you can tell the system to ask you again if someone else plays something.
 
-            I would like to emphasize at this time that there is little benefit in stalling your decision here. \
-            You have as much information as you need to answer the bots queuestion, and if others provide more information you will/can just be asked to privately decide again at that later point. \
-            The one exception to this is if you can glean information from table chatter, which if you can, by all means wait to decide until you hear all the chatter.""";
+            It should be understood that there is little benefit in stalling your decision here. \
+            You have as much information as you need to answer the bot's queuestion, and if others provide more information (by playing any whens/afters) \
+            you will be asked to privately decide again at that later point. The one exception to this rule of thumb is if you can glean information from \
+            table chatter, which if you can, by all means wait to decide until you hear all the chatter.""";
 
         MessageHelper.sendEphemeralMessageToEventChannel(event, msg);
     }

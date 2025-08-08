@@ -707,34 +707,24 @@ public class StartPhaseService {
         startActionPhase(event, game, true);
     }
 
-    public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
-        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
-        game.setStoredValue("willRevolution", "");
-        game.setPhaseOfGame("action");
-        GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
+    public static void postSurveyResults(Game game) {
         int completedSurvey = 0;
-        for (Player p2 : game.getRealPlayers()) {
-            var userSettings = UserSettingsManager.get(p2.getUserID());
-            if (userSettings.isHasAnsweredSurvey()) {
-                completedSurvey++;
+        if (game.getRealPlayers().size() > 0) {
+            for (Player p2 : game.getRealPlayers()) {
+                var userSettings = UserSettingsManager.get(p2.getUserID());
+                if (userSettings.isHasAnsweredSurvey()) {
+                    completedSurvey++;
+                }
             }
-            ButtonHelperActionCards.checkForAssigningCoup(game, p2);
-            if (game.getStoredValue("Play Naalu PN") != null
-                && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
-                if (!p2.getPromissoryNotesInPlayArea().contains("gift")
-                    && p2.getPromissoryNotes().containsKey("gift")) {
-                    PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
+        } else {
+            for (Player p2 : game.getPlayers().values()) {
+                var userSettings = UserSettingsManager.get(p2.getUserID());
+                if (userSettings.isHasAnsweredSurvey()) {
+                    completedSurvey++;
                 }
             }
         }
-
-        if (game.hasAnyPriorityTrackMode()) {
-            PriorityTrackHelper.ClearPriorityTrack(game);
-            if (game.getPriorityTrackMode() == PriorityTrackMode.THIS_ROUND_ONLY) {
-                game.setPriorityTrackMode(PriorityTrackMode.NONE);
-            }
-        }
-        if (game.getRound() == 1 && !game.isFowMode() && completedSurvey > 1) {
+        if (game.getRound() == 1 && !game.isFowMode() && completedSurvey > 2 && game.getStoredValue("postedSurvey").isEmpty()) {
             String header = "# __Survey Results__\n";
             String question1 = "## Question #1: Whispers\n";
             String question2 = "## Question #2: Supports\n";
@@ -742,7 +732,11 @@ public class StartPhaseService {
             String question3 = "## Question #3: How To Handle Rollback Disputes\n";
             String question5 = "## Question #5: Meta Preferences\n";
             List<Player> randomPlayers = new ArrayList<>();
-            randomPlayers.addAll(game.getRealPlayers());
+            if (game.getRealPlayers().size() > 0) {
+                randomPlayers.addAll(game.getRealPlayers());
+            } else {
+                randomPlayers.addAll(game.getPlayers().values());
+            }
             boolean anyoneWantsToBan = false;
             boolean anyoneWantsNoSwaps = false;
             boolean anyoneWantsLimitedWhispers = false;
@@ -783,7 +777,6 @@ public class StartPhaseService {
             if (anyoneWantsLimitedWhispers) {
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.blue("setLimitedWhispers", "Allow Limited Whispers"));
-
                 buttons.add(Buttons.gray("deleteButtons", "Dismiss these buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(game.getTableTalkChannel(), 
                     "If you wish to do play with limited whispers, you can use these buttons." 
@@ -793,6 +786,32 @@ public class StartPhaseService {
             }
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), "You are encouraged to discuss these results if there appears to be any disagreement on questions 1-3,"
                 + " as they each have some impact upon the game. Questions 4 and 5 are purely for informational purposes/setting expectations.");
+            game.setStoredValue("postedSurvey", "yes");
+        }
+
+    }
+
+    public static void startActionPhase(GenericInteractionCreateEvent event, Game game, boolean incrementTgs) {
+        boolean isFowPrivateGame = FoWHelper.isPrivateGame(game, event);
+        game.setStoredValue("willRevolution", "");
+        game.setPhaseOfGame("action");
+        GMService.logActivity(game, "**Action** Phase for Round " + game.getRound() + " started.", true);
+        for (Player p2 : game.getRealPlayers()) {
+            ButtonHelperActionCards.checkForAssigningCoup(game, p2);
+            if (game.getStoredValue("Play Naalu PN") != null
+                && game.getStoredValue("Play Naalu PN").contains(p2.getFaction())) {
+                if (!p2.getPromissoryNotesInPlayArea().contains("gift")
+                    && p2.getPromissoryNotes().containsKey("gift")) {
+                    PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
+                }
+            }
+        }
+
+        if (game.hasAnyPriorityTrackMode()) {
+            PriorityTrackHelper.ClearPriorityTrack(game);
+            if (game.getPriorityTrackMode() == PriorityTrackMode.THIS_ROUND_ONLY) {
+                game.setPriorityTrackMode(PriorityTrackMode.NONE);
+            }
         }
 
         Player nextPlayer = game.getActionPhaseTurnOrder().getFirst();
@@ -811,7 +830,6 @@ public class StartPhaseService {
         //ADD A TRADE GOOD TO UNPICKED STRATEGY CARDS
         if (incrementTgs) {
             game.incrementScTradeGoods();
-
             for (int sc : scPickedList) {
                 game.setScTradeGood(sc, 0);
             }
@@ -849,6 +867,7 @@ public class StartPhaseService {
             String hold = "";
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "All players have picked a strategy card.\n"
                 + nextPlayer.getRepresentation() + " is first in initiative order.");
+            postSurveyResults(game);
             for (Player p2 : game.getRealPlayers()) {
                 if (p2.hasTechReady("qdn") && p2.getTg() > 2 && p2.getStrategicCC() > 0) {
                     List<Button> buttons = new ArrayList<>();

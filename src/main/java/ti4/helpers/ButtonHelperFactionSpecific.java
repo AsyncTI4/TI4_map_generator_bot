@@ -504,6 +504,7 @@ public class ButtonHelperFactionSpecific {
 
     public static void cleanCavUp(Game game, GenericInteractionCreateEvent event) {
         for (Player player : game.getRealPlayers()) {
+            ButtonHelper.checkFleetInEveryTile(player, game);
             if (player.hasUnit("cavalry1") || player.hasUnit("cavalry2")) {
                 String cav = "cavalry1";
                 String unit = game.getStoredValue("nomadPNShip");
@@ -2175,7 +2176,7 @@ public class ButtonHelperFactionSpecific {
             }
             msg = msg.replace("infantrys", "infantry");
 
-            AddUnitService.addUnits(event, cabal.getNomboxTile(), game, color, amount + " " + unit);
+            AddUnitService.addUnits(event, cabal.getNomboxTile(), game, color, amount + " " + unit.replace(" ", ""));
         }
         MessageHelper.sendMessageToChannel(cabal.getCorrectChannel(), msg);
 
@@ -2284,7 +2285,7 @@ public class ButtonHelperFactionSpecific {
         int unitCap = game.getPlayerByColorID(unitKey.getColorID())
             .filter(p -> p.getUnitCap(unitKey.asyncID()) != 0).map(p -> p.getUnitCap(unitKey.asyncID()))
             .orElse(baseUnitCap);
-        return ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey) < unitCap;
+        return (ButtonHelper.getNumberOfUnitsOnTheBoard(game, unitKey) < unitCap && unitKey.getUnitType() != UnitType.Spacedock && unitKey.getUnitType() != UnitType.Pds);
     }
 
     public static Button buildVortexButton(Game game, UnitKey unitKey) {
@@ -2751,7 +2752,7 @@ public class ButtonHelperFactionSpecific {
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "1 " + unit + " " + planet);
         String opponent = "their opponent's";
-        for (Player p2 : game.getRealPlayers()) {
+        for (Player p2 : game.getRealPlayersNNeutral()) {
             if (p2 == player) {
                 continue;
             }

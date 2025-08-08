@@ -1,9 +1,10 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -24,6 +25,7 @@ import ti4.map.persistence.ManagedPlayer;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.MiscEmojis;
+import ti4.settings.users.UserSettingsManager;
 
 public class UserLeaveServerListener extends ListenerAdapter {
 
@@ -170,6 +172,15 @@ public class UserLeaveServerListener extends ListenerAdapter {
             String msg = generateBothelperReport(guild, player, games);
             StringBuilder gs = new StringBuilder();
             if (!msg.equalsIgnoreCase("dud")) {
+                var userSettings = UserSettingsManager.get(player.getId());
+                String prevRecord = userSettings.getTrackRecord();
+                for (Game game : games) {
+                    userSettings.setTrackRecord(userSettings.getTrackRecord() + "Dropped out of  " + game.getName() + ". ");
+                }
+                UserSettingsManager.save(userSettings);
+                if (!prevRecord.isEmpty()) {
+                    msg += "\n User had a previous track record of the following: " + prevRecord;
+                }
                 MessageHelper.sendMessageToChannel(moderationLogChannel, msg);
             } else {
                 for (Game game : games) {

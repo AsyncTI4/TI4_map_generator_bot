@@ -27,6 +27,7 @@ public class BothelperCommand implements ParentCommand {
         new ServerGameStats(),
         new ListDeadGames(),
         new RemoveTitle(),
+        new EditTrackRecord(),
         new CheckNextPingTime(),
         new ListSlashCommandsUsed(),
         new ReserveGame() //
