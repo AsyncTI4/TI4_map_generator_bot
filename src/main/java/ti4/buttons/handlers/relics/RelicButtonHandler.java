@@ -140,6 +140,17 @@ class RelicButtonHandler {
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
     }
 
+    @ButtonHandler("eyeOfVogul")
+    static void eyeOfVogul(ButtonInteractionEvent event, Player player, Game game) {
+        String relicId = "eye_of_vogul";
+        player.removeRelic(relicId);
+        player.removeExhaustedRelic(relicId);
+        String relicName = Mapper.getRelic(relicId).getName();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
+            "Purged " + ExploreEmojis.Relic + " relic: " + relicName);
+        ButtonHelper.deleteTheOneButton(event);
+    }
+
     @ButtonHandler("exhauste6g0network")
     static void exhaustE6G0Network(ButtonInteractionEvent event, Player player, Game game) {
         player.addExhaustedRelic("e6-g0_network");

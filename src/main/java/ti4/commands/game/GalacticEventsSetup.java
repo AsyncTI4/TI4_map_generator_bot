@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.map.Game;
+import ti4.map.Player;
 
 class GalacticEventsSetup extends GameStateSubcommand {
 
@@ -55,7 +56,15 @@ class GalacticEventsSetup extends GameStateSubcommand {
         if (civilizedSocietyMode != null) game.setCivilizedSocietyMode(civilizedSocietyMode);
 
         Boolean stellarMode = event.getOption(Constants.STELLAR_ATOMICS_MODE, null, OptionMapping::getAsBoolean);
-        if (stellarMode != null) game.setStellarAtomicsMode(stellarMode);
+        if (stellarMode != null) {
+            game.setStellarAtomicsMode(stellarMode);
+            if (stellarMode) {
+                int poIndex = game.addCustomPO("Stellar Atomics", 0);
+                for (Player playerWL : game.getRealPlayers()) {
+                    game.scorePublicObjective(playerWL.getUserID(), poIndex);
+                }
+            }
+        }
     }
 
 }

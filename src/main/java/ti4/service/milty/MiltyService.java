@@ -550,8 +550,15 @@ public class MiltyService {
 
         }
         if (game.isStellarAtomicsMode()) {
-            int stellarID = game.getRevealedPublicObjectives().get("Stellar Atomics");
-            game.scorePublicObjective(player.getUserID(), stellarID);
+            if (game.getRevealedPublicObjectives().get("Stellar Atomics") != null) {
+                int stellarID = game.getRevealedPublicObjectives().get("Stellar Atomics");
+                game.scorePublicObjective(player.getUserID(), stellarID);
+            } else {
+                int poIndex = game.addCustomPO("Stellar Atomics", 0);
+                for (Player playerWL : game.getRealPlayers()) {
+                    game.scorePublicObjective(playerWL.getUserID(), poIndex);
+                }
+            }
         }
         if (player.hasAbility("policies")) {
             player.removeAbility("policies");

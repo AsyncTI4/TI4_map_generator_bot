@@ -383,6 +383,10 @@ public class TacticalActionService {
         if (player.hasRelic("dominusorb")) {
             buttons.add(Buttons.gray("dominusOrb", "Purge Dominus Orb", ExploreEmojis.Relic));
         }
+        if (player.hasRelic("eye_of_vogul")) {
+            buttons.add(Buttons.gray("eyeOfVogul", "Purge Eye of Vogul", ExploreEmojis.Relic));
+        }
+
         if (player.hasRelicReady("absol_luxarchtreatise")) {
             buttons.add(Buttons.gray("exhaustRelic_absol_luxarchtreatise", "Exhaust Luxarch Treatise", ExploreEmojis.Relic));
         }

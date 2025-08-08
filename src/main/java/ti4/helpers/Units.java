@@ -7,11 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Data;
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
 import ti4.AsyncTI4DiscordBot;
 import ti4.image.Mapper;
 import ti4.service.emoji.TI4Emoji;
@@ -124,7 +126,7 @@ public class Units {
                 case Carrier -> "Carrier";
                 case Dreadnought -> "Dreadnought";
                 case Flagship -> "Flagship";
-                case Warsun -> "War Sun";
+                case Warsun -> "Warsun";
                 case PlenaryOrbital -> "Plenary Orbital";
                 case TyrantsLament -> "Tyrant's Lament";
                 case Cavalry -> "The Cavalry";

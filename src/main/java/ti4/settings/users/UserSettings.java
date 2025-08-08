@@ -32,6 +32,7 @@ public class UserSettings {
     private String winmakingPref = "No Preference";
     private String takebackPref = "No Preference";
     private String metaPref = "No Preference";
+    private String trackRecord = "";
 
     UserSettings() {} // needed for ObjectMapper
 
