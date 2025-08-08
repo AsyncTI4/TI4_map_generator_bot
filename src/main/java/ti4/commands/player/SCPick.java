@@ -2,11 +2,9 @@ package ti4.commands.player;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -29,11 +27,6 @@ class SCPick extends GameStateSubcommand {
     public SCPick() {
         super(Constants.SC_PICK, "Pick a strategy card", true, true);
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number").setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC2, "2nd choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC4, "4th choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC5, "5th choice"));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC6, "6th choice"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
 
     }
@@ -64,20 +57,9 @@ class SCPick extends GameStateSubcommand {
         boolean pickSuccessful = PlayerStatsService.pickSC(event, game, player, option);
         Set<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
-            if (game.isFowMode()) {
-                String[] scs = { Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6 };
-                int c = 0;
-                while (playerSCs.isEmpty() && c < 5 && !pickSuccessful) {
-                    if (event.getOption(scs[c]) != null) {
-                        pickSuccessful = PlayerStatsService.pickSC(event, game, player, event.getOption(scs[c]));
-                    }
-                    playerSCs = player.getSCs();
-                    c++;
-                }
-            }
-            if (!pickSuccessful) {
-                return;
-            }
+            MessageHelper.sendMessageToEventChannel(event, "No strategy card picked.");
+            return;
+
         }
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
         if (playerSCs.isEmpty()) {
@@ -109,6 +91,9 @@ class SCPick extends GameStateSubcommand {
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext()) {
             Player player_ = players.poll();
+            if (player_ == player) {
+                nextCorrectPing = true;
+            }
             if (player_ == null || !player_.isRealPlayer()) {
                 continue;
             }
@@ -120,9 +105,7 @@ class SCPick extends GameStateSubcommand {
                 allPicked = false;
                 break;
             }
-            if (player_ == player) {
-                nextCorrectPing = true;
-            }
+
             if (player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
                 players.add(player_);
             }
