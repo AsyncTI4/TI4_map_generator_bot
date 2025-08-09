@@ -1810,7 +1810,7 @@ public class MapGenerator implements AutoCloseable {
 
         for (Objective objective : objectives) {
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
-            box.Display(game, graphics, this, objective);
+            box.display(game, graphics, this, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
 
@@ -1827,7 +1827,7 @@ public class MapGenerator implements AutoCloseable {
         boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
         for (Objective objective : objectives) {
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
-            box.Display(game, graphics, this, objective);
+            box.display(game, graphics, this, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
 
@@ -1841,7 +1841,7 @@ public class MapGenerator implements AutoCloseable {
         boxWidth = ObjectiveBox.getBoxWidth(game, maxTextWidth, scoreTokenSpacing);
         for (Objective objective : objectives) {
             ObjectiveBox box = new ObjectiveBox(x, y, boxWidth, maxTextWidth, scoreTokenSpacing);
-            box.Display(game, graphics, this, objective);
+            box.display(game, graphics, this, objective);
             y += ObjectiveBox.getVerticalSpacing();
         }
 
