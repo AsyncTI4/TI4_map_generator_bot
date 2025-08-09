@@ -972,7 +972,7 @@ public class UnfiledButtonHandlers {
             AgendaHelper.reverseRider("reverse_" + acName, event, game, player);
         }
         if (sendReact) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message + "\n" + game.getPing());
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
     }
 
