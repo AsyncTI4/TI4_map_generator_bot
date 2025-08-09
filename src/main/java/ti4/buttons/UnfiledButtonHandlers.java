@@ -948,7 +948,7 @@ public class UnfiledButtonHandlers {
                     "You clicked the _Instinct Training_ button but did not have the technology.");
             }
         } else if ("ac".equalsIgnoreCase(type)) {
-            message += "A _Sabotage_!";
+            message += "a _Sabotage_!";
             boolean hasSabo = false;
             String saboID = "3";
             for (String AC : player.getActionCards().keySet()) {
