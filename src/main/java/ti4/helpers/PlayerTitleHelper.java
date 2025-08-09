@@ -135,7 +135,7 @@ public class PlayerTitleHelper {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.red("purgeSupportsconfirmed", "Purge Supports"));
             buttons.add(Buttons.gray("deleteButtons", "Oops Mistake"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please confirm that you are pressing this button to purge supports from the game.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please confirm that you are pressing this button to purge all _Supports for the Thrones_ from the game.", buttons);
         }
     }
 

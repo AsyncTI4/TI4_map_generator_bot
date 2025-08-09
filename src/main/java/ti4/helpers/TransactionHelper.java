@@ -744,7 +744,7 @@ public class TransactionHelper {
         var userSettings = UserSettingsManager.get(userId);
         userSettings.setTrackRecord(thoughts.replace("\n", ""));
         UserSettingsManager.save(userSettings);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully edited the players track record");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Successfully edited the players track record.");
     }
 
     @ModalHandler("finishDealDetailsInvert_")

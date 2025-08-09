@@ -204,7 +204,7 @@ public class CombatMessageHelper {
             }
             game.setStoredValue(combatName, "" + round);
             if (game.getStoredValue("thalnosPlusOne").equalsIgnoreCase("true")) {
-                combatTypeName += " (Thalnos reroll for round #" + round + ")";
+                combatTypeName += " (_Crown of Thalnos_ reroll for round #" + round + ")";
             } else {
                 combatTypeName += " (round #" + round + ")";
                 if (game.getStoredValue("solagent").equalsIgnoreCase(player.getFaction())) {
@@ -218,9 +218,9 @@ public class CombatMessageHelper {
         if (rollType == CombatRollType.bombardment && !player.getGame().getStoredValue("bombardmentTarget" + player.getFaction()).isEmpty()) {
             String planet = player.getGame().getStoredValue("bombardmentTarget" + player.getFaction());
             return String.format("%s rolls for %s on %s %s :\n",
-                player.getFactionEmoji(), combatTypeName.toLowerCase(), Helper.getPlanetRepresentationNoResInf(planet, player.getGame()), MiscEmojis.RollDice);
+                player.getFactionEmoji(), combatTypeName, Helper.getPlanetRepresentationNoResInf(planet, player.getGame()), MiscEmojis.RollDice);
         }
         return String.format("%s rolls for %s %s :\n",
-            player.getFactionEmoji(), combatTypeName.toLowerCase(), MiscEmojis.RollDice);
+            player.getFactionEmoji(), combatTypeName, MiscEmojis.RollDice);
     }
 }

@@ -555,7 +555,7 @@ public class PlayerTechService {
                     if (numUnpassed == 0) {
                         text += "No other players are unpassed.";
                     } else {
-                        text += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                        text += numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
                     }
                 }
             }

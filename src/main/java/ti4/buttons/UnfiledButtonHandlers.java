@@ -574,7 +574,7 @@ public class UnfiledButtonHandlers {
                 ButtonHelper.deleteTheOneButton(event, event.getButton().getId(), false);
                 player.setSarweenCounter(player.getSarweenCounter() + 1);
                 String msg = player.getFactionEmoji() + " has used _Sarween Tools_ to save " + player.getSarweenCounter()
-                    + " resource(s) in this game so far. ";
+                    + " resource" + (player.getSarweenCounter() == 1 ? "" : "s") + " in this game so far. ";
                 int result = ThreadLocalRandom.current().nextInt(0, 5);
                 if (player.getSarweenCounter() < 6) {
 
@@ -789,7 +789,7 @@ public class UnfiledButtonHandlers {
             return summary;
         }
         for (String planet : getBombardablePlanets(player, game, tile)) {
-            summary += "### " + player.getFactionEmoji() + " bombarding " + Helper.getPlanetRepresentationNoResInf(planet, game) + ":\n";
+            summary += "### " + player.getFactionEmoji() + " BOMBARDMENT of " + Helper.getPlanetRepresentationNoResInf(planet, game) + ":\n";
             for (Player p2 : game.getRealAndEliminatedPlayers()) {
                 if (p2 == player) {
                     continue;
@@ -907,10 +907,18 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("sabotage_")
     public static void sabotage(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String typeNName = buttonID.replace("sabotage_", "");
-        String type = typeNName.substring(0, typeNName.indexOf("_"));
-        String acName = typeNName.replace(type + "_", "");
-        String message = "Cancelling the action card _" + acName + "_ using ";
+        String typeNNameNTarget = buttonID.replace("sabotage_", "");
+        String type = typeNNameNTarget.split("_")[0];
+        String acName = typeNNameNTarget.split("_")[1];
+        String target = "somebody";
+        if (typeNNameNTarget.split("_").length > 2)
+        {
+            String faction = typeNNameNTarget.split("_")[2];
+            Player p2 = game.getPlayerFromColorOrFaction(faction);
+            target = p2.getRepresentationUnfogged();
+        }
+        String message = game.getPing() + ", the action card _" + acName + "_ played by " + target 
+            + " has been cancelled by " + player.getRepresentationUnfogged() + " with ";
         Integer count = game.getAllActionCardsSabod().get(acName);
         if (count == null) {
             game.setSpecificActionCardSaboCount(acName, 1);
@@ -936,11 +944,11 @@ public class UnfiledButtonHandlers {
                 ButtonHelper.deleteMessage(event);
             } else {
                 sendReact = false;
-                MessageHelper.sendMessageToChannel(event.getChannel(),
-                    "Someone clicked the _Instinct Training_ button but did not have the technology.");
+                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(),
+                    "You clicked the _Instinct Training_ button but did not have the technology.");
             }
         } else if ("ac".equalsIgnoreCase(type)) {
-            message += "A _Sabotage_!";
+            message += "a _Sabotage_!";
             boolean hasSabo = false;
             String saboID = "3";
             for (String AC : player.getActionCards().keySet()) {
@@ -964,7 +972,7 @@ public class UnfiledButtonHandlers {
             AgendaHelper.reverseRider("reverse_" + acName, event, game, player);
         }
         if (sendReact) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message + "\n" + game.getPing());
+            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
         }
     }
 
@@ -1394,7 +1402,7 @@ public class UnfiledButtonHandlers {
                 ReactionService.addReaction(event, game, player);
                 if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
                     String msg = "Please score objectives.";
-                    msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
+                    msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
                     event.getMessage().editMessage(msg).queue();
                 }
             } catch (Exception e) {
@@ -1457,7 +1465,7 @@ public class UnfiledButtonHandlers {
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()
             && !game.getPhaseOfGame().equalsIgnoreCase("action")) {
             String msg = "Please score objectives.";
-            msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
+            msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
         if (game.getPhaseOfGame().equalsIgnoreCase("action")) {
@@ -2154,7 +2162,7 @@ public class UnfiledButtonHandlers {
         CommandCounterHelper.addCC(event, constructionPlayer, tile);
 
         String colorName = Mapper.getColor(constructionPlayer.getColor()).getDisplayName();
-        String message = player.getRepresentation() + " Placed 1 " + colorName + " command token in the "
+        String message = player.getRepresentation() + " placed 1 " + colorName + " command token in the "
             + Helper.getPlanetRepresentation(planet, game)
             + " system due to use of " + (player.hasUnexhaustedLeader("yssarilagent") ? "Clever Clever " : "")
             + "Jae Mir Kan, the Mahact" + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "")
@@ -2964,7 +2972,7 @@ public class UnfiledButtonHandlers {
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
             String msg = "Please score objectives.";
-            msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
+            msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
         ReactionService.addReaction(event, game, player);
@@ -2974,7 +2982,7 @@ public class UnfiledButtonHandlers {
     @ButtonHandler(value = "refreshStatusSummary", save = false)
     public static void refreshStatusSummary(ButtonInteractionEvent event, Game game) {
         String msg = "Please score objectives.";
-        msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
+        msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
         event.getMessage().editMessage(msg).queue();
     }
 
@@ -3024,7 +3032,7 @@ public class UnfiledButtonHandlers {
         }
         if (!game.getStoredValue("newStatusScoringMode").isEmpty()) {
             String msg = "Please score objectives.";
-            msg += "\n\n" + Helper.getNewStatusScoringRepresentation(game);
+            msg += "\n" + Helper.getNewStatusScoringRepresentation(game);
             event.getMessage().editMessage(msg).queue();
         }
     }

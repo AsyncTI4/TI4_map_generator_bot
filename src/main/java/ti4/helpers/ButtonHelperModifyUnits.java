@@ -1210,7 +1210,7 @@ public class ButtonHelperModifyUnits {
                 successMessage = "Placed 1 space dock in the space area of the " + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID + " " + planetName);
-                successMessage = "Placed 1 " + UnitEmojis.spacedock + " on " + Helper.getPlanetRepresentation(planetName, game) + ".";
+                successMessage = "Placed 1 space dock on " + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
             CommanderUnlockCheckService.checkPlayer(player, "cabal");
             if (player.hasAbility("industrious") && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)) {
@@ -1224,20 +1224,20 @@ public class ButtonHelperModifyUnits {
         } else if ("pds".equalsIgnoreCase(unitLong)) {
             if (player.ownsUnit("mirveda_pds") || player.ownsUnit("mirveda_pds2")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
-                successMessage = "Placed 1 " + UnitEmojis.pds + " in the space area of the "
+                successMessage = "Placed 1 space dock in the space area of the "
                     + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitLong + " " + planetName);
-                successMessage = "Placed 1 " + UnitEmojis.pds + " on "
+                successMessage = "Placed 1 PDS on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else if ("monument".equalsIgnoreCase(unitLong)) {
             if (player.ownsUnit("empyrean_monument")) {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
-                successMessage = "Placed 1 " + UnitEmojis.Monument + " in the space area of the " + Helper.getPlanetRepresentation(planetName, game) + " system.";
+                successMessage = "Placed 1 monument in the space area of the " + Helper.getPlanetRepresentation(planetName, game) + " system.";
             } else {
                 AddUnitService.addUnits(event, tile, game, player.getColor(), unitLong + " " + planetName);
-                successMessage = "Placed 1 " + UnitEmojis.Monument + " on " + Helper.getPlanetRepresentation(planetName, game) + ".";
+                successMessage = "Placed 1 monument on " + Helper.getPlanetRepresentation(planetName, game) + ".";
             }
         } else {
             String producedOrPlaced = "Produced";
@@ -1253,7 +1253,7 @@ public class ButtonHelperModifyUnits {
                             player.produceUnit(producedInput);
                         }
                         AddUnitService.addUnits(event, tile, game, player.getColor(), num + " gf " + planetName);
-                        successMessage = producedOrPlaced + " " + num + " " + UnitEmojis.infantry + " on "
+                        successMessage = producedOrPlaced + " " + num + " infantry on "
                             + Helper.getPlanetRepresentation(planetName, game) + ".";
                     } else {
                         spaceOrPlanet = "space";
@@ -1265,7 +1265,7 @@ public class ButtonHelperModifyUnits {
                             player.produceUnit(producedInput);
                         }
                         AddUnitService.addUnits(event, tile, game, player.getColor(), num + " gf");
-                        successMessage = producedOrPlaced + " " + num + " " + UnitEmojis.infantry + " in space.";
+                        successMessage = producedOrPlaced + " " + num + " infantry in space.";
                     }
                 } else {
 
@@ -1274,7 +1274,7 @@ public class ButtonHelperModifyUnits {
                         String producedInput = unitID.replace("2", "") + "_" + tile.getPosition() + "_" + spaceOrPlanet;
                         player.produceUnit(producedInput);
                         AddUnitService.addUnits(event, tile, game, player.getColor(), unitID + " " + planetName);
-                        successMessage = producedOrPlaced + " a " + unitKey.unitEmoji() + " on "
+                        successMessage = producedOrPlaced + " 1 " + unitKey.humanReadableName().toLowerCase() + " on "
                             + Helper.getPlanetRepresentation(planetName, game) + ".";
                     } else {
                         spaceOrPlanet = "space";
@@ -1282,7 +1282,7 @@ public class ButtonHelperModifyUnits {
                         String producedInput = unitID.replace("2", "") + "_" + tile.getPosition() + "_" + spaceOrPlanet;
                         player.produceUnit(producedInput);
                         AddUnitService.addUnits(event, tile, game, player.getColor(), unitID);
-                        successMessage = producedOrPlaced + " a " + unitKey.unitEmoji() + " in space.";
+                        successMessage = producedOrPlaced + " 1 " + unitKey.humanReadableName().toLowerCase() + " in space.";
                     }
 
                 }
@@ -1294,7 +1294,7 @@ public class ButtonHelperModifyUnits {
                 player.produceUnit(producedInput);
                 if ("2ff".equalsIgnoreCase(unitLong)) {
                     AddUnitService.addUnits(event, game.getTileByPosition(planetName), game, player.getColor(), "2 ff");
-                    successMessage = "Produced 2 " + UnitEmojis.fighter + " in tile "
+                    successMessage = "Produced 2 fighters in tile "
                         + tile.getRepresentationForButtons(game, player) + ".";
                     player.produceUnit(producedInput);
                     Tile tile2 = game.getTileByPosition(planetName);
@@ -1336,11 +1336,11 @@ public class ButtonHelperModifyUnits {
                     }
                 } else if ("2destroyer".equalsIgnoreCase(unitLong)) {
                     AddUnitService.addUnits(event, game.getTileByPosition(planetName), game, player.getColor(), "2 destroyer");
-                    successMessage = "Produced 2 " + UnitEmojis.destroyer + " in tile " + tile.getRepresentationForButtons(game, player) + ".";
+                    successMessage = "Produced 2 destroyers in tile " + tile.getRepresentationForButtons(game, player) + ".";
                     player.produceUnit(producedInput);
                 } else {
                     AddUnitService.addUnits(event, game.getTileByPosition(planetName), game, player.getColor(), unitID);
-                    successMessage = "Produced a " + unitKey.unitEmoji() + " in tile " + tile.getRepresentationForButtons(game, player) + ".";
+                    successMessage = "Produced 1 " + unitKey.humanReadableName().toLowerCase() + " in tile " + tile.getRepresentationForButtons(game, player) + ".";
                     if (player.hasAbility("cloaked_fleets")) {
                         List<Button> cloakedFleets = new ArrayList<>();
                         cloakedFleets.add(Buttons.green("cloakedFleets_" + tile.getPosition() + "_" + unitID, "Capture 1 " + StringUtils.capitalize(Mapper.getUnitBaseTypeFromAsyncID(unitID))));
@@ -1359,9 +1359,9 @@ public class ButtonHelperModifyUnits {
         }
         if (("sd".equalsIgnoreCase(unitID) || "pds".equalsIgnoreCase(unitLong) || "monument".equalsIgnoreCase(unitLong)) && event.getMessage().getContentRaw().toLowerCase().contains("construction")) {
             if (game.isFowMode() || (!"action".equalsIgnoreCase(game.getPhaseOfGame()) && !"statusScoring".equalsIgnoreCase(game.getPhaseOfGame()))) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + successMessage.replace("Produced", " produced"));
+                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerRep + successMessage.replace("Produce", " produce").replace("Place", " place"));
             } else {
-                ButtonHelper.sendMessageToRightStratThread(player, game, playerRep + successMessage.replace("Produced", " produced"), "construction");
+                ButtonHelper.sendMessageToRightStratThread(player, game, playerRep + successMessage.replace("Produced", " produced").replace("Place", " place"), "construction");
             }
 
             if (player.hasLeader("mahactagent") || player.hasExternalAccessToLeader("mahactagent")) {
@@ -1419,7 +1419,7 @@ public class ButtonHelperModifyUnits {
             }
 
             if (editedMessage.contains("place 2 infantry")) {
-                successMessage = "Placed " + UnitEmojis.infantry + UnitEmojis.infantry + " on "
+                successMessage = "Placed 2 infantry on "
                     + Helper.getPlanetRepresentation(planetName, game) + ".";
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                 event.getMessage().delete().queue();
