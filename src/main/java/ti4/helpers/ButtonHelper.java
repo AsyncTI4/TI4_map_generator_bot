@@ -3478,7 +3478,9 @@ public class ButtonHelper {
             }
         }
         if (buttons.isEmpty()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you cannot do this action at this time, as there are no valid locations. Reminder that you need a non-home system on the edge of the game board with your ships in it before you can do this action.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() 
+                + ", you cannot do this action at this time, as there are no valid locations."
+                + " Reminder that you need a non-home system on the edge of the game board with your ships in it before you can do this action.");
         } else {
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
                 player.getRepresentation() + ", please choose an edge tile that the new tile will be adjacent to.", buttons);
@@ -5969,7 +5971,7 @@ public class ButtonHelper {
                 if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
                 } else {
-                    msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                    msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
                 }
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
@@ -6637,5 +6639,10 @@ public class ButtonHelper {
             }
         }
         return output;
+    }
+
+    @ButtonHandler("autoProveEndurance_")
+    public static void autoProveEndurance(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        game.setStoredValue("autoProveEndurance_" + player.getFaction(), buttonID.split("_")[1]);
     }
 }

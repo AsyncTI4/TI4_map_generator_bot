@@ -77,6 +77,16 @@ public class StartTurnService {
         if (nextPlayer != null && !game.isFowMode()) {
             if (nextPlayer == player) {
                 text += "\n-# All other players are passed; you will take consecutive turns until you pass, ending the Action Phase.";
+                if (player.getSecretsUnscored().containsKey("pe") && "".equals(game.getStoredValue("autoProveEndurance_" + player.getFaction())))
+                {
+                    List<Button> buttons = new ArrayList<>();
+                    buttons.add(Buttons.green("autoProveEndurance_yes", "Queue Prove Endurance", CardEmojis.SecretObjectiveAlt));
+                    buttons.add(Buttons.red("autoProveEndurance_no", "Decline Prove Endurance", "🙅"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
+                        "All other players have passed. As such, when you pass, you could score _Prove Endurance_."
+                            + " You may use these buttons to queue scoring this when you pass (or not).",
+                        buttons);
+                }
             } else {
                 String ping = UserSettingsManager.get(nextPlayer.getUserID()).isPingOnNextTurn() ? nextPlayer.getRepresentationUnfogged() : nextPlayer.getRepresentationNoPing();
                 int numUnpassed = -2;
@@ -87,7 +97,7 @@ public class StartTurnService {
                 if (numUnpassed == 0) {
                     text += "No other players are unpassed.";
                 } else {
-                    text += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                    text += numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
                 }
             }
         }

@@ -805,6 +805,7 @@ public class StartPhaseService {
                     PromissoryNoteHelper.resolvePNPlay("gift", p2, game, event);
                 }
             }
+            game.setStoredValue("autoProveEndurance_" + p2.getFaction(), "");
         }
 
         if (game.hasAnyPriorityTrackMode()) {
@@ -906,7 +907,7 @@ public class StartPhaseService {
                 if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
                 } else {
-                    msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                    msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
                 }
             }
             if (!hold.isEmpty()) {

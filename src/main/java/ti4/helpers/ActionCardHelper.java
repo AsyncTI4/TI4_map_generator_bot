@@ -393,11 +393,11 @@ public class ActionCardHelper {
             + " played the action card _" + actionCardTitle + "_.";
 
         List<Button> buttons = new ArrayList<>();
-        Button sabotageButton = Buttons.red("sabotage_ac_" + actionCardTitle, "Cancel Action Card With Sabotage", MiscEmojis.Sabotage);
+        Button sabotageButton = Buttons.red("sabotage_ac_" + actionCardTitle + "_" + player.getFaction(), "Cancel Action Card With Sabotage", MiscEmojis.Sabotage);
         buttons.add(sabotageButton);
         Player empy = Helper.getPlayerFromUnit(game, "empyrean_mech");
         if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(game, player, empy) && !ButtonHelper.isLawInPlay(game, "articles_war")) {
-            Button empyButton = Buttons.gray("sabotage_empy_" + actionCardTitle, "Cancel " + actionCardTitle + " With Watcher", UnitEmojis.mech);
+            Button empyButton = Buttons.gray("sabotage_empy_" + actionCardTitle + "_" + player.getFaction(), "Cancel " + actionCardTitle + " With Watcher", UnitEmojis.mech);
             List<Button> empyButtons = new ArrayList<>();
             empyButtons.add(empyButton);
             Button refuse = Buttons.red("deleteButtons", "Delete These Buttons");
@@ -411,7 +411,7 @@ public class ActionCardHelper {
         for (Player player2 : game.getPlayers().values()) {
             if (!player.equals(player2) && player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0) {
                 List<Button> xxchaButtons = new ArrayList<>();
-                xxchaButtons.add(Buttons.gray("sabotage_xxcha_" + actionCardTitle, "Cancel " + actionCardTitle + " With Instinct Training", FactionEmojis.Xxcha));
+                xxchaButtons.add(Buttons.gray("sabotage_xxcha_" + actionCardTitle + "_" + player.getFaction(), "Cancel " + actionCardTitle + " With Instinct Training", FactionEmojis.Xxcha));
                 xxchaButtons.add(Buttons.red("deleteButtons", "Delete These Buttons"));
                 MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), player2.getRepresentationUnfogged()
                     + ", you have _Instinct Training_ readied and a command token available in your strategy pool."
