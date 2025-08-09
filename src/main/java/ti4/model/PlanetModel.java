@@ -13,9 +13,9 @@ import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
 import org.apache.commons.lang3.StringUtils;
 import ti4.AsyncTI4DiscordBot;
+import ti4.helpers.Stickers;
 import ti4.image.TileHelper;
 import ti4.image.UnitTokenPosition;
-import ti4.helpers.Stickers;
 import ti4.model.PlanetTypeModel.PlanetType;
 import ti4.model.Source.ComponentSource;
 import ti4.model.TechSpecialtyModel.TechSpecialty;
@@ -55,6 +55,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
     private String contrastColor;
     private ComponentSource source;
+
+    private String cachedStickerUrl;
 
     @JsonIgnore
     public boolean isValid() {
@@ -169,12 +171,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         eb.setColor(Color.black);
 
         eb.setDescription(getLegendaryAbilityText());
-        //if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
         if (getStickerOrEmojiURL() != null) eb.setThumbnail(getStickerOrEmojiURL());
-
-        // footer can have some of the planet info
-        //eb.setFooter(getName());
-
         return eb.build();
     }
 
@@ -251,11 +248,18 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public String getStickerOrEmojiURL() {
+        if (cachedStickerUrl != null) {
+            return cachedStickerUrl;
+        }
+
         long ident = Stickers.getPlanetSticker(getId());
         if (ident == -1) {
-            return getEmojiURL();
+            cachedStickerUrl = getEmojiURL();
+        } else {
+            cachedStickerUrl = AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();
         }
-        return AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();
+
+        return cachedStickerUrl;
     }
 
     public boolean search(String searchString) {

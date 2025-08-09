@@ -25,10 +25,8 @@ public record Objective(
     }
 
     public static List<Objective> retrieve(Game game) {
-        List<Objective> objectives = new ArrayList<>();
+        List<Objective> objectives = retrievePublic1(game);
 
-        appendRevealedObjectives(game, objectives, Type.Stage1);
-        appendUnrevealedObjectives(game, objectives, Type.Stage1);
         appendRevealedObjectives(game, objectives, Type.Stage2);
         appendUnrevealedObjectives(game, objectives, Type.Stage2);
         appendRevealedObjectives(game, objectives, Type.Custom);
