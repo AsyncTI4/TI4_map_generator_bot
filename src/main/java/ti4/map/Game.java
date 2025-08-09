@@ -2491,11 +2491,9 @@ public class Game extends GameProperties {
                 ButtonHelperFactionSpecific.resolveDeceive(player, this);
                 return null;
             }
-            if (player != null) {
-                getActionCards().remove(id);
-                player.setActionCard(id);
-                return player.getActionCards();
-            }
+            getActionCards().remove(id);
+            player.setActionCard(id);
+            return player.getActionCards();
         } else if (!discardActionCards.isEmpty()) {
             reshuffleActionCardDiscard();
             return drawActionCard(userID);

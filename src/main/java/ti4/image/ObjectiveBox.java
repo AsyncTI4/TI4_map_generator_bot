@@ -1,7 +1,6 @@
 package ti4.image;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class ObjectiveBox {
         this.spaceForTokens = boxWidth - (maxTextWidth + bufferBetweenTextAndTokens * 2);
     }
 
-    public void Display(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
+    public void display(Game game, Graphics graphics, MapGenerator generator, Objective objective) {
         setColor(graphics, objective);
 
         graphics.drawString(objective.getDisplayText(game), x, y + textVerticalOffset);
