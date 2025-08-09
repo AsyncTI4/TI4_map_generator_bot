@@ -621,11 +621,11 @@ public class CreateGameService {
         Role everyoneRole = getRole("@everyone", guild);
         ChannelAction<Category> createCategoryAction = guild.createCategory(categoryName);
         if (bothelperRole != null)
-            createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allow, null);
+            createCategoryAction = createCategoryAction.addRolePermissionOverride(bothelperRole.getIdLong(), allow, null);
         if (spectatorRole != null)
-            createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
+            createCategoryAction = createCategoryAction.addRolePermissionOverride(spectatorRole.getIdLong(), allow, null);
         if (everyoneRole != null)
-            createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
+            createCategoryAction = createCategoryAction.addRolePermissionOverride(everyoneRole.getIdLong(), null, deny);
         return createCategoryAction.complete();
     }
 
