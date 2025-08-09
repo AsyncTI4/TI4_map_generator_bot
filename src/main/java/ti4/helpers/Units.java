@@ -52,6 +52,10 @@ public class Units {
             return unitType.plainName();
         }
 
+        public String humanReadableName() {
+            return unitType.humanReadableName();
+        }
+
         public TI4Emoji unitEmoji() {
             return unitType.getUnitTypeEmoji();
         }

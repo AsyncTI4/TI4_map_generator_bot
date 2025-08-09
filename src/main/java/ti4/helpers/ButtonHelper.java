@@ -5971,7 +5971,7 @@ public class ButtonHelper {
                 if (numUnpassed == 0) {
                     msgExtra += "No other players are unpassed.";
                 } else {
-                    msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? "" : "s") + " are still unpassed.";
+                    msgExtra += numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
                 }
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);
@@ -6639,5 +6639,10 @@ public class ButtonHelper {
             }
         }
         return output;
+    }
+
+    @ButtonHandler("autoProveEndurance_")
+    public static void autoProveEndurance(Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        game.setStoredValue("autoProveEndurance_" + player.getFaction(), buttonID.split("_")[1]);
     }
 }

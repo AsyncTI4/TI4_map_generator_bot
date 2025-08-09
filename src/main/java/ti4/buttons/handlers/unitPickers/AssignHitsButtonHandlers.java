@@ -56,7 +56,7 @@ public class AssignHitsButtonHandlers {
             }
 
             String verb = remove ? " removed " : " destroyed ";
-            String msg = player.getRepresentationNoPing() + verb + amt + " " + (prefersState ? state.humanDescr() : "") + type.humanReadableName();
+            String msg = player.getRepresentationNoPing() + verb + amt + " " + (prefersState ? state.humanDescr() + " " : "") + type.humanReadableName().toLowerCase();
             msg += (planetName != null && holder != null ? " on " + holder.getRepresentation(game) : " in tile " + tile.getRepresentationForButtons(game, player)) + ".";
 
             List<Button> systemButtons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, game, tile, assignHitsType);

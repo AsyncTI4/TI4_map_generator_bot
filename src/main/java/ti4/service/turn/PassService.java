@@ -3,6 +3,7 @@ package ti4.service.turn;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -10,8 +11,10 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperCommanders;
+import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.omega_phase.PriorityTrackHelper;
+import ti4.helpers.SecretObjectiveHelper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -90,6 +93,16 @@ public class PassService {
         }
 
         DiscordantStarsHelper.checkKjalengardMechs(event, player, game);
+        
+        if ("yes".equals(game.getStoredValue("autoProveEndurance_" + player.getFaction())))
+        {
+            for (Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
+                if ("pe".equals(so.getKey()))
+                {
+                    SecretObjectiveHelper.scoreSO(event, game, player, so.getValue(), (game.isFowMode() ? player.getPrivateChannel() : game.getMainGameChannel()));
+                }
+            }
+        }
 
         EndTurnService.pingNextPlayer(event, game, player, true);
         ButtonHelper.updateMap(game, event, "End of Turn (PASS) " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getFactionEmoji());
