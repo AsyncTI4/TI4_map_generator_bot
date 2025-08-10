@@ -14,7 +14,9 @@ class RemoveTeamMate extends GameStateSubcommand {
     public RemoveTeamMate() {
         super(Constants.REMOVE_TEAMMATE, "Remove a teammate", true, true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "User who is on your team").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -22,6 +24,7 @@ class RemoveTeamMate extends GameStateSubcommand {
         Player player = getPlayer();
         User targetPlayer = event.getOption(Constants.PLAYER2).getAsUser();
         player.removeTeamMateID(targetPlayer.getId());
-        MessageHelper.sendMessageToEventChannel(event, "Removed " + targetPlayer.getAsMention() + " from " + player.getFaction() + "'s team");
+        MessageHelper.sendMessageToEventChannel(
+                event, "Removed " + targetPlayer.getAsMention() + " from " + player.getFaction() + "'s team");
     }
 }

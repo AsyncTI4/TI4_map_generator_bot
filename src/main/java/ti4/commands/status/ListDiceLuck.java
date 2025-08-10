@@ -3,7 +3,6 @@ package ti4.commands.status;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -43,7 +42,7 @@ class ListDiceLuck extends GameStateSubcommand {
             lines.add(entry.getKey());
         }
         lines.sort((s1, s2) -> record.get(s2).compareTo(record.get(s1)));
-        for (String s: lines) {
+        for (String s : lines) {
             message.append("\n").append(s);
         }
 
@@ -60,9 +59,10 @@ class ListDiceLuck extends GameStateSubcommand {
 
         double total = actualHits / expectedHits;
 
-        record.put("> " + player.getUserName() + ": `" +
-            String.format("%.2f", total) +
-            "` (" + actualHits + "/" + String.format("%.1f", expectedHits) + " actual/expected)",
-            total);
+        record.put(
+                "> " + player.getUserName() + ": `" + String.format("%.2f", total)
+                        + "` ("
+                        + actualHits + "/" + String.format("%.1f", expectedHits) + " actual/expected)",
+                total);
     }
 }

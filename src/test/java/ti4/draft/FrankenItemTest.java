@@ -1,12 +1,11 @@
 package ti4.draft;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ti4.testUtils.BaseTi4Test;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class FrankenItemTest extends BaseTi4Test {
     @Test

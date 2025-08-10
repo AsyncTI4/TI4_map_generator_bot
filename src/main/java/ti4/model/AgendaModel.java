@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
@@ -34,12 +32,7 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && validateCategory()
-            && type != null
-            && text1 != null
-            && source != null;
+        return alias != null && name != null && validateCategory() && type != null && text1 != null && source != null;
     }
 
     private boolean validateCategory() {
@@ -48,7 +41,8 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
                 return Mapper.isValidFaction(getCategoryDescription());
             }
             case "event" -> {
-                return Stream.of("immediate", "permanent", "temporary").anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
+                return Stream.of("immediate", "permanent", "temporary")
+                        .anyMatch(s -> s.equalsIgnoreCase(getCategoryDescription()));
             }
             default -> {
                 return true;
@@ -102,10 +96,14 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
 
     public String footnote() {
         return switch (alias) {
-            case "mutiny" -> "Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`\n";
-            case "seed_empire" -> "Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`\n";
-            case "censure" -> "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
-            case Constants.VOICE_OF_THE_COUNCIL_ID -> "Use this command to change the electee: `/omegaphase elect_voice_of_the_council`\n";
+            case "mutiny" ->
+                "Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`\n";
+            case "seed_empire" ->
+                "Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`\n";
+            case "censure" ->
+                "Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`\n";
+            case Constants.VOICE_OF_THE_COUNCIL_ID ->
+                "Use this command to change the electee: `/omegaphase elect_voice_of_the_council`\n";
             default -> null;
         };
     }
@@ -177,7 +175,9 @@ public class AgendaModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

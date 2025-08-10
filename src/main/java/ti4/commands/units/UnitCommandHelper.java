@@ -52,7 +52,10 @@ class UnitCommandHelper {
         if (otherPlayer != null) {
             return otherPlayer.getColor();
         }
-        MessageHelper.replyToMessage(event, Constants.TARGET_FACTION_OR_COLOR + " option is not valid. Use `/special2 setup_neutral_player` for neutrals.");
+        MessageHelper.replyToMessage(
+                event,
+                Constants.TARGET_FACTION_OR_COLOR
+                        + " option is not valid. Use `/special2 setup_neutral_player` for neutrals.");
         return null;
     }
 }

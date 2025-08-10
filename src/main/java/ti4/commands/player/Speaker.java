@@ -14,7 +14,9 @@ class Speaker extends GameStateSubcommand {
 
     public Speaker() {
         super(Constants.SPEAKER, "Speaker selection", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override

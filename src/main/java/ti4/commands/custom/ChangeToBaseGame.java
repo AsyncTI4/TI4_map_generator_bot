@@ -16,7 +16,8 @@ class ChangeToBaseGame extends GameStateSubcommand {
 
     public ChangeToBaseGame() {
         super(Constants.CHANGE_TO_BASE_GAME, "Remove Prophecy of Kings components from the game", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex action cards too? (y/n)"));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex action cards too? (y/n)"));
     }
 
     @Override
@@ -29,7 +30,6 @@ class ChangeToBaseGame extends GameStateSubcommand {
             if ("y".equalsIgnoreCase(codex)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Codex action cards.");
             }
-
         }
         game.setBaseGameMode(true);
         Helper.removePoKComponents(game, codex);

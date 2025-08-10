@@ -1,13 +1,12 @@
 package ti4.model;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.testUtils.BaseTi4Test;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DraftErrataModelTest extends BaseTi4Test {
     @Test
@@ -27,7 +26,8 @@ public class DraftErrataModelTest extends BaseTi4Test {
                 return true;
             }
         }
-        System.out.println("FrankenErrata **" + model.getAlias() + "** failed validation due to invalid Alias: `" + model.getAlias() + "`");
+        System.out.println("FrankenErrata **" + model.getAlias() + "** failed validation due to invalid Alias: `"
+                + model.getAlias() + "`");
         return false;
     }
 
@@ -35,14 +35,19 @@ public class DraftErrataModelTest extends BaseTi4Test {
         if (model.AdditionalComponents == null) {
             return true;
         }
-        List<String> draftItems = DraftItem.generateAllCards().stream().map(DraftItem::getAlias).toList();
-        List<String> additionalComponents = model.getAdditionalComponents().stream().map(DraftErrataModel::getAlias).toList();
+        List<String> draftItems =
+                DraftItem.generateAllCards().stream().map(DraftItem::getAlias).toList();
+        List<String> additionalComponents = model.getAdditionalComponents().stream()
+                .map(DraftErrataModel::getAlias)
+                .toList();
 
         if (draftItems.containsAll(additionalComponents)) {
             return true;
         }
 
-        System.out.println("FrankenErrata **" + model.getAlias() + "** failed validation due to at least one invalid AdditionalComponent: `" + additionalComponents + "`");
+        System.out.println("FrankenErrata **" + model.getAlias()
+                + "** failed validation due to at least one invalid AdditionalComponent: `" + additionalComponents
+                + "`");
         return false;
     }
 
@@ -50,14 +55,18 @@ public class DraftErrataModelTest extends BaseTi4Test {
         if (model.OptionalSwaps == null) {
             return true;
         }
-        List<String> draftItems = DraftItem.generateAllCards().stream().map(DraftItem::getAlias).toList();
-        List<String> optionalComponents = model.getOptionalSwaps().stream().map(DraftErrataModel::getAlias).toList();
+        List<String> draftItems =
+                DraftItem.generateAllCards().stream().map(DraftItem::getAlias).toList();
+        List<String> optionalComponents = model.getOptionalSwaps().stream()
+                .map(DraftErrataModel::getAlias)
+                .toList();
 
         if (draftItems.containsAll(optionalComponents)) {
             return true;
         }
 
-        System.out.println("FrankenErrata **" + model.getAlias() + "** failed validation due to at least one invalid OptionalComponent: `" + optionalComponents + "`");
+        System.out.println("FrankenErrata **" + model.getAlias()
+                + "** failed validation due to at least one invalid OptionalComponent: `" + optionalComponents + "`");
         return false;
     }
 }

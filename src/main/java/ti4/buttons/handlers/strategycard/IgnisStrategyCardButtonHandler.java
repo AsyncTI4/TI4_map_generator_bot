@@ -27,6 +27,8 @@ class IgnisStrategyCardButtonHandler {
     @ButtonHandler("ignisAuroraSC8Secondary")
     public static void resolveIgnisAuroraSC8Secondary(Player player) {
         player.addFragment("urf1");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " gained an " + ExploreEmojis.UFrag + " Unknown Relic Fragment");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation() + " gained an " + ExploreEmojis.UFrag + " Unknown Relic Fragment");
     }
 }

@@ -1,12 +1,11 @@
 package ti4.json;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Storage;
@@ -42,7 +41,8 @@ public class PersistenceManager {
         return readListFromJsonFile(PERSISTENCE_MANAGER_JSON_PATH, fileName, clazz);
     }
 
-    public static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz) throws IOException {
+    public static <T> List<T> readListFromJsonFile(String directory, String fileName, Class<T> clazz)
+            throws IOException {
         JavaType ref = objectMapper.getTypeFactory().constructParametricType(List.class, clazz);
         return readObjectFromJsonFile(directory, fileName, ref);
     }
@@ -84,5 +84,4 @@ public class PersistenceManager {
             BotLogger.error("Failed to delete file: " + file.getAbsolutePath());
         }
     }
-
 }

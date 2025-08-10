@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -29,7 +28,8 @@ public class FinishDraftService {
 
     public FactionModel determineKeleresFlavor(MiltyDraftManager manager, Game game) {
         List<String> flavors = List.of("mentak", "xxcha", "argent");
-        List<String> valid = flavors.stream().filter(Predicate.not(manager::isFactionTaken)).toList();
+        List<String> valid =
+                flavors.stream().filter(Predicate.not(manager::isFactionTaken)).toList();
         String preset = game.getStoredValue("keleresFlavorPreset");
         if (valid.contains(preset)) return Mapper.getFaction("keleres" + preset.charAt(0));
         if (valid.size() == 1) {
@@ -48,7 +48,8 @@ public class FinishDraftService {
                 Player player = game.getPlayer(playerId);
                 PlayerDraft picks = manager.getPlayerDraft(playerId);
                 String color = player.getNextAvailableColour();
-                if (playerId.equals(Constants.chassitId) && game.getUnusedColorsPreferringBase().contains(Mapper.getColor("lightgray"))) {
+                if (playerId.equals(Constants.chassitId)
+                        && game.getUnusedColorsPreferringBase().contains(Mapper.getColor("lightgray"))) {
                     color = "lightgray";
                 }
                 String faction = picks.getFaction();
@@ -69,18 +70,23 @@ public class FinishDraftService {
                         List<Button> buttons = new ArrayList<>();
                         String message = player.getPing() + " choose a flavor of keleres:";
                         if (allowed.isEmpty()) {
-                            MessageHelper.sendMessageToPlayerCardsInfoThread(player, "*Hrrnnggh*\nThis is awkward, all of the Keleres flavors got drafted. I'll let you pick any of them, but don't do that again!");
+                            MessageHelper.sendMessageToPlayerCardsInfoThread(
+                                    player,
+                                    "*Hrrnnggh*\nThis is awkward, all of the Keleres flavors got drafted. I'll let you pick any of them, but don't do that again!");
                             allowed.addAll(Set.of("mentak", "xxcha", "argent"));
                         }
                         for (String flavor : allowed) {
                             String emoji = Mapper.getFaction(flavor).getFactionEmoji();
                             String keleres = "keleres" + flavor.charAt(0);
-                            String id = String.format("setupStep5_%s_%s_%s_%s_%s", player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
+                            String id = String.format(
+                                    "setupStep5_%s_%s_%s_%s_%s",
+                                    player.getUserID(), keleres, color, pos, speaker ? "yes" : "no");
                             String msg = "Keleres (" + flavor + ")";
                             Button butt = Buttons.green(id, msg).withEmoji(Emoji.fromFormatted(emoji));
                             buttons.add(butt);
                         }
-                        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(player.getCardsInfoThread(), message, buttons);
+                        MessageHelper.sendMessageToChannelWithButtonsAndNoUndo(
+                                player.getCardsInfoThread(), message, buttons);
                     }
                 }
 
@@ -91,18 +97,24 @@ public class FinishDraftService {
             game.setPhaseOfGame("playerSetup");
             AddTileListService.finishSetup(game, event);
             if (keleresExists) {
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(), game.getPing()
-                    + " be sure to wait for Keleres to choose their flavour and starting tech before dealing out secret objectives.");
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        game.getPing()
+                                + " be sure to wait for Keleres to choose their flavour and starting tech before dealing out secret objectives.");
             }
             game.getMiltyDraftManager().setFinished(true);
         } catch (Exception e) {
-            StringBuilder error = new StringBuilder("Something went wrong and the map could not be built automatically. Here are the slice strings if you wish to try doing it manually: ");
+            StringBuilder error = new StringBuilder(
+                    "Something went wrong and the map could not be built automatically. Here are the slice strings if you wish to try doing it manually: ");
             List<PlayerDraft> speakerOrdered = manager.getDraft().values().stream()
-                .sorted(Comparator.comparing(PlayerDraft::getPosition))
-                .toList();
+                    .sorted(Comparator.comparing(PlayerDraft::getPosition))
+                    .toList();
             int index = 1;
             for (PlayerDraft d : speakerOrdered) {
-                error.append("\n").append(index).append(". ").append(d.getSlice().ttsString());
+                error.append("\n")
+                        .append(index)
+                        .append(". ")
+                        .append(d.getSlice().ttsString());
             }
             MessageHelper.sendMessageToChannel(mainGameChannel, error.toString());
             BotLogger.error(new BotLogger.LogMessageOrigin(event, game), e.getMessage(), e);

@@ -2,7 +2,6 @@ package ti4.commands.franken;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -19,18 +18,24 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
 
     public FactionTechAddRemove(String name, String description) {
         super(name, description, true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology Name")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "Technology Name").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "Technology Name").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         List<String> techIDs = new ArrayList<>();
 
-        //GET ALL TECH OPTIONS AS STRING
-        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.TECH)).toList()) {
+        // GET ALL TECH OPTIONS AS STRING
+        for (OptionMapping option : event.getOptions().stream()
+                .filter(o -> o != null && o.getName().contains(Constants.TECH))
+                .toList()) {
             techIDs.add(option.getAsString());
         }
 
@@ -38,7 +43,8 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
         techIDs.removeIf(id -> !Mapper.isValidTech(id));
 
         if (techIDs.isEmpty()) {
-            MessageHelper.sendMessageToEventChannel(event, "No valid technologies were provided. Please see `/search techs` for available choices.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "No valid technologies were provided. Please see `/search techs` for available choices.");
             return;
         }
 
@@ -50,5 +56,4 @@ abstract class FactionTechAddRemove extends GameStateSubcommand {
     }
 
     public abstract void doAction(Player player, List<String> leaderIDs, SlashCommandInteractionEvent event);
-
 }

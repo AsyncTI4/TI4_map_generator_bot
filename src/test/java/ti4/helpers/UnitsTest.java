@@ -2,15 +2,12 @@ package ti4.helpers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
@@ -34,9 +31,7 @@ public class UnitsTest extends BaseTi4Test {
             // DO NOT ADD NEW JSON KEYS TO THIS OBJECT.
             // This object is being used as a key in maps which causes issues when we
             // try to conver the Java map to a JSON map (as maps only allow for string keys).
-            Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
-                "unitType",
-                "colorID"));
+            Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList("unitType", "colorID"));
 
             // When
             JsonValidator.assertAvailableJsonAttributes(unitKey, knownJsonAttributes);

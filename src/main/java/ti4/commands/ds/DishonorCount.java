@@ -14,7 +14,6 @@ class DishonorCount extends GameStateSubcommand {
     public DishonorCount() {
         super(Constants.DISHONOR_COUNT, "Set Dishonor amount", true, true);
         addOptions(new OptionData(OptionType.INTEGER, "count", "Count").setRequired(true));
-
     }
 
     @Override

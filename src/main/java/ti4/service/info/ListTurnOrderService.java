@@ -3,7 +3,6 @@ package ti4.service.info;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;

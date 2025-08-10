@@ -1,19 +1,18 @@
 package ti4.helpers;
 
-import org.apache.commons.collections4.CollectionUtils;
-import ti4.image.PositionMapper;
-import ti4.map.Game;
-import ti4.map.Player;
-
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
+import ti4.image.PositionMapper;
+import ti4.map.Game;
+import ti4.map.Player;
 
 public class PlayerStatsHelper {
-    public static List<String> findThreeNearbyStatTiles(Game game, Player player, Set<String> taken,
-                                                  boolean isFoWPrivate, Player fowPlayer) {
+    public static List<String> findThreeNearbyStatTiles(
+            Game game, Player player, Set<String> taken, boolean isFoWPrivate, Player fowPlayer) {
         boolean fow = isFoWPrivate;
         boolean randomizeLocation = false;
         if (fow && player != fowPlayer) {
@@ -89,8 +88,7 @@ public class PlayerStatsHelper {
     }
 
     private static int tileRing(String pos) {
-        if (pos.replaceAll("\\d", "").isEmpty())
-            return Integer.parseInt(pos) / 100;
+        if (pos.replaceAll("\\d", "").isEmpty()) return Integer.parseInt(pos) / 100;
         return 100;
     }
 }

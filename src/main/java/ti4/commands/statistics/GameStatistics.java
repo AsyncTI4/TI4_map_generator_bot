@@ -9,12 +9,14 @@ import ti4.service.statistics.game.GameStatisticsService;
 
 class GameStatistics extends Subcommand {
 
-
     public GameStatistics() {
         super(Constants.GAMES, "Game Statistics");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a statistic to show").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATISTIC, "Choose a statistic to show")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you wish to get the history of").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction that you wish to get the history of")
+                .setAutoComplete(true));
     }
 
     @Override

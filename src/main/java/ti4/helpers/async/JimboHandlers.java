@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -53,7 +52,8 @@ public class JimboHandlers {
             message += "\n> - Border anomalies are a homebrew feature that can make it harder to move around the map";
         } else if (buttonID.startsWith(JimboConst.transformAction)) {
             menu = JimboConst.transformAction;
-            message += "\n> Shift the map in any direction, or rotate the map centered on 000. (Hyperlanes will be rotated along with the map).";
+            message +=
+                    "\n> Shift the map in any direction, or rotate the map centered on 000. (Hyperlanes will be rotated along with the map).";
         } else if (buttonID.startsWith(JimboConst.metaAction)) {
             menu = JimboConst.metaAction;
             message += " Add symmetry or export the map template for later use";
@@ -82,18 +82,22 @@ public class JimboHandlers {
         boolean symmetrical = false;
         String msg = "Choose a type of tile to add:";
         msg += "\n> Special tiles include mecatol, mallice, and several other tiles of a similar nature";
-        msg += "\n> Draft tiles are plain colored tiles used in map templates to mark where a player would place drafted tiles";
+        msg +=
+                "\n> Draft tiles are plain colored tiles used in map templates to mark where a player would place drafted tiles";
         if (symmetrical) {
-            msg += "\n> - You have symmetry turned on. Green, blue, and red tiles will become random, and hyperlanes will rotate or flip accordingly.";
-            msg += " Available \"draft tile\" colors will be heavily restricted while symmetry is turned on, and symmetrically-placed tiles will pull from the restricted portion of the list.";
+            msg +=
+                    "\n> - You have symmetry turned on. Green, blue, and red tiles will become random, and hyperlanes will rotate or flip accordingly.";
+            msg +=
+                    " Available \"draft tile\" colors will be heavily restricted while symmetry is turned on, and symmetrically-placed tiles will pull from the restricted portion of the list.";
         }
-        List<Button> buttons = List.of(JimboButtons.MAIN_PAGE,
-            Buttons.green(JimboConst.tileAdd + "_green_page0", "Green-back tile (home systems)"),
-            Buttons.blue(JimboConst.tileAdd + "_blue_page0", "Blue-back tile"),
-            Buttons.red(JimboConst.tileAdd + "_red_page0", "Red-back tile"),
-            Buttons.gray(JimboConst.tileAdd + "_hyperlane_rot0_page0", "Hyperlane tile"),
-            Buttons.gray(JimboConst.tileAdd + "_draft_rot0_page0", "Draft tile"),
-            Buttons.gray(JimboConst.tileAdd + "_other_page0", "Other special tile"));
+        List<Button> buttons = List.of(
+                JimboButtons.MAIN_PAGE,
+                Buttons.green(JimboConst.tileAdd + "_green_page0", "Green-back tile (home systems)"),
+                Buttons.blue(JimboConst.tileAdd + "_blue_page0", "Blue-back tile"),
+                Buttons.red(JimboConst.tileAdd + "_red_page0", "Red-back tile"),
+                Buttons.gray(JimboConst.tileAdd + "_hyperlane_rot0_page0", "Hyperlane tile"),
+                Buttons.gray(JimboConst.tileAdd + "_draft_rot0_page0", "Draft tile"),
+                Buttons.gray(JimboConst.tileAdd + "_other_page0", "Other special tile"));
         MessageHelper.editMessageWithButtons(event, msg, buttons);
     }
 
@@ -102,7 +106,8 @@ public class JimboHandlers {
     @ButtonHandler(JimboConst.tileAdd + "_")
     private static void addTileRoutine(ButtonInteractionEvent event, Game game, String buttonID) {
         Matcher matcher;
-        String rotationAndPage = RegexHelper.optional("_rot" + RegexHelper.intRegex("index")) + "_" + RegexHelper.pageRegex();
+        String rotationAndPage =
+                RegexHelper.optional("_rot" + RegexHelper.intRegex("index")) + "_" + RegexHelper.pageRegex();
         String regexPt1 = JimboConst.tileAdd + "_(?<type>(green|blue|red|hyperlane|draft|other))" + rotationAndPage;
         String regexPt2 = JimboConst.tileAdd + "_" + RegexHelper.tileIDRegex();
         String regexPt3 = regexPt2 + "_ring" + RegexHelper.oneOf(List.of(RegexHelper.intRegex("ring"), "corners"));
@@ -120,17 +125,20 @@ public class JimboHandlers {
             bonusButtons.addAll(getRotateTileButtons(type, matcher.group("page"), rotation));
             List<TileModel> tiles = getTilesForType(type, rotation, 0);
 
-            JimboButtons.jimboPagination(event, msg, tiles, toButton, JimboImageHelper::tilesImage, bonusButtons, 10, buttonID);
+            JimboButtons.jimboPagination(
+                    event, msg, tiles, toButton, JimboImageHelper::tilesImage, bonusButtons, 10, buttonID);
 
         } else if ((matcher = Pattern.compile(regexPt2).matcher(buttonID)).matches()) {
             TileModel model = TileHelper.getTileById(matcher.group("tileID"));
             String msg = "Choose a ring to place " + model.getName() + " (" + model.getAlias() + "):";
-            List<Button> goBack = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileAdd, "Pick a different tile")));
+            List<Button> goBack = new ArrayList<>(
+                    List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileAdd, "Pick a different tile")));
             pickRing(event, null, msg, buttonID, goBack);
 
         } else if ((matcher = Pattern.compile(regexPt3).matcher(buttonID)).matches()) {
             TileModel model = TileHelper.getTileById(matcher.group("tileID"));
-            String msg = "Choose a location to place " + model.getName() + " (" + model.getAlias() + "): \n> - Any existing tile will be overwritten";
+            String msg = "Choose a location to place " + model.getName() + " (" + model.getAlias()
+                    + "): \n> - Any existing tile will be overwritten";
             List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
             bonus.add(Buttons.gray(JimboConst.tileAdd + "_" + model.getAlias(), "Pick a different ring"));
             bonus.add(Buttons.gray("showGameEphemeral", "Show map"));
@@ -141,7 +149,8 @@ public class JimboHandlers {
 
         } else if ((matcher = Pattern.compile(regexPt4).matcher(buttonID)).matches()) {
             TileModel model = TileHelper.getTileById(matcher.group("tileID"));
-            String msg = "Choose a location to place " + model.getName() + " (" + model.getAlias() + "): \n> - Any existing tile will be overwritten";
+            String msg = "Choose a location to place " + model.getName() + " (" + model.getAlias()
+                    + "): \n> - Any existing tile will be overwritten";
             List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE));
             bonus.add(Buttons.gray(JimboConst.tileAdd + "_" + model.getAlias(), "Pick a different ring"));
             bonus.add(Buttons.gray("showGameEphemeral", "Show map"));
@@ -181,22 +190,26 @@ public class JimboHandlers {
         } else if ((matcher = Pattern.compile(regexPt2).matcher(buttonID)).matches()) {
             String msg = "Choose a tile to move:";
             String ring = matcher.group("ring");
-            List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileMove, "Pick a different ring")));
+            List<Button> bonus = new ArrayList<>(
+                    List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileMove, "Pick a different ring")));
             List<String> locations = PositionMapper.getPositionsInRing(ring, null);
             Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, JimboConst.tileMove, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
 
         } else if ((matcher = Pattern.compile(regexPt3).matcher(buttonID)).matches()) {
             String tile = game.getTileByPosition(matcher.group("posFrom")).getRepresentationForButtons(null, null);
-            String msg = "Choose a ring to move " + tile + " to:\n> - If there is already a tile in the destination, they will be swapped";
-            List<Button> goBack = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileMove, "Move a different tile")));
+            String msg = "Choose a ring to move " + tile
+                    + " to:\n> - If there is already a tile in the destination, they will be swapped";
+            List<Button> goBack = new ArrayList<>(
+                    List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileMove, "Move a different tile")));
             pickRing(event, null, msg, buttonID, goBack);
 
         } else if ((matcher = Pattern.compile(regexPt4).matcher(buttonID)).matches()) {
             String tile = game.getTileByPosition(matcher.group("posFrom")).getRepresentationForButtons(null, null);
             String msg = "Choose a destination to move or swap " + tile + " to:";
             String ring = matcher.group("ring");
-            List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileMove, "Pick a different ring")));
+            List<Button> bonus = new ArrayList<>(
+                    List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileMove, "Pick a different ring")));
             List<String> locations = PositionMapper.getPositionsInRing(ring, null);
             Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, JimboConst.tileMove, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
@@ -238,9 +251,11 @@ public class JimboHandlers {
         } else if ((matcher = Pattern.compile(regexPt2).matcher(buttonID)).matches()) {
             String msg = "Choose a tile to remove:";
             String ring = matcher.group("ring");
-            List<Button> bonus = new ArrayList<>(List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileRemove, "Pick a different ring")));
+            List<Button> bonus = new ArrayList<>(
+                    List.of(JimboButtons.MAIN_PAGE, Buttons.gray(JimboConst.tileRemove, "Pick a different ring")));
             List<String> locations = PositionMapper.getPositionsInRing(ring, null);
-            Function<String, Button> buttonator = pos -> JimboButtons.positionToButton(pos, JimboConst.tileRemove, game);
+            Function<String, Button> buttonator =
+                    pos -> JimboButtons.positionToButton(pos, JimboConst.tileRemove, game);
             JimboButtons.jimboPagination(event, msg, locations, buttonator, null, bonus, 15, buttonID);
 
         } else if ((matcher = Pattern.compile(regexPt3).matcher(buttonID)).matches()) {
@@ -258,7 +273,8 @@ public class JimboHandlers {
     // ------------------------------------------------------------------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------------------------------------------------------------------
-    private static void pickRing(ButtonInteractionEvent event, Game game, String msg, String buttonPrefix, List<Button> goBack) {
+    private static void pickRing(
+            ButtonInteractionEvent event, Game game, String msg, String buttonPrefix, List<Button> goBack) {
         if (StringUtils.isBlank(msg)) msg = "Choose a ring:";
 
         List<Button> rings = new ArrayList<>(goBack);
@@ -302,14 +318,20 @@ public class JimboHandlers {
         if (type.equals("hyperlane")) {
             int prev = (rotation + 5) % 6, next = (rotation + 1) % 6;
             String page = "_page" + pageNum;
-            bonusButtons.add(Buttons.gray(JimboConst.tileAdd + "_hyperlane_rot" + prev + page, "Rotate CCW")); // TODO: emoji
-            bonusButtons.add(Buttons.gray(JimboConst.tileAdd + "_hyperlane_rot" + next + page, "Rotate CW")); // TODO: emoji
+            bonusButtons.add(
+                    Buttons.gray(JimboConst.tileAdd + "_hyperlane_rot" + prev + page, "Rotate CCW")); // TODO: emoji
+            bonusButtons.add(
+                    Buttons.gray(JimboConst.tileAdd + "_hyperlane_rot" + next + page, "Rotate CW")); // TODO: emoji
         } else if (type.equals("draft")) {
             int prev = rotation - 1, next = rotation + 1;
             String page = "_page" + pageNum;
             String decString = prev == -1 ? "Get Home Tile" : "Decrement Tile Number";
-            if (prev > -2) bonusButtons.add(Buttons.gray(JimboConst.tileAdd + "_draft_rot" + prev + page, decString)); // TODO: emoji
-            if (next < 11) bonusButtons.add(Buttons.gray(JimboConst.tileAdd + "_draft_rot" + next + page, "Increment Tile Number")); // TODO: emoji
+            if (prev > -2)
+                bonusButtons.add(
+                        Buttons.gray(JimboConst.tileAdd + "_draft_rot" + prev + page, decString)); // TODO: emoji
+            if (next < 11)
+                bonusButtons.add(Buttons.gray(
+                        JimboConst.tileAdd + "_draft_rot" + next + page, "Increment Tile Number")); // TODO: emoji
         }
         return bonusButtons;
     }

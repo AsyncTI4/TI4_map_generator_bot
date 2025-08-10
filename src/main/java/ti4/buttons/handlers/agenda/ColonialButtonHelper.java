@@ -16,15 +16,14 @@ class ColonialButtonHelper {
     @ButtonHandler("colonialRedTarget_")
     public static void resolveColonialRedTarget(Game game, String buttonID, ButtonInteractionEvent event) {
         Player p2 = game.getPlayerFromColorOrFaction(buttonID.split("_")[1]);
-        if (p2 == null)
-            return;
+        if (p2 == null) return;
         String planet = buttonID.split("_")[2];
         Tile tile = game.getTileFromPlanet(planet);
         if (tile != null) {
             AddUnitService.addUnits(event, tile, game, p2.getColor(), "1 inf " + planet);
         }
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(),
-            "1 " + p2.getColor() + " infantry was added to " + planet);
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(), "1 " + p2.getColor() + " infantry was added to " + planet);
         ButtonHelper.deleteMessage(event);
     }
 }

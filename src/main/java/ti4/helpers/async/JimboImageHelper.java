@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.helpers.Storage;
 import ti4.image.DrawingUtil;
@@ -39,13 +38,23 @@ public class JimboImageHelper {
     // ------------------------------------------------------------------------------------------------------------------------------------------------
     // Image Generation Helper Functions
     // ------------------------------------------------------------------------------------------------------------------------------------------------
-    private static <T> FileUpload generateImage(List<T> models, Function<T, String> getImgPath, Function<T, String> getDisplayName) {
+    private static <T> FileUpload generateImage(
+            List<T> models, Function<T, String> getImgPath, Function<T, String> getDisplayName) {
         List<BufferedImage> images = new ArrayList<>();
         for (T model : models) {
             BufferedImage img = ImageHelper.square(ImageHelper.read(getImgPath.apply(model)));
             Graphics2D g2 = img.createGraphics();
             g2.setFont(Storage.getFont32());
-            DrawingUtil.superDrawString(g2, getDisplayName.apply(model), img.getWidth() / 2, 0, null, HorizontalAlign.Center, VerticalAlign.Top, null, null);
+            DrawingUtil.superDrawString(
+                    g2,
+                    getDisplayName.apply(model),
+                    img.getWidth() / 2,
+                    0,
+                    null,
+                    HorizontalAlign.Center,
+                    VerticalAlign.Top,
+                    null,
+                    null);
             images.add(img);
         }
         return layoutImagesAndUpload(images);
@@ -53,7 +62,10 @@ public class JimboImageHelper {
 
     private static FileUpload layoutImagesAndUpload(List<BufferedImage> images) {
         if (images.isEmpty()) return null;
-        int size = images.stream().map(BufferedImage::getWidth).max((a, b) -> a > b ? a : b).orElse(600);
+        int size = images.stream()
+                .map(BufferedImage::getWidth)
+                .max((a, b) -> a > b ? a : b)
+                .orElse(600);
         int n = 5;
         int m = (images.size() + n - 1) / n;
         int i = 0;

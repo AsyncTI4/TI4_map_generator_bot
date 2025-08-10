@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -29,10 +28,7 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private String homebrewReplacesID;
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && text != null
-            && source != null;
+        return alias != null && name != null && text != null && source != null;
     }
 
     public String getSimpleRepresentation() {
@@ -50,14 +46,16 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
         if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shortName).orElse(getName());
         }
-        return Optional.ofNullable(shortName).orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShortName());
+        return Optional.ofNullable(shortName)
+                .orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
         if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
-        return Optional.ofNullable(shrinkName).orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShrinkName());
+        return Optional.ofNullable(shrinkName)
+                .orElse(Mapper.getRelic(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getHomebrewReplacesID() {
@@ -108,8 +106,10 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getText().toLowerCase().contains(searchString)
-            || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getText().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

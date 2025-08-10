@@ -3,7 +3,6 @@ package ti4.helpers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-
 import ti4.service.game.RematchService;
 import ti4.testUtils.BaseTi4Test;
 

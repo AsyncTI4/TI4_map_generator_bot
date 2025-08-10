@@ -27,7 +27,8 @@ class CombatButtonHandler {
         String planet = buttonID.split("_")[3];
         String confirmed = buttonID.split("_")[4];
         if (player != p1 && player != p2) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This button is only for combat participants");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "This button is only for combat participants");
             return;
         }
         Player opponent;
@@ -40,36 +41,44 @@ class CombatButtonHandler {
         if (opponent == null || opponent.isDummy() || confirmed.equalsIgnoreCase("confirmed")) {
             ButtonHelperModifyUnits.automateGroundCombat(p1, p2, planet, game, event);
         } else if (p1 != null && p2 != null) {
-            Button automate = Buttons.green(opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_"
-                + p1.getFaction() + "_" + p2.getFaction() + "_" + planet + "_confirmed", "Automate Combat");
-            MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), opponent.getRepresentation() + " Your opponent has voted to automate the entire combat. Press to confirm:", automate);
+            Button automate = Buttons.green(
+                    opponent.getFinsFactionCheckerPrefix() + "automateGroundCombat_" + p1.getFaction() + "_"
+                            + p2.getFaction() + "_" + planet + "_confirmed",
+                    "Automate Combat");
+            MessageHelper.sendMessageToChannelWithButton(
+                    event.getMessageChannel(),
+                    opponent.getRepresentation()
+                            + " Your opponent has voted to automate the entire combat. Press to confirm:",
+                    automate);
         }
     }
 
     @ButtonHandler("declinePDS_")
     public static void declinePDS(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
         Tile tile = game.getTile(buttonID.split("_")[1]);
-        String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON" + (tile != null ? " at " + tile.getRepresentation() : "") + ".";
+        String msg = player.getRepresentationNoPing() + " officially declines to fire SPACE CANNON"
+                + (tile != null ? " at " + tile.getRepresentation() : "") + ".";
         if (game.isFowMode()) {
             String targetFaction = buttonID.split("_")[2];
             Player target = game.getPlayerFromColorOrFaction(targetFaction);
             if (target != null) {
-                MessageHelper.sendMessageToChannel(target.getCorrectChannel(), target.getRepresentationUnfogged() + " " + msg);
+                MessageHelper.sendMessageToChannel(
+                        target.getCorrectChannel(), target.getRepresentationUnfogged() + " " + msg);
             }
         }
-        MessageHelper.sendMessageToChannel(game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg);
+        MessageHelper.sendMessageToChannel(
+                game.isFowMode() ? player.getCorrectChannel() : event.getMessageChannel(), msg);
     }
 
     @ButtonHandler("applytempcombatmod__" + Constants.AC + "__")
     static void applyTemporaryCombatMod(ButtonInteractionEvent event, Player player, String buttonID) {
         String acAlias = buttonID.substring(buttonID.lastIndexOf("__") + 2);
-        TemporaryCombatModifierModel combatModAC = CombatTempModHelper.getPossibleTempModifier(Constants.AC,
-            acAlias,
-            player.getNumberOfTurns());
+        TemporaryCombatModifierModel combatModAC =
+                CombatTempModHelper.getPossibleTempModifier(Constants.AC, acAlias, player.getNumberOfTurns());
         if (combatModAC != null) {
             player.addNewTempCombatMod(combatModAC);
-            MessageHelper.sendMessageToChannel(event.getChannel(),
-                "Combat modifier will be applied next time you push the combat roll button.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Combat modifier will be applied next time you push the combat roll button.");
         }
         ButtonHelper.deleteMessage(event);
     }

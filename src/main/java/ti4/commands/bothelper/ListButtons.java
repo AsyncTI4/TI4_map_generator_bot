@@ -1,7 +1,6 @@
 package ti4.commands.bothelper;
 
 import java.util.Objects;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -39,19 +38,21 @@ class ListButtons extends Subcommand {
             return;
         }
 
-        Objects.requireNonNullElse(channel, threadChannel).getHistoryAround(messageId, 1).queue(messageHistory -> {
-            Message msg = messageHistory.getMessageById(messageId);
-            if (msg == null) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find message");
-                return;
-            }
+        Objects.requireNonNullElse(channel, threadChannel)
+                .getHistoryAround(messageId, 1)
+                .queue(messageHistory -> {
+                    Message msg = messageHistory.getMessageById(messageId);
+                    if (msg == null) {
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find message");
+                        return;
+                    }
 
-            msg.getButtons();
-            StringBuilder sb = new StringBuilder("Button details:\n>>> ");
-            for (Button b : msg.getButtons()) {
-                sb.append(ButtonHelper.getButtonRepresentation(b)).append("\n");
-            }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
-        });
+                    msg.getButtons();
+                    StringBuilder sb = new StringBuilder("Button details:\n>>> ");
+                    for (Button b : msg.getButtons()) {
+                        sb.append(ButtonHelper.getButtonRepresentation(b)).append("\n");
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+                });
     }
 }

@@ -1,7 +1,6 @@
 package ti4.commands.cardspn;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -16,7 +15,11 @@ public class PurgePN extends GameStateSubcommand {
 
     public PurgePN() {
         super(Constants.PURGE_PN, "Purge promissory note", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory note ID, which is found between ()").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.PROMISSORY_NOTE_ID,
+                        "Promissory note ID, which is found between ()")
+                .setRequired(true));
     }
 
     @Override

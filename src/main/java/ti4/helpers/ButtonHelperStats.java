@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.util.List;
 import java.util.regex.Pattern;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -15,7 +14,8 @@ import ti4.service.regex.RegexService;
 
 public class ButtonHelperStats {
 
-    static final Pattern convertCommsRegex = Pattern.compile("convertComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
+    static final Pattern convertCommsRegex =
+            Pattern.compile("convertComms_" + RegexHelper.intRegex("amt") + "(_stay)?");
 
     @ButtonHandler("convertComms_") // convertComms_12(_stay)
     public static void convertCommButton(ButtonInteractionEvent event, Game game, Player player, String buttonID) {
@@ -38,21 +38,25 @@ public class ButtonHelperStats {
     }
 
     public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt) {
-        convertComms(event, game, player, amt, event.getMessage().getContentRaw().contains("explore"));
+        convertComms(
+                event, game, player, amt, event.getMessage().getContentRaw().contains("explore"));
     }
 
-    public static void convertComms(ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg) {
+    public static void convertComms(
+            ButtonInteractionEvent event, Game game, Player player, int amt, boolean deleteMsg) {
         String message, ident = player.getRepresentation();
         if (player.getCommodities() >= amt) {
             player.setCommodities(player.getCommodities() - amt);
             player.setTg(player.getTg() + amt);
-            message = "Converted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good" + (amt == 1 ? "" : "s") + ".";
+            message = "Converted " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " to " + amt + " trade good"
+                    + (amt == 1 ? "" : "s") + ".";
         } else if (player.getCommodities() == 1) {
             message = "Converted their last remaining commodity (less than " + amt + ") into 1 trade good.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         } else {
-            message = "Converted their " + player.getCommodities() + " remaining commodities (less than " + amt + ") into " + player.getCommodities() + " trade goods.";
+            message = "Converted their " + player.getCommodities() + " remaining commodities (less than " + amt
+                    + ") into " + player.getCommodities() + " trade goods.";
             player.setTg(player.getTg() + player.getCommodities());
             player.setCommodities(0);
         }
@@ -64,24 +68,35 @@ public class ButtonHelperStats {
         if (deleteMsg) ButtonHelper.deleteMessage(event);
     }
 
-    public static void gainComms(GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean deleteMsg) {
+    public static void gainComms(
+            GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean deleteMsg) {
         gainComms(event, game, player, amt, deleteMsg, false);
     }
 
-    public static void gainComms(GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean deleteMsg, boolean skipOutput) {
+    public static void gainComms(
+            GenericInteractionCreateEvent event,
+            Game game,
+            Player player,
+            int amt,
+            boolean deleteMsg,
+            boolean skipOutput) {
         String message = player.getRepresentationNoPing();
         String fogMessage;
         int initComm = player.getCommodities();
         if (player.getCommodities() + amt > player.getCommoditiesTotal()) {
             player.setCommodities(player.getCommoditiesTotal());
             int gained = player.getCommodities() - initComm;
-            message += " gained " + gained + " commodit" + (gained == 1 ? "y" : "ies") + " (" + initComm + "->" + player.getCommoditiesRepresentation()
-                + ").\n-# They would have gained " + amt + " but were limited by their faction's commodity value.";
-            fogMessage = "Gained " + gained + " commodit" + (gained == 1 ? "y" : "ies") + " (" + initComm + "->" + player.getCommoditiesRepresentation() + ").";
+            message += " gained " + gained + " commodit" + (gained == 1 ? "y" : "ies") + " (" + initComm + "->"
+                    + player.getCommoditiesRepresentation() + ").\n-# They would have gained " + amt
+                    + " but were limited by their faction's commodity value.";
+            fogMessage = "Gained " + gained + " commodit" + (gained == 1 ? "y" : "ies") + " (" + initComm + "->"
+                    + player.getCommoditiesRepresentation() + ").";
         } else {
             player.setCommodities(player.getCommodities() + amt);
-            message += " gained " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " (" + initComm + "->" + player.getCommoditiesRepresentation() + ").";
-            fogMessage = "Gained " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " (" + initComm + "->" + player.getCommoditiesRepresentation() + ").";
+            message += " gained " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " (" + initComm + "->"
+                    + player.getCommoditiesRepresentation() + ").";
+            fogMessage = "Gained " + amt + " commodit" + (amt == 1 ? "y" : "ies") + " (" + initComm + "->"
+                    + player.getCommoditiesRepresentation() + ").";
         }
         int finalComm = player.getCommodities();
 
@@ -92,7 +107,8 @@ public class ButtonHelperStats {
         afterGainCommsChecks(game, player, finalComm - initComm);
     }
 
-    public static void replenishComms(GenericInteractionCreateEvent event, Game game, Player player, boolean skipOutput) {
+    public static void replenishComms(
+            GenericInteractionCreateEvent event, Game game, Player player, boolean skipOutput) {
         String message, ident = player.getRepresentationNoPing();
         int initComm = player.getCommodities();
         player.setCommodities(player.getCommodities() + player.getCommoditiesTotal());
@@ -108,10 +124,12 @@ public class ButtonHelperStats {
         ButtonHelperAgents.cabalAgentInitiation(game, player);
     }
 
-    public static void gainTGs(GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean skipOutput) {
+    public static void gainTGs(
+            GenericInteractionCreateEvent event, Game game, Player player, int amt, boolean skipOutput) {
         if (amt == 0) return;
         String message = "has gained " + amt + " trade goods " + player.gainTG(amt);
-        if (!skipOutput) MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
+        if (!skipOutput)
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " " + message);
         if (game.isFowMode()) FoWHelper.pingAllPlayersWithFullStats(game, event, player, message);
 
         // After gain tg checks
@@ -120,9 +138,11 @@ public class ButtonHelperStats {
     }
 
     public static void afterGainCommsChecks(Game game, Player player, int realGain) {
-        if (player.hasAbility("military_industrial_complex") && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
+        if (player.hasAbility("military_industrial_complex")
+                && ButtonHelperAbilities.getBuyableAxisOrders(player, game).size() > 1) {
             String axis = player.getRepresentationUnfogged() + " you have the opportunity to buy _Axis Orders_.";
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(), axis, ButtonHelperAbilities.getBuyableAxisOrders(player, game));
         }
         CommanderUnlockCheckService.checkPlayer(player, "mykomentori");
     }
@@ -133,9 +153,9 @@ public class ButtonHelperStats {
         if (!redistribute) buttons = ButtonHelper.getGainCCButtons(player);
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation()); // redundant
 
-        String message = player.getRepresentation() + ", your current command tokens are " + player.getCCRepresentation() + ". ";
+        String message =
+                player.getRepresentation() + ", your current command tokens are " + player.getCCRepresentation() + ". ";
         message += "Use the buttons to gain" + (redistribute ? " and redistribute" : "") + " command tokens.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
     }
-
 }

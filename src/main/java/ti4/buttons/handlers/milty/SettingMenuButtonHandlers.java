@@ -13,5 +13,4 @@ public class SettingMenuButtonHandlers {
     private void handleSettingMenuButton(ButtonInteractionEvent event, Game game) {
         game.initializeMiltySettings().parseButtonInput(event);
     }
-
 }

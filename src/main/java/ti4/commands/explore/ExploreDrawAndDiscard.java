@@ -17,8 +17,8 @@ class ExploreDrawAndDiscard extends GameStateSubcommand {
         super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.", true, true);
         addOptions(
                 new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
-                    .setRequired(true)
-                    .setAutoComplete(true),
+                        .setRequired(true)
+                        .setAutoComplete(true),
                 new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)"));
     }
 
@@ -30,7 +30,8 @@ class ExploreDrawAndDiscard extends GameStateSubcommand {
         StringBuilder sb = new StringBuilder();
         Game game = getGame();
         for (int i = 0; i < count; i++) {
-            String cardID = game.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
+            String cardID = game.drawExplore(
+                    event.getOption(Constants.TRAIT).getAsString().toLowerCase());
             ExploreModel explore = Mapper.getExplore(cardID);
             sb.append(explore.textRepresentation()).append(System.lineSeparator());
         }

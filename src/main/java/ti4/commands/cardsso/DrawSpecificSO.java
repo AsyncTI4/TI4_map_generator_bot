@@ -1,7 +1,6 @@
 package ti4.commands.cardsso;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,9 +16,15 @@ class DrawSpecificSO extends GameStateSubcommand {
 
     public DrawSpecificSO() {
         super(Constants.DRAW_SPECIFIC_SO, "Draw specific secret objective", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player who draws the secret objective (default is you)"));
-        addOptions(new OptionData(OptionType.STRING, Constants.PURGE_SO, "Enter YES to purge the secret objective instead of drawing it"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.USER, Constants.PLAYER, "Player who draws the secret objective (default is you)"));
+        addOptions(new OptionData(
+                OptionType.STRING,
+                Constants.PURGE_SO,
+                "Enter YES to purge the secret objective instead of drawing it"));
     }
 
     @Override

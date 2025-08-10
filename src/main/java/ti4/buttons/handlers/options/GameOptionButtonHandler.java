@@ -15,7 +15,9 @@ class GameOptionButtonHandler {
     public static void enableAidReact(ButtonInteractionEvent event, Game game) {
         game.setBotFactionReacts(true);
         game.setBotStratReacts(true);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Faction reaction icons have been enabled. Use `/game options` to change this.");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "Faction reaction icons have been enabled. Use `/game options` to change this.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -23,7 +25,9 @@ class GameOptionButtonHandler {
     public static void disableAidReact(ButtonInteractionEvent event, Game game) {
         game.setBotFactionReacts(false);
         game.setBotStratReacts(false);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Faction reaction icons have been disabled. Use `/game options` to change this.");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                "Faction reaction icons have been disabled. Use `/game options` to change this.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -31,7 +35,9 @@ class GameOptionButtonHandler {
     public static void editShowHexBorders(ButtonInteractionEvent event, Game game, String buttonID) {
         String value = buttonID.replace("showHexBorders_", "");
         game.setHexBorderStyle(value);
-        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Updated Hex Border Style to `" + value + "`.\nUse `/game options` to change this.");
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(),
+                "Updated Hex Border Style to `" + value + "`.\nUse `/game options` to change this.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -53,17 +59,23 @@ class GameOptionButtonHandler {
     }
 
     @ButtonHandler("anonDeclare_")
-    public static void handleEnvironmentChoice(ButtonInteractionEvent event, String buttonId, Game game, Player player) {
+    public static void handleEnvironmentChoice(
+            ButtonInteractionEvent event, String buttonId, Game game, Player player) {
         String declaration = buttonId.split("_")[1];
         String old = game.getStoredValue(player.getUserID() + "anonDeclare");
         if (old.isEmpty()) {
             if (declaration.toLowerCase().contains("strong")) {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has said that they have \"" + declaration + "\"");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(), "Someone has said that they have \"" + declaration + "\"");
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has said that they prefer a \"" + declaration + "\" environment.");
+                MessageHelper.sendMessageToChannel(
+                        event.getMessageChannel(),
+                        "Someone has said that they prefer a \"" + declaration + "\" environment.");
             }
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Someone has changed their preference from \"" + old + "\" to  \"" + declaration + "\" ");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "Someone has changed their preference from \"" + old + "\" to  \"" + declaration + "\" ");
         }
         game.setStoredValue(player.getUserID() + "anonDeclare", declaration);
     }

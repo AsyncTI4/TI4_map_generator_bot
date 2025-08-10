@@ -1,10 +1,9 @@
 package ti4.service.statistics.game;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.experimental.UtilityClass;
 import ti4.commands.statistics.GameStatisticsFilterer;
 import ti4.map.Game;
@@ -14,16 +13,15 @@ import ti4.message.BotLogger;
 @UtilityClass
 public class WinningPathCacheService {
 
-    private static final Cache<CacheKey, Map<String, Integer>> WINNING_PATH_CACHE = Caffeine.newBuilder().build();
+    private static final Cache<CacheKey, Map<String, Integer>> WINNING_PATH_CACHE =
+            Caffeine.newBuilder().build();
     private static boolean hasBeenComputed = false;
 
     public static synchronized void recomputeCache() {
         BotLogger.info("**Recomputing win path cache**");
         WINNING_PATH_CACHE.invalidateAll();
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null),
-            WinningPathCacheService::addGame
-        );
+                GameStatisticsFilterer.getNormalFinishedGamesFilter(null, null), WinningPathCacheService::addGame);
         hasBeenComputed = true;
         BotLogger.info("**Finished recomputing win path cache**");
     }

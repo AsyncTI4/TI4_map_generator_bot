@@ -1,7 +1,6 @@
 package ti4.buttons.handlers.unitPickers;
 
 import java.util.regex.Matcher;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.RegexHelper;
 import ti4.helpers.Units;
@@ -38,5 +37,4 @@ public class UnitPickerHandlerHelper {
         UnitKey key = Units.getUnitKey(type, player.getColorID());
         return new ParsedUnit(key, amt, location);
     }
-
 }
