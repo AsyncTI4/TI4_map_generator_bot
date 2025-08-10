@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import ti4.model.ColorModel;
 
 public class ColourHelper {
@@ -545,7 +544,7 @@ public class ColourHelper {
                     case "rbw":
                         return 37;
                 }
-                // Discordant Stars
+            // Discordant Stars
             case "augers":
                 switch (colour) {
                     case "lvn", "ppl", "plm", "sns":
@@ -786,7 +785,7 @@ public class ColourHelper {
                     case "red", "rst", "bld":
                         return 35;
                 }
-                // other homebrew
+            // other homebrew
             case "drahn":
                 switch (colour) {
                     case "red", "rst", "bld":

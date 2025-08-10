@@ -1,7 +1,6 @@
 package ti4.service.tigl;
 
 import java.util.List;
-
 import lombok.Data;
 
 @Data

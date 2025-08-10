@@ -14,7 +14,10 @@ class ApplyDraftBags extends GameStateSubcommand {
 
     public ApplyDraftBags() {
         super("apply_draft_bags", "Begin selecting items from draft bags to apply them to your faction.", true, false);
-        addOption(OptionType.BOOLEAN, Constants.FORCE, "Force apply current bags, even if the bag draft is not complete.");
+        addOption(
+                OptionType.BOOLEAN,
+                Constants.FORCE,
+                "Force apply current bags, even if the bag draft is not complete.");
     }
 
     @Override
@@ -24,7 +27,8 @@ class ApplyDraftBags extends GameStateSubcommand {
 
         boolean force = event.getOption(Constants.FORCE, false, OptionMapping::getAsBoolean);
         if (!draft.isDraftStageComplete() && !force) {
-            String message = "The draft stage of the FrankenDraft is NOT complete. Please finish the draft or rerun the command with the force option set.";
+            String message =
+                    "The draft stage of the FrankenDraft is NOT complete. Please finish the draft or rerun the command with the force option set.";
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
             return;
         }

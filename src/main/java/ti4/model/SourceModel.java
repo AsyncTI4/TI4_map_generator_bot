@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -41,14 +40,16 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(getSource().emoji() + " " + getName());
 
         StringBuilder content = new StringBuilder();
-        if (getDescription() != null) content.append("*").append(getDescription()).append("*\n\n");
-        if (getData() != null) content.append("Links:\n").append(getDataFormatted()).append("\n");
+        if (getDescription() != null)
+            content.append("*").append(getDescription()).append("*\n\n");
+        if (getData() != null)
+            content.append("Links:\n").append(getDataFormatted()).append("\n");
         if (occurrences != null) content.append("Implementation: ").append(compTypeOccurrences(occurrences));
         eb.setDescription(content);
 
         StringBuilder footer = new StringBuilder();
         footer.append("Source: ").append(getSource()).append("    Type: ").append(getCanal());
-        if(getSubcanal() != null) footer.append(" > ").append(getSubcanal());
+        if (getSubcanal() != null) footer.append(" > ").append(getSubcanal());
         footer.append("\nCredits: ").append(getCredits());
         eb.setFooter(footer.toString());
 
@@ -69,7 +70,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString)
-            || getSource().toString().toLowerCase().contains(searchString);
+                || getSource().toString().toLowerCase().contains(searchString);
     }
 
     /**
@@ -106,15 +107,18 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
      * @param occurrences HashMap with Key is Component Type and Value is occurrences for specific Source in Component Type json files
      * @return StringBuilder
      */
-    private String compTypeOccurrences(HashMap<String, Integer> occurrences){
+    private String compTypeOccurrences(HashMap<String, Integer> occurrences) {
         StringBuilder implementation = new StringBuilder();
         for (Map.Entry<String, Integer> entry : occurrences.entrySet()) {
             if (entry.getValue() != 0) {
                 if (!implementation.toString().equals("")) implementation.append(", ");
-                implementation.append(entry.getKey()).append(" (").append(entry.getValue()).append(")");
+                implementation
+                        .append(entry.getKey())
+                        .append(" (")
+                        .append(entry.getValue())
+                        .append(")");
             }
         }
         return implementation.toString();
     }
-
 }

@@ -1,5 +1,10 @@
 package ti4.image;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,12 +24,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -68,14 +67,14 @@ import ti4.model.WormholeModel;
 import ti4.service.emoji.CardEmojis;
 
 public class Mapper {
-    //private static final Properties colors = new Properties();
+    // private static final Properties colors = new Properties();
     private static final Properties decals = new Properties();
     private static final Properties general = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties special_case = new Properties();
     private static final Properties tokens_fromProperties = new Properties();
 
-    //TODO: Finish moving all files over from properties to json
+    // TODO: Finish moving all files over from properties to json
     private static final Map<String, AbilityModel> abilities = new HashMap<>();
     private static final Map<String, ActionCardModel> actionCards = new HashMap<>();
     private static final Map<String, AgendaModel> agendas = new HashMap<>();
@@ -101,9 +100,8 @@ public class Mapper {
     private static final Map<String, TokenModel> tokens = new HashMap<>();
     private static final Map<String, UnitModel> units = new HashMap<>();
 
-    private static final Cache<String, ColorModel> colorToColorModelCache = Caffeine.newBuilder()
-        .maximumSize(1000)
-        .build();
+    private static final Cache<String, ColorModel> colorToColorModelCache =
+            Caffeine.newBuilder().maximumSize(1000).build();
 
     public static void init() {
         try {
@@ -163,9 +161,11 @@ public class Mapper {
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjectsFromFolder(String jsonFolderName, Map<String, T> objectMap, Class<T> target) throws InvalidFormatException {
+    private static <T extends ModelInterface> void importJsonObjectsFromFolder(
+            String jsonFolderName, Map<String, T> objectMap, Class<T> target) throws InvalidFormatException {
         String folderPath = ResourceHelper.getInstance().getDataFolder(jsonFolderName);
-        objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest classes
+        objectMap.clear(); // Added to prevent duplicates when running Mapper.init() over and over with *ModelTest
+        // classes
 
         File folder = new File(folderPath);
         File[] listOfFiles = folder.listFiles();
@@ -174,16 +174,19 @@ public class Mapper {
                 try {
                     importJsonObjects(jsonFolderName + File.separator + file.getName(), objectMap, target);
                 } catch (InvalidFormatException e) {
-                    BotLogger.error("JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
+                    BotLogger.error(
+                            "JSON File may be formatted incorrectly: " + jsonFolderName + "/" + file.getName(), e);
                     throw e;
                 } catch (Exception e) {
-                    BotLogger.error("Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
+                    BotLogger.error(
+                            "Could not import JSON Objects from File: " + jsonFolderName + "/" + file.getName(), e);
                 }
             }
         }
     }
 
-    private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
+    private static <T extends ModelInterface> void importJsonObjects(
+            String jsonFileName, Map<String, T> objectMap, Class<T> target) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         List<T> allObjects = new ArrayList<>();
         String filePath = ResourceHelper.getInstance().getDataFile(jsonFileName);
@@ -201,7 +204,7 @@ public class Mapper {
 
         List<String> badObjects = new ArrayList<>();
         for (T obj : allObjects) {
-            if (objectMap.containsKey(obj.getAlias())) { //duplicate found
+            if (objectMap.containsKey(obj.getAlias())) { // duplicate found
                 BotLogger.warning("Duplicate **" + target.getSimpleName() + "** found: " + obj.getAlias());
             }
             objectMap.put(obj.getAlias(), obj);
@@ -211,7 +214,7 @@ public class Mapper {
         }
         if (!badObjects.isEmpty())
             BotLogger.warning("The following **" + target.getSimpleName() + "** are improperly formatted:\n> "
-                + String.join("\n> ", badObjects));
+                    + String.join("\n> ", badObjects));
     }
 
     private static <T extends ColorableModelInterface<T>> void duplicateObjectsForAllColors(Map<String, T> objectMap) {
@@ -263,8 +266,7 @@ public class Mapper {
                 if (unit.getAbility().isPresent()) displayName += " - *" + unit.getAbility() + "*";
             }
             case Constants.LEADER -> displayName = getLeader(relatedID).getRepresentation(true, true, false);
-            default -> {
-            }
+            default -> {}
         }
         return displayName;
     }
@@ -286,8 +288,9 @@ public class Mapper {
 
     public static List<String> getAbilitiesSources(ComponentSource CompSource) {
         return Mapper.getAbilities().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static AbilityModel getAbilityOrReplacement(String abilityID, Game game) {
@@ -295,7 +298,8 @@ public class Mapper {
             for (AbilityModel replace : getAbilities().values()) {
                 if (replace.getSource() != ComponentSource.miltymod) continue;
 
-                boolean replacesAbility = replace.getHomebrewReplacesID().map(abilityID::equals).orElse(false);
+                boolean replacesAbility =
+                        replace.getHomebrewReplacesID().map(abilityID::equals).orElse(false);
                 if (replacesAbility) {
                     return replace;
                 }
@@ -337,8 +341,9 @@ public class Mapper {
 
     public static List<String> getActionCardsSources(ComponentSource CompSource) {
         return Mapper.getActionCards().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static Map<String, String> getACJustNames() {
@@ -366,8 +371,9 @@ public class Mapper {
 
     public static List<String> getAgendasSources(ComponentSource CompSource) {
         return Mapper.getAgendas().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     @Nullable
@@ -404,7 +410,6 @@ public class Mapper {
             if (!game.isAbsolMode() && !agenda.getAlias().contains("absol_")) {
                 agendaList.put(agenda.getAlias(), agenda.getName());
             }
-
         }
         return agendaList;
     }
@@ -460,8 +465,9 @@ public class Mapper {
 
     public static List<String> getAttachmentsSources(ComponentSource CompSource) {
         return Mapper.getAttachments().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static AttachmentModel getAttachmentInfo(String id) {
@@ -500,8 +506,7 @@ public class Mapper {
     }
 
     public static boolean isValidColor(String color) {
-        if (colors.containsKey(color))
-            return true;
+        if (colors.containsKey(color)) return true;
         for (ColorModel col : colors.values()) {
             if (col.getName().equals(color)) return true;
             if (col.getAliases().contains(color)) return true;
@@ -512,7 +517,8 @@ public class Mapper {
     // no source field in colors data, missing 'private List<String> getColorsSources(ComponentSource CompSource)'
 
     public static List<String> getColorIDs() {
-        return new ArrayList<>(colors.values().stream().map(ColorModel::getAlias).toList());
+        return new ArrayList<>(
+                colors.values().stream().map(ColorModel::getAlias).toList());
     }
 
     public static List<String> getColorNames() {
@@ -538,7 +544,8 @@ public class Mapper {
         return new HashMap<>(combatModifiers);
     }
 
-    // no source field in combat_modifiers data, missing 'private List<String> getCombatModifiersSources(ComponentSource CompSource)'
+    // no source field in combat_modifiers data, missing 'private List<String> getCombatModifiersSources(ComponentSource
+    // CompSource)'
 
     // ####################
     // Decks
@@ -557,8 +564,9 @@ public class Mapper {
 
     public static List<String> getDecksSources(ComponentSource CompSource) {
         return Mapper.getDecks().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static List<String> getShuffledDeck(String deckID) {
@@ -582,8 +590,9 @@ public class Mapper {
 
     public static List<String> getEventsSources(ComponentSource CompSource) {
         return Mapper.getEvents().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -605,8 +614,9 @@ public class Mapper {
 
     public static List<String> getExploresSources(ComponentSource CompSource) {
         return Mapper.getExplores().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -618,8 +628,9 @@ public class Mapper {
 
     public static List<FactionModel> getFactionsValues() {
         return factions.values().stream()
-            .sorted(Comparator.comparing(f -> f.getFactionName().toLowerCase().replace("the ", "")))
-            .collect(Collectors.toList());
+                .sorted(Comparator.comparing(
+                        f -> f.getFactionName().toLowerCase().replace("the ", "")))
+                .collect(Collectors.toList());
     }
 
     public static FactionModel getFaction(String factionID) {
@@ -632,15 +643,13 @@ public class Mapper {
 
     public static List<String> getFactionsSources(ComponentSource CompSource) {
         return Mapper.getFactionsValues().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static List<String> getFactionIDs() {
-        return factions.keySet().stream()
-            .filter(Objects::nonNull)
-            .sorted()
-            .collect(Collectors.toList());
+        return factions.keySet().stream().filter(Objects::nonNull).sorted().collect(Collectors.toList());
     }
 
     // ####################
@@ -652,8 +661,9 @@ public class Mapper {
 
     public static List<String> getDraftErratasSources(ComponentSource CompSource) {
         return Mapper.getFrankenErrata().values().stream()
-            .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -665,8 +675,8 @@ public class Mapper {
 
     public static Map<String, GenericCardModel> getTraps() {
         Map<String, GenericCardModel> plots = getGenericCards().entrySet().stream()
-            .filter(card -> card.getValue().getCardType() == CardType.trap)
-            .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+                .filter(card -> card.getValue().getCardType() == CardType.trap)
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
         return new HashMap<>(plots);
     }
 
@@ -676,8 +686,9 @@ public class Mapper {
 
     public static List<String> getGenericCardsSources(ComponentSource CompSource) {
         return Mapper.getGenericCards().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -697,8 +708,9 @@ public class Mapper {
 
     public static List<String> getLeadersSources(ComponentSource CompSource) {
         return Mapper.getLeaders().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -717,12 +729,14 @@ public class Mapper {
         return mapTemplates.containsKey(id);
     }
 
-    // no source field in map_templates data, missing 'private List<String> getMapTemplatesSources(ComponentSource CompSource)'
+    // no source field in map_templates data, missing 'private List<String> getMapTemplatesSources(ComponentSource
+    // CompSource)'
 
     public static List<MapTemplateModel> getMapTemplatesForPlayerCount(int players) {
-        return new ArrayList<>(mapTemplates.values()).stream()
-            .filter(template -> template.getPlayerCount() == players)
-            .toList();
+        return new ArrayList<>(mapTemplates.values())
+                .stream()
+                        .filter(template -> template.getPlayerCount() == players)
+                        .toList();
     }
 
     public static MapTemplateModel getDefaultMapTemplateForPlayerCount(int players) {
@@ -733,15 +747,16 @@ public class Mapper {
         } else if (templates.size() == 1) {
             mapTemplate = templates.getFirst();
         } else {
-            String defaultMapTemplate = switch (players) {
-                case 3 -> "3pHyperlanes";
-                case 4 -> "4pHyperlanes";
-                case 5 -> "5pHyperlanes";
-                case 6 -> "6pStandard";
-                case 7 -> "7pHyperlanes";
-                case 8 -> "8pHyperlanes";
-                default -> null;
-            };
+            String defaultMapTemplate =
+                    switch (players) {
+                        case 3 -> "3pHyperlanes";
+                        case 4 -> "4pHyperlanes";
+                        case 5 -> "5pHyperlanes";
+                        case 6 -> "6pStandard";
+                        case 7 -> "7pHyperlanes";
+                        case 8 -> "8pHyperlanes";
+                        default -> null;
+                    };
             if (defaultMapTemplate == null) {
                 mapTemplate = templates.getFirst(); // just get whatever template lol
             } else {
@@ -772,8 +787,9 @@ public class Mapper {
 
     public static List<String> getPromissoryNotesSources(ComponentSource CompSource) {
         return Mapper.getPromissoryNotes().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static List<String> getAllPromissoryNoteIDs() {
@@ -786,10 +802,14 @@ public class Mapper {
         if (isValidColor(color)) {
             for (PromissoryNoteModel pn : promissoryNotes.values()) {
                 if (pn.getColor().isPresent() && color.equals(pn.getColor().get())) {
-                    if ("agendas_absol".equals(game.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() != ComponentSource.absol) {
+                    if ("agendas_absol".equals(game.getAgendaDeckID())
+                            && pn.getAlias().endsWith("_ps")
+                            && pn.getSource() != ComponentSource.absol) {
                         continue;
                     }
-                    if (!"agendas_absol".equals(game.getAgendaDeckID()) && pn.getAlias().endsWith("_ps") && pn.getSource() == ComponentSource.absol) {
+                    if (!"agendas_absol".equals(game.getAgendaDeckID())
+                            && pn.getAlias().endsWith("_ps")
+                            && pn.getSource() == ComponentSource.absol) {
                         continue;
                     }
                     if (pn.getAlias().startsWith("wekkerabsol_") && !"g14".equals(game.getName())) {
@@ -831,8 +851,9 @@ public class Mapper {
 
     public static List<String> getPublicObjectivesSources(ComponentSource CompSource) {
         return Mapper.getPublicObjectives().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static Map<String, String> getPublicObjectivesStage1() {
@@ -862,8 +883,9 @@ public class Mapper {
 
     public static List<String> getRelicsSources(ComponentSource CompSource) {
         return Mapper.getRelics().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -891,8 +913,9 @@ public class Mapper {
 
     public static List<String> getSecretObjectivesSources(ComponentSource CompSource) {
         return Mapper.getSecretObjectives().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static Map<String, String> getSecretObjectivesJustNames() {
@@ -906,7 +929,9 @@ public class Mapper {
     public static Map<String, String> getSecretObjectivesJustNamesAndSource() {
         Map<String, String> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
-            soList.put(entry.getKey(), entry.getValue().getName() + " (" + entry.getValue().getSource() + ")");
+            soList.put(
+                    entry.getKey(),
+                    entry.getValue().getName() + " (" + entry.getValue().getSource() + ")");
         }
         return soList;
     }
@@ -941,8 +966,9 @@ public class Mapper {
 
     public static List<String> getStrategyCardSetsSources(ComponentSource CompSource) {
         return Mapper.getStrategyCardSets().values().stream()
-            .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -962,8 +988,9 @@ public class Mapper {
 
     public static List<String> getStrategyCardsSources(ComponentSource CompSource) {
         return Mapper.getStrategyCards().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -983,18 +1010,21 @@ public class Mapper {
 
     public static List<String> getTechnologiesSources(ComponentSource CompSource) {
         return Mapper.getTechs().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
-    private static <T> Map<String, T> getGenericHomebrewReplaceMap(List<T> models, Function<T, Optional<String>> getHomebrewID) {
+    private static <T> Map<String, T> getGenericHomebrewReplaceMap(
+            List<T> models, Function<T, Optional<String>> getHomebrewID) {
         return new HashMap<>(models.stream()
-            .filter(model -> getHomebrewID.apply(model).isPresent())
-            .collect(Collectors.toMap(m -> getHomebrewID.apply(m).get(), Function.identity())));
+                .filter(model -> getHomebrewID.apply(model).isPresent())
+                .collect(Collectors.toMap(m -> getHomebrewID.apply(m).get(), Function.identity())));
     }
 
     public static Map<String, TechnologyModel> getHomebrewTechReplaceMap(String deckID) {
-        List<TechnologyModel> models = getDeck(deckID).getNewDeck().stream().map(Mapper::getTech).toList();
+        List<TechnologyModel> models =
+                getDeck(deckID).getNewDeck().stream().map(Mapper::getTech).toList();
         return getGenericHomebrewReplaceMap(models, TechnologyModel::getHomebrewReplacesID);
     }
 
@@ -1010,12 +1040,14 @@ public class Mapper {
     }
 
     public static List<String> getTokensFromProperties() {
-        return Stream.of(attachments.keySet(), tokens_fromProperties.keySet(), tokens.keySet()).flatMap(Collection::stream)
-            .filter(String.class::isInstance)
-            .map(String.class::cast)
-            .sorted()
-            .collect(Collectors.toSet())
-            .stream().toList();
+        return Stream.of(attachments.keySet(), tokens_fromProperties.keySet(), tokens.keySet())
+                .flatMap(Collection::stream)
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .sorted()
+                .collect(Collectors.toSet())
+                .stream()
+                .toList();
     }
 
     public static TokenModel getToken(String id) {
@@ -1028,8 +1060,9 @@ public class Mapper {
 
     public static List<String> getTokensSources(ComponentSource CompSource) {
         return Mapper.getTokens().values().stream()
-            .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource)) // searchSource not implemented
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static Map<String, String> getTokensToName() {
@@ -1060,8 +1093,7 @@ public class Mapper {
         for (Entry<String, TokenModel> token : tokens.entrySet()) {
             String key = token.getKey();
             String val = token.getValue().getImagePath();
-            if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key))
-                return key;
+            if (tokenID.equalsIgnoreCase(val) || tokenID.equalsIgnoreCase(key)) return key;
         }
         System.out.println("Could not resolve token: " + tokenID);
         return tokenID;
@@ -1129,19 +1161,24 @@ public class Mapper {
 
     public static List<String> getUnitsSources(ComponentSource CompSource) {
         return Mapper.getUnits().values().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     public static List<String> getUnitSourcesDistinct() {
-        return units.values().stream().map(unit -> unit.getSource().toString()).distinct().sorted().toList();
+        return units.values().stream()
+                .map(unit -> unit.getSource().toString())
+                .distinct()
+                .sorted()
+                .toList();
     }
 
     public static UnitModel getUnitModelByTechUpgrade(String techID) {
         return units.values().stream()
-            .filter(unitModel -> techID.equals(unitModel.getRequiredTechId().orElse("")))
-            .findFirst()
-            .orElse(null);
+                .filter(unitModel -> techID.equals(unitModel.getRequiredTechId().orElse("")))
+                .findFirst()
+                .orElse(null);
     }
 
     public static UnitKey getUnitKey(String unitID, String colorID) {
@@ -1155,17 +1192,15 @@ public class Mapper {
     }
 
     public static Set<String> getUnitIDList() {
-        return getUnits().values().stream()
-            .map(UnitModel::getAsyncId)
-            .collect(Collectors.toSet());
+        return getUnits().values().stream().map(UnitModel::getAsyncId).collect(Collectors.toSet());
     }
 
     public static String getUnitBaseTypeFromAsyncID(String asyncID) {
         return getUnits().values().stream()
-            .filter(unitModel -> asyncID.equals(unitModel.getAsyncId()))
-            .map(UnitModel::getBaseType)
-            .findFirst()
-            .orElse(null);
+                .filter(unitModel -> asyncID.equals(unitModel.getAsyncId()))
+                .map(UnitModel::getBaseType)
+                .findFirst()
+                .orElse(null);
     }
 
     // ####################
@@ -1173,9 +1208,9 @@ public class Mapper {
 
     public static Set<String> getDecals() {
         return decals.keySet().stream()
-            .filter(String.class::isInstance)
-            .map(String.class::cast)
-            .collect(Collectors.toSet());
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .collect(Collectors.toSet());
     }
 
     public static boolean isValidDecalSet(String decalID) {
@@ -1204,9 +1239,9 @@ public class Mapper {
 
     public static String getHyperlaneTileId(String hyperlaneData) {
         return hyperlaneAdjacencies.stringPropertyNames().stream()
-            .filter(key -> hyperlaneData.equals(hyperlaneAdjacencies.getProperty(key)))
-            .findFirst()
-            .orElse(null);
+                .filter(key -> hyperlaneData.equals(hyperlaneAdjacencies.getProperty(key)))
+                .findFirst()
+                .orElse(null);
     }
 
     // ####################
@@ -1226,7 +1261,7 @@ public class Mapper {
 
     public static Map<String, String> getPlanetRepresentations() {
         return TileHelper.getAllPlanetModels().stream()
-            .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
+                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
     }
 
     public static PlanetModel getPlanet(String id) {
@@ -1239,8 +1274,9 @@ public class Mapper {
 
     public static List<String> getPlanetsSources(ComponentSource CompSource) {
         return TileHelper.getAllPlanetModels().stream()
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // ####################
@@ -1248,7 +1284,7 @@ public class Mapper {
 
     public static Map<String, String> getTileRepresentations() {
         return TileHelper.getAllTileModels().stream()
-            .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
+                .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
     public static String getTileID(String tileID) {
@@ -1260,8 +1296,9 @@ public class Mapper {
 
     public static List<String> getTilesSources(ComponentSource CompSource) {
         return TileHelper.getAllTileModels().stream() // Collection<TileModel> -> Stream<>
-            .filter(model -> model.searchSource(CompSource))
-            .map(model -> model.getSource().toString()).toList();
+                .filter(model -> model.searchSource(CompSource))
+                .map(model -> model.getSource().toString())
+                .toList();
     }
 
     // Frontiers
@@ -1269,24 +1306,26 @@ public class Mapper {
     public static List<String> getFrontierTileIds() {
         List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
         return TileHelper.getAllTileModels().stream()
-            .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
-            .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
-            .filter(tileModel -> !tileModel.isHyperlane())
-            .filter(TileModel::isEmpty)
-            .map(TileModel::getId)
-            .toList();
+                .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
+                .filter(tileModel -> !TileHelper.isDraftTile(tileModel))
+                .filter(tileModel -> !tileModel.isHyperlane())
+                .filter(TileModel::isEmpty)
+                .map(TileModel::getId)
+                .toList();
     }
 
     // Wormholes
 
     public static Set<String> getWormholes(String tileID) {
-        if (tileID == null || TileHelper.getTileById(tileID) == null || TileHelper.getTileById(tileID).getWormholes() == null) {
+        if (tileID == null
+                || TileHelper.getTileById(tileID) == null
+                || TileHelper.getTileById(tileID).getWormholes() == null) {
             return new HashSet<>();
         }
         return TileHelper.getTileById(tileID).getWormholes().stream()
-            .filter(Objects::nonNull)
-            .map(WormholeModel.Wormhole::toString)
-            .collect(Collectors.toSet());
+                .filter(Objects::nonNull)
+                .map(WormholeModel.Wormhole::toString)
+                .collect(Collectors.toSet());
     }
 
     public static Set<String> getWormholesTiles(String wormholeID) {
@@ -1297,9 +1336,9 @@ public class Mapper {
         }
 
         return TileHelper.getAllTileModels().stream()
-            .filter(tileModel -> tileModel.getWormholes() != null && tileModel.getWormholes().contains(wormhole))
-            .map(TileModel::getId)
-            .collect(Collectors.toSet());
+                .filter(tileModel -> tileModel.getWormholes() != null
+                        && tileModel.getWormholes().contains(wormhole))
+                .map(TileModel::getId)
+                .collect(Collectors.toSet());
     }
-
 }

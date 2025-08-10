@@ -2,13 +2,11 @@ package ti4.service.async;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jetbrains.annotations.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.User;
+import org.jetbrains.annotations.NotNull;
 import ti4.AsyncTI4DiscordBot;
 import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
@@ -27,7 +25,8 @@ public class TourneyWinnersService {
     public static void removeTourneyWinner(User user, String tourneyName) {
         List<TournamentWinner> winners = readWinnerList();
         if (isPlayerWinner(user.getId())) {
-            winners.removeIf(w -> w.getId().equals(user.getId()) && w.getTourneyName().equals(tourneyName));
+            winners.removeIf(
+                    w -> w.getId().equals(user.getId()) && w.getTourneyName().equals(tourneyName));
             saveWinnerList(winners);
         }
     }
@@ -53,7 +52,8 @@ public class TourneyWinnersService {
     private static List<TournamentWinner> readWinnerList() {
         if (winnerCache == null) {
             try {
-                List<TournamentWinner> reserved = PersistenceManager.readListFromJsonFile(fileName, TournamentWinner.class);
+                List<TournamentWinner> reserved =
+                        PersistenceManager.readListFromJsonFile(fileName, TournamentWinner.class);
                 winnerCache = reserved;
             } catch (Exception e) {
                 BotLogger.error("Failed to read json data for Reserved Game Cache.", e);

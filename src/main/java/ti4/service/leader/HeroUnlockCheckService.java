@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
@@ -32,12 +31,15 @@ public class HeroUnlockCheckService {
         Map<String, List<String>> playerScoredPublics = game.getScoredPublicObjectives();
         for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
             if (Mapper.getPublicObjectivesStage1().containsKey(scoredPublic.getKey())
-                || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())
-                || game.getSoToPoList().contains(scoredPublic.getKey())
-                || game.getSoToPoList().stream().map(Mapper::getSecretObjective).filter(Objects::nonNull).anyMatch(so -> so.getName().equals(scoredPublic.getKey()))
-                || scoredPublic.getKey().contains("Throne of the False Emperor")
-                || scoredPublic.getKey().contains("Liberate Ordinian")
-                || scoredPublic.getKey().contains("Control Ordinian")) {
+                    || Mapper.getPublicObjectivesStage2().containsKey(scoredPublic.getKey())
+                    || game.getSoToPoList().contains(scoredPublic.getKey())
+                    || game.getSoToPoList().stream()
+                            .map(Mapper::getSecretObjective)
+                            .filter(Objects::nonNull)
+                            .anyMatch(so -> so.getName().equals(scoredPublic.getKey()))
+                    || scoredPublic.getKey().contains("Throne of the False Emperor")
+                    || scoredPublic.getKey().contains("Liberate Ordinian")
+                    || scoredPublic.getKey().contains("Control Ordinian")) {
                 if (scoredPublic.getValue().contains(player.getUserID())) {
                     scoredPOCount++;
                 }
@@ -60,6 +62,5 @@ public class HeroUnlockCheckService {
         for (Leader hero : heroesToUnlock) {
             UnlockLeaderService.unlockLeader(hero.getId(), game, player);
         }
-
     }
 }

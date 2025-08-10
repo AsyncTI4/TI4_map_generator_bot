@@ -1,7 +1,6 @@
 package ti4.service.franken;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.image.Mapper;
@@ -40,7 +39,7 @@ public class FrankenFactionTechService {
 
     public static void removeFactionTechs(GenericInteractionCreateEvent event, Player player, List<String> techIDs) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" removed faction technologies:\n");
-        for (String techID : techIDs ){
+        for (String techID : techIDs) {
             if (!player.getFactionTechs().contains(techID)) {
                 sb.append("> ").append(techID).append(" (player did not have this technology)");
             } else {

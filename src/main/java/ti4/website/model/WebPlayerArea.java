@@ -1,12 +1,10 @@
 package ti4.website.model;
 
 import java.util.*;
-
 import lombok.Data;
 import ti4.helpers.Helper;
 import ti4.helpers.Units;
 import ti4.image.Mapper;
-
 import ti4.map.*;
 
 @Data
@@ -239,13 +237,18 @@ public class WebPlayerArea {
             webPlayerArea.setKnownUnscoredSecrets(new HashMap<>());
         }
 
-        webPlayerArea.setNumUnscoredSecrets(player.getSecretsUnscored() != null ? player.getSecretsUnscored().size() : 0);
+        webPlayerArea.setNumUnscoredSecrets(
+                player.getSecretsUnscored() != null
+                        ? player.getSecretsUnscored().size()
+                        : 0);
 
         // Additional properties
         webPlayerArea.setFlexibleDisplayName(player.getFlexibleDisplayName());
         webPlayerArea.setScs(player.getSCs());
         webPlayerArea.setIsSpeaker(player.isSpeaker());
-        webPlayerArea.setNeighbors(player.getNeighbouringPlayers(false).stream().map(Player::getColor).toList());
+        webPlayerArea.setNeighbors(player.getNeighbouringPlayers(false).stream()
+                .map(Player::getColor)
+                .toList());
 
         // Army values
         webPlayerArea.setSpaceArmyRes(player.getTotalResourceValueOfUnits("space"));
@@ -361,7 +364,8 @@ public class WebPlayerArea {
             for (Map.Entry<String, Map<String, Integer>> factionEntry : unitsByFaction.entrySet()) {
                 String faction = factionEntry.getKey();
                 List<String> unitList = new ArrayList<>();
-                for (Map.Entry<String, Integer> unitEntry : factionEntry.getValue().entrySet()) {
+                for (Map.Entry<String, Integer> unitEntry :
+                        factionEntry.getValue().entrySet()) {
                     unitList.add(unitEntry.getKey() + "," + unitEntry.getValue());
                 }
                 nomboxData.put(faction, unitList);
@@ -418,5 +422,4 @@ public class WebPlayerArea {
         int remainingReinforcements = ccLimit - ccCount;
         return Math.max(0, remainingReinforcements);
     }
-
 }

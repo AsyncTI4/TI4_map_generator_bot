@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-
 import ti4.testUtils.BaseTi4Test;
 
 public class PositionMapperTest extends BaseTi4Test {

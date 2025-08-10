@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.Data;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -45,7 +44,10 @@ public class WebTileUnitData {
             String position = entry.getKey();
             Tile tile = entry.getValue();
 
-            if (tile != null && tile.getTileID() != null && !"-1".equals(tile.getTileID()) && !"null".equals(tile.getTileID())) {
+            if (tile != null
+                    && tile.getTileID() != null
+                    && !"-1".equals(tile.getTileID())
+                    && !"null".equals(tile.getTileID())) {
                 WebTileUnitData unitData = extractTileUnitData(game, tile);
                 tileUnitData.put(position, unitData);
             }
@@ -64,7 +66,8 @@ public class WebTileUnitData {
         UnitHolder spaceHolder = tile.getUnitHolders().get(Constants.SPACE);
         if (spaceHolder != null) {
             for (String ccID : spaceHolder.getCcList()) {
-                Player player = DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), ccID);
+                Player player =
+                        DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), ccID);
                 if (player != null) {
                     tileData.ccs.add(player.getFaction());
                 }
@@ -94,7 +97,8 @@ public class WebTileUnitData {
 
                     // Get sustained damage count for this unit
                     Integer sustainedDamage = null;
-                    if (unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().containsKey(unitKey)) {
+                    if (unitHolder.getUnitDamage() != null
+                            && unitHolder.getUnitDamage().containsKey(unitKey)) {
                         int damagedCount = unitHolder.getUnitDamage().get(unitKey);
                         if (damagedCount > 0) {
                             sustainedDamage = damagedCount;
@@ -102,7 +106,9 @@ public class WebTileUnitData {
                     }
 
                     WebEntityData entityData = new WebEntityData(unitId, "unit", unitCount, sustainedDamage);
-                    factionEntities.computeIfAbsent(faction, k -> new ArrayList<>()).add(entityData);
+                    factionEntities
+                            .computeIfAbsent(faction, k -> new ArrayList<>())
+                            .add(entityData);
                 }
 
                 if (!factionEntities.isEmpty()) {
@@ -113,7 +119,8 @@ public class WebTileUnitData {
                         }
                     } else {
                         // For planets, create or get existing WebTilePlanet
-                        WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
+                        WebTilePlanet planetData =
+                                tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
                         for (Map.Entry<String, List<WebEntityData>> factionEntry : factionEntities.entrySet()) {
                             planetData.getEntities().put(factionEntry.getKey(), factionEntry.getValue());
                         }
@@ -139,14 +146,18 @@ public class WebTileUnitData {
 
                     // For now, we'll treat all tokens as non-faction specific
                     // If tokens become faction-specific in the future, we can update this logic
-                    WebEntityData tokenData = new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
-                    factionTokens.computeIfAbsent("neutral", k -> new ArrayList<>()).add(tokenData);
+                    WebEntityData tokenData =
+                            new WebEntityData(ti4.image.Mapper.getTokenIDFromTokenPath(token), entityType, 1);
+                    factionTokens
+                            .computeIfAbsent("neutral", k -> new ArrayList<>())
+                            .add(tokenData);
                 }
 
                 if (isSpace) {
                     // Merge token data with existing space data
                     for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
-                        tileData.space.computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                        tileData.space
+                                .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
                                 .addAll(factionEntry.getValue());
                     }
                 } else {
@@ -154,7 +165,9 @@ public class WebTileUnitData {
                     WebTilePlanet planetData = tileData.planets.computeIfAbsent(holderName, k -> new WebTilePlanet());
 
                     for (Map.Entry<String, List<WebEntityData>> factionEntry : factionTokens.entrySet()) {
-                        planetData.getEntities().computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
+                        planetData
+                                .getEntities()
+                                .computeIfAbsent(factionEntry.getKey(), k -> new ArrayList<>())
                                 .addAll(factionEntry.getValue());
                     }
                 }
@@ -172,7 +185,8 @@ public class WebTileUnitData {
             if (!planet.getControlList().isEmpty()) {
                 // Get the first control token (there should only be one)
                 String controlToken = planet.getControlList().iterator().next();
-                Player controllingPlayer = DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlToken);
+                Player controllingPlayer =
+                        DrawingUtil.getPlayerByControlMarker(game.getPlayers().values(), controlToken);
                 if (controllingPlayer != null) {
                     controllingFaction = controllingPlayer.getFaction();
                 }

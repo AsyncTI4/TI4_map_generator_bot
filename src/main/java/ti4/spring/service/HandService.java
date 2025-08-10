@@ -2,7 +2,6 @@ package ti4.spring.service;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.springframework.stereotype.Service;
 import ti4.map.Player;
 

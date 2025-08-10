@@ -13,7 +13,8 @@ class RemoveCustomPO extends GameStateSubcommand {
 
     public RemoveCustomPO() {
         super(Constants.REMOVE_CUSTOM, "Remove custom Public Objective", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PO_ID, "Public Objective ID that is between ()")
+                .setRequired(true));
     }
 
     @Override
@@ -22,7 +23,8 @@ class RemoveCustomPO extends GameStateSubcommand {
 
         OptionMapping option = event.getOption(Constants.PO_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please choose which public objective to shuffle back in");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), "Please choose which public objective to shuffle back in");
             return;
         }
         boolean removedCustomPO = game.removeCustomPO(option.getAsInt());

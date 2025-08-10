@@ -21,5 +21,4 @@ public class Stickers {
             default -> -1;
         };
     }
-
 }

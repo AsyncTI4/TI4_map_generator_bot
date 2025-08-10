@@ -3,7 +3,6 @@ package ti4.buttons.handlers.agenda;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -21,7 +20,8 @@ import ti4.service.player.PlayerStatsService;
 class ChecksAndBalancesButtonHandler {
 
     @ButtonHandler("checksNBalancesPt2_")
-    public static void resolvePt2ChecksNBalances(ButtonInteractionEvent event, Player player, Game game, String buttonID) {
+    public static void resolvePt2ChecksNBalances(
+            ButtonInteractionEvent event, Player player, Game game, String buttonID) {
         String scPicked = buttonID.split("_")[1];
         int scpick = Integer.parseInt(scPicked);
         String factionPicked = buttonID.split("_")[2];
@@ -30,11 +30,13 @@ class ChecksAndBalancesButtonHandler {
         PlayerStatsService.secondHalfOfPickSC(event, game, p2, scpick);
 
         String recipientMessage = p2.getRepresentationUnfogged() + " was given " + Helper.getSCName(scpick, game)
-            + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "") + ".";
+                + (!game.isFowMode() ? " by " + player.getFactionEmoji() : "") + ".";
         MessageHelper.sendMessageToChannel(p2.getCorrectChannel(), recipientMessage);
 
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scpick, game) + ".");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    p2.getRepresentationNoPing() + " was given " + Helper.getSCName(scpick, game) + ".");
         }
         event.getMessage().delete().queue();
         List<Button> buttons = getPlayerOptionsForChecksNBalances(player, game, scpick);
@@ -45,7 +47,8 @@ class ChecksAndBalancesButtonHandler {
             boolean foundPlayer = false;
             Player privatePlayer = null;
             List<Player> players = game.getRealPlayers();
-            if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
+            if (game.isReverseSpeakerOrder()
+                    || !game.getStoredValue("willRevolution").isEmpty()) {
                 Collections.reverse(players);
             }
             for (Player p3 : players) {
@@ -65,8 +68,11 @@ class ChecksAndBalancesButtonHandler {
             }
             game.setPhaseOfGame("strategy");
             game.updateActivePlayer(privatePlayer);
-            MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getCorrectChannel(),
-                privatePlayer.getRepresentationUnfogged() + ", please choose which strategy card you wish to give someone else.", Helper.getRemainingSCButtons(game, privatePlayer));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    privatePlayer.getCorrectChannel(),
+                    privatePlayer.getRepresentationUnfogged()
+                            + ", please choose which strategy card you wish to give someone else.",
+                    Helper.getRemainingSCButtons(game, privatePlayer));
         }
     }
 
@@ -95,12 +101,14 @@ class ChecksAndBalancesButtonHandler {
                 if (game.isFowMode()) {
                     buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), p2.getColor()));
                 } else {
-                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ").withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
+                    buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + p2.getFaction(), " ")
+                            .withEmoji(Emoji.fromFormatted(p2.getFactionEmoji())));
                 }
             }
         }
         if (buttons.isEmpty()) {
-            buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ").withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
+            buttons.add(Buttons.gray("checksNBalancesPt2_" + scPicked + "_" + player.getFaction(), " ")
+                    .withEmoji(Emoji.fromFormatted(player.getFactionEmoji())));
         }
 
         return buttons;

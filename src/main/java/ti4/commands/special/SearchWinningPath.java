@@ -2,7 +2,6 @@ package ti4.commands.special;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -21,7 +20,8 @@ class SearchWinningPath extends Subcommand {
 
     public SearchWinningPath() {
         super(Constants.SEARCH_WINNING_PATH, "List games with the provided winning path");
-        addOptions(new OptionData(OptionType.STRING, Constants.WINNING_PATH, "Winning path to search for").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.WINNING_PATH, "Winning path to search for")
+                .setRequired(true));
         addOptions(GameStatisticsFilterer.gameStatsFilters());
     }
 
@@ -30,16 +30,18 @@ class SearchWinningPath extends Subcommand {
         String searchedPath = event.getOption(Constants.WINNING_PATH, OptionMapping::getAsString);
 
         Set<String> foundGames = new HashSet<>();
-        StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ").append(searchedPath).append("\n");
+        StringBuilder sb = new StringBuilder("__**Games with Winning Path:**__ ")
+                .append(searchedPath)
+                .append("\n");
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game ->
-                    game.getWinner().map(winner -> hasWinningPath(game, winner, searchedPath)).orElse(false)),
-            game -> {
-                foundGames.add(game.getName());
-                sb.append(formatGame(game)).append("\n");
-            }
-        );
+                GameStatisticsFilterer.getGamesFilterForWonGame(event).and(game -> game.getWinner()
+                        .map(winner -> hasWinningPath(game, winner, searchedPath))
+                        .orElse(false)),
+                game -> {
+                    foundGames.add(game.getName());
+                    sb.append(formatGame(game)).append("\n");
+                });
 
         if (foundGames.isEmpty()) {
             sb.append("No games match the selected path.");
@@ -50,8 +52,8 @@ class SearchWinningPath extends Subcommand {
 
     private static boolean hasWinningPath(Game game, Player winner, String searchedPath) {
         return WinningPathHelper.buildWinningPath(game, winner)
-            .replaceAll("_", "") // needed due to Support for the Throne being italicized
-            .contains(searchedPath);
+                .replaceAll("_", "") // needed due to Support for the Throne being italicized
+                .contains(searchedPath);
     }
 
     private static String formatGame(Game game) {

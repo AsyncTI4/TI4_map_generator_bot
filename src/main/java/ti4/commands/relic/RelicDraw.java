@@ -11,7 +11,8 @@ class RelicDraw extends GameStateSubcommand {
 
     public RelicDraw() {
         super(Constants.RELIC_DRAW, "Draw a relic", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override

@@ -15,7 +15,11 @@ class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
 
     public ExploreShuffleIntoDeckFromHand() {
         super(Constants.SHUFFLE_INTO_DECK_FROM_HAND, "Discard an Exploration Card from the hand to deck.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ids. May include multiple comma-separated ids.").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.EXPLORE_CARD_ID,
+                        "Exploration card ids. May include multiple comma-separated ids.")
+                .setRequired(true));
     }
 
     @Override
@@ -29,10 +33,15 @@ class ExploreShuffleIntoDeckFromHand extends GameStateSubcommand {
             ExploreModel explore = Mapper.getExplore(id);
             if (explore != null) {
                 activePlayer.removeFragment(id);
-                sb.append("Fragment discarded: ").append(explore.textRepresentation()).append(System.lineSeparator());
+                sb.append("Fragment discarded: ")
+                        .append(explore.textRepresentation())
+                        .append(System.lineSeparator());
                 game.addExplore(id);
             } else {
-                sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
+                sb.append("Card ID ")
+                        .append(id)
+                        .append(" not found, please retry")
+                        .append(System.lineSeparator());
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

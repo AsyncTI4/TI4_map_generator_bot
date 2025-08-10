@@ -1,8 +1,8 @@
 package ti4.commands.map;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.GameStateSubcommand;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
 import ti4.service.map.AddTileListService;
 

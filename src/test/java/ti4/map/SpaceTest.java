@@ -1,21 +1,19 @@
 package ti4.map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
-
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
 import ti4.testUtils.BaseTi4Test;
 import ti4.testUtils.JsonValidator;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SpaceTest extends BaseTi4Test {
     private final String expectedName = "space";
@@ -46,13 +44,7 @@ public class SpaceTest extends BaseTi4Test {
         // Given
         Space space = buildSpace();
         Set<String> knownJsonAttributes = new HashSet<>(Arrays.asList(
-            "name",
-            "javaClassType",
-            "holderCenterPosition",
-            "unitsByState",
-            "ccList",
-            "controlList",
-            "tokenList"));
+                "name", "javaClassType", "holderCenterPosition", "unitsByState", "ccList", "controlList", "tokenList"));
 
         // When
         JsonValidator.assertAvailableJsonAttributes(space, knownJsonAttributes);

@@ -3,14 +3,12 @@ package ti4.buttons.handlers.agenda;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
@@ -53,8 +51,11 @@ public class VoteButtonHandler {
         buttons.add(Buttons.green("preVote", "Pre-Vote"));
         buttons.add(Buttons.blue("resolvePreassignment_Abstain On Agenda", "Pre-abstain"));
         buttons.add(Buttons.red("deleteButtons", "Don't do anything"));
-        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-            player.getRepresentation() + " due to the playing of an \"after\", your pre-vote was erased. You can use these buttons to pre-vote again.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCardsInfoThread(),
+                player.getRepresentation()
+                        + " due to the playing of an \"after\", your pre-vote was erased. You can use these buttons to pre-vote again.",
+                buttons);
     }
 
     @ButtonHandler("preVote")
@@ -70,20 +71,21 @@ public class VoteButtonHandler {
             pfaction2 = player.getFaction();
         }
         if (pfaction2 != null) {
-            String voteMessage = player.getRepresentation() + " is up to vote. Please use the buttons to choose the outcome you wish to vote for.";
+            String voteMessage = player.getRepresentation()
+                    + " is up to vote. Please use the buttons to choose the outcome you wish to vote for.";
             String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
             List<Button> outcomeActionRow;
             if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
-                outcomeActionRow = getForAgainstOutcomeButtons(game, null, "outcome", game.getCurrentAgendaInfo().split("_")[2], player);
+                outcomeActionRow = getForAgainstOutcomeButtons(
+                        game, null, "outcome", game.getCurrentAgendaInfo().split("_")[2], player);
             } else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
                 outcomeActionRow = getPlayerOutcomeButtons(game, null, "outcome", null);
             } else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
                 voteMessage = player.getRepresentation() + " is up to vote."
-                    + " Since there are too many planets in the game to represent all as buttons,"
-                    + " please use the buttons to choose the player who controls the planet you wish to vote for."
-                    + " You will then be given a list of their planets to vote for.";
-                outcomeActionRow = getPlayerOutcomeButtons(game, null, "planetOutcomes",
-                    null);
+                        + " Since there are too many planets in the game to represent all as buttons,"
+                        + " please use the buttons to choose the player who controls the planet you wish to vote for."
+                        + " You will then be given a list of their planets to vote for.";
+                outcomeActionRow = getPlayerOutcomeButtons(game, null, "planetOutcomes", null);
             } else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
                 outcomeActionRow = getSecretOutcomeButtons(game, null, "outcome");
             } else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
@@ -96,8 +98,10 @@ public class VoteButtonHandler {
                 outcomeActionRow = getLawOutcomeButtons(game, null, "outcome");
             }
             ButtonHelper.deleteMessage(event);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), AgendaHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
-                outcomeActionRow);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getChannel(),
+                    AgendaHelper.getSummaryOfVotes(game, true) + "\n\n" + voteMessage,
+                    outcomeActionRow);
         }
     }
 
@@ -106,7 +110,7 @@ public class VoteButtonHandler {
         String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Choosing to vote for one of " + factionOrColor
-            + "'s planets. Please use the buttons to choose the planet you wish to vote for.";
+                + "'s planets. Please use the buttons to choose the planet you wish to vote for.";
         List<Button> outcomeActionRow;
         outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "outcome", null);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
@@ -121,10 +125,9 @@ public class VoteButtonHandler {
         String factionOrColor = buttonID;
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Choosing to break tie for one of " + factionOrColor
-            + "'s planets. As Speaker, please decide a winner.";
+                + "'s planets. As Speaker, please decide a winner.";
         List<Button> outcomeActionRow;
-        outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game,
-            "resolveAgendaVote_outcomeTie*", null);
+        outcomeActionRow = getPlanetOutcomeButtons(planetOwner, game, "resolveAgendaVote_outcomeTie*", null);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
         ButtonHelper.deleteMessage(event);
     }
@@ -144,7 +147,8 @@ public class VoteButtonHandler {
         return lawButtons;
     }
 
-    public static List<Button> getForAgainstOutcomeButtons(Game game, String rider, String prefix, String agendaID, Player player) {
+    public static List<Button> getForAgainstOutcomeButtons(
+            Game game, String rider, String prefix, String agendaID, Player player) {
         List<Button> voteButtons = new ArrayList<>();
         Button buttonFor;
         Button buttonAgainst;
@@ -158,7 +162,8 @@ public class VoteButtonHandler {
         String againstEmojiString = "👎";
         try {
             agendaInt = Integer.valueOf(agendaID);
-        } catch (NumberFormatException e) {}
+        } catch (NumberFormatException e) {
+        }
         if (agendaInt != null) {
             String agendaAlias = "";
             for (Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
@@ -213,7 +218,8 @@ public class VoteButtonHandler {
                     button = Buttons.blue(prefix + "rider_so;" + so.getKey() + "_" + rider, soName);
                 }
                 if (!game.isFowMode()) {
-                    String colorEmojiString = ColorEmojis.getColorEmoji(player.getColor()).toString();
+                    String colorEmojiString =
+                            ColorEmojis.getColorEmoji(player.getColor()).toString();
                     button = button.withEmoji(Emoji.fromFormatted(colorEmojiString));
                 }
                 secretButtons.add(button);
@@ -259,9 +265,13 @@ public class VoteButtonHandler {
             Button button;
             TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(sc.getInitiative());
             if (rider == null) {
-                button = Buttons.blue(prefix + "_" + sc.getInitiative(), stratCards.getSCName(sc.getInitiative()), scEmoji);
+                button = Buttons.blue(
+                        prefix + "_" + sc.getInitiative(), stratCards.getSCName(sc.getInitiative()), scEmoji);
             } else {
-                button = Buttons.blue(prefix + "rider_sc;" + sc.getInitiative() + "_" + rider, stratCards.getSCName(sc.getInitiative()), scEmoji);
+                button = Buttons.blue(
+                        prefix + "rider_sc;" + sc.getInitiative() + "_" + rider,
+                        stratCards.getSCName(sc.getInitiative()),
+                        scEmoji);
             }
             strategyButtons.add(button);
         }
@@ -277,8 +287,10 @@ public class VoteButtonHandler {
             if (rider == null) {
                 button = Buttons.blue(prefix + "_" + planet, Helper.getPlanetRepresentation(planet, game), planetEmoji);
             } else {
-                button = Buttons.blue(prefix + "rider_planet;" + planet + "_" + rider,
-                    Helper.getPlanetRepresentation(planet, game), planetEmoji);
+                button = Buttons.blue(
+                        prefix + "rider_planet;" + planet + "_" + rider,
+                        Helper.getPlanetRepresentation(planet, game),
+                        planetEmoji);
             }
             planetOutcomeButtons.add(button);
         }
@@ -294,22 +306,25 @@ public class VoteButtonHandler {
             if (!game.isFowMode() && !faction.contains("franken")) {
                 if (rider != null) {
                     if (planetRes != null) {
-                        button = Buttons.blue(prefix + planetRes + "_" + faction + "_" + rider, StringUtils.capitalize(faction));
+                        button = Buttons.blue(
+                                prefix + planetRes + "_" + faction + "_" + rider, StringUtils.capitalize(faction));
                     } else {
-                        button = Buttons.blue(prefix + "rider_player;" + faction + "_" + rider, StringUtils.capitalize(faction));
+                        button = Buttons.blue(
+                                prefix + "rider_player;" + faction + "_" + rider, StringUtils.capitalize(faction));
                     }
                 } else {
                     button = Buttons.blue(prefix + "_" + faction, StringUtils.capitalize(faction));
                 }
-                String colorEmojiString = ColorEmojis.getColorEmoji(player.getColor()).toString();
+                String colorEmojiString =
+                        ColorEmojis.getColorEmoji(player.getColor()).toString();
                 button = button.withEmoji(Emoji.fromFormatted(colorEmojiString));
             } else {
                 if (rider != null) {
                     if (planetRes != null) {
                         button = Buttons.blue(planetRes + "_" + player.getColor() + "_" + rider, player.getColor());
                     } else {
-                        button = Buttons.blue(prefix + "rider_player;" + player.getColor() + "_" + rider,
-                            player.getColor());
+                        button = Buttons.blue(
+                                prefix + "rider_player;" + player.getColor() + "_" + rider, player.getColor());
                     }
                 } else {
                     button = Buttons.blue(prefix + "_" + player.getColor(), player.getColor());

@@ -1,8 +1,4 @@
-
 package ti4.map_ttpg;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -10,36 +6,38 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "Leadership",
-    "Technology",
-    "Trade",
-    "Imperial",
-    "Diplomacy",
-    "Warfare",
-    "Construction",
-    "Politics"
+@JsonPropertyOrder({"Leadership", "Technology", "Trade", "Imperial", "Diplomacy", "Warfare", "Construction", "Politics"
 })
 public class TTPGUnpickedStrategyCards {
 
     @JsonProperty("Leadership")
     private Integer leadership;
+
     @JsonProperty("Technology")
     private Integer technology;
+
     @JsonProperty("Trade")
     private Integer trade;
+
     @JsonProperty("Imperial")
     private Integer imperial;
+
     @JsonProperty("Diplomacy")
     private Integer diplomacy;
+
     @JsonProperty("Warfare")
     private Integer warfare;
+
     @JsonProperty("Construction")
     private Integer construction;
+
     @JsonProperty("Politics")
     private Integer politics;
+
     @JsonIgnore
     private final Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
@@ -132,5 +130,4 @@ public class TTPGUnpickedStrategyCards {
     public void setAdditionalProperty(String name, Object value) {
         additionalProperties.put(name, value);
     }
-
 }

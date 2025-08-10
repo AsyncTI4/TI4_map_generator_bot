@@ -3,7 +3,6 @@ package ti4.service.player;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -32,7 +31,11 @@ public class PlayerStatsService {
 
         sb.append("> VP: ").append(player.getTotalVictoryPoints());
         sb.append("      ").append(MiscEmojis.getTGorNomadCoinEmoji(game)).append(player.getTg());
-        sb.append("      ").append(MiscEmojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
+        sb.append("      ")
+                .append(MiscEmojis.comm)
+                .append(player.getCommodities())
+                .append("/")
+                .append(player.getCommoditiesTotal());
 
         sb.append("      ").append(ExploreEmojis.CFrag).append(player.getCrf());
         sb.append("   ").append(ExploreEmojis.IFrag).append(player.getIrf());
@@ -42,17 +45,25 @@ public class PlayerStatsService {
         sb.append("\n");
         sb.append("> Base commodities: `").append(player.getCommoditiesBase()).append("`\n");
         sb.append("> Bonus commodities: `").append(player.getCommoditiesBonus()).append("`\n");
-        sb.append("> Old total commodities: `").append(player.getCommoditiesTotal(true)).append("`\n");
+        sb.append("> Old total commodities: `")
+                .append(player.getCommoditiesTotal(true))
+                .append("`\n");
         sb.append("> Command Tokens: `").append(player.getCCRepresentation()).append("`\n");
         sb.append("> Strategy Cards: `").append(player.getSCs()).append("`\n");
-        sb.append("> Unfollowed Strategy Cards: `").append(player.getUnfollowedSCs()).append("`\n");
+        sb.append("> Unfollowed Strategy Cards: `")
+                .append(player.getUnfollowedSCs())
+                .append("`\n");
         sb.append("> Debt: `").append(player.getDebtTokens()).append("`\n");
-        sb.append("> Speaker: `").append(game.getSpeakerUserID().equals(player.getUserID())).append("`\n");
+        sb.append("> Speaker: `")
+                .append(game.getSpeakerUserID().equals(player.getUserID()))
+                .append("`\n");
         sb.append("> Passed: `").append(player.isPassed()).append("`\n");
         sb.append("> Dummy: `").append(player.isDummy()).append("`\n");
         sb.append("> Raw Faction Emoji: `").append(player.getFactionEmoji()).append("`\n");
         sb.append("> Display Name: `").append(player.getDisplayName()).append("`\n");
-        sb.append("> Stats Anchor: `").append(player.getPlayerStatsAnchorPosition()).append("`\n");
+        sb.append("> Stats Anchor: `")
+                .append(player.getPlayerStatsAnchorPosition())
+                .append("`\n");
 
         Tile homeSystemTile = player.getHomeSystemTile();
         if (homeSystemTile != null) {
@@ -67,23 +78,50 @@ public class PlayerStatsService {
         sb.append("> Relics: `").append(player.getRelics()).append("`\n");
         sb.append("> Imperia Command Tokens: `").append(player.getMahactCC()).append("`\n");
         sb.append("> Leaders: `").append(player.getLeaderIDs()).append("`\n");
-        sb.append("> Owned Promissory Notes: `").append(player.getPromissoryNotesOwned()).append("`\n");
-        sb.append("> Player Area Promissory Notes: `").append(player.getPromissoryNotesInPlayArea()).append("`\n");
+        sb.append("> Owned Promissory Notes: `")
+                .append(player.getPromissoryNotesOwned())
+                .append("`\n");
+        sb.append("> Player Area Promissory Notes: `")
+                .append(player.getPromissoryNotesInPlayArea())
+                .append("`\n");
         sb.append("> Owned Units: `").append(player.getUnitsOwned()).append("`\n");
-        sb.append("> Alliance Members: ").append(player.getAllianceMembers().replace(player.getFaction(), "")).append("\n");
-        sb.append("> Followed SCs: `").append(player.getFollowedSCs().toString()).append("`\n");
-        sb.append("> Expected Number of Hits: `").append((player.getExpectedHitsTimes10() / 10.0)).append("`\n");
+        sb.append("> Alliance Members: ")
+                .append(player.getAllianceMembers().replace(player.getFaction(), ""))
+                .append("\n");
+        sb.append("> Followed SCs: `")
+                .append(player.getFollowedSCs().toString())
+                .append("`\n");
+        sb.append("> Expected Number of Hits: `")
+                .append((player.getExpectedHitsTimes10() / 10.0))
+                .append("`\n");
         sb.append("> Actual Hits: `").append(player.getActualHits()).append("`\n");
-        sb.append("> Total Unit Resource Value: ").append(MiscEmojis.resources).append("`").append(player.getTotalResourceValueOfUnits("both")).append("`\n");
-        sb.append("> Total Unit Hit-point Value: ").append("🩷").append("`").append(player.getTotalHPValueOfUnits("both")).append("`\n");
-        sb.append("> Total Unit Combat Expected Hits: ").append("💥").append("`").append(player.getTotalCombatValueOfUnits("both")).append("`\n");
-        sb.append("> Total Unit Ability Expected Hits: ").append(TechEmojis.UnitUpgradeTech).append("`").append(player.getTotalUnitAbilityValueOfUnits()).append("`\n");
+        sb.append("> Total Unit Resource Value: ")
+                .append(MiscEmojis.resources)
+                .append("`")
+                .append(player.getTotalResourceValueOfUnits("both"))
+                .append("`\n");
+        sb.append("> Total Unit Hit-point Value: ")
+                .append("🩷")
+                .append("`")
+                .append(player.getTotalHPValueOfUnits("both"))
+                .append("`\n");
+        sb.append("> Total Unit Combat Expected Hits: ")
+                .append("💥")
+                .append("`")
+                .append(player.getTotalCombatValueOfUnits("both"))
+                .append("`\n");
+        sb.append("> Total Unit Ability Expected Hits: ")
+                .append(TechEmojis.UnitUpgradeTech)
+                .append("`")
+                .append(player.getTotalUnitAbilityValueOfUnits())
+                .append("`\n");
         sb.append("> Decal Set: `").append(player.getDecalName()).append("`\n");
         sb.append("\n");
         return sb.toString();
     }
 
-    public static boolean pickSC(GenericInteractionCreateEvent event, Game game, Player player, OptionMapping optionSC) {
+    public static boolean pickSC(
+            GenericInteractionCreateEvent event, Game game, Player player, OptionMapping optionSC) {
         if (optionSC == null) {
             return false;
         }
@@ -91,55 +129,63 @@ public class PlayerStatsService {
         return secondHalfOfPickSC(event, game, player, scNumber);
     }
 
-    public static boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Game game, Player player, int scNumber) {
+    public static boolean secondHalfOfPickSC(
+            GenericInteractionCreateEvent event, Game game, Player player, int scNumber) {
         Map<Integer, Integer> strategyCardToTradeGoodCount = game.getScTradeGoods();
         if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                "Can only pick strategy card if both faction and color have been picked.");
+            MessageHelper.sendMessageToChannel(
+                    (MessageChannel) event.getChannel(),
+                    "Can only pick strategy card if both faction and color have been picked.");
             return false;
         }
         if (!strategyCardToTradeGoodCount.containsKey(scNumber)) {
-            MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                "Strategy Card must be from possible ones in game: " + strategyCardToTradeGoodCount.keySet());
+            MessageHelper.sendMessageToChannel(
+                    (MessageChannel) event.getChannel(),
+                    "Strategy Card must be from possible ones in game: " + strategyCardToTradeGoodCount.keySet());
             return false;
         }
 
         Map<String, Player> players = game.getPlayers();
         for (Player playerStats : players.values()) {
             if (playerStats.getSCs().contains(scNumber)) {
-                MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(),
-                    Helper.getSCName(scNumber, game) + " is already picked.");
+                MessageHelper.sendMessageToChannel(
+                        (MessageChannel) event.getChannel(), Helper.getSCName(scNumber, game) + " is already picked.");
                 return false;
             }
         }
 
         player.addSC(scNumber);
         if (game.isFowMode()) {
-            String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked " + Helper.getSCName(scNumber, game);
+            String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " picked "
+                    + Helper.getSCName(scNumber, game);
             FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
         }
 
-        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(scNumber).orElse(null);
+        StrategyCardModel scModel =
+                game.getStrategyCardModelByInitiative(scNumber).orElse(null);
 
         // WARNING IF PICKING TRADE WHEN PLAYER DOES NOT HAVE THEIR TRADE AGREEMENT
-        if (scModel.usesAutomationForSCID("pok5trade") && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
-            String message = player.getRepresentationUnfogged() + " heads up, you just picked **Trade** but don't currently hold your _Trade Agreement_.";
+        if (scModel.usesAutomationForSCID("pok5trade")
+                && !player.getPromissoryNotes().containsKey(player.getColor() + "_ta")) {
+            String message = player.getRepresentationUnfogged()
+                    + " heads up, you just picked **Trade** but don't currently hold your _Trade Agreement_.";
             MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), message);
         }
 
         Integer tgCount = strategyCardToTradeGoodCount.get(scNumber);
-        String msg = player.getRepresentationUnfogged() +
-            " picked " + Helper.getSCRepresentation(game, scNumber) + ".";
+        String msg = player.getRepresentationUnfogged() + " picked " + Helper.getSCRepresentation(game, scNumber) + ".";
         MessageHelper.sendMessageToChannel(player.getCorrectChannel(), msg);
         if (tgCount != null && tgCount != 0) {
             int tg = player.getTg();
             tg += tgCount;
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
-                    + " from picking " + Helper.getSCName(scNumber, game) + ".");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " gained " + tgCount + " trade good" + (tgCount == 1 ? "" : "s")
+                            + " from picking " + Helper.getSCName(scNumber, game) + ".");
             if (game.isFowMode()) {
-                String messageToSend = ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount
-                    + " trade good" + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game) + ".";
+                String messageToSend =
+                        ColorEmojis.getColorEmojiWithName(player.getColor()) + " gained " + tgCount + " trade good"
+                                + (tgCount == 1 ? "" : "s") + " from picking " + Helper.getSCName(scNumber, game) + ".";
                 FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
             }
             player.setTg(tg);
@@ -155,24 +201,35 @@ public class PlayerStatsService {
     }
 
     public void setValue(
-        SlashCommandInteractionEvent event, Game game, Player player, OptionMapping option,
-        Consumer<Integer> consumer, Supplier<Integer> supplier
-    ) {
+            SlashCommandInteractionEvent event,
+            Game game,
+            Player player,
+            OptionMapping option,
+            Consumer<Integer> consumer,
+            Supplier<Integer> supplier) {
         setValue(event, game, player, option.getName(), consumer, supplier, option.getAsString(), false);
     }
 
     public void setValue(
-        SlashCommandInteractionEvent event, Game game, Player player, OptionMapping option,
-        Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage
-    ) {
-        setValue(event, game, player, option.getName(), consumer, supplier, option.getAsString(),
-            suppressMessage);
+            SlashCommandInteractionEvent event,
+            Game game,
+            Player player,
+            OptionMapping option,
+            Consumer<Integer> consumer,
+            Supplier<Integer> supplier,
+            boolean suppressMessage) {
+        setValue(event, game, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
     }
 
     public void setValue(
-        SlashCommandInteractionEvent event, Game game, Player player, String optionName,
-        Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage
-    ) {
+            SlashCommandInteractionEvent event,
+            Game game,
+            Player player,
+            String optionName,
+            Consumer<Integer> consumer,
+            Supplier<Integer> supplier,
+            String value,
+            boolean suppressMessage) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             String explanation = "";
@@ -185,10 +242,8 @@ public class PlayerStatsService {
             int existingNumber = supplier.get();
             if (setValue) {
                 consumer.accept(number);
-                String messageToSend = getSetValueMessage(optionName, number, existingNumber,
-                    explanation);
-                if (!suppressMessage)
-                    MessageHelper.sendMessageToEventChannel(event, messageToSend);
+                String messageToSend = getSetValueMessage(optionName, number, existingNumber, explanation);
+                if (!suppressMessage) MessageHelper.sendMessageToEventChannel(event, messageToSend);
                 if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
                 }
@@ -196,10 +251,9 @@ public class PlayerStatsService {
                 int newNumber = existingNumber + number;
                 newNumber = Math.max(newNumber, 0);
                 consumer.accept(newNumber);
-                String messageToSend = getChangeValueMessage(optionName, number, existingNumber,
-                    newNumber, explanation);
-                if (!suppressMessage)
-                    MessageHelper.sendMessageToEventChannel(event, messageToSend);
+                String messageToSend =
+                        getChangeValueMessage(optionName, number, existingNumber, newNumber, explanation);
+                if (!suppressMessage) MessageHelper.sendMessageToEventChannel(event, messageToSend);
                 if (game.isFowMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(game, event, player, messageToSend);
                 }
@@ -210,25 +264,20 @@ public class PlayerStatsService {
     }
 
     public static String getSetValueMessage(
-        String optionName,
-        Integer setToNumber, Integer existingNumber, String explanation
-    ) {
+            String optionName, Integer setToNumber, Integer existingNumber, String explanation) {
         if (explanation == null || "".equalsIgnoreCase(explanation)) {
             return "Set __" + optionName + "__ to " + setToNumber + " (was "
-                + existingNumber + ", a change of " + (setToNumber - existingNumber)
-                + ").";
+                    + existingNumber + ", a change of " + (setToNumber - existingNumber)
+                    + ").";
         } else {
             return "Set __" + optionName + "__ to " + setToNumber + " (was "
-                + existingNumber + ", a change of " + (setToNumber - existingNumber)
-                + ") for the reason of: " + explanation + ".";
+                    + existingNumber + ", a change of " + (setToNumber - existingNumber)
+                    + ") for the reason of: " + explanation + ".";
         }
-
     }
 
     public static String getChangeValueMessage(
-        String optionName,
-        Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation
-    ) {
+            String optionName, Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation) {
         String changeDescription = "Changed";
         if (changeNumber > 0) {
             changeDescription = "Increased";
@@ -236,15 +285,16 @@ public class PlayerStatsService {
             changeDescription = "Decreased";
         }
         if (explanation == null || "".equalsIgnoreCase(explanation)) {
-            return changeDescription + " __" + optionName + "__ by " + changeNumber + " (was "
-                + existingNumber + ", now " + newNumber + ").";
+            return changeDescription + " __" + optionName + "__ by " + changeNumber + " (was " + existingNumber
+                    + ", now " + newNumber + ").";
         } else {
-            return changeDescription + " __" + optionName + "__ by " + changeNumber + " (was "
-                + existingNumber + ", now " + newNumber + ") for the reason of: " + explanation + ".";
+            return changeDescription + " __" + optionName + "__ by " + changeNumber + " (was " + existingNumber
+                    + ", now " + newNumber + ") for the reason of: " + explanation + ".";
         }
     }
 
-    public static void setTotalCommodities(GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
+    public static void setTotalCommodities(
+            GenericInteractionCreateEvent event, Player player, Integer commoditiesTotalCount) {
         String message = "> Set base commodity to " + commoditiesTotalCount + MiscEmojis.comm + ".";
         if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
             message = "__Warning__: Total commodity count seems like a wrong value.\n" + message;

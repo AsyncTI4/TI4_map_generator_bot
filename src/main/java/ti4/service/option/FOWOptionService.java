@@ -2,7 +2,6 @@ package ti4.service.option;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -16,8 +15,10 @@ import ti4.service.fow.GMService;
 @UtilityClass
 public class FOWOptionService {
 
-    public enum FOWOptionCategory { 
-        GAME, VISIBILITY, OTHER;
+    public enum FOWOptionCategory {
+        GAME,
+        VISIBILITY,
+        OTHER;
 
         static FOWOptionCategory fromString(String string) {
             for (FOWOptionCategory category : FOWOptionCategory.values()) {
@@ -30,24 +31,36 @@ public class FOWOptionService {
     }
 
     public enum FOWOption {
-        //Comm Options (max 5)
+        // Comm Options (max 5)
         MANAGED_COMMS(FOWOptionCategory.GAME, "Managed comms", "Use managed player-to-player communication threads"),
-        ALLOW_AGENDA_COMMS(FOWOptionCategory.GAME, "Allow comms in agenda", "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
-        STATUS_SUMMARY(FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
+        ALLOW_AGENDA_COMMS(
+                FOWOptionCategory.GAME,
+                "Allow comms in agenda",
+                "Managed player-to-player communication threads allow talking with everyone in Agenda Phase"),
+        STATUS_SUMMARY(
+                FOWOptionCategory.GAME, "Status summary", "Prints explores info as summary thread in status homework"),
         HIDE_TOTAL_VOTES(FOWOptionCategory.GAME, "Hide total votes", "Hide total votes amount in agenda"),
         HIDE_VOTE_ORDER(FOWOptionCategory.GAME, "Hide voting order", "Hide player colors from vote order"),
-        
-        //Visibility Options (max 5)
+
+        // Visibility Options (max 5)
         BRIGHT_NOVAS(FOWOptionCategory.VISIBILITY, "Bright Novas", "Locations of Supernovas are always visible"),
-        HIDE_EXPLORES(FOWOptionCategory.VISIBILITY, "Hide Explore Decks", "Disables looking at explore and relic decks"),
+        HIDE_EXPLORES(
+                FOWOptionCategory.VISIBILITY, "Hide Explore Decks", "Disables looking at explore and relic decks"),
         HIDE_MAP(FOWOptionCategory.VISIBILITY, "Hide Unexplored Map", "Hides unexplored (blue 0b) map tiles."),
-        STATS_FROM_HS_ONLY(FOWOptionCategory.VISIBILITY, "Stats from HS", "Only way to see players stats is to see their Home System"),
+        STATS_FROM_HS_ONLY(
+                FOWOptionCategory.VISIBILITY,
+                "Stats from HS",
+                "Only way to see players stats is to see their Home System"),
 
-        //Other Options (max 5)
-        HIDE_PLAYER_NAMES(FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
-        FOW_PLUS(FOWOptionCategory.OTHER, "FoW Plus Mode", "Hello darkness my old friend... WIP - ask Solax for details"),
+        // Other Options (max 5)
+        HIDE_PLAYER_NAMES(
+                FOWOptionCategory.OTHER, "Hide real names", "Completely hide player Discord names on the map"),
+        FOW_PLUS(
+                FOWOptionCategory.OTHER,
+                "FoW Plus Mode",
+                "Hello darkness my old friend... WIP - ask Solax for details"),
 
-        //Hidden from normal options
+        // Hidden from normal options
         RIFTSET_MODE(null, "RiftSet Mode", "For Eronous to run fow300", false);
 
         private final FOWOptionCategory category;
@@ -101,7 +114,8 @@ public class FOWOptionService {
         offerFOWOptionButtons(null, game, FOWOptionCategory.GAME);
     }
 
-    private static void offerFOWOptionButtons(ButtonInteractionEvent event, Game game, FOWOptionCategory selectedCategory) {
+    private static void offerFOWOptionButtons(
+            ButtonInteractionEvent event, Game game, FOWOptionCategory selectedCategory) {
         StringBuilder sb = new StringBuilder("### Change FoW " + selectedCategory + " Options\n\n");
 
         List<ActionRow> rows = new ArrayList<>();
@@ -120,19 +134,30 @@ public class FOWOptionService {
             if (!option.isVisible() || !option.getCategory().equals(selectedCategory)) continue;
 
             boolean currentValue = game.getFowOption(option);
-            sb.append(valueRepresentation(currentValue)).append(" **").append(option.getTitle()).append("**\n");
+            sb.append(valueRepresentation(currentValue))
+                    .append(" **")
+                    .append(option.getTitle())
+                    .append("**\n");
             sb.append("-# ").append(option.getDescription()).append("\n");
 
-            optionButtons.add(currentValue
-                ? Buttons.red("fowOption_" + selectedCategory + "_false_" + option, "Disable " + option.getTitle())
-                : Buttons.green("fowOption_" + selectedCategory + "_true_" + option, "Enable " + option.getTitle()));
+            optionButtons.add(
+                    currentValue
+                            ? Buttons.red(
+                                    "fowOption_" + selectedCategory + "_false_" + option,
+                                    "Disable " + option.getTitle())
+                            : Buttons.green(
+                                    "fowOption_" + selectedCategory + "_true_" + option,
+                                    "Enable " + option.getTitle()));
         }
 
         rows.add(ActionRow.of(optionButtons));
         rows.add(ActionRow.of(categoryButtons));
 
         if (event == null) {
-            GMService.getGMChannel(game).sendMessage(sb.toString()).addComponents(rows).queue();
+            GMService.getGMChannel(game)
+                    .sendMessage(sb.toString())
+                    .addComponents(rows)
+                    .queue();
         } else {
             event.getHook().editOriginal(sb.toString()).setComponents(rows).queue();
         }

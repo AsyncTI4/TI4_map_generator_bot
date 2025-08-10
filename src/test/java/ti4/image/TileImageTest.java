@@ -1,7 +1,6 @@
 package ti4.image;
 
 import java.util.HashSet;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,7 +26,7 @@ import ti4.testUtils.BaseTi4Test;
  * <p><p> For advanced tips & complaints, ping Jazzxhands in discord
  */
 
-//@org.junit.jupiter.api.Disabled
+// @org.junit.jupiter.api.Disabled
 public class TileImageTest extends BaseTi4Test {
 
     public static Game testGame = null;
@@ -68,15 +67,42 @@ public class TileImageTest extends BaseTi4Test {
     public void generateDevilsTestImage() {
         Tile devils = new Tile("75", "000");
         testGame.setTile(devils);
-        TileImageTestHelper.addUnitsToUnitHolder(testPlayer1, devils, "space", UnitType.Dreadnought, UnitType.Flagship, UnitType.Destroyer);
-        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, devils, "loki", UnitType.Infantry, UnitType.Mech, UnitType.Spacedock, UnitType.Pds, UnitType.Pds);
-        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, devils, "abaddon", UnitType.Infantry, UnitType.Mech, UnitType.Spacedock, UnitType.Pds, UnitType.Pds);
-        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, devils, "ashtroth", UnitType.Infantry, UnitType.Mech, UnitType.Spacedock, UnitType.Pds, UnitType.Pds);
-        TileImageTestHelper.addTokensToHolder(devils, "loki",
-            "attachment_tombofemphidia.png",
-            "attachment_paradiseworld.png",
-            "attachment_nanoforge.png",
-            "attachment_dysonsphere.png");
+        TileImageTestHelper.addUnitsToUnitHolder(
+                testPlayer1, devils, "space", UnitType.Dreadnought, UnitType.Flagship, UnitType.Destroyer);
+        TileImageTestHelper.addUnitsAndControlToPlanet(
+                testPlayer1,
+                devils,
+                "loki",
+                UnitType.Infantry,
+                UnitType.Mech,
+                UnitType.Spacedock,
+                UnitType.Pds,
+                UnitType.Pds);
+        TileImageTestHelper.addUnitsAndControlToPlanet(
+                testPlayer1,
+                devils,
+                "abaddon",
+                UnitType.Infantry,
+                UnitType.Mech,
+                UnitType.Spacedock,
+                UnitType.Pds,
+                UnitType.Pds);
+        TileImageTestHelper.addUnitsAndControlToPlanet(
+                testPlayer1,
+                devils,
+                "ashtroth",
+                UnitType.Infantry,
+                UnitType.Mech,
+                UnitType.Spacedock,
+                UnitType.Pds,
+                UnitType.Pds);
+        TileImageTestHelper.addTokensToHolder(
+                devils,
+                "loki",
+                "attachment_tombofemphidia.png",
+                "attachment_paradiseworld.png",
+                "attachment_nanoforge.png",
+                "attachment_dysonsphere.png");
 
         TileImageTestHelper.runTest(devils, "Devils.png");
     }
@@ -90,7 +116,8 @@ public class TileImageTest extends BaseTi4Test {
 
         TileImageTestHelper.addTokensToHolder(emptyAlpha, "space", "token_mirage.png");
         TokenPlanetService.addTokenPlanetToTile(testGame, emptyAlpha, "mirage");
-        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer1, emptyAlpha, "mirage", UnitType.Infantry, UnitType.Infantry, UnitType.Infantry);
+        TileImageTestHelper.addUnitsAndControlToPlanet(
+                testPlayer1, emptyAlpha, "mirage", UnitType.Infantry, UnitType.Infantry, UnitType.Infantry);
 
         TileImageTestHelper.runTest(emptyAlpha, "Mirage.png");
     }
@@ -119,7 +146,8 @@ public class TileImageTest extends BaseTi4Test {
         testGame.setTile(acheron);
 
         TileImageTestHelper.addUnitsToUnitHolder(testPlayer2, acheron, "space", UnitType.Destroyer);
-        TileImageTestHelper.addUnitsAndControlToPlanet(testPlayer2, acheron, "acheron", UnitType.Mech, UnitType.Infantry, UnitType.Spacedock);
+        TileImageTestHelper.addUnitsAndControlToPlanet(
+                testPlayer2, acheron, "acheron", UnitType.Mech, UnitType.Infantry, UnitType.Spacedock);
 
         TileImageTestHelper.runTest(acheron, "Acheron.png");
     }

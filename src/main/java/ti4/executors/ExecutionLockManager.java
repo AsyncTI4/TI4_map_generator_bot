@@ -2,7 +2,6 @@ package ti4.executors;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.message.BotLogger;
@@ -43,7 +42,8 @@ public class ExecutionLockManager {
         return locks.computeIfAbsent(lockName, k -> new ReentrantReadWriteLock());
     }
 
-    public static Runnable wrapWithTryLockAndRelease(String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
+    public static Runnable wrapWithTryLockAndRelease(
+            String lockName, LockType lockType, Runnable task, MessageChannel messageChannel) {
         return () -> {
             boolean gotLock = ExecutionLockManager.tryLock(lockName, ExecutionLockManager.LockType.WRITE);
             if (gotLock) {
@@ -51,8 +51,9 @@ public class ExecutionLockManager {
                 return;
             }
             if (messageChannel != null) {
-                MessageHelper.sendMessageToChannel(messageChannel,
-                    "The bot hasn't finished processing the last task for " + lockName + ". Please wait.");
+                MessageHelper.sendMessageToChannel(
+                        messageChannel,
+                        "The bot hasn't finished processing the last task for " + lockName + ". Please wait.");
             } else {
                 BotLogger.warning("The bot hasn't finished processing the last task for " + lockName + ".");
             }
@@ -78,5 +79,8 @@ public class ExecutionLockManager {
         };
     }
 
-    public enum LockType { READ, WRITE }
+    public enum LockType {
+        READ,
+        WRITE
+    }
 }

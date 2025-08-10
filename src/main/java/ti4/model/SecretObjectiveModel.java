@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -53,12 +52,7 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     }
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && phase != null
-            && text != null
-            && points != 0
-            && source != null;
+        return alias != null && name != null && phase != null && text != null && points != 0 && source != null;
     }
 
     public static final Comparator<SecretObjectiveModel> sortByPointsAndName = (po1, po2) -> {
@@ -84,16 +78,18 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     public MessageEmbed getRepresentationEmbed(boolean includeID) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = CardEmojis.SecretObjective + "__**" + getName() + "**__" + getSource().emoji();
+        // TITLE
+        String title = CardEmojis.SecretObjective + "__**" + getName() + "**__"
+                + getSource().emoji();
         eb.setTitle(title);
 
-        //DESCRIPTION
+        // DESCRIPTION
         eb.setDescription(getText());
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID)
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -108,7 +104,9 @@ public class SecretObjectiveModel implements ColorableModelInterface<SecretObjec
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

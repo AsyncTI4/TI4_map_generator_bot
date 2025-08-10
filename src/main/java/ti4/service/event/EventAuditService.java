@@ -20,14 +20,22 @@ public class EventAuditService {
             case SlashCommandInteractionEvent slash -> username + " used: " + slash.getCommandString();
             case ButtonInteractionEvent button -> {
                 boolean thread = button.getMessageChannel() instanceof ThreadChannel;
-                boolean cardThread = thread && button.getMessageChannel().getName().contains("Cards Info-");
-                boolean draftThread = thread && button.getMessageChannel().getName().contains("Draft Bag-");
-                if (cardThread || draftThread || isFow || button.getButton().getId().contains("anonDeclare") || button.getButton().getId().contains("requestAllFollow")) {
-                    yield  "someone pressed button: [CLASSIFIED]";
+                boolean cardThread =
+                        thread && button.getMessageChannel().getName().contains("Cards Info-");
+                boolean draftThread =
+                        thread && button.getMessageChannel().getName().contains("Draft Bag-");
+                if (cardThread
+                        || draftThread
+                        || isFow
+                        || button.getButton().getId().contains("anonDeclare")
+                        || button.getButton().getId().contains("requestAllFollow")) {
+                    yield "someone pressed button: [CLASSIFIED]";
                 }
-                yield username + " pressed button: " + button.getButton().getId() + " -- " + button.getButton().getLabel();
+                yield username + " pressed button: " + button.getButton().getId() + " -- "
+                        + button.getButton().getLabel();
             }
-            case StringSelectInteractionEvent selectMenu -> username + " used string selection: " + selectMenu.getComponentId();
+            case StringSelectInteractionEvent selectMenu ->
+                username + " used string selection: " + selectMenu.getComponentId();
             case ModalInteractionEvent modal -> username + " used modal: " + modal.getModalId();
             default -> "Last Command Unknown";
         };

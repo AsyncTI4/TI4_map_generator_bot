@@ -21,5 +21,4 @@ class ShowMapString extends GameStateSubcommand {
         MessageHelper.sendMessageToEventChannel(event, game.getName() + " map string below:");
         MessageHelper.sendMessageToEventChannel(event, game.getMapString());
     }
-
 }

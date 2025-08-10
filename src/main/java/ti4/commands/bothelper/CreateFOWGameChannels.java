@@ -1,7 +1,6 @@
 package ti4.commands.bothelper;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
@@ -31,33 +30,39 @@ class CreateFOWGameChannels extends Subcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        //GAME NAME
+        // GAME NAME
         String gameName = CreateFoWGameService.getNextFOWGameName();
 
-        //CHECK IF GIVEN CATEGORY IS VALID
+        // CHECK IF GIVEN CATEGORY IS VALID
         Guild guild = event.getGuild();
         if (guild == null) {
             MessageHelper.sendMessageToEventChannel(event, "Guild was null");
             return;
         }
 
-        //PLAYERS
+        // PLAYERS
         Member gameOwner = CreateFoWGameService.getGM(event);
         List<Member> members = CreateFoWGameService.getPlayers(event);
 
-        //CHECK IF SERVER CAN SUPPORT A NEW GAME
+        // CHECK IF SERVER CAN SUPPORT A NEW GAME
         if (!CreateFoWGameService.serverCanHostNewGame(guild, members.size() + 1)) {
-            MessageHelper.sendMessageToEventChannel(event, "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
 
-        //CHECK IF GUILD HAS ALL PLAYERS LISTED
-        List<String> guildMemberIDs = guild.getMembers().stream().map(ISnowflake::getId).toList();
+        // CHECK IF GUILD HAS ALL PLAYERS LISTED
+        List<String> guildMemberIDs =
+                guild.getMembers().stream().map(ISnowflake::getId).toList();
         boolean sendInviteLink = false;
         int count = 0;
         for (Member member : members) {
             if (!guildMemberIDs.contains(member.getId())) {
-                MessageHelper.sendMessageToEventChannel(event, member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
+                MessageHelper.sendMessageToEventChannel(
+                        event,
+                        member.getAsMention() + " is not a member of the server **" + guild.getName()
+                                + "**. Please use the invite below to join the server and then try this command again.");
                 sendInviteLink = true;
                 count++;
             }
@@ -69,5 +74,4 @@ class CreateFOWGameChannels extends Subcommand {
 
         CreateFoWGameService.executeCreateFoWGame(guild, gameName, "", gameOwner, members, event.getChannel());
     }
-
 }

@@ -3,16 +3,26 @@ package ti4.service.emoji;
 public enum UnitEmojis implements TI4Emoji {
 
     // Structures
-    spacedock, pds,
+    spacedock,
+    pds,
 
     // Ships
-    warsun, flagship, dreadnought, carrier, cruiser, destroyer, fighter,
+    warsun,
+    flagship,
+    dreadnought,
+    carrier,
+    cruiser,
+    destroyer,
+    fighter,
 
     // Ground forces
-    mech, infantry,
+    mech,
+    infantry,
 
     // Homebrew
-    TyrantsLament, PlenaryOrbital, Monument;
+    TyrantsLament,
+    PlenaryOrbital,
+    Monument;
 
     @Override
     public String toString() {

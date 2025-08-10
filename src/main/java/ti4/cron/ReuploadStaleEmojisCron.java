@@ -1,7 +1,6 @@
 package ti4.cron;
 
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import ti4.message.BotLogger;
 import ti4.service.emoji.ApplicationEmojiService;
@@ -10,7 +9,11 @@ import ti4.service.emoji.ApplicationEmojiService;
 public class ReuploadStaleEmojisCron {
 
     public static void register() {
-        CronManager.scheduleOnce(ReuploadStaleEmojisCron.class, ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging, 2, TimeUnit.MINUTES);
+        CronManager.scheduleOnce(
+                ReuploadStaleEmojisCron.class,
+                ReuploadStaleEmojisCron::reuploadEmojisAndDeleteHanging,
+                2,
+                TimeUnit.MINUTES);
     }
 
     private static void reuploadEmojisAndDeleteHanging() {

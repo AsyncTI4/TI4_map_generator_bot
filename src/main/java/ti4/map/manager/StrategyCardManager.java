@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.ButtonHelperAbilities;
 import ti4.helpers.ButtonHelperAgents;
@@ -42,10 +41,12 @@ public class StrategyCardManager {
                 ButtonHelperAbilities.pillageCheck(player, game);
                 ButtonHelperAgents.resolveArtunoCheck(player, tradeGoodCount);
                 tradeGoodCount = 0;
-                MessageHelper.sendMessageToChannel(game.getActionsChannel(),
-                    "The trade goods that would be placed on **" + Helper.getSCName(strategyCard, game)
-                        + "** have instead been given to the Kyro "
-                        + (game.isFrankenGame() ? "hero " : "") + "player, as per the text on Speygh, the Kyro Hero.");
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(),
+                        "The trade goods that would be placed on **" + Helper.getSCName(strategyCard, game)
+                                + "** have instead been given to the Kyro "
+                                + (game.isFrankenGame() ? "hero " : "")
+                                + "player, as per the text on Speygh, the Kyro Hero.");
             }
         }
         strategyCardToTradeGoodCount.put(strategyCard, tradeGoodCount);

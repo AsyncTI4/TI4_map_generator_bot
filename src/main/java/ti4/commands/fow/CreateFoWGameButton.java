@@ -2,7 +2,6 @@ package ti4.commands.fow;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,7 +21,8 @@ class CreateFoWGameButton extends Subcommand {
 
     public CreateFoWGameButton() {
         super(Constants.CREATE_FOW_GAME_BUTTON, "Create FoW Game Creation Button");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Game").setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Game").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3"));
@@ -42,11 +42,12 @@ class CreateFoWGameButton extends Subcommand {
 
         Guild guild = CreateFoWGameService.findFoWGuildWithSpace(event.getGuild(), members.size() + 1);
         if (guild == null) {
-            MessageHelper.sendMessageToEventChannel(event, "All FoW Server are full. Can not host a new game - please contact @Bothelper to resolve.");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "All FoW Server are full. Can not host a new game - please contact @Bothelper to resolve.");
             return;
         }
 
-        //Make sure everyone is in the right server
+        // Make sure everyone is in the right server
         List<Member> allMembers = new ArrayList<>(members);
         allMembers.add(gm);
         CreateGameService.inviteUsersToServer(guild, allMembers, event.getMessageChannel());
@@ -55,10 +56,21 @@ class CreateFoWGameButton extends Subcommand {
         buttons.add(Buttons.green("createFoWGameChannels", "Create FoW Game"));
 
         StringBuilder buttonMsg = new StringBuilder("## Game Fun Name: " + gameFunName.replace(":", ""));
-        buttonMsg.append("\nGM: ").append(gm.getId()).append(".(").append(gm.getEffectiveName().replace(":", "")).append(")\n\nPlayers:\n");
+        buttonMsg
+                .append("\nGM: ")
+                .append(gm.getId())
+                .append(".(")
+                .append(gm.getEffectiveName().replace(":", ""))
+                .append(")\n\nPlayers:\n");
         int counter = 1;
         for (Member member : members) {
-            buttonMsg.append(counter).append(":").append(member.getId()).append(".(").append(member.getEffectiveName().replace(":", "")).append(")\n");
+            buttonMsg
+                    .append(counter)
+                    .append(":")
+                    .append(member.getId())
+                    .append(".(")
+                    .append(member.getEffectiveName().replace(":", ""))
+                    .append(")\n");
             counter++;
         }
         buttonMsg.append("\nPlease hit this button after confirming that the members are the correct ones");
@@ -67,6 +79,4 @@ class CreateFoWGameButton extends Subcommand {
         ActionRow actionRow = ActionRow.of(buttons);
         baseMessageObject.addComponents(actionRow);
     }
-
 }
-

@@ -23,20 +23,21 @@ class CommandGameState {
     public void preExecute(SlashCommandInteractionEvent event) {
         String gameName = GameNameService.getGameName(event);
         if (!GameManager.isValid(gameName)) {
-            throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event " + event.getName() +
-                    " in channel " + event.getChannel().getName());
+            throw new IllegalArgumentException("Invalid game name: " + gameName + " while attempting to run event "
+                    + event.getName() + " in channel " + event.getChannel().getName());
         }
         Game game = GameManager.getManagedGame(gameName).getGame();
         this.game.set(game);
-        game.incrementSpecificSlashCommandCount(event.getFullCommandName()); // TODO: This only works for commands that save...
+        game.incrementSpecificSlashCommandCount(
+                event.getFullCommandName()); // TODO: This only works for commands that save...
 
         if (!isPlayerCommand) {
             return;
         }
         var player = CommandHelper.getPlayerFromEvent(game, event);
         if (player == null) {
-            throw new IllegalArgumentException("Unable to determine player while attempting to run event " + event.getName() +
-                " in channel " + event.getChannel().getName() + " for game " + gameName);
+            throw new IllegalArgumentException("Unable to determine player while attempting to run event "
+                    + event.getName() + " in channel " + event.getChannel().getName() + " for game " + gameName);
         }
         this.player.set(player);
     }
@@ -58,7 +59,8 @@ class CommandGameState {
     @NotNull
     public Player getPlayer() {
         if (!isPlayerCommand) {
-            throw new IllegalStateException("CommandGameStateHelper cannot get player state because command was not set to be a player command. This is a bug.");
+            throw new IllegalStateException(
+                    "CommandGameStateHelper cannot get player state because command was not set to be a player command. This is a bug.");
         }
         return player.get();
     }

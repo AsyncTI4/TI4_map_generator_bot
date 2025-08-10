@@ -8,5 +8,4 @@ public class EmojiService {
     public static String getFactionIconFromDiscord(String faction) {
         return FactionEmojis.getFactionIcon(faction).toString();
     }
-
 }
