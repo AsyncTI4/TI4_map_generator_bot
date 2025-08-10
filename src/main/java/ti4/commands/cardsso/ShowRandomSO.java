@@ -2,7 +2,6 @@ package ti4.commands.cardsso;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -18,8 +17,12 @@ class ShowRandomSO extends GameStateSubcommand {
 
     public ShowRandomSO() {
         super("show_random", "Show a Secret Objective to a player", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)")
+                        .setAutoComplete(true));
     }
 
     @Override

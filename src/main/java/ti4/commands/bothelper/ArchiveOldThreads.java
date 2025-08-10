@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -21,7 +20,9 @@ class ArchiveOldThreads extends Subcommand {
 
     public ArchiveOldThreads() {
         super(Constants.ARCHIVE_OLD_THREADS, "Archive a number of the oldest active threads");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.THREAD_COUNT, "Number of threads to archive (1 to 1000)").setRequired(true));
+        addOptions(
+                new OptionData(OptionType.INTEGER, Constants.THREAD_COUNT, "Number of threads to archive (1 to 1000)")
+                        .setRequired(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -47,9 +48,19 @@ class ArchiveOldThreads extends Subcommand {
         StringBuilder sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
-            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            sb.append("> `").append(latestActivityTime).append(" (").append(duration.toHours()).append(" hours ago)`  ").append(threadChannel.getAsMention()).append(" **")
-                    .append(threadChannel.getName()).append("** from channel **").append(threadChannel.getParentChannel().getName()).append("**\n");
+            Duration duration = Duration.between(
+                    latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            sb.append("> `")
+                    .append(latestActivityTime)
+                    .append(" (")
+                    .append(duration.toHours())
+                    .append(" hours ago)`  ")
+                    .append(threadChannel.getAsMention())
+                    .append(" **")
+                    .append(threadChannel.getName())
+                    .append("** from channel **")
+                    .append(threadChannel.getParentChannel().getName())
+                    .append("**\n");
         }
         return sb.toString();
     }

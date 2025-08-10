@@ -2,7 +2,7 @@ package ti4.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-public interface Command  {
+public interface Command {
 
     default boolean accept(SlashCommandInteractionEvent event) {
         return event.getName().equals(getName());

@@ -1,10 +1,9 @@
 package ti4.cache;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.github.benmanes.caffeine.cache.Cache;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

@@ -2,7 +2,6 @@ package ti4.website.model;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
 import lombok.Data;
 import ti4.helpers.Constants;
 import ti4.image.Mapper;
@@ -26,10 +25,16 @@ public class WebObjectives {
         private Map<String, Integer> factionProgress;
         private int progressThreshold;
 
-        public ObjectiveInfo(String key, String name, int pointValue,
-                           boolean revealed, boolean isMultiScoring,
-                           List<String> scoredFactions, List<String> peekingFactions,
-                           Map<String, Integer> factionProgress, int progressThreshold) {
+        public ObjectiveInfo(
+                String key,
+                String name,
+                int pointValue,
+                boolean revealed,
+                boolean isMultiScoring,
+                List<String> scoredFactions,
+                List<String> peekingFactions,
+                Map<String, Integer> factionProgress,
+                int progressThreshold) {
             this.key = key;
             this.name = name;
             this.pointValue = pointValue;
@@ -143,41 +148,62 @@ public class WebObjectives {
             return null;
         }
 
-        String displayKey = revealed ? key : "UNREVEALED_" + String.format("%04d", (int)(Math.random() * 10000));
+        String displayKey = revealed ? key : "UNREVEALED_" + String.format("%04d", (int) (Math.random() * 10000));
         String name = revealed ? po.getName() : "UNREVEALED";
         int pointValue = po.getPoints();
 
-        boolean isMultiScoring = Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || game.isFowMode();
+        boolean isMultiScoring =
+                Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || game.isFowMode();
 
         List<String> scoredFactions = getScoredFactions(game, key);
         List<String> peekingFactions = getPeekingFactions(game, key);
         Map<String, Integer> factionProgress = getFactionProgress(game, key, revealed);
         int progressThreshold = revealed ? ListPlayerInfoService.getObjectiveThreshold(key, game) : 0;
 
-        return new ObjectiveInfo(displayKey, name, pointValue, revealed, isMultiScoring, scoredFactions, peekingFactions, factionProgress, progressThreshold);
+        return new ObjectiveInfo(
+                displayKey,
+                name,
+                pointValue,
+                revealed,
+                isMultiScoring,
+                scoredFactions,
+                peekingFactions,
+                factionProgress,
+                progressThreshold);
     }
 
     private static ObjectiveInfo createCustomObjectiveInfo(Game game, String key, int pointValue) {
-        boolean isMultiScoring = Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || game.isFowMode();
+        boolean isMultiScoring =
+                Constants.CUSTODIAN.equals(key) || Constants.IMPERIAL_RIDER.equals(key) || game.isFowMode();
 
         List<String> scoredFactions = getScoredFactions(game, key);
         List<String> peekingFactions = new ArrayList<>(); // Custom objectives don't have peeking
         Map<String, Integer> factionProgress = getFactionProgress(game, key, true);
         int progressThreshold = ListPlayerInfoService.getObjectiveThreshold(key, game);
 
-        return new ObjectiveInfo(key, key, pointValue, true, isMultiScoring, scoredFactions, peekingFactions, factionProgress, progressThreshold);
+        return new ObjectiveInfo(
+                key,
+                key,
+                pointValue,
+                true,
+                isMultiScoring,
+                scoredFactions,
+                peekingFactions,
+                factionProgress,
+                progressThreshold);
     }
 
     private static List<String> getScoredFactions(Game game, String objectiveKey) {
-        List<String> scoredPlayerIDs = game.getScoredPublicObjectives().getOrDefault(objectiveKey, Collections.emptyList());
+        List<String> scoredPlayerIDs =
+                game.getScoredPublicObjectives().getOrDefault(objectiveKey, Collections.emptyList());
 
         return scoredPlayerIDs.stream()
-            .map(playerID -> {
-                Player player = game.getPlayers().get(playerID);
-                return player != null ? player.getFaction() : null;
-            })
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+                .map(playerID -> {
+                    Player player = game.getPlayers().get(playerID);
+                    return player != null ? player.getFaction() : null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private static List<String> getPeekingFactions(Game game, String objectiveKey) {
@@ -194,12 +220,12 @@ public class WebObjectives {
         }
 
         return peekingPlayerIDs.stream()
-            .map(playerID -> {
-                Player player = game.getPlayers().get(playerID);
-                return player != null ? player.getFaction() : null;
-            })
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+                .map(playerID -> {
+                    Player player = game.getPlayers().get(playerID);
+                    return player != null ? player.getFaction() : null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     private static Map<String, Integer> getFactionProgress(Game game, String objectiveKey, boolean revealed) {

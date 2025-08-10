@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -21,8 +20,12 @@ class SwapTwoSystems extends GameStateSubcommand {
 
     public SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to or RND").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from or RND")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to or RND")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override

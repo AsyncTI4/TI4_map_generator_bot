@@ -1,11 +1,10 @@
 package ti4.model.metadata;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import ti4.json.PersistenceManager;
 import ti4.message.BotLogger;
@@ -36,7 +35,8 @@ public class AutoPingMetadataManager {
         if (autoPing == null) {
             autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 1, false));
         } else {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount + 1, false));
+            autoPings.gameNameToAutoPing.put(
+                    gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount + 1, false));
         }
 
         persistFile(autoPings);
@@ -53,7 +53,8 @@ public class AutoPingMetadataManager {
             return;
         }
 
-        autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, autoPing.quickPing));
+        autoPings.gameNameToAutoPing.put(
+                gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, autoPing.quickPing));
 
         persistFile(autoPings);
     }
@@ -68,7 +69,8 @@ public class AutoPingMetadataManager {
         if (autoPing == null) {
             autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), 0, true));
         } else {
-            autoPings.gameNameToAutoPing.put(gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, true));
+            autoPings.gameNameToAutoPing.put(
+                    gameName, new AutoPing(System.currentTimeMillis(), autoPing.pingCount, true));
         }
 
         persistFile(autoPings);

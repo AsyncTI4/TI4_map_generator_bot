@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.NotNull;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.helpers.Units;
 import ti4.helpers.Units.UnitKey;
@@ -30,7 +28,10 @@ public class RemoveUnitService {
 
     public record RemovedUnit(UnitKey unitKey, Tile tile, UnitHolder uh, List<Integer> states) {
         public int getTotalRemoved() {
-            return states.stream().filter(Objects::nonNull).mapToInt(Integer::intValue).sum();
+            return states.stream()
+                    .filter(Objects::nonNull)
+                    .mapToInt(Integer::intValue)
+                    .sum();
         }
 
         public RemovedUnit onUnitHolder(UnitHolder uh2) {
@@ -51,7 +52,8 @@ public class RemoveUnitService {
     }
 
     @NotNull
-    public List<RemovedUnit> removeAllUnits(GenericInteractionCreateEvent event, Tile tile, Game game, UnitHolder unitHolder) {
+    public List<RemovedUnit> removeAllUnits(
+            GenericInteractionCreateEvent event, Tile tile, Game game, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByState().keySet())) {
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
@@ -61,7 +63,8 @@ public class RemoveUnitService {
     }
 
     @NotNull
-    public List<RemovedUnit> removeAllPlayerUnits(GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
+    public List<RemovedUnit> removeAllPlayerUnits(
+            GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
             ParsedUnit u = new ParsedUnit(uk, unitHolder.getUnitCount(uk), unitHolder.getName());
@@ -71,7 +74,8 @@ public class RemoveUnitService {
     }
 
     @NotNull
-    public List<RemovedUnit> removeAllPlayerNonStructureUnits(GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
+    public List<RemovedUnit> removeAllPlayerNonStructureUnits(
+            GenericInteractionCreateEvent event, Game game, Player player, Tile tile, UnitHolder unitHolder) {
         List<RemovedUnit> removed = new ArrayList<>();
         for (UnitKey uk : Set.copyOf(unitHolder.getUnitsByStateForPlayer(player).keySet())) {
             if (uk.getUnitType() == UnitType.Pds || uk.getUnitType() == UnitType.Spacedock) {
@@ -83,28 +87,58 @@ public class RemoveUnitService {
         return removed;
     }
 
-    public static List<RemovedUnit> removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, UnitHolder uh, UnitType unit, int amt) {
+    public static List<RemovedUnit> removeUnit(
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            Game game,
+            Player player,
+            UnitHolder uh,
+            UnitType unit,
+            int amt) {
         ParsedUnit pu = ParseUnitService.simpleParsedUnit(player, unit, uh, amt);
         return removeUnit(event, tile, game, pu);
     }
 
-    public static List<RemovedUnit> removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, UnitHolder uh, UnitType unit, int amt, boolean prioDamage) {
+    public static List<RemovedUnit> removeUnit(
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            Game game,
+            Player player,
+            UnitHolder uh,
+            UnitType unit,
+            int amt,
+            boolean prioDamage) {
         ParsedUnit pu = ParseUnitService.simpleParsedUnit(player, unit, uh, amt);
         return removeUnit(event, tile, game, pu, prioDamage);
     }
 
-    public static List<RemovedUnit> removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, Player player, UnitHolder uh, UnitType unit, int amt, UnitState state) {
+    public static List<RemovedUnit> removeUnit(
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            Game game,
+            Player player,
+            UnitHolder uh,
+            UnitType unit,
+            int amt,
+            UnitState state) {
         ParsedUnit pu = ParseUnitService.simpleParsedUnit(player, unit, uh, amt);
         return removeUnit(event, tile, game, pu, state);
     }
 
     @NotNull
-    public static List<RemovedUnit> removeUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
+    public static List<RemovedUnit> removeUnits(
+            GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList) {
         return removeUnits(event, tile, game, color, unitList, true);
     }
 
     @NotNull
-    public static List<RemovedUnit> removeUnits(GenericInteractionCreateEvent event, Tile tile, Game game, String color, String unitList, boolean prioritizeDamagedUnits) {
+    public static List<RemovedUnit> removeUnits(
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            Game game,
+            String color,
+            String unitList,
+            boolean prioritizeDamagedUnits) {
         List<ParsedUnit> parsedUnits = ParseUnitService.getParsedUnits(event, color, tile, unitList);
 
         List<RemovedUnit> unitsRemoved = new ArrayList<>();
@@ -116,16 +150,27 @@ public class RemoveUnitService {
     }
 
     @NotNull
-    public static List<RemovedUnit> removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit) {
+    public static List<RemovedUnit> removeUnit(
+            GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit) {
         return removeUnit(event, tile, game, parsedUnit, true);
     }
 
     @NotNull
-    public static List<RemovedUnit> removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit, boolean prioritizeDamagedUnits) {
+    public static List<RemovedUnit> removeUnit(
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            Game game,
+            ParsedUnit parsedUnit,
+            boolean prioritizeDamagedUnits) {
         return removeUnit(event, tile, game, parsedUnit, UnitState.dmg);
     }
 
-    public static List<RemovedUnit> removeUnit(GenericInteractionCreateEvent event, Tile tile, Game game, ParsedUnit parsedUnit, UnitState preferredState) {
+    public static List<RemovedUnit> removeUnit(
+            GenericInteractionCreateEvent event,
+            Tile tile,
+            Game game,
+            ParsedUnit parsedUnit,
+            UnitState preferredState) {
         List<UnitHolder> unitHoldersToRemoveFrom = getUnitHoldersToRemoveFrom(tile, parsedUnit);
 
         if (unitHoldersToRemoveFrom.isEmpty()) {
@@ -136,7 +181,8 @@ public class RemoveUnitService {
         int toRemoveCount = parsedUnit.getCount();
         List<RemovedUnit> allUnitsRemoved = new ArrayList<>();
         for (UnitHolder unitHolder : unitHoldersToRemoveFrom) {
-            List<Integer> unitsRemovedCount = unitHolder.removeUnit(parsedUnit.getUnitKey(), toRemoveCount, preferredState);
+            List<Integer> unitsRemovedCount =
+                    unitHolder.removeUnit(parsedUnit.getUnitKey(), toRemoveCount, preferredState);
 
             int tot = unitsRemovedCount.stream().collect(Collectors.summingInt(i -> i));
             if (tot > 0) {
@@ -153,7 +199,10 @@ public class RemoveUnitService {
             MessageHelper.replyToMessage(event, "Did not find enough units to remove, " + toRemoveCount + " missing.");
         }
 
-        tile.getUnitHolders().values().forEach(unitHolder -> AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game));
+        tile.getUnitHolders()
+                .values()
+                .forEach(unitHolder ->
+                        AddPlanetToPlayAreaService.addPlanetToPlayArea(event, tile, unitHolder.getName(), game));
         return allUnitsRemoved;
     }
 
@@ -164,8 +213,8 @@ public class RemoveUnitService {
         }
         // Otherwise, the location was not specified, so we check everywhere
         return tile.getUnitHolders().values().stream()
-            .filter(unitHolderTemp -> countUnitsInHolder(unitHolderTemp, parsedUnit.getUnitKey()) > 0)
-            .toList();
+                .filter(unitHolderTemp -> countUnitsInHolder(unitHolderTemp, parsedUnit.getUnitKey()) > 0)
+                .toList();
     }
 
     private static int countUnitsInHolder(UnitHolder holder, UnitKey unitKey) {
@@ -174,7 +223,10 @@ public class RemoveUnitService {
 
     private static void handleEmptyUnitHolders(GenericInteractionCreateEvent event, Tile tile, ParsedUnit parsedUnit) {
         if (event != null && event instanceof ButtonInteractionEvent) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation() + " " + parsedUnit.getLocation());
+            BotLogger.warning(
+                    new BotLogger.LogMessageOrigin(event),
+                    event.getId() + " found a null UnitHolder with the following info: " + tile.getRepresentation()
+                            + " " + parsedUnit.getLocation());
         } else if (event != null) {
             MessageHelper.replyToMessage(event, "Unable to determine where the units are being removed from.");
         }

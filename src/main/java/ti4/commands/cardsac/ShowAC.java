@@ -1,7 +1,6 @@
 package ti4.commands.cardsac;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -18,9 +17,14 @@ class ShowAC extends GameStateSubcommand {
 
     public ShowAC() {
         super(Constants.SHOW_AC, "Show an action card to one player", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID, which is found between ()")
+                .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
@@ -41,12 +45,11 @@ class ShowAC extends GameStateSubcommand {
         }
 
         Game game = getGame();
-        String sb = "---------\n" +
-            "Game: " + game.getName() + "\n" +
-            "Player: " + player.getUserName() + "\n" +
-            "Shown Action Cards:" + "\n" +
-            Mapper.getActionCard(acID).getRepresentation() + "\n" +
-            "---------\n";
+        String sb = "---------\n" + "Game: "
+                + game.getName() + "\n" + "Player: "
+                + player.getUserName() + "\n" + "Shown Action Cards:"
+                + "\n" + Mapper.getActionCard(acID).getRepresentation()
+                + "\n" + "---------\n";
         player.setActionCard(acID);
 
         Player playerToShowTo = CommandHelper.getOtherPlayerFromEvent(game, event);

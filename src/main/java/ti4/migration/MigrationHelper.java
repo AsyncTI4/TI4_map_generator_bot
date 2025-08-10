@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.draft.DraftBag;
@@ -111,7 +110,8 @@ public class MigrationHelper {
     }
 
     public static void swapBagItem(DraftBag bag, int index, DraftItem newItem) {
-        BotLogger.info(String.format("Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
+        BotLogger.info(String.format(
+                "Draft Bag replacing %s with %s", bag.Contents.get(index).getAlias(), newItem.getAlias()));
         bag.Contents.remove(index);
         bag.Contents.add(index, newItem);
     }
@@ -186,7 +186,8 @@ public class MigrationHelper {
                 // Add the unit to "unk"
                 if (!game.getTacticalActionDisplacement().containsKey("unk"))
                     game.getTacticalActionDisplacement().put("unk", new HashMap<>());
-                Map<Units.UnitKey, List<Integer>> uh = game.getTacticalActionDisplacement().get("unk");
+                Map<Units.UnitKey, List<Integer>> uh =
+                        game.getTacticalActionDisplacement().get("unk");
                 if (!uh.containsKey(key)) uh.put(key, Units.UnitState.emptyList());
                 int mv = uh.get(key).get(st.ordinal());
                 uh.get(key).set(st.ordinal(), mv + amt);
@@ -195,16 +196,21 @@ public class MigrationHelper {
         game.resetCurrentMovedUnitsFrom1System();
         game.resetCurrentMovedUnitsFrom1TacticalAction();
 
-        String msg = "Hey %s, I redid a lot of the tactical action buttons, and because of this a little bit of information has been lost. ";
-        msg += "**__All your units are still accounted for__**, but any units that you moved won't be able to be put back unless you use `undo`. ";
-        msg += "Apologies for the inconvenience. Let me know if anything breaks during this tactical action and you need help fixing it.\n\n";
-        msg += "Good news though, future tactical actions you'll be able to freely edit your unit movement from each system as much as you like!\n";
+        String msg =
+                "Hey %s, I redid a lot of the tactical action buttons, and because of this a little bit of information has been lost. ";
+        msg +=
+                "**__All your units are still accounted for__**, but any units that you moved won't be able to be put back unless you use `undo`. ";
+        msg +=
+                "Apologies for the inconvenience. Let me know if anything breaks during this tactical action and you need help fixing it.\n\n";
+        msg +=
+                "Good news though, future tactical actions you'll be able to freely edit your unit movement from each system as much as you like!\n";
         msg += "\\- Jazzxhands";
         String playerMsg = String.format(msg, player.getRepresentationUnfogged());
         if (game.isFowMode()) {
             MessageHelper.sendMessageToChannel(player.getCorrectChannel(), playerMsg);
 
-            String gmMsg = String.format(msg, "GM (on behalf of " + player.getRepresentationUnfoggedNoPing() + ")") + "\n";
+            String gmMsg =
+                    String.format(msg, "GM (on behalf of " + player.getRepresentationUnfoggedNoPing() + ")") + "\n";
             GMService.logActivity(game, gmMsg, true);
         } else if (game.getTableTalkChannel() != null) {
             MessageHelper.sendMessageToChannel(game.getTableTalkChannel(), playerMsg);

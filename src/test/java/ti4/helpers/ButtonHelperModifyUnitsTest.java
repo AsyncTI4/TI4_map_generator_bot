@@ -1,7 +1,10 @@
 package ti4.helpers;
 
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import ti4.helpers.Units.UnitKey;
 import ti4.helpers.Units.UnitType;
@@ -9,10 +12,6 @@ import ti4.map.Game;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.testUtils.BaseTi4Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
     private final Game game = new Game();
@@ -31,7 +30,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, true, true);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, true, true);
 
         assertFalse(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
     }
@@ -48,7 +48,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, true, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, true, false);
 
         assertFalse(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
     }
@@ -69,7 +70,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
 
         assertFalse(actualMessage.contains("Would repair 1 <normalEmoji> due to _Duranium Armor_"));
     }
@@ -87,7 +89,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, true, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, true, false);
 
         assertTrue(actualMessage.contains("Would repair 1 <dreadnought> due to _Duranium Armor_"));
     }
@@ -105,7 +108,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, true, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, true, false);
 
         assertTrue(actualMessage.contains("Would repair 1 <dreadnought> due to _Duranium Armor_"));
     }
@@ -123,7 +127,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
 
         assertFalse(actualMessage.contains("Would repair 1 <dreadnought> due to _Duranium Armor_"));
     }
@@ -147,7 +152,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
 
         assertTrue(actualMessage.contains("Would repair 1 <warsun> due to _Duranium Armor_"));
     }
@@ -171,7 +177,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, true, false);
 
         assertTrue(actualMessage.contains("Would repair 1 <warsun> due to _Duranium Armor_"));
     }
@@ -188,7 +195,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         UnitKey dreadnoughtUnitKey = Units.getUnitKey(UnitType.Dreadnought, "red");
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
 
         assertFalse(actualMessage.contains("Would repair 1 <dreadnought> due to _Duranium Armor_"));
     }
@@ -209,7 +217,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         UnitKey flagshipUnitKey = Units.getUnitKey(UnitType.Flagship, "red");
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
         assertFalse(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
     }
@@ -227,7 +236,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 1, null, false, false);
 
         assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
     }
@@ -245,7 +255,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
 
         assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
     }
@@ -263,7 +274,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 2);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
         assertFalse(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
     }
@@ -287,7 +299,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
         assertTrue(actualMessage.contains("Repaired 1 <warsun> due to _Duranium Armor_"));
     }
 
@@ -310,7 +323,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, flagshipUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, flagshipUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
         assertTrue(actualMessage.contains("Repaired 1 <warsun> due to _Duranium Armor_"));
         assertEquals(1, tile.getUnitHolders().get(Constants.SPACE).getDamagedUnitCount(warsunUnitKey));
@@ -329,7 +343,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 2, null, false, false);
 
         assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
         assertEquals(1, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));
@@ -347,7 +362,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 2);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 3, null, false, false);
 
         assertFalse(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
         assertEquals(0, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));
@@ -363,7 +379,8 @@ public class ButtonHelperModifyUnitsTest extends BaseTi4Test {
         tile.addUnit(Constants.SPACE, dreadnoughtUnitKey, 4);
         tile.addUnitDamage(Constants.SPACE, dreadnoughtUnitKey, 1);
 
-        String actualMessage = ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 4, null, false, false);
+        String actualMessage =
+                ButtonHelperModifyUnits.autoAssignSpaceCombatHits(player, game, tile, 4, null, false, false);
 
         assertTrue(actualMessage.contains("Repaired 1 <dreadnought> due to _Duranium Armor_"));
         assertEquals(3, tile.getUnitHolders().get(Constants.SPACE).getUnitCount(dreadnoughtUnitKey));

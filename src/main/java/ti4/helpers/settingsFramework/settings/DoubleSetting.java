@@ -1,10 +1,9 @@
 package ti4.helpers.settingsFramework.settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,7 +12,7 @@ import ti4.buttons.Buttons;
 
 @Getter
 @Setter
-@JsonIncludeProperties({ "id", "val" })
+@JsonIncludeProperties({"id", "val"})
 public class DoubleSetting extends SettingInterface {
     private double val;
     private double defaultValue;
@@ -79,5 +78,4 @@ public class DoubleSetting extends SettingInterface {
         val -= delta;
         return null;
     }
-
 }

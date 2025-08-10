@@ -22,5 +22,4 @@ class AddOmenDie extends GameStateSubcommand {
         ButtonHelperAbilities.addOmenDie(getGame(), dieResult);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Added an Omen Die with value " + dieResult);
     }
-
 }

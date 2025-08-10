@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -24,7 +23,8 @@ import ti4.service.emoji.CardEmojis;
 public class SecretObjectiveInfoService {
 
     public static void sendSecretObjectiveInfo(Game game, Player player, ButtonInteractionEvent event) {
-        String headerText = player.getRepresentationUnfogged() + " pressed button: " + event.getButton().getLabel();
+        String headerText = player.getRepresentationUnfogged() + " pressed button: "
+                + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, headerText);
         sendSecretObjectiveInfo(game, player);
     }
@@ -42,7 +42,7 @@ public class SecretObjectiveInfoService {
     }
 
     public static void sendSecretObjectiveInfo(Game game, Player player) {
-        //SO INFO
+        // SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, getSecretObjectiveCardInfo(game, player));
 
         if (player.getSecretsUnscored().isEmpty()) return;
@@ -69,20 +69,31 @@ public class SecretObjectiveInfoService {
         StringBuilder sb = new StringBuilder();
         int index = 1;
 
-        //SCORED SECRET OBJECTIVES
-        sb.append("__Scored Secret Objectives__ (").append(player.getSoScored()).append("/").append(player.getMaxSOCount()).append("):").append("\n");
+        // SCORED SECRET OBJECTIVES
+        sb.append("__Scored Secret Objectives__ (")
+                .append(player.getSoScored())
+                .append("/")
+                .append(player.getMaxSOCount())
+                .append("):")
+                .append("\n");
         if (scoredSecretObjective.isEmpty()) {
             sb.append("> None");
         } else {
             for (Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
                 SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
-                sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _")
-                    .append(soModel.getName()).append("_ `(").append(so.getValue()).append(")`\n");
+                sb.append(index++)
+                        .append("\\. ")
+                        .append(CardEmojis.SecretObjectiveAlt)
+                        .append(" _")
+                        .append(soModel.getName())
+                        .append("_ `(")
+                        .append(so.getValue())
+                        .append(")`\n");
             }
         }
         sb.append("\n");
 
-        //UNSCORED SECRET OBJECTIVES
+        // UNSCORED SECRET OBJECTIVES
         sb.append("__Unscored Secret Objectives:__").append("\n");
         if (secretObjective != null) {
             if (secretObjective.isEmpty()) {
@@ -90,12 +101,25 @@ public class SecretObjectiveInfoService {
             } else {
                 for (Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                     SecretObjectiveModel soModel = Mapper.getSecretObjective(so.getKey());
-                    sb.append(index++).append("\\. ").append(CardEmojis.SecretObjectiveAlt).append(" _").append(soModel.getName()).append("_ - ").append(soModel.getPhase()).append(" Phase `(")
-                        .append(Helper.leftpad("" + so.getValue(), 3)).append(")`\n> ").append(soModel.getText());
+                    sb.append(index++)
+                            .append("\\. ")
+                            .append(CardEmojis.SecretObjectiveAlt)
+                            .append(" _")
+                            .append(soModel.getName())
+                            .append("_ - ")
+                            .append(soModel.getPhase())
+                            .append(" Phase `(")
+                            .append(Helper.leftpad("" + so.getValue(), 3))
+                            .append(")`\n> ")
+                            .append(soModel.getText());
 
                     int threshold = ListPlayerInfoService.getObjectiveThreshold(so.getKey(), game);
                     if (threshold > 0) {
-                        sb.append(" (").append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player)).append("/").append(threshold).append(")");
+                        sb.append(" (")
+                                .append(ListPlayerInfoService.getPlayerProgressOnObjective(so.getKey(), game, player))
+                                .append("/")
+                                .append(threshold)
+                                .append(")");
                     }
                     sb.append("\n");
                 }
@@ -108,7 +132,11 @@ public class SecretObjectiveInfoService {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
         String soName = so.getName();
-        sb.append(CardEmojis.SecretObjectiveAlt).append("_").append(soName).append("_").append("\n");
+        sb.append(CardEmojis.SecretObjectiveAlt)
+                .append("_")
+                .append(soName)
+                .append("_")
+                .append("\n");
         return sb.toString();
     }
 
@@ -126,7 +154,14 @@ public class SecretObjectiveInfoService {
         String soName = so.getName();
         String soPhase = so.getPhase();
         String soDescription = so.getText();
-        sb.append(CardEmojis.SecretObjectiveAlt).append("_").append(soName).append("_").append(" (").append(soPhase).append(" Phase): ").append(soDescription);
+        sb.append(CardEmojis.SecretObjectiveAlt)
+                .append("_")
+                .append(soName)
+                .append("_")
+                .append(" (")
+                .append(soPhase)
+                .append(" Phase): ")
+                .append(soDescription);
         if (newLine) {
             sb.append("\n");
         }

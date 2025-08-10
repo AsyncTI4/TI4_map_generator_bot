@@ -1,7 +1,6 @@
 package ti4.commands.franken;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,6 +19,7 @@ class UnitAdd extends UnitAddRemove {
 
     @Override
     public void doAction(Player player, List<String> unitIDs, SlashCommandInteractionEvent event) {
-        FrankenUnitService.addUnits(event, player, unitIDs, event.getOption(ALLOW_DUPLICATES, false, OptionMapping::getAsBoolean));
+        FrankenUnitService.addUnits(
+                event, player, unitIDs, event.getOption(ALLOW_DUPLICATES, false, OptionMapping::getAsBoolean));
     }
 }

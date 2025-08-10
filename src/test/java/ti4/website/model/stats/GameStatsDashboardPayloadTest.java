@@ -1,12 +1,11 @@
 package ti4.website.model.stats;
 
-import java.util.Map;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import ti4.map.Game;
 import ti4.testUtils.BaseTi4Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class GameStatsDashboardPayloadTest extends BaseTi4Test {
 
@@ -57,5 +56,4 @@ class GameStatsDashboardPayloadTest extends BaseTi4Test {
         game.setCustomName("pbd123-a-test-for-you-and-me");
         return game;
     }
-
 }

@@ -15,8 +15,12 @@ class ShowAllSO extends GameStateSubcommand {
 
     public ShowAllSO() {
         super(Constants.SHOW_ALL, "Show all Secret Objectives to one player", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source faction or color (default is you)")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -29,6 +33,4 @@ class ShowAllSO extends GameStateSubcommand {
         }
         SecretObjectiveHelper.showAll(getPlayer(), targetPlayer, game);
     }
-
-
 }

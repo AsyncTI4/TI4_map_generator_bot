@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
@@ -30,21 +29,25 @@ public class TechSummariesMetadataManager {
             return;
         }
 
-        RoundTechSummaries roundTechSummaries = techSummaries.gameNameToTechSummary
-            .computeIfAbsent(game.getName(), k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
+        RoundTechSummaries roundTechSummaries = techSummaries.gameNameToTechSummary.computeIfAbsent(
+                game.getName(), k -> new RoundTechSummaries(game.getRound(), new ArrayList<>()));
         if (roundTechSummaries.round != game.getRound()) {
             roundTechSummaries = new RoundTechSummaries(game.getRound(), new ArrayList<>());
             techSummaries.gameNameToTechSummary.put(game.getName(), roundTechSummaries);
         }
 
         FactionTechSummary factionTechSummary = roundTechSummaries.techSummaries.stream()
-            .filter(summary -> summary.faction.equals(player.getFaction()))
-            .findFirst()
-            .orElseGet(() -> {
-                var newFactionTechSummary = new FactionTechSummary(player.getFaction());
-                techSummaries.gameNameToTechSummary.get(game.getName()).techSummaries.add(newFactionTechSummary);
-                return newFactionTechSummary;
-            });
+                .filter(summary -> summary.faction.equals(player.getFaction()))
+                .findFirst()
+                .orElseGet(() -> {
+                    var newFactionTechSummary = new FactionTechSummary(player.getFaction());
+                    techSummaries
+                            .gameNameToTechSummary
+                            .get(game.getName())
+                            .techSummaries
+                            .add(newFactionTechSummary);
+                    return newFactionTechSummary;
+                });
 
         if (isResearchAgreement) {
             factionTechSummary.addResearchAgreementTech(techId);

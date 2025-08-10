@@ -3,7 +3,6 @@ package ti4.commands.status;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -21,7 +20,8 @@ class POInfo extends GameStateSubcommand {
 
     public POInfo() {
         super("po_info", "Show Public Objectives", false, true);
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_SCORED, "Also display which players have scored each objective"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.INCLUDE_SCORED, "Also display which players have scored each objective"));
     }
 
     @Override
@@ -32,26 +32,29 @@ class POInfo extends GameStateSubcommand {
         Map<String, Integer> publicObjectiveIDs = game.getRevealedPublicObjectives();
         Map<String, List<String>> scoredPublicObjectives = game.getScoredPublicObjectives();
         List<PublicObjectiveModel> publicObjectives = publicObjectiveIDs.keySet().stream()
-            .filter(Mapper::isValidPublicObjective)
-            .map(Mapper::getPublicObjective)
-            .toList();
+                .filter(Mapper::isValidPublicObjective)
+                .map(Mapper::getPublicObjective)
+                .toList();
 
         Player currentPlayer = getPlayer();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("__**Current Public Objectives**__\n");
         int publicObjectiveNumber = 1;
         for (PublicObjectiveModel publicObjective : publicObjectives) {
-            stringBuilder.append(publicObjectiveNumber)
-                .append(". ")
-                .append(publicObjective.getRepresentation())
-                .append("\n");
+            stringBuilder
+                    .append(publicObjectiveNumber)
+                    .append(". ")
+                    .append(publicObjective.getRepresentation())
+                    .append("\n");
 
             if (includeScored && scoredPublicObjectives.containsKey(publicObjective.getAlias())) {
-                List<Player> playersWhoHaveScoredObjective = scoredPublicObjectives.get(publicObjective.getAlias()).stream()
-                    .map(game::getPlayer)
-                    .filter(Objects::nonNull)
-                    .filter(player -> !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
-                    .toList();
+                List<Player> playersWhoHaveScoredObjective =
+                        scoredPublicObjectives.get(publicObjective.getAlias()).stream()
+                                .map(game::getPlayer)
+                                .filter(Objects::nonNull)
+                                .filter(player ->
+                                        !game.isFowMode() || FoWHelper.canSeeStatsOfPlayer(game, player, currentPlayer))
+                                .toList();
 
                 if (!playersWhoHaveScoredObjective.isEmpty()) {
                     stringBuilder.append("> Scored By:");
@@ -64,8 +67,6 @@ class POInfo extends GameStateSubcommand {
             publicObjectiveNumber++;
         }
 
-        MessageHelper.sendMessageToChannel(
-            event.getMessageChannel(),
-            stringBuilder.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), stringBuilder.toString());
     }
 }

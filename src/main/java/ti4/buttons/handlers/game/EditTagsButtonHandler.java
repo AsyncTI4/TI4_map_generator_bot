@@ -3,7 +3,6 @@ package ti4.buttons.handlers.game;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -14,7 +13,6 @@ import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.listeners.annotations.ModalHandler;
 import ti4.map.Game;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 @UtilityClass
@@ -28,10 +26,12 @@ public class EditTagsButtonHandler {
 
         String fieldID = "tags";
         TextInput tags = TextInput.create(fieldID, "Edit Tags", TextInputStyle.SHORT)
-            .setPlaceholder("Add tags here, separated by semicolons. Leave blank to delete all tags.")
-            .setValue(currentTags)
-            .build();
-        Modal modal = Modal.create(modalId, "Tags for Game " + game.getName()).addActionRow(tags).build();
+                .setPlaceholder("Add tags here, separated by semicolons. Leave blank to delete all tags.")
+                .setValue(currentTags)
+                .build();
+        Modal modal = Modal.create(modalId, "Tags for Game " + game.getName())
+                .addActionRow(tags)
+                .build();
         event.replyModal(modal).queue();
     }
 
@@ -46,6 +46,7 @@ public class EditTagsButtonHandler {
             List<String> tags = new ArrayList<>(Arrays.asList((tagsRaw.split(";"))));
             game.setTags(tags);
         }
-        MessageHelper.sendMessageToEventChannel(event, "Changed tags from `" + currentTags + "` to `" + game.getTags() + "`");
+        MessageHelper.sendMessageToEventChannel(
+                event, "Changed tags from `" + currentTags + "` to `" + game.getTags() + "`");
     }
 }

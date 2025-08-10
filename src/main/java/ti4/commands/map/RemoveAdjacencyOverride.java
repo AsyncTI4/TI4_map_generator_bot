@@ -1,7 +1,6 @@
 package ti4.commands.map;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -15,7 +14,9 @@ class RemoveAdjacencyOverride extends GameStateSubcommand {
 
     public RemoveAdjacencyOverride() {
         super(Constants.REMOVE_ADJACENCY_OVERRIDE, "Remove Custom Adjacencies", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Tiles to remove adjacencies or ALL to remove all").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.PRIMARY_TILE, "Tiles to remove adjacencies or ALL to remove all")
+                .setRequired(true));
     }
 
     @Override

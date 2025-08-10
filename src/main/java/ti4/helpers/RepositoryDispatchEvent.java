@@ -1,7 +1,6 @@
 package ti4.helpers;
 
 import java.util.Map;
-
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -11,7 +10,8 @@ import ti4.message.BotLogger;
 
 public class RepositoryDispatchEvent {
 
-    private static final String GITHUB_API_URL = "https://api.github.com/repos/AsyncTI4/TI4_map_generator_bot/dispatches";
+    private static final String GITHUB_API_URL =
+            "https://api.github.com/repos/AsyncTI4/TI4_map_generator_bot/dispatches";
     private static final String REPO_DISPATCH_TOKEN = System.getenv("REPO_DISPATCH_TOKEN");
     private final String eventType;
     private final RespositoryDispatchClientPayload payload;
@@ -27,8 +27,7 @@ public class RepositoryDispatchEvent {
     }
 
     public void sendEvent() {
-        if (System.getenv("TESTING") != null || REPO_DISPATCH_TOKEN == null || REPO_DISPATCH_TOKEN.isEmpty())
-            return;
+        if (System.getenv("TESTING") != null || REPO_DISPATCH_TOKEN == null || REPO_DISPATCH_TOKEN.isEmpty()) return;
         try {
             OkHttpClient client = new OkHttpClient().newBuilder().build();
             MediaType mediaType = MediaType.parse("application/json");
@@ -39,14 +38,15 @@ public class RepositoryDispatchEvent {
             bodyJson.append("}");
             RequestBody body = RequestBody.create(bodyJson.toString(), mediaType);
             Request request = new Request.Builder()
-                .url(GITHUB_API_URL)
-                .method("POST", body)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer " + REPO_DISPATCH_TOKEN)
-                .build();
+                    .url(GITHUB_API_URL)
+                    .method("POST", body)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", "Bearer " + REPO_DISPATCH_TOKEN)
+                    .build();
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
-                    BotLogger.error("RespositoryDisptachEvent error: " + response.body().string());
+                    BotLogger.error(
+                            "RespositoryDisptachEvent error: " + response.body().string());
                 }
             }
         } catch (Exception e) {

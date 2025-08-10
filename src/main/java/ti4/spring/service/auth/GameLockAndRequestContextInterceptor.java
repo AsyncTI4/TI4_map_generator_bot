@@ -1,10 +1,9 @@
 package ti4.spring.service.auth;
 
-import java.util.List;
-import java.util.Map;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -19,7 +18,8 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
     private static final List<String> MUTATION_METHODS = List.of("PUT", "POST", "PATCH", "DELETE");
 
     @Override
-    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
+    public boolean preHandle(
+            @NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) {
         String gameName = getPathVariable(request, "gameName");
         if (gameName == null) return true;
         if (!GameManager.isValid(gameName)) throw new InvalidGameNameException(gameName);
@@ -33,7 +33,7 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
 
     private String getPathVariable(HttpServletRequest request, String variable) {
         Map<String, String> uriTemplateVars =
-            (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+                (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
         return uriTemplateVars.get(variable);
     }
@@ -49,7 +49,11 @@ public class GameLockAndRequestContextInterceptor implements HandlerInterceptor 
     }
 
     @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
+    public void afterCompletion(
+            @NotNull HttpServletRequest request,
+            @NotNull HttpServletResponse response,
+            @NotNull Object handler,
+            Exception exception) {
         var game = RequestContext.getGame();
         if (game == null) return;
 

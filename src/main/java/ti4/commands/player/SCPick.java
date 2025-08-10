@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -26,9 +25,11 @@ class SCPick extends GameStateSubcommand {
 
     public SCPick() {
         super(Constants.SC_PICK, "Pick a strategy card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
-
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy card initiative number")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -47,7 +48,10 @@ class SCPick extends GameStateSubcommand {
         Player player = getPlayer();
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
-            MessageHelper.sendMessageToEventChannel(event, "Player may not pick another strategy card. Max strategy cards per player for this game is " + maxSCsPerPlayer + ".");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Player may not pick another strategy card. Max strategy cards per player for this game is "
+                            + maxSCsPerPlayer + ".");
             return;
         }
 
@@ -59,9 +63,8 @@ class SCPick extends GameStateSubcommand {
         if (!pickSuccessful) {
             MessageHelper.sendMessageToEventChannel(event, "No strategy card picked.");
             return;
-
         }
-        //ONLY DEAL WITH EXTRA PICKS IF IN FoW
+        // ONLY DEAL WITH EXTRA PICKS IF IN FoW
         if (playerSCs.isEmpty()) {
             MessageHelper.sendMessageToEventChannel(event, "No strategy card picked.");
             return;
@@ -111,7 +114,7 @@ class SCPick extends GameStateSubcommand {
             }
         }
 
-        //SEND EXTRA MESSAGE
+        // SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
@@ -119,7 +122,10 @@ class SCPick extends GameStateSubcommand {
             game.updateActivePlayer(privatePlayer);
             if (!allPicked) {
                 game.setPhaseOfGame("strategy");
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
+                MessageHelper.sendMessageToChannelWithButtons(
+                        privatePlayer.getPrivateChannel(),
+                        "Use buttons to pick your strategy card.",
+                        Helper.getRemainingSCButtons(game, privatePlayer));
             }
         } else {
             if (!allPicked) {

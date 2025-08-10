@@ -1,5 +1,6 @@
 package ti4.image;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,12 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import org.apache.commons.collections4.CollectionUtils;
-
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 import ti4.map.Game;
@@ -71,20 +68,21 @@ public class TileHelper {
         File[] storedFiles = new File(storagePath).listFiles();
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
-            files.addAll(Stream.of(storedFiles)
-                .filter(file -> !file.isDirectory())
-                .toList());
+            files.addAll(
+                    Stream.of(storedFiles).filter(file -> !file.isDirectory()).toList());
         }
         files.addAll(Stream.of(new File(resourcePath).listFiles())
-            .filter(file -> !file.isDirectory())
-            .toList());
+                .filter(file -> !file.isDirectory())
+                .toList());
 
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
             try {
                 PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
                 planetIdsToPlanetModels.put(planet.getId(), planet);
-                tileIdsToPlanetModels.computeIfAbsent(planet.getTileId(), k -> new ArrayList<>()).add(planet);
+                tileIdsToPlanetModels
+                        .computeIfAbsent(planet.getTileId(), k -> new ArrayList<>())
+                        .add(planet);
                 if (!planet.isValid()) {
                     badObjects.add(planet.getAlias());
                 }
@@ -94,7 +92,7 @@ public class TileHelper {
         });
         if (!badObjects.isEmpty())
             BotLogger.warning("The following **PlanetModel** are improperly formatted, but were imported anyway:\n> "
-                + String.join("\n> ", badObjects));
+                    + String.join("\n> ", badObjects));
     }
 
     public static void initTilesFromJson() {
@@ -106,13 +104,13 @@ public class TileHelper {
 
         if (Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
-                .filter(File::exists)
-                .filter(file -> !file.isDirectory())
-                .toList());
+                    .filter(File::exists)
+                    .filter(file -> !file.isDirectory())
+                    .toList());
         }
         files.addAll(Stream.of(new File(resourcePath).listFiles())
-            .filter(file -> !file.isDirectory())
-            .toList());
+                .filter(file -> !file.isDirectory())
+                .toList());
         List<String> badObjects = new ArrayList<>();
         files.forEach(file -> {
             try {
@@ -126,17 +124,18 @@ public class TileHelper {
                     duplicateDraftTiles(tile);
                 }
             } catch (Exception e) {
-                //BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
+                // BotLogger.log("Error reading tile from file:\n> " + file.getPath(), e);
             }
         });
         if (!badObjects.isEmpty())
             BotLogger.warning("The following **TileModel** are improperly formatted, but were imported anyway:\n> "
-                + String.join("\n> ", badObjects));
+                    + String.join("\n> ", badObjects));
     }
 
     private static void duplicateDraftTiles(TileModel tile) {
         String color = tile.getAlias().replaceAll("blank", "");
-        String namePre = Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
+        String namePre =
+                Character.toUpperCase(color.charAt(0)) + color.substring(1).toLowerCase() + ", draft tile ";
 
         for (int i = 0; i < 13; i++) {
             TileModel newTile = new TileModel();
@@ -198,13 +197,17 @@ public class TileHelper {
     public static Tile getTile(GenericInteractionCreateEvent event, String tileNameOrPos, Game game) {
         if (tileNameOrPos.matches("^\\s*\\d{3} \\(\\w+\\)\\s*$")) {
             // If the tileNameOrPos is in the format "123 (XYZ)", we extract the position only
-            tileNameOrPos = tileNameOrPos.trim().substring(0, tileNameOrPos.indexOf(' ')).trim();
+            tileNameOrPos = tileNameOrPos
+                    .trim()
+                    .substring(0, tileNameOrPos.indexOf(' '))
+                    .trim();
         }
 
         String tileAlias = AliasHandler.resolveTile(tileNameOrPos);
         if (game.isTileDuplicated(tileAlias)) {
             if (event != null)
-                MessageHelper.replyToMessage(event, "Duplicate tile name `" + tileAlias + "` found, please use position coordinates");
+                MessageHelper.replyToMessage(
+                        event, "Duplicate tile name `" + tileAlias + "` found, please use position coordinates");
             return null;
         }
 
@@ -214,8 +217,7 @@ public class TileHelper {
 
         Tile tile = game.getTile(tileAlias);
         if (tile == null) {
-            if (event != null)
-                MessageHelper.replyToMessage(event, "Tile in map not found: " + tileNameOrPos);
+            if (event != null) MessageHelper.replyToMessage(event, "Tile in map not found: " + tileNameOrPos);
             return null;
         }
         return tile;

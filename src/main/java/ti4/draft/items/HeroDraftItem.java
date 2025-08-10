@@ -1,12 +1,10 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -40,7 +38,8 @@ public class HeroDraftItem extends DraftItem {
     public String getLongDescriptionImpl() {
         LeaderModel leader = getLeader();
         if (leader != null) {
-            return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*" + leader.getAbilityWindow() + "* " + leader.getAbilityText();
+            return "**" + leader.getAbilityName().orElse("").replace("\n", "") + "** - " + "*"
+                    + leader.getAbilityWindow() + "* " + leader.getAbilityText();
         }
         return "";
     }
@@ -66,7 +65,8 @@ public class HeroDraftItem extends DraftItem {
         Map<String, LeaderModel> allLeaders = Mapper.getLeaders();
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
-            leaders.removeIf((String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
+            leaders.removeIf(
+                    (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
                 allItems.add(DraftItem.generate(Category.HERO, leader));
             }
@@ -86,7 +86,8 @@ public class HeroDraftItem extends DraftItem {
         String[] results = game.getStoredValue("bannedLeaders").split("finSep");
         for (FactionModel faction : factions) {
             List<String> leaders = faction.getLeaders();
-            leaders.removeIf((String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
+            leaders.removeIf(
+                    (String leader) -> !"hero".equals(allLeaders.get(leader).getType()));
             for (String leader : leaders) {
                 if (Arrays.asList(results).contains(leader)) {
                     continue;

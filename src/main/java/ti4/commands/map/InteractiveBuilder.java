@@ -8,7 +8,11 @@ import ti4.map.Game;
 
 public class InteractiveBuilder extends GameStateSubcommand {
     public InteractiveBuilder() {
-        super(Constants.INTERACTIVE_BUILDER, "Use the interactive map builder to add tiles, tokens, and more", true, false);
+        super(
+                Constants.INTERACTIVE_BUILDER,
+                "Use the interactive map builder to add tiles, tokens, and more",
+                true,
+                false);
     }
 
     @Override

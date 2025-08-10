@@ -1,7 +1,6 @@
 package ti4.commands.tokens;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -24,7 +23,8 @@ public class AddCCCommand extends AddRemoveTokenCommand {
                 usedTactics = true;
                 String value = option.getAsString().toLowerCase();
                 switch (value) {
-                    case "t/tactic", "t", "tactic", "tac", "tact" -> RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
+                    case "t/tactic", "t", "tactic", "tac", "tact" ->
+                        RemoveCommandCounterService.fromTacticsPool(event, color, tile, game);
                 }
             }
             CommandCounterHelper.addCC(event, game, color, tile);
@@ -45,8 +45,14 @@ public class AddCCCommand extends AddRemoveTokenCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.CC_USE, "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements").setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(
+                                OptionType.STRING,
+                                Constants.CC_USE,
+                                "\"t\"/\"tactic\" to add a token from tactic pool, \"r\"/\"retreat\" to add a token from reinforcements")
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 }

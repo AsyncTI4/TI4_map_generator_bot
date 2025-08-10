@@ -2,18 +2,47 @@ package ti4.service.emoji;
 
 public enum MiltyDraftEmojis implements TI4Emoji {
     sliceUnpicked, //
-    sliceA, sliceB, sliceC, sliceD, sliceE, //
-    sliceF, sliceG, sliceH, sliceI, sliceJ, //
-    sliceK, sliceL, sliceM, sliceN, sliceO, //
-    sliceP, sliceQ, sliceR, sliceS, sliceT, //
-    sliceU, sliceV, sliceW, sliceX, sliceY, //
+    sliceA,
+    sliceB,
+    sliceC,
+    sliceD,
+    sliceE, //
+    sliceF,
+    sliceG,
+    sliceH,
+    sliceI,
+    sliceJ, //
+    sliceK,
+    sliceL,
+    sliceM,
+    sliceN,
+    sliceO, //
+    sliceP,
+    sliceQ,
+    sliceR,
+    sliceS,
+    sliceT, //
+    sliceU,
+    sliceV,
+    sliceW,
+    sliceX,
+    sliceY, //
     sliceZ,
 
     // Positions
     positionUnpicked, //
-    position1, position2, position3, position4, //
-    position5, position6, position7, position8, //
-    position9, position10, position11, position12;
+    position1,
+    position2,
+    position3,
+    position4, //
+    position5,
+    position6,
+    position7,
+    position8, //
+    position9,
+    position10,
+    position11,
+    position12;
 
     @Override
     public String toString() {
@@ -74,5 +103,4 @@ public enum MiltyDraftEmojis implements TI4Emoji {
             default -> positionUnpicked;
         };
     }
-
 }

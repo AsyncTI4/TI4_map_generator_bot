@@ -15,8 +15,13 @@ class AddLaw extends GameStateSubcommand {
 
     public AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between the ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected non-player game object (e.g. secret objective, planet, etc.)"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between the ()")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.STRING,
+                Constants.ELECTED,
+                "Elected non-player game object (e.g. secret objective, planet, etc.)"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected faction").setAutoComplete(true));
     }
 
@@ -31,7 +36,8 @@ class AddLaw extends GameStateSubcommand {
         Game game = getGame();
         Player player = getPlayer();
         String optionText;
-        boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
+        boolean playerWasElected =
+                !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
         if (playerWasElected) {
             optionText = player.getFaction();
         } else {

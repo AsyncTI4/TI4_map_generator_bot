@@ -18,7 +18,8 @@ public class RemoveCommandCounterService {
 
     public static void fromTile(GenericInteractionCreateEvent event, Player player, Tile tile) {
         if (player == null) {
-            BotLogger.warning(new BotLogger.LogMessageOrigin(event), "Player cannot be found for removing command counter");
+            BotLogger.warning(
+                    new BotLogger.LogMessageOrigin(event), "Player cannot be found for removing command counter");
             return;
         }
         fromTile(player.getColor(), tile, player.getGame());
@@ -28,11 +29,13 @@ public class RemoveCommandCounterService {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         if (game.isFowMode()) {
             String colorMention = ColorEmojis.getColorEmojiWithName(color);
-            FoWHelper.pingSystem(game, tile.getPosition(), colorMention + " command token has been removed from the system.");
+            FoWHelper.pingSystem(
+                    game, tile.getPosition(), colorMention + " command token has been removed from the system.");
         }
         tile.removeCC(ccID);
     }
@@ -42,7 +45,8 @@ public class RemoveCommandCounterService {
             if (color.equals(player.getColor())) {
                 int cc = player.getTacticalCC();
                 if (cc == 0) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have a command token in your tactic pool.");
+                    MessageHelper.sendMessageToChannel(
+                            event.getChannel(), "You don't have a command token in your tactic pool.");
                     break;
                 } else if (!CommandCounterHelper.hasCC(event, color, tile)) {
                     cc -= 1;

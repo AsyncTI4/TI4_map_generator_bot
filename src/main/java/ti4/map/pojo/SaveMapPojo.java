@@ -1,11 +1,10 @@
 package ti4.map.pojo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
 import ti4.json.ObjectMapperFactory;
 import ti4.map.Game;
@@ -54,7 +53,8 @@ public class SaveMapPojo { //
         return obj;
     }
 
-    private <T> void setFieldToValue(T object, Class<T> clazz, String fieldName, String stringValue) throws NoSuchFieldException {
+    private <T> void setFieldToValue(T object, Class<T> clazz, String fieldName, String stringValue)
+            throws NoSuchFieldException {
         try {
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
@@ -63,9 +63,14 @@ public class SaveMapPojo { //
             field.set(object, value);
         } catch (NoSuchFieldException e) {
             System.out.println("Failed to find field `" + fieldName + "` for class `" + clazz.getName() + "`");
-            System.out.println(String.join(", ", Arrays.asList(clazz.getFields()).stream().map(Field::getName).toList()));
+            System.out.println(String.join(
+                    ", ",
+                    Arrays.asList(clazz.getFields()).stream()
+                            .map(Field::getName)
+                            .toList()));
             throw e;
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     private <T> String getSaveStringForField(Field field, T props) {

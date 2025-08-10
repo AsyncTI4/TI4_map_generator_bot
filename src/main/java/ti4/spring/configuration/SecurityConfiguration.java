@@ -18,14 +18,13 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/public/**").permitAll()
-                .anyRequest().authenticated())
-            .oauth2ResourceServer(oauth2 ->
-                oauth2.opaqueToken(token ->
-                    token.introspector(discordOpaqueTokenIntrospector)));
+        http.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/public/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
+                .oauth2ResourceServer(
+                        oauth2 -> oauth2.opaqueToken(token -> token.introspector(discordOpaqueTokenIntrospector)));
 
         return http.build();
     }

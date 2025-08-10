@@ -1,11 +1,9 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import ti4.draft.DraftItem;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Storage;
 import ti4.json.PersistenceManager;
@@ -38,7 +37,8 @@ public class UserSettingsManager {
 
     private static void persistFile(UserSettings userSettings) {
         try {
-            PersistenceManager.writeObjectToJsonFile(USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
+            PersistenceManager.writeObjectToJsonFile(
+                    USER_SETTINGS_PATH, userSettings.getUserId() + ".json", userSettings);
         } catch (Exception e) {
             BotLogger.error("Failed to write json data for UserSettingsManager.", e);
         }
@@ -75,5 +75,4 @@ public class UserSettingsManager {
         }
         return allUserSettings;
     }
-
 }

@@ -4,7 +4,6 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -61,7 +60,7 @@ public class PickStrategyCardService {
             }
         }
 
-        //SEND EXTRA MESSAGE
+        // SEND EXTRA MESSAGE
         if (isFowPrivateGame) {
             String fail = "User for next faction not found. Report to ADMIN.";
             String success = "The next player has been notified.";
@@ -79,7 +78,8 @@ public class PickStrategyCardService {
                 } else {
                     return;
                 }
-                //MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
+                // MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use buttons to pick
+                // your strategy card.", Helper.getRemainingSCButtons(game, privatePlayer));
             }
         } else {
             if (!allPicked) {
@@ -101,18 +101,20 @@ public class PickStrategyCardService {
         if (allPicked) {
             StartPhaseService.startActionPhase(event, game);
         }
-
     }
 
-    public static void checkForForcePickLastStratCard(GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra) {
+    public static void checkForForcePickLastStratCard(
+            GenericInteractionCreateEvent event, Player privatePlayer, Game game, String msgExtra) {
         List<Button> scButtons = Helper.getRemainingSCButtons(game, privatePlayer);
-        if (scButtons.size() == 1) { // if there is only one strategy card left to pick (4p/8p games), force pick last strategy card
-            MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation() +
-                ", you have only one available strategy card to pick. Bot will force pick for you.");
+        if (scButtons.size()
+                == 1) { // if there is only one strategy card left to pick (4p/8p games), force pick last strategy card
+            MessageHelper.sendMessageToChannel(
+                    privatePlayer.getCorrectChannel(),
+                    privatePlayer.getRepresentation()
+                            + ", you have only one available strategy card to pick. Bot will force pick for you.");
             int unpickedStrategyCard = 0;
             for (Integer sc : game.getSCList()) {
-                if (sc <= 0)
-                    continue; // some older games have a 0 in the list of SCs
+                if (sc <= 0) continue; // some older games have a 0 in the list of SCs
                 boolean held = false;
                 for (Player p : game.getPlayers().values()) {
                     if (p == null || p.getFaction() == null) {
@@ -123,8 +125,7 @@ public class PickStrategyCardService {
                         break;
                     }
                 }
-                if (held)
-                    continue;
+                if (held) continue;
                 unpickedStrategyCard = sc;
             }
             PlayerStatsService.secondHalfOfPickSC(event, game, privatePlayer, unpickedStrategyCard);
@@ -134,13 +135,16 @@ public class PickStrategyCardService {
         }
     }
 
-    public static boolean checkForQueuedSCPick(ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra) {
+    public static boolean checkForQueuedSCPick(
+            ButtonInteractionEvent event, Player privatePlayer, Game game, String msgExtra) {
         Player player = privatePlayer;
         String alreadyQueued = game.getStoredValue(player.getFaction() + "scpickqueue");
         if (!alreadyQueued.isEmpty()) {
             int unpickedStrategyCard = 0;
             for (String scNum : alreadyQueued.split("_")) {
-                game.setStoredValue(player.getFaction() + "scpickqueue", game.getStoredValue(player.getFaction() + "scpickqueue").replace(scNum + "_", ""));
+                game.setStoredValue(
+                        player.getFaction() + "scpickqueue",
+                        game.getStoredValue(player.getFaction() + "scpickqueue").replace(scNum + "_", ""));
                 int sc = Integer.parseInt(scNum);
                 boolean held = false;
                 for (Player p : game.getRealPlayers()) {
@@ -149,20 +153,21 @@ public class PickStrategyCardService {
                         break;
                     }
                 }
-                if (held)
-                    continue;
+                if (held) continue;
                 unpickedStrategyCard = sc;
                 break;
             }
             if (unpickedStrategyCard == 0) {
-                MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Tried to pick your queued strategy card, but they were all already taken.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCardsInfoThread(),
+                        "Tried to pick your queued strategy card, but they were all already taken.");
                 return false;
             } else {
-                MessageHelper.sendMessageToChannel(privatePlayer.getCorrectChannel(), privatePlayer.getRepresentation(false, false) +
-                    " had queued an strategy card pick.");
+                MessageHelper.sendMessageToChannel(
+                        privatePlayer.getCorrectChannel(),
+                        privatePlayer.getRepresentation(false, false) + " had queued an strategy card pick.");
                 return PickStrategyCardButtonHandler.scPick(event, game, player, "scPick_" + unpickedStrategyCard);
             }
-
         }
         return false;
     }
@@ -181,7 +186,8 @@ public class PickStrategyCardService {
         }
 
         List<Player> activePlayers = Helper.getSpeakerOrFullPriorityOrder(game);
-        if (game.isReverseSpeakerOrder() || !game.getStoredValue("willRevolution").isEmpty()) {
+        if (game.isReverseSpeakerOrder()
+                || !game.getStoredValue("willRevolution").isEmpty()) {
             Collections.reverse(activePlayers);
         }
         return activePlayers;

@@ -1,11 +1,10 @@
 package ti4.spring.service.auth;
 
-import java.io.IOException;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
@@ -23,7 +22,8 @@ public class CircuitBreakerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             @NotNull HttpServletRequest request,
             @NotNull HttpServletResponse response,
-            @NotNull FilterChain filterChain) throws ServletException, IOException {
+            @NotNull FilterChain filterChain)
+            throws ServletException, IOException {
         if (CircuitBreaker.isOpen()) throw new ServiceUnavailableException();
 
         filterChain.doFilter(request, response);

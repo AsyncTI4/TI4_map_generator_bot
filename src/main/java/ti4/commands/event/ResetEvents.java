@@ -12,17 +12,21 @@ class ResetEvents extends GameStateSubcommand {
 
     public ResetEvents() {
         super(Constants.RESET_EVENTS, "Reset event deck", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
+                .setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
-        if (option == null || !"YES".equals(option.getAsString())){
+        if (option == null || !"YES".equals(option.getAsString())) {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
         getGame().resetEvents();
-        MessageHelper.replyToMessage(event, "Agenda deck reset to deck: `" + getGame().getEventDeckID() + "`. Discards removed. All shuffled as new");
+        MessageHelper.replyToMessage(
+                event,
+                "Agenda deck reset to deck: `" + getGame().getEventDeckID()
+                        + "`. Discards removed. All shuffled as new");
     }
 }

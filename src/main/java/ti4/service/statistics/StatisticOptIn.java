@@ -14,5 +14,4 @@ public class StatisticOptIn {
     private boolean showFactionStats;
     private boolean showOpponents;
     private boolean showGames;
-
 }

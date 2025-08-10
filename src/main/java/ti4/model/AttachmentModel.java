@@ -3,7 +3,6 @@ package ti4.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -28,9 +27,7 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean isValid() {
-        return id != null
-            && imagePath != null
-            && source != null;
+        return id != null && imagePath != null && source != null;
     }
 
     @Override
@@ -80,9 +77,16 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         eb.setTitle(sb.toString());
 
         sb = new StringBuilder();
-        if (getSpaceCannonHitsOn() != 0 || getSpaceCannonDieCount() != 0) sb.append("Space Cannon: ").append(getSpaceCannonHitsOn()).append("x").append(getSpaceCannonDieCount()).append("\n");
-        if (getAbilityText() != null) sb.append("Ability: ").append(getAbilityText()).append("\n");
-        if (getToken().isPresent()) sb.append("Token: ").append(getToken().get()).append("\n");
+        if (getSpaceCannonHitsOn() != 0 || getSpaceCannonDieCount() != 0)
+            sb.append("Space Cannon: ")
+                    .append(getSpaceCannonHitsOn())
+                    .append("x")
+                    .append(getSpaceCannonDieCount())
+                    .append("\n");
+        if (getAbilityText() != null)
+            sb.append("Ability: ").append(getAbilityText()).append("\n");
+        if (getToken().isPresent())
+            sb.append("Token: ").append(getToken().get()).append("\n");
         if (getIsFakeAttachment() != null) sb.append("(fake attachment)\n");
         eb.setDescription(sb.toString());
 
@@ -91,7 +95,9 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
         sb.append(" Source: ").append(getSource());
         eb.setFooter(sb.toString());
 
-        eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/attachment_token/" + getImagePath() + "?raw=true");
+        eb.setThumbnail(
+                "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/attachment_token/"
+                        + getImagePath() + "?raw=true");
 
         return eb.build();
     }
@@ -99,16 +105,16 @@ public class AttachmentModel implements ModelInterface, EmbeddableModel {
     @Override
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString.toLowerCase())
-            || getId().toLowerCase().contains(searchString.toLowerCase())
-            || (getToken().isPresent() && getToken().get().toLowerCase().contains(searchString.toLowerCase()))
-            || (getResourcesModifier() != 0 && "resources".contains(searchString.toLowerCase()))
-            || (getInfluenceModifier() != 0 && "influence".contains(searchString.toLowerCase()))
-            || (getPlanetTypes() != null && getPlanetTypes().toString().contains(searchString.toLowerCase()))
-            || (getTechSpeciality() != null && getTechSpeciality().toString().contains(searchString.toLowerCase()))
-            || (isLegendary() && "legendary".contains(searchString.toLowerCase()))
-            || (getSpaceCannonHitsOn() != 0 && "space cannon".contains(searchString.toLowerCase()))
-            || (isFakeAttachment() && "fake".contains(searchString.toLowerCase()))
-            || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
-
+                || getId().toLowerCase().contains(searchString.toLowerCase())
+                || (getToken().isPresent() && getToken().get().toLowerCase().contains(searchString.toLowerCase()))
+                || (getResourcesModifier() != 0 && "resources".contains(searchString.toLowerCase()))
+                || (getInfluenceModifier() != 0 && "influence".contains(searchString.toLowerCase()))
+                || (getPlanetTypes() != null && getPlanetTypes().toString().contains(searchString.toLowerCase()))
+                || (getTechSpeciality() != null
+                        && getTechSpeciality().toString().contains(searchString.toLowerCase()))
+                || (isLegendary() && "legendary".contains(searchString.toLowerCase()))
+                || (getSpaceCannonHitsOn() != 0 && "space cannon".contains(searchString.toLowerCase()))
+                || (isFakeAttachment() && "fake".contains(searchString.toLowerCase()))
+                || getAutoCompleteName().toLowerCase().contains(searchString.toLowerCase());
     }
 }

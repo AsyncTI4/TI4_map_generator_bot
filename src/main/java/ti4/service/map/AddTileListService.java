@@ -1,10 +1,9 @@
 package ti4.service.map;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -58,7 +57,9 @@ public class AddTileListService {
         ShowGameService.simpleShowGame(game, event, DisplayType.map);
 
         if (!badTiles.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There were some bad tiles that were replaced with gray tiles: " + badTiles + "\n");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "There were some bad tiles that were replaced with gray tiles: " + badTiles + "\n");
         }
 
         finishSetup(game, event);
@@ -109,14 +110,18 @@ public class AddTileListService {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         if (!game.isBaseGameMode()) {
             AddFrontierTokensService.addFrontierTokens(event, game);
-            MessageHelper.sendMessageToChannel(channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
+            MessageHelper.sendMessageToChannel(
+                    channel, ExploreEmojis.Frontier + " frontier tokens have been added to empty spaces.");
         }
         if (!game.isOrdinianC1Mode() && !game.isLiberationC4Mode()) {
             MessageHelper.sendMessageToChannelWithButtons(
-                game.getMainGameChannel(), "Press this button after every player is setup.",
-                List.of(Buttons.green("deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
+                    game.getMainGameChannel(),
+                    "Press this button after every player is setup.",
+                    List.of(Buttons.green(
+                            "deal2SOToAll", "Deal 2 Secret Objectives To All", CardEmojis.SecretObjectiveAlt)));
 
-            if (!game.isFowMode() && game.getRealPlayers().size() < game.getPlayers().size()) {
+            if (!game.isFowMode()
+                    && game.getRealPlayers().size() < game.getPlayers().size()) {
                 ButtonHelper.offerPlayerSetupButtons(channel, game);
             }
         }
@@ -125,11 +130,18 @@ public class AddTileListService {
     public static Modal buildMapStringModal(Game game, String modalId) {
         String fieldId = "mapString";
         TextInput tags = TextInput.create(fieldId, "Enter Map String", TextInputStyle.PARAGRAPH)
-            .setPlaceholder("Paste the map string here.")
-            .setValue(game.getMapString().substring(0, game.getMapString().length() > 4000 ? 4000 : game.getMapString().length()))
-            .setRequired(true)
-            .build();
-        return Modal.create(modalId, "Add Map String for " + game.getName()).addActionRow(tags).build();
+                .setPlaceholder("Paste the map string here.")
+                .setValue(game.getMapString()
+                        .substring(
+                                0,
+                                game.getMapString().length() > 4000
+                                        ? 4000
+                                        : game.getMapString().length()))
+                .setRequired(true)
+                .build();
+        return Modal.create(modalId, "Add Map String for " + game.getName())
+                .addActionRow(tags)
+                .build();
     }
 
     @ModalHandler("addMapString")

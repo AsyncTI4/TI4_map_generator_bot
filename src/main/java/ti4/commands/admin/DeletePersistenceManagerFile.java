@@ -10,7 +10,8 @@ public class DeletePersistenceManagerFile extends Subcommand {
 
     DeletePersistenceManagerFile() {
         super("delete_pm_file", "Deletes a persistence manager file.");
-        addOptions(new OptionData(OptionType.STRING, "file_name", "File name (e.g. TechSummaries.json").setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, "file_name", "File name (e.g. TechSummaries.json").setRequired(true));
     }
 
     @Override

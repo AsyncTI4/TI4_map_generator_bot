@@ -15,7 +15,10 @@ public class SetMapTemplate extends GameStateSubcommand {
     public SetMapTemplate() {
         super("set_map_template", "Set the template for the map.", true, false);
         addOption(OptionType.STRING, Constants.MAP_TEMPLATE, "Template for the map.", true, true);
-        addOption(OptionType.BOOLEAN, "transform", "True to attempt to transform the current map to the new map template.");
+        addOption(
+                OptionType.BOOLEAN,
+                "transform",
+                "True to attempt to transform the current map to the new map template.");
     }
 
     @Override
@@ -30,13 +33,19 @@ public class SetMapTemplate extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "Invalid map template: " + mapTemplate);
         }
         if (game.getMapTemplateID() != null && !game.getMapTemplateID().equals("null") && !transform) {
-            MessageHelper.sendMessageToEventChannel(event, "Map template already set to: `" + game.getMapTemplateID() + "`\nUse the transform option to overwrite.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "Map template already set to: `" + game.getMapTemplateID()
+                            + "`\nUse the transform option to overwrite.");
             return;
         }
 
         if (transform) {
             // check if map templates are compatible
-            MessageHelper.sendMessageToEventChannel(event, "New map template (" + mapTemplate + ") is not compatible with the old map template (" + game.getMapTemplateID() + ")");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    "New map template (" + mapTemplate + ") is not compatible with the old map template ("
+                            + game.getMapTemplateID() + ")");
             return;
         }
 

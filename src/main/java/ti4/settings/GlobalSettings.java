@@ -1,35 +1,35 @@
 package ti4.settings;
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 
 public class GlobalSettings {
 
-    //Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter, and will allow you to get the setting easier
+    // Adding an enum here will make it show up as an AutoComplete option in the /admin setting setting_name parameter,
+    // and will allow you to get the setting easier
     public enum ImplementedSettings {
-        DEBUG, //When true, additional show additional debug messages
-        UPLOAD_DATA_TO_WEB_SERVER, //Whether to send map and data to the web server
-        MAX_THREAD_COUNT, //How many threads can be open before force closing old ones
-        THREAD_AUTOCLOSE_COUNT, //How many threads to close when above max thread count
+        DEBUG, // When true, additional show additional debug messages
+        UPLOAD_DATA_TO_WEB_SERVER, // Whether to send map and data to the web server
+        MAX_THREAD_COUNT, // How many threads can be open before force closing old ones
+        THREAD_AUTOCLOSE_COUNT, // How many threads to close when above max thread count
         FILE_IMAGE_CACHE_MAX_SIZE, //
         FILE_IMAGE_CACHE_EXPIRE_TIME_MINUTES, //
         URL_IMAGE_CACHE_MAX_SIZE, //
         URL_IMAGE_CACHE_EXPIRE_TIME_MINUTES, //
-        GUILD_ID_FOR_NEW_GAME_CATEGORIES, //Which guild to create new game categories in (DEPRECATED)
-        MAX_GAMES_PER_CATEGORY, //Max # of games when creating a category
+        GUILD_ID_FOR_NEW_GAME_CATEGORIES, // Which guild to create new game categories in (DEPRECATED)
+        MAX_GAMES_PER_CATEGORY, // Max # of games when creating a category
         ALLOW_GAME_CREATION,
-        READY_TO_RECEIVE_COMMANDS; //Whether the bot is ready to receive commands
+        READY_TO_RECEIVE_COMMANDS; // Whether the bot is ready to receive commands
 
         @Override
         public String toString() {
@@ -40,8 +40,7 @@ public class GlobalSettings {
     private static Map<String, Object> settings = new HashMap<>();
 
     public static <T> T getSetting(String attr, Class<T> clazz, T def) {
-        if (!settings.containsKey(attr))
-            return def;
+        if (!settings.containsKey(attr)) return def;
         return clazz.cast(settings.get(attr));
     }
 
@@ -82,7 +81,8 @@ public class GlobalSettings {
 
     public static String getSettingsRepresentation() {
         StringBuilder sb = new StringBuilder("### Global Settings:\n```");
-        for (Entry<String, Object> entries : getSettings().entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
+        for (Entry<String, Object> entries :
+                getSettings().entrySet().stream().sorted(Entry.comparingByKey()).toList()) {
             sb.append(entries.getKey()).append(": ").append(entries.getValue()).append("\n");
         }
         sb.append("```");

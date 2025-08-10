@@ -1,7 +1,6 @@
 package ti4.commands.relic;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.GameStateSubcommand;
 import ti4.helpers.Constants;
@@ -27,18 +26,21 @@ class RelicAddCodexRelics extends GameStateSubcommand {
         }
         if (!allRelics.contains("circletofthevoid")) {
             game.shuffleRelicBack("circletofthevoid");
-            newRelics += (relicCount > 0 ? " and " : "") +  "_Circlet Of The Void_";
+            newRelics += (relicCount > 0 ? " and " : "") + "_Circlet Of The Void_";
             relicCount++;
         }
         if (!allRelics.contains("neuraloop")) {
             game.shuffleRelicBack("neuraloop");
-            newRelics += (relicCount > 0 ? " and " : "") +  "_Neuraloop_";
+            newRelics += (relicCount > 0 ? " and " : "") + "_Neuraloop_";
             relicCount++;
         }
         if (relicCount == 0) {
             MessageHelper.sendMessageToEventChannel(event, "No new relics have been added.");
         } else {
-            MessageHelper.sendMessageToEventChannel(event, (relicCount == 2 ? newRelics : newRelics.replaceFirst(" and ", ", ")) + (relicCount == 1 ? "has" : "have") + " been shuffled into the relic deck.");
+            MessageHelper.sendMessageToEventChannel(
+                    event,
+                    (relicCount == 2 ? newRelics : newRelics.replaceFirst(" and ", ", "))
+                            + (relicCount == 1 ? "has" : "have") + " been shuffled into the relic deck.");
         }
     }
 }

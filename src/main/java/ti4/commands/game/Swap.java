@@ -2,7 +2,6 @@ package ti4.commands.game;
 
 import java.util.Collection;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -23,8 +22,11 @@ class Swap extends GameStateSubcommand {
 
     public Swap() {
         super(Constants.SWAP, "Swap factions with a player", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Swap with player in Faction/Color ").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.TARGET_PLAYER, "Replacement player @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Swap with player in Faction/Color ")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.TARGET_PLAYER, "Replacement player @playerName")
+                .setRequired(true));
     }
 
     @Override

@@ -4,9 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-
 import org.jetbrains.annotations.Nullable;
-
 import ti4.helpers.Constants;
 import ti4.helpers.RandomHelper;
 import ti4.helpers.Storage;
@@ -64,7 +62,7 @@ public class ResourceHelper {
         return tile;
     }
 
-    //@Deprecated
+    // @Deprecated
     @Nullable
     public String getUnitFile(String name) {
         if (name.endsWith(Constants.UNIT_DD)) {
@@ -193,7 +191,7 @@ public class ResourceHelper {
         if (resourceFile.exists()) {
             return resourceFile.getAbsolutePath();
         }
-        //BotLogger.log("Could not find resource file: " + resourceFile.getAbsolutePath());
+        // BotLogger.log("Could not find resource file: " + resourceFile.getAbsolutePath());
         return null;
     }
 
@@ -224,5 +222,4 @@ public class ResourceHelper {
     public String getHelpFile(String name) {
         return getResourceFromFolder("help/", name);
     }
-
 }
