@@ -9,11 +9,14 @@ import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 
 class ElectVoiceOfTheCouncil extends GameStateSubcommand {
     public ElectVoiceOfTheCouncil() {
-        super(Constants.ELECT_VOICE_OF_THE_COUNCIL, "Resolve Voice of the Council, electing the specified player", true, true);
+        super(
+                Constants.ELECT_VOICE_OF_THE_COUNCIL,
+                "Resolve Voice of the Council, electing the specified player",
+                true,
+                true);
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to elect as Voice of the Council"))
-            .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,
-                "Elect another Faction or Color")
-                    .setAutoComplete(true));
+                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elect another Faction or Color")
+                        .setAutoComplete(true));
     }
 
     @Override

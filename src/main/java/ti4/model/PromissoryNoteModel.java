@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -67,11 +66,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && (faction != null || color != null)
-            && text != null
-            && source != null;
+        return alias != null && name != null && (faction != null || color != null) && text != null && source != null;
     }
 
     public String getID() {
@@ -82,14 +77,16 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shortName).orElse(getName());
         }
-        return Optional.ofNullable(shortName).orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShortName());
+        return Optional.ofNullable(shortName)
+                .orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShortName());
     }
 
     public boolean getShrinkName() {
         if (getHomebrewReplacesID().isEmpty()) {
             return Optional.ofNullable(shrinkName).orElse(false);
         }
-        return Optional.ofNullable(shrinkName).orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShrinkName());
+        return Optional.ofNullable(shrinkName)
+                .orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShrinkName());
     }
 
     public Optional<String> getFaction() {
@@ -142,10 +139,11 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     public MessageEmbed getRepresentationEmbed(boolean justShowName, boolean includeID, boolean includeHelpfulText) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
+        // TITLE
         StringBuilder title = new StringBuilder();
         title.append(CardEmojis.PN);
-        if (!StringUtils.isBlank(getFaction().orElse(""))) title.append(FactionEmojis.getFactionIcon(getFaction().get()));
+        if (!StringUtils.isBlank(getFaction().orElse("")))
+            title.append(FactionEmojis.getFactionIcon(getFaction().get()));
         title.append("_").append(getName()).append("_");
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             title.append(" (");
@@ -161,13 +159,14 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
         if (justShowName) return eb.build();
 
-        //DESCRIPTION
+        // DESCRIPTION
         eb.setDescription(getText());
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeHelpfulText) {
-            if (!StringUtils.isBlank(getAttachment().orElse(""))) footer.append("Attachment: ").append(getAttachment().orElse("")).append("\n");
+            if (!StringUtils.isBlank(getAttachment().orElse("")))
+                footer.append("Attachment: ").append(getAttachment().orElse("")).append("\n");
             if (getPlayArea()) {
                 footer.append("Play area card. ");
                 if (isPlayedDirectlyToPlayArea()) {
@@ -179,7 +178,11 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
             }
         }
         if (includeID) {
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource()).append("\n");
+            footer.append("ID: ")
+                    .append(getAlias())
+                    .append("    Source: ")
+                    .append(getSource())
+                    .append("\n");
         }
         eb.setFooter(footer.toString());
 
@@ -189,7 +192,8 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
 
     public String getNameRepresentation() {
         StringBuilder sb = new StringBuilder();
-        if (!StringUtils.isBlank(getFaction().orElse(""))) sb.append(FactionEmojis.getFactionIcon(getFaction().get()));
+        if (!StringUtils.isBlank(getFaction().orElse("")))
+            sb.append(FactionEmojis.getFactionIcon(getFaction().get()));
         sb.append(CardEmojis.PN);
         sb.append(" ").append(getName());
         if (!StringUtils.isBlank(getColor().orElse(""))) {
@@ -219,8 +223,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public boolean isNotWellKnown() {
-        return getFaction().isPresent()
-            || (getSource() != ComponentSource.base && getSource() != ComponentSource.pok);
+        return getFaction().isPresent() || (getSource() != ComponentSource.base && getSource() != ComponentSource.pok);
     }
 
     /**
@@ -237,8 +240,10 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public boolean search(String searchString) {
-        return getAlias().toLowerCase().contains(searchString) || getName().toLowerCase().contains(searchString) || getFactionOrColor().toLowerCase().contains(searchString)
-            || getSearchTags().contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getFactionOrColor().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

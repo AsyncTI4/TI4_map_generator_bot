@@ -11,15 +11,19 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class DiploSystemHelper {
 
-    public static boolean diploSystem(GenericInteractionCreateEvent event, Game game, Player player, String tileToResolve) {
+    public static boolean diploSystem(
+            GenericInteractionCreateEvent event, Game game, Player player, String tileToResolve) {
         Tile tile = TileHelper.getTile(event, tileToResolve, game);
         if (tile == null) {
-            MessageHelper.sendMessageToEventChannel(event, "Could not resolve tileID:  `" + tileToResolve + "`. Tile not found");
+            MessageHelper.sendMessageToEventChannel(
+                    event, "Could not resolve tileID:  `" + tileToResolve + "`. Tile not found");
             return false;
         }
 
         for (Player player_ : game.getPlayers().values()) {
-            if (player_ != player && player_.isRealPlayer() && !player.getAllianceMembers().contains(player_.getFaction())) {
+            if (player_ != player
+                    && player_.isRealPlayer()
+                    && !player.getAllianceMembers().contains(player_.getFaction())) {
                 CommandCounterHelper.addCC(event, player_, tile);
                 Helper.isCCCountCorrect(player_);
             }

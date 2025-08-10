@@ -23,7 +23,4 @@ class SearchMyTitles extends Subcommand {
         StringBuilder sb = TitlesHelper.getPlayerTitles(user.getId(), user.getName(), true);
         MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Titles List", sb.toString());
     }
-
-
-
 }

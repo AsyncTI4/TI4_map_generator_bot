@@ -12,9 +12,19 @@ import ti4.message.MessageHelper;
 class SetFactionDisplayName extends GameStateSubcommand {
 
     public SetFactionDisplayName() {
-        super(Constants.SET_FACTION_DISPLAY_NAME, "Set your faction Display Name (instead of your username)", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_DISPLAY_NAME, "Name to use. Enter 'none' to delete currently set name.").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        super(
+                Constants.SET_FACTION_DISPLAY_NAME,
+                "Set your faction Display Name (instead of your username)",
+                true,
+                true);
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.FACTION_DISPLAY_NAME,
+                        "Name to use. Enter 'none' to delete currently set name.")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -26,8 +36,8 @@ class SetFactionDisplayName extends GameStateSubcommand {
             MessageHelper.sendMessageToEventChannel(event, "Faction Display Name removed");
             return;
         }
-        MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " Display Name set to: `" + displayName + "`");
+        MessageHelper.sendMessageToEventChannel(
+                event, player.getFactionEmojiOrColor() + " Display Name set to: `" + displayName + "`");
         player.setDisplayName(displayName);
     }
-
 }

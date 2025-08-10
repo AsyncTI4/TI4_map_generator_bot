@@ -12,7 +12,8 @@ import ti4.map.Player;
 class DrawRelicButtonHandler {
 
     @ButtonHandler("drawRelicAtPosition_")
-    public static void resolveDrawRelicAtPosition(Player player, ButtonInteractionEvent event, Game game, String buttonID) {
+    public static void resolveDrawRelicAtPosition(
+            Player player, ButtonInteractionEvent event, Game game, String buttonID) {
         int position = Integer.parseInt(buttonID.split("_")[1]);
         if (player.getPromissoryNotes().containsKey("dspnflor") && game.getPNOwner("dspnflor") != player) {
             PromissoryNoteHelper.resolvePNPlay("dspnflorChecked", player, game, event);

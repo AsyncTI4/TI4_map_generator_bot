@@ -1,12 +1,11 @@
 package ti4.helpers;
 
+import java.util.*;
 import ti4.map.*;
 import ti4.model.UnitModel;
 
-import java.util.*;
-
 public class PdsCoverageHelper {
-    
+
     /**
      * Calculate PDS coverage for a specific tile, returning comprehensive coverage data per faction.
      * This method contains all the logic from TileGenerator's SpaceCannon case.
@@ -52,7 +51,8 @@ public class PdsCoverageHelper {
                     }
 
                     // Check units for PDS
-                    for (Map.Entry<Units.UnitKey, Integer> unitEntry : unitHolder.getUnits().entrySet()) {
+                    for (Map.Entry<Units.UnitKey, Integer> unitEntry :
+                            unitHolder.getUnits().entrySet()) {
                         if (unitEntry.getValue() == 0) {
                             continue;
                         }
@@ -63,8 +63,9 @@ public class PdsCoverageHelper {
                         }
 
                         UnitModel model = player.getUnitFromUnitKey(unitKey);
-                        if (model == null || (model.getId().equalsIgnoreCase("xxcha_mech")
-                                && ButtonHelper.isLawInPlay(game, "articles_war"))) {
+                        if (model == null
+                                || (model.getId().equalsIgnoreCase("xxcha_mech")
+                                        && ButtonHelper.isLawInPlay(game, "articles_war"))) {
                             continue;
                         }
 
@@ -132,10 +133,16 @@ public class PdsCoverageHelper {
             float expectedHits;
             if (rerolls) {
                 // With rerolls: probability of success = 1 - ((X-1)/10)²
-                expectedHits = (100.0f * numberOfDice - diceList.stream().mapToInt(value -> (value - 1) * (value - 1)).sum()) / 100;
+                expectedHits = (100.0f * numberOfDice
+                                - diceList.stream()
+                                        .mapToInt(value -> (value - 1) * (value - 1))
+                                        .sum())
+                        / 100;
             } else {
                 // Without rerolls: probability of success = (11-X)/10
-                expectedHits = (11.0f * numberOfDice - diceList.stream().mapToInt(Integer::intValue).sum()) / 10;
+                expectedHits = (11.0f * numberOfDice
+                                - diceList.stream().mapToInt(Integer::intValue).sum())
+                        / 10;
             }
 
             pdsCoverage.put(player.getFaction(), new PdsCoverage(numberOfDice, expectedHits, diceList, rerolls));
@@ -151,7 +158,9 @@ public class PdsCoverageHelper {
             if (!player.unitBelongsToPlayer(unit)) continue;
 
             UnitModel removedUnit = player.getUnitsByAsyncID(unit.asyncID()).getFirst();
-            if (removedUnit.getIsShip() && !removedUnit.getAsyncId().contains("ff") && removedUnit.getSpaceCannonDieCount() == 0) {
+            if (removedUnit.getIsShip()
+                    && !removedUnit.getAsyncId().contains("ff")
+                    && removedUnit.getSpaceCannonDieCount() == 0) {
                 count += space.getUnitCount(unit);
             }
         }

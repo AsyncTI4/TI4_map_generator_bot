@@ -3,7 +3,6 @@ package ti4.commands.uncategorized;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -105,7 +104,9 @@ public class ServerPromoteCommand implements ParentCommand {
                 }
             } else if (Ranks.get(rank_opt.getAsString()).equalsIgnoreCase("bothelper")) {
                 for (Role r : member.getRoles()) {
-                    if (r.getId().equals("943596173896323072") || r.getId().equals("947648366056185897") || r.getId().equals("1166011604488425482")) {
+                    if (r.getId().equals("943596173896323072")
+                            || r.getId().equals("947648366056185897")
+                            || r.getId().equals("1166011604488425482")) {
                         allowed = true;
                     }
                 }
@@ -131,7 +132,9 @@ public class ServerPromoteCommand implements ParentCommand {
         boolean demote = demote_opt != null && demote_opt.getAsBoolean();
         User user = event.getUser();
 
-        MessageHelper.replyToMessage(event, (demote ? "Demoting" : "Promoting") + " " + user.getEffectiveName() + "; rank " + Ranks.get(rank));
+        MessageHelper.replyToMessage(
+                event,
+                (demote ? "Demoting" : "Promoting") + " " + user.getEffectiveName() + "; rank " + Ranks.get(rank));
 
         if (target.startsWith("Emoji Farm")) {
             Guild guild = event.getJDA().getGuildById(Long.parseLong(target));
@@ -161,11 +164,10 @@ public class ServerPromoteCommand implements ParentCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server")
-                .setRequired(true).setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank")
-                .setAutoComplete(true),
-             new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote")
-                 .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.PROMOTE_TARGET, "Target Server")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.PROMOTE_RANK, "Rank").setAutoComplete(true),
+                new OptionData(OptionType.BOOLEAN, Constants.PROMOTE_DEMOTE, "Demote").setAutoComplete(true));
     }
 }

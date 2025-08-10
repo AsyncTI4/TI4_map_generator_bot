@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,64 +12,253 @@ public enum PlanetEmojis implements TI4Emoji {
 
     // Base/PoK Home planets
     Nestphar, // Arborec
-    Avar, Valk, Ylir, // Argent
+    Avar,
+    Valk,
+    Ylir, // Argent
     Acheron, // Cabal
     PlanetCreuss, // Creuss
     TheDark, // Empyrean
-    Arretze, Kamdorn, Hercant, //Hacan
-    Jol, Nar, // Jol-nar
+    Arretze,
+    Kamdorn,
+    Hercant, // Hacan
+    Jol,
+    Nar, // Jol-nar
     Planet000, // L1
-    ArcPrime, WrenTerra, // Letnev
+    ArcPrime,
+    WrenTerra, // Letnev
     Ixth, // Mahact
     MollPrimus, // Mentak
     PlanetMuaat, // Muaat
-    Druaa, Maaluuk, //Naalu
-    Naazir, Rokha, // NRA
+    Druaa,
+    Maaluuk, // Naalu
+    Naazir,
+    Rokha, // NRA
     Mordai, // Nekro
     Arcturus, // Nomad
-    Rahg, LisisII, // Saar
-    Trenlak, Quinarra, // Sardakk
+    Rahg,
+    LisisII, // Saar
+    Trenlak,
+    Quinarra, // Sardakk
     Jord, // Sol
     Elysium, // Titans
     PlanetWinnu, // Winnu
-    ArchonRen, ArchonTau, // Xxcha
+    ArchonRen,
+    ArchonTau, // Xxcha
     Darien, // Yin
-    Retillion, Shalloq, // Yssaril
+    Retillion,
+    Shalloq, // Yssaril
 
     // Base/PoK non-home
-    Ang, ArchonVail, Atlas, Cormund, //
-    Everra, HopesEnd, Lodor, Mallice, //
-    Mecatol, MeharXull, Mirage, Perimeter, //
-    Primor, Quann, Saudor, SemLore, //
-    Tarmann, Thibah, Vefut, Vorhal, Wellon, //
-    Abyz, Fria, Accoen, JeolIr, //
-    Bakal, AlioPrima, Arinam, Meer, //
-    Arnor, Lor, Bereg, LirtaIV, //
-    Cealdri, Xanhact, Centauri, Gral, //
-    Corneeq, Resculon, DalBootha, Xxehan, //
-    Kraag, Siig, Lazar, Sakulag, //
-    Lisis, Velnor, Mellon, Zohbat, //
-    Starpoint, NewAlbion, Qucenn, Rarron, //
-    Tequran, Torkan, VegaMajor, VegaMinor, //
-    RigelI, RigelII, RigelIII, Abaddon, Ashtroth, Loki, //
+    Ang,
+    ArchonVail,
+    Atlas,
+    Cormund, //
+    Everra,
+    HopesEnd,
+    Lodor,
+    Mallice, //
+    Mecatol,
+    MeharXull,
+    Mirage,
+    Perimeter, //
+    Primor,
+    Quann,
+    Saudor,
+    SemLore, //
+    Tarmann,
+    Thibah,
+    Vefut,
+    Vorhal,
+    Wellon, //
+    Abyz,
+    Fria,
+    Accoen,
+    JeolIr, //
+    Bakal,
+    AlioPrima,
+    Arinam,
+    Meer, //
+    Arnor,
+    Lor,
+    Bereg,
+    LirtaIV, //
+    Cealdri,
+    Xanhact,
+    Centauri,
+    Gral, //
+    Corneeq,
+    Resculon,
+    DalBootha,
+    Xxehan, //
+    Kraag,
+    Siig,
+    Lazar,
+    Sakulag, //
+    Lisis,
+    Velnor,
+    Mellon,
+    Zohbat, //
+    Starpoint,
+    NewAlbion,
+    Qucenn,
+    Rarron, //
+    Tequran,
+    Torkan,
+    VegaMajor,
+    VegaMinor, //
+    RigelI,
+    RigelII,
+    RigelIII,
+    Abaddon,
+    Ashtroth,
+    Loki, //
 
     // DS
-    Derbrae, Detic, Domna, Dorvok, Echo, EtirV, Fakrenn, Gwiyun, Inan, Larred, Lliot, Lodran, Mandle, //
-    Moln, Nairb, Prism, Qaak, Regnem, Rysaa, Salin, Sanvit, Sierpen, Silence, Swog, Tarrock, Troac, Vioss, //
+    Derbrae,
+    Detic,
+    Domna,
+    Dorvok,
+    Echo,
+    EtirV,
+    Fakrenn,
+    Gwiyun,
+    Inan,
+    Larred,
+    Lliot,
+    Lodran,
+    Mandle, //
+    Moln,
+    Nairb,
+    Prism,
+    Qaak,
+    Regnem,
+    Rysaa,
+    Salin,
+    Sanvit,
+    Sierpen,
+    Silence,
+    Swog,
+    Tarrock,
+    Troac,
+    Vioss, //
 
-    //Ero
-    Adoriah, Adrian, Akhassi, Ako, Aranndan, Argenum, Behjan, Breakpoint, Brilenci, Cahgaris, Cantris, Casibann, //
-    Cerberus, Char, DeathsGate, Dognui, Dwuuit, ElansRest, ElokNu, ElokPhi, Erissiha, Erodius, Eshonia, Ferrust, //
-    Fyrain, Ghanis, Grishinu, Gryenorn, Grywon, HellsMaw, Hersey, Heska, Hevahold, HranCus, Hurigati, IkrusIII, //
-    IlVoshu, KanHis, Kelgate, Khjan, KkitaUlIn, Kris, Kytos, Leonelli, Limbo, Lunerus, Lust, Lynntani, Malbolge, //
-    MaonLor, Mayris, Mecantor, MekoII, Meranna, Merjae, Migyro, MorRock, Mornn, Myrwater, Nix, Nokrurn, Norrk, //
-    Orchard, Perpetual, Phylo, Plutus, Prymis, Quwon, RayonV, Renhult, Rhyah, RialArchon, RylFang, Sehnn, Selen, //
-    Sentuim, Shigonas, Shul, Sigilus, Sokaris, Solin, Station309, Stygain, SuPrima, Syvian, TaalDorn, Telahas, //
-    TethnSekus, TethnTirs, Thenphase, Tir, Uhott, UlonGamma, UlonRho, Ultimur, Venhalo, Vent, Verdis, Vernium, //
-    Veyhrune, Viliguard, Violence, Volgan, Volra, VygarII, Vylanua, Xyon, Yncranti, Ynnis, Zhgen, //
+    // Ero
+    Adoriah,
+    Adrian,
+    Akhassi,
+    Ako,
+    Aranndan,
+    Argenum,
+    Behjan,
+    Breakpoint,
+    Brilenci,
+    Cahgaris,
+    Cantris,
+    Casibann, //
+    Cerberus,
+    Char,
+    DeathsGate,
+    Dognui,
+    Dwuuit,
+    ElansRest,
+    ElokNu,
+    ElokPhi,
+    Erissiha,
+    Erodius,
+    Eshonia,
+    Ferrust, //
+    Fyrain,
+    Ghanis,
+    Grishinu,
+    Gryenorn,
+    Grywon,
+    HellsMaw,
+    Hersey,
+    Heska,
+    Hevahold,
+    HranCus,
+    Hurigati,
+    IkrusIII, //
+    IlVoshu,
+    KanHis,
+    Kelgate,
+    Khjan,
+    KkitaUlIn,
+    Kris,
+    Kytos,
+    Leonelli,
+    Limbo,
+    Lunerus,
+    Lust,
+    Lynntani,
+    Malbolge, //
+    MaonLor,
+    Mayris,
+    Mecantor,
+    MekoII,
+    Meranna,
+    Merjae,
+    Migyro,
+    MorRock,
+    Mornn,
+    Myrwater,
+    Nix,
+    Nokrurn,
+    Norrk, //
+    Orchard,
+    Perpetual,
+    Phylo,
+    Plutus,
+    Prymis,
+    Quwon,
+    RayonV,
+    Renhult,
+    Rhyah,
+    RialArchon,
+    RylFang,
+    Sehnn,
+    Selen, //
+    Sentuim,
+    Shigonas,
+    Shul,
+    Sigilus,
+    Sokaris,
+    Solin,
+    Station309,
+    Stygain,
+    SuPrima,
+    Syvian,
+    TaalDorn,
+    Telahas, //
+    TethnSekus,
+    TethnTirs,
+    Thenphase,
+    Tir,
+    Uhott,
+    UlonGamma,
+    UlonRho,
+    Ultimur,
+    Venhalo,
+    Vent,
+    Verdis,
+    Vernium, //
+    Veyhrune,
+    Viliguard,
+    Violence,
+    Volgan,
+    Volra,
+    VygarII,
+    Vylanua,
+    Xyon,
+    Yncranti,
+    Ynnis,
+    Zhgen, //
 
     // Bonus Semlores
-    SemLor, SemLord, SemiLor, ArchonFail;
+    SemLor,
+    SemLord,
+    SemiLor,
+    ArchonFail;
 
     public static TI4Emoji getRandomSemLore() {
         List<TI4Emoji> semLores = new ArrayList<>(List.of(SemLor, SemLord, SemiLor, SemLore));
@@ -344,7 +532,7 @@ public enum PlanetEmojis implements TI4Emoji {
 
             case "space" -> TileEmojis.randomVoid();
 
-            case null, default -> null;
+            default -> null;
         };
     }
 

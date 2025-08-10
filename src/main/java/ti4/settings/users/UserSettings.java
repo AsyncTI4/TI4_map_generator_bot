@@ -2,14 +2,12 @@ package ti4.settings.users;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.Data;
 
 @Data

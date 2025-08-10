@@ -3,7 +3,6 @@ package ti4.commands.developer;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.AsyncTI4DiscordBot;
 import ti4.commands.CommandHelper;
@@ -32,8 +31,8 @@ public class DeveloperCommand implements ParentCommand {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return ParentCommand.super.accept(event) &&
-            CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
+        return ParentCommand.super.accept(event)
+                && CommandHelper.acceptIfHasRoles(event, AsyncTI4DiscordBot.developerRoles);
     }
 
     @Override

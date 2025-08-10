@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import ti4.helpers.Units.UnitState;
 import ti4.helpers.Units.UnitType;
@@ -195,8 +194,8 @@ public class RegexHelper {
     public static String unitHolderRegex(Game game, String group) {
         Set<String> unitholders = new HashSet<>(game.getPlanets());
         game.getPlanetsInfo().values().stream()
-            .filter(p -> game.getTileFromPlanet(p.getName()) != null)
-            .forEach(p -> unitholders.add(p.getName()));
+                .filter(p -> game.getTileFromPlanet(p.getName()) != null)
+                .forEach(p -> unitholders.add(p.getName()));
         unitholders.add("space");
         return regexBuilder(group, unitholders);
     }
@@ -204,8 +203,7 @@ public class RegexHelper {
     /** @return group "ability" */
     public static String factionAbilityRegex(Game game) {
         Set<String> abilities = new HashSet<>();
-        for (Player p : game.getRealPlayers())
-            abilities.addAll(p.getAbilities());
+        for (Player p : game.getRealPlayers()) abilities.addAll(p.getAbilities());
         return regexBuilder("ability", abilities);
     }
 
@@ -217,7 +215,8 @@ public class RegexHelper {
 
     /** @return group "tech" */
     public static String techRegex(Game game) {
-        Set<String> techs = new HashSet<>(Mapper.getDeck(game.getTechnologyDeckID()).getNewDeck());
+        Set<String> techs =
+                new HashSet<>(Mapper.getDeck(game.getTechnologyDeckID()).getNewDeck());
         return regexBuilder("tech", techs);
     }
 
@@ -271,7 +270,8 @@ public class RegexHelper {
         } else {
             allACs.addAll(Mapper.getActionCards().keySet());
         }
-        allACs.addAll(player.getActionCards().values().stream().map(Object::toString).toList());
+        allACs.addAll(
+                player.getActionCards().values().stream().map(Object::toString).toList());
         return regexBuilder("ac", allACs);
     }
 
@@ -279,8 +279,7 @@ public class RegexHelper {
     public static String pnRegex(Game game) {
         Set<String> allPNs = new HashSet<>();
         if (game != null) {
-            for (Player p : game.getRealPlayers())
-                allPNs.addAll(p.getPromissoryNotesOwned());
+            for (Player p : game.getRealPlayers()) allPNs.addAll(p.getPromissoryNotesOwned());
         } else {
             allPNs.addAll(Mapper.getPromissoryNotes().keySet());
         }

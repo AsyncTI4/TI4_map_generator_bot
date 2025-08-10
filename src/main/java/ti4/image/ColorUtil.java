@@ -6,10 +6,8 @@ import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.model.ColorModel;
@@ -39,8 +37,8 @@ public class ColorUtil {
         if (p == null) return getColor(null);
         ColorModel colorModel = Mapper.getColor(p.getColor());
         return (colorModel != null && colorModel.getSecondaryColor() != null)
-            ? colorModel.getSecondaryColor()
-            : getPlayerMainColor(p);
+                ? colorModel.getSecondaryColor()
+                : getPlayerMainColor(p);
     }
 
     public Color getColor(String color) {

@@ -1,7 +1,6 @@
 package ti4.buttons.handlers.explore;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -42,7 +41,8 @@ import ti4.service.unit.RemoveUnitService;
 class ExploreButtonHandler {
 
     @ButtonHandler("resolveLocalFab_")
-    public static void resolveLocalFabricators(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
+    public static void resolveLocalFabricators(
+            String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetName = buttonID.split("_")[1];
         String commOrTg;
         if (player.getCommodities() > 0) {
@@ -55,30 +55,41 @@ class ExploreButtonHandler {
             player.setTg(player.getTg() - 1);
             commOrTg = "trade good";
         } else {
-            ReactionService.addReaction(event, game, player, "Didn't have any commodities or trade goods to spend, so no mech has been placed.");
+            ReactionService.addReaction(
+                    event,
+                    game,
+                    player,
+                    "Didn't have any commodities or trade goods to spend, so no mech has been placed.");
             return;
         }
-        AddUnitService.addUnits(event, TileHelper.getTile(event, planetName, game), game, player.getColor(), "mech " + planetName);
-        planetName = Mapper.getPlanet(planetName) == null ? "`error?`" : Mapper.getPlanet(planetName).getName();
+        AddUnitService.addUnits(
+                event, TileHelper.getTile(event, planetName, game), game, player.getColor(), "mech " + planetName);
+        planetName = Mapper.getPlanet(planetName) == null
+                ? "`error?`"
+                : Mapper.getPlanet(planetName).getName();
         ReactionService.addReaction(event, game, player, "Spent a " + commOrTg + " for a mech on " + planetName + ".");
         ButtonHelper.deleteMessage(event);
         if (!game.isFowMode() && (event.getChannel() != game.getActionsChannel())) {
             String pF = player.getFactionEmoji();
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), pF + " Spent a " + commOrTg + " for a mech on " + planetName + ".");
         }
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
     }
 
     @ButtonHandler("resolveVolatileMech_")
-    public static void resolveVolatileFuelSourceMech(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
+    public static void resolveVolatileFuelSourceMech(
+            String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetID = StringUtils.substringAfter(buttonID, "_");
         if (!ExploreHelper.checkForMech(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
 
         String message = player.getRepresentation() + " is using a mech to resolve _Volatile Fuel Source_.";
-        message += " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
+        message +=
+                " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -86,16 +97,19 @@ class ExploreButtonHandler {
         if (!event.getMessage().getContentRaw().contains("fragment")) {
             ButtonHelper.deleteMessage(event);
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " has a mech.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), player.getFactionEmoji() + " has a mech.");
             }
         }
     }
 
     @ButtonHandler("resolveVolatileInf_")
-    public static void resolveVolatileFuelSourceInf(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
+    public static void resolveVolatileFuelSourceInf(
+            String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetID = StringUtils.substringAfter(buttonID, "_");
         if (!ExploreHelper.checkForInf(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
 
@@ -104,7 +118,8 @@ class ExploreButtonHandler {
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
 
         String message = player.getRepresentation() + " is removing an infantry to resolve _Volatile Fuel Source_.";
-        message += " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
+        message +=
+                " Please gain 1 command token. Your current command tokens are " + player.getCCRepresentation() + ".";
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -113,7 +128,8 @@ class ExploreButtonHandler {
             // what is this here for?
             ButtonHelper.deleteMessage(event);
             if (!game.isFowMode() && event.getChannel() != game.getActionsChannel()) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getFactionEmoji() + " has had an infantry removed.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(), player.getFactionEmoji() + " has had an infantry removed.");
             }
         }
     }
@@ -122,7 +138,8 @@ class ExploreButtonHandler {
     public static void resolveExpeditionMech(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetID = StringUtils.substringAfter(buttonID, "_");
         if (!ExploreHelper.checkForMech(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
 
@@ -137,7 +154,8 @@ class ExploreButtonHandler {
     public static void resolveExpeditionInf(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetID = StringUtils.substringAfter(buttonID, "_");
         if (!ExploreHelper.checkForInf(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
 
@@ -156,7 +174,8 @@ class ExploreButtonHandler {
     public static void resolveCoreMineMech(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetID = StringUtils.substringAfter(buttonID, "_");
         if (!ExploreHelper.checkForMech(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
 
@@ -175,7 +194,8 @@ class ExploreButtonHandler {
     public static void resolveCoreMineInf(String buttonID, Game game, Player player, ButtonInteractionEvent event) {
         String planetID = StringUtils.substringAfter(buttonID, "_");
         if (!ExploreHelper.checkForInf(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
 
@@ -195,15 +215,18 @@ class ExploreButtonHandler {
     }
 
     @ButtonHandler("resolveRuinsMech_")
-    public static void resolveWarForgeRuinsMech(Game game, String buttonID, Player player, ButtonInteractionEvent event) {
+    public static void resolveWarForgeRuinsMech(
+            Game game, String buttonID, Player player, ButtonInteractionEvent event) {
         String planetID = buttonID.split("_")[1];
         String placedUnit = "mech".equalsIgnoreCase(buttonID.split("_")[2]) ? "mech" : "2 infantry";
         if (!ExploreHelper.checkForMech(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
 
-        AddUnitService.addUnits(event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
+        AddUnitService.addUnits(
+                event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
         String message = player.getRepresentation() + " is using a mech to resolve _War Forge Ruins_.";
         message += " Placing " + placedUnit + " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -211,11 +234,13 @@ class ExploreButtonHandler {
     }
 
     @ButtonHandler("resolveRuinsInf_")
-    public static void resolveWarForgeRuinsInf(Game game, String buttonID, Player player, ButtonInteractionEvent event) {
+    public static void resolveWarForgeRuinsInf(
+            Game game, String buttonID, Player player, ButtonInteractionEvent event) {
         String planetID = buttonID.split("_")[1];
         String placedUnit = "mech".equalsIgnoreCase(buttonID.split("_")[2]) ? "mech" : "2 infantry";
         if (!ExploreHelper.checkForInf(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
 
@@ -223,7 +248,8 @@ class ExploreButtonHandler {
         Planet planet = tile.getUnitHolderFromPlanet(planetID);
         RemoveUnitService.removeUnit(event, tile, game, player, planet, UnitType.Infantry, 1);
 
-        AddUnitService.addUnits(event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
+        AddUnitService.addUnits(
+                event, game.getTileFromPlanet(planetID), game, player.getColor(), placedUnit + " " + planetID);
         String message = player.getRepresentation() + " is removing an infantry to resolve _War Forge Ruins_.";
         message += " Placing " + placedUnit + " on " + Helper.getPlanetRepresentation(planetID, game) + ".";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -235,7 +261,8 @@ class ExploreButtonHandler {
         String planetID = buttonID.split("_")[2];
         String agent = buttonID.split("_")[1];
         if (!ExploreHelper.checkForMech(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain a mech, please try again.");
             return;
         }
 
@@ -244,10 +271,12 @@ class ExploreButtonHandler {
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
                 game.drawActionCard(player.getUserID());
-                message += " Drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + " use buttons to discard.",
-                    ActionCardHelper.getDiscardActionCardButtons(player, false));
+                message +=
+                        " Drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged() + " use buttons to discard.",
+                        ActionCardHelper.getDiscardActionCardButtons(player, false));
             } else {
                 game.drawActionCard(player.getUserID());
                 message += " Drew 1 action card.";
@@ -271,7 +300,8 @@ class ExploreButtonHandler {
         String planetID = buttonID.split("_")[2];
         String agent = buttonID.split("_")[1];
         if (!ExploreHelper.checkForInf(planetID, game, player)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), planetID + " does not seem to contain an infantry, please try again.");
             return;
         }
 
@@ -284,10 +314,12 @@ class ExploreButtonHandler {
             if (player.hasAbility("scheming")) {
                 game.drawActionCard(player.getUserID());
                 game.drawActionCard(player.getUserID());
-                message += " Drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                    player.getRepresentationUnfogged() + " use buttons to discard.",
-                    ActionCardHelper.getDiscardActionCardButtons(player, false));
+                message +=
+                        " Drew 2 action cards with **Scheming**. Please discard 1 action card with the blue buttons.";
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCardsInfoThread(),
+                        player.getRepresentationUnfogged() + " use buttons to discard.",
+                        ActionCardHelper.getDiscardActionCardButtons(player, false));
             } else {
                 game.drawActionCard(player.getUserID());
                 message += " Drew 1 action card.";
@@ -324,14 +356,17 @@ class ExploreButtonHandler {
             player.setTg(player.getTg() - 1);
             commOrTg = "trade good";
         } else {
-            ReactionService.addReaction(event, game, player,
-                " didn't have any commodities or trade goods to spend, so no action card was drawn.");
+            ReactionService.addReaction(
+                    event,
+                    game,
+                    player,
+                    " didn't have any commodities or trade goods to spend, so no action card was drawn.");
             return;
         }
         String message = hasSchemingAbility
-            ? " spent 1 " + commOrTg + " to draw " + count2
-            + " action card (**Scheming** added 1 action card). Please discard 1 action card from your hand."
-            : " spent 1 " + commOrTg + " to draw " + count2 + " action card.";
+                ? " spent 1 " + commOrTg + " to draw " + count2
+                        + " action card (**Scheming** added 1 action card). Please discard 1 action card from your hand."
+                : " spent 1 " + commOrTg + " to draw " + count2 + " action card.";
         if (player.hasAbility("autonetic_memory")) {
             ButtonHelperAbilities.autoneticMemoryStep1(game, player, count2);
             message = player.getFactionEmoji() + " triggered **Autonetic Memory** option.";
@@ -346,9 +381,10 @@ class ExploreButtonHandler {
         CommanderUnlockCheckService.checkPlayer(player, "yssaril");
 
         if (hasSchemingAbility) {
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(),
-                player.getRepresentationUnfogged() + " use buttons to discard.",
-                ActionCardHelper.getDiscardActionCardButtons(player, false));
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCardsInfoThread(),
+                    player.getRepresentationUnfogged() + " use buttons to discard.",
+                    ActionCardHelper.getDiscardActionCardButtons(player, false));
         }
 
         ReactionService.addReaction(event, game, player, message);
@@ -380,8 +416,9 @@ class ExploreButtonHandler {
 
             String traitNameWithEmoji = ExploreEmojis.getTraitEmoji(type) + type;
             if (deck.isEmpty() && discard.isEmpty()) {
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        traitNameWithEmoji + " exploration deck & discard is empty - nothing to look at.");
                 continue;
             }
 
@@ -392,9 +429,10 @@ class ExploreButtonHandler {
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, sb.toString());
         }
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            "The top card of each of the cultural, industrial, and hazardous exploration decks has been set to "
-                + player.getFactionEmoji() + " `#cards-info` thread.");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                "The top card of each of the cultural, industrial, and hazardous exploration decks has been set to "
+                        + player.getFactionEmoji() + " `#cards-info` thread.");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -417,18 +455,22 @@ class ExploreButtonHandler {
         boolean dsdihmy = bID.startsWith("dsdihmy_");
         String[] info = bID.split("_");
         Tile tile = game.getTileFromPlanet(info[1]);
-        ExploreService.explorePlanet(event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, false);
+        ExploreService.explorePlanet(
+                event, game.getTileFromPlanet(info[1]), info[1], info[2], player, false, game, 1, false);
         if (dsdihmy) {
             player.exhaustPlanet(info[1]);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), info[1] + " was exhausted by _Impressment Programs_.");
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(), info[1] + " was exhausted by _Impressment Programs_.");
         }
         if (tile != null && player.getTechs().contains("dsdihmy")) {
             List<Button> produce = new java.util.ArrayList<>();
             String pos = tile.getPosition();
             produce.add(Buttons.blue("dsdihmy_" + pos, "Produce (1) Units"));
-            MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                player.getRepresentation() + ", you explored a planet, and due to _Impressment Programs_ you may now produce 1 ship in the system.",
-                produce);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    player.getCorrectChannel(),
+                    player.getRepresentation()
+                            + ", you explored a planet, and due to _Impressment Programs_ you may now produce 1 ship in the system.",
+                    produce);
         }
         event.getMessage().delete().queue(Consumers.nop(), BotLogger::catchRestError);
     }
@@ -436,8 +478,10 @@ class ExploreButtonHandler {
     @ButtonHandler("exploreAPlanet")
     static void exploreAPlanet(ButtonInteractionEvent event, Player player, Game game) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getRepresentation() + ", please use these buttons to explore.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", please use these buttons to explore.",
+                buttons);
     }
 
     @ButtonHandler("shuffleExplores")

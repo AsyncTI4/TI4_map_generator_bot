@@ -1,7 +1,6 @@
 package ti4.commands.cardspn;
 
 import java.util.Map;
-
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,7 +16,11 @@ class ShowPNToAll extends GameStateSubcommand {
 
     public ShowPNToAll() {
         super(Constants.SHOW_TO_ALL, "Show Promissory Note to table", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory note ID, which is found between ()").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.INTEGER,
+                        Constants.PROMISSORY_NOTE_ID,
+                        "Promissory note ID, which is found between ()")
+                .setRequired(true));
     }
 
     @Override

@@ -14,7 +14,11 @@ class ExploreRemoveFromGame extends GameStateSubcommand {
 
     public ExploreRemoveFromGame() {
         super(Constants.REMOVE, "Remove an Exploration card from the game.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Exploration card ids. May include multiple comma-separated ids.").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.EXPLORE_CARD_ID,
+                        "Exploration card ids. May include multiple comma-separated ids.")
+                .setRequired(true));
     }
 
     @Override
@@ -27,7 +31,9 @@ class ExploreRemoveFromGame extends GameStateSubcommand {
             ExploreModel explore = Mapper.getExplore(id);
             game.purgeExplore(id);
             if (explore != null) {
-                sb.append("Exploration card removed: ").append(explore.textRepresentation()).append(System.lineSeparator());
+                sb.append("Exploration card removed: ")
+                        .append(explore.textRepresentation())
+                        .append(System.lineSeparator());
             } else {
                 sb.append("Removed id without matching card: ").append(id).append(System.lineSeparator());
             }

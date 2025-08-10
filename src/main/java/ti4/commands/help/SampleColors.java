@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -29,7 +28,8 @@ class SampleColors extends Subcommand {
 
     public SampleColors() {
         super(Constants.SAMPLE_COLORS, "Show a sample image of dreadnoughts in various player colors.");
-        addOptions(new OptionData(OptionType.STRING, Constants.HUE, "General hue of colors to show (default: all)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.HUE, "General hue of colors to show (default: all)")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -47,8 +47,11 @@ class SampleColors extends Subcommand {
 
         OptionMapping input = event.getOption(Constants.HUE);
         List<String> hues = new ArrayList<>();
-        if (input == null || input.getAsString().equals(Constants.ALL) || input.getAsString().isEmpty()) {
-            hues = Arrays.asList("RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2");
+        if (input == null
+                || input.getAsString().equals(Constants.ALL)
+                || input.getAsString().isEmpty()) {
+            hues = Arrays.asList(
+                    "RED", "GRAY", "ORANGE", "YELLOW", "GREEN", "BLUE", "PURPLE", "PINK", "MULTI1", "MULTI2");
         } else {
             SPACING = 12;
             DREADWIDTH = 77 + 2 * SPACING;
@@ -57,12 +60,9 @@ class SampleColors extends Subcommand {
             LINEHEIGHT = 20;
             bigFont = Storage.getFont16();
             smallFont = Storage.getFont12();
-            if (input.getAsString().equals("MULTI"))
-            {
+            if (input.getAsString().equals("MULTI")) {
                 hues = Arrays.asList("MULTI1", "MULTI2");
-            }
-            else
-            {
+            } else {
                 hues.add(input.getAsString());
             }
             stroke = new BasicStroke(3.0f);
@@ -92,7 +92,8 @@ class SampleColors extends Subcommand {
         int y = top;
 
         BufferedImage coloursImage = new BufferedImage(PAGEWIDTH, PAGEHIGHT, BufferedImage.TYPE_INT_ARGB);
-        BufferedImage backgroundImage = ImageHelper.read(ResourceHelper.getInstance().getExtraFile("starfield.png"));
+        BufferedImage backgroundImage =
+                ImageHelper.read(ResourceHelper.getInstance().getExtraFile("starfield.png"));
         Graphics graphic = coloursImage.getGraphics();
         graphic.drawImage(backgroundImage, 0, 0, null);
 
@@ -104,29 +105,59 @@ class SampleColors extends Subcommand {
                 }
                 String alias = c.getAlias();
 
-                BufferedImage dread = ImageHelper.read(ResourceHelper.getInstance().getUnitFile(alias + "_dn.png"));
+                BufferedImage dread =
+                        ImageHelper.read(ResourceHelper.getInstance().getUnitFile(alias + "_dn.png"));
                 graphic.drawImage(dread, x + SPACING, y + SPACING, null);
                 graphic.setFont(bigFont);
-                DrawingUtil.superDrawString(graphic, c.getName(), x + DREADWIDTH / 2, y + DREADSUBHIGHT + SPACING,
-                    Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
-                    stroke, Color.BLACK);
+                DrawingUtil.superDrawString(
+                        graphic,
+                        c.getName(),
+                        x + DREADWIDTH / 2,
+                        y + DREADSUBHIGHT + SPACING,
+                        Color.WHITE,
+                        MapGenerator.HorizontalAlign.Center,
+                        MapGenerator.VerticalAlign.Top,
+                        stroke,
+                        Color.BLACK);
                 graphic.setFont(smallFont);
-                DrawingUtil.superDrawString(graphic, alias, x + DREADWIDTH / 2, y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
-                    Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
-                    stroke, Color.BLACK);
+                DrawingUtil.superDrawString(
+                        graphic,
+                        alias,
+                        x + DREADWIDTH / 2,
+                        y + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+                        Color.WHITE,
+                        MapGenerator.HorizontalAlign.Center,
+                        MapGenerator.VerticalAlign.Top,
+                        stroke,
+                        Color.BLACK);
 
-                String file = ResourceHelper.getInstance().getUnitFile((alias.equals("lgy") ? "orca" : "split" + alias) + "_dn.png");
+                String file = ResourceHelper.getInstance()
+                        .getUnitFile((alias.equals("lgy") ? "orca" : "split" + alias) + "_dn.png");
                 if (file != null) {
                     dread = ImageHelper.read(file);
                     graphic.drawImage(dread, x + SPACING, y + SPACING + DREADTEXHIGHT, null);
                     graphic.setFont(bigFont);
-                    DrawingUtil.superDrawString(graphic, (alias.equals("lgy") ? "orca" : "split" + c.getName()), x + DREADWIDTH / 2, y + DREADTEXHIGHT + DREADSUBHIGHT + SPACING,
-                        Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
-                        stroke, Color.BLACK);
+                    DrawingUtil.superDrawString(
+                            graphic,
+                            (alias.equals("lgy") ? "orca" : "split" + c.getName()),
+                            x + DREADWIDTH / 2,
+                            y + DREADTEXHIGHT + DREADSUBHIGHT + SPACING,
+                            Color.WHITE,
+                            MapGenerator.HorizontalAlign.Center,
+                            MapGenerator.VerticalAlign.Top,
+                            stroke,
+                            Color.BLACK);
                     graphic.setFont(smallFont);
-                    DrawingUtil.superDrawString(graphic, (alias.equals("lgy") ? "orca" : "split" + alias), x + DREADWIDTH / 2, y + DREADTEXHIGHT + DREADSUBHIGHT + LINEHEIGHT + SPACING,
-                        Color.WHITE, MapGenerator.HorizontalAlign.Center, MapGenerator.VerticalAlign.Top,
-                        stroke, Color.BLACK);
+                    DrawingUtil.superDrawString(
+                            graphic,
+                            (alias.equals("lgy") ? "orca" : "split" + alias),
+                            x + DREADWIDTH / 2,
+                            y + DREADTEXHIGHT + DREADSUBHIGHT + LINEHEIGHT + SPACING,
+                            Color.WHITE,
+                            MapGenerator.HorizontalAlign.Center,
+                            MapGenerator.VerticalAlign.Top,
+                            stroke,
+                            Color.BLACK);
                 }
 
                 x += DREADWIDTH;
@@ -144,9 +175,11 @@ class SampleColors extends Subcommand {
         int subWidth = Math.max(1, right - left);
         int subHeight = Math.max(1, bottom - top);
         coloursImage = coloursImage.getSubimage(left, top, subWidth, subHeight);
-        String fileNamePrefix = "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : Constants.ALL);
+        String fileNamePrefix =
+                "colour_sample_" + top + "_" + left + "_" + (hues.size() == 1 ? hues.getFirst() : Constants.ALL);
         try (var fileUpload = FileUploadService.createFileUpload(coloursImage, fileNamePrefix)) {
-            fileUpload.setDescription("Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
+            fileUpload.setDescription(
+                    "Colour samples for " + (hues.size() == 1 ? "all the " + hues.getFirst() : "ALL the") + " units.");
             MessageHelper.sendFileUploadToChannel(event.getChannel(), fileUpload);
         } catch (IOException e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Exception when closing FileUpload.", e);

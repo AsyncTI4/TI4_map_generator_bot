@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -27,17 +26,17 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class FOWCombatThreadMirroring {
 
-  /*
-    Checks that event occured in a valid thread and is a message from a player
-    participating in the combat
-  */
-  public static void mirrorEvent(MessageReceivedEvent event) {
+    /*
+      Checks that event occured in a valid thread and is a message from a player
+      participating in the combat
+    */
+    public static void mirrorEvent(MessageReceivedEvent event) {
         if (!isFowCombatThread(event.getChannel()) || event.getAuthor().isBot()) {
             return;
         }
 
         String threadName = event.getChannel().getName();
-        String gameName = threadName.substring(0, threadName.indexOf("-"));
+        String gameName = threadName.substring(0, threadName.indexOf('-'));
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) {
             return;
@@ -55,7 +54,8 @@ public class FOWCombatThreadMirroring {
 
         boolean messageMirrored = mirrorMessage((ThreadChannel) event.getChannel(), player, game, newMessageText);
         if (messageMirrored) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
+            MessageHelper.sendMessageToChannel(
+                    event.getChannel(), player.getRepresentationNoPing() + "(You) said: " + messageText);
             event.getMessage().delete().queue();
         }
     }
@@ -65,7 +65,7 @@ public class FOWCombatThreadMirroring {
         String hits = matchPattern(messageText, "Total hits (\\d+)");
 
         return player.getRepresentationNoPing() + " rolled for " + combat + ": "
-            + CombatMessageHelper.displayHitResults(Integer.valueOf(hits)).replace("\n", "");
+                + CombatMessageHelper.displayHitResults(Integer.valueOf(hits)).replace("\n", "");
     }
 
     private static boolean isFowCombatThread(Channel eventChannel) {
@@ -128,7 +128,8 @@ public class FOWCombatThreadMirroring {
     public static boolean mirrorMessage(GenericInteractionCreateEvent event, Game game, String message) {
         if (!isFowCombatThread(event.getChannel())) return false;
 
-        return mirrorMessage((ThreadChannel) event.getChannel(), getCommunityModePlayer(event.getMember(), game), game, message);
+        return mirrorMessage(
+                (ThreadChannel) event.getChannel(), getCommunityModePlayer(event.getMember(), game), game, message);
     }
 
     private static boolean mirrorMessage(ThreadChannel channel, Player player, Game game, String message) {
@@ -144,8 +145,9 @@ public class FOWCombatThreadMirroring {
             TextChannel pChan = (TextChannel) pChannel;
             if (pChan != null) {
                 boolean combatParticipant = combatParticipants.contains(playerOther);
-                String newMessage = (combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "")
-                    + message;
+                String newMessage =
+                        (combatParticipant ? playerOther.getRepresentation(true, combatParticipant) + " " : "")
+                                + message;
 
                 List<ThreadChannel> threadChannels = pChan.getThreadChannels();
                 for (ThreadChannel threadChannel_ : threadChannels) {

@@ -1,13 +1,12 @@
 package ti4.helpers.settingsFramework.menus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -30,7 +29,7 @@ import ti4.service.emoji.SourceEmojis;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties({ "messageId", "bpp" })
+@JsonIgnoreProperties({"messageId", "bpp"})
 public class GameSettings extends SettingsMenu {
 
     // ---------------------------------------------------------------------------------------------------------------------------------
@@ -76,7 +75,8 @@ public class GameSettings extends SettingsMenu {
         mapTemplate.setEmoji(MiltyDraftEmojis.sliceA);
 
         // Other initialization
-        mapTemplate.setAllValues(Mapper.getMapTemplates().stream().collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x)));
+        mapTemplate.setAllValues(
+                Mapper.getMapTemplates().stream().collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x)));
         mapTemplate.setShow(MapTemplateModel::getAlias);
         mapTemplate.setGetExtraInfo(MapTemplateModel::getDescr);
 
@@ -86,7 +86,9 @@ public class GameSettings extends SettingsMenu {
 
         // Verify this is the correct JSON node and continue initialization
         List<String> historicIDs = new ArrayList<>(List.of("game"));
-        if (json != null && json.has("menuId") && historicIDs.contains(json.get("menuId").asText(""))) {
+        if (json != null
+                && json.has("menuId")
+                && historicIDs.contains(json.get("menuId").asText(""))) {
             pointTotal.initialize(json.get("pointTotal"));
             stage1s.initialize(json.get("stage1s"));
             stage2s.initialize(json.get("stage2s"));
@@ -134,11 +136,12 @@ public class GameSettings extends SettingsMenu {
 
     @Override
     protected String handleSpecialButtonAction(GenericInteractionCreateEvent event, String action) {
-        String error = switch (action) {
-            case "preset14pt" -> preset14vp();
-            case "preset444" -> preset444();
-            default -> null;
-        };
+        String error =
+                switch (action) {
+                    case "preset14pt" -> preset14vp();
+                    case "preset444" -> preset444();
+                    default -> null;
+                };
         if (action.startsWith("changeTemplate_") && event instanceof StringSelectInteractionEvent sEvent) {
             afterChangeMapTemplateHandler(sEvent);
         }
@@ -150,7 +153,7 @@ public class GameSettings extends SettingsMenu {
         if (parent instanceof MiltySettings m) {
             int players = m.getPlayerSettings().getGamePlayers().getKeys().size();
             Map<String, MapTemplateModel> allowed = Mapper.getMapTemplatesForPlayerCount(players).stream()
-                .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
+                    .collect(Collectors.toMap(MapTemplateModel::getAlias, x -> x));
             var defaultTemplate = Mapper.getDefaultMapTemplateForPlayerCount(players);
             if (defaultTemplate == null) {
                 return;
@@ -183,8 +186,11 @@ public class GameSettings extends SettingsMenu {
         if (parent != null && parent instanceof MiltySettings mparent)
             preview = MapTemplateHelper.generateTemplatePreviewImage(event, mparent.getGame(), mapTemplate.getValue());
         if (preview != null)
-            event.getHook().sendMessage("Here is a preview of the selected map template:")
-                .addFiles(preview).setEphemeral(true).queue();
+            event.getHook()
+                    .sendMessage("Here is a preview of the selected map template:")
+                    .addFiles(preview)
+                    .setEphemeral(true)
+                    .queue();
         if (mapTemplate.getValue().bluePerPlayer() != bpp && parent instanceof MiltySettings m) {
             SliceGenerationSettings slice = m.getSliceSettings();
             bpp = mapTemplate.getValue().bluePerPlayer();
@@ -204,7 +210,9 @@ public class GameSettings extends SettingsMenu {
                 slice.getTotalValue().setValLow(0);
                 slice.getTotalValue().setValHigh(6);
             }
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "The number of blue tiles per player in the map template changed, your slice settings have been reset to accomodate the change.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    "The number of blue tiles per player in the map template changed, your slice settings have been reset to accomodate the change.");
         }
     }
 }

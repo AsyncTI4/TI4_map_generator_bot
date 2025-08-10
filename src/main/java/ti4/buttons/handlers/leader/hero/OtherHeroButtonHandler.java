@@ -2,7 +2,6 @@ package ti4.buttons.handlers.leader.hero;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -34,28 +33,29 @@ import ti4.service.unit.RemoveUnitService;
 
 @UtilityClass
 public class OtherHeroButtonHandler {
-    
-    private static void purgeHeroPreamble(ButtonInteractionEvent event, Player player, Game game, String heroId, String heroTitle)
-    {
+
+    private static void purgeHeroPreamble(
+            ButtonInteractionEvent event, Player player, Game game, String heroId, String heroTitle) {
         Leader playerLeader = player.unsafeGetLeader(heroId);
         LeaderModel leaderModel = playerLeader.getLeaderModel().orElse(null);
         boolean showFlavourText = Constants.VERBOSITY_VERBOSE.equals(game.getOutputVerbosity());
         if (leaderModel != null) {
-            MessageHelper.sendMessageToChannelWithEmbed(player.getCorrectChannel(),
-                player.getRepresentation() + " is playing " + heroTitle + ".",
-                leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
+            MessageHelper.sendMessageToChannelWithEmbed(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " is playing " + heroTitle + ".",
+                    leaderModel.getRepresentationEmbed(false, true, true, showFlavourText));
         } else {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                player.getRepresentation() + " is playing " + heroTitle + ".\n"
-                    + Helper.getLeaderFullRepresentation(playerLeader));
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " is playing " + heroTitle + ".\n"
+                            + Helper.getLeaderFullRepresentation(playerLeader));
         }
         boolean purged = player.removeLeader(playerLeader);
         if (purged) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                heroTitle + ", has been purged.");
+            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), heroTitle + ", has been purged.");
         } else {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                heroTitle + ", was not purged - something went wrong.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), heroTitle + ", was not purged - something went wrong.");
         }
         ButtonHelper.deleteTheOneButton(event);
     }
@@ -69,30 +69,42 @@ public class OtherHeroButtonHandler {
     public static void purgeSardakkHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         purgeHeroPreamble(event, player, game, "sardakkhero", "Sh'val, Harbinger, the N'orr hero");
         ButtonHelperHeroes.killShipsSardakkHero(player, game, event);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", all ships have been removed, please continue to invasion.");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged() + ", all ships have been removed, please continue to invasion.");
     }
 
     @ButtonHandler("purgeAtokeraHero")
     public static void purgeAtokeraHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         purgeHeroPreamble(event, player, game, "atokerahero", "Kapoko Vui, the Atokera hero");
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-            player.getRepresentationUnfogged() + ", unfortunately at this time the addition of ships to the ground is not automated."
-                + " `/move units` can place them on the planet however, and they will roll dice as normal once there.");
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationUnfogged()
+                        + ", unfortunately at this time the addition of ships to the ground is not automated."
+                        + " `/move units` can place them on the planet however, and they will roll dice as normal once there.");
     }
 
     @ButtonHandler("utilizePharadnHero_")
-    public static void utilizePharadnHero(Player player, Game game, String buttonID, ButtonInteractionEvent event) { // TODO: add service
+    public static void utilizePharadnHero(
+            Player player, Game game, String buttonID, ButtonInteractionEvent event) { // TODO: add service
         purgeHeroPreamble(event, player, game, "pharadnhero", "Pharad'n the Immortal, the Pharad'n hero");
         String planet = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
-        buttons.add(Buttons.red(player.getFinsFactionCheckerPrefix() + "pharadnHeroDestroy_" + planet, "Destroy All Infantry"));
-        for (int x = 1; x < player.getNomboxTile().getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) + 1; x++) {
-            buttons.add(Buttons.green(player.getFinsFactionCheckerPrefix() + "pharadnHeroCommit_" + planet + "_" + x, "Commit " + x + " Infantry"));
+        buttons.add(Buttons.red(
+                player.getFinsFactionCheckerPrefix() + "pharadnHeroDestroy_" + planet, "Destroy All Infantry"));
+        for (int x = 1;
+                x < player.getNomboxTile().getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player) + 1;
+                x++) {
+            buttons.add(Buttons.green(
+                    player.getFinsFactionCheckerPrefix() + "pharadnHeroCommit_" + planet + "_" + x,
+                    "Commit " + x + " Infantry"));
         }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
-            player.getFactionEmoji() + ", you've chosen to use Pharad'n the Immortal on " + Mapper.getPlanet(planet).getAutoCompleteName() 
-                + ". Decide whether to destroy all infantry or commit infantry.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getMessageChannel(),
+                player.getFactionEmoji() + ", you've chosen to use Pharad'n the Immortal on "
+                        + Mapper.getPlanet(planet).getAutoCompleteName()
+                        + ". Decide whether to destroy all infantry or commit infantry.",
+                buttons);
     }
 
     @ButtonHandler("pharadnHeroDestroy_")
@@ -113,7 +125,8 @@ public class OtherHeroButtonHandler {
             }
         }
 
-        String msg = player.getFactionEmoji() + ", you've chosen to use Pharad'n the Immortal on " + unitHolder.getRepresentation(game) + " to destroy all infantry.";
+        String msg = player.getFactionEmoji() + ", you've chosen to use Pharad'n the Immortal on "
+                + unitHolder.getRepresentation(game) + " to destroy all infantry.";
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
         ButtonHelper.deleteMessage(event);
     }
@@ -122,8 +135,10 @@ public class OtherHeroButtonHandler {
     public static void pharadnHeroCommit(Player player, Game game, String buttonID, ButtonInteractionEvent event) {
         String planet = buttonID.split("_")[1];
         String amount = buttonID.split("_")[2];
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getFactionEmoji() + " you chose to use the Pharad'n the Immortal on " + Mapper.getPlanet(planet).getAutoCompleteName() + " to commit " + amount + " infantry.");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getFactionEmoji() + " you chose to use the Pharad'n the Immortal on "
+                        + Mapper.getPlanet(planet).getAutoCompleteName() + " to commit " + amount + " infantry.");
         ButtonHelper.deleteMessage(event);
         Tile tile = game.getTileFromPlanet(planet);
         AddUnitService.addUnits(event, tile, game, player.getColor(), amount + " inf " + planet);
@@ -147,13 +162,16 @@ public class OtherHeroButtonHandler {
         for (int i = 0; i < gloryTiles.size(); i++) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "vaylerianhero");
             if (!buttons.isEmpty()) {
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    "Use buttons to remove a command token from the game board.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        "Use buttons to remove a command token from the game board.",
+                        buttons);
             }
         }
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-        String message2 = player.getRepresentationUnfogged() + ", you may gain 1 command token. Your current command tokens are " 
-            + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
+        String message2 =
+                player.getRepresentationUnfogged() + ", you may gain 1 command token. Your current command tokens are "
+                        + player.getCCRepresentation() + ". Use buttons to gain 1 command token.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         game.setStoredValue("originalCCsFor" + player.getFaction(), player.getCCRepresentation());
     }
@@ -161,18 +179,26 @@ public class OtherHeroButtonHandler {
     @ButtonHandler("purgeKeleresAHero")
     public static void purgeKeleresAHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         purgeHeroPreamble(event, player, game, "keleresherokuuasi", "Kuuasi Aun Jalatai, the Keleres (Argent) hero");
-        AddUnitService.addUnits(event, game.getTileByPosition(game.getActiveSystem()), game, player.getColor(), "2 cruiser, 1 flagship");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-            player.getRepresentationUnfogged() + ", 2 cruisers and a flagship have been added to " + game.getTileByPosition(game.getActiveSystem()).getRepresentation() + ".");
-        
+        AddUnitService.addUnits(
+                event,
+                game.getTileByPosition(game.getActiveSystem()),
+                game,
+                player.getColor(),
+                "2 cruiser, 1 flagship");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged() + ", 2 cruisers and a flagship have been added to "
+                        + game.getTileByPosition(game.getActiveSystem()).getRepresentation() + ".");
     }
 
     @ButtonHandler("purgeDihmohnHero")
     public static void purgeDihmohnHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         purgeHeroPreamble(event, player, game, "dihmohnhero", "Verrisus Ypru, the Dih-Mohn");
         ButtonHelperHeroes.resolvDihmohnHero(game);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), player.getRepresentationUnfogged()
-            + " sustained all ships in the active system. Reminder that your ships cannot be destroyed this combat round.");
+        MessageHelper.sendMessageToChannel(
+                event.getMessageChannel(),
+                player.getRepresentationUnfogged()
+                        + " sustained all ships in the active system. Reminder that your ships cannot be destroyed this combat round.");
     }
 
     @ButtonHandler("purgeUydaiHero")
@@ -181,31 +207,37 @@ public class OtherHeroButtonHandler {
     }
 
     @ButtonHandler("purgeKortaliHero_")
-    public static void purgeKortaliHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
+    public static void purgeKortaliHero(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
         purgeHeroPreamble(event, player, game, "kortalihero", "Queen Nadalia, the Kortali hero");
         ButtonHelperHeroes.offerStealRelicButtons(game, player, buttonID, event);
         List<Button> buttons = ButtonHelper.getGainCCButtons(player);
-        String message2 = player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
-            + ". Use buttons to gain command tokens equal to your technology specialty and legendary planet count.";
+        String message2 =
+                player.getRepresentationUnfogged() + ", your current command tokens are " + player.getCCRepresentation()
+                        + ". Use buttons to gain command tokens equal to your technology specialty and legendary planet count.";
         MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message2, buttons);
     }
 
     @ButtonHandler("purgeOrlandoHero_")
     public static void purgeOrlandoHero(ButtonInteractionEvent event, Player player, Game game) { // TODO: add service
         String p = "p";
-        while (RandomHelper.isOneInX(20))
-        {
+        while (RandomHelper.isOneInX(20)) {
             p += "p";
         }
         purgeHeroPreamble(event, player, game, "orlandohero", "F.S.S. Orlando, the Orlando hero");
-        String msg = player.getRepresentationNoPing() + ", please choose the unit that recently died, with which you wish to resolve _A" + p + "ollo Protocol_.";
-        MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), msg, ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
+        String msg = player.getRepresentationNoPing()
+                + ", please choose the unit that recently died, with which you wish to resolve _A" + p
+                + "ollo Protocol_.";
+        MessageHelper.sendMessageToChannelWithButtons(
+                player.getCorrectChannel(),
+                msg,
+                ButtonHelperActionCards.getCourageousOptions(player, game, true, "orlando"));
         ButtonHelper.deleteTheOneButton(event);
-
     }
 
     @ButtonHandler("purgeRedCreussHero_")
-    public static void purgeRedCreussHero(ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
+    public static void purgeRedCreussHero(
+            ButtonInteractionEvent event, Player player, String buttonID, Game game) { // TODO: add service
         purgeHeroPreamble(event, player, game, "redcreusshero", "\"A Tall Stranger\", the Red Creuss hero");
         String pos = buttonID.split("_")[1];
         Tile tile = game.getTileByPosition(pos);
@@ -229,24 +261,33 @@ public class OtherHeroButtonHandler {
         String pos = buttonID.split("_")[1];
         String unit = buttonID.split("_")[2];
         AddUnitService.addUnits(event, game.getTileByPosition(pos), game, player.getColor(), unit);
-        MessageHelper.sendMessageToChannel(event.getChannel(), 
-            player.getFactionEmojiOrColor() + " chose to duplicate a " + unit + " in " + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
+        MessageHelper.sendMessageToChannel(
+                event.getChannel(),
+                player.getFactionEmojiOrColor() + " chose to duplicate a " + unit + " in "
+                        + game.getTileByPosition(pos).getRepresentationForButtons(game, player));
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("glimmersHeroIn_")
     public static void glimmersHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.substring(buttonID.indexOf("_") + 1);
-        List<Button> buttons = ButtonHelperHeroes.getUnitsToGlimmersHero(player, game, event, game.getTileByPosition(pos));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + ", please choose which unit you wish to duplicate.", buttons);
+        String pos = buttonID.substring(buttonID.indexOf('_') + 1);
+        List<Button> buttons =
+                ButtonHelperHeroes.getUnitsToGlimmersHero(player, game, event, game.getTileByPosition(pos));
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                player.getRepresentationUnfogged() + ", please choose which unit you wish to duplicate.",
+                buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("ghotiHeroIn_")
     public static void ghotiHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.substring(buttonID.indexOf("_") + 1);
+        String pos = buttonID.substring(buttonID.indexOf('_') + 1);
         List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), player.getRepresentationUnfogged() + ", please choose which unit you wish to replace.", buttons);
+        MessageHelper.sendMessageToChannelWithButtons(
+                event.getChannel(),
+                player.getRepresentationUnfogged() + ", please choose which unit you wish to replace.",
+                buttons);
         ButtonHelper.deleteTheOneButton(event);
     }
 }

@@ -1,7 +1,7 @@
 package ti4.helpers;
 
-import lombok.Data;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class PdsCoverage {

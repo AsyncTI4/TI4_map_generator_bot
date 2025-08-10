@@ -2,7 +2,6 @@ package ti4.commands.special;
 
 import java.util.List;
 import java.util.Random;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,15 +16,15 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
 
     public SetupNeutralPlayer() {
         super("setup_neutral_player", "Setup neutral player units", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color for neutral units")
-            .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color for neutral units").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
 
-        List<String> unusedColors = game.getUnusedColors().stream().map(ColorModel::getName).toList();
+        List<String> unusedColors =
+                game.getUnusedColors().stream().map(ColorModel::getName).toList();
         if (unusedColors.isEmpty()) {
             MessageHelper.replyToMessage(event, "Unable to find an unused color. This is probably a bug?");
             return;

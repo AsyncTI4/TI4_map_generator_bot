@@ -17,7 +17,9 @@ class ForcePick extends GameStateSubcommand {
 
     public ForcePick() {
         super("force_pick", "Pick for the active player in milty draft", true, false);
-        addOptions(new OptionData(OptionType.STRING, PICK, "What should be picked").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, PICK, "What should be picked")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
@@ -33,7 +35,8 @@ class ForcePick extends GameStateSubcommand {
         MiltyDraftManager manager = game.getMiltyDraftManager();
         Player player = manager.getCurrentDraftPlayer(game);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is not an active milty draft for this game.");
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(), "There is not an active milty draft for this game.");
         }
 
         boolean error = false;

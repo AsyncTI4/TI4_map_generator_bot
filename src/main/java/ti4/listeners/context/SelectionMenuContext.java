@@ -2,7 +2,6 @@ package ti4.listeners.context;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 
@@ -14,8 +13,7 @@ public class SelectionMenuContext extends ListenerContext {
     private List<String> values;
 
     public StringSelectInteractionEvent getEvent() {
-        if (event instanceof StringSelectInteractionEvent button)
-            return button;
+        if (event instanceof StringSelectInteractionEvent button) return button;
         return null;
     }
 
@@ -25,7 +23,7 @@ public class SelectionMenuContext extends ListenerContext {
 
     public SelectionMenuContext(StringSelectInteractionEvent event) {
         super(event, event.getSelectMenu().getId());
-        if (!isValid()) return; //super failed
+        if (!isValid()) return; // super failed
 
         // Proceed with additional context
         this.menuID = this.componentID; // ID after checking faction

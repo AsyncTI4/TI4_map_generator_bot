@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -13,8 +13,11 @@ class RelicReady extends GameStateSubcommand {
 
     public RelicReady() {
         super(Constants.RELIC_REFRESH, "Ready a relic", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to be readied").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to be readied")
+                .setAutoComplete(true)
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override

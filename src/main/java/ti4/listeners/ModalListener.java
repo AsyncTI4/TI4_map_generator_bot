@@ -1,10 +1,9 @@
 package ti4.listeners;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-
+import javax.annotation.Nonnull;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
@@ -24,8 +23,7 @@ public class ModalListener extends ListenerAdapter {
     private final Map<String, Consumer<ModalContext>> knownModals = new HashMap<>();
 
     public static ModalListener getInstance() {
-        if (instance == null)
-            instance = new ModalListener();
+        if (instance == null) instance = new ModalListener();
         return instance;
     }
 
@@ -36,14 +34,20 @@ public class ModalListener extends ListenerAdapter {
     @Override
     public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
         if (!AsyncTI4DiscordBot.isReadyToReceiveCommands()) {
-            event.reply("Please try again in a moment. The bot is not ready to handle button presses.").setEphemeral(true).queue();
+            event.reply("Please try again in a moment. The bot is not ready to handle button presses.")
+                    .setEphemeral(true)
+                    .queue();
             return;
         }
 
         event.deferEdit().queue();
 
         String gameName = GameNameService.getGameNameFromChannel(event);
-        ExecutorServiceManager.runAsync("ModalListener task for  `" + gameName + "`", gameName, event.getMessageChannel(), () -> handleModal(event));
+        ExecutorServiceManager.runAsync(
+                "ModalListener task for  `" + gameName + "`",
+                gameName,
+                event.getMessageChannel(),
+                () -> handleModal(event));
     }
 
     private void handleModal(@Nonnull ModalInteractionEvent event) {
@@ -54,7 +58,8 @@ public class ModalListener extends ListenerAdapter {
                 context.save();
             }
         } catch (Exception e) {
-            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
+            String message = "Modal issue in event: " + event.getModalId() + "\n> Channel: "
+                    + event.getChannel().getAsMention() + "\n> Command: " + event.getValues();
             BotLogger.error(new BotLogger.LogMessageOrigin(event), message, e);
         }
     }
@@ -89,8 +94,7 @@ public class ModalListener extends ListenerAdapter {
     }
 
     public static String getModalDebugText(ModalInteractionEvent event) {
-        StringBuilder output = new StringBuilder("INPUT:\n```\n" +
-            "MenuID: " + event.getModalId());
+        StringBuilder output = new StringBuilder("INPUT:\n```\n" + "MenuID: " + event.getModalId());
         for (ModalMapping field : event.getValues()) {
             output.append("\n> Field: ").append(field.getId()).append(" => ").append(field.getAsString());
         }

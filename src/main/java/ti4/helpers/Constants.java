@@ -739,7 +739,7 @@ public class Constants {
     public static final String PEEK_AT_STAGE1 = "peek_at_stage1";
     public static final String PEEK_AT_STAGE2 = "peek_at_stage2";
 
-    //Omega Phase bot commands and parameters
+    // Omega Phase bot commands and parameters
     public static final String OMEGA_PHASE_COMMAND = "omegaphase";
     public static final String SETUP_VOTC = "setup_voice_of_the_council";
     public static final String ASSIGN_PLAYER_TO_VOTC = "assign_player_to_votc";
@@ -754,11 +754,11 @@ public class Constants {
     public static final String RESET_VOICE_OF_THE_COUNCIL = "reset_voice_of_the_council";
     public static final String ELECT_VOICE_OF_THE_COUNCIL = "elect_voice_of_the_council";
     public static final String IMPERIUM_REX_ID = "imperium_rex_omegaphase";
-    //Omega Phase state keys
+    // Omega Phase state keys
     public static final String PRIORITY_TRACK = "priority_track";
     public static final String OMEGA_PHASE_MODE = "omega_phase_mode";
 
-    //Other Priority Track implementations
+    // Other Priority Track implementations
     public static final String PRIORITY_TRACK_MODE = "priority_track_mode";
 
     public static final String ADD_CUSTOM = "po_add_custom";
@@ -915,6 +915,7 @@ public class Constants {
     public static final String HERO = "hero";
     public static final String ENVOY = "envoy";
     public static final List<String> leaderList = new ArrayList<>();
+
     static {
         leaderList.add(AGENT);
         leaderList.add(COMMANDER);
@@ -982,12 +983,13 @@ public class Constants {
     public static final String SHOW_GAME_AS_PLAYER = "show_game_as";
     public static final String CHECK_PRIVATE_COMMUNICATIONS = "check_private_communications";
 
-    //DRAFTS
+    // DRAFTS
     public static final String BAG_DRAFT = "bag_draft";
     public static final String MILTY_DRAFT_MANAGER = "milty_draft_manager";
     public static final String MILTY_DRAFT_SETTINGS = "milty_draft_settings";
 
-    //ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET, BLUETILE, REDTILE, DRAFTORDER
+    // ABILITY, TECH, AGENT, COMMANDER, HERO, MECH, FLAGSHIP, COMMODITIES, PN, HOMESYSTEM, STARTINGTECH, STARTINGFLEET,
+    // BLUETILE, REDTILE, DRAFTORDER
     public static final String ABILITY_LIMIT = "ability_limit";
     public static final String TECH_LIMIT = "tech_limit";
     public static final String AGENT_LIMIT = "agent_limit";
@@ -1064,11 +1066,13 @@ public class Constants {
     public static final String VERBOSITY_AVERAGE = "average";
     public static final String VERBOSITY_MINIMAL = "minimal";
     public static final List<String> VERBOSITY_OPTIONS = new ArrayList<>();
+
     static {
         VERBOSITY_OPTIONS.add(VERBOSITY_VERBOSE);
         VERBOSITY_OPTIONS.add(VERBOSITY_AVERAGE);
         VERBOSITY_OPTIONS.add(VERBOSITY_MINIMAL);
     }
+
     public static final String BETA_TEST_MODE = "beta_test_mode";
     public static final String CC_LIMIT = "cc_limit";
     public static final String AGE_OF_EXPLORATION_MODE = "age_of_exploration_mode";

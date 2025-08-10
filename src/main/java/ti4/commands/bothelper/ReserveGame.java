@@ -1,7 +1,6 @@
 package ti4.commands.bothelper;
 
 import java.util.List;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command.Choice;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -25,7 +24,8 @@ public class ReserveGame extends Subcommand {
         super("reserve_game", "Adds or removes a game number from the list of reserved game numbers.");
         addOptions(new OptionData(OptionType.STRING, CATEGORY, "'pbd' or 'fow'", true).addChoices(categories));
         addOptions(new OptionData(OptionType.INTEGER, NUMBER, "Game number to reserve", true).setMinValue(1));
-        addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove from the list instead", false).addChoices(removeOpts));
+        addOptions(new OptionData(OptionType.STRING, REMOVE, "Remove from the list instead", false)
+                .addChoices(removeOpts));
     }
 
     @Override

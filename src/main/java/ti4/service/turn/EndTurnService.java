@@ -2,7 +2,6 @@ package ti4.service.turn;
 
 import java.util.Collections;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -42,7 +41,11 @@ public class EndTurnService {
         pingNextPlayer(event, game, player);
         CommanderUnlockCheckService.checkPlayer(player, "naaz");
         if (!game.isFowMode()) {
-            ButtonHelper.updateMap(game, event, "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + player.getRepresentationNoPing() + ".");
+            ButtonHelper.updateMap(
+                    game,
+                    event,
+                    "End of Turn " + player.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
+                            + player.getRepresentationNoPing() + ".");
         }
     }
 
@@ -59,7 +62,8 @@ public class EndTurnService {
         game.setActiveSystem("");
     }
 
-    public static void pingNextPlayer(GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
+    public static void pingNextPlayer(
+            GenericInteractionCreateEvent event, Game game, Player mainPlayer, boolean justPassed) {
         resetStoredValuesEndOfTurn(game, mainPlayer);
 
         CommanderUnlockCheckService.checkPlayer(mainPlayer, "sol", "hacan");
@@ -76,18 +80,22 @@ public class EndTurnService {
         }
         if (game.isFowMode()) {
             FowCommunicationThreadService.checkNewNeighbors(game, mainPlayer);
-            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(),
-                "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for " + mainPlayer.getRepresentation());
+            MessageHelper.sendMessageToChannel(
+                    mainPlayer.getPrivateChannel(),
+                    "# End of Turn " + mainPlayer.getInRoundTurnCount() + ", Round " + game.getRound() + " for "
+                            + mainPlayer.getRepresentation());
         } else {
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
+            MessageHelper.sendMessageToChannel(
+                    game.getMainGameChannel(), mainPlayer.getRepresentation(true, false) + " ended turn.");
             if (game.getPhaseOfGame().equalsIgnoreCase("statushomework")) {
                 return;
             }
         }
 
-        MessageChannel gameChannel = game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
+        MessageChannel gameChannel =
+                game.getMainGameChannel() == null ? event.getMessageChannel() : game.getMainGameChannel();
 
-        //MAKE ALL NON-REAL PLAYERS PASSED
+        // MAKE ALL NON-REAL PLAYERS PASSED
         for (Player player : game.getPlayers().values()) {
             if (!player.isRealPlayer()) {
                 player.setPassed(true);
@@ -96,8 +104,9 @@ public class EndTurnService {
 
         if (game.getPlayers().values().stream().allMatch(Player::isPassed)) {
             if (mainPlayer.getSecretsUnscored().containsKey("pe")) {
-                MessageHelper.sendMessageToChannel(mainPlayer.getCardsInfoThread(),
-                    "You were the last player to pass, and so you can score _Prove Endurance_.");
+                MessageHelper.sendMessageToChannel(
+                        mainPlayer.getCardsInfoThread(),
+                        "You were the last player to pass, and so you can score _Prove Endurance_.");
             }
             EndPhaseService.EndActionPhase(event, game, gameChannel);
             game.updateActivePlayer(null);
@@ -107,9 +116,10 @@ public class EndTurnService {
         }
         Player nextPlayer = findNextUnpassedPlayer(game, mainPlayer);
         if (!game.isFowMode()) {
-            GameMessageManager
-                .remove(game.getName(), GameMessageType.TURN)
-                .ifPresent(messageId -> game.getMainGameChannel().deleteMessageById(messageId).queue());
+            GameMessageManager.remove(game.getName(), GameMessageType.TURN)
+                    .ifPresent(messageId -> game.getMainGameChannel()
+                            .deleteMessageById(messageId)
+                            .queue());
         }
         boolean isFowPrivateGame = FoWHelper.isPrivateGame(game);
         if (isFowPrivateGame) {
@@ -121,10 +131,15 @@ public class EndTurnService {
             ButtonHelper.checkForPrePassing(game, mainPlayer);
         }
         CommanderUnlockCheckService.checkPlayer(nextPlayer, "sol");
-        if (!game.isFowMode() && !game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()).isEmpty()) {
+        if (!game.isFowMode()
+                && !game.getStoredValue("currentActionSummary" + mainPlayer.getFaction())
+                        .isEmpty()) {
             for (ThreadChannel summary : game.getActionsChannel().getThreadChannels()) {
                 if (summary.getName().equalsIgnoreCase("Turn Summary")) {
-                    MessageHelper.sendMessageToChannel(summary, "(Turn " + mainPlayer.getInRoundTurnCount() + ") " + mainPlayer.getFactionEmoji() + game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()));
+                    MessageHelper.sendMessageToChannel(
+                            summary,
+                            "(Turn " + mainPlayer.getInRoundTurnCount() + ") " + mainPlayer.getFactionEmoji()
+                                    + game.getStoredValue("currentActionSummary" + mainPlayer.getFaction()));
                     game.removeStoredValue("currentActionSummary" + mainPlayer.getFaction());
                 }
             }
@@ -138,6 +153,5 @@ public class EndTurnService {
                 StartTurnService.turnStart(event, game, nextPlayer);
             }
         }
-
     }
 }

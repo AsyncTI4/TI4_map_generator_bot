@@ -3,7 +3,6 @@ package ti4.service.statistics;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.executors.CircuitBreaker;
 import ti4.executors.ExecutionHistoryManager;
@@ -20,7 +19,10 @@ public class StatisticsPipeline {
         if (CircuitBreaker.checkIsOpenAndPostWarningIfTrue(event.getMessageChannel())) {
             return;
         }
-        event.getHook().sendMessage("Your statistics are being processed, please hold...").setEphemeral(true).queue();
+        event.getHook()
+                .sendMessage("Your statistics are being processed, please hold...")
+                .setEphemeral(true)
+                .queue();
         var timedRunnable = new TimedRunnable(eventToString(event), EXECUTION_TIME_SECONDS_WARNING_THRESHOLD, runnable);
         ExecutionHistoryManager.runWithExecutionHistory(EXECUTOR_SERVICE, timedRunnable);
     }
@@ -37,6 +39,7 @@ public class StatisticsPipeline {
     }
 
     private static String eventToString(SlashCommandInteractionEvent event) {
-        return "StatisticsPipeline task for `" + event.getUser().getEffectiveName() + "`: `" + event.getCommandString() + "`";
+        return "StatisticsPipeline task for `" + event.getUser().getEffectiveName() + "`: `" + event.getCommandString()
+                + "`";
     }
 }

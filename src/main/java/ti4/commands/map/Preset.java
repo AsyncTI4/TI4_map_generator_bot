@@ -21,6 +21,7 @@ class Preset extends GameStateSubcommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MapPresetService.build(event, getGame(), event.getOption(Constants.MAP_TEMPLATE).getAsString());
+        MapPresetService.build(
+                event, getGame(), event.getOption(Constants.MAP_TEMPLATE).getAsString());
     }
 }

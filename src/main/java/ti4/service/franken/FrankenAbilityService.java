@@ -3,7 +3,6 @@ package ti4.service.franken;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -45,8 +44,10 @@ public class FrankenAbilityService {
             if (abilityID.equalsIgnoreCase("private_fleet")) {
                 String unitID = AliasHandler.resolveUnit("destroyer");
                 player.setUnitCap(unitID, 12);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set destroyer max to 12 for " + player.getRepresentation() + " due to the **Private Fleet** ability.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "Set destroyer max to 12 for " + player.getRepresentation()
+                                + " due to the **Private Fleet** ability.");
             }
             if (abilityID.equalsIgnoreCase("policies")) {
                 player.removeAbility("policies");
@@ -55,8 +56,10 @@ public class FrankenAbilityService {
                 player.addAbility("policy_the_economy_empower");
                 player.removeOwnedUnitByID("olradin_mech");
                 player.addOwnedUnitByID("olradin_mech_positive");
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    player.getRepresentationUnfogged() + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        player.getRepresentationUnfogged()
+                                + ", I have automatically set all of your Policies to the positive side, but you can flip any of them now with these buttons.");
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
                 ButtonHelperHeroes.offerOlradinHeroFlips(player.getGame(), player);
@@ -64,30 +67,35 @@ public class FrankenAbilityService {
             if (abilityID.equalsIgnoreCase("industrialists")) {
                 String unitID = AliasHandler.resolveUnit("spacedock");
                 player.setUnitCap(unitID, 4);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set space dock max to 4 for " + player.getRepresentation() + " due to the **Industrialists** ability.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "Set space dock max to 4 for " + player.getRepresentation()
+                                + " due to the **Industrialists** ability.");
             }
             if (abilityID.equalsIgnoreCase("teeming")) {
                 String unitID = AliasHandler.resolveUnit("dreadnought");
                 player.setUnitCap(unitID, 7);
                 unitID = AliasHandler.resolveUnit("mech");
                 player.setUnitCap(unitID, 5);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
-                        + " due to the **Teeming** ability.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "Set dreadnought unit max to 7 and mech unit max to 5 for " + player.getRepresentation()
+                                + " due to the **Teeming** ability.");
             }
             if (abilityID.equalsIgnoreCase("machine_cult")) {
                 String unitID = AliasHandler.resolveUnit("mech");
                 player.setUnitCap(unitID, 6);
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set mech unit maximum to 6 for " + player.getRepresentation()
-                        + ", due to their **Machine Cult** ability.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "Set mech unit maximum to 6 for " + player.getRepresentation()
+                                + ", due to their **Machine Cult** ability.");
             }
             if (abilityID.equalsIgnoreCase("diplomats")) {
                 ButtonHelperAbilities.resolveFreePeopleAbility(player.getGame());
-                MessageHelper.sendMessageToChannel(player.getCorrectChannel(),
-                    "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
-                        + ", any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
+                MessageHelper.sendMessageToChannel(
+                        player.getCorrectChannel(),
+                        "Set up **Free People** ability markers. " + player.getRepresentationUnfogged()
+                                + ", any planet with a **Free People** token on it will show up as spendable in your various spends. Once spent, the token will be removed.");
             }
             if (abilityID.equalsIgnoreCase("the_lady_and_the_lord")) {
                 player.addOwnedUnitByID("ghemina_flagship_lady");
@@ -95,8 +103,10 @@ public class FrankenAbilityService {
             if (abilityID.equalsIgnoreCase("ancient_empire")) {
                 List<Button> buttons = new ArrayList<>();
                 buttons.add(Buttons.green("startAncientEmpire", "Place a Tomb Token"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(),
-                    player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.", buttons);
+                MessageHelper.sendMessageToChannelWithButtons(
+                        player.getCorrectChannel(),
+                        player.getRepresentation() + ", please place up to 14 Tomb tokens for **Ancient Empire**.",
+                        buttons);
             }
         }
         MessageHelper.sendMessageToEventChannel(event, sb.toString());

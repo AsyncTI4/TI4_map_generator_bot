@@ -11,8 +11,7 @@ class ChangeNickname extends Subcommand {
 
     public ChangeNickname() {
         super(Constants.TIGL_CHANGE_NICKNAME, "Change your TIGL nickname");
-        addOptions(new OptionData(OptionType.STRING, Constants.TIGL_NICKNAME, "New TIGL nickname")
-            .setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TIGL_NICKNAME, "New TIGL nickname").setRequired(true));
     }
 
     @Override

@@ -12,8 +12,11 @@ class FactionGames extends Subcommand {
 
     public FactionGames() {
         super(Constants.STATISTICS_FACTION_GAMES, "List games that contain a certain faction");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction to Show").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to show ended games as well (default = false)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction to Show")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to show ended games as well (default = false)"));
     }
 
     @Override

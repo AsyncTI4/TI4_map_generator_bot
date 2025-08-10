@@ -4,7 +4,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -27,12 +26,7 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
-        return alias != null
-            && name != null
-            && phase != null
-            && window != null
-            && text != null
-            && source != null;
+        return alias != null && name != null && phase != null && window != null && text != null && source != null;
     }
 
     public String getNameRepresentation() {
@@ -56,27 +50,29 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getAutomationID() {
-        if (automationID == null)
-            return alias;
+        if (automationID == null) return alias;
         return automationID;
     }
 
     public MessageEmbed getRepresentationEmbed(boolean includeID, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
-        String title = CardEmojis.ActionCard + "__**" + getName() + "**__" + getSource().emoji();
+        // TITLE
+        String title = CardEmojis.ActionCard + "__**" + getName() + "**__"
+                + getSource().emoji();
         eb.setTitle(title);
 
-        //DESCRIPTION
+        // DESCRIPTION
         eb.setDescription(getPhase() + " Phase\n***" + getWindow() + ":***\n" + getText());
 
-        //FLAVOUR TEXT
-        if (includeFlavourText && getFlavorText().isPresent()) eb.addField("", "*" + getFlavorText().get() + "*", true);
+        // FLAVOUR TEXT
+        if (includeFlavourText && getFlavorText().isPresent())
+            eb.addField("", "*" + getFlavorText().get() + "*", true);
 
-        //FOOTER
+        // FOOTER
         StringBuilder footer = new StringBuilder();
-        if (includeID) footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
+        if (includeID)
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.orange);
@@ -85,8 +81,8 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         return getAlias().toLowerCase().contains(searchString)
-            || getName().toLowerCase().contains(searchString)
-            || getSearchTags().contains(searchString);
+                || getName().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {

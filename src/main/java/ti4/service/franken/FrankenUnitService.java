@@ -1,7 +1,6 @@
 package ti4.service.franken;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.image.Mapper;
@@ -12,7 +11,8 @@ import ti4.model.UnitModel;
 @UtilityClass
 public class FrankenUnitService {
 
-    public static void addUnits(GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean allowDuplicates) {
+    public static void addUnits(
+            GenericInteractionCreateEvent event, Player player, List<String> unitIDs, boolean allowDuplicates) {
         StringBuilder sb = new StringBuilder(player.getRepresentation()).append(" added units:\n");
         for (String unitID : unitIDs) {
             UnitModel unitModel = Mapper.getUnit(unitID);
@@ -20,7 +20,7 @@ public class FrankenUnitService {
             if (player.ownsUnit(unitID)) {
                 sb.append("> ").append(unitID).append(" (player had this unit)");
             } else {
-                if(!allowDuplicates) {
+                if (!allowDuplicates) {
                     UnitModel oldBaseType;
                     while ((oldBaseType = player.getUnitByBaseType(unitModel.getBaseType())) != null) {
                         player.removeOwnedUnitByID(oldBaseType.getAlias());
