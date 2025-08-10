@@ -61,7 +61,7 @@ public class CreateGameService {
         newGame.setOwnerName(gameOwner.getEffectiveName());
         newGame.setName(gameName);
         newGame.setAutoPing(true);
-        newGame.setAutoPingSpacer(24);
+        newGame.setAutoPingSpacer(12);
         newGame.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
         GameManager.save(newGame, "Game created");
         return newGame;
