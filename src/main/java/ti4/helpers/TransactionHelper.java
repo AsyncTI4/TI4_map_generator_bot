@@ -502,7 +502,7 @@ public class TransactionHelper {
             Game game, Player player, String buttonID, ButtonInteractionEvent event) {
         List<Button> stuffToTransButtons = new ArrayList<>();
         buttonID = buttonID.replace("newTransact_", "");
-        String thingToTrans = buttonID.substring(0, buttonID.indexOf("_"));
+        String thingToTrans = buttonID.substring(0, buttonID.indexOf('_'));
         String senderFaction = buttonID.split("_")[1];
         String receiverFaction = buttonID.split("_")[2];
         Player p1 = game.getPlayerFromColorOrFaction(senderFaction);
@@ -1007,8 +1007,8 @@ public class TransactionHelper {
 
         List<Button> stuffToTransButtons = new ArrayList<>();
         buttonID = buttonID.replace("transact_", "");
-        String thingToTrans = buttonID.substring(0, buttonID.indexOf("_"));
-        String factionToTrans = buttonID.substring(buttonID.indexOf("_") + 1);
+        String thingToTrans = buttonID.substring(0, buttonID.indexOf('_'));
+        String factionToTrans = buttonID.substring(buttonID.indexOf('_') + 1);
         Player p2 = game.getPlayerFromColorOrFaction(factionToTrans);
         if (p2 == null) {
             return;
@@ -1190,10 +1190,10 @@ public class TransactionHelper {
         buttonID = buttonID.replace("send_", "");
         List<Button> goAgainButtons = new ArrayList<>();
 
-        String thingToTrans = buttonID.substring(0, buttonID.indexOf("_"));
+        String thingToTrans = buttonID.substring(0, buttonID.indexOf('_'));
         buttonID = buttonID.replace(thingToTrans + "_", "");
-        String factionToTrans = buttonID.substring(0, buttonID.indexOf("_"));
-        String amountToTrans = buttonID.substring(buttonID.indexOf("_") + 1);
+        String factionToTrans = buttonID.substring(0, buttonID.indexOf('_'));
+        String amountToTrans = buttonID.substring(buttonID.indexOf('_') + 1);
         Player p2 = game.getPlayerFromColorOrFaction(factionToTrans);
         if (p1 == null || p2 == null) return;
 
@@ -1282,7 +1282,7 @@ public class TransactionHelper {
                         amountToTrans = amountToTrans.replace("duplicate", "");
                     } else {
                         if (!amountToTrans.contains("duplicate") && p1.hasRelic(amountToTrans + "duplicate")) {
-                            amountToTrans = amountToTrans + "duplicate";
+                            amountToTrans += "duplicate";
                         }
                     }
                 }

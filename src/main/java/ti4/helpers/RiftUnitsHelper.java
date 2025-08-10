@@ -32,7 +32,7 @@ public class RiftUnitsHelper {
     public static void riftUnitButton(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String ident = player.getFactionEmoji();
         String rest = buttonID.replace("riftUnit_", "").toLowerCase();
-        String pos = rest.substring(0, rest.indexOf("_"));
+        String pos = rest.substring(0, rest.indexOf('_'));
         Tile tile = game.getTileByPosition(pos);
         rest = rest.replace(pos + "_", "");
         int amount = Integer.parseInt(rest.charAt(0) + "");

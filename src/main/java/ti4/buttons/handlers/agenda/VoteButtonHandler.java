@@ -107,7 +107,7 @@ public class VoteButtonHandler {
 
     @ButtonHandler("planetOutcomes_")
     public static void planetOutcomes(ButtonInteractionEvent event, String buttonID, Game game) {
-        String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1);
+        String factionOrColor = buttonID.substring(buttonID.indexOf('_') + 1);
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Choosing to vote for one of " + factionOrColor
                 + "'s planets. Please use the buttons to choose the planet you wish to vote for.";

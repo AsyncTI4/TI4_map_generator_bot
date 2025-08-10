@@ -36,7 +36,7 @@ public class FOWCombatThreadMirroring {
         }
 
         String threadName = event.getChannel().getName();
-        String gameName = threadName.substring(0, threadName.indexOf("-"));
+        String gameName = threadName.substring(0, threadName.indexOf('-'));
         ManagedGame managedGame = GameManager.getManagedGame(gameName);
         if (managedGame == null) {
             return;

@@ -1496,10 +1496,10 @@ public class Helper {
                     productionLimit = Helper.getProductionValue(player, game, tile, false);
                     boolean warM = player.getSpentThingsThisWindow().contains("warmachine");
                     if (warM) {
-                        productionLimit = productionLimit + 4;
+                        productionLimit += 4;
                     }
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
-                        productionLimit = productionLimit + 2;
+                        productionLimit += 2;
                     }
                     msg.append("Producing a total of ")
                             .append(unitCount)
@@ -1799,7 +1799,7 @@ public class Helper {
             productionValueTotal = highestProd;
         }
         if (productionValueTotal > 0 && game.playerHasLeaderUnlockedOrAlliance(player, "gledgecommander")) {
-            productionValueTotal = productionValueTotal + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd");
+            productionValueTotal += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd");
         }
         if (productionValueTotal > 0 && player.hasAbility("policy_the_environment_plunder")) {
             productionValueTotal -= 2;

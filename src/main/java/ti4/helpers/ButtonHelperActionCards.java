@@ -2697,7 +2697,7 @@ public class ButtonHelperActionCards {
                 if (game.getTileFromPlanet(planet) == player.getHomeSystemTile() && count > 0) {
                     int amount = game.changeCommsOnPlanet(0, planet);
                     game.changeCommsOnPlanet(-Math.min(amount, count), planet);
-                    count = count - Math.min(amount, count);
+                    count -= Math.min(amount, count);
                 }
             }
         }

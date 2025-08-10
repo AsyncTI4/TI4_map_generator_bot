@@ -507,7 +507,7 @@ public class UnfiledButtonHandlers {
 
     @ButtonHandler("arboAgentIn_")
     public static void arboAgentIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.substring(buttonID.indexOf("_") + 1);
+        String pos = buttonID.substring(buttonID.indexOf('_') + 1);
         List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),
@@ -1797,7 +1797,7 @@ public class UnfiledButtonHandlers {
             String finalCCs = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
             String shortCCs = editedMessage.substring(editedMessage.indexOf("command tokens have gone from "));
             shortCCs = shortCCs.replace("command tokens have gone from ", "");
-            shortCCs = shortCCs.substring(0, shortCCs.indexOf(" "));
+            shortCCs = shortCCs.substring(0, shortCCs.indexOf(' '));
             if (event.getMessage().getContentRaw().contains("Net gain")) {
                 boolean cyber = false;
                 int netGain = ButtonHelper.checkNetGain(player, shortCCs);
@@ -2818,7 +2818,7 @@ public class UnfiledButtonHandlers {
     public static void gain1TG(ButtonInteractionEvent event, Player player, Game game, MessageChannel mainGameChannel) {
         String message = "";
         String labelP = event.getButton().getLabel();
-        String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1);
+        String planetName = labelP.substring(labelP.lastIndexOf(' ') + 1);
         boolean failed = false;
         if (labelP.contains("inf") && labelP.contains("mech")) {
             message += "Please resolve removing infantry manually, if applicable.";

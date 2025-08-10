@@ -105,7 +105,7 @@ class SampleDecals extends Subcommand {
 
             String label = Mapper.getDecalName(d);
             int mid = -1;
-            int i = label.indexOf(" ");
+            int i = label.indexOf(' ');
             while (i >= 0) {
                 if (Math.abs(label.length() / 2.0 - 0.5 - mid) + (n % 2)
                         > Math.abs(label.length() / 2.0
@@ -114,7 +114,7 @@ class SampleDecals extends Subcommand {
                     // collisions
                     mid = i;
                 }
-                i = label.indexOf(" ", i + 1);
+                i = label.indexOf(' ', i + 1);
             }
 
             graphic.setFont(bigFont);

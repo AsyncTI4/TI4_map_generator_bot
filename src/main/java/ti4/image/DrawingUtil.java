@@ -569,12 +569,12 @@ public class DrawingUtil {
             line = line.trim();
             while (width(g2, line) > maxWidth) {
                 int splitIndex = -1;
-                int nextSpace = line.indexOf(" ");
+                int nextSpace = line.indexOf(' ');
 
                 // Prefer splitting at spaces
                 while (nextSpace != -1 && width(g2, line.substring(0, nextSpace)) < maxWidth) {
                     splitIndex = nextSpace;
-                    nextSpace = line.indexOf(" ", splitIndex + 1);
+                    nextSpace = line.indexOf(' ', splitIndex + 1);
                 }
 
                 // If no space is found or no valid split, break at max width
@@ -708,8 +708,8 @@ public class DrawingUtil {
             float center = text.length() / 2.0f + 0.5f;
             String front = text.substring(0, (int) center);
             // String back = text.substring((int) (center - 0.5f));
-            int before = front.lastIndexOf(" ");
-            int after = text.indexOf(" ", (int) (center - 0.5f));
+            int before = front.lastIndexOf(' ');
+            int after = text.indexOf(' ', (int) (center - 0.5f));
 
             // if there's only a space in the back half, replace the first space with a newline
             if (before == -1) {

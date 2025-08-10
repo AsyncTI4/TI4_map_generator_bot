@@ -111,7 +111,7 @@ public class SourceModel implements ModelInterface, EmbeddableModel {
         StringBuilder implementation = new StringBuilder();
         for (Map.Entry<String, Integer> entry : occurrences.entrySet()) {
             if (entry.getValue() != 0) {
-                if (!implementation.toString().equals("")) implementation.append(", ");
+                if (!implementation.toString().isEmpty()) implementation.append(", ");
                 implementation
                         .append(entry.getKey())
                         .append(" (")

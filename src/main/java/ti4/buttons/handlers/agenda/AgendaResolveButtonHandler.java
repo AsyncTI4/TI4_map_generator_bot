@@ -58,7 +58,7 @@ class AgendaResolveButtonHandler {
     @ButtonHandler("agendaResolution_")
     public static void resolveAgenda(Game game, String buttonID, ButtonInteractionEvent event) {
         MessageChannel actionsChannel = game.getMainGameChannel();
-        String winner = buttonID.substring(buttonID.indexOf("_") + 1);
+        String winner = buttonID.substring(buttonID.indexOf('_') + 1);
         String agendaid = game.getCurrentAgendaInfo().split("_")[2];
         if (game.getStoredValue(
                         "agendaRes" + game.getRound() + game.getDiscardAgendas().size())

@@ -83,7 +83,7 @@ class SystemInfo extends GameStateSubcommand {
                 continue;
             }
             String tileName = tile.getTilePath();
-            tileName = tileName.substring(tileName.indexOf("_") + 1);
+            tileName = tileName.substring(tileName.indexOf('_') + 1);
             tileName = tileName.substring(0, tileName.indexOf(".png"));
             tileName = " - " + tileName + "[" + tile.getTileID() + "]";
             StringBuilder sb = new StringBuilder();

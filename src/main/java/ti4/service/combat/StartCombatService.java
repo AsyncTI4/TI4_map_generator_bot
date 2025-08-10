@@ -704,8 +704,8 @@ public class StartCombatService {
                         msg + ", a reminder that if you win the combat, you could score _Darken the Skies_.");
             }
             if (player.hasAbility("war_stories")) {
-                msg = msg
-                        + ", a reminder that if you win the combat, and you have not already done so this action, you may use **War Stories** to explore any planet you control.";
+                msg +=
+                        ", a reminder that if you win the combat, and you have not already done so this action, you may use **War Stories** to explore any planet you control.";
                 buttons = new ArrayList<>();
                 buttons.add(Buttons.green("warStoriesPlanetExplore", "Explore A Planet You Control"));
                 if (tile.getPlanetUnitHolders().isEmpty()) {

@@ -88,7 +88,7 @@ public class DataMigrationManager {
     }
 
     private static Optional<LocalDate> getMigrationForGamesBeforeDate(String migrationName) {
-        String migrationDateString = migrationName.substring(migrationName.indexOf("_") + 1);
+        String migrationDateString = migrationName.substring(migrationName.indexOf('_') + 1);
         try {
             return Optional.of(LocalDate.parse(migrationDateString, MIGRATION_DATE_FORMATTER));
         } catch (Exception e) {

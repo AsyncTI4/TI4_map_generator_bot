@@ -340,7 +340,7 @@ public class ButtonHelper {
     public static void arboAgentOnButton(
             String buttonID, ButtonInteractionEvent event, Game game, Player player, String ident) {
         String rest = buttonID.replace("arboAgentOn_", "").toLowerCase();
-        String pos = rest.substring(0, rest.indexOf("_"));
+        String pos = rest.substring(0, rest.indexOf('_'));
         Tile tile = game.getTileByPosition(pos);
         rest = rest.replace(pos + "_", "");
         int amount = Integer.parseInt(rest.charAt(0) + "");
@@ -1691,7 +1691,7 @@ public class ButtonHelper {
     @ButtonHandler("biostimsReady_")
     public static void bioStimsReady(Game game, GenericInteractionCreateEvent event, Player player, String buttonID) {
         buttonID = buttonID.replace("biostimsReady_", "");
-        String last = buttonID.substring(buttonID.lastIndexOf("_") + 1);
+        String last = buttonID.substring(buttonID.lastIndexOf('_') + 1);
         if (buttonID.contains("tech_")) {
             last = buttonID.replace("tech_", "");
             player.refreshTech(last);
@@ -2637,10 +2637,10 @@ public class ButtonHelper {
 
     public static int checkNetGain(Player player, String ccs) {
         int netGain;
-        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
-        ccs = ccs.substring(ccs.indexOf("/") + 1);
-        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
-        ccs = ccs.substring(ccs.indexOf("/") + 1);
+        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
+        ccs = ccs.substring(ccs.indexOf('/') + 1);
+        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
+        ccs = ccs.substring(ccs.indexOf('/') + 1);
         int oldStrat = Integer.parseInt(ccs);
 
         netGain = (player.getTacticalCC() - oldTactic)
@@ -2650,10 +2650,10 @@ public class ButtonHelper {
     }
 
     public static void resetCCs(Player player, String ccs) {
-        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
-        ccs = ccs.substring(ccs.indexOf("/") + 1);
-        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
-        ccs = ccs.substring(ccs.indexOf("/") + 1);
+        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
+        ccs = ccs.substring(ccs.indexOf('/') + 1);
+        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf('/')));
+        ccs = ccs.substring(ccs.indexOf('/') + 1);
         int oldStrat = Integer.parseInt(ccs);
         player.setTacticalCC(oldTactic);
         player.setStrategicCC(oldStrat);
@@ -4024,13 +4024,13 @@ public class ButtonHelper {
         } else {
             int ringN;
             if (ringNum.contains("_")) {
-                ringN = Integer.parseInt(ringNum.substring(0, ringNum.indexOf("_")));
+                ringN = Integer.parseInt(ringNum.substring(0, ringNum.indexOf('_')));
             } else {
                 ringN = Integer.parseInt(ringNum);
             }
             int totalTiles = ringN * 6;
             if (ringNum.contains("_")) {
-                String side = ringNum.substring(ringNum.lastIndexOf("_") + 1);
+                String side = ringNum.substring(ringNum.lastIndexOf('_') + 1);
                 if ("left".equalsIgnoreCase(side)) {
                     for (int x = totalTiles / 2; x < totalTiles + 1; x++) {
                         String pos = ringN + "" + x;
@@ -5022,7 +5022,7 @@ public class ButtonHelper {
 
     @ButtonHandler("addIonStorm_")
     public static void addIonStorm(Game game, String buttonID, ButtonInteractionEvent event, Player player) {
-        String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
+        String pos = buttonID.substring(buttonID.lastIndexOf('_') + 1);
         Tile tile = game.getTileByPosition(pos);
         if (buttonID.contains("alpha")) {
             String tokenFilename = Mapper.getTokenID("ionalpha");
@@ -5063,7 +5063,7 @@ public class ButtonHelper {
 
     @ButtonHandler("flipIonStorm_")
     public static void flipIonStorm(Game game, String buttonID, ButtonInteractionEvent event) {
-        String pos = buttonID.substring(buttonID.lastIndexOf("_") + 1);
+        String pos = buttonID.substring(buttonID.lastIndexOf('_') + 1);
         Tile tile = game.getTileByPosition(pos);
         String tokenFilenameAlpha = Mapper.getTokenID("ionalpha");
         UnitHolder space = tile.getUnitHolders().get("space");

@@ -270,7 +270,7 @@ public class OtherHeroButtonHandler {
 
     @ButtonHandler("glimmersHeroIn_")
     public static void glimmersHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.substring(buttonID.indexOf("_") + 1);
+        String pos = buttonID.substring(buttonID.indexOf('_') + 1);
         List<Button> buttons =
                 ButtonHelperHeroes.getUnitsToGlimmersHero(player, game, event, game.getTileByPosition(pos));
         MessageHelper.sendMessageToChannelWithButtons(
@@ -282,7 +282,7 @@ public class OtherHeroButtonHandler {
 
     @ButtonHandler("ghotiHeroIn_")
     public static void ghotiHeroIn(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String pos = buttonID.substring(buttonID.indexOf("_") + 1);
+        String pos = buttonID.substring(buttonID.indexOf('_') + 1);
         List<Button> buttons = ButtonHelperAgents.getUnitsToArboAgent(player, game.getTileByPosition(pos));
         MessageHelper.sendMessageToChannelWithButtons(
                 event.getChannel(),

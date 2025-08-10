@@ -1416,7 +1416,7 @@ public class ButtonHelperModifyUnits {
     @ButtonHandler("place_")
     public static void genericPlaceUnit(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlanet = buttonID.replace("place_", "");
-        String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
+        String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf('_'));
         String planetName = unitNPlanet.replace(unitLong + "_", "");
         String unitID = AliasHandler.resolveUnit(unitLong.replace("2", ""));
         UnitKey unitKey = Mapper.getUnitKey(unitID, player.getColorID());
@@ -1785,9 +1785,9 @@ public class ButtonHelperModifyUnits {
     public static void placeUnitAndDeleteButton(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         String unitNPlanet = buttonID.replace("placeOneNDone_", "");
-        String skipbuild = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
+        String skipbuild = unitNPlanet.substring(0, unitNPlanet.indexOf('_'));
         unitNPlanet = unitNPlanet.replace(skipbuild + "_", "");
-        String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
+        String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf('_'));
         String planetName = unitNPlanet.replace(unitLong + "_", "");
         String unitID = AliasHandler.resolveUnit(unitLong);
         UnitKey unitKey = Mapper.getUnitKey(unitID, player.getColorID());

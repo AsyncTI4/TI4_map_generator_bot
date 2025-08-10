@@ -577,8 +577,8 @@ public class TileGenerator {
                         int gearY = TILE_PADDING + TILE_POSITION_POINT.y + yMod + 5;
 
                         if (prodInSystem == 0) {
-                            gearX = gearX - 27;
-                            gearY = gearY - 55;
+                            gearX -= 27;
+                            gearY -= 55;
                         }
 
                         // g2d.setColor(new Color(128, 197, 222));

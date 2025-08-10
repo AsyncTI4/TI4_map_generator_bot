@@ -234,8 +234,8 @@ public class PlayerStatsService {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             String explanation = "";
             if (value.contains("?")) {
-                explanation = value.substring(value.indexOf("?") + 1);
-                value = value.substring(0, value.indexOf("?")).replace(" ", "");
+                explanation = value.substring(value.indexOf('?') + 1);
+                value = value.substring(0, value.indexOf('?')).replace(" ", "");
             }
 
             int number = Integer.parseInt(value);

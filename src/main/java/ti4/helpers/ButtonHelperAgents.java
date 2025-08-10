@@ -552,7 +552,7 @@ public class ButtonHelperAgents {
         String rest = agent;
         String trueIdentity = player.getRepresentationUnfogged();
         if (agent.contains("_")) {
-            agent = agent.substring(0, agent.indexOf("_"));
+            agent = agent.substring(0, agent.indexOf('_'));
         }
 
         Leader playerLeader = player.getLeader(agent).orElse(null);

@@ -364,7 +364,7 @@ public class ComponentActionHelper {
         String finChecker = p1.getFinsFactionCheckerPrefix();
         buttonID = buttonID.replace(prefix, "");
 
-        String firstPart = buttonID.substring(0, buttonID.indexOf("_"));
+        String firstPart = buttonID.substring(0, buttonID.indexOf('_'));
         buttonID = buttonID.replace(firstPart + "_", "");
 
         switch (firstPart) {

@@ -319,8 +319,8 @@ public class MiltyDraftManager {
         boolean force = buttonID.startsWith("miltyForce_");
         String draftPick =
                 buttonID.replace("milty_", "").replace("miltyAuto_", "").replace("miltyForce_", "");
-        String category = draftPick.substring(0, draftPick.indexOf("_"));
-        String item = draftPick.substring(draftPick.indexOf("_") + 1);
+        String category = draftPick.substring(0, draftPick.indexOf('_'));
+        String item = draftPick.substring(draftPick.indexOf('_') + 1);
 
         String errorMessage =
                 switch (category) {

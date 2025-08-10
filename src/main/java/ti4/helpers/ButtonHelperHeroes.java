@@ -1126,8 +1126,8 @@ public class ButtonHelperHeroes {
                 + " PRODUCTION value in this system\n";
         if (Helper.getProductionValue(player, game, tile, false) > 0
                 && game.playerHasLeaderUnlockedOrAlliance(player, "cabalcommander")) {
-            message3 = message3
-                    + ". You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.\n";
+            message3 +=
+                    ". You also have the That Which Molds Flesh, the Vuil'raith commander, which allows you to produce 2 fighters/infantry that don't count towards PRODUCTION limit.\n";
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         MessageHelper.sendMessageToChannel(
@@ -1570,8 +1570,8 @@ public class ButtonHelperHeroes {
     @ButtonHandler("naaluHeroSend")
     public static void resolveNaaluHeroSend(Player p1, Game game, String buttonID, ButtonInteractionEvent event) {
         buttonID = buttonID.replace("naaluHeroSend_", "");
-        String factionToTrans = buttonID.substring(0, buttonID.indexOf("_"));
-        String amountToTrans = buttonID.substring(buttonID.indexOf("_") + 1);
+        String factionToTrans = buttonID.substring(0, buttonID.indexOf('_'));
+        String amountToTrans = buttonID.substring(buttonID.indexOf('_') + 1);
         Player p2 = game.getPlayerFromColorOrFaction(factionToTrans);
         if (p2 == null) {
             MessageHelper.sendMessageToChannel(
@@ -1842,13 +1842,13 @@ public class ButtonHelperHeroes {
         if ("environment".equalsIgnoreCase(policy)) {
             if (player.hasAbility("policy_the_environment_preserve")) {
                 player.removeAbility("policy_the_environment_preserve");
-                msg = msg
-                        + "removed _Policy - The Environment: Preserve ➕_ and added _Policy - The Environment: Plunder ➖_.";
+                msg +=
+                        "removed _Policy - The Environment: Preserve ➕_ and added _Policy - The Environment: Plunder ➖_.";
                 player.addAbility("policy_the_environment_plunder");
             } else if (player.hasAbility("policy_the_environment_plunder")) {
                 player.removeAbility("policy_the_environment_plunder");
-                msg = msg
-                        + "removed _Policy - The Environment: Plunder ➖_ and added _Policy - The Environment: Preserve ➕_.";
+                msg +=
+                        "removed _Policy - The Environment: Plunder ➖_ and added _Policy - The Environment: Preserve ➕_.";
                 player.addAbility("policy_the_environment_preserve");
             }
         }
@@ -1857,8 +1857,8 @@ public class ButtonHelperHeroes {
                 player.removeAbility("policy_the_economy_empower");
                 msg += "removed _Policy - The Economy: Empower ➕_";
                 player.addAbility("policy_the_economy_exploit");
-                msg = msg
-                        + " and added _Policy - The Economy: Exploit ➖_. Decreased commodities total by 1 (double check the value is correct).";
+                msg +=
+                        " and added _Policy - The Economy: Exploit ➖_. Decreased commodities total by 1 (double check the value is correct).";
             } else if (player.hasAbility("policy_the_economy_exploit")) {
                 player.removeAbility("policy_the_economy_exploit");
                 msg += "removed _Policy - The Economy: Exploit ➖_";

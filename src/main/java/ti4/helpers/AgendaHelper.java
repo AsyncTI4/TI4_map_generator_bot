@@ -1115,7 +1115,7 @@ public class AgendaHelper {
 
     public static void exhaustPlanetsForVotingVersion2(
             String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
+        String outcome = buttonID.substring(buttonID.indexOf('_') + 1);
         String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
                 + ". Click buttons to exhaust planets and use abilities for votes.";
         if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
@@ -1200,9 +1200,9 @@ public class AgendaHelper {
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
             } else {
                 int totalVotes = Integer.parseInt(totalVotesSoFar.substring(
-                                totalVotesSoFar.indexOf(":") + 2, totalVotesSoFar.indexOf("\n")))
+                                totalVotesSoFar.indexOf(':') + 2, totalVotesSoFar.indexOf("\n")))
                         + Integer.parseInt(votes);
-                totalVotesSoFar = totalVotesSoFar.substring(0, totalVotesSoFar.indexOf(":") + 2)
+                totalVotesSoFar = totalVotesSoFar.substring(0, totalVotesSoFar.indexOf(':') + 2)
                         + totalVotes
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf("\n"))
                         + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, game);
@@ -1219,9 +1219,9 @@ public class AgendaHelper {
                         "Total votes exhausted so far: " + votes + "\n Planets exhausted so far are: all planets";
             } else {
                 int totalVotes = Integer.parseInt(totalVotesSoFar.substring(
-                                totalVotesSoFar.indexOf(":") + 2, totalVotesSoFar.indexOf("\n")))
+                                totalVotesSoFar.indexOf(':') + 2, totalVotesSoFar.indexOf("\n")))
                         + Integer.parseInt(votes);
-                totalVotesSoFar = totalVotesSoFar.substring(0, totalVotesSoFar.indexOf(":") + 2)
+                totalVotesSoFar = totalVotesSoFar.substring(0, totalVotesSoFar.indexOf(':') + 2)
                         + totalVotes
                         + totalVotesSoFar.substring(totalVotesSoFar.indexOf("\n"));
             }
@@ -1267,7 +1267,7 @@ public class AgendaHelper {
     public static void resolvingAnAgendaVote(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
         boolean resolveTime = false;
         String winner = "";
-        String votes = buttonID.substring(buttonID.lastIndexOf("_") + 1);
+        String votes = buttonID.substring(buttonID.lastIndexOf('_') + 1);
         MessageChannel channel;
 
         boolean playerPrevotesIsEmpty =
@@ -1365,7 +1365,7 @@ public class AgendaHelper {
 
                             while (vote_info.hasMoreTokens()) {
                                 String specificVote = vote_info.nextToken();
-                                String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                                String faction = specificVote.substring(0, specificVote.indexOf('_'));
                                 Player p = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                                 if (p != null && !winnners.contains(p)) {
                                     winnners.add(p);
@@ -1528,7 +1528,7 @@ public class AgendaHelper {
             }
         } else {
             resolveTime = true;
-            winner = buttonID.substring(buttonID.lastIndexOf("*") + 2);
+            winner = buttonID.substring(buttonID.lastIndexOf('*') + 2);
             MessageHelper.sendMessageToChannel(game.getActionsChannel(), "## The speaker has broken the tie.");
         }
         if (resolveTime) {
@@ -1645,7 +1645,7 @@ public class AgendaHelper {
 
     @ButtonHandler("reverse_")
     public static void reverseRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        String choice = buttonID.substring(buttonID.indexOf("_") + 1);
+        String choice = buttonID.substring(buttonID.indexOf('_') + 1);
         String voteMessage = player.getFactionEmojiOrColor() + " Chose to reverse the " + choice + ".";
         Map<String, String> outcomes = game.getCurrentAgendaVotes();
         for (String outcome : outcomes.keySet()) {
@@ -1701,8 +1701,8 @@ public class AgendaHelper {
 
     @ButtonHandler("rider_")
     public static void placeRider(String buttonID, ButtonInteractionEvent event, Game game, Player player) {
-        int firstIndex = buttonID.indexOf("_");
-        int lastIndex = buttonID.lastIndexOf("_");
+        int firstIndex = buttonID.indexOf('_');
+        int lastIndex = buttonID.lastIndexOf('_');
         if (firstIndex == -1 || lastIndex <= firstIndex) {
             BotLogger.error(
                     new BotLogger.LogMessageOrigin(event, game),
@@ -1719,7 +1719,7 @@ public class AgendaHelper {
         }
         String choice = choiceParams[1];
 
-        String rider = buttonID.substring(buttonID.lastIndexOf("_") + 1);
+        String rider = buttonID.substring(buttonID.lastIndexOf('_') + 1);
         String agendaDetails = game.getCurrentAgendaInfo().split("_")[1];
 
         String cleanedChoice = choice;
@@ -2057,7 +2057,7 @@ public class AgendaHelper {
             StringTokenizer vote_info2 = new StringTokenizer(outcomes.get(outcome), ";");
             while (vote_info2.hasMoreTokens()) {
                 String specificVote = vote_info2.nextToken();
-                String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                String faction = specificVote.substring(0, specificVote.indexOf('_'));
                 Player keleres = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                 if (keleres != null && specificVote.contains("Keleres Xxcha Hero")) {
                     int size = getLosingVoters(outcome, game).size();
@@ -2086,7 +2086,7 @@ public class AgendaHelper {
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
-                    String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                    String faction = specificVote.substring(0, specificVote.indexOf('_'));
                     Player winningR = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (winningR != null && specificVote.contains("Sanction")) {
                         List<Player> loseFleetPlayers = getWinningVoters(winner, game);
@@ -2375,8 +2375,8 @@ public class AgendaHelper {
 
             while (vote_info.hasMoreTokens()) {
                 String specificVote = vote_info.nextToken();
-                String faction = specificVote.substring(0, specificVote.indexOf("_"));
-                String vote = specificVote.substring(specificVote.indexOf("_") + 1);
+                String faction = specificVote.substring(0, specificVote.indexOf('_'));
+                String vote = specificVote.substring(specificVote.indexOf('_') + 1);
                 if (vote.contains("Rider") || vote.contains("Sanction")) {
                     Player rider = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (rider != null) {
@@ -2397,7 +2397,7 @@ public class AgendaHelper {
                 StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
-                    String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                    String faction = specificVote.substring(0, specificVote.indexOf('_'));
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null && !losers.contains(loser)) {
                         losers.add(loser);
@@ -2418,7 +2418,7 @@ public class AgendaHelper {
 
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
-                    String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                    String faction = specificVote.substring(0, specificVote.indexOf('_'));
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null
                             && !specificVote.contains("Rider")
@@ -2444,7 +2444,7 @@ public class AgendaHelper {
 
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
-                    String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                    String faction = specificVote.substring(0, specificVote.indexOf('_'));
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null) {
                         if (!losers.contains(loser)
@@ -2472,7 +2472,7 @@ public class AgendaHelper {
 
             while (vote_info.hasMoreTokens()) {
                 String specificVote = vote_info.nextToken();
-                String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                String faction = specificVote.substring(0, specificVote.indexOf('_'));
                 Player voter = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                 if (voter != null) {
                     if (!specificVote.contains("Rider")
@@ -3082,8 +3082,8 @@ public class AgendaHelper {
             StringBuilder voteSummBuilder = new StringBuilder(voteSumm);
             while (vote_info.hasMoreTokens()) {
                 String specificVote = vote_info.nextToken();
-                String faction2 = specificVote.substring(0, specificVote.indexOf("_"));
-                String vote = specificVote.substring(specificVote.indexOf("_") + 1);
+                String faction2 = specificVote.substring(0, specificVote.indexOf('_'));
+                String vote = specificVote.substring(specificVote.indexOf('_') + 1);
                 if (vote.contains("Rider")
                         || vote.contains("Sanction")
                         || vote.contains("Radiance")
@@ -3178,7 +3178,7 @@ public class AgendaHelper {
                 StringBuilder outcomeSummaryBuilder = new StringBuilder();
                 while (vote_info.hasMoreTokens()) {
                     String specificVote = vote_info.nextToken();
-                    String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                    String faction = specificVote.substring(0, specificVote.indexOf('_'));
                     if (capitalize) {
                         Player p2 = game.getPlayerFromColorOrFaction(faction);
                         faction = FactionEmojis.getFactionIcon(faction).toString();
@@ -3188,7 +3188,7 @@ public class AgendaHelper {
                         if (game.isFowMode() && !overwriteFog) {
                             faction = "Someone";
                         }
-                        String vote = specificVote.substring(specificVote.indexOf("_") + 1);
+                        String vote = specificVote.substring(specificVote.indexOf('_') + 1);
                         if (NumberUtils.isDigits(vote)) {
                             totalVotes += Integer.parseInt(vote);
                         }
@@ -3207,7 +3207,7 @@ public class AgendaHelper {
                         }
                         outcomeSummaryBuilder.append(", ");
                     } else {
-                        String vote = specificVote.substring(specificVote.indexOf("_") + 1);
+                        String vote = specificVote.substring(specificVote.indexOf('_') + 1);
                         if (NumberUtils.isDigits(vote)) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummaryBuilder
@@ -3543,7 +3543,7 @@ public class AgendaHelper {
     @ButtonHandler("planetRider_")
     public static void planetRider(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
         buttonID = buttonID.replace("planetRider_", "");
-        String factionOrColor = buttonID.substring(0, buttonID.indexOf("_"));
+        String factionOrColor = buttonID.substring(0, buttonID.indexOf('_'));
         Player planetOwner = game.getPlayerFromColorOrFaction(factionOrColor);
         String voteMessage = "Chose to Rider for one of " + factionOrColor + "'s planets. Please choose which one.";
         List<Button> outcomeActionRow;
@@ -3558,7 +3558,7 @@ public class AgendaHelper {
     public static void distinguishedReverse(ButtonInteractionEvent event, String buttonID) {
         String voteMessage = "Please choose from the available buttons your total vote amount."
                 + " If your desired amount is not available, you may use the buttons to increase or decrease by multiples of 5 until you arrive at it.";
-        String vote = buttonID.substring(buttonID.indexOf("_") + 1);
+        String vote = buttonID.substring(buttonID.indexOf('_') + 1);
         int votes = Integer.parseInt(vote);
         List<Button> voteActionRow = getVoteButtonsVersion2(votes - 5, votes);
         voteActionRow.add(Buttons.gray("distinguishedReverse_" + (votes - 5), "Decrease Votes"));
@@ -3570,7 +3570,7 @@ public class AgendaHelper {
     public static void distinguished(ButtonInteractionEvent event, String buttonID) {
         String voteMessage = "Please choose from the available buttons your total vote amount."
                 + " If your desired amount is not available, you may use the buttons to increase or decrease by multiples of 5 until you arrive at it.";
-        String vote = buttonID.substring(buttonID.indexOf("_") + 1);
+        String vote = buttonID.substring(buttonID.indexOf('_') + 1);
         int votes = Integer.parseInt(vote);
         List<Button> voteActionRow = getVoteButtonsVersion2(votes, votes + 5);
         voteActionRow.add(Buttons.gray("distinguishedReverse_" + votes, "Decrease Votes"));
@@ -3608,7 +3608,7 @@ public class AgendaHelper {
         if (game.getLaws() != null && (game.getLaws().containsKey("rep_govt"))) {
             player.resetSpentThings();
             player.addSpentThing("representative_1");
-            String outcome = buttonID.substring(buttonID.indexOf("_") + 1);
+            String outcome = buttonID.substring(buttonID.indexOf('_') + 1);
             String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome);
             if (game.getCurrentAgendaInfo().contains("Elect Strategy Card")) {
                 voteMessage = "Chose to vote for **" + Helper.getSCName(Integer.parseInt(outcome), game) + "**";
@@ -3624,7 +3624,7 @@ public class AgendaHelper {
 
     @ButtonHandler("autoresolve_")
     public static void autoResolve(@Nullable ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String result = buttonID.substring(buttonID.indexOf("_") + 1);
+        String result = buttonID.substring(buttonID.indexOf('_') + 1);
         if (result.contains("manual")) {
             if (result.contains("committee")) {
                 if (game.isACInDiscard("Confounding") && game.isACInDiscard("Confusing")) {
@@ -4311,7 +4311,7 @@ public class AgendaHelper {
 
     @ButtonHandler("topAgenda_")
     public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
-        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+        String agendaNumID = buttonID.substring(buttonID.indexOf('_') + 1);
         AgendaHelper.putTop(Integer.parseInt(agendaNumID), game);
 
         String key = "round" + game.getRound() + "AgendaPlacement";
@@ -4335,14 +4335,14 @@ public class AgendaHelper {
 
     @ButtonHandler("retrieveAgenda_")
     public static void retrieveAgenda(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String agendaID = buttonID.substring(buttonID.indexOf("_") + 1);
+        String agendaID = buttonID.substring(buttonID.indexOf('_') + 1);
         AgendaHelper.drawSpecificAgenda(agendaID, game, player);
         ButtonHelper.deleteTheOneButton(event);
     }
 
     @ButtonHandler("discardAgenda_")
     public static void discardAgenda(ButtonInteractionEvent event, Player player, String buttonID, Game game) {
-        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+        String agendaNumID = buttonID.substring(buttonID.indexOf('_') + 1);
         String agendaID = game.revealAgenda(false);
         AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
         String agendaName = agendaDetails.getName();
@@ -4357,7 +4357,7 @@ public class AgendaHelper {
 
     @ButtonHandler("bottomAgenda_")
     public static void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game, Player player) {
-        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+        String agendaNumID = buttonID.substring(buttonID.indexOf('_') + 1);
         AgendaHelper.putBottom(Integer.parseInt(agendaNumID), game);
         AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
         Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());

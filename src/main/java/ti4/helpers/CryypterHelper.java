@@ -672,7 +672,7 @@ public class CryypterHelper {
 
     public static String handleCovert(String target) {
         if (target.contains("(")) {
-            return target.substring(0, target.indexOf("("));
+            return target.substring(0, target.indexOf('('));
         }
         return target;
     }
