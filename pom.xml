@@ -200,9 +200,11 @@
         <artifactId>spotless-maven-plugin</artifactId>
         <version>2.46.1</version>
         <configuration>
-          <cleanthat/>
-          <removeUnusedImports/>
+          <lineEndings>GIT_ATTRIBUTES</lineEndings>
+          <encoding>UTF-8</encoding>
           <java>
+            <cleanthat/>
+            <removeUnusedImports/>
             <formatAnnotations/>
             <palantirJavaFormat/>
           </java>
