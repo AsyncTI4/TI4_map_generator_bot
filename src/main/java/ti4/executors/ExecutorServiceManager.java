@@ -3,7 +3,6 @@ package ti4.executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.TimedRunnable;
@@ -21,7 +20,7 @@ public class ExecutorServiceManager {
 
         // TODO: We can do read/write based on if it is a save command
         var lockReleaseRunnable = ExecutionLockManager.wrapWithTryLockAndRelease(
-            gameName, ExecutionLockManager.LockType.WRITE, runnable, messageChannel);
+                gameName, ExecutionLockManager.LockType.WRITE, runnable, messageChannel);
         var timedRunnable = new TimedRunnable(name, lockReleaseRunnable);
         runAsync(timedRunnable);
     }
@@ -30,7 +29,8 @@ public class ExecutorServiceManager {
         if (CircuitBreaker.isOpen()) {
             return;
         }
-        var lockReleaseRunnable = ExecutionLockManager.wrapWithTryLockAndRelease(taskName, ExecutionLockManager.LockType.WRITE, runnable);
+        var lockReleaseRunnable =
+                ExecutionLockManager.wrapWithTryLockAndRelease(taskName, ExecutionLockManager.LockType.WRITE, runnable);
         var timedRunnable = new TimedRunnable(taskName, lockReleaseRunnable);
         runAsync(timedRunnable);
     }

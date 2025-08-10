@@ -1,7 +1,6 @@
 package ti4.buttons.handlers.planet;
 
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -22,14 +21,18 @@ class PrismButtonHandler {
         String techOut = buttonID.split("@")[1];
         player.purgeTech(techOut);
         TechnologyModel techM1 = Mapper.getTech(techOut);
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation(false, false) + " purged the technology _" + techM1.getNameRepresentation() + "_.");
-        MessageHelper.sendMessageToChannelWithButton(event.getMessageChannel(), player.getRepresentation()
-            + ", use the button to get a technology that also has " + techM1.getRequirements().orElse("").length() + " prerequisites.", Buttons.GET_A_FREE_TECH);
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentation(false, false) + " purged the technology _" + techM1.getNameRepresentation()
+                        + "_.");
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getMessageChannel(),
+                player.getRepresentation() + ", use the button to get a technology that also has "
+                        + techM1.getRequirements().orElse("").length() + " prerequisites.",
+                Buttons.GET_A_FREE_TECH);
         event.getMessage().delete().queue();
         String message2 = "Use buttons to end turn or do another action.";
         List<Button> systemButtons = StartTurnService.getStartOfTurnButtons(player, game, true, event);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, systemButtons);
     }
-
-
 }

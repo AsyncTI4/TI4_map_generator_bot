@@ -1,20 +1,17 @@
 package ti4.model;
 
-import java.awt.*;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-
+import java.awt.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -29,7 +26,10 @@ import ti4.service.emoji.TileEmojis;
 public class TileModel implements ModelInterface, EmbeddableModel {
 
     public enum TileBack {
-        GREEN, BLUE, RED, BLACK;
+        GREEN,
+        BLUE,
+        RED,
+        BLACK;
 
         @JsonCreator
         public static TileBack fromString(String value) {
@@ -47,8 +47,10 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     private List<String> aliases;
     private String imagePath;
     private List<String> planets;
+
     @Nullable
     private ShipPositionModel.ShipPosition shipPositionsType;
+
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
     private @JsonProperty("isHyperlane") boolean hyperlane = false;
@@ -63,9 +65,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     @Override
     @JsonIgnore
     public boolean isValid() {
-        return id != null
-            && imagePath != null
-            && source != null;
+        return id != null && imagePath != null && source != null;
     }
 
     @JsonIgnore
@@ -76,7 +76,7 @@ public class TileModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(boolean includeAliases) {
         EmbedBuilder eb = new EmbedBuilder();
 
-        //TITLE
+        // TITLE
         eb.setTitle(getEmbedTitle());
 
         StringBuilder sb = new StringBuilder();
@@ -92,7 +92,9 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         TI4Emoji emoji = getEmoji();
         if (emoji != null && emoji.asEmoji() instanceof CustomEmoji customEmoji) {
             if (emoji.name().endsWith("Back") && !StringUtils.isEmpty(getImagePath())) {
-                eb.setThumbnail("https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/" + getImagePath() + "?raw=true");
+                eb.setThumbnail(
+                        "https://github.com/AsyncTI4/TI4_map_generator_bot/blob/master/src/main/resources/tiles/"
+                                + getImagePath() + "?raw=true");
             } else {
                 eb.setThumbnail(customEmoji.getImageUrl());
             }
@@ -106,7 +108,8 @@ public class TileModel implements ModelInterface, EmbeddableModel {
         StringBuilder sb = new StringBuilder();
         sb.append("(").append(getId()).append(") ");
         if (getEmoji() != null) sb.append(getEmoji().emojiString()).append(" ");
-        if (!getNameNullSafe().isEmpty()) sb.append("__").append(getNameNullSafe()).append("__");
+        if (!getNameNullSafe().isEmpty())
+            sb.append("__").append(getNameNullSafe()).append("__");
         return sb.toString();
     }
 
@@ -171,9 +174,10 @@ public class TileModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean search(String searchString) {
-        return getId().toLowerCase().contains(searchString) ||
-            getNameNullSafe().toLowerCase().contains(searchString) ||
-            (getAliases() != null && getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
+        return getId().toLowerCase().contains(searchString)
+                || getNameNullSafe().toLowerCase().contains(searchString)
+                || (getAliases() != null
+                        && getAliases().stream().anyMatch(a -> a.toLowerCase().contains(searchString)));
     }
 
     @JsonIgnore

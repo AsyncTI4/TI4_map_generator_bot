@@ -2,7 +2,6 @@ package ti4.commands.special;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -18,7 +17,9 @@ class StasisInfantry extends GameStateSubcommand {
         super(Constants.STASIS_INFANTRY, "Add/Remove Infantry to Stasis Capsule", true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.COUNT, "Infantry count").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -28,7 +29,12 @@ class StasisInfantry extends GameStateSubcommand {
         setValue(event, player, player::setStasisInfantry, player::getStasisInfantry, count);
     }
 
-    public void setValue(SlashCommandInteractionEvent event, Player player, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
+    public void setValue(
+            SlashCommandInteractionEvent event,
+            Player player,
+            Consumer<Integer> consumer,
+            Supplier<Integer> supplier,
+            String value) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);
@@ -36,13 +42,15 @@ class StasisInfantry extends GameStateSubcommand {
             String explanation = "";
             if (setValue) {
                 consumer.accept(number);
-                String messageToSend = PlayerStatsService.getSetValueMessage(Constants.COUNT, number, existingNumber, explanation);
+                String messageToSend =
+                        PlayerStatsService.getSetValueMessage(Constants.COUNT, number, existingNumber, explanation);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             } else {
                 int newNumber = existingNumber + number;
                 newNumber = Math.max(newNumber, 0);
                 consumer.accept(newNumber);
-                String messageToSend = PlayerStatsService.getChangeValueMessage(Constants.COUNT, number, existingNumber, newNumber, explanation);
+                String messageToSend = PlayerStatsService.getChangeValueMessage(
+                        Constants.COUNT, number, existingNumber, newNumber, explanation);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             }
         } catch (Exception e) {

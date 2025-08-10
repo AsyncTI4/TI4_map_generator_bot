@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import ti4.cron.CronManager;
 import ti4.helpers.TimedRunnable;
 import ti4.message.BotLogger;
@@ -25,7 +24,8 @@ public final class ExecutionHistoryManager {
                 var elapsedMinutes = elapsedDuration.toMinutes();
                 var elapsedSeconds = elapsedDuration.toSeconds() % 60;
                 if (elapsedMinutes >= 2) {
-                    BotLogger.error("A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds + " seconds: " + execution.name);
+                    BotLogger.error("A task has been executing for " + elapsedMinutes + " minutes and " + elapsedSeconds
+                            + " seconds: " + execution.name);
                 } else if (elapsedMinutes == 1 && CircuitBreaker.incrementThresholdCount()) {
                     BotLogger.warning("Incremented circuit breaker threshold. Task name: " + execution.name);
                 }

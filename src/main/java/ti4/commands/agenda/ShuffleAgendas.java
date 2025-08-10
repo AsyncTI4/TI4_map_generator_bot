@@ -12,13 +12,14 @@ class ShuffleAgendas extends GameStateSubcommand {
 
     public ShuffleAgendas() {
         super(Constants.SHUFFLE_AGENDAS, "Shuffle agenda deck", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
+                .setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String confirm = event.getOption(Constants.CONFIRM, null, OptionMapping::getAsString);
-        if (!"YES".equals(confirm)){
+        if (!"YES".equals(confirm)) {
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }

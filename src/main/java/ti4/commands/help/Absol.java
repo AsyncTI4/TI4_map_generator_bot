@@ -2,7 +2,6 @@ package ti4.commands.help;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;

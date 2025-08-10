@@ -1,7 +1,6 @@
 package ti4.listeners.context;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ButtonHelper;
@@ -17,8 +16,7 @@ public class ButtonContext extends ListenerContext {
     }
 
     public ButtonInteractionEvent getEvent() {
-        if (event instanceof ButtonInteractionEvent button)
-            return button;
+        if (event instanceof ButtonInteractionEvent button) return button;
         return null;
     }
 

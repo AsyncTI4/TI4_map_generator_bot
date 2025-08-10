@@ -15,7 +15,6 @@ class ExploreShuffle extends GameStateSubcommand {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-
         Game game = getGame();
         game.shuffleExplores();
         game.shuffleRelics();

@@ -25,7 +25,8 @@ public class WebStrategyCard {
         webSC.setExhausted(!game.getStoredValue("exhaustedSC" + scNumber).isEmpty());
 
         // Get strategy card model for additional details
-        StrategyCardModel scModel = game.getStrategyCardModelByInitiative(scNumber).orElse(null);
+        StrategyCardModel scModel =
+                game.getStrategyCardModelByInitiative(scNumber).orElse(null);
         if (scModel != null) {
             webSC.setName(scModel.getName());
             webSC.setId(scModel.getId());

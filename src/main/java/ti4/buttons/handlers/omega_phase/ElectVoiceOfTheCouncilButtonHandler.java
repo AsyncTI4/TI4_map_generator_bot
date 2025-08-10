@@ -5,7 +5,6 @@ import ti4.helpers.ButtonHelper;
 import ti4.helpers.omega_phase.VoiceOfTheCouncilHelper;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
-import ti4.map.Player;
 
 public class ElectVoiceOfTheCouncilButtonHandler {
     @ButtonHandler("elect_voice_of_the_council")

@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -22,55 +21,64 @@ class RoundTimeStatisticsService {
         Map<String, Integer> amountCount = new HashMap<>();
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
-            game -> getRoundTimes(game, timeCount, amountCount)
-        );
+                GameStatisticsFilterer.getGamesFilter(event), game -> getRoundTimes(game, timeCount, amountCount));
 
         StringBuilder sb = new StringBuilder();
         sb.append("Time Per Phase:").append("\n");
-        timeCount.forEach((key, value) -> sb.append(key).append(": ")
-            .append(StringUtils.leftPad(convertMillisecondsToDays((float) value / amountCount.get(key)), 4)).append(" days (based on ").append(amountCount.get(key)).append(" games)")
-            .append("\n"));
-        MessageHelper.sendMessageToThread((MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
+        timeCount.forEach((key, value) -> sb.append(key)
+                .append(": ")
+                .append(StringUtils.leftPad(convertMillisecondsToDays((float) value / amountCount.get(key)), 4))
+                .append(" days (based on ")
+                .append(amountCount.get(key))
+                .append(" games)")
+                .append("\n"));
+        MessageHelper.sendMessageToThread(
+                (MessageChannelUnion) event.getMessageChannel(), "Time per Phase", sb.toString());
     }
 
     private static void getRoundTimes(Game game, Map<String, Long> timeCount, Map<String, Integer> amountCount) {
         for (int round = 1; round <= game.getRound(); round++) {
             processPhaseTime(
-                game,
-                timeCount,
-                amountCount,
-                "Round " + round + " Strategy And Action Phases",
-                "startTimeOfRound" + round + "Strategy",
-                "startTimeOfRound" + round + "StatusScoring");
+                    game,
+                    timeCount,
+                    amountCount,
+                    "Round " + round + " Strategy And Action Phases",
+                    "startTimeOfRound" + round + "Strategy",
+                    "startTimeOfRound" + round + "StatusScoring");
 
             processPhaseTime(
-                game,
-                timeCount,
-                amountCount,
-                "Round " + round + " Status Phase",
-                "startTimeOfRound" + round + "StatusScoring",
-                "startTimeOfRound" + round + "Agenda1");
+                    game,
+                    timeCount,
+                    amountCount,
+                    "Round " + round + " Status Phase",
+                    "startTimeOfRound" + round + "StatusScoring",
+                    "startTimeOfRound" + round + "Agenda1");
 
             processPhaseTime(
-                game,
-                timeCount,
-                amountCount,
-                "Round " + round + " Agenda 1",
-                "startTimeOfRound" + round + "Agenda1",
-                "startTimeOfRound" + round + "Agenda2");
+                    game,
+                    timeCount,
+                    amountCount,
+                    "Round " + round + " Agenda 1",
+                    "startTimeOfRound" + round + "Agenda1",
+                    "startTimeOfRound" + round + "Agenda2");
 
             processPhaseTime(
-                game,
-                timeCount,
-                amountCount,
-                "Round " + round + " Agenda 2",
-                "startTimeOfRound" + round + "Agenda2",
-                "startTimeOfRound" + (round + 1) + "Strategy");
+                    game,
+                    timeCount,
+                    amountCount,
+                    "Round " + round + " Agenda 2",
+                    "startTimeOfRound" + round + "Agenda2",
+                    "startTimeOfRound" + (round + 1) + "Strategy");
         }
     }
 
-    private static void processPhaseTime(Game game, Map<String, Long> timeCount, Map<String, Integer> amountCount, String phaseName, String key1, String key2) {
+    private static void processPhaseTime(
+            Game game,
+            Map<String, Long> timeCount,
+            Map<String, Integer> amountCount,
+            String phaseName,
+            String key1,
+            String key2) {
         if (game.getStoredValue(key1).isEmpty() || game.getStoredValue(key2).isEmpty()) {
             return;
         }

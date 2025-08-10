@@ -14,8 +14,10 @@ import ti4.service.info.SecretObjectiveInfoService;
 class DealSO extends GameStateSubcommand {
 
     public DealSO() {
-        super(Constants.DEAL_SO, "Deal Secret Objective", true,  true);
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        super(Constants.DEAL_SO, "Deal Secret Objective", true, true);
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to deal, default 1"));
     }
 

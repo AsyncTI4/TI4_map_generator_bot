@@ -1,11 +1,10 @@
 package ti4.website.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import ti4.helpers.Constants;
 import ti4.map.Game;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 public class WebCardPool {
@@ -45,7 +44,6 @@ public class WebCardPool {
     private List<String> agendaDiscard;
     private int agendaFullDeckSize;
 
-
     public static WebCardPool fromGame(Game game) {
         WebCardPool cardPool = new WebCardPool();
 
@@ -55,7 +53,8 @@ public class WebCardPool {
 
         // Action Cards
         cardPool.setActionCardDeck(new ArrayList<>(game.getActionCards()));
-        cardPool.setActionCardDiscard(new ArrayList<>(game.getDiscardActionCards().keySet()));
+        cardPool.setActionCardDiscard(
+                new ArrayList<>(game.getDiscardActionCards().keySet()));
         cardPool.setActionCardFullDeckSize(game.getActionCardFullDeckSize());
 
         // Exploration Cards

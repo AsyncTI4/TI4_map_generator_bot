@@ -3,7 +3,6 @@ package ti4.service.game;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;

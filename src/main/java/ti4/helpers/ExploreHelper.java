@@ -25,11 +25,14 @@ public class ExploreHelper {
         return unitHolder.getUnitCount(infKey) > 0;
     }
 
-    public static String getUnitListEmojisOnPlanetForHazardousExplorePurposes(Game game, Player player, String planetID) {
+    public static String getUnitListEmojisOnPlanetForHazardousExplorePurposes(
+            Game game, Player player, String planetID) {
         String message = "";
         Planet planet = game.getUnitHolderFromPlanet(planetID);
         if (planet != null) {
-            String planetName = Mapper.getPlanet(planetID) == null ? "`error?`" : Mapper.getPlanet(planetID).getName();
+            String planetName = Mapper.getPlanet(planetID) == null
+                    ? "`error?`"
+                    : Mapper.getPlanet(planetID).getName();
             String unitList = planet.getPlayersUnitListEmojisOnHolder(player);
             if (unitList.isEmpty()) {
                 message += "no units on " + planetName;

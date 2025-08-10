@@ -12,16 +12,23 @@ import ti4.message.MessageHelper;
 class ExploreReset extends GameStateSubcommand {
 
     public ExploreReset() {
-        super(Constants.RESET, "Reset the exploration decks, emptying discards and adding all cards to their respective decks.", true, true);
+        super(
+                Constants.RESET,
+                "Reset the exploration decks, emptying discards and adding all cards to their respective decks.",
+                true,
+                true);
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.")
+                .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         if (!"YES".equals(event.getOption(Constants.CONFIRM).getAsString())) {
             MessageHelper.sendMessageToEventChannel(event, "Confirmation not received to reset exploration decks.");
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getOption(Constants.CONFIRM).getAsString());
+            MessageHelper.sendMessageToChannel(
+                    event.getMessageChannel(),
+                    event.getOption(Constants.CONFIRM).getAsString());
             return;
         }
 

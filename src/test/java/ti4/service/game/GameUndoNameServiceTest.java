@@ -1,8 +1,8 @@
 package ti4.service.game;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class GameUndoNameServiceTest {
 
@@ -17,5 +17,4 @@ class GameUndoNameServiceTest {
         int undoNumber = GameUndoNameService.getUndoNumberFromFileName("pbd14_321.txt");
         assertThat(undoNumber).isEqualTo(321);
     }
-
 }

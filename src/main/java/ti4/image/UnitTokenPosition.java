@@ -1,5 +1,7 @@
 package ti4.image;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,18 +9,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class UnitTokenPosition implements Serializable {
     private final String unitHolderName;
     private LinkedHashMap<String, List<Point>> coordinateMap = new LinkedHashMap<>();
     private final boolean removeUnitCoordinate;
 
     @JsonCreator
-    public UnitTokenPosition(@JsonProperty("unitHolderName") String unitHolderName,
-        @JsonProperty("coordinateMap") LinkedHashMap<String, List<Point>> coordinateMap,
-        @JsonProperty("removeUnitCoordinate") boolean removeUnitCoordinate) {
+    public UnitTokenPosition(
+            @JsonProperty("unitHolderName") String unitHolderName,
+            @JsonProperty("coordinateMap") LinkedHashMap<String, List<Point>> coordinateMap,
+            @JsonProperty("removeUnitCoordinate") boolean removeUnitCoordinate) {
         this.unitHolderName = unitHolderName;
         this.coordinateMap = coordinateMap;
         this.removeUnitCoordinate = removeUnitCoordinate;
@@ -64,7 +64,10 @@ public class UnitTokenPosition implements Serializable {
     public Point getPosition(String unitAsyncID) {
         List<Point> points = coordinateMap.get(unitAsyncID);
         if (points == null) {
-            unitAsyncID = coordinateMap.keySet().stream().filter(unitAsyncID::contains).findFirst().orElse(null); // TODO This is why Cavalry lands on Cruiser (id = "ca")
+            unitAsyncID = coordinateMap.keySet().stream()
+                    .filter(unitAsyncID::contains)
+                    .findFirst()
+                    .orElse(null); // TODO This is why Cavalry lands on Cruiser (id = "ca")
             if (unitAsyncID == null) {
                 return null;
             }

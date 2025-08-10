@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -15,6 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.CommandInteractionPayload;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.apache.commons.lang3.StringUtils;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelperSCs;
 import ti4.helpers.Constants;
@@ -33,7 +31,8 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
 
     @Override
     void doAction(SlashCommandInteractionEvent event, List<String> colors, Tile tile, Game game) {
-        String tokenName = event.getOption(Constants.TOKEN, "", OptionMapping::getAsString).toLowerCase();
+        String tokenName =
+                event.getOption(Constants.TOKEN, "", OptionMapping::getAsString).toLowerCase();
         if (tokenName.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
             return;
@@ -63,11 +62,17 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 MessageHelper.sendMessageToChannel(channel, "Token: " + tokenName + " is not valid");
                 return;
             }
-            addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName), game);
+            addToken(
+                    event,
+                    tile,
+                    tokenFileName,
+                    Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName),
+                    game);
         }
     }
 
-    private static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Game game) {
+    private static void addToken(
+            GenericInteractionCreateEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Game game) {
         MessageChannel channel = event != null ? event.getMessageChannel() : game.getMainGameChannel();
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
@@ -111,11 +116,11 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
                 for (UnitKey key : planetUnitHolder.getUnitKeys()) {
                     int amt = planetUnitHolder.getUnitCount(key);
                     var removed = planetUnitHolder.removeUnit(key, amt);
-                    if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech).contains(key.getUnitType())) {
+                    if (Set.of(UnitType.Fighter, UnitType.Infantry, UnitType.Mech)
+                            .contains(key.getUnitType())) {
                         spaceUnitHolder.addUnitsWithStates(key, removed);
                     }
                 }
-
             }
             if (tokenID.contains("facility")) {
                 String facility = tokenID;
@@ -156,14 +161,12 @@ public class AddTokenCommand extends AddRemoveTokenCommand {
     @Override
     public List<OptionData> getOptions() {
         return List.of(
-            new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                .setRequired(true)
-                .setAutoComplete(true),
-            new OptionData(OptionType.STRING, Constants.PLANET, "Planet name")
-                .setAutoComplete(true));
+                new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                        .setRequired(true)
+                        .setAutoComplete(true),
+                new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true));
     }
-
 }

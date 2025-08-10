@@ -14,7 +14,7 @@ public interface EmbeddableModel {
 
     default boolean search(String searchString, ComponentSource searchSource) {
         return (searchSource == null || (getSource() != null && getSource().equals(searchSource)))
-            && (searchString == null || search(searchString));
+                && (searchString == null || search(searchString));
     }
 
     default boolean searchSource(ComponentSource searchSource) {

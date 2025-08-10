@@ -25,11 +25,19 @@ class ShowGameButtonHandler {
 
     @ButtonHandler(value = "showMap", save = false)
     public static void showMap(Game game, ButtonInteractionEvent event) {
-        MapRenderPipeline.queue(game, event, DisplayType.map, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
+        MapRenderPipeline.queue(
+                game,
+                event,
+                DisplayType.map,
+                fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 
     @ButtonHandler(value = "showPlayerAreas", save = false)
     public static void showPlayArea(Game game, ButtonInteractionEvent event) {
-        MapRenderPipeline.queue(game, event, DisplayType.stats, fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
+        MapRenderPipeline.queue(
+                game,
+                event,
+                DisplayType.stats,
+                fileUpload -> MessageHelper.sendEphemeralFileInResponseToButtonPress(fileUpload, event));
     }
 }

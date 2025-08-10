@@ -1,10 +1,8 @@
 package ti4.website.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import ti4.model.ModelInterface;

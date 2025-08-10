@@ -1,10 +1,4 @@
-
 package ti4.map_ttpg;
-
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -12,7 +6,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-//https://www.jsonschema2pojo.org/
+// https://www.jsonschema2pojo.org/
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "players",
@@ -34,32 +32,46 @@ public class TTPGMap {
 
     @JsonProperty("players")
     private List<TTPGPlayer> players;
+
     @JsonProperty("setupTimestamp")
     private Double setupTimestamp;
+
     @JsonProperty("isPoK")
     private Boolean isPoK;
+
     @JsonProperty("scoreboard")
     private Integer scoreboard;
+
     @JsonProperty("config")
     private TTPGConfig config;
+
     @JsonProperty("decks")
     private TTPGDecks decks;
+
     @JsonProperty("hexSummary")
     private String hexSummary;
+
     @JsonProperty("laws")
     private List<String> laws;
+
     @JsonProperty("mapString")
     private String mapString;
+
     @JsonProperty("objectives")
     private TTPGObjectives objectives;
+
     @JsonProperty("round")
     private Integer round;
+
     @JsonProperty("timestamp")
     private Double timestamp;
+
     @JsonProperty("turn")
     private String turn;
+
     @JsonProperty("unpickedStrategyCards")
     private TTPGUnpickedStrategyCards unpickedStrategyCards;
+
     @JsonIgnore
     private final Map<String, Object> additionalProperties = new LinkedHashMap<>();
 
@@ -212,5 +224,4 @@ public class TTPGMap {
     public void setAdditionalProperty(String name, Object value) {
         additionalProperties.put(name, value);
     }
-
 }

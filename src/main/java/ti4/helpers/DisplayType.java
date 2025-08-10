@@ -18,7 +18,8 @@ public enum DisplayType {
     shipless("shipless"),
     googly("googly"),
     landscape("landscape"),
-    unlocked("unlocked"); // Master Display Type = Map, force HexBorder = Solid, hide locked units (have a CC of their colour in their system)
+    unlocked("unlocked"); // Master Display Type = Map, force HexBorder = Solid, hide locked units (have a CC of their
+    // colour in their system)
 
     public final String value;
 

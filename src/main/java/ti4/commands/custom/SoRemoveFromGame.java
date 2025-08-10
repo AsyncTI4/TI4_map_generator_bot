@@ -12,7 +12,9 @@ class SoRemoveFromGame extends GameStateSubcommand {
 
     public SoRemoveFromGame() {
         super(Constants.REMOVE_SO_FROM_GAME, "Removes a secret objective from the game", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret objective ID")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override

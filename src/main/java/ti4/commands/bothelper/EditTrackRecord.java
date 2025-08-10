@@ -30,11 +30,11 @@ class EditTrackRecord extends Subcommand {
         }
         String fieldID = "record";
         TextInput summary = TextInput.create(fieldID, "Edit user's track record", TextInputStyle.PARAGRAPH)
-            .setPlaceholder("Edit the user's track record here.")
-            .setValue(prevRecord)
-            .build();
-        Modal modal = Modal.create(modalId, "Track Record").addActionRow(summary).build();
+                .setPlaceholder("Edit the user's track record here.")
+                .setValue(prevRecord)
+                .build();
+        Modal modal =
+                Modal.create(modalId, "Track Record").addActionRow(summary).build();
         event.replyModal(modal).queue();
     }
-
 }

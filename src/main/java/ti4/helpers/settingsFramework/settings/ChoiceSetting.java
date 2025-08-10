@@ -1,13 +1,12 @@
 package ti4.helpers.settingsFramework.settings;
 
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -26,7 +25,7 @@ import ti4.message.BotLogger;
 
 @Getter
 @Setter
-@JsonIncludeProperties({ "id", "chosenKey" })
+@JsonIncludeProperties({"id", "chosenKey"})
 public class ChoiceSetting<T> extends SettingInterface {
     private String chosenKey;
     private String defaultKey;
@@ -140,19 +139,21 @@ public class ChoiceSetting<T> extends SettingInterface {
         int x = 0;
         for (List<Map.Entry<String, T>> menu : ListUtils.partition(entries, 25)) {
             List<SelectOption> options = menu.stream()
-                .map(entry -> SelectOption.of(show.apply(entry.getValue()), entry.getKey()))
-                .toList();
+                    .map(entry -> SelectOption.of(show.apply(entry.getValue()), entry.getKey()))
+                    .toList();
             StringSelectMenu selectionMenu = StringSelectMenu.create(prefixID + "_" + x)
-                .addOptions(options)
-                .setPlaceholder("Select an option")
-                .setRequiredRange(1, 1)
-                .build();
+                    .addOptions(options)
+                    .setPlaceholder("Select an option")
+                    .setRequiredRange(1, 1)
+                    .build();
             rows.add(ActionRow.of(selectionMenu));
             x++;
         }
-        buttonEvent.getHook().sendMessage("Select a new setting for " + name)
-            .addComponents(rows)
-            .setEphemeral(true)
-            .queue(Consumers.nop(), BotLogger::catchRestError);
+        buttonEvent
+                .getHook()
+                .sendMessage("Select a new setting for " + name)
+                .addComponents(rows)
+                .setEphemeral(true)
+                .queue(Consumers.nop(), BotLogger::catchRestError);
     }
 }

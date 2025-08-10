@@ -3,7 +3,6 @@ package ti4.commands.fow;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,8 +19,12 @@ class RemoveFogTile extends GameStateSubcommand {
 
     public RemoveFogTile() {
         super(Constants.REMOVE_FOG_TILE, "Remove Fog of War tiles from the map.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING, Constants.POSITION, "Tile positions on map or ALL to remove all fog tiles")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color to remove from")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -37,18 +40,23 @@ class RemoveFogTile extends GameStateSubcommand {
         StringBuffer sb = new StringBuffer();
         for (Player targetPlayer : targetPlayers) {
             StringBuffer sb2 = new StringBuffer();
-            Set<String> positionsToRemove = Constants.ALL.equals(positionMapping) ? new HashSet<>(targetPlayer.getFogTiles().keySet()) : positions;
+            Set<String> positionsToRemove = Constants.ALL.equals(positionMapping)
+                    ? new HashSet<>(targetPlayer.getFogTiles().keySet())
+                    : positions;
             for (String position : positionsToRemove) {
                 if (!PositionMapper.isTilePositionValid(position)) {
                     MessageHelper.replyToMessage(event, "Tile position '" + position + "' is invalid");
                     continue;
                 }
 
-                //remove the custom tile from the player
+                // remove the custom tile from the player
                 targetPlayer.removeFogTile(position);
                 sb2.append(" ").append(position);
             }
-            sb.append(targetPlayer.getRepresentation()).append(" removed fog tiles:").append(sb2).append("\n");
+            sb.append(targetPlayer.getRepresentation())
+                    .append(" removed fog tiles:")
+                    .append(sb2)
+                    .append("\n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }

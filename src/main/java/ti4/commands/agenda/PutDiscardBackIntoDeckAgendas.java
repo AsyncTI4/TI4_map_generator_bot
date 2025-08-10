@@ -12,8 +12,14 @@ class PutDiscardBackIntoDeckAgendas extends GameStateSubcommand {
 
     public PutDiscardBackIntoDeckAgendas() {
         super(Constants.PUT_DISCARD_BACK_INTO_DECK, "Put agenda back into deck from discard", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.SHUFFLE_AGENDAS, "Enter \"YES\" to shuffle, otherwise \"NO\" to put on top").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID, which is found between ()")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.SHUFFLE_AGENDAS,
+                        "Enter \"YES\" to shuffle, otherwise \"NO\" to put on top")
+                .setRequired(true));
     }
 
     @Override

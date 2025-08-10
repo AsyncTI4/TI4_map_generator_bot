@@ -1,5 +1,7 @@
 package ti4.website;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SequenceWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -13,9 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.SequenceWriter;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.map.Game;
@@ -40,7 +39,8 @@ public class AsyncTi4WebsiteHelper {
     private static final int STAT_BATCH_SIZE = 200;
 
     public static boolean uploadsEnabled() {
-        return GlobalSettings.getSetting(GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
+        return GlobalSettings.getSetting(
+                GlobalSettings.ImplementedSettings.UPLOAD_DATA_TO_WEB_SERVER.toString(), Boolean.class, false);
     }
 
     public static void putData(String gameName, Game game) {
@@ -60,15 +60,19 @@ public class AsyncTi4WebsiteHelper {
                 String url = urlTemplate.replace("{gameName}", gameName);
 
                 HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .POST(HttpRequest.BodyPublishers.ofString(json))
-                    .build();
+                        .uri(URI.create(url))
+                        .POST(HttpRequest.BodyPublishers.ofString(json))
+                        .build();
 
-                EgressClientManager.getHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                    .exceptionally(e -> {
-                        BotLogger.error(new BotLogger.LogMessageOrigin(game), "An exception occurred while performing an async send of game data to: " + url, e);
-                        return null;
-                    });
+                EgressClientManager.getHttpClient()
+                        .sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                        .exceptionally(e -> {
+                            BotLogger.error(
+                                    new BotLogger.LogMessageOrigin(game),
+                                    "An exception occurred while performing an async send of game data to: " + url,
+                                    e);
+                            return null;
+                        });
             }
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
@@ -76,7 +80,7 @@ public class AsyncTi4WebsiteHelper {
     }
 
     public static void putPlayerData(String gameId, Game game) {
-        if (!uploadsEnabled())  return;
+        if (!uploadsEnabled()) return;
         String bucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
         if (bucket == null || bucket.isEmpty()) {
             BotLogger.error("S3 bucket not configured.");
@@ -86,7 +90,7 @@ public class AsyncTi4WebsiteHelper {
         try {
             List<WebPlayerArea> playerDataList = new ArrayList<>();
             for (Player player : game.getPlayers().values()) {
-                if(!player.isDummy()) {
+                if (!player.isDummy()) {
                     playerDataList.add(WebPlayerArea.fromPlayer(player, game));
                 }
             }
@@ -131,12 +135,11 @@ public class AsyncTi4WebsiteHelper {
             String json = EgressClientManager.getObjectMapper().writeValueAsString(webData);
 
             putObjectInBucket(
-                String.format("webdata/%s/%s.json", gameId, gameId),
-                AsyncRequestBody.fromString(json),
-                "application/json",
-                "no-cache, no-store, must-revalidate",
-                bucket
-            );
+                    String.format("webdata/%s/%s.json", gameId, gameId),
+                    AsyncRequestBody.fromString(json),
+                    "application/json",
+                    "no-cache, no-store, must-revalidate",
+                    bucket);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not put data to web server", e);
         }
@@ -154,12 +157,11 @@ public class AsyncTi4WebsiteHelper {
             String json = EgressClientManager.getObjectMapper().writeValueAsString(overlays);
 
             putObjectInBucket(
-                String.format("overlays/%s/%s.json", gameId, gameId),
-                AsyncRequestBody.fromString(json),
-                "application/json",
-                "no-cache, no-store, must-revalidate",
-                bucket
-            );
+                    String.format("overlays/%s/%s.json", gameId, gameId),
+                    AsyncRequestBody.fromString(json),
+                    "application/json",
+                    "no-cache, no-store, must-revalidate",
+                    bucket);
         } catch (Exception e) {
             BotLogger.error("Could not put overlay to web server", e);
         }
@@ -177,11 +179,12 @@ public class AsyncTi4WebsiteHelper {
         List<String> badGames = new ArrayList<>();
         int eligible = 0;
         int uploaded = 0;
-        int currentBatchSize  = 0;
+        int currentBatchSize = 0;
 
         Path tempFile = Files.createTempFile("statistics", ".json");
         try (OutputStream outputStream = Files.newOutputStream(tempFile);
-            SequenceWriter writer = EgressClientManager.getObjectMapper().writer().writeValuesAsArray(outputStream)) {
+                SequenceWriter writer =
+                        EgressClientManager.getObjectMapper().writer().writeValuesAsArray(outputStream)) {
             for (ManagedGame managedGame : GameManager.getManagedGames()) {
                 if (managedGame.getRound() <= 2 && (!managedGame.isHasEnded() || !managedGame.isHasWinner())) {
                     continue;
@@ -190,7 +193,8 @@ public class AsyncTi4WebsiteHelper {
                 eligible++;
 
                 try {
-                    JsonNode node = EgressClientManager.getObjectMapper().valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
+                    JsonNode node = EgressClientManager.getObjectMapper()
+                            .valueToTree(new GameStatsDashboardPayload(managedGame.getGame()));
                     writer.write(node);
                     uploaded++;
                     currentBatchSize++;
@@ -201,7 +205,9 @@ public class AsyncTi4WebsiteHelper {
                 } catch (Exception e) {
                     badGames.add(managedGame.getName());
                     BotLogger.error(
-                        String.format("Failed to create GameStatsDashboardPayload for game: `%s`", managedGame.getName()), e);
+                            String.format(
+                                    "Failed to create GameStatsDashboardPayload for game: `%s`", managedGame.getName()),
+                            e);
                 }
             }
 
@@ -209,34 +215,38 @@ public class AsyncTi4WebsiteHelper {
         }
 
         long fileSize = Files.size(tempFile);
-        String msg = String.format("# Uploading statistics to S3 (%.2f MB)... \nOut of %d eligible games, %d games are being uploaded.",
-            fileSize / (1024d * 1024d), eligible, uploaded);
+        String msg = String.format(
+                "# Uploading statistics to S3 (%.2f MB)... \nOut of %d eligible games, %d games are being uploaded.",
+                fileSize / (1024d * 1024d), eligible, uploaded);
         if (eligible != uploaded) {
-            msg += "\nBad games (first 10):\n- " + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));
+            msg += "\nBad games (first 10):\n- "
+                    + String.join("\n- ", badGames.subList(0, Math.min(10, badGames.size())));
         }
         BotLogger.info(msg);
 
         PutObjectRequest req = PutObjectRequest.builder()
-            .bucket(bucket)
-            .key("statistics/statistics.json")
-            .contentType("application/json")
-            .cacheControl("no-cache, no-store, must-revalidate")
-            .build();
+                .bucket(bucket)
+                .key("statistics/statistics.json")
+                .contentType("application/json")
+                .cacheControl("no-cache, no-store, must-revalidate")
+                .build();
 
-        EgressClientManager.getS3AsyncClient().putObject(req, AsyncRequestBody.fromFile(tempFile))
-            .whenComplete((result, throwable) -> {
-                if (throwable != null) {
-                    BotLogger.error(String.format("Failed to upload game stats to S3 bucket %s.", bucket), throwable);
-                } else {
-                    BotLogger.info(String.format("Statistics upload to bucket %s complete.", bucket));
-                }
+        EgressClientManager.getS3AsyncClient()
+                .putObject(req, AsyncRequestBody.fromFile(tempFile))
+                .whenComplete((result, throwable) -> {
+                    if (throwable != null) {
+                        BotLogger.error(
+                                String.format("Failed to upload game stats to S3 bucket %s.", bucket), throwable);
+                    } else {
+                        BotLogger.info(String.format("Statistics upload to bucket %s complete.", bucket));
+                    }
 
-                try {
-                    Files.deleteIfExists(tempFile);
-                } catch (IOException e) {
-                    BotLogger.error("Failed to delete temporary stats file", e);
-                }
-            });
+                    try {
+                        Files.deleteIfExists(tempFile);
+                    } catch (IOException e) {
+                        BotLogger.error("Failed to delete temporary stats file", e);
+                    }
+                });
     }
 
     public static void putMap(String gameName, byte[] imageBytes, boolean frog, Player player) {
@@ -259,14 +269,16 @@ public class AsyncTi4WebsiteHelper {
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
             putObjectInBucket(
-                String.format(mapPath, gameName, dtstamp),
-                AsyncRequestBody.fromBytes(imageBytes),
-                "image/jpg",
-                null,
-                bucket
-            );
+                    String.format(mapPath, gameName, dtstamp),
+                    AsyncRequestBody.fromBytes(imageBytes),
+                    "image/jpg",
+                    null,
+                    bucket);
         } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(player), "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.", e);
+            BotLogger.error(
+                    new BotLogger.LogMessageOrigin(player),
+                    "Could not add image for game `" + gameName + "` to web server. Likely invalid credentials.",
+                    e);
         }
     }
 
@@ -287,13 +299,12 @@ public class AsyncTi4WebsiteHelper {
         return urls;
     }
 
-    private static void putObjectInBucket(String key, AsyncRequestBody body, String contentType, String cacheControl, String bucket) {
+    private static void putObjectInBucket(
+            String key, AsyncRequestBody body, String contentType, String cacheControl, String bucket) {
         String websiteBucket = EgressClientManager.getWebProperties().getProperty("website.bucket");
 
-        PutObjectRequest.Builder requestBuilder = PutObjectRequest.builder()
-            .bucket(websiteBucket)
-            .key(key)
-            .contentType(contentType);
+        PutObjectRequest.Builder requestBuilder =
+                PutObjectRequest.builder().bucket(websiteBucket).key(key).contentType(contentType);
 
         if (cacheControl != null) {
             requestBuilder.cacheControl(cacheControl);
@@ -301,10 +312,11 @@ public class AsyncTi4WebsiteHelper {
 
         PutObjectRequest request = requestBuilder.build();
 
-        EgressClientManager.getS3AsyncClient().putObject(request, body)
-            .exceptionally(e -> {
-                BotLogger.error(String.format("An exception occurred while performing an async send to bucket %s", websiteBucket), e);
-                return null;
-            });
+        EgressClientManager.getS3AsyncClient().putObject(request, body).exceptionally(e -> {
+            BotLogger.error(
+                    String.format("An exception occurred while performing an async send to bucket %s", websiteBucket),
+                    e);
+            return null;
+        });
     }
 }

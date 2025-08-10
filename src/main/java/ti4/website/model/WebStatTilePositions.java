@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.Data;
 import ti4.helpers.PlayerStatsHelper;
 import ti4.map.Game;
@@ -28,7 +27,8 @@ public class WebStatTilePositions {
                 continue;
             }
 
-            List<String> myStatTiles = PlayerStatsHelper.findThreeNearbyStatTiles(game, player, statTilesInUse, false, null);
+            List<String> myStatTiles =
+                    PlayerStatsHelper.findThreeNearbyStatTiles(game, player, statTilesInUse, false, null);
             if (myStatTiles != null) {
                 statTilesInUse.addAll(myStatTiles);
                 factionToStatTiles.put(player.getFaction(), myStatTiles);

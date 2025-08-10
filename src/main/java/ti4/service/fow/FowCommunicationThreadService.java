@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -29,7 +28,8 @@ public class FowCommunicationThreadService {
 
     private static final String YES_CHAR = "↔";
     private static final String NO_CHAR = "X";
-    private static final Pattern THREAD_NAME_PATTERN = Pattern.compile("^(\\w+)\\s*(?:"+YES_CHAR+"|"+NO_CHAR+")\\s*(\\w+)");
+    private static final Pattern THREAD_NAME_PATTERN =
+            Pattern.compile("^(\\w+)\\s*(?:" + YES_CHAR + "|" + NO_CHAR + ")\\s*(\\w+)");
 
     public static boolean isActive(Game game) {
         return game.isFowMode() && game.getFowOption(FOWOption.MANAGED_COMMS);
@@ -50,14 +50,19 @@ public class FowCommunicationThreadService {
                 Map<ThreadChannel, Player> commThreadsWithPlayer = findPlayersCommThreads(game, threads, p);
                 validateNeighbors(p, neighbors, commThreadsWithPlayer, checkedPairs, game);
 
-                //If checking from a specific player perspective, check for new neighbors
+                // If checking from a specific player perspective, check for new neighbors
                 if (player != null && player == p) {
                     Set<Player> newNeighbors = checkNewNeighbors(player, neighbors, commThreadsWithPlayer);
                     if (!newNeighbors.isEmpty()) {
-                        MessageHelper.sendMessageToChannelWithButton(player.getPrivateChannel(), "New neighbors found",
-                            Buttons.blue("fowComms_"
-                                + newNeighbors.stream().map(Player::getColor).collect(Collectors.joining("-")),
-                                "Open Comms"));
+                        MessageHelper.sendMessageToChannelWithButton(
+                                player.getPrivateChannel(),
+                                "New neighbors found",
+                                Buttons.blue(
+                                        "fowComms_"
+                                                + newNeighbors.stream()
+                                                        .map(Player::getColor)
+                                                        .collect(Collectors.joining("-")),
+                                        "Open Comms"));
                     }
                 }
             }
@@ -66,13 +71,12 @@ public class FowCommunicationThreadService {
 
     private static boolean areAllowedToTalkInAgenda(Game game) {
         return game.getPhaseOfGame().startsWith("agenda")
-            && game.getFowOption(FOWOption.ALLOW_AGENDA_COMMS)
-            && !game.isHiddenAgendaMode();
+                && game.getFowOption(FOWOption.ALLOW_AGENDA_COMMS)
+                && !game.isHiddenAgendaMode();
     }
 
     private static boolean isHiddenAgenda(Game game) {
-        return game.getPhaseOfGame().startsWith("agenda")
-            && game.isHiddenAgendaMode();
+        return game.getPhaseOfGame().startsWith("agenda") && game.isHiddenAgendaMode();
     }
 
     private static Set<Player> getNeighbors(Game game, Player player) {
@@ -90,16 +94,19 @@ public class FowCommunicationThreadService {
         List<ThreadChannel> result = new ArrayList<>(game.getMainGameChannel().getThreadChannels());
 
         game.getMainGameChannel()
-            .retrieveArchivedPrivateThreadChannels()
-            .queue(pagination -> {
-                pagination.forEach(result::add);
-                future.complete(result);
-            }, future::completeExceptionally);
+                .retrieveArchivedPrivateThreadChannels()
+                .queue(
+                        pagination -> {
+                            pagination.forEach(result::add);
+                            future.complete(result);
+                        },
+                        future::completeExceptionally);
 
         return future;
     }
 
-    private static Map<ThreadChannel, Player> findPlayersCommThreads(Game game, List<ThreadChannel> threads, Player player) {
+    private static Map<ThreadChannel, Player> findPlayersCommThreads(
+            Game game, List<ThreadChannel> threads, Player player) {
         Map<ThreadChannel, Player> threadMap = new HashMap<>();
         for (ThreadChannel thread : threads) {
             Matcher matcher = THREAD_NAME_PATTERN.matcher(thread.getName());
@@ -114,14 +121,21 @@ public class FowCommunicationThreadService {
         return threadMap;
     }
 
-    private static void validateNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads, Set<String> checkedPairs, Game game) {
+    private static void validateNeighbors(
+            Player player,
+            Set<Player> neighbors,
+            Map<ThreadChannel, Player> commThreads,
+            Set<String> checkedPairs,
+            Game game) {
         boolean areAllowedToTalkInAgenda = areAllowedToTalkInAgenda(game);
         for (Entry<ThreadChannel, Player> thread : commThreads.entrySet()) {
             ThreadChannel threadChannel = thread.getKey();
             String threadName = thread.getKey().getName();
             Player otherPlayer = thread.getValue();
 
-            String pairKey = Stream.of(player.getColor(), otherPlayer.getColor()).sorted().collect(Collectors.joining("-"));
+            String pairKey = Stream.of(player.getColor(), otherPlayer.getColor())
+                    .sorted()
+                    .collect(Collectors.joining("-"));
             if (checkedPairs.contains(pairKey)) {
                 continue; // Skip if we already checked this pair
             }
@@ -130,27 +144,39 @@ public class FowCommunicationThreadService {
             boolean areNeighbors = neighbors.contains(otherPlayer);
             boolean threadLocked = threadName.contains(NO_CHAR);
 
-            String notice = "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
+            String notice =
+                    "Attention! " + player.getRepresentationNoPing() + " and " + otherPlayer.getRepresentationNoPing();
             if (!threadLocked && isHiddenAgenda(game)) {
-                //Reminder of Hidden Agenda mode
-                threadChannel.getManager().setArchived(false).queue(success ->
-                    threadChannel.sendMessage("⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.").queue());
+                // Reminder of Hidden Agenda mode
+                threadChannel.getManager().setArchived(false).queue(success -> threadChannel
+                        .sendMessage("⚠️ Reminder that during Hidden Agenda __only__ the speaker is allowed to speak.")
+                        .queue());
             } else if (areNeighbors && threadLocked) {
-                //Allow talking
-                threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(NO_CHAR, YES_CHAR))
-                    .queue(nameUpdated -> threadChannel.sendMessage(notice + (areAllowedToTalkInAgenda
-                        ? " __may__ communicate in Agenda Phase."
-                        : " are neighbors again and __may__ communicate.")).queue()));
+                // Allow talking
+                threadChannel.getManager().setArchived(false).queue(success -> threadChannel
+                        .getManager()
+                        .setName(threadName.replace(NO_CHAR, YES_CHAR))
+                        .queue(nameUpdated -> threadChannel
+                                .sendMessage(notice
+                                        + (areAllowedToTalkInAgenda
+                                                ? " __may__ communicate in Agenda Phase."
+                                                : " are neighbors again and __may__ communicate."))
+                                .queue()));
 
             } else if (!areNeighbors && !threadLocked) {
-                //Deny talking
-                threadChannel.getManager().setArchived(false).queue(success -> threadChannel.getManager().setName(threadName.replace(YES_CHAR, NO_CHAR))
-                    .queue(nameUpdated -> threadChannel.sendMessage(notice + " are no longer neighbors and should __not__ communicate.").queue()));
+                // Deny talking
+                threadChannel.getManager().setArchived(false).queue(success -> threadChannel
+                        .getManager()
+                        .setName(threadName.replace(YES_CHAR, NO_CHAR))
+                        .queue(nameUpdated -> threadChannel
+                                .sendMessage(notice + " are no longer neighbors and should __not__ communicate.")
+                                .queue()));
             }
         }
     }
 
-    private static Set<Player> checkNewNeighbors(Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads) {
+    private static Set<Player> checkNewNeighbors(
+            Player player, Set<Player> neighbors, Map<ThreadChannel, Player> commThreads) {
         Set<Player> newNeighbors = new HashSet<>();
         for (Player neighbor : neighbors) {
             boolean hasExistingThread = commThreads.values().stream().anyMatch(p -> p.equals(neighbor));
@@ -179,16 +205,22 @@ public class FowCommunicationThreadService {
         Player inviteePlayer = game.getPlayerFromColorOrFaction(color);
 
         ThreadArchiveHelper.checkThreadLimitAndArchive(game.getGuild());
-        String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + YES_CHAR + " " + StringUtils.capitalize(player.getColor());
-        game.getMainGameChannel().createThreadChannel(threadName, true)
-            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
-            .queue(t -> MessageHelper.sendMessageToChannel(t, "## Private communications thread opened\n"
-                + "Players: " + inviteePlayer.getRepresentation(true, true, false, true)
-                + " " + player.getRepresentation(true, true, false, true) + "\n"
-                + "GM ping: " + GMService.gmPing(game)));
+        String threadName = StringUtils.capitalize(inviteePlayer.getColor()) + " " + YES_CHAR + " "
+                + StringUtils.capitalize(player.getColor());
+        game.getMainGameChannel()
+                .createThreadChannel(threadName, true)
+                .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
+                .queue(t -> MessageHelper.sendMessageToChannel(
+                        t,
+                        "## Private communications thread opened\n"
+                                + "Players: " + inviteePlayer.getRepresentation(true, true, false, true)
+                                + " " + player.getRepresentation(true, true, false, true) + "\n"
+                                + "GM ping: " + GMService.gmPing(game)));
 
-        MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing()
-                + "(You) accepted private communications invitation from " + inviteePlayer.getRepresentationNoPing());
+        MessageHelper.sendMessageToChannel(
+                player.getCorrectChannel(),
+                player.getRepresentationNoPing() + "(You) accepted private communications invitation from "
+                        + inviteePlayer.getRepresentationNoPing());
         event.getMessage().delete().queue();
     }
 
@@ -197,13 +229,16 @@ public class FowCommunicationThreadService {
         String color = buttonID.replace("fowCommsSuggest_", "");
         Player targetPlayer = game.getPlayerFromColorOrFaction(color);
         if (targetPlayer != null) {
-            String msg = targetPlayer.getRepresentationUnfogged() + " " + player.getRepresentationNoPing() + " wishes to open private communications thread with you.";
+            String msg = targetPlayer.getRepresentationUnfogged() + " " + player.getRepresentationNoPing()
+                    + " wishes to open private communications thread with you.";
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green("fowCommsAccept_" + player.getColor(), "Accept"));
             buttons.add(Buttons.DONE_DELETE_BUTTONS);
             MessageHelper.sendMessageToChannelWithButtons(targetPlayer.getCorrectChannel(), msg, buttons);
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentationNoPing()
-                + "(You) sent an invitation to open communications with " + targetPlayer.getRepresentationNoPing());
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentationNoPing() + "(You) sent an invitation to open communications with "
+                            + targetPlayer.getRepresentationNoPing());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player '" + color + "' was not found.");
         }

@@ -2,7 +2,6 @@ package ti4.buttons;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -23,11 +22,15 @@ import ti4.website.AsyncTi4WebsiteHelper;
 public class Buttons {
 
     public enum ButtonColor {
-        green, red, gray, blue
+        green,
+        red,
+        gray,
+        blue
     }
 
     public static final Button GET_A_TECH = green("acquireATech", "Get a Technology");
-    public static final Button GET_A_UNIT_TECH_WITH_INF = green("acquireAUnitTechWithInf", "Get a Unit Upgrade Technology");
+    public static final Button GET_A_UNIT_TECH_WITH_INF =
+            green("acquireAUnitTechWithInf", "Get a Unit Upgrade Technology");
     public static final Button GET_A_FREE_TECH = green("acquireAFreeTech", "Get a Technology");
     public static final Button REDISTRIBUTE_CCs = green("redistributeCCButtons", "Redistribute Command Tokens");
     public static final Button DONE_DELETE_BUTTONS = gray("deleteButtons", "Done");
@@ -40,34 +43,40 @@ public class Buttons {
     public static final Button REFRESH_INFO = green("refreshInfoButtons", "Other Info");
     public static final Button REFRESH_AC_INFO = green("refreshACInfo", "Action Card Info", CardEmojis.ActionCard);
     public static final Button REFRESH_PN_INFO = green("refreshPNInfo", "Promissory Notes Info", CardEmojis.PN);
-    public static final Button REFRESH_SO_INFO = green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
+    public static final Button REFRESH_SO_INFO =
+            green("refreshSOInfo", "Secret Objectives Info", CardEmojis.SecretObjective);
     public static final Button REFRESH_ABILITY_INFO = green("refreshAbilityInfo", "Ability Info");
-    public static final Button REFRESH_RELIC_INFO = green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
-    public static final Button REFRESH_LEADER_INFO = green(Constants.REFRESH_LEADER_INFO, "Leader Info", LeaderEmojis.Hero);
-    public static final Button REFRESH_UNIT_INFO = green(Constants.REFRESH_UNIT_INFO, "Unit Info", TechEmojis.UnitUpgradeTech);
+    public static final Button REFRESH_RELIC_INFO =
+            green(Constants.REFRESH_RELIC_INFO, "Relic Info", ExploreEmojis.Relic);
+    public static final Button REFRESH_LEADER_INFO =
+            green(Constants.REFRESH_LEADER_INFO, "Leader Info", LeaderEmojis.Hero);
+    public static final Button REFRESH_UNIT_INFO =
+            green(Constants.REFRESH_UNIT_INFO, "Unit Info", TechEmojis.UnitUpgradeTech);
     public static final Button REFRESH_ALL_UNIT_INFO = green(Constants.REFRESH_ALL_UNIT_INFO, "Show All Units");
     public static final Button REFRESH_TECH_INFO = green(Constants.REFRESH_TECH_INFO, "Technology Info");
-    public static final Button REFRESH_PLANET_INFO = green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
+    public static final Button REFRESH_PLANET_INFO =
+            green(Constants.REFRESH_PLANET_INFO, "Planet Info", PlanetEmojis.SemLor);
 
-    public static final Button OFFER_PING_OPTIONS_BUTTON = Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
+    public static final Button OFFER_PING_OPTIONS_BUTTON =
+            Buttons.gray("playerPref_personalPingInterval", "Personal Ping Interval");
 
-    //Map buttons
+    // Map buttons
     public static final Button REFRESH_CARDS_INFO = green("cardsInfo", "Cards Info");
     public static final Button SHOW_DECKS = blue("offerDeckButtons", "Show Decks");
     public static final Button REFRESH_MAP = gray("showGameAgain", "Refresh Map");
     public static final Button PLAYER_INFO = green("gameInfoButtons", "Player Info");
 
     public static final List<Button> REFRESH_INFO_BUTTONS = List.of(
-        REFRESH_AC_INFO,
-        REFRESH_PN_INFO,
-        REFRESH_SO_INFO,
-        REFRESH_ABILITY_INFO,
-        REFRESH_RELIC_INFO,
-        REFRESH_LEADER_INFO,
-        REFRESH_UNIT_INFO,
-        REFRESH_TECH_INFO,
-        REFRESH_PLANET_INFO,
-        FACTION_EMBED);
+            REFRESH_AC_INFO,
+            REFRESH_PN_INFO,
+            REFRESH_SO_INFO,
+            REFRESH_ABILITY_INFO,
+            REFRESH_RELIC_INFO,
+            REFRESH_LEADER_INFO,
+            REFRESH_UNIT_INFO,
+            REFRESH_TECH_INFO,
+            REFRESH_PLANET_INFO,
+            FACTION_EMBED);
 
     /**
      * Check if a game is standard PoK or only uses 4/4/4 homebrew
@@ -77,26 +86,26 @@ public class Buttons {
 
         // FIRST: Check that NO other homebrew elements are present
         if (game.isHomebrew() // explicit homebrew flag
-            || game.isExtraSecretMode()
-            || game.isFowMode()
-            || game.isAgeOfExplorationMode()
-            || game.isFacilitiesMode()
-            || game.isMinorFactionsMode()
-            || game.isLightFogMode()
-            || game.isRedTapeMode()
-            || game.isDiscordantStarsMode()
-            || game.isFrankenGame()
-            || game.isMiltyModMode()
-            || game.isAbsolMode()
-            || game.isVotcMode()
-            || game.isPromisesPromisesMode()
-            || game.isFlagshippingMode()
-            || game.isAllianceMode()
-            || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
-            || game.isHomebrewSCMode()
-            || game.isCommunityMode()
-            || game.getPlayerCountForMap() < 3
-            || game.getPlayerCountForMap() > 8) {
+                || game.isExtraSecretMode()
+                || game.isFowMode()
+                || game.isAgeOfExplorationMode()
+                || game.isFacilitiesMode()
+                || game.isMinorFactionsMode()
+                || game.isLightFogMode()
+                || game.isRedTapeMode()
+                || game.isDiscordantStarsMode()
+                || game.isFrankenGame()
+                || game.isMiltyModMode()
+                || game.isAbsolMode()
+                || game.isVotcMode()
+                || game.isPromisesPromisesMode()
+                || game.isFlagshippingMode()
+                || game.isAllianceMode()
+                || (game.getSpinMode() != null && !"OFF".equalsIgnoreCase(game.getSpinMode()))
+                || game.isHomebrewSCMode()
+                || game.isCommunityMode()
+                || game.getPlayerCountForMap() < 3
+                || game.getPlayerCountForMap() > 8) {
 
             return false; // Has other homebrew elements, not standard
         }
@@ -104,11 +113,11 @@ public class Buttons {
         // Check decks, tiles, and factions are official
         try {
             if (!game.checkAllDecksAreOfficial()
-                || !game.checkAllTilesAreOfficial()
-                || game.getFactions().stream()
-                    .map(Mapper::getFaction)
-                    .filter(java.util.Objects::nonNull)
-                    .anyMatch(faction -> !faction.getSource().isOfficial())) {
+                    || !game.checkAllTilesAreOfficial()
+                    || game.getFactions().stream()
+                            .map(Mapper::getFaction)
+                            .filter(java.util.Objects::nonNull)
+                            .anyMatch(faction -> !faction.getSource().isOfficial())) {
                 return false;
             }
         } catch (Exception e) {
@@ -227,8 +236,8 @@ public class Buttons {
         return gray("deleteMessage_" + notificationMessage, buttonLabel);
     }
 
-    public static List<ActionRow> paginateButtons(List<Button> mainButtons, List<Button> persistentButtons,
-                                   int page, String pageButtonId) {
+    public static List<ActionRow> paginateButtons(
+            List<Button> mainButtons, List<Button> persistentButtons, int page, String pageButtonId) {
         int totalPages = (int) Math.ceil((double) mainButtons.size() / PAGE_SIZE);
         int currentPage = Math.max(1, Math.min(page, totalPages));
         int fromIndex = (currentPage - 1) * PAGE_SIZE;
@@ -252,12 +261,10 @@ public class Buttons {
         // Add navigation buttons if more than one page
         if (totalPages > 1) {
             if (currentPage > 1) {
-                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage - 1),
-                        "Previous Page", "⏪"));
+                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage - 1), "Previous Page", "⏪"));
             }
             if (currentPage < totalPages) {
-                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage + 1),
-                        "Next Page", "⏩"));
+                persistentAndNav.add(Buttons.gray(pageButtonId + "_page" + (currentPage + 1), "Next Page", "⏩"));
             }
         }
         if (!persistentAndNav.isEmpty()) {

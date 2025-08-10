@@ -19,8 +19,7 @@ public class CalendarHelper {
     public static boolean isBetween(int startMonth, int startDay, int endMonth, int endDay) {
         int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
         int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-        return currentMonth >= startMonth && currentDay >= startDay
-            && currentMonth <= endMonth && currentDay <= endDay;
+        return currentMonth >= startMonth && currentDay >= startDay && currentMonth <= endMonth && currentDay <= endDay;
     }
 
     public static boolean isNearNewYearsDay() {

@@ -14,8 +14,11 @@ class Undo extends GameStateSubcommand {
 
     public Undo() {
         super(Constants.UNDO, "Undo the last action", false, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_COMMAND, "Command to undo back to").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.UNDO_TO_COMMAND, "Command to undo back to")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES")
+                .setRequired(true));
     }
 
     @Override

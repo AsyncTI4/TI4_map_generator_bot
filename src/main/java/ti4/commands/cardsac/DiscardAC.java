@@ -11,8 +11,11 @@ class DiscardAC extends GameStateSubcommand {
 
     public DiscardAC() {
         super(Constants.DISCARD_AC, "Discard an Action Card", true, true);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action card ID, which is found between ()")
+                .setRequired(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override

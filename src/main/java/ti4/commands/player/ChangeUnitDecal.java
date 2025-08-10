@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.GameStateSubcommand;
-import ti4.image.Mapper;
 import ti4.helpers.Constants;
+import ti4.image.Mapper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.service.UnitDecalService;
@@ -14,8 +14,15 @@ class ChangeUnitDecal extends GameStateSubcommand {
 
     public ChangeUnitDecal() {
         super(Constants.CHANGE_UNIT_DECAL, "Player Change Unit Decals", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.DECAL_SET, "Decals for units. Enter 'none' to remove current decals.").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.DECAL_SET,
+                        "Decals for units. Enter 'none' to remove current decals.")
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats")
+                        .setAutoComplete(true));
     }
 
     @Override
@@ -39,6 +46,7 @@ class ChangeUnitDecal extends GameStateSubcommand {
         }
 
         player.setDecalSet(newDecalSet);
-        MessageHelper.sendMessageToEventChannel(event, player.getFactionEmojiOrColor() + " changed their decal set to " + newDecalSet);
+        MessageHelper.sendMessageToEventChannel(
+                event, player.getFactionEmojiOrColor() + " changed their decal set to " + newDecalSet);
     }
 }

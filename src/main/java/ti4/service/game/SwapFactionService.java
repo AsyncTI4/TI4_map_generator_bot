@@ -3,7 +3,6 @@ package ti4.service.game;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -14,7 +13,12 @@ import ti4.message.MessageHelper;
 @UtilityClass
 public class SwapFactionService {
 
-    public static void secondHalfOfSwap(Game game, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
+    public static void secondHalfOfSwap(
+            Game game,
+            Player swapperPlayer,
+            Player removedPlayer,
+            User addedUser,
+            GenericInteractionCreateEvent event) {
         Collection<Player> players = game.getPlayers().values();
         if (players.stream().noneMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
             MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
@@ -39,7 +43,6 @@ public class SwapFactionService {
 
                 if (removed4) {
                     value.add(removedPlayer.getUserID());
-
                 }
             }
         }
@@ -66,16 +69,18 @@ public class SwapFactionService {
         }
 
         if (game.isFowMode()) {
-            //Fog data is saved by userID so need to swap it too
+            // Fog data is saved by userID so need to swap it too
             game.getTileMap().values().forEach(tile -> tile.swapFogData(player, swapperPlayer));
         }
 
-        String before = "> **Before:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
+        String before =
+                "> **Before:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
         swapperPlayer.setUserName(removedPlayer.getUserName());
         swapperPlayer.setUserID(removedPlayer.getUserID());
         player.setUserName(addedUser.getName());
         player.setUserID(addedUser.getId());
-        String after = "> **After:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
+        String after =
+                "> **After:** " + swapperPlayer.getRepresentation() + " & " + removedPlayer.getRepresentation() + "\n";
 
         String message = "Users have swapped factions:\n" + before + after;
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);

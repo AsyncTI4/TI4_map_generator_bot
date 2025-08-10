@@ -2,7 +2,6 @@ package ti4.service;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.Helper;
 import ti4.image.Mapper;
@@ -52,10 +51,14 @@ public class BookOfLatviniaService {
         Player prevSpeaker = game.getSpeaker();
         game.setSpeaker(player);
 
-        String msg = prevSpeaker.getRepresentation() + ", the speaker token has been ripped from your grasp by the _Book of Latvinia_. " + MiscEmojis.SpeakerToken;
+        String msg = prevSpeaker.getRepresentation()
+                + ", the speaker token has been ripped from your grasp by the _Book of Latvinia_. "
+                + MiscEmojis.SpeakerToken;
         MessageHelper.sendMessageToChannel(prevSpeaker.getCorrectChannel(), msg);
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(player.getCorrectChannel(), player.getRepresentation() + " you have gained the speaker token. " + MiscEmojis.SpeakerToken);
+            MessageHelper.sendMessageToChannel(
+                    player.getCorrectChannel(),
+                    player.getRepresentation() + " you have gained the speaker token. " + MiscEmojis.SpeakerToken);
         }
     }
 
@@ -70,7 +73,8 @@ public class BookOfLatviniaService {
         } else {
             id = game.addCustomPO(book, 1);
             game.scorePublicObjective(player.getUserID(), id);
-            message = "Custom objective \"Book of Latvinia\" has been added.\n" + player.getRepresentation() + " has scored the \"Book of Latvinia\" custom objective.";
+            message = "Custom objective \"Book of Latvinia\" has been added.\n" + player.getRepresentation()
+                    + " has scored the \"Book of Latvinia\" custom objective.";
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         Helper.checkEndGame(game, player);

@@ -18,7 +18,12 @@ class RelicSendFragments extends GameStateSubcommand {
         super(Constants.SEND_FRAGMENT, "Send a number of relic fragments (default 1) to another player", true, true);
 
         addOption(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.", true, true);
-        addOption(OptionType.STRING, Constants.TARGET_FACTION_OR_COLOR, "Faction or Color you are sending to.", true, true);
+        addOption(
+                OptionType.STRING,
+                Constants.TARGET_FACTION_OR_COLOR,
+                "Faction or Color you are sending to.",
+                true,
+                true);
         addOption(OptionType.STRING, Constants.FACTION_COLOR, "Faction or color (defaults to you)", false, true);
         addOption(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)");
     }
@@ -38,5 +43,4 @@ class RelicSendFragments extends GameStateSubcommand {
         ButtonHelperAbilities.pillageCheck(receiver, game);
         RelicHelper.sendFrags(event, sender, receiver, trait, count, game);
     }
-
 }

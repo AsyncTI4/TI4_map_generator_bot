@@ -2,7 +2,6 @@ package ti4.commands.tech;
 
 import java.util.List;
 import java.util.Map;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,12 +19,14 @@ abstract class TechAddRemove extends GameStateSubcommand {
 
     public TechAddRemove(String id, String description) {
         super(id, description, true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Technology")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2nd technology").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd technology").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th technology").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color with the technology").setAutoComplete(true));
-
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color with the technology")
+                .setAutoComplete(true));
     }
 
     @Override
@@ -47,8 +48,11 @@ abstract class TechAddRemove extends GameStateSubcommand {
                 doAction(player, techID, event);
             } else {
                 Map<String, TechnologyModel> techs = Mapper.getTechs();
-                List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
-                    .map(Map.Entry::getKey).toList();
+                List<String> possibleTechs = techs.entrySet().stream()
+                        .filter(value ->
+                                value.getValue().getName().toLowerCase().contains(techID))
+                        .map(Map.Entry::getKey)
+                        .toList();
                 if (possibleTechs.isEmpty()) {
                     MessageHelper.sendMessageToEventChannel(event, "No matching technology found.");
                     return;
@@ -57,7 +61,6 @@ abstract class TechAddRemove extends GameStateSubcommand {
                     return;
                 }
                 doAction(player, possibleTechs.getFirst(), event);
-
             }
         }
     }

@@ -9,7 +9,11 @@ import ti4.message.MessageHelper;
 class OfferAutoPassOptions extends GameStateSubcommand {
 
     public OfferAutoPassOptions() {
-        super(Constants.OFFER_AUTOPASS_OPTIONS, "Offer auto pass on Sabotages to every player in the game.", true, false);
+        super(
+                Constants.OFFER_AUTOPASS_OPTIONS,
+                "Offer auto pass on Sabotages to every player in the game.",
+                true,
+                false);
     }
 
     @Override

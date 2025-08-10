@@ -12,13 +12,16 @@ class AgendaRemoveFromGame extends GameStateSubcommand {
 
     public AgendaRemoveFromGame() {
         super(Constants.REMOVE_AGENDA_FROM_GAME, "Agenda remove from game", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda ID").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda ID")
+                .setRequired(true)
+                .setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Game game = getGame();
-        boolean removed = game.removeAgendaFromGame(event.getOption(Constants.AGENDA_ID).getAsString());
+        boolean removed =
+                game.removeAgendaFromGame(event.getOption(Constants.AGENDA_ID).getAsString());
         if (removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda removed from game deck");
         } else {

@@ -2,7 +2,6 @@ package ti4.commands.bothelper;
 
 import java.time.Instant;
 import java.time.ZoneId;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import ti4.commands.Subcommand;
@@ -25,15 +24,20 @@ class CheckNextPingTime extends Subcommand {
         String gameName = GameNameService.getGameName(event);
         Game game = GameManager.getManagedGame(gameName).getGame();
         AutoPingMetadataManager.AutoPing latestPing = AutoPingMetadataManager.getLatestAutoPing(gameName);
-        String pingInfo = latestPing == null ? "No upcoming ping was found for " + gameName :
-            ToStringHelper.of("Ping Info")
-                .add("Game name", gameName)
-                .add("Ping count", latestPing.pingCount())
-                .add("Last ping time", Instant.ofEpochMilli(latestPing.lastPingTimeEpochMilliseconds()).atZone(ZoneId.of("UTC")).toString())
-                .add("Quick ping active", latestPing.quickPing())
-                .add("Auto ping active", game.getAutoPingStatus())
-                .add("Ping interval", game.getAutoPingSpacer())
-                .toString();
+        String pingInfo = latestPing == null
+                ? "No upcoming ping was found for " + gameName
+                : ToStringHelper.of("Ping Info")
+                        .add("Game name", gameName)
+                        .add("Ping count", latestPing.pingCount())
+                        .add(
+                                "Last ping time",
+                                Instant.ofEpochMilli(latestPing.lastPingTimeEpochMilliseconds())
+                                        .atZone(ZoneId.of("UTC"))
+                                        .toString())
+                        .add("Quick ping active", latestPing.quickPing())
+                        .add("Auto ping active", game.getAutoPingStatus())
+                        .add("Ping interval", game.getAutoPingSpacer())
+                        .toString();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "```" + pingInfo + "```");
     }
 }

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -26,9 +25,8 @@ public class ExportToCsvService {
         StringBuilder output = new StringBuilder(header(playerCount));
 
         GamesPage.consumeAllGames(
-            GameStatisticsFilterer.getGamesFilter(event),
-            game -> output.append(System.lineSeparator()).append(gameToCsv(game))
-        );
+                GameStatisticsFilterer.getGamesFilter(event),
+                game -> output.append(System.lineSeparator()).append(gameToCsv(game)));
 
         if (output.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No games found matching filter.");
@@ -80,13 +78,15 @@ public class ExportToCsvService {
             fields.add(Integer.toString(p.getTotalVictoryPoints()));
             fields.add(Integer.toString(p.getSecretVictoryPoints()));
             fields.add(Integer.toString(p.getPublicVictoryPoints(false)));
-            fields.add(Integer.toString(p.getTotalVictoryPoints() - p.getSecretVictoryPoints() - p.getPublicVictoryPoints(false)));
+            fields.add(Integer.toString(
+                    p.getTotalVictoryPoints() - p.getSecretVictoryPoints() - p.getPublicVictoryPoints(false)));
             fields.add(String.join("|", p.getTechs()));
             fields.add(String.join("|", p.getRelics()));
             fields.add(Boolean.toString(p.getLeaderByType("hero").isEmpty()));
         }
 
-        List<String> outputFields = fields.stream().map(f -> f.contains(",") ? "\"" + f + "\"" : f).toList();
+        List<String> outputFields =
+                fields.stream().map(f -> f.contains(",") ? "\"" + f + "\"" : f).toList();
         return String.join(",", outputFields);
     }
 }

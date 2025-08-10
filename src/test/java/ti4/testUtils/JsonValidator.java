@@ -1,16 +1,15 @@
 package ti4.testUtils;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
 import ti4.json.ObjectMapperFactory;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Utility test class that allows us to validate our source files are correctly configured
@@ -19,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public final class JsonValidator<T> {
     private static final ObjectMapper objectMapper = ObjectMapperFactory.build();
 
-    private JsonValidator() {
-    }
+    private JsonValidator() {}
 
     /**
      * Subjects the provided object to a save/restore JSON loop where we serialize the object to
@@ -43,7 +41,8 @@ public final class JsonValidator<T> {
      *
      * Any any missing attributes or unknown attributes will cause an exception to be thrown.
      */
-    public static void assertAvailableJsonAttributes(Object obj, Set<String> knownJsonAttributes) throws JacksonConfigurationException {
+    public static void assertAvailableJsonAttributes(Object obj, Set<String> knownJsonAttributes)
+            throws JacksonConfigurationException {
         JsonNode json = objectMapper.valueToTree(obj);
 
         // Validate all fields we expect to be present in JSON output are accounted for with no extras.
@@ -51,11 +50,14 @@ public final class JsonValidator<T> {
         while (fields.hasNext()) {
             Entry<String, JsonNode> field = fields.next();
             if (!knownJsonAttributes.remove(field.getKey())) {
-                throw new JacksonConfigurationException("Untested JSON property found in class. Please update tests to validate this new field is JSON safe. Field: " + field.getKey());
+                throw new JacksonConfigurationException(
+                        "Untested JSON property found in class. Please update tests to validate this new field is JSON safe. Field: "
+                                + field.getKey());
             }
         }
 
-        assertEquals(0, knownJsonAttributes.size(), "JSON field was expected to be seen on object but was never observed");
+        assertEquals(
+                0, knownJsonAttributes.size(), "JSON field was expected to be seen on object but was never observed");
     }
 
     /**

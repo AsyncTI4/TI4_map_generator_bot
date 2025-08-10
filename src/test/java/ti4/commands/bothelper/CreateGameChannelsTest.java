@@ -1,10 +1,10 @@
 package ti4.commands.bothelper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import ti4.service.game.CreateGameService;
 import ti4.testUtils.BaseTi4Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CreateGameChannelsTest extends BaseTi4Test {
     @Test

@@ -22,8 +22,12 @@ public class ManagedGameService {
     }
 
     public String getPingAllPlayers(ManagedGame game) {
-        Role role = game.getGuild() == null ? null :
-            game.getGuild().getRoles().stream().filter(r -> game.getName().equals(r.getName().toLowerCase())).findFirst().orElse(null);
+        Role role = game.getGuild() == null
+                ? null
+                : game.getGuild().getRoles().stream()
+                        .filter(r -> game.getName().equals(r.getName().toLowerCase()))
+                        .findFirst()
+                        .orElse(null);
         if (role != null) {
             return role.getAsMention();
         }

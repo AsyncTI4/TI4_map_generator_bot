@@ -1,5 +1,7 @@
 package ti4.commands.user;
 
+import static java.util.function.Predicate.not;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Subcommand;
 import ti4.executors.ExecutionLockManager;
@@ -10,8 +12,6 @@ import ti4.map.persistence.GameManager;
 import ti4.map.persistence.ManagedGame;
 import ti4.map.persistence.ManagedPlayer;
 import ti4.message.MessageHelper;
-
-import static java.util.function.Predicate.not;
 
 class WipeTurnTime extends Subcommand {
 
@@ -27,13 +27,14 @@ class WipeTurnTime extends Subcommand {
             return;
         }
         managedPlayer.getGames().stream()
-            .filter(not(ManagedGame::isFowMode))
-            .map(ManagedGame::getName)
-            .distinct()
-            .forEach(gameName ->
-                ExecutionLockManager
-                    .wrapWithLockAndRelease(gameName, ExecutionLockManager.LockType.WRITE, () -> wipeTurnTime(gameName, userId, event))
-                    .run());
+                .filter(not(ManagedGame::isFowMode))
+                .map(ManagedGame::getName)
+                .distinct()
+                .forEach(gameName -> ExecutionLockManager.wrapWithLockAndRelease(
+                                gameName,
+                                ExecutionLockManager.LockType.WRITE,
+                                () -> wipeTurnTime(gameName, userId, event))
+                        .run());
 
         MessageHelper.sendMessageToChannel(event.getChannel(), "Wiped all of your turn times");
     }

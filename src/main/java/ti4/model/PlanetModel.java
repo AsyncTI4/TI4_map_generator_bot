@@ -1,11 +1,10 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -60,9 +59,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public boolean isValid() {
-        return id != null
-            && name != null
-            && source != null;
+        return id != null && name != null && source != null;
     }
 
     @JsonIgnore
@@ -88,8 +85,7 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @Deprecated
     public Point getPositionInTile() {
-        if (positionInTile != null)
-            return positionInTile;
+        if (positionInTile != null) return positionInTile;
         else if (planetLayout != null && planetLayout.getCenterPosition() != null) {
             return planetLayout.getCenterPosition();
         }
@@ -146,7 +142,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (tile != null) sb.append("\nSystem: ").append(tile.getName());
         eb.setDescription(sb.toString());
         if (getBasicAbilityText() != null) eb.addField("Ability:", getBasicAbilityText(), false);
-        if (getLegendaryAbilityName() != null) eb.addField(MiscEmojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
+        if (getLegendaryAbilityName() != null)
+            eb.addField(MiscEmojis.LegendaryPlanet + getLegendaryAbilityName(), getLegendaryAbilityText(), false);
         if (getLegendaryAbilityFlavourText() != null) eb.addField("", getLegendaryAbilityFlavourText(), false);
         if (getFlavourText() != null) eb.addField("", getFlavourText(), false);
 
@@ -162,8 +159,8 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     @JsonIgnore
     public MessageEmbed getLegendaryEmbed() {
-        if (StringUtils.isBlank(getLegendaryAbilityName())) return null; //no ability name, no embed
-        if (StringUtils.isBlank(getLegendaryAbilityText())) return null; //no ability text, no embed
+        if (StringUtils.isBlank(getLegendaryAbilityName())) return null; // no ability name, no embed
+        if (StringUtils.isBlank(getLegendaryAbilityText())) return null; // no ability text, no embed
 
         EmbedBuilder eb = new EmbedBuilder();
 
@@ -256,7 +253,10 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
         if (ident == -1) {
             cachedStickerUrl = getEmojiURL();
         } else {
-            cachedStickerUrl = AsyncTI4DiscordBot.jda.retrieveSticker(Sticker.fromId(ident)).complete().getIconUrl();
+            cachedStickerUrl = AsyncTI4DiscordBot.jda
+                    .retrieveSticker(Sticker.fromId(ident))
+                    .complete()
+                    .getIconUrl();
         }
 
         return cachedStickerUrl;
@@ -264,16 +264,17 @@ public class PlanetModel implements ModelInterface, EmbeddableModel {
 
     public boolean search(String searchString) {
         return getName().toLowerCase().contains(searchString)
-            || getId().toLowerCase().contains(searchString)
-            || getSource().toString().contains(searchString)
-            || getSearchTags().contains(searchString);
+                || getId().toLowerCase().contains(searchString)
+                || getSource().toString().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     @JsonIgnore
     public String getAutoCompleteName() {
         StringBuilder sb = new StringBuilder();
         sb.append(getName()).append(" (").append(getResources()).append("/").append(getInfluence());
-        if (!getTechSpecialtyStringRepresentation().isBlank()) sb.append(" ").append(getTechSpecialtyStringRepresentation());
+        if (!getTechSpecialtyStringRepresentation().isBlank())
+            sb.append(" ").append(getTechSpecialtyStringRepresentation());
         sb.append(")");
         return sb.toString();
     }

@@ -14,8 +14,8 @@ public class TemporaryCombatModifierModel {
     private String useInSystem;
     private String useInUnitHolder;
 
-    public TemporaryCombatModifierModel(String relatedType, String relatedID, CombatModifierModel modifier,
-        Integer useInTurn) {
+    public TemporaryCombatModifierModel(
+            String relatedType, String relatedID, CombatModifierModel modifier, Integer useInTurn) {
         this.relatedType = relatedType;
         this.relatedID = relatedID;
         this.modifier = modifier;
@@ -35,11 +35,11 @@ public class TemporaryCombatModifierModel {
 
     public String getSaveString() {
         if (getModifier() != null) {
-            return relatedID + "," + relatedType + "," + useInTurn + "," + useInSystem + ","
-                + useInUnitHolder + "," + getModifier().getAlias();
+            return relatedID + "," + relatedType + "," + useInTurn + "," + useInSystem + "," + useInUnitHolder + ","
+                    + getModifier().getAlias();
         } else {
-            return relatedID + "," + relatedType + "," + useInTurn + "," + useInSystem + ","
-                + useInUnitHolder + ",bleh";
+            return relatedID + "," + relatedType + "," + useInTurn + "," + useInSystem + "," + useInUnitHolder
+                    + ",bleh";
         }
     }
 }

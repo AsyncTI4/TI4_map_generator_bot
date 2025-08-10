@@ -12,7 +12,8 @@ class SCRemoveFromGame extends GameStateSubcommand {
 
     public SCRemoveFromGame() {
         super(Constants.REMOVE_SC_FROM_GAME, "Remove a Stategy Card # from the game", true, false);
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to remove").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card to remove")
+                .setRequired(true));
     }
 
     @Override
@@ -25,5 +26,4 @@ class SCRemoveFromGame extends GameStateSubcommand {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card did not exist: " + sc);
         }
     }
-
 }

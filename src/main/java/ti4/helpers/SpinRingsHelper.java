@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -18,16 +17,15 @@ import ti4.service.fow.FowCommunicationThreadService;
 public class SpinRingsHelper {
     private static final String DEFAULT_MSG = "Spun the rings";
     private static final List<String> STATUS_MSGS = Arrays.asList(
-      "Shifted the cosmic rings",
-        "Aligned the stellar orbits",
-        "Twisted the galactic core",
-        "Rearranged the celestial dance",
-        "Tilted the astral axis",
-        "Rotated the planetary rings",
-        "Adjusted the star-bound gyroscope",
-        "Spiraled the galactic arms",
-        "Warped the orbital paths"
-    );
+            "Shifted the cosmic rings",
+            "Aligned the stellar orbits",
+            "Twisted the galactic core",
+            "Rearranged the celestial dance",
+            "Tilted the astral axis",
+            "Rotated the planetary rings",
+            "Adjusted the star-bound gyroscope",
+            "Spiraled the galactic arms",
+            "Warped the orbital paths");
 
     private static final String CW = "cw";
     private static final String CCW = "ccw";
@@ -37,7 +35,7 @@ public class SpinRingsHelper {
         String[] customSpins = customSpinSptring.toLowerCase().split(" ");
         for (String spinString : customSpins) {
 
-            //Needs to have Ring:Direction:Steps
+            // Needs to have Ring:Direction:Steps
             String[] spinSettings = spinString.toLowerCase().split(":");
             if (spinSettings.length != 3) {
                 return false;
@@ -57,7 +55,7 @@ public class SpinRingsHelper {
                 return false;
             }
 
-            //Step counts must be less than tiles in smallest ring
+            // Step counts must be less than tiles in smallest ring
             for (String stepsString : spinSettings[2].split(",")) {
                 int steps = parseInt(stepsString);
                 if (steps < 0 || steps > smallestRing * 6 - 1) {
@@ -129,7 +127,7 @@ public class SpinRingsHelper {
                     String fromPosition = tile.getPosition();
                     tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
                     if (game.getCustomHyperlaneData().get(fromPosition) != null) {
-                        customHyperlanesToMove.add(new String[]{fromPosition, tile.getPosition()});
+                        customHyperlanesToMove.add(new String[] {fromPosition, tile.getPosition()});
                     }
                     tilesToSet.add(tile);
                     updateHomeSystem(game, tile);
@@ -162,7 +160,7 @@ public class SpinRingsHelper {
         }
     }
 
-    //the original spin logic which does
+    // the original spin logic which does
     // - ring 1 cw one step
     // - ring 2 ccw two steps
     // - ring 3 cw three steps (except 6p map HS positions)

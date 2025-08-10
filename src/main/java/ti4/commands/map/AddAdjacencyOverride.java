@@ -11,17 +11,22 @@ class AddAdjacencyOverride extends GameStateSubcommand {
 
     public AddAdjacencyOverride() {
         super(Constants.ADD_ADJACENCY_OVERRIDE, "Add Custom Adjacent Tiles.", true, true);
-        addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Primary tile position")
-            .setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Direction the second tile is from the primary tile for linking hyperlanes")
-            .setRequired(true).setAutoComplete(true));
+        addOptions(
+                new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Primary tile position").setRequired(true));
+        addOptions(new OptionData(
+                        OptionType.STRING,
+                        Constants.PRIMARY_TILE_DIRECTION,
+                        "Direction the second tile is from the primary tile for linking hyperlanes")
+                .setRequired(true)
+                .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.SECONDARY_TILE, "Secondary tile position")
-            .setRequired(true));
+                .setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String primaryTile = event.getOption(Constants.PRIMARY_TILE).getAsString().toLowerCase();
+        String primaryTile =
+                event.getOption(Constants.PRIMARY_TILE).getAsString().toLowerCase();
         int direction;
         switch (event.getOption(Constants.PRIMARY_TILE_DIRECTION).getAsString().toLowerCase()) {
             case "n", "north" -> direction = 0;
@@ -33,7 +38,8 @@ class AddAdjacencyOverride extends GameStateSubcommand {
             default -> direction = -1;
         }
 
-        String secondaryTile = event.getOption(Constants.SECONDARY_TILE).getAsString().toLowerCase();
+        String secondaryTile =
+                event.getOption(Constants.SECONDARY_TILE).getAsString().toLowerCase();
         if (primaryTile.isBlank() || secondaryTile.isBlank() || direction == -1) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad data, try again");
             return;

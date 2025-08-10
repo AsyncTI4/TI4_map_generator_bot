@@ -15,6 +15,4 @@ class AbilityInfo extends GameStateSubcommand {
     public void execute(SlashCommandInteractionEvent event) {
         AbilityInfoService.sendAbilityInfo(getGame(), getPlayer(), event);
     }
-
-
 }

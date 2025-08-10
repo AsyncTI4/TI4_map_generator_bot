@@ -2,7 +2,6 @@ package ti4.service.player;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Leader;

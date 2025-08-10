@@ -17,7 +17,7 @@ class PutAgendaButtonHandler {
 
     @ButtonHandler("topAgenda_")
     public static void topAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
-        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+        String agendaNumID = buttonID.substring(buttonID.indexOf('_') + 1);
         AgendaHelper.putTop(Integer.parseInt(agendaNumID), game);
         String key = "round" + game.getRound() + "AgendaPlacement";
         if (game.getStoredValue(key).isEmpty()) {
@@ -27,23 +27,25 @@ class PutAgendaButtonHandler {
         }
         AgendaModel agenda = Mapper.getAgenda(game.lookAtTopAgenda(0));
         Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
-            "Put " + agenda.getName()
-                + " on the top of the agenda deck. You may use this button to undo that and reassign it.",
-            reassign);
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getChannel(),
+                "Put " + agenda.getName()
+                        + " on the top of the agenda deck. You may use this button to undo that and reassign it.",
+                reassign);
         ButtonHelper.deleteMessage(event);
     }
 
     @ButtonHandler("bottomAgenda_")
     public static void bottomAgenda(ButtonInteractionEvent event, String buttonID, Game game) {
-        String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1);
+        String agendaNumID = buttonID.substring(buttonID.indexOf('_') + 1);
         AgendaHelper.putBottom(Integer.parseInt(agendaNumID), game);
         AgendaModel agenda = Mapper.getAgenda(game.lookAtBottomAgenda(0));
         Button reassign = Buttons.gray("retrieveAgenda_" + agenda.getAlias(), "Reassign " + agenda.getName());
-        MessageHelper.sendMessageToChannelWithButton(event.getChannel(),
-            "Put " + agenda.getName()
-                + " on the bottom of the agenda deck. You may use this button to undo that and reassign it.",
-            reassign);
+        MessageHelper.sendMessageToChannelWithButton(
+                event.getChannel(),
+                "Put " + agenda.getName()
+                        + " on the bottom of the agenda deck. You may use this button to undo that and reassign it.",
+                reassign);
         String key = "round" + game.getRound() + "AgendaPlacement";
         if (game.getStoredValue(key).isEmpty()) {
             game.setStoredValue(key, "bottom");

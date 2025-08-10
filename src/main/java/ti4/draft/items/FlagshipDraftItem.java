@@ -1,12 +1,10 @@
 package ti4.draft.items;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import ti4.draft.DraftItem;
 import ti4.image.Mapper;
 import ti4.map.Game;
@@ -62,9 +60,10 @@ public class FlagshipDraftItem extends DraftItem {
         }
         if (unit.getAfbDieCount() > 0) {
             sb.append("ANTI-FIGHTER BARRAGE ")
-                .append(unit.getAfbHitsOn())
-                .append("x").append(unit.getAfbDieCount())
-                .append(" ");
+                    .append(unit.getAfbHitsOn())
+                    .append("x")
+                    .append(unit.getAfbDieCount())
+                    .append(" ");
         }
         if (unit.getAbility().isPresent()) sb.append(unit.getAbility().get());
         return sb.toString();
@@ -87,7 +86,8 @@ public class FlagshipDraftItem extends DraftItem {
         Map<String, UnitModel> allUnits = Mapper.getUnits();
         for (FactionModel faction : factions) {
             var units = faction.getUnits();
-            units.removeIf((String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
+            units.removeIf(
+                    (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
             allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;
@@ -108,7 +108,8 @@ public class FlagshipDraftItem extends DraftItem {
                 continue;
             }
             var units = faction.getUnits();
-            units.removeIf((String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
+            units.removeIf(
+                    (String unit) -> !"flagship".equals(allUnits.get(unit).getBaseType()));
             allItems.add(DraftItem.generate(Category.FLAGSHIP, units.getFirst()));
         }
         return allItems;

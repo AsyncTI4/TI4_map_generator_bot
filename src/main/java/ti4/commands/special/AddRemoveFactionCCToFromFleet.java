@@ -3,7 +3,6 @@ package ti4.commands.special;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -20,8 +19,10 @@ abstract class AddRemoveFactionCCToFromFleet extends GameStateSubcommand {
     public AddRemoveFactionCCToFromFleet(String id, String description) {
         super(id, description, true, true);
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction Color for command token")
-            .setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set command tokens"));
+                .setRequired(true)
+                .setAutoComplete(true));
+        addOptions(new OptionData(
+                OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set command tokens"));
     }
 
     @Override

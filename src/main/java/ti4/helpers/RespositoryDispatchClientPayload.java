@@ -30,9 +30,11 @@ public class RespositoryDispatchClientPayload {
     }
 
     public String toJson() {
-        return "\"client_payload\":{" + records.entrySet().stream()
-            .map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"")
-            .reduce((a, b) -> a + "," + b)
-            .orElse("") + "}";
+        return "\"client_payload\":{"
+                + records.entrySet().stream()
+                        .map(e -> "\"" + e.getKey() + "\":\"" + e.getValue() + "\"")
+                        .reduce((a, b) -> a + "," + b)
+                        .orElse("")
+                + "}";
     }
 }

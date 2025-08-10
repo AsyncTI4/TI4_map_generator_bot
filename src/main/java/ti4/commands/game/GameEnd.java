@@ -15,10 +15,18 @@ class GameEnd extends GameStateSubcommand {
 
     public GameEnd() {
         super(Constants.END, "Declare the game has ended", true, false);
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles. (Default: True)"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ARCHIVE_CHANNELS, "True to archive the channels and delete the game role (Default: True)"));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.REMATCH, "True to start another game using the same channels (Default: False)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'")
+                .setRequired(true));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, Constants.PUBLISH, "True to publish results to #pbd-chronicles. (Default: True)"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.ARCHIVE_CHANNELS,
+                "True to archive the channels and delete the game role (Default: True)"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                Constants.REMATCH,
+                "True to start another game using the same channels (Default: False)"));
     }
 
     @Override

@@ -2,13 +2,49 @@ package ti4.service.emoji;
 
 public enum DiceEmojis implements TI4Emoji {
     // Green
-    d10green_0, d10green_1, d10green_2, d10green_3, d10green_4, d10green_5, d10green_6, d10green_7, d10green_8, d10green_9,
+    d10green_0,
+    d10green_1,
+    d10green_2,
+    d10green_3,
+    d10green_4,
+    d10green_5,
+    d10green_6,
+    d10green_7,
+    d10green_8,
+    d10green_9,
     // Red
-    d10red_0, d10red_1, d10red_2, d10red_3, d10red_4, d10red_5, d10red_6, d10red_7, d10red_8, d10red_9,
+    d10red_0,
+    d10red_1,
+    d10red_2,
+    d10red_3,
+    d10red_4,
+    d10red_5,
+    d10red_6,
+    d10red_7,
+    d10red_8,
+    d10red_9,
     // Blue
-    d10blue_0, d10blue_1, d10blue_2, d10blue_3, d10blue_4, d10blue_5, d10blue_6, d10blue_7, d10blue_8, d10blue_9,
+    d10blue_0,
+    d10blue_1,
+    d10blue_2,
+    d10blue_3,
+    d10blue_4,
+    d10blue_5,
+    d10blue_6,
+    d10blue_7,
+    d10blue_8,
+    d10blue_9,
     // Gray
-    d10grey_0, d10grey_1, d10grey_2, d10grey_3, d10grey_4, d10grey_5, d10grey_6, d10grey_7, d10grey_8, d10grey_9;
+    d10grey_0,
+    d10grey_1,
+    d10grey_2,
+    d10grey_3,
+    d10grey_4,
+    d10grey_5,
+    d10grey_6,
+    d10grey_7,
+    d10grey_8,
+    d10grey_9;
 
     public static String getDieEmoji(String color, int value) {
         return switch (color) {
@@ -88,5 +124,4 @@ public enum DiceEmojis implements TI4Emoji {
     public String toString() {
         return emojiString();
     }
-
 }

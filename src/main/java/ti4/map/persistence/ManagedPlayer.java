@@ -3,7 +3,6 @@ package ti4.map.persistence;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
 import lombok.Getter;
 import ti4.map.Player;
 

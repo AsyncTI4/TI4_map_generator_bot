@@ -1,10 +1,9 @@
 package ti4.helpers.settingsFramework.settings;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,7 +12,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
 @Getter
 @Setter
-@JsonIncludeProperties({ "id", "val" })
+@JsonIncludeProperties({"id", "val"})
 public class BooleanSetting extends SettingInterface {
     private boolean val;
     private String whenFalse;

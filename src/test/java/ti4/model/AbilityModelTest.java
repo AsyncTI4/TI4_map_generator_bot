@@ -1,16 +1,15 @@
 package ti4.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Test;
 import ti4.image.Mapper;
 import ti4.model.Source.ComponentSource;
 import ti4.testUtils.BaseTi4Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AbilityModelTest extends BaseTi4Test {
     @Test
@@ -23,7 +22,8 @@ public class AbilityModelTest extends BaseTi4Test {
 
     private boolean validateFaction(AbilityModel model) {
         if (Mapper.isValidFaction(model.getFaction()) || "keleres".equals(model.getFaction())) return true;
-        System.out.println("Ability **" + model.getAlias() + "** failed validation due to invalid FactionID: `" + model.getFaction() + "`");
+        System.out.println("Ability **" + model.getAlias() + "** failed validation due to invalid FactionID: `"
+                + model.getFaction() + "`");
         return false;
     }
 
@@ -93,5 +93,4 @@ public class AbilityModelTest extends BaseTi4Test {
         abilityModel.setId(id);
         assertEquals(id, abilityModel.getAlias());
     }
-
 }
