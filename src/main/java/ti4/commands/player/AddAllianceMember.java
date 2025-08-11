@@ -52,7 +52,9 @@ public class AddAllianceMember extends GameStateSubcommand {
         player.removePromissoryNote(player.getColor() + "_an");
         otherPlayer.removeOwnedPromissoryNoteByID(otherPlayer.getColor() + "_an");
         otherPlayer.removePromissoryNote(otherPlayer.getColor() + "_an");
-
+        if (!game.isLiberationC4Mode() && game.getVp() == 10) {
+            game.setVp(14);
+        }
         for (String leaderID : otherPlayer.getLeaderIDs()) {
             if (leaderID.contains("commander") && !player.hasLeader(leaderID)) {
                 if (!leaderID.contains("mahact") && !player.hasAbility("edict")) {
@@ -101,5 +103,17 @@ public class AddAllianceMember extends GameStateSubcommand {
                 event,
                 "Added " + otherPlayer.getFaction() + " as part of " + player.getFaction()
                         + "'s alliance. This works 2 ways.");
+
+        if (game.getStoredValue("allianceMsgSent").isEmpty()) {
+            game.setStoredValue("allianceMsgSent", "Yes");
+            String msg2 =
+                    game.getPing() + " you are starting an alliance game, which has many gray areas in the rules. "
+                            + "You may consider using this handbook, which is not official but was compiled by knowledgable players and does attempt to cover all the gray areas and make them clear. "
+                            + "If you all agree to rely upon it for rulings, it can function as a useful aid in your game.\n\n"
+                            + "https://tijunkies.com/resources/alliance-handbook/";
+            if (game.getTableTalkChannel() != null) {
+                MessageHelper.sendMessageToChannelAndPin(game.getTableTalkChannel(), msg2);
+            }
+        }
     }
 }

@@ -664,7 +664,7 @@ public class TacticalActionService {
         }
         if (player.hasLeaderUnlocked("muaathero")
                 && !tile.isMecatol()
-                && !tile.isHomeSystem()
+                && !tile.isHomeSystem(game)
                 && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
                         .contains(tile)) {
             buttons.add(Buttons.blue(

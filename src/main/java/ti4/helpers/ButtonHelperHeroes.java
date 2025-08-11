@@ -861,7 +861,7 @@ public class ButtonHelperHeroes {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
                     if (!player.getPlanetsAllianceMode().contains(planet.getName())
-                            && !tile.isHomeSystem()
+                            && !tile.isHomeSystem(game)
                             && !planet.getName().toLowerCase().contains("rex")) {
                         buttons.add(Buttons.green(
                                 finChecker + "gheminaLadyHero_" + planet.getName(),
@@ -888,7 +888,7 @@ public class ButtonHelperHeroes {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 if (unitHolder instanceof Planet planet) {
                     if (!player.getPlanetsAllianceMode().contains(planet.getName())
-                            && !tile.isHomeSystem()
+                            && !tile.isHomeSystem(game)
                             && !planet.getName().toLowerCase().contains("rex")
                             && (unitHolder.getUnits() == null
                                     || unitHolder.getUnits().isEmpty())) {

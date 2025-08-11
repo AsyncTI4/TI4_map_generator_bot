@@ -391,7 +391,7 @@ public class AddPlanetService {
         if (tile != null
                 && game.getActivePlayer() == player
                 && game.playerHasLeaderUnlockedOrAlliance(player, "freesystemscommander")
-                && !tile.isHomeSystem()
+                && !tile.isHomeSystem(game)
                 && FoWHelper.playerHasShipsInSystem(player, tile)) {
             List<Button> buttons = new ArrayList<>();
             buttons.add(Buttons.green(

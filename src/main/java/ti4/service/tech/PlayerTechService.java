@@ -177,7 +177,9 @@ public class PlayerTechService {
             case "dscymiy" -> {
                 List<Tile> tiles = new ArrayList<>();
                 for (Tile tile : game.getTileMap().values()) {
-                    if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem() && !tile.isMecatol()) {
+                    if (FoWHelper.playerHasUnitsInSystem(player, tile)
+                            && !tile.isHomeSystem(game)
+                            && !tile.isMecatol()) {
                         tiles.add(tile);
                     }
                 }

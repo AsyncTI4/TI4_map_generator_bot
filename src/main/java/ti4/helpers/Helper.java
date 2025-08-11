@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import java.awt.*;
+import java.awt.Point;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1268,7 +1268,7 @@ public class Helper {
                     }
                 } else {
                     Tile t = game.getTileFromPlanet(planet.getName());
-                    if (t != null && !t.isHomeSystem()) {
+                    if (t != null && !t.isHomeSystem(game)) {
                         if (planet.getResources() > bestRes) {
                             bestRes = planet.getResources();
                         }
@@ -2216,7 +2216,7 @@ public class Helper {
             }
         } else {
             for (Tile tile : game.getTileMap().values()) {
-                if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem()) {
+                if (FoWHelper.playerHasUnitsInSystem(player, tile) && !tile.isHomeSystem(game)) {
                     Button button = Buttons.gray(
                             finsFactionCheckerPrefix + "diplo_" + tile.getPosition() + "_" + "mahact"
                                     + mahact.getColor(),
@@ -2933,10 +2933,10 @@ public class Helper {
                 MessageHelper.sendMessageToChannel(
                         game.getMainGameChannel(),
                         """
-                    ## Note about FoW
-                    When you press **End Game** all the game channels will be deleted immediately!
-                    A new thread will be generated under the **#fow-war-stories** channel.
-                    Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.""");
+                        ## Note about FoW
+                        When you press **End Game** all the game channels will be deleted immediately!
+                        A new thread will be generated under the **#fow-war-stories** channel.
+                        Round Summaries will be shared there. So it is advised to hold end-of-game chat until then.""");
                 List<Button> titleButton = new ArrayList<>();
                 titleButton.add(Buttons.blue("offerToGiveTitles", "Offer to bestow a Title"));
                 titleButton.add(Buttons.gray("deleteButtons", "No titles for this game"));

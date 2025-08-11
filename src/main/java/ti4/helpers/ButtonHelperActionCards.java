@@ -1577,7 +1577,7 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String planet : p2.getReadiedPlanets()) {
             if (game.getTileFromPlanet(planet) != null
-                    && game.getTileFromPlanet(planet).isHomeSystem()) {
+                    && game.getTileFromPlanet(planet).isHomeSystem(game)) {
                 continue;
             }
             buttons.add(Buttons.gray(
@@ -1654,14 +1654,14 @@ public class ButtonHelperActionCards {
         List<Button> buttons = new ArrayList<>();
         for (String tilePos : FoWHelper.getAdjacentTilesAndNotThisTile(game, pos, player, false)) {
             Tile tile = game.getTileByPosition(tilePos);
-            if (!tile.isHomeSystem()) {
+            if (!tile.isHomeSystem(game)) {
                 buttons.add(Buttons.gray(
                         "signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                         tile.getRepresentationForButtons(game, player)));
             }
         }
         Tile tile = game.getTileByPosition(pos);
-        if (!tile.isHomeSystem()) {
+        if (!tile.isHomeSystem(game)) {
             buttons.add(Buttons.gray(
                     "signalJammingStep4_" + p2.getFaction() + "_" + tile.getPosition(),
                     tile.getRepresentationForButtons(game, player)));
@@ -1709,7 +1709,7 @@ public class ButtonHelperActionCards {
             }
             UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
             if (uH.getUnitCount(UnitType.Spacedock, p2.getColor()) > 0) {
-                if (!game.getTileFromPlanet(planet).isHomeSystem()) {
+                if (!game.getTileFromPlanet(planet).isHomeSystem(game)) {
                     Tile tile = game.getTileFromPlanet(planet);
                     buttons.add(Buttons.gray(
                             "reactorMeltdownStep3_" + p2.getFaction() + "_" + tile.getPosition() + "_" + planet,

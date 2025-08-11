@@ -769,7 +769,7 @@ public class ButtonHelperFactionSpecific {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (!tile.getPosition().equalsIgnoreCase(game.getActiveSystem())
-                    && !tile.isHomeSystem()
+                    && !tile.isHomeSystem(game)
                     && !CommandCounterHelper.hasCC(event, activePlayer.getColor(), tile)) {
                 buttons.add(Buttons.green(
                         "stymiePlayerStep2_" + activePlayer.getFaction() + "_" + tile.getPosition(),

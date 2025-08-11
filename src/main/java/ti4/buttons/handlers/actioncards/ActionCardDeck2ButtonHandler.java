@@ -369,7 +369,7 @@ class ActionCardDeck2ButtonHandler {
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getPosition().contains("t")
                     || tile.getPosition().contains("b")
-                    || tile.isHomeSystem()
+                    || tile.isHomeSystem(game)
                     || tile.isMecatol()) {
                 continue;
             }
@@ -392,7 +392,7 @@ class ActionCardDeck2ButtonHandler {
             if (tile.getPosition().contains("t")
                     || tile.getPosition().contains("b")
                     || tile == tile1
-                    || tile.isHomeSystem()
+                    || tile.isHomeSystem(game)
                     || tile.isMecatol()) {
                 continue;
             }

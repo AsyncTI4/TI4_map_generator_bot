@@ -505,7 +505,7 @@ public class StartCombatService {
             offerRedGhostCommanderButtons(p, game, event);
         }
 
-        if (tile.isHomeSystem()
+        if (tile.isHomeSystem(game)
                 && isGroundCombat
                 && game.getStoredValue("audioSent").isEmpty()) {
             for (Player p3 : game.getRealPlayers()) {
@@ -697,7 +697,7 @@ public class StartCombatService {
                         msg + ", a reminder that if you win the combat, you could score _Brave the Void_.");
             }
             if (player.getSecretsUnscored().containsKey("dts")
-                    && tile.isHomeSystem()
+                    && tile.isHomeSystem(game)
                     && tile != player.getHomeSystemTile()) {
                 MessageHelper.sendMessageToChannel(
                         player.getCardsInfoThread(),

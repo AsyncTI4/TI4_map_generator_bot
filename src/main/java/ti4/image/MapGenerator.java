@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -125,6 +132,7 @@ public class MapGenerator implements AutoCloseable {
                 .filter(Mapper.getPublicObjectivesStage2()::containsKey)
                 .count();
         int otherObjCount = game.getRevealedPublicObjectives().size() - stage1PublicObjCount - stage2PublicObjCount;
+        otherObjCount = Math.max(Objective.retrieveCustom(game).size(), otherObjCount);
         stage1PublicObjCount = game.getPublicObjectives1Peakable().size() + stage1PublicObjCount;
         stage2PublicObjCount = game.getPublicObjectives2Peakable().size() + stage2PublicObjCount;
         int mostObjectivesInAColumn = Math.max(Math.max(stage1PublicObjCount, stage2PublicObjCount), otherObjCount);
@@ -132,6 +140,9 @@ public class MapGenerator implements AutoCloseable {
 
         // Height of sections of players stats and agendas/events in play and objectives
         int playerCountForMap = game.getRealPlayers().size() + game.getDummies().size();
+        if (game.getRealPlayers().size() > game.getRealPlayersNNeutral().size()) {
+            playerCountForMap--;
+        }
         int heightOfPlayerAreasSection =
                 getHeightOfPlayerAreasSection(game, playerCountForMap, heightOfObjectivesSection);
 

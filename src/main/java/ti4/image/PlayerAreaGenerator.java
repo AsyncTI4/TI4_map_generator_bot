@@ -1,6 +1,13 @@
 package ti4.image;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -1399,9 +1406,9 @@ public class PlayerAreaGenerator {
 
                 String unitName = unitKey.getUnitType().humanReadableName();
                 if (!game.isHasEnded() && numInReinforcements < 0 && game.isCcNPlasticLimit()) {
-                    String warningMessage =
-                            player.getRepresentation() + " is exceeding unit plastic or cardboard limits for "
-                                    + unitName + ". Use buttons to remove.";
+                    String warningMessage = player.getRepresentation()
+                            + " is exceeding unit plastic or cardboard limits for " + unitName
+                            + ". Use buttons to remove (note that you cannot remove plastic pieces from systems with your command token in them).";
                     List<Button> removeButtons =
                             ButtonHelperModifyUnits.getRemoveThisTypeOfUnitButton(player, game, unitKey.asyncID());
                     MessageHelper.sendMessageToChannelWithButtons(
