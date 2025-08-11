@@ -809,10 +809,16 @@ public class ButtonHelperModifyUnits {
         for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, type)) {
             for (UnitHolder uH : tile.getUnitHolders().values()) {
                 if (uH.getUnitCount(type, player.getColor()) > 0) {
-                    buttons.add(Buttons.red(
-                            "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
-                                    + uH.getName(),
-                            type.humanReadableName() + " from " + tile.getRepresentation() + " in " + uH.getName()));
+                    if (!CommandCounterHelper.hasCC(player, tile)
+                            || type == UnitType.Fighter
+                            || type == UnitType.Infantry
+                            || game.getActiveSystem().equalsIgnoreCase(tile.getPosition())) {
+                        buttons.add(Buttons.red(
+                                "removeThisTypeOfUnit_" + type.humanReadableName() + "_" + tile.getPosition() + "_"
+                                        + uH.getName(),
+                                type.humanReadableName() + " from " + tile.getRepresentation() + " in "
+                                        + uH.getName()));
+                    }
                 }
             }
         }

@@ -226,7 +226,7 @@ public class SpinRingsHelper {
     }
 
     private static void updateHomeSystem(Game game, Tile tile) {
-        if (!tile.isHomeSystem()) return;
+        if (!tile.isHomeSystem(game)) return;
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
             if (tile.getPosition().equals(player.getHomeSystemPosition())) {

@@ -96,10 +96,9 @@ public class CheckDistanceHelper {
                             || (player != null
                                     && FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
                                     && !player.hasTech("lwd")
-                                    && !player.hasTech("absol_lwd"))
-                            || (player != null
+                                    && !player.hasTech("absol_lwd")
                                     && tile2 != null
-                                    && ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2))
+                                    && !ButtonHelper.doesPlayerHaveFSHere("yssaril_flagship", player, tile2))
                             || (player != null
                                     && FoWHelper.otherPlayersHaveMovementBlockersInSystem(player, tile, game))
                             || (tile.isAsteroidField()

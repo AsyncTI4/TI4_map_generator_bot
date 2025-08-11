@@ -92,7 +92,7 @@ class SCPick extends GameStateSubcommand {
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
-        while (players.iterator().hasNext()) {
+        while (players.iterator().hasNext() && player.isRealPlayer()) {
             Player player_ = players.poll();
             if (player_ == player) {
                 nextCorrectPing = true;

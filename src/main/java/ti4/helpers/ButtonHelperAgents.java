@@ -1675,7 +1675,7 @@ public class ButtonHelperAgents {
         adjTiles.add(tile.getPosition());
         for (String adjTilePos : adjTiles) {
             Tile adjTile = game.getTileByPosition(adjTilePos);
-            if (adjTile.isHomeSystem()) {
+            if (adjTile.isHomeSystem(game)) {
                 continue;
             }
             for (UnitHolder unitHolder : adjTile.getPlanetUnitHolders()) {
@@ -2010,7 +2010,7 @@ public class ButtonHelperAgents {
             if (tile != null
                             && !FoWHelper.otherPlayersHaveShipsInSystem(player, tile, game)
                             && ButtonHelper.checkForTechSkips(game, planet)
-                    || tile.isHomeSystem()) {
+                    || tile.isHomeSystem(game)) {
                 buttons.add(Buttons.green(
                         "produceOneUnitInTile_" + tile.getPosition() + "_ZealotsAgent",
                         tile.getRepresentationForButtons(game, player)));

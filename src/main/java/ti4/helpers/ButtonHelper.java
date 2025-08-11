@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1871,7 +1871,7 @@ public class ButtonHelper {
         int nebula = 0;
         int totalNumber = 0;
         for (Tile tile : game.getTileMap().values()) {
-            if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isAnomaly() && !tile.isHomeSystem()) {
+            if (FoWHelper.playerHasUnitsInSystem(player, tile) && tile.isAnomaly() && !tile.isHomeSystem(game)) {
                 if (tile.isGravityRift(game) && grav < 1) {
                     grav = 1;
                 }
@@ -3684,7 +3684,7 @@ public class ButtonHelper {
             if (tile.isEdgeOfBoard(game)
                     && tile.getPosition().length() > 2
                     && (game.isDiscordantStarsMode() || FoWHelper.playerHasShipsInSystem(player, tile))) {
-                if (game.isAgeOfExplorationMode() && tile.isHomeSystem()) {
+                if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
                     continue;
                 }
                 buttons.add(Buttons.green(
@@ -3714,16 +3714,37 @@ public class ButtonHelper {
         String newTileID = buttonID.split("_")[1];
         String pos = buttonID.split("_")[2];
         List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(pos);
+        List<String> usedPos = new ArrayList<>();
         for (String pos2 : directlyAdjacentTiles) {
             Tile tile = game.getTileByPosition(pos2);
-            if (tile != null && tile.isEdgeOfBoard(game) && !pos2.equalsIgnoreCase(pos)) {
-                if (game.isAgeOfExplorationMode() && tile.isHomeSystem()) {
+            if (tile != null && tile.isEdgeOfBoard(game) && !pos2.equalsIgnoreCase(pos) && !usedPos.contains(pos2)) {
+                if (game.isAgeOfExplorationMode() && tile.isHomeSystem(game)) {
                     continue;
                 }
+                usedPos.add(pos2);
                 buttons.add(Buttons.green(
                         player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_" + tile.getPosition()
                                 + "_" + pos,
                         tile.getRepresentationForButtons(game, player)));
+            }
+
+            if (tile == null) {
+                for (String pos3 : PositionMapper.getAdjacentTilePositions(pos2)) {
+                    Tile tile2 = game.getTileByPosition(pos3);
+                    if (tile2 != null
+                            && tile2.isEdgeOfBoard(game)
+                            && !pos3.equalsIgnoreCase(pos)
+                            && !usedPos.contains(pos3)) {
+                        if (game.isAgeOfExplorationMode() && tile2.isHomeSystem(game)) {
+                            continue;
+                        }
+                        usedPos.add(pos3);
+                        buttons.add(Buttons.green(
+                                player.getFinsFactionCheckerPrefix() + "starChartsStep3_" + newTileID + "_"
+                                        + tile2.getPosition() + "_" + pos,
+                                tile2.getRepresentationForButtons(game, player)));
+                    }
+                }
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(
@@ -6683,7 +6704,8 @@ public class ButtonHelper {
                             player.getCorrectChannel(),
                             "Game needs "
                                     + AgendaHelper.getPlayersWhoNeedToPreVoted(game)
-                                            .size() + " more people to pre-vote before voting will start.");
+                                            .size()
+                                    + " more people to pre-vote before voting will start.");
                 }
             }
         }

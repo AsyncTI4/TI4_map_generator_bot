@@ -673,7 +673,7 @@ public class ListPlayerInfoService {
                 int count = 0;
                 for (String planet : player.getPlanets()) {
                     Tile tile = game.getTileFromPlanet(planet);
-                    if (tile != null && tile.isHomeSystem() && tile != player.getHomeSystemTile()) {
+                    if (tile != null && tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) {
                         count++;
                     }
                 }
@@ -683,7 +683,7 @@ public class ListPlayerInfoService {
                 int count = 0;
                 for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(
                         game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
-                    if ((tile.isHomeSystem() && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
+                    if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
                         count++;
                     }
                 }

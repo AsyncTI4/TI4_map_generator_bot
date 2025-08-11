@@ -279,7 +279,7 @@ public class ButtonHelperAbilities {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)
-                    || tile.isHomeSystem()
+                    || tile.isHomeSystem(game)
                     || ButtonHelper.isTileLegendary(tile)
                     || tile.isMecatol()
                     || tile.getPlanetUnitHolders().isEmpty()) {
@@ -1064,7 +1064,7 @@ public class ButtonHelperAbilities {
             }
             if (!planet.getTokenList().contains(Constants.GLEDGE_CORE_PNG)
                     && !Constants.MECATOLS.contains(planetName)
-                    && !tile.isHomeSystem()) {
+                    && !tile.isHomeSystem(game)) {
                 buttons.add(
                         Buttons.gray("mantleCrack_" + planetName, Helper.getPlanetRepresentation(planetName, game)));
             } else {
