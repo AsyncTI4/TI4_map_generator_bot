@@ -40,22 +40,22 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
         }
 
         game.setupNeutralPlayer(color);
-        MessageHelper.replyToMessage(event, "Neutral player has been set as " + color + "**" + ColorEmojis.getColorEmoji(color).toString().toUpperCase() + "**.");
+        MessageHelper.replyToMessage(
+                event,
+                "Neutral player has been set as " + color + "**"
+                        + ColorEmojis.getColorEmoji(color).toString().toUpperCase() + "**.");
     }
 
     public String pickNeutralColor(List<String> unusedColors) {
-        if (unusedColors.contains("gray"))
-        {
+        if (unusedColors.contains("gray")) {
             return "gray";
         }
         Random random = new Random();
         String colour;
-        for (int i=0; i<10; i++)
-        {
+        for (int i = 0; i < 10; i++) {
             int randomIndex = random.nextInt(unusedColors.size());
             colour = unusedColors.get(randomIndex);
-            if (!colour.contains("split"))
-            {
+            if (!colour.contains("split")) {
                 return colour;
             }
         }

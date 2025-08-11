@@ -593,7 +593,8 @@ public class ButtonHelperAgents {
                     + "Garv and Gunn, the Naaz-Rokha" + ssruuSlash + " agents.";
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game);
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(
+                    event.getMessageChannel(), "Please choose which planet you wish to explore.", buttons);
         }
 
         if ("augersagent".equalsIgnoreCase(agent)) {
@@ -830,16 +831,15 @@ public class ButtonHelperAgents {
             MessageHelper.sendMessageToChannel(channel, exhaustText);
             String faction = rest.replace("xxchaagent_", "");
             Player p2 = game.getPlayerFromColorOrFaction(faction);
-            message = p2.getRepresentationUnfogged() + 
-                    ", please choose the planet you wish to ready. Removing the infantry from your own planets is not automated but is an option for you to do.";
+            message = p2.getRepresentationUnfogged()
+                    + ", please choose the planet you wish to ready. Removing the infantry from your own planets is not automated but is an option for you to do.";
             List<Button> buttons = new ArrayList<>();
             for (String planet : p2.getExhaustedPlanets()) {
                 buttons.add(Buttons.gray(
                         "khraskHeroStep4Ready_" + p2.getFaction() + "_" + planet,
                         Helper.getPlanetRepresentation(planet, game)));
             }
-            MessageHelper.sendMessageToChannelWithButtons(
-                    p2.getCorrectChannel(), message, buttons);
+            MessageHelper.sendMessageToChannelWithButtons(p2.getCorrectChannel(), message, buttons);
         }
 
         if ("redcreussagent".equalsIgnoreCase(agent)) {
@@ -871,8 +871,8 @@ public class ButtonHelperAgents {
             if (p2 == null) return;
             MessageHelper.sendMessageToChannelWithButtons(
                     event.getMessageChannel(),
-                    p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever + "Brother Milor, the Yin"
-                            + ssruuSlash + " agent.",
+                    p2.getRepresentationUnfogged() + ", use buttons to resolve " + ssruuClever
+                            + "Brother Milor, the Yin" + ssruuSlash + " agent.",
                     getYinAgentButtons(p2, game, pos));
         }
 
@@ -2120,8 +2120,8 @@ public class ButtonHelperAgents {
         int infAmount = player.getCommoditiesTotal() - 1;
         List<Button> buttons = new ArrayList<>(
                 Helper.getPlanetPlaceUnitButtons(kyro, game, infAmount + "gf", "placeOneNDone_skipbuild"));
-        String message =
-                kyro.getRepresentationUnfogged() + ", please choose the planet you wish to drop " + infAmount + " infantry upon.";
+        String message = kyro.getRepresentationUnfogged() + ", please choose the planet you wish to drop " + infAmount
+                + " infantry upon.";
         MessageHelper.sendMessageToChannelWithButtons(kyro.getCorrectChannel(), message, buttons);
     }
 
@@ -2476,7 +2476,8 @@ public class ButtonHelperAgents {
                             + "Shipmonger Zsknck, the Axis"
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             buttons.addAll(Helper.getTileWithShipsPlaceUnitButtons(player, game, "cruiser", "placeOneNDone_skipbuild"));
-            message = player.getRepresentationUnfogged() + ", please choose the system containing your ships where you wish to place a cruiser.";
+            message = player.getRepresentationUnfogged()
+                    + ", please choose the system containing your ships where you wish to place a cruiser.";
         } else {
             MessageHelper.sendMessageToChannel(
                     event.getChannel(),
@@ -2486,10 +2487,10 @@ public class ButtonHelperAgents {
                             + (player.hasUnexhaustedLeader("yssarilagent") ? "/Yssaril" : "") + " agent.");
             buttons.addAll(
                     Helper.getTileWithShipsPlaceUnitButtons(player, game, "destroyer", "placeOneNDone_skipbuild"));
-            message = player.getRepresentationUnfogged() + ", please choose the system containing your ships where you wish to place a destroyer.";
+            message = player.getRepresentationUnfogged()
+                    + ", please choose the system containing your ships where you wish to place a destroyer.";
         }
-        MessageHelper.sendMessageToChannelWithButtons(
-                event.getChannel(), message, buttons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         ButtonHelper.deleteMessage(event);
     }
 
