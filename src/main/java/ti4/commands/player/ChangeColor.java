@@ -56,6 +56,6 @@ class ChangeColor extends GameStateSubcommand {
         String oldRepresentation = player.getRepresentationNoPing();
         ColorChangeHelper.changePlayerColor(game, player, oldColor, newColor);
         MessageHelper.sendMessageToEventChannel(
-                event, oldRepresentation + " changed color to " + player.getRepresentationNoPing());
+                event, oldRepresentation + " changed color to " + player.getRepresentationNoPing() + ".");
     }
 }

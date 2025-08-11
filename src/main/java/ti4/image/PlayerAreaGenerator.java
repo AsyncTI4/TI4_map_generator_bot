@@ -1072,6 +1072,8 @@ public class PlayerAreaGenerator {
                 String fac = leaderModel.getFaction();
                 if (leader.getId().contains("redcreuss")) {
                     fac = "redcreuss";
+                } else if (leader.getId().contains("orlandohero")) {
+                    fac = "bastion";
                 }
                 drawFactionIconImage(graphics, fac, x + deltaX - 1, y + 108, 42, 42);
             }
