@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.ColorModel;
+import ti4.service.emoji.ColorEmojis;
 
 public class SetupNeutralPlayer extends GameStateSubcommand {
 
@@ -39,12 +40,27 @@ public class SetupNeutralPlayer extends GameStateSubcommand {
         }
 
         game.setupNeutralPlayer(color);
-        MessageHelper.replyToMessage(event, "Neutral player has been set as " + color + ".");
+        MessageHelper.replyToMessage(
+                event,
+                "Neutral player has been set as " + color + "**"
+                        + ColorEmojis.getColorEmoji(color).toString().toUpperCase() + "**.");
     }
 
     public String pickNeutralColor(List<String> unusedColors) {
+        if (unusedColors.contains("gray")) {
+            return "gray";
+        }
         Random random = new Random();
+        String colour;
+        for (int i = 0; i < 10; i++) {
+            int randomIndex = random.nextInt(unusedColors.size());
+            colour = unusedColors.get(randomIndex);
+            if (!colour.contains("split")) {
+                return colour;
+            }
+        }
         int randomIndex = random.nextInt(unusedColors.size());
-        return unusedColors.get(randomIndex);
+        colour = unusedColors.get(randomIndex);
+        return colour;
     }
 }
