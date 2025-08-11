@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -51,8 +52,7 @@ import ti4.service.regex.RegexService;
 public class TacticalActionService {
 
     public void reverseAllUnitMovement(ButtonInteractionEvent event, Game game, Player player) {
-        Set<String> displacedKeys =
-                new HashSet<>(game.getTacticalActionDisplacement().keySet());
+        Set<String> displacedKeys = new HashSet<>(game.getTacticalActionDisplacement().keySet());
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
 
         boolean unkEncountered = false;
@@ -74,27 +74,29 @@ public class TacticalActionService {
 
         // Handle output
         MessageHelper.sendMessageToEventChannel(
-                event, player.fogSafeEmoji() + " put all units back where they started.");
+            event, player.fogSafeEmoji() + " put all units back where they started.");
         if (unkEncountered)
             MessageHelper.sendMessageToEventChannel(
-                    event,
-                    player.fogSafeEmoji()
-                            + " some units could not be put back... You can put them back manually after movement.");
+                event,
+                player.fogSafeEmoji()
+                    + " some units could not be put back... You can put them back manually after movement.");
         TacticalActionOutputService.refreshButtonsAndMessageForChoosingTile(event, game, player);
     }
 
     public void reverseTileUnitMovement(
-            ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
+        ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove
+    ) {
         reverseTileUnitMovement(event, game, player, tile, moveOrRemove, false);
     }
 
     public void reverseTileUnitMovement(
-            ButtonInteractionEvent event,
-            Game game,
-            Player player,
-            Tile tile,
-            String moveOrRemove,
-            boolean skipOutput) {
+        ButtonInteractionEvent event,
+        Game game,
+        Player player,
+        Tile tile,
+        String moveOrRemove,
+        boolean skipOutput
+    ) {
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
         for (UnitHolder uh : tile.getUnitHolders().values()) {
             String key = tile.getPosition() + "-" + uh.getName();
@@ -110,7 +112,8 @@ public class TacticalActionService {
     }
 
     public void moveAllFromTile(
-            ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
+        ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove
+    ) {
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
 
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
@@ -126,8 +129,8 @@ public class TacticalActionService {
                     if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
                         for (Player p2 : game.getRealPlayers()) {
                             if (p2.unitBelongsToPlayer(unitKey)
-                                    && player.getAllianceMembers().contains(p2.getFaction())
-                                    && !tile.hasPlayerCC(p2)) {
+                                && player.getAllianceMembers().contains(p2.getFaction())
+                                && !tile.hasPlayerCC(p2)) {
                                 belongsToUnlockedAlly = true;
                             }
                         }
@@ -148,7 +151,8 @@ public class TacticalActionService {
     }
 
     public void moveAllShipsFromTile(
-            ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
+        ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove
+    ) {
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
 
         UnitHolder uh = tile.getSpaceUnitHolder();
@@ -162,8 +166,8 @@ public class TacticalActionService {
                 if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
                     for (Player p2 : game.getRealPlayers()) {
                         if (p2.unitBelongsToPlayer(unitKey)
-                                && player.getAllianceMembers().contains(p2.getFaction())
-                                && !tile.hasPlayerCC(p2)) {
+                            && player.getAllianceMembers().contains(p2.getFaction())
+                            && !tile.hasPlayerCC(p2)) {
                             belongsToUnlockedAlly = true;
                         }
                     }
@@ -182,23 +186,23 @@ public class TacticalActionService {
     }
 
     public void moveSingleUnit(
-            ButtonInteractionEvent event,
-            Game game,
-            Player player,
-            Tile tile,
-            String planetName,
-            UnitType type,
-            int amt,
-            UnitState state,
-            String moveOrRemove,
-            String color) {
+        ButtonInteractionEvent event,
+        Game game,
+        Player player,
+        Tile tile,
+        String planetName,
+        UnitType type,
+        int amt,
+        UnitState state,
+        String moveOrRemove,
+        String color
+    ) {
         UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getUnitHolderFromPlanet(planetName);
         if (uh == null) return;
         String uhKey = tile.getPosition() + "-" + uh.getName();
 
         // setup a fake unitholder to take advantage of that code
-        Map<UnitKey, List<Integer>> displaced =
-                game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
+        Map<UnitKey, List<Integer>> displaced = game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
         UnitHolder fakeUh = new Space("fake", null);
         String pColor = player.getColor();
         if (color != null && !color.isEmpty()) {
@@ -218,23 +222,23 @@ public class TacticalActionService {
     }
 
     public void reverseSingleUnit(
-            ButtonInteractionEvent event,
-            Game game,
-            Player player,
-            Tile tile,
-            String planetName,
-            UnitType type,
-            int amt,
-            UnitState state,
-            String moveOrRemove,
-            String color) {
+        ButtonInteractionEvent event,
+        Game game,
+        Player player,
+        Tile tile,
+        String planetName,
+        UnitType type,
+        int amt,
+        UnitState state,
+        String moveOrRemove,
+        String color
+    ) {
         UnitHolder uh = planetName == null ? tile.getSpaceUnitHolder() : tile.getUnitHolderFromPlanet(planetName);
         if (uh == null) return;
         String uhKey = tile.getPosition() + "-" + uh.getName();
 
         // Get the data
-        Map<UnitKey, List<Integer>> displaced =
-                game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
+        Map<UnitKey, List<Integer>> displaced = game.getTacticalActionDisplacement().getOrDefault(uhKey, new HashMap<>());
         String pColor = player.getColor();
         if (color != null && !color.isEmpty()) {
             pColor = color;
@@ -268,11 +272,11 @@ public class TacticalActionService {
 
     public boolean spendAndPlaceTokenIfNecessary(ButtonInteractionEvent event, Game game, Player player, Tile tile) {
         boolean skipPlacingAbilities = game.isNaaluAgent()
-                || game.isL1Hero()
-                || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
+            || game.isL1Hero()
+            || (!game.getStoredValue("hiredGunsInPlay").isEmpty() && player != game.getActivePlayer());
         if (!skipPlacingAbilities
-                && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
-                && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
+            && !CommandCounterHelper.hasCC(event, player.getColor(), tile)
+            && game.getStoredValue("vaylerianHeroActive").isEmpty()) {
             if (!game.getStoredValue("absolLux").isEmpty()) {
                 player.setTacticalCC(player.getTacticalCC() + 1);
             }
@@ -289,15 +293,14 @@ public class TacticalActionService {
             tile = FlipTileService.flipTileIfNeeded(event, tile, game);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(
-                        event.getMessageChannel(), "Failed to flip the Wormhole Nexus. Please yell at Jazzxhands");
+                    event.getMessageChannel(), "Failed to flip the Wormhole Nexus. Please yell at Jazzxhands");
                 return false;
             }
         }
 
         boolean moved = false;
         UnitHolder activeSystemSpace = tile.getSpaceUnitHolder();
-        for (Entry<String, Map<UnitKey, List<Integer>>> e :
-                game.getTacticalActionDisplacement().entrySet()) {
+        for (Entry<String, Map<UnitKey, List<Integer>>> e : game.getTacticalActionDisplacement().entrySet()) {
             for (Entry<UnitKey, List<Integer>> unit : e.getValue().entrySet()) {
                 if (unit.getValue().stream().collect(Collectors.summingInt(x -> x)) > 0) moved = true;
                 activeSystemSpace.addUnitsWithStates(unit.getKey(), unit.getValue());
@@ -312,7 +315,7 @@ public class TacticalActionService {
             FOWPlusService.resolveVoidActivation(player, game);
             Button conclude = Buttons.red(player.finChecker() + "doneWithTacticalAction", "Conclude Tactical Action");
             MessageHelper.sendMessageToChannelWithButton(
-                    player.getCorrectChannel(), "All units were lost to The Void.", conclude);
+                player.getCorrectChannel(), "All units were lost to The Void.", conclude);
             ButtonHelper.deleteAllButtons(event);
             return;
         }
@@ -323,25 +326,24 @@ public class TacticalActionService {
         tile = game.getTileByPosition(tile.getPosition());
         spendAndPlaceTokenIfNecessary(event, game, player, tile);
         boolean hasGfsInRange = game.playerHasLeaderUnlockedOrAlliance(player, "sardakkcommander")
-                || tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
-                || tile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0;
+            || tile.getSpaceUnitHolder().getUnitCount(UnitType.Infantry, player) > 0
+            || tile.getSpaceUnitHolder().getUnitCount(UnitType.Mech, player) > 0;
 
         List<Button> systemButtons;
         String message = "Moved all units to the space area.";
         if (!unitsWereMoved && !hasGfsInRange) {
-            message =
-                    "Nothing moved. Use buttons to decide if you wish to build (if you can), or finish the activation.";
+            message = "Nothing moved. Use buttons to decide if you wish to build (if you can), or finish the activation.";
             game.setStoredValue(
-                    "currentActionSummary" + player.getFaction(),
-                    game.getStoredValue("currentActionSummary" + player.getFaction()) + " Did not move units.");
+                "currentActionSummary" + player.getFaction(),
+                game.getStoredValue("currentActionSummary" + player.getFaction()) + " Did not move units.");
             systemButtons = getBuildButtons(event, game, player, tile);
         } else {
             systemButtons = getLandingTroopsButtons(game, player, tile);
             if (unitsWereMoved) {
                 ButtonHelperTacticalAction.resolveAfterMovementEffects(event, game, player, tile, unitsWereMoved);
                 game.setStoredValue(
-                        "currentActionSummary" + player.getFaction(),
-                        game.getStoredValue("currentActionSummary" + player.getFaction()) + " Moved ships there.");
+                    "currentActionSummary" + player.getFaction(),
+                    game.getStoredValue("currentActionSummary" + player.getFaction()) + " Moved ships there.");
             }
         }
 
@@ -384,9 +386,9 @@ public class TacticalActionService {
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
             buttons.add(Buttons.green(
-                    player.finChecker() + "getRiftButtons_" + tile.getPosition(),
-                    "Units Travelled Through Gravity Rift",
-                    MiscEmojis.GravityRift));
+                player.finChecker() + "getRiftButtons_" + tile.getPosition(),
+                "Units Travelled Through Gravity Rift",
+                MiscEmojis.GravityRift));
         }
         if (player.hasUnexhaustedLeader("sardakkagent")) {
             buttons.addAll(ButtonHelperAgents.getSardakkAgentButtons(game));
@@ -395,9 +397,8 @@ public class TacticalActionService {
             buttons.addAll(ButtonHelperAgents.getMercerAgentInitialButtons(game, player));
         }
         if (player.hasAbility("shroud_of_lith")
-                && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
-                                .size()
-                        > 1) {
+            && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
+                .size() > 1) {
             buttons.add(Buttons.blue("shroudOfLithStart", "Use Shroud of Lith", FactionEmojis.kollecc));
         }
         buttons.add(Buttons.red(player.finChecker() + "doneWithTacticalAction", "Conclude Tactical Action"));
@@ -409,24 +410,24 @@ public class TacticalActionService {
         List<Button> buttons = new ArrayList<>();
         for (Map.Entry<String, Tile> tileEntry : new HashMap<>(game.getTileMap()).entrySet()) {
             boolean movedFrom = game.getTacticalActionDisplacement().keySet().stream()
-                    .anyMatch(s -> s.startsWith(tileEntry.getValue().getPosition() + "-"));
+                .anyMatch(s -> s.startsWith(tileEntry.getValue().getPosition() + "-"));
             boolean hasUnits = FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue());
             for (Player p2 : game.getRealPlayers()) {
                 if (player.getAllianceMembers().contains(p2.getFaction())) {
                     if (FoWHelper.playerHasUnitsInSystem(p2, tileEntry.getValue())
-                            && !CommandCounterHelper.hasCC(event, p2.getColor(), tileEntry.getValue())) {
+                        && !CommandCounterHelper.hasCC(event, p2.getColor(), tileEntry.getValue())) {
                         hasUnits = true;
                     }
                 }
             }
             if ((movedFrom || hasUnits)
-                    && (!CommandCounterHelper.hasCC(event, player.getColor(), tileEntry.getValue())
-                            || ButtonHelper.nomadHeroAndDomOrbCheck(player, game))) {
+                && (!CommandCounterHelper.hasCC(event, player.getColor(), tileEntry.getValue())
+                    || ButtonHelper.nomadHeroAndDomOrbCheck(player, game))) {
                 Tile tile = tileEntry.getValue();
                 buttons.add(Buttons.green(
-                        player.finChecker() + "tacticalMoveFrom_" + tileEntry.getKey(),
-                        tile.getRepresentationForButtons(game, player),
-                        tile.getTileEmoji(player)));
+                    player.finChecker() + "tacticalMoveFrom_" + tileEntry.getKey(),
+                    tile.getRepresentationForButtons(game, player),
+                    tile.getTileEmoji(player)));
             }
         }
 
@@ -437,9 +438,9 @@ public class TacticalActionService {
             buttons.add(Buttons.gray("exhaustAgent_belkoseaagent", "Use Belkosea Agent", FactionEmojis.belkosea));
         }
         if (player.hasUnexhaustedLeader("qhetagent")
-                && active != null
-                && !active.isHomeSystem(game)
-                && FoWHelper.otherPlayersHaveShipsInSystem(player, active, game)) {
+            && active != null
+            && !active.isHomeSystem(game)
+            && FoWHelper.otherPlayersHaveShipsInSystem(player, active, game)) {
             buttons.add(Buttons.gray("exhaustAgent_qhetagent", "Use Qhet Agent", FactionEmojis.qhet));
         }
         if (player.hasRelic("dominusorb")) {
@@ -451,7 +452,7 @@ public class TacticalActionService {
 
         if (player.hasRelicReady("absol_luxarchtreatise")) {
             buttons.add(Buttons.gray(
-                    "exhaustRelic_absol_luxarchtreatise", "Exhaust Luxarch Treatise", ExploreEmojis.Relic));
+                "exhaustRelic_absol_luxarchtreatise", "Exhaust Luxarch Treatise", ExploreEmojis.Relic));
         }
         if (player.hasUnexhaustedLeader("ghostagent") && FoWHelper.doesTileHaveWHs(game, game.getActiveSystem())) {
             buttons.add(Buttons.gray("exhaustAgent_ghostagent", "Use Creuss Agent", FactionEmojis.Ghost));
@@ -461,11 +462,11 @@ public class TacticalActionService {
         }
         if (player.hasTech("dstoldb")) {
             buttons.add(Buttons.gray(
-                    "declareUse_Emergency Modifications", "Emergency Modifications", FactionEmojis.toldar));
+                "declareUse_Emergency Modifications", "Emergency Modifications", FactionEmojis.toldar));
         }
         if (player.hasTech("dspharb")) {
             buttons.add(Buttons.gray(
-                    "declareUse_Reality Field Impactor", "Declare Reality Field Impactor", FactionEmojis.pharadn));
+                "declareUse_Reality Field Impactor", "Declare Reality Field Impactor", FactionEmojis.pharadn));
         }
         if (player.hasTech("baldrick_gd")) {
             buttons.add(Buttons.gray("exhaustTech_baldrick_gd", "Exhaust Gravity Drive", SourceEmojis.IgnisAurora));
@@ -475,44 +476,44 @@ public class TacticalActionService {
         }
         if (player.hasTech("baldrick_lwd")) {
             buttons.add(
-                    Buttons.gray("exhaustTech_baldrick_lwd", "Exhaust Light/Wave Deflector", SourceEmojis.IgnisAurora));
+                Buttons.gray("exhaustTech_baldrick_lwd", "Exhaust Light/Wave Deflector", SourceEmojis.IgnisAurora));
         }
         if (player.getTechs().contains("dsgledb")) {
             buttons.add(Buttons.green(
-                    player.finChecker() + "declareUse_Lightning", "Declare Lightning Drives", FactionEmojis.gledge));
+                player.finChecker() + "declareUse_Lightning", "Declare Lightning Drives", FactionEmojis.gledge));
         }
         if (player.getTechs().contains("dsvadeb") && !player.getExhaustedTechs().contains("dsvadeb")) {
             buttons.add(Buttons.green(
-                    player.finChecker() + "exhaustTech_dsvadeb", "Exhaust Midas Turbine", FactionEmojis.vaden));
+                player.finChecker() + "exhaustTech_dsvadeb", "Exhaust Midas Turbine", FactionEmojis.vaden));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "vayleriancommander")) {
             buttons.add(
-                    Buttons.gray("declareUse_Vaylerian Commander", "Use Vaylerian Commander", FactionEmojis.vaylerian));
+                Buttons.gray("declareUse_Vaylerian Commander", "Use Vaylerian Commander", FactionEmojis.vaylerian));
         }
         if (player.hasLeaderUnlocked("vaylerianhero")) {
             buttons.add(Buttons.blue(
-                    player.finChecker() + "purgeVaylerianHero", "Use Vaylerian Hero", FactionEmojis.vaylerian));
+                player.finChecker() + "purgeVaylerianHero", "Use Vaylerian Hero", FactionEmojis.vaylerian));
         }
         if (active != null && !active.isHomeSystem(game) && player.hasLeaderUnlocked("uydaihero")) {
             buttons.add(
-                    Buttons.blue(player.finChecker() + "purgeUydaiHero", "Use Uydai Hero", FactionEmojis.vaylerian));
+                Buttons.blue(player.finChecker() + "purgeUydaiHero", "Use Uydai Hero", FactionEmojis.vaylerian));
         }
         if (player.ownsUnit("ghost_mech") && ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "mech") > 0) {
             buttons.add(Buttons.gray("creussMechStep1_", "Use Creuss Mech", FactionEmojis.Ghost));
         }
         if ((player.ownsUnit("nivyn_mech")
-                        && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)
-                                .contains(active))
-                || player.ownsUnit("nivyn_mech2")) {
+            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Mech)
+                .contains(active))
+            || player.ownsUnit("nivyn_mech2")) {
             buttons.add(Buttons.gray("nivynMechStep1_", "Use Nivyn Mech", FactionEmojis.nivyn));
         }
         if (active != null && player.hasTech("dslihb") && !active.isHomeSystem(game)) {
             buttons.add(Buttons.gray("exhaustTech_dslihb", "Exhaust Wraith Engine", FactionEmojis.lizho));
         }
         if (player.getPlanets().contains("eko")
-                && !player.getExhaustedPlanetsAbilities().contains("eko")) {
+            && !player.getExhaustedPlanetsAbilities().contains("eko")) {
             buttons.add(Buttons.gray(
-                    player.finChecker() + "planetAbilityExhaust_" + "eko", "Use Eko's Ability To Ignore Anomalies"));
+                player.finChecker() + "planetAbilityExhaust_" + "eko", "Use Eko's Ability To Ignore Anomalies"));
         }
 
         buttons.add(Buttons.red(player.finChecker() + "concludeMove_" + game.getActiveSystem(), "Done moving"));
@@ -527,11 +528,11 @@ public class TacticalActionService {
 
         UnitHolder space = tile.getSpaceUnitHolder();
         boolean hasMechInReinforcements = ButtonHelperFactionSpecific.vortexButtonAvailable(
-                game, Units.getUnitKey(UnitType.Mech, player.getColor()));
+            game, Units.getUnitKey(UnitType.Mech, player.getColor()));
 
         List<UnitType> committable = new ArrayList<>(List.of(UnitType.Mech, UnitType.Infantry));
         boolean naaluFS = (player.hasUnit("naalu_flagship") || player.hasUnit("sigma_naalu_flagship_2"))
-                && space.getUnitCount(UnitType.Flagship, player) > 0;
+            && space.getUnitCount(UnitType.Flagship, player) > 0;
         boolean belkoFF = player.hasUnit("belkosea_fighter") || player.hasUnit("belkosea_fighter2");
         if (naaluFS || belkoFF) committable.add(UnitType.Fighter);
 
@@ -556,8 +557,7 @@ public class TacticalActionService {
                         }
                         if (planet.getUnitCountForState(gf, player, state) >= x) {
                             String id = unlandPrefix + x + gf.getValue() + "_" + planetName + "_" + player.getColor();
-                            String label =
-                                    "Un-land " + x + stateStr + " " + gf.humanReadableName() + " from " + planetRep;
+                            String label = "Un-land " + x + stateStr + " " + gf.humanReadableName() + " from " + planetRep;
                             unlandUnitButtons.add(Buttons.gray(id, label, gf.getUnitTypeEmoji()));
                         }
                         for (Player p2 : game.getRealPlayers()) {
@@ -566,14 +566,13 @@ public class TacticalActionService {
                                 if (space.getUnitCountForState(gf, p2, state) >= x) {
                                     String id = landPrefix + x + gf.getValue() + "_" + planetName + "_" + p2.getColor();
                                     String label = "Land " + x + color + stateStr + " " + gf.humanReadableName()
-                                            + " on " + planetRep;
+                                        + " on " + planetRep;
                                     buttons.add(Buttons.red(id, label, gf.getUnitTypeEmoji()));
                                 }
                                 if (planet.getUnitCountForState(gf, p2, state) >= x) {
-                                    String id =
-                                            unlandPrefix + x + gf.getValue() + "_" + planetName + "_" + p2.getColor();
+                                    String id = unlandPrefix + x + gf.getValue() + "_" + planetName + "_" + p2.getColor();
                                     String label = "Un-land " + x + color + stateStr + " " + gf.humanReadableName()
-                                            + " from " + planetRep;
+                                        + " from " + planetRep;
                                     unlandUnitButtons.add(Buttons.gray(id, label, gf.getUnitTypeEmoji()));
                                 }
                             }
@@ -592,7 +591,7 @@ public class TacticalActionService {
             }
 
             boolean tnelis = player.hasUnit("tnelis_mech")
-                    && tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, player) > 0;
+                && tile.getSpaceUnitHolder().getUnitCount(UnitType.Destroyer, player) > 0;
             if (tnelis && hasMechInReinforcements) {
                 String id = "tnelisDeploy_" + planetName;
                 String label = "Deploy Mech on " + planetRep;
@@ -611,99 +610,98 @@ public class TacticalActionService {
         }
         if (!game.getStoredValue("possiblyUsedRift").isEmpty()) {
             buttons.add(Buttons.green(
-                    player.finChecker() + "getRiftButtons_" + tile.getPosition(),
-                    "Units Travelled Through Gravity Rift",
-                    MiscEmojis.GravityRift));
+                player.finChecker() + "getRiftButtons_" + tile.getPosition(),
+                "Units Travelled Through Gravity Rift",
+                MiscEmojis.GravityRift));
         }
         if (player.hasAbility("combat_drones") && FoWHelper.playerHasFightersInSystem(player, tile)) {
             buttons.add(Buttons.blue(
-                    player.finChecker() + "combatDrones", "Use Combat Drones Ability", FactionEmojis.mirveda));
+                player.finChecker() + "combatDrones", "Use Combat Drones Ability", FactionEmojis.mirveda));
         }
         if (player.hasAbility("shroud_of_lith")
-                && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
-                                .size()
-                        > 1) {
+            && ButtonHelperFactionSpecific.getKolleccReleaseButtons(player, game)
+                .size() > 1) {
             buttons.add(Buttons.blue("shroudOfLithStart", "Use Shroud of Lith", FactionEmojis.kollecc));
             buttons.add(Buttons.gray("refreshLandingButtons", "Refresh Landing Buttons", FactionEmojis.kollecc));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "mirvedacommander")) {
             buttons.add(Buttons.blue(
-                    player.finChecker() + "offerMirvedaCommander", "Use Mirveda Commander", FactionEmojis.mirveda));
+                player.finChecker() + "offerMirvedaCommander", "Use Mirveda Commander", FactionEmojis.mirveda));
         }
         if (game.playerHasLeaderUnlockedOrAlliance(player, "ghostcommander")) {
             buttons.add(Buttons.blue(
-                    player.finChecker() + "placeGhostCommanderFF_" + tile.getPosition(),
-                    "Place Fighter with Creuss Commander",
-                    FactionEmojis.Ghost));
+                player.finChecker() + "placeGhostCommanderFF_" + tile.getPosition(),
+                "Place Fighter with Creuss Commander",
+                FactionEmojis.Ghost));
         }
         if (!tile.getPlanetUnitHolders().isEmpty()
-                && game.playerHasLeaderUnlockedOrAlliance(player, "khraskcommander")) {
+            && game.playerHasLeaderUnlockedOrAlliance(player, "khraskcommander")) {
             buttons.add(Buttons.blue(
-                    player.finChecker() + "placeKhraskCommanderInf_" + tile.getPosition(),
-                    "Place Infantry with Khrask Commander",
-                    FactionEmojis.khrask));
+                player.finChecker() + "placeKhraskCommanderInf_" + tile.getPosition(),
+                "Place Infantry with Khrask Commander",
+                FactionEmojis.khrask));
         }
         if (player.hasUnexhaustedLeader("nokaragent") && FoWHelper.playerHasShipsInSystem(player, tile)) {
             buttons.add(Buttons.gray(
-                    "exhaustAgent_nokaragent_" + player.getFaction(),
-                    "Use Nokar Agent to Place 1 Destroyer",
-                    FactionEmojis.nokar));
+                "exhaustAgent_nokaragent_" + player.getFaction(),
+                "Use Nokar Agent to Place 1 Destroyer",
+                FactionEmojis.nokar));
         }
         if (player.hasUnexhaustedLeader("tnelisagent")
-                && FoWHelper.playerHasShipsInSystem(player, tile)
-                && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
+            && FoWHelper.playerHasShipsInSystem(player, tile)
+            && FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
             buttons.add(Buttons.gray(
-                    "exhaustAgent_tnelisagent_" + player.getFaction(), "Use Tnelis Agent", FactionEmojis.tnelis));
+                "exhaustAgent_tnelisagent_" + player.getFaction(), "Use Tnelis Agent", FactionEmojis.tnelis));
         }
         if (player.hasUnexhaustedLeader("zelianagent")
-                && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
+            && tile.getUnitHolders().get("space").getUnitCount(UnitType.Infantry, player.getColor()) > 0) {
             buttons.add(Buttons.gray(
-                    "exhaustAgent_zelianagent_" + player.getFaction(),
-                    "Use Zelian Agent Yourself",
-                    FactionEmojis.zelian));
+                "exhaustAgent_zelianagent_" + player.getFaction(),
+                "Use Zelian Agent Yourself",
+                FactionEmojis.zelian));
         }
         if (player.hasLeaderUnlocked("muaathero")
-                && !tile.isMecatol()
-                && !tile.isHomeSystem()
-                && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
-                        .contains(tile)) {
+            && !tile.isMecatol()
+            && !tile.isHomeSystem(game)
+            && ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Warsun)
+                .contains(tile)) {
             buttons.add(Buttons.blue(
-                    player.finChecker() + "novaSeed_" + tile.getPosition(),
-                    "Nova Seed This Tile",
-                    FactionEmojis.Muaat));
+                player.finChecker() + "novaSeed_" + tile.getPosition(),
+                "Nova Seed This Tile",
+                FactionEmojis.Muaat));
         }
         if (player.hasLeaderUnlocked("zelianhero")
-                && !tile.isMecatol()
-                && ButtonHelper.getTilesOfUnitsWithBombard(player, game).contains(tile)) {
+            && !tile.isMecatol()
+            && ButtonHelper.getTilesOfUnitsWithBombard(player, game).contains(tile)) {
             buttons.add(Buttons.blue(
-                    player.finChecker() + "celestialImpact_" + tile.getPosition(),
-                    "Celestial Impact This Tile",
-                    FactionEmojis.zelian));
+                player.finChecker() + "celestialImpact_" + tile.getPosition(),
+                "Celestial Impact This Tile",
+                FactionEmojis.zelian));
         }
         if (player.hasLeaderUnlocked("sardakkhero")
-                && !tile.getPlanetUnitHolders().isEmpty()) {
+            && !tile.getPlanetUnitHolders().isEmpty()) {
             buttons.add(
-                    Buttons.blue(player.finChecker() + "purgeSardakkHero", "Use N'orr Hero", FactionEmojis.Sardakk));
+                Buttons.blue(player.finChecker() + "purgeSardakkHero", "Use N'orr Hero", FactionEmojis.Sardakk));
         }
         if (player.hasLeaderUnlocked("atokeraherp")
-                && !tile.getPlanetUnitHolders().isEmpty()) {
+            && !tile.getPlanetUnitHolders().isEmpty()) {
             buttons.add(
-                    Buttons.blue(player.finChecker() + "purgeAtokeraHero", "Use Atokera Hero", FactionEmojis.atokera));
+                Buttons.blue(player.finChecker() + "purgeAtokeraHero", "Use Atokera Hero", FactionEmojis.atokera));
         }
         if (player.hasLeaderUnlocked("rohdhnahero")) {
             buttons.add(
-                    Buttons.blue(player.finChecker() + "purgeRohdhnaHero", "Use Roh'Dhna Hero", FactionEmojis.rohdhna));
+                Buttons.blue(player.finChecker() + "purgeRohdhnaHero", "Use Roh'Dhna Hero", FactionEmojis.rohdhna));
         }
         if (tile.getUnitHolders().size() > 1
-                && ButtonHelper.getTilesOfUnitsWithBombard(player, game).contains(tile)) {
+            && ButtonHelper.getTilesOfUnitsWithBombard(player, game).contains(tile)) {
             if (tile.getUnitHolders().size() > 2) {
                 buttons.add(Buttons.gray(
-                        "bombardConfirm_combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment,
-                        "Roll BOMBARDMENT"));
+                    "bombardConfirm_combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment,
+                    "Roll BOMBARDMENT"));
             } else {
                 buttons.add(Buttons.gray(
-                        "combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment,
-                        "Roll BOMBARDMENT"));
+                    "combatRoll_" + tile.getPosition() + "_space_" + CombatRollType.bombardment,
+                    "Roll BOMBARDMENT"));
             }
         }
 

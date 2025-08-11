@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import lombok.experimental.UtilityClass;
 import ti4.map.Game;
 import ti4.map.Player;
@@ -17,15 +18,15 @@ import ti4.service.fow.FowCommunicationThreadService;
 public class SpinRingsHelper {
     private static final String DEFAULT_MSG = "Spun the rings";
     private static final List<String> STATUS_MSGS = Arrays.asList(
-            "Shifted the cosmic rings",
-            "Aligned the stellar orbits",
-            "Twisted the galactic core",
-            "Rearranged the celestial dance",
-            "Tilted the astral axis",
-            "Rotated the planetary rings",
-            "Adjusted the star-bound gyroscope",
-            "Spiraled the galactic arms",
-            "Warped the orbital paths");
+        "Shifted the cosmic rings",
+        "Aligned the stellar orbits",
+        "Twisted the galactic core",
+        "Rearranged the celestial dance",
+        "Tilted the astral axis",
+        "Rotated the planetary rings",
+        "Adjusted the star-bound gyroscope",
+        "Spiraled the galactic arms",
+        "Warped the orbital paths");
 
     private static final String CW = "cw";
     private static final String CCW = "ccw";
@@ -127,7 +128,7 @@ public class SpinRingsHelper {
                     String fromPosition = tile.getPosition();
                     tile.setPosition(ring + (pos < 10 ? "0" : "") + pos);
                     if (game.getCustomHyperlaneData().get(fromPosition) != null) {
-                        customHyperlanesToMove.add(new String[] {fromPosition, tile.getPosition()});
+                        customHyperlanesToMove.add(new String[] { fromPosition, tile.getPosition() });
                     }
                     tilesToSet.add(tile);
                     updateHomeSystem(game, tile);
@@ -226,7 +227,7 @@ public class SpinRingsHelper {
     }
 
     private static void updateHomeSystem(Game game, Tile tile) {
-        if (!tile.isHomeSystem()) return;
+        if (!tile.isHomeSystem(game)) return;
 
         for (Player player : game.getRealAndEliminatedAndDummyPlayers()) {
             if (tile.getPosition().equals(player.getHomeSystemPosition())) {
