@@ -3,6 +3,7 @@ package ti4.buttons.handlers.actioncards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -38,19 +39,19 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveDataArchive(Player player, Game game, ButtonInteractionEvent event) {
         List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, game, true);
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", use buttons to explore planet #1.",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentation() + ", use buttons to explore planet #1.",
+            buttons);
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", use buttons to explore planet #2 (different planet from #1).",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentation() + ", use buttons to explore planet #2 (different planet from #1).",
+            buttons);
         if (game.getPhaseOfGame().toLowerCase().contains("agenda")) {
             for (String planet : player.getPlanets()) {
                 player.exhaustPlanet(planet);
             }
             MessageHelper.sendMessageToChannel(
-                    player.getCorrectChannel(), player.getFactionEmoji() + " exhausted all planets.");
+                player.getCorrectChannel(), player.getFactionEmoji() + " exhausted all planets.");
         }
         event.getMessage().delete().queue();
     }
@@ -60,26 +61,27 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = new ArrayList<>();
         for (String planet : player.getReadiedPlanets()) {
             buttons.add(
-                    Buttons.green("defenseInstallationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
+                Buttons.green("defenseInstallationStep2_" + planet, Helper.getPlanetRepresentation(planet, game)));
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust and put 1 PDS on.",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + ", please choose the planet you wish to exhaust and put 1 PDS on.",
+            buttons);
     }
 
     @ButtonHandler("defenseInstallationStep2_")
     public static void resolveDefenseInstallationStep2(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player player, Game game, ButtonInteractionEvent event, String buttonID
+    ) {
         String planet = buttonID.split("_")[1];
         player.exhaustPlanet(planet);
         AddUnitService.addUnits(event, game.getTileFromPlanet(planet), game, player.getColor(), "pds " + planet);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " exhausted " + Helper.getPlanetRepresentation(planet, game)
-                        + " and put 1 PDS on it");
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + " exhausted " + Helper.getPlanetRepresentation(planet, game)
+                + " and put 1 PDS on it");
     }
 
     @ButtonHandler("resolveBoardingParty")
@@ -88,7 +90,7 @@ class ActionCardDeck2ButtonHandler {
         String type = "sling";
         String pos = game.getActiveSystem();
         List<Button> buttons = Helper.getPlaceUnitButtons(
-                event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_skipbuild");
+            event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_skipbuild");
         String message = player.getRepresentation() + ", use the buttons to place the 1 ship you killed under 5 cost. ";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
@@ -99,9 +101,9 @@ class ActionCardDeck2ButtonHandler {
         String type = "sling";
         String pos = game.getActiveSystem();
         List<Button> buttons = Helper.getPlaceUnitButtons(
-                event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskip");
+            event, player, game, game.getTileByPosition(pos), type, "placeOneNDone_dontskip");
         String message = player.getRepresentation()
-                + ", use the buttons to place up to 2 ships that have a combined cost of 4 or less.";
+            + ", use the buttons to place up to 2 ships that have a combined cost of 4 or less.";
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
     }
@@ -120,16 +122,16 @@ class ActionCardDeck2ButtonHandler {
             }
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(),
-                "Please choose which system you wish to produce a ship in. The bot will not know that it is reduced cost and limited to a specific ship type, but you know that. ",
-                buttons);
+            event.getMessageChannel(),
+            "Please choose which system you wish to produce a ship in. The bot will not know that it is reduced cost and limited to a specific ship type, but you know that. ",
+            buttons);
     }
 
     @ButtonHandler("resolveChainReaction")
     public static void resolveChainReaction(ButtonInteractionEvent event) {
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), "Effect changed, so old implementation was deprecated. Roll manually.");
+            event.getChannel(), "Effect changed, so old implementation was deprecated. Roll manually.");
         //        StringBuilder msg = new StringBuilder("The _Chain Reaction_ rolled: ");
         //        int currentRequirement = 7;
         //        Die die;
@@ -177,7 +179,7 @@ class ActionCardDeck2ButtonHandler {
         }
         scButtons.add(Buttons.red("deleteButtons", "Done resolving"));
         MessageHelper.sendMessageToChannelWithButtons(
-                event.getMessageChannel(), player.getRepresentation() + ", use the buttons to resolve.", scButtons);
+            event.getMessageChannel(), player.getRepresentation() + ", use the buttons to resolve.", scButtons);
     }
 
     @ButtonHandler("resolveRendezvousPoint")
@@ -186,10 +188,10 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, game, event, "rendezvous");
         MessageChannel channel = player.getCorrectChannel();
         MessageHelper.sendMessageToChannelWithButtons(
-                channel,
-                "Use the buttons to remove token from what was the active system when you played the card."
-                        + " Then end your turn after doing any end of turn abilities you wish to do.",
-                buttons);
+            channel,
+            "Use the buttons to remove token from what was the active system when you played the card."
+                + " Then end your turn after doing any end of turn abilities you wish to do.",
+            buttons);
     }
 
     @ButtonHandler("resolveAncientTradeRoutes")
@@ -198,7 +200,7 @@ class ActionCardDeck2ButtonHandler {
         player.setCommodities(player.getCommodities() + 2);
         ButtonHelperAgents.toldarAgentInitiation(game, player, 2);
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(), player.getFactionEmoji() + " gained 2 commodities.");
+            player.getCorrectChannel(), player.getFactionEmoji() + " gained 2 commodities.");
         for (Player p2 : game.getRealPlayers()) {
             if (p2 == player) {
                 continue;
@@ -215,14 +217,14 @@ class ActionCardDeck2ButtonHandler {
         buttons.add(Buttons.red("deleteButtons", "Don't Give Commodities"));
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose the player you wish to give 2 commodities to.",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + ", please choose the player you wish to give 2 commodities to.",
+            buttons);
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose a __different__ player you wish to give 2 commodities to.",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged()
+                + ", please choose a __different__ player you wish to give 2 commodities to.",
+            buttons);
     }
 
     @ButtonHandler("resolveArmsDeal")
@@ -244,9 +246,9 @@ class ActionCardDeck2ButtonHandler {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose which neighbor gets 1 cruiser and 1 destroyer.",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + ", please choose which neighbor gets 1 cruiser and 1 destroyer.",
+            buttons);
     }
 
     @ButtonHandler("armsDealStep2_")
@@ -255,34 +257,35 @@ class ActionCardDeck2ButtonHandler {
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
         List<Button> buttons = new ArrayList<>(
-                Helper.getTileWithShipsPlaceUnitButtons(p2, game, "cruiser", "placeOneNDone_skipbuild"));
+            Helper.getTileWithShipsPlaceUnitButtons(p2, game, "cruiser", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't Place"));
         MessageHelper.sendMessageToChannelWithButtons(
-                p2.getCorrectChannel(),
-                p2.getRepresentation() + ", please choose where you wish to place the _Arms Deal_ cruiser.",
-                buttons);
+            p2.getCorrectChannel(),
+            p2.getRepresentation() + ", please choose where you wish to place the _Arms Deal_ cruiser.",
+            buttons);
         buttons = new ArrayList<>(
-                Helper.getTileWithShipsPlaceUnitButtons(p2, game, "destroyer", "placeOneNDone_skipbuild"));
+            Helper.getTileWithShipsPlaceUnitButtons(p2, game, "destroyer", "placeOneNDone_skipbuild"));
         buttons.add(Buttons.red("deleteButtons", "Don't Place"));
         MessageHelper.sendMessageToChannelWithButtons(
-                p2.getCorrectChannel(),
-                p2.getRepresentation() + ", please choose where you wish to place the _Arms Deal_ destroyer.",
-                buttons);
+            p2.getCorrectChannel(),
+            p2.getRepresentation() + ", please choose where you wish to place the _Arms Deal_ destroyer.",
+            buttons);
         event.getMessage().delete().queue();
     }
 
     @ButtonHandler("ancientTradeRoutesStep2_")
     public static void resolveAncientTradeRoutesStep2(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player player, Game game, ButtonInteractionEvent event, String buttonID
+    ) {
         String faction = buttonID.split("_")[1];
         Player p2 = game.getPlayerFromColorOrFaction(faction);
         if (p2 == null) return;
         p2.setCommodities(p2.getCommodities() + 2);
         ButtonHelperAgents.toldarAgentInitiation(game, p2, 2);
         MessageHelper.sendMessageToChannel(
-                p2.getCorrectChannel(),
-                p2.getFactionEmoji() + " gained 2 commodities due to _Ancient Trade Routes_ and is neighbors with "
-                        + player.getFactionEmojiOrColor() + " for this turn.");
+            p2.getCorrectChannel(),
+            p2.getFactionEmoji() + " gained 2 commodities due to _Ancient Trade Routes_ and is neighbors with "
+                + player.getFactionEmojiOrColor() + " for this turn.");
         event.getMessage().delete().queue();
     }
 
@@ -304,8 +307,8 @@ class ActionCardDeck2ButtonHandler {
                 game.purgeExplore(cardID);
             } else {
                 sb.append("Looked at the top of the ")
-                        .append(type)
-                        .append(" deck and saw that it was not a relic fragment.\n");
+                    .append(type)
+                    .append(" deck and saw that it was not a relic fragment.\n");
                 MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), card.getName());
             }
         }
@@ -322,7 +325,7 @@ class ActionCardDeck2ButtonHandler {
             }
         }
         MessageHelper.sendMessageToChannel(
-                event.getChannel(), player.getFactionEmoji() + " readied every planet with a technology specialty.");
+            event.getChannel(), player.getFactionEmoji() + " readied every planet with a technology specialty.");
         event.getMessage().delete().queue();
     }
 
@@ -331,22 +334,23 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = getStrandedShipButtons(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose the system you wish to place the _Ghost Ship_ in.",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged()
+                + ", please choose the system you wish to place the _Ghost Ship_ in.",
+            buttons);
     }
 
     @ButtonHandler("strandedShipStep2_")
     public static void resolveStrandedShipStep2(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player player, Game game, ButtonInteractionEvent event, String buttonID
+    ) {
         Tile tile = game.getTileByPosition(buttonID.split("_")[1]);
         tile = FlipTileService.flipTileIfNeeded(event, tile, game);
         AddUnitService.addUnits(event, tile, game, player.getColor(), "cruiser");
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation() + ".");
+            player.getCorrectChannel(),
+            player.getFactionEmoji() + " put 1 cruiser in " + tile.getRepresentation() + ".");
 
         // If Empyrean Commander is in game check if unlock condition exists
         Player p2 = game.getPlayerFromLeader("empyreancommander");
@@ -358,24 +362,24 @@ class ActionCardDeck2ButtonHandler {
         List<Button> buttons = getSpatialCollapseTilesStep1(game, player);
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged()
-                        + ", please choose which system (with your ships) you wish to swap with an adjacent system.",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged()
+                + ", please choose which system (with your ships) you wish to swap with an adjacent system.",
+            buttons);
     }
 
     public static List<Button> getSpatialCollapseTilesStep1(Game game, Player player) {
         List<Button> buttons = new ArrayList<>();
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getPosition().contains("t")
-                    || tile.getPosition().contains("b")
-                    || tile.isHomeSystem()
-                    || tile.isMecatol()) {
+                || tile.getPosition().contains("b")
+                || tile.isHomeSystem(game)
+                || tile.isMecatol()) {
                 continue;
             }
             if (FoWHelper.playerHasShipsInSystem(player, tile)) {
                 buttons.add(Buttons.gray(
-                        "spatialCollapseStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+                    "spatialCollapseStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
         return buttons;
@@ -383,35 +387,37 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("spatialCollapseStep2_")
     public static void resolveSpatialCollapseStep2(
-            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Game game, Player player, ButtonInteractionEvent event, String buttonID
+    ) {
         String pos1 = buttonID.split("_")[1];
         List<Button> buttons = new ArrayList<>();
         Tile tile1 = game.getTileByPosition(pos1);
         for (String tilePos2 : FoWHelper.getAdjacentTiles(game, pos1, player, false, false)) {
             Tile tile = game.getTileByPosition(tilePos2);
             if (tile.getPosition().contains("t")
-                    || tile.getPosition().contains("b")
-                    || tile == tile1
-                    || tile.isHomeSystem()
-                    || tile.isMecatol()) {
+                || tile.getPosition().contains("b")
+                || tile == tile1
+                || tile.isHomeSystem(game)
+                || tile.isMecatol()) {
                 continue;
             }
 
             buttons.add(Buttons.gray(
-                    "spatialCollapseStep3_" + pos1 + "_" + tile.getPosition(),
-                    tile.getRepresentationForButtons(game, player)));
+                "spatialCollapseStep3_" + pos1 + "_" + tile.getPosition(),
+                tile.getRepresentationForButtons(game, player)));
         }
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + ", please choose which system you wish to swap places with "
-                        + tile1.getRepresentationForButtons(game, player) + ".",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + ", please choose which system you wish to swap places with "
+                + tile1.getRepresentationForButtons(game, player) + ".",
+            buttons);
         event.getMessage().delete().queue();
     }
 
     @ButtonHandler("spatialCollapseStep3_")
     public static void resolveSpatialCollapseStep3(
-            Game game, Player player, ButtonInteractionEvent event, String buttonID) {
+        Game game, Player player, ButtonInteractionEvent event, String buttonID
+    ) {
         String position = buttonID.split("_")[1];
         String position2 = buttonID.split("_")[2];
         Tile tile = game.getTileByPosition(position);
@@ -422,10 +428,10 @@ class ActionCardDeck2ButtonHandler {
         game.setTile(tile2);
         game.rebuildTilePositionAutoCompleteList();
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentationUnfogged() + " Chose to swap "
-                        + tile2.getRepresentationForButtons(game, player) + " with "
-                        + tile.getRepresentationForButtons(game, player));
+            player.getCorrectChannel(),
+            player.getRepresentationUnfogged() + " Chose to swap "
+                + tile2.getRepresentationForButtons(game, player) + " with "
+                + tile.getRepresentationForButtons(game, player));
         event.getMessage().delete().queue();
     }
 
@@ -434,7 +440,7 @@ class ActionCardDeck2ButtonHandler {
         for (Tile tile : game.getTileMap().values()) {
             if (tile.getPlanetUnitHolders().isEmpty() && !FoWHelper.otherPlayersHaveUnitsInSystem(player, tile, game)) {
                 buttons.add(Buttons.green(
-                        "strandedShipStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
+                    "strandedShipStep2_" + tile.getPosition(), tile.getRepresentationForButtons(game, player)));
             }
         }
         return buttons;
@@ -444,12 +450,11 @@ class ActionCardDeck2ButtonHandler {
     public static void resolveSideProject(Player player, Game game, ButtonInteractionEvent event) {
         String successMessage;
         if (player.getStrategicCC() > 0) {
-            successMessage =
-                    player.getRepresentationNoPing() + ", 1 command token has been removed from your strategy pool ("
-                            + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
+            successMessage = player.getRepresentationNoPing() + ", 1 command token has been removed from your strategy pool ("
+                + (player.getStrategicCC()) + " -> " + (player.getStrategicCC() - 1) + ").";
             player.setStrategicCC(player.getStrategicCC() - 1);
             ButtonHelperCommanders.resolveMuaatCommanderCheck(
-                    player, game, event, CardEmojis.ActionCard + "played _Side Project_");
+                player, game, event, CardEmojis.ActionCard + "played _Side Project_");
         } else {
             successMessage = player.getRepresentationNoPing() + " exhausted the _" + RelicHelper.sillySpelling() + "_.";
             player.addExhaustedRelic("emelpar");
@@ -468,9 +473,9 @@ class ActionCardDeck2ButtonHandler {
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannelWithButtons(
-                player.getCorrectChannel(),
-                player.getRepresentation() + ", please choose the target of _Brutal Occupation_.",
-                buttons);
+            player.getCorrectChannel(),
+            player.getRepresentation() + ", please choose the target of _Brutal Occupation_.",
+            buttons);
     }
 
     @ButtonHandler("resolveShrapnelTurrets_")
@@ -480,7 +485,7 @@ class ActionCardDeck2ButtonHandler {
             ButtonHelper.resolveCombatRoll(player, game, event, "combatRoll_" + buttonID.split("_")[1] + "_space_afb");
         } else {
             MessageHelper.sendMessageToChannel(
-                    event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
+                event.getMessageChannel(), "Could not find active system. You will need to roll using `/roll`.");
         }
         game.setStoredValue("ShrapnelTurretsFaction", "");
         event.getMessage().delete().queue();
@@ -488,20 +493,21 @@ class ActionCardDeck2ButtonHandler {
 
     @ButtonHandler("brutalOccupationStep2_")
     public static void resolveBrutalOccupationStep2(
-            Player player, Game game, ButtonInteractionEvent event, String buttonID) {
+        Player player, Game game, ButtonInteractionEvent event, String buttonID
+    ) {
         String planet = buttonID.split("_")[1];
         player.refreshPlanet(planet);
         List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(
-                game, ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
+            game, ButtonHelper.getUnitHolderFromPlanetName(planet, game), player);
         if (!buttons.isEmpty()) {
             String message = player.getFactionEmoji() + ", please press the button to explore "
-                    + Helper.getPlanetRepresentation(planet, game) + ".";
+                + Helper.getPlanetRepresentation(planet, game) + ".";
             MessageHelper.sendMessageToChannelWithButtons(player.getCorrectChannel(), message, buttons);
         }
         event.getMessage().delete().queue();
         MessageHelper.sendMessageToChannel(
-                player.getCorrectChannel(),
-                player.getRepresentation() + " readied and explored "
-                        + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ".");
+            player.getCorrectChannel(),
+            player.getRepresentation() + " readied and explored "
+                + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, game) + ".");
     }
 }
