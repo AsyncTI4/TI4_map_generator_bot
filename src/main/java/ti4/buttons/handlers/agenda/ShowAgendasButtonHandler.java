@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.Buttons;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.EventHelper;
 import ti4.helpers.RelicHelper;
 import ti4.helpers.SecretObjectiveHelper;
 import ti4.listeners.annotations.ButtonHandler;
@@ -53,6 +54,7 @@ class ShowAgendasButtonHandler {
                 ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
+            case "tiles" -> EventHelper.showRemainingTiles(game, event);
             default ->
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
         }
