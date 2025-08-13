@@ -17,7 +17,7 @@ public class ArticlesOfWarAgendaResolver implements AgendaResolver {
 
     @Override
     public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
-        if("for".equalsIgnoreCase(winner)) return;
+        if ("for".equalsIgnoreCase(winner)) return;
         List<Player> winOrLose = AgendaHelper.getLosingVoters(winner, game);
         for (Player playerWL : winOrLose) {
             playerWL.setTg(playerWL.getTg() + 3);
@@ -27,5 +27,4 @@ public class ArticlesOfWarAgendaResolver implements AgendaResolver {
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(), "Given 3 trade goods to those who voted \"For\".");
     }
-
 }

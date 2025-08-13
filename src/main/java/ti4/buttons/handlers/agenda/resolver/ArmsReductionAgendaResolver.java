@@ -38,8 +38,7 @@ public class ArmsReductionAgendaResolver implements AgendaResolver {
             }
         }
         MessageHelper.sendMessageToChannel(
-                game.getMainGameChannel(),
-                "Sent buttons for each player to remove excess dreadnoughts and cruisers.");
+                game.getMainGameChannel(), "Sent buttons for each player to remove excess dreadnoughts and cruisers.");
     }
 
     private void handleAgainst(Game game) {
