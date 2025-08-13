@@ -687,6 +687,7 @@ public class Constants {
     public static final String SENT_AGENDAS = "sent_agenda";
     public static final String DISCARDED_AGENDAS = "discarded_agendas";
     public static final String AGENDAS = "agendas";
+    public static final String MANDATES = "mandates";
     public static final String AGENDA_DECK = "agenda_deck";
     public static final String AGENDA = "agenda";
     public static final String SHOW_REMAINING = "show_remaining";

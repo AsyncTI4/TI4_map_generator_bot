@@ -25,6 +25,11 @@ public class UserSettings {
     private boolean showTransactables;
 
     private boolean hasAnsweredSurvey;
+    private boolean prefersSarweenMsg = true;
+    private boolean prefersPillageMsg = true;
+    private boolean prefersPassOnWhensAfters = false;
+    private boolean prefersPrePassOnSC = true;
+    private int autoNoSaboInterval = 0;
     private String whisperPref = "No Preference";
     private String supportPref = "No Preference";
     private String winmakingPref = "No Preference";
