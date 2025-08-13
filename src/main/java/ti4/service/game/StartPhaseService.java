@@ -1094,6 +1094,11 @@ public class StartPhaseService {
         }
         for (Player p2 : game.getRealPlayers()) {
             if (!game.isFowMode()) {
+
+                var userSettings = UserSettingsManager.get(p2.getUserID());
+                if (!userSettings.isPrefersPrePassOnSC()) {
+                    continue;
+                }
                 String preDeclineMsg = p2.getRepresentationUnfogged() + ", in order to resolve strategy cards faster,"
                         + " you have the opportunity now to pre-decline various strategy cards if you know you will not follow them."
                         + " Feel free to not do this. **Trade** is never available for this feature due to **Trade** sometimes being mandatory.";
@@ -1117,7 +1122,8 @@ public class StartPhaseService {
                             "Use this to decide for **"
                                     + game.getStrategyCardModelByInitiative(sc)
                                             .get()
-                                            .getName() + "**.",
+                                            .getName()
+                                    + "**.",
                             scButtons);
                 }
             }
