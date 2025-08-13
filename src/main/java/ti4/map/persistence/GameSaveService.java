@@ -50,6 +50,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
@@ -81,6 +82,8 @@ class GameSaveService {
             Files.move(temporarySavePath, gameSavePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not save map: " + game.getName(), e);
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "Failed to save the game during the last command.");
             return false;
         } finally {
             deleteTemporaryFileIfNeeded(temporarySavePath);
