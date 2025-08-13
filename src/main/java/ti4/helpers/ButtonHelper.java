@@ -848,9 +848,9 @@ public class ButtonHelper {
                 ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
-            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
             case "tiles" -> EventHelper.showRemainingTiles(game, event);
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
+
         }
         deleteMessage(event);
     }
