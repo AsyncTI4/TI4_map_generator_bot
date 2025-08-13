@@ -4,11 +4,9 @@ import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.lang3.StringUtils;
 import ti4.buttons.Buttons;
 import ti4.listeners.annotations.ButtonHandler;
 import ti4.map.Game;
@@ -31,12 +29,11 @@ public class PlayerPreferenceHelper {
         buttons.add(Buttons.gray("playerPref_directHitManagement", "Units to Risk Direct Hit"));
         if (player.getUserSettings().isShowTransactables())
             buttons.add(Buttons.gray("playerPref_hideTransactables", "Stop showing player areas start of transaction"));
-        else
-            buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
+        else buttons.add(Buttons.gray("playerPref_showTransactables", "Show player areas start of transaction"));
         MessageHelper.sendMessageToChannelWithButtons(
-            player.getCardsInfoThread(),
-            player.getRepresentation() + ", please choose the thing you wish to change.",
-            buttons);
+                player.getCardsInfoThread(),
+                player.getRepresentation() + ", please choose the thing you wish to change.",
+                buttons);
     }
 
     @ButtonHandler(value = "playerPref_", save = false)
@@ -48,9 +45,9 @@ public class PlayerPreferenceHelper {
             case "tacticalAction" -> {
                 List<Button> buttons = new ArrayList<>();
                 String msg = player.getRepresentation()
-                    + ", please choose whether you wish to selected the active system for your tactical action"
-                    + " by distance (offer you 0 tiles away initially, then 1, 2, 3 tiles away upon more button presses)"
-                    + " or by ring (choose what ring the active system is in). Default is by ring. This will apply to all your games.";
+                        + ", please choose whether you wish to selected the active system for your tactical action"
+                        + " by distance (offer you 0 tiles away initially, then 1, 2, 3 tiles away upon more button presses)"
+                        + " or by ring (choose what ring the active system is in). Default is by ring. This will apply to all your games.";
                 buttons.add(Buttons.green("playerPrefDecision_true_distance", "By Distance"));
                 buttons.add(Buttons.green("playerPrefDecision_false_distance", "By Ring"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -58,8 +55,8 @@ public class PlayerPreferenceHelper {
             case "autoNoWhensAfters" -> {
                 List<Button> buttons = new ArrayList<>();
                 String msg = player.getRepresentation()
-                    + ", please choose whether you wish for the bot to auto react \"no whens\"/\"no afters\" after a random amount of time for you when you have no \"when\"s and no \"after\"s."
-                    + " Default is off. This will only apply to this game. If you have any \"when\"s or \"afters\", or related \"when\"/\"after\" abilities, the bot will do nothing. ";
+                        + ", please choose whether you wish for the bot to auto react \"no whens\"/\"no afters\" after a random amount of time for you when you have no \"when\"s and no \"after\"s."
+                        + " Default is off. This will only apply to this game. If you have any \"when\"s or \"afters\", or related \"when\"/\"after\" abilities, the bot will do nothing. ";
                 buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
                 buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
@@ -128,31 +125,31 @@ public class PlayerPreferenceHelper {
                     player.setAutoSaboPassMedian(userSettings.getAutoNoSaboInterval());
                     if (userSettings.isPrefersPassOnWhensAfters()) {
                         if (!player.hasAbility("quash")
-                            && !player.ownsPromissoryNote("rider")
-                            && !player.getPromissoryNotes().containsKey("riderm")
-                            && !player.hasAbility("radiance")
-                            && !player.hasAbility("galactic_threat")
-                            && !player.hasAbility("conspirators")
-                            && !player.ownsPromissoryNote("riderx")
-                            && !player.ownsPromissoryNote("riderm")
-                            && !player.ownsPromissoryNote("ridera")
-                            && !player.hasTechReady("gr")) {
+                                && !player.ownsPromissoryNote("rider")
+                                && !player.getPromissoryNotes().containsKey("riderm")
+                                && !player.hasAbility("radiance")
+                                && !player.hasAbility("galactic_threat")
+                                && !player.hasAbility("conspirators")
+                                && !player.ownsPromissoryNote("riderx")
+                                && !player.ownsPromissoryNote("riderm")
+                                && !player.ownsPromissoryNote("ridera")
+                                && !player.hasTechReady("gr")) {
                             player.setAutoPassOnWhensAfters(true);
                         }
                     }
                     continue;
                 }
                 String message = player.getRepresentationUnfogged()
-                    + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs."
-                    + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
-                    + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with `/player stats`.";
+                        + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs."
+                        + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
+                        + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with `/player stats`.";
                 MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), message, buttons);
             }
         } else {
             String message = player2.getRepresentationUnfogged()
-                + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs. "
-                + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
-                + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with `/player stats`.";
+                    + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs. "
+                    + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."
+                    + " It's random so people can't derive much information from it. You are free to decline, no-one will ever know either way, but if necessary you may change your time later with `/player stats`.";
             MessageHelper.sendMessageToChannelWithButtons(player2.getCardsInfoThread(), message, buttons);
         }
     }
@@ -167,11 +164,11 @@ public class PlayerPreferenceHelper {
         }
 
         MessageHelper.sendMessageToChannelWithButtons(
-            player.getCardsInfoThread(),
-            player.getRepresentationUnfogged()
-                + ", your AFK times (if any) have been reset. Please choose the hours (note they are in UTC) in which you're AFK."
-                + " If you choose `8` for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
-            buttons);
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", your AFK times (if any) have been reset. Please choose the hours (note they are in UTC) in which you're AFK."
+                        + " If you choose `8` for example, you will be set as AFK from 8:00 UTC to 8:59 UTC in every game you are in.",
+                buttons);
     }
 
     public static List<Button> getSetAFKButtons() {
@@ -186,10 +183,10 @@ public class PlayerPreferenceHelper {
     public static void offerDirectHitManagementOptions(Game game, Player player) {
         List<Button> buttons = getDirectHitManagementButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
-            player.getCardsInfoThread(),
-            player.getRepresentationUnfogged()
-                + ", please choose the units you wish to either risk or not risk _Direct Hit_. Upgraded dreadnoughts will automatically \"risk\" _Direct Hits_.  ",
-            buttons);
+                player.getCardsInfoThread(),
+                player.getRepresentationUnfogged()
+                        + ", please choose the units you wish to either risk or not risk _Direct Hit_. Upgraded dreadnoughts will automatically \"risk\" _Direct Hits_.  ",
+                buttons);
     }
 
     public static List<Button> getDirectHitManagementButtons(Game game, Player player) {
@@ -223,7 +220,7 @@ public class PlayerPreferenceHelper {
                 buttons.add(Buttons.red("riskDirectHit_" + unit + "_yes", "Risk " + StringUtils.capitalize(unit)));
             } else {
                 buttons.add(
-                    Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + StringUtils.capitalize(unit)));
+                        Buttons.green("riskDirectHit_" + unit + "_no", "Don't Risk " + StringUtils.capitalize(unit)));
             }
         }
         buttons.add(Buttons.gray("deleteButtons", "Done"));
@@ -246,9 +243,9 @@ public class PlayerPreferenceHelper {
         game.setStoredValue("stuffNotToSustainFor" + player.getFaction(), stuffNotToSustain);
         List<Button> systemButtons = getDirectHitManagementButtons(game, player);
         event.getMessage()
-            .editMessage(event.getMessage().getContentRaw())
-            .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
-            .queue();
+                .editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons))
+                .queue();
     }
 
     @ButtonHandler(value = "setHourAsAFK_", save = false)
@@ -261,7 +258,7 @@ public class PlayerPreferenceHelper {
 
         ButtonHelper.deleteTheOneButton(event);
         MessageHelper.sendMessageToChannel(
-            event.getMessageChannel(),
-            player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
+                event.getMessageChannel(),
+                player.getFactionEmoji() + " Set hour " + time + " as a time that you are afk");
     }
 }

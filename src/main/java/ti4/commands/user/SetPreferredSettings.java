@@ -15,8 +15,12 @@ class SetPreferredSettings extends Subcommand {
         addOptions(new OptionData(OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre decline on SCs"));
         addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the pillage flavor text"));
         addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the sarween flavor text"));
-        addOptions(new OptionData(OptionType.BOOLEAN, "pass_on_agenda_stuff", "True to pass on whens/afters if you have none"));
-        addOptions(new OptionData(OptionType.INTEGER, "sabo_decline_median", "Your median hours that the bot will wait for auto no sabo. Enter 0 to turn off."));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, "pass_on_agenda_stuff", "True to pass on whens/afters if you have none"));
+        addOptions(new OptionData(
+                OptionType.INTEGER,
+                "sabo_decline_median",
+                "Your median hours that the bot will wait for auto no sabo. Enter 0 to turn off."));
     }
 
     @Override
