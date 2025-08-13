@@ -149,7 +149,6 @@ public class GameProperties {
     private List<String> secretObjectives;
     private List<String> actionCards;
     private List<String> agendas;
-    private List<String> mandates;
     private List<String> events; // ignis_aurora
 
     // Priority Track

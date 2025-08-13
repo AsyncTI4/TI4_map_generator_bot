@@ -482,15 +482,13 @@ public class ListPlayerInfoService {
             }
             case "infrastructure", "protect_border" -> {
                 int counter = 0;
-                int maxPlanets = counter;
                 for (String planet : player.getPlanetsAllianceMode()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
-                    if (uH != null && game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
-                        if (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
-                                || uH.getUnitCount(Units.UnitType.Pds, player) > 0) {
-                            counter++;
-                        }
-                        maxPlanets++;
+                    if (uH != null
+                            && game.getTileFromPlanet(planet) != player.getHomeSystemTile()
+                            && (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
+                                    || uH.getUnitCount(Units.UnitType.Pds, player) > 0)) {
+                        counter++;
                     }
                 }
                 if (player.hasAbility("privileged_citizenry")) {
@@ -498,6 +496,15 @@ public class ListPlayerInfoService {
                 }
                 if (player.hasAbility("orbital_foundries")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                }
+                int maxPlanets = counter;
+                if (player.getHomeSystemTile() != null) {
+                    maxPlanets = Math.max(
+                            0,
+                            player.getPlanetsAllianceMode().size()
+                                    - player.getHomeSystemTile()
+                                            .getPlanetUnitHolders()
+                                            .size());
                 }
                 return Math.min(counter, maxPlanets);
             }
