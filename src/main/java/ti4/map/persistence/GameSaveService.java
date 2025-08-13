@@ -272,7 +272,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         StringBuilder sb1 = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry : game.getScoredPublicObjectives().entrySet()) {
+        for (Map.Entry<String, List<String>> entry :
+                game.getScoredPublicObjectives().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             sb1.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -280,7 +281,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacentTiles = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry : game.getCustomAdjacentTiles().entrySet()) {
+        for (Map.Entry<String, List<String>> entry :
+                game.getCustomAdjacentTiles().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             adjacentTiles.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -303,7 +305,8 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacencyOverrides = new StringBuilder();
-        for (Map.Entry<Pair<String, Integer>, String> entry : game.getAdjacentTileOverrides().entrySet()) {
+        for (Map.Entry<Pair<String, Integer>, String> entry :
+                game.getAdjacentTileOverrides().entrySet()) {
             adjacencyOverrides.append(entry.getKey().getLeft()).append("-");
             adjacencyOverrides.append(entry.getKey().getRight()).append("-");
             adjacencyOverrides.append(entry.getValue()).append(";");
@@ -540,7 +543,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         String anomaliesJson = mapper.writeValueAsString(game.getBorderAnomalies()); // much easier than manually
-                                                                                     // (de)serialising
+        // (de)serialising
         writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
         writer.write(System.lineSeparator());
 
@@ -586,7 +589,8 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(Constants.FACTION_EMOJI + " " + player.getFactionEmojiRaw());
             writer.write(System.lineSeparator());
-            String displayName = player.getDisplayName() != null ? player.getDisplayName().replace(" ", "_") : "null";
+            String displayName =
+                    player.getDisplayName() != null ? player.getDisplayName().replace(" ", "_") : "null";
             writer.write(Constants.FACTION_DISPLAY_NAME + " " + displayName);
             writer.write(System.lineSeparator());
             // TODO Remove when no longer relevant
@@ -778,8 +782,7 @@ class GameSaveService {
             if (unitHolder != null) {
                 for (UnitKey unit : unitHolder.getUnitKeys()) {
                     int amt = unitHolder.getUnitCount(unit);
-                    if (!Mapper.isValidColor(unit.getColor()) || amt <= 0)
-                        continue;
+                    if (!Mapper.isValidColor(unit.getColor()) || amt <= 0) continue;
                     units.append(unit.outputForSave()).append(",").append(amt).append(";");
                 }
             }
@@ -814,8 +817,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             StringBuilder leaderInfo = new StringBuilder();
-            if (player.getLeaders().isEmpty())
-                leaderInfo.append("none");
+            if (player.getLeaders().isEmpty()) leaderInfo.append("none");
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
                 leaderInfo.append(",");
@@ -839,8 +841,7 @@ class GameSaveService {
             for (String key : fow_systems.keySet()) {
                 String system = fow_systems.get(key);
                 String label = fow_labels.get(key);
-                if (label != null)
-                    label = label.replaceAll(" ", "—"); // replace spaces with em dash
+                if (label != null) label = label.replaceAll(" ", "—"); // replace spaces with em dash
                 fogOfWarSystems.append(key);
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
@@ -940,7 +941,8 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(unitHolder.getName());
             writer.write(System.lineSeparator());
-            for (Entry<UnitKey, List<Integer>> entry : unitHolder.getUnitsByState().entrySet()) {
+            for (Entry<UnitKey, List<Integer>> entry :
+                    unitHolder.getUnitsByState().entrySet()) {
                 if (entry.getKey() != null) {
                     String amtString = String.join(
                             ",", entry.getValue().stream().map(Object::toString).toList());
@@ -1009,8 +1011,8 @@ class GameSaveService {
             if (!mapStorage.exists()) {
                 return false;
             }
-            File deletedMapStorage = Storage
-                    .getDeletedGame(gameName + "_" + System.currentTimeMillis() + Constants.TXT);
+            File deletedMapStorage =
+                    Storage.getDeletedGame(gameName + "_" + System.currentTimeMillis() + Constants.TXT);
             return mapStorage.renameTo(deletedMapStorage);
         });
     }
