@@ -14,12 +14,12 @@ import ti4.service.emoji.PlanetEmojis;
 
 public class AbsolArtifactAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "absol_artifact";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         TextChannel watchParty = AgendaHelper.watchPartyChannel(game);
         String watchPartyPing = AgendaHelper.watchPartyPing(game);
         if (watchParty != null && !game.isFowMode()) {

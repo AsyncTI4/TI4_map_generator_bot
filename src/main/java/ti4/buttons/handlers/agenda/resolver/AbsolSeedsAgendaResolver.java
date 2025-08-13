@@ -11,12 +11,12 @@ import ti4.message.MessageHelper;
 
 public class AbsolSeedsAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "absol_seeds";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         var winOrLose = "for".equalsIgnoreCase(winner)
                 ? AgendaHelper.getPlayersWithMostPoints(game)
                 : AgendaHelper.getPlayersWithLeastPoints(game);
@@ -45,7 +45,7 @@ public class AbsolSeedsAgendaResolver implements AgendaResolver {
                     }
                 }
             } else {
-                ActionCardHelper.drawActionCards(game, playerWL, aID, true);
+                ActionCardHelper.drawActionCards(game, playerWL, agendaNumericId, true);
                 playerWL.setFleetCC(playerWL.getFleetCC() + 1);
                 playerWL.setTacticalCC(playerWL.getTacticalCC() + 1);
                 playerWL.setStrategicCC(playerWL.getStrategicCC() + 1);

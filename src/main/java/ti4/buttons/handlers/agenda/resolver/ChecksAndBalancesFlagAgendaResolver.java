@@ -5,12 +5,13 @@ import ti4.map.Game;
 
 public class ChecksAndBalancesFlagAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "checks";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
+        if ("for".equalsIgnoreCase(winner)) return;
         game.setStoredValue("agendaChecksNBalancesAgainst", "true");
     }
 }

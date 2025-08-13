@@ -6,12 +6,12 @@ import ti4.service.objectives.RevealPublicObjectiveService;
 
 public class IncentiveAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "incentive";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         var actionsChannel = game.getMainGameChannel();
         if ("for".equalsIgnoreCase(winner)) {
             RevealPublicObjectiveService.revealS1(game, event, actionsChannel);

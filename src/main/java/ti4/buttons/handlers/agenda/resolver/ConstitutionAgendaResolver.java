@@ -6,12 +6,12 @@ import ti4.message.MessageHelper;
 
 public class ConstitutionAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "constitution";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if ("for".equalsIgnoreCase(winner)) {
             java.util.List<String> laws =
                     new java.util.ArrayList<>(game.getLaws().keySet());

@@ -10,12 +10,12 @@ import ti4.map.Tile;
 
 public class WormholeReconAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "wormhole_recon";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if (!"for".equalsIgnoreCase(winner)) {
             for (Tile tile : ButtonHelper.getAllWormholeTiles(game)) {
                 for (Player player : game.getRealPlayers()) {
