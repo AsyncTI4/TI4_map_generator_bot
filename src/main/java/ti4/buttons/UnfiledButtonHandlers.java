@@ -481,7 +481,7 @@ public class UnfiledButtonHandlers {
         String hours = buttonID.split("_")[1];
         int median = Integer.parseInt(hours);
         player.setAutoSaboPassMedian(median);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours.");
         var userSettings = UserSettingsManager.get(player.getUserID());
         userSettings.setAutoNoSaboInterval(median);
         UserSettingsManager.save(userSettings);
