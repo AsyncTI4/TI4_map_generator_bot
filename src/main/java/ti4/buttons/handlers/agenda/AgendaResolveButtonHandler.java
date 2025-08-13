@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -1100,7 +1101,7 @@ class AgendaResolveButtonHandler {
             return;
         }
 
-        Integer poIndex = game.addCustomPO("Mutiny", 1);
+        Integer poIndex = game.addCustomPO("Mutiny", agendaWentFor ? 1 : -1);
 
         StringBuilder message = new StringBuilder();
         message.append("Custom objective _Mutiny_ has been added.\n");
