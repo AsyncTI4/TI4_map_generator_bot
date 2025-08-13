@@ -231,7 +231,7 @@ public class SecretObjectiveHelper {
 
     public static void showUnscored(Game game, GenericInteractionCreateEvent event) {
         if (game.isFowMode()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "This command is disabled for fog mode.");
             return;
         }
         List<String> defaultSecrets = Mapper.getDecks().get(game.getSoDeckID()).getNewShuffledDeck();

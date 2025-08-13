@@ -85,7 +85,8 @@ public enum LeaderEmojis implements TI4Emoji {
     YssarilHero, //
     RedCreussAgent,
     RedCreussCommander,
-    RedCreussHero, //
+    RedCreussHero,
+    OrlandoHero,
 
     // Discordant Stars
     AugersAgent,
@@ -263,6 +264,7 @@ public enum LeaderEmojis implements TI4Emoji {
             case "yinhero" -> YinHero;
             case "yssarilhero" -> YssarilHero;
             case "redghosthero", "redcreusshero" -> RedCreussHero;
+            case "orlandohero" -> OrlandoHero;
 
             // DS LEADERS
             case "augersagent" -> AugersAgent;
