@@ -2440,9 +2440,9 @@ public class Player extends PlayerProperties {
 
     @JsonIgnore
     public String getNextAvailableColour() {
-        // if (getColor() != null && !getColor().equals("null")) {
-        //     return getColor();
-        // }
+        if (getColor() != null && !getColor().equals("null")) {
+            return getColor();
+        }
         return getNextAvailableColorIgnoreCurrent();
     }
 
