@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.helpers.ButtonHelper;
@@ -32,13 +33,7 @@ public class ListPlayerInfoService {
         return switch (objID) {
             // stage 1's
             case "push_boundaries" -> 2;
-            case "outer_rim",
-                    "ancient_monuments",
-                    "revolutionize",
-                    "deep_space",
-                    "lead",
-                    "research_outposts",
-                    "infrastructure" -> 3;
+            case "outer_rim", "ancient_monuments", "revolutionize", "deep_space", "lead", "research_outposts", "infrastructure" -> 3;
             case "make_history" -> 2;
             case "corner", "become_legend", "master_science", "build_defenses" -> 4;
             case "develop" -> 2;
@@ -125,28 +120,29 @@ public class ListPlayerInfoService {
     record ObjectiveResult(boolean canFullyMeet, int closenessScore) {}
 
     public ObjectiveResult checkObjective(
-            List<String> planets, int tradeGoods, int goal, Player player, Game game, int closestScore) {
+        List<String> planets, int tradeGoods, int goal, Player player, Game game, int closestScore
+    ) {
         return backtrack(planets, 0, 0, 0, new HashSet<>(), tradeGoods, goal, player, game, closestScore);
     }
 
     private ObjectiveResult backtrack(
-            List<String> planets,
-            int currentResources,
-            int currentInfluence,
-            int index,
-            Set<String> usedPlanets,
-            int remainingTradeGoods,
-            int goal,
-            Player player,
-            Game game,
-            int closestScore) {
+        List<String> planets,
+        int currentResources,
+        int currentInfluence,
+        int index,
+        Set<String> usedPlanets,
+        int remainingTradeGoods,
+        int goal,
+        Player player,
+        Game game,
+        int closestScore
+    ) {
         // Success condition
         if (currentResources >= goal && currentInfluence >= goal) {
             return new ObjectiveResult(true, goal * 2);
         }
         int additionalResources2 = Math.min(remainingTradeGoods, Math.max(0, goal - currentResources));
-        int additionalInfluence2 =
-                Math.min(remainingTradeGoods - additionalResources2, Math.max(0, goal - currentInfluence));
+        int additionalInfluence2 = Math.min(remainingTradeGoods - additionalResources2, Math.max(0, goal - currentInfluence));
 
         int newResources2 = currentResources + additionalResources2;
         int newInfluence2 = currentInfluence + additionalInfluence2;
@@ -171,8 +167,7 @@ public class ListPlayerInfoService {
         if (index >= planets.size()) {
             // Try using remaining trade goods for resources
             int additionalResources = Math.min(remainingTradeGoods, Math.max(0, goal - currentResources));
-            int additionalInfluence =
-                    Math.min(remainingTradeGoods - additionalResources, Math.max(0, goal - currentInfluence));
+            int additionalInfluence = Math.min(remainingTradeGoods - additionalResources, Math.max(0, goal - currentInfluence));
 
             int newResources = currentResources + additionalResources;
             int newInfluence = currentInfluence + additionalInfluence;
@@ -191,64 +186,9 @@ public class ListPlayerInfoService {
         Planet planet = game.getPlanetsInfo().get(current);
         if (planet == null) {
             BotLogger.warning(
-                    new LogMessageOrigin(player),
-                    "ListPlayerInfoService: Planet \"" + current + "\" not found for game " + game.getName());
+                new LogMessageOrigin(player),
+                "ListPlayerInfoService: Planet \"" + current + "\" not found for game " + game.getName());
             return backtrack(
-                    planets,
-                    currentResources,
-                    currentInfluence,
-                    index + 1,
-                    usedPlanets,
-                    remainingTradeGoods,
-                    goal,
-                    player,
-                    game,
-                    closestScore);
-        }
-        int resources = planet.getResources();
-        int influence = planet.getInfluence();
-        if (player.hasLeaderUnlocked("xxchahero")) {
-            resources += influence;
-            influence += planet.getResources();
-        }
-        if (resources > 0) {
-            ObjectiveResult resourceResult = backtrack(
-                    planets,
-                    currentResources + resources,
-                    currentInfluence,
-                    index + 1,
-                    usedPlanets,
-                    remainingTradeGoods,
-                    goal,
-                    player,
-                    game,
-                    closestScore);
-            closestScore = Math.max(resourceResult.closenessScore, closestScore);
-            if (resourceResult.canFullyMeet()) {
-                return resourceResult;
-            }
-        }
-        // Try using planet for influence
-        if (influence > 0) {
-            ObjectiveResult influenceResult = backtrack(
-                    planets,
-                    currentResources,
-                    currentInfluence + influence,
-                    index + 1,
-                    usedPlanets,
-                    remainingTradeGoods,
-                    goal,
-                    player,
-                    game,
-                    closestScore);
-            closestScore = Math.max(influenceResult.closenessScore, closestScore);
-            if (influenceResult.canFullyMeet()) {
-                return influenceResult;
-            }
-        }
-
-        // Skip this planet
-        return backtrack(
                 planets,
                 currentResources,
                 currentInfluence,
@@ -259,10 +199,66 @@ public class ListPlayerInfoService {
                 player,
                 game,
                 closestScore);
+        }
+        int resources = planet.getResources();
+        int influence = planet.getInfluence();
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            resources += influence;
+            influence += planet.getResources();
+        }
+        if (resources > 0) {
+            ObjectiveResult resourceResult = backtrack(
+                planets,
+                currentResources + resources,
+                currentInfluence,
+                index + 1,
+                usedPlanets,
+                remainingTradeGoods,
+                goal,
+                player,
+                game,
+                closestScore);
+            closestScore = Math.max(resourceResult.closenessScore, closestScore);
+            if (resourceResult.canFullyMeet()) {
+                return resourceResult;
+            }
+        }
+        // Try using planet for influence
+        if (influence > 0) {
+            ObjectiveResult influenceResult = backtrack(
+                planets,
+                currentResources,
+                currentInfluence + influence,
+                index + 1,
+                usedPlanets,
+                remainingTradeGoods,
+                goal,
+                player,
+                game,
+                closestScore);
+            closestScore = Math.max(influenceResult.closenessScore, closestScore);
+            if (influenceResult.canFullyMeet()) {
+                return influenceResult;
+            }
+        }
+
+        // Skip this planet
+        return backtrack(
+            planets,
+            currentResources,
+            currentInfluence,
+            index + 1,
+            usedPlanets,
+            remainingTradeGoods,
+            goal,
+            player,
+            game,
+            closestScore);
     }
 
     public static void displayerScoringProgression(
-            Game game, boolean onlyThisGameObj, MessageChannel channel, String stage1sOrTwos) {
+        Game game, boolean onlyThisGameObj, MessageChannel channel, String stage1sOrTwos
+    ) {
         StringBuilder msg = new StringBuilder();
         int x = 1;
         if (onlyThisGameObj) {
@@ -285,10 +281,10 @@ public class ListPlayerInfoService {
         } else {
             for (String id : Mapper.getPublicObjectives().keySet()) {
                 if (Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.pok
-                        || Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.base) {
+                    || Mapper.getPublicObjective(id).getSource() == Source.ComponentSource.base) {
                     if (stage1sOrTwos.equalsIgnoreCase(
-                                    "" + Mapper.getPublicObjective(id).getPoints())
-                            || stage1sOrTwos.equalsIgnoreCase("both")) {
+                        "" + Mapper.getPublicObjective(id).getPoints())
+                        || stage1sOrTwos.equalsIgnoreCase("both")) {
                         msg.append(representScoring(game, id, x)).append("\n");
                         x++;
                     }
@@ -306,7 +302,7 @@ public class ListPlayerInfoService {
         StringBuilder representation;
         if (secret) {
             representation = new StringBuilder(
-                    x + ". " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(objID) + "> ");
+                x + ". " + SecretObjectiveInfoService.getSecretObjectiveRepresentation(objID) + "> ");
         } else {
             PublicObjectiveModel model = Mapper.getPublicObjective(objID);
             if (x > 0) {
@@ -320,32 +316,32 @@ public class ListPlayerInfoService {
                 representation.append(player.getFactionEmoji()).append(": ");
                 if (secret) {
                     if (game.didPlayerScoreThisAlready(player.getUserID(), objID)
-                            || game.didPlayerScoreThisAlready(
-                                    player.getUserID(),
-                                    Mapper.getSecretObjectivesJustNames().get(objID))) {
+                        || game.didPlayerScoreThisAlready(
+                            player.getUserID(),
+                            Mapper.getSecretObjectivesJustNames().get(objID))) {
                         representation.append("✅  ");
                     } else {
                         if (getObjectiveThreshold(objID, game) > 0) {
                             representation
-                                    .append(" (")
-                                    .append(getPlayerProgressOnObjective(objID, game, player))
-                                    .append("/")
-                                    .append(getObjectiveThreshold(objID, game))
-                                    .append(")  ");
+                                .append(" (")
+                                .append(getPlayerProgressOnObjective(objID, game, player))
+                                .append("/")
+                                .append(getObjectiveThreshold(objID, game))
+                                .append(")  ");
                         } else {
                             representation.append("0/1  ");
                         }
                     }
                 } else {
                     if (game.getRevealedPublicObjectives().containsKey(objID)
-                            && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
+                        && game.didPlayerScoreThisAlready(player.getUserID(), objID)) {
                         representation.append("✅  ");
                     } else {
                         representation
-                                .append(getPlayerProgressOnObjective(objID, game, player))
-                                .append("/")
-                                .append(getObjectiveThreshold(objID, game))
-                                .append("  ");
+                            .append(getPlayerProgressOnObjective(objID, game, player))
+                            .append("/")
+                            .append(getObjectiveThreshold(objID, game))
+                            .append("  ");
                     }
                 }
             }
@@ -358,12 +354,12 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
-                        .append(player.getFactionEmoji())
-                        .append(": ")
-                        .append(player.getSoScored())
-                        .append("/")
-                        .append(player.getMaxSOCount())
-                        .append("  ");
+                    .append(player.getFactionEmoji())
+                    .append(": ")
+                    .append(player.getSoScored())
+                    .append("/")
+                    .append(player.getMaxSOCount())
+                    .append("  ");
             }
         }
         return representation.toString();
@@ -374,10 +370,10 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
-                        .append(player.getFactionEmoji())
-                        .append(": ")
-                        .append(player.getSupportForTheThroneVictoryPoints())
-                        .append("/1  ");
+                    .append(player.getFactionEmoji())
+                    .append(": ")
+                    .append(player.getSupportForTheThroneVictoryPoints())
+                    .append("/1  ");
             }
         }
         return representation.toString();
@@ -394,7 +390,7 @@ public class ListPlayerInfoService {
 
     public static boolean gameHasTransferablePoints(Game game) {
         return game.getCustomPublicVP().keySet().stream()
-                .anyMatch(obj -> getTransferablePointRepresentation(obj) != null);
+            .anyMatch(obj -> getTransferablePointRepresentation(obj) != null);
     }
 
     public static String representTransferablePoints(Game game) {
@@ -409,18 +405,18 @@ public class ListPlayerInfoService {
                     scoringPlayers = List.of();
                 }
                 representation
-                        .append("\n> ")
-                        .append(mutablePointRepresentation)
-                        .append(" (")
-                        .append(objective.getValue())
-                        .append(" VP)")
-                        .append(": ")
-                        .append(scoringPlayers.stream()
-                                .map(game::getPlayer)
-                                .filter(Objects::nonNull)
-                                .map(Player::getRepresentationNoPing)
-                                .reduce((a, b) -> a + ", " + b)
-                                .orElse("Not currently held"));
+                    .append("\n> ")
+                    .append(mutablePointRepresentation)
+                    .append(" (")
+                    .append(objective.getValue())
+                    .append(" VP)")
+                    .append(": ")
+                    .append(scoringPlayers.stream()
+                        .map(game::getPlayer)
+                        .filter(Objects::nonNull)
+                        .map(Player::getRepresentationNoPing)
+                        .reduce((a, b) -> a + ", " + b)
+                        .orElse("Not currently held"));
             }
         }
         return representation.toString();
@@ -431,12 +427,12 @@ public class ListPlayerInfoService {
         if (!game.isFowMode()) {
             for (Player player : game.getRealPlayers()) {
                 representation
-                        .append(player.getFactionEmoji())
-                        .append(": ")
-                        .append(player.getTotalVictoryPoints())
-                        .append("/")
-                        .append(game.getVp())
-                        .append("  ");
+                    .append(player.getFactionEmoji())
+                    .append(": ")
+                    .append(player.getTotalVictoryPoints())
+                    .append("/")
+                    .append(game.getVp())
+                    .append("  ");
             }
         }
         return representation.toString();
@@ -463,8 +459,8 @@ public class ListPlayerInfoService {
                 int edge = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.playerHasUnitsInSystem(player, tile)
-                            && tile.isEdgeOfBoard(game)
-                            && tile != player.getHomeSystemTile()) {
+                        && tile.isEdgeOfBoard(game)
+                        && tile != player.getHomeSystemTile()) {
                         edge++;
                     }
                 }
@@ -482,29 +478,24 @@ public class ListPlayerInfoService {
             }
             case "infrastructure", "protect_border" -> {
                 int counter = 0;
+                int maxPlanets = counter;
                 for (String planet : player.getPlanetsAllianceMode()) {
                     UnitHolder uH = ButtonHelper.getUnitHolderFromPlanetName(planet, game);
                     if (uH != null
-                            && game.getTileFromPlanet(planet) != player.getHomeSystemTile()
-                            && (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
-                                    || uH.getUnitCount(Units.UnitType.Pds, player) > 0)) {
-                        counter++;
+                        && game.getTileFromPlanet(planet) != player.getHomeSystemTile()) {
+                        if (uH.getUnitCount(Units.UnitType.Spacedock, player) > 0
+                            || uH.getUnitCount(Units.UnitType.Pds, player) > 0) {
+                            counter++;
+                        }
+                        maxPlanets++;
                     }
+
                 }
                 if (player.hasAbility("privileged_citizenry")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false);
                 }
                 if (player.hasAbility("orbital_foundries")) {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
-                }
-                int maxPlanets = counter;
-                if (player.getHomeSystemTile() != null) {
-                    maxPlanets = Math.max(
-                            0,
-                            player.getPlanetsAllianceMode().size()
-                                    - player.getHomeSystemTile()
-                                            .getPlanetUnitHolders()
-                                            .size());
                 }
                 return Math.min(counter, maxPlanets);
             }
@@ -568,8 +559,7 @@ public class ListPlayerInfoService {
                 int count = 0;
                 Tile mecatol = game.getMecatolTile();
                 if (mecatol == null) return 2;
-                for (String pos :
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
+                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
                     Tile tile2 = game.getTileByPosition(pos);
                     if (FoWHelper.playerHasShipsInSystem(player, tile2)) {
                         count++;
@@ -581,8 +571,7 @@ public class ListPlayerInfoService {
                 int count = 0;
                 Tile mecatol = game.getMecatolTile();
                 if (mecatol == null) return 3;
-                for (String pos :
-                        FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
+                for (String pos : FoWHelper.getAdjacentTilesAndNotThisTile(game, mecatol.getPosition(), player, false)) {
                     Tile tile2 = game.getTileByPosition(pos);
                     if (tile2.containsPlayersUnits(player)) {
                         count++;
@@ -608,7 +597,7 @@ public class ListPlayerInfoService {
                     return forTG + leftOverTg + forInfluence + forResources;
                 } else {
                     return forTG
-                            + checkObjective(player.getReadiedPlanets(), leftOverTg, 3, player, game, 0).closenessScore;
+                        + checkObjective(player.getReadiedPlanets(), leftOverTg, 3, player, game, 0).closenessScore;
                 }
             }
             case "build_defenses", "massive_cities", "massive_cities_omegaphase" -> {
@@ -620,8 +609,8 @@ public class ListPlayerInfoService {
                     counter += ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "flagship", false);
                 }
                 return counter
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "pds", false)
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "sd", false);
             }
             case "lost_outposts", "ancient_monuments", "ancient_monuments_omegaphase" -> {
                 int count = 0;
@@ -631,7 +620,7 @@ public class ListPlayerInfoService {
                         count++;
                     } else {
                         if (planet.getName().contains("custodia")
-                                && game.getStoredValue("terraformedPlanet").equalsIgnoreCase(planet.getName())) {
+                            && game.getStoredValue("terraformedPlanet").equalsIgnoreCase(planet.getName())) {
                             count++;
                         }
                     }
@@ -640,8 +629,8 @@ public class ListPlayerInfoService {
             }
             case "engineer_marvel" -> {
                 return ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "fs", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
-                        + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "lady", false)
+                    + ButtonHelper.getNumberOfUnitsOnTheBoard(game, player, "warsun", false);
             }
             case "deep_space", "vast_territories", "vast_territories_omegaphase" -> {
                 return ButtonHelper.getNumberOfTilesPlayerIsInWithNoPlanets(game, player);
@@ -682,7 +671,7 @@ public class ListPlayerInfoService {
             case "supremacy", "supremacy_omegaphase" -> {
                 int count = 0;
                 for (Tile tile : ButtonHelper.getTilesOfPlayersSpecificUnits(
-                        game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
+                    game, player, Units.UnitType.Flagship, Units.UnitType.Warsun, Units.UnitType.Lady)) {
                     if ((tile.isHomeSystem(game) && tile != player.getHomeSystemTile()) || tile.isMecatol()) {
                         count++;
                     }
@@ -701,7 +690,7 @@ public class ListPlayerInfoService {
                     return forTG + leftOverTg + forInfluence + forResources;
                 } else {
                     return forTG
-                            + checkObjective(player.getReadiedPlanets(), leftOverTg, 6, player, game, 0).closenessScore;
+                        + checkObjective(player.getReadiedPlanets(), leftOverTg, 6, player, game, 0).closenessScore;
                 }
             }
             case "distant_lands", "distant_lands_omegaphase" -> {
@@ -733,8 +722,8 @@ public class ListPlayerInfoService {
                     Planet planet = game.getPlanetsInfo().get(p);
                     if (planet == null) {
                         BotLogger.warning(
-                                new BotLogger.LogMessageOrigin(player),
-                                "Planet \"" + p + "\" not found for game " + game.getName());
+                            new BotLogger.LogMessageOrigin(player),
+                            "Planet \"" + p + "\" not found for game " + game.getName());
                     } else if (planet.isLegendary()) {
                         count++;
                     }
@@ -802,7 +791,7 @@ public class ListPlayerInfoService {
             }
             case "dfat" -> {
                 Tile tile = Optional.ofNullable(game.getTileFromPlanet("mallice"))
-                        .orElseGet(() -> game.getTileFromPlanet("hexmallice"));
+                    .orElseGet(() -> game.getTileFromPlanet("hexmallice"));
                 if (!FoWHelper.playerHasUnitsInSystem(player, tile)) {
                     return 0;
                 } else {
@@ -889,7 +878,7 @@ public class ListPlayerInfoService {
                 int alpha = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.doesTileHaveAlpha(game, tile.getPosition())
-                            && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                        && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         alpha = 1;
                         break;
                     }
@@ -898,7 +887,7 @@ public class ListPlayerInfoService {
                 int beta = 0;
                 for (Tile tile : game.getTileMap().values()) {
                     if (FoWHelper.doesTileHaveBeta(game, tile.getPosition())
-                            && FoWHelper.playerHasShipsInSystem(player, tile)) {
+                        && FoWHelper.playerHasShipsInSystem(player, tile)) {
                         beta = 1;
                         break;
                     }

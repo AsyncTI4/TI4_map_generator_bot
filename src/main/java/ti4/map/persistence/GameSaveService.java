@@ -2,7 +2,6 @@ package ti4.map.persistence;
 
 import static ti4.map.persistence.GamePersistenceKeys.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.helpers.Constants;
@@ -138,7 +140,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " "
-                + game.getLastActivePlayerChange().getTime());
+            + game.getLastActivePlayerChange().getTime());
         writer.write(System.lineSeparator());
 
         Map<Integer, Boolean> scPlayed = game.getScPlayed();
@@ -162,9 +164,9 @@ class GameSaveService {
         sb2 = new StringBuilder();
         for (Map.Entry<String, String> entry : currentCheckingForAllReacts.entrySet()) {
             sb2.append(entry.getKey())
-                    .append(",")
-                    .append(entry.getValue().replace("\n", ". "))
-                    .append(":");
+                .append(",")
+                .append(entry.getValue().replace("\n", ". "))
+                .append(":");
         }
         writer.write(Constants.CHECK_REACTS_INFO + " " + sb2);
         writer.write(System.lineSeparator());
@@ -198,6 +200,9 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AGENDAS + " " + String.join(",", game.getAgendas()));
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.MANDATES + " " + String.join(",", game.getMandates()));
         writer.write(System.lineSeparator());
 
         writeCards(game.getDiscardAgendas(), writer, Constants.DISCARDED_AGENDAS);
@@ -267,8 +272,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         StringBuilder sb1 = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry :
-                game.getScoredPublicObjectives().entrySet()) {
+        for (Map.Entry<String, List<String>> entry : game.getScoredPublicObjectives().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             sb1.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -276,8 +280,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacentTiles = new StringBuilder();
-        for (Map.Entry<String, List<String>> entry :
-                game.getCustomAdjacentTiles().entrySet()) {
+        for (Map.Entry<String, List<String>> entry : game.getCustomAdjacentTiles().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             adjacentTiles.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -288,10 +291,10 @@ class GameSaveService {
         for (Map.Entry<String, String> entry : game.getCustomHyperlaneData().entrySet()) {
             String encodedData = CustomHyperlaneService.encodeMatrix(entry.getValue());
             customHyperlaneData
-                    .append(entry.getKey())
-                    .append(",")
-                    .append(encodedData)
-                    .append(";");
+                .append(entry.getKey())
+                .append(",")
+                .append(encodedData)
+                .append(";");
         }
         writer.write(Constants.CUSTOM_HYPERLANE_DATA + " " + customHyperlaneData);
         writer.write(System.lineSeparator());
@@ -300,8 +303,7 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacencyOverrides = new StringBuilder();
-        for (Map.Entry<Pair<String, Integer>, String> entry :
-                game.getAdjacentTileOverrides().entrySet()) {
+        for (Map.Entry<Pair<String, Integer>, String> entry : game.getAdjacentTileOverrides().entrySet()) {
             adjacencyOverrides.append(entry.getKey().getLeft()).append("-");
             adjacencyOverrides.append(entry.getKey().getRight()).append("-");
             adjacencyOverrides.append(entry.getValue()).append(";");
@@ -355,10 +357,10 @@ class GameSaveService {
         StringBuilder fowOptions = new StringBuilder();
         for (Map.Entry<FOWOption, Boolean> entry : game.getFowOptions().entrySet()) {
             fowOptions
-                    .append(entry.getKey())
-                    .append(",")
-                    .append(entry.getValue())
-                    .append(";");
+                .append(entry.getKey())
+                .append(",")
+                .append(entry.getValue())
+                .append(";");
         }
         writer.write(Constants.FOW_OPTIONS + " " + fowOptions);
         writer.write(System.lineSeparator());
@@ -507,9 +509,9 @@ class GameSaveService {
         writer.write(System.lineSeparator());
 
         writer.write(Constants.BAG_DRAFT + " "
-                + (game.getActiveBagDraft() == null
-                        ? ""
-                        : game.getActiveBagDraft().getSaveString()));
+            + (game.getActiveBagDraft() == null
+                ? ""
+                : game.getActiveBagDraft().getSaveString()));
         writer.write(System.lineSeparator());
 
         writer.write(Constants.GAME_TAGS + " " + String.join(",", game.getTags()));
@@ -537,8 +539,7 @@ class GameSaveService {
         writer.write(Constants.STRATEGY_CARD_SET + " " + game.getScSetID());
         writer.write(System.lineSeparator());
 
-        String anomaliesJson =
-                mapper.writeValueAsString(game.getBorderAnomalies()); // much easier than manually (de)serialising
+        String anomaliesJson = mapper.writeValueAsString(game.getBorderAnomalies()); // much easier than manually (de)serialising
         writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
         writer.write(System.lineSeparator());
 
@@ -584,8 +585,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(Constants.FACTION_EMOJI + " " + player.getFactionEmojiRaw());
             writer.write(System.lineSeparator());
-            String displayName =
-                    player.getDisplayName() != null ? player.getDisplayName().replace(" ", "_") : "null";
+            String displayName = player.getDisplayName() != null ? player.getDisplayName().replace(" ", "_") : "null";
             writer.write(Constants.FACTION_DISPLAY_NAME + " " + displayName);
             writer.write(System.lineSeparator());
             // TODO Remove when no longer relevant
@@ -682,7 +682,7 @@ class GameSaveService {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " "
-                    + String.join(",", player.getPromissoryNotesInPlayArea()));
+                + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.UNITS_OWNED + " " + String.join(",", player.getUnitsOwned()));
@@ -734,7 +734,7 @@ class GameSaveService {
             writer.write(Constants.PLANETS_EXHAUSTED + " " + String.join(",", player.getExhaustedPlanets()));
             writer.write(System.lineSeparator());
             writer.write(Constants.PLANETS_ABILITY_EXHAUSTED + " "
-                    + String.join(",", player.getExhaustedPlanetsAbilities()));
+                + String.join(",", player.getExhaustedPlanetsAbilities()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
@@ -790,7 +790,7 @@ class GameSaveService {
             writer.write(Constants.SO + " " + getStringRepresentationOfMap(player.getSecrets()));
             writer.write(System.lineSeparator());
             writer.write(
-                    Constants.PRODUCED_UNITS + " " + getStringRepresentationOfMap(player.getCurrentProducedUnits()));
+                Constants.PRODUCED_UNITS + " " + getStringRepresentationOfMap(player.getCurrentProducedUnits()));
             writer.write(System.lineSeparator());
             writer.write(Constants.SO_SCORED + " " + getStringRepresentationOfMap(player.getSecretsScored()));
             writer.write(System.lineSeparator());
@@ -800,15 +800,15 @@ class GameSaveService {
             writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
             writer.write(System.lineSeparator());
             writer.write(Constants.STRATEGY_CARD + " "
-                    + String.join(
-                            ",", player.getSCs().stream().map(String::valueOf).toList()));
+                + String.join(
+                    ",", player.getSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
             writer.write(Constants.FOLLOWED_SC + " "
-                    + String.join(
-                            ",",
-                            player.getFollowedSCs().stream()
-                                    .map(String::valueOf)
-                                    .toList()));
+                + String.join(
+                    ",",
+                    player.getFollowedSCs().stream()
+                        .map(String::valueOf)
+                        .toList()));
             writer.write(System.lineSeparator());
 
             StringBuilder leaderInfo = new StringBuilder();
@@ -906,7 +906,7 @@ class GameSaveService {
     }
 
     private static void writeCardsStrings(Map<String, String> cardList, Writer writer, String saveID)
-            throws IOException {
+        throws IOException {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
@@ -936,11 +936,10 @@ class GameSaveService {
             writer.write(System.lineSeparator());
             writer.write(unitHolder.getName());
             writer.write(System.lineSeparator());
-            for (Entry<UnitKey, List<Integer>> entry :
-                    unitHolder.getUnitsByState().entrySet()) {
+            for (Entry<UnitKey, List<Integer>> entry : unitHolder.getUnitsByState().entrySet()) {
                 if (entry.getKey() != null) {
                     String amtString = String.join(
-                            ",", entry.getValue().stream().map(Object::toString).toList());
+                        ",", entry.getValue().stream().map(Object::toString).toList());
                     writer.write(entry.getKey().outputForSave() + " " + amtString);
                     writer.write(System.lineSeparator());
                 }
@@ -980,7 +979,8 @@ class GameSaveService {
     }
 
     private static void savePeekedPublicObjectives(
-            Writer writer, final String constant, Map<String, List<String>> peekedPOs) {
+        Writer writer, final String constant, Map<String, List<String>> peekedPOs
+    ) {
         try {
             writer.write(constant + " ");
 
@@ -1006,8 +1006,7 @@ class GameSaveService {
             if (!mapStorage.exists()) {
                 return false;
             }
-            File deletedMapStorage =
-                    Storage.getDeletedGame(gameName + "_" + System.currentTimeMillis() + Constants.TXT);
+            File deletedMapStorage = Storage.getDeletedGame(gameName + "_" + System.currentTimeMillis() + Constants.TXT);
             return mapStorage.renameTo(deletedMapStorage);
         });
     }
