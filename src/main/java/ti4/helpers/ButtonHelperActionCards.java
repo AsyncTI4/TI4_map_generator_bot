@@ -55,8 +55,8 @@ public class ButtonHelperActionCards {
                 buttons.add(validTile);
             }
         }
-        // Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Decline");
-        // buttons.add(validTile2);
+        Button validTile2 = Buttons.red(finChecker + "deleteButtons", "Decline");
+        buttons.add(validTile2);
         return buttons;
     }
 
@@ -2342,7 +2342,7 @@ public class ButtonHelperActionCards {
                     player.getCorrectChannel(),
                     player.getRepresentationUnfogged() + ", you crippled " + planetRep
                             + (amount > 0
-                                    ? " and killed " + amount + " of " + p2.getRepresentationUnfogged() + " PDS."
+                                    ? " and killed " + amount + "of " + p2.getRepresentationUnfogged() + " PDS."
                                     : ". There were no " + p2.getRepresentationUnfogged() + " PDS to kill."));
         }
     }

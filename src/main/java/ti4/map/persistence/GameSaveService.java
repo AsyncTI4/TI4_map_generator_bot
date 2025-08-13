@@ -200,9 +200,6 @@ class GameSaveService {
         writer.write(Constants.AGENDAS + " " + String.join(",", game.getAgendas()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.MANDATES + " " + String.join(",", game.getMandates()));
-        writer.write(System.lineSeparator());
-
         writeCards(game.getDiscardAgendas(), writer, Constants.DISCARDED_AGENDAS);
         writeCards(game.getSentAgendas(), writer, Constants.SENT_AGENDAS);
         writeCards(game.getLaws(), writer, Constants.LAW);
