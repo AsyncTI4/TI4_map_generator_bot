@@ -1,7 +1,7 @@
 package ti4.map;
 
-import static java.util.function.Predicate.not;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static java.util.function.Predicate.*;
+import static org.apache.commons.collections4.CollectionUtils.*;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.awt.*;
+import java.awt.Point;
 import java.lang.reflect.Field;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -3369,6 +3369,74 @@ public class Game extends GameProperties {
         }
         setAgendaDeckID(deck.getAlias());
         setAgendas(deck.getNewShuffledDeck());
+        if (deck.getAlias().equalsIgnoreCase("agendas_br")) {
+            List<String> list = new ArrayList<>(Arrays.asList(
+                    "prophecy",
+                    "minister_antiquities",
+                    "minister_commrece",
+                    "minister_exploration",
+                    "minister_industry",
+                    "minister_peace",
+                    "minister_policy",
+                    "minister_sciences",
+                    "minister_war",
+                    "censure",
+                    "arbiter",
+                    "abolishment",
+                    "classified",
+                    "crisis",
+                    "execution",
+                    "grant_reallocation",
+                    "redistribution",
+                    "secret",
+                    "standardization",
+                    "warrant",
+                    "prophecy",
+                    "minister_antiquities",
+                    "minister_commrece",
+                    "minister_exploration",
+                    "minister_industry",
+                    "minister_peace",
+                    "minister_policy",
+                    "minister_sciences",
+                    "minister_war",
+                    "censure",
+                    "arbiter",
+                    "abolishment",
+                    "classified",
+                    "crisis",
+                    "execution",
+                    "grant_reallocation",
+                    "redistribution",
+                    "secret",
+                    "standardization",
+                    "warrant",
+                    "prophecy",
+                    "minister_antiquities",
+                    "minister_commrece",
+                    "minister_exploration",
+                    "minister_industry",
+                    "minister_peace",
+                    "minister_policy",
+                    "minister_sciences",
+                    "minister_war",
+                    "censure",
+                    "arbiter",
+                    "abolishment",
+                    "classified",
+                    "crisis",
+                    "execution",
+                    "grant_reallocation",
+                    "redistribution",
+                    "secret",
+                    "standardization",
+                    "warrant",
+                    "strategic_coordination",
+                    "minister_of_justice",
+                    "invalidated_patent"));
+            Collections.shuffle(list);
+            setMandates(list);
+        }
         return true;
     }
 

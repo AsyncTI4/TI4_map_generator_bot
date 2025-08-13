@@ -1,6 +1,6 @@
 package ti4.helpers;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,6 +88,9 @@ public class PlayerPreferenceHelper {
             UserSettingsManager.save(userSettings);
         } else {
             player.setAutoPassOnWhensAfters("true".equals(trueOrFalse));
+            var userSettings = UserSettingsManager.get(player.getUserID());
+            userSettings.setPrefersPassOnWhensAfters("true".equals(trueOrFalse));
+            UserSettingsManager.save(userSettings);
         }
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(), "Set setting successfully");
         ButtonHelper.deleteMessage(event);
@@ -116,6 +119,26 @@ public class PlayerPreferenceHelper {
         buttons.add(Buttons.red("setAutoPassMedian_" + x, "Turn off (if already on)"));
         if (player2 == null) {
             for (Player player : game.getRealPlayers()) {
+                var userSettings = UserSettingsManager.get(player.getUserID());
+                if (userSettings.getAutoNoSaboInterval() > 0) {
+
+                    player.setAutoSaboPassMedian(userSettings.getAutoNoSaboInterval());
+                    if (userSettings.isPrefersPassOnWhensAfters()) {
+                        if (!player.hasAbility("quash")
+                                && !player.ownsPromissoryNote("rider")
+                                && !player.getPromissoryNotes().containsKey("riderm")
+                                && !player.hasAbility("radiance")
+                                && !player.hasAbility("galactic_threat")
+                                && !player.hasAbility("conspirators")
+                                && !player.ownsPromissoryNote("riderx")
+                                && !player.ownsPromissoryNote("riderm")
+                                && !player.ownsPromissoryNote("ridera")
+                                && !player.hasTechReady("gr")) {
+                            player.setAutoPassOnWhensAfters(true);
+                        }
+                    }
+                    continue;
+                }
                 String message = player.getRepresentationUnfogged()
                         + " you may choose to automatically pass on Sabos after a random amount of time if you don't have a Sabo/Instinct Training/Watcher mechs."
                         + " How it works is you secretly set a median time (in hours) here, and then from now on when an action card is played, the bot will randomly react for you, 50% of the time being above that amount of time and 50% below."

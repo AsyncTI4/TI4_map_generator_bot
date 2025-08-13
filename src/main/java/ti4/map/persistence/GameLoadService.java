@@ -371,6 +371,7 @@ class GameLoadService {
                 }
                 case Constants.REVERSE_SPEAKER_ORDER -> game.setReverseSpeakerOrder("true".equals(info));
                 case Constants.AGENDAS -> game.setAgendas(getCardList(info));
+                case Constants.MANDATES -> game.setMandates(getCardList(info));
                 case Constants.AC_DISCARDED -> game.setDiscardActionCards(getParsedCards(info));
                 case Constants.AC_PURGED -> game.setPurgedActionCards(getParsedCards(info));
                 case Constants.DISCARDED_AGENDAS -> game.setDiscardAgendas(getParsedCards(info));
