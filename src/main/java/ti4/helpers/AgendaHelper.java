@@ -2421,10 +2421,10 @@ public class AgendaHelper {
 
         for (String outcome : outcomes.keySet()) {
             if (outcome.equalsIgnoreCase(winner)) {
-                StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+                StringTokenizer voteInfo = new StringTokenizer(outcomes.get(outcome), ";");
 
-                while (vote_info.hasMoreTokens()) {
-                    String specificVote = vote_info.nextToken();
+                while (voteInfo.hasMoreTokens()) {
+                    String specificVote = voteInfo.nextToken();
                     String faction = specificVote.substring(0, specificVote.indexOf('_'));
                     Player loser = game.getPlayerFromColorOrFaction(faction.toLowerCase());
                     if (loser != null

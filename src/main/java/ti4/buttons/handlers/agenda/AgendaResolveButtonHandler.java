@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -1078,7 +1077,6 @@ class AgendaResolveButtonHandler {
         }
 
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
-
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
