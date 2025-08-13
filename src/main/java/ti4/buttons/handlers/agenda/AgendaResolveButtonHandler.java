@@ -1094,10 +1094,10 @@ class AgendaResolveButtonHandler {
 
     private static void handleMutiny(Game game, String winner) {
         boolean agendaWentFor = "for".equalsIgnoreCase(winner);
-        List<Player> winOrLose = agendaWentFor
+        List<Player> winningOrLosingPlayers = agendaWentFor
                 ? AgendaHelper.getWinningVoters(winner, game)
                 : AgendaHelper.getLosingVoters(winner, game);
-        if (winOrLose.isEmpty()) {
+        if (winningOrLosingPlayers.isEmpty()) {
             return;
         }
 
@@ -1105,16 +1105,16 @@ class AgendaResolveButtonHandler {
 
         StringBuilder message = new StringBuilder();
         message.append("Custom objective _Mutiny_ has been added.\n");
-        for (Player playerWL : winOrLose) {
-            if (playerWL.getTotalVictoryPoints() < 1 && !agendaWentFor) {
+        for (var winningOrLosingPlayer : winningOrLosingPlayers) {
+            if (winningOrLosingPlayer.getTotalVictoryPoints() < 1 && !agendaWentFor) {
                 continue;
             }
-            game.scorePublicObjective(playerWL.getUserID(), poIndex);
+            game.scorePublicObjective(winningOrLosingPlayer.getUserID(), poIndex);
             if (!game.isFowMode()) {
-                message.append(playerWL.getRepresentation()).append(" scored _Mutiny_.\n");
+                message.append(winningOrLosingPlayer.getRepresentation()).append(" scored _Mutiny_.\n");
             }
-            Helper.checkEndGame(game, playerWL);
-            if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
+            Helper.checkEndGame(game, winningOrLosingPlayer);
+            if (winningOrLosingPlayer.getTotalVictoryPoints() >= game.getVp()) {
                 break;
             }
         }
