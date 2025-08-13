@@ -9,6 +9,7 @@
 	- Other faction units should be written as `a Name (Faction unittype)`
 - Emphasis and list item text headers should be `__underlined__`;
 - Agenda outcomes should be `"For"` and `"Against"`;
+- Agenda timing abilities should be `"when"s` and `"after"s`;
 - Reminder text should be `-# small text` on a new line;
 - Text should be in sentence case;
 - Text should read as a proper sentence (including period);
@@ -16,7 +17,8 @@
 - Abbreviations should be avoided;
 	- Use "command token from [their] tactic pool" etc.;
 - Bot commands should be ``` `teletext` ```;
-- Reference to the cards info thread should be ``` `#cards-info` thread```
+- Reference to the cards info thread should be ``` `#cards-info` thread```;
+- Avoid "use buttons" in favour of "please choose the [game object] that you with to [whatever]"
 # Buttons
 - Text should be in Title Case;
 - Ability use should be `Use AbilitySource`;
@@ -33,7 +35,7 @@
 - For unit themselves, no attributes or keyword abilities in ability text field(s) - these are taken from dedicated data fields
     - E.g. war sun "Other players' units in this system lose PLANETARY SHIELD."
     - E.g. space dock "This unit's PRODUCTION value is equal to 4 more than the resource value of this planet.\nUp to 3 fighters in this system do not count against your ships' capacity."
-- for technologies and unit abilities, split unrelated abilities by a single newline
+- For technologies and unit abilities, split unrelated abilities by a single newline
 # Vocabulary
 - Short faction names should be what appears on their promissory notes/unit upgrades;
   - In particular, "N'orr", "Creuss", "Vuil'raith", "Ul";

@@ -93,6 +93,7 @@ import ti4.service.emoji.MiscEmojis;
 import ti4.service.emoji.PlanetEmojis;
 import ti4.service.emoji.SourceEmojis;
 import ti4.service.emoji.TechEmojis;
+import ti4.service.emoji.TileEmojis;
 import ti4.service.emoji.UnitEmojis;
 import ti4.service.explore.ExploreService;
 import ti4.service.fow.FOWCombatThreadMirroring;
@@ -796,7 +797,7 @@ public class ButtonHelper {
     }
 
     @ButtonHandler(value = "offerDeckButtons", save = false)
-    public static void offerDeckButtons(ButtonInteractionEvent event) {
+    public static void offerDeckButtons(Game game, ButtonInteractionEvent event) {
         List<Button> buttons = new ArrayList<>();
         buttons.add(Buttons.gray("showDeck_frontier", "Frontier", ExploreEmojis.Frontier));
         buttons.add(Buttons.blue("showDeck_cultural", "Cultural", ExploreEmojis.Cultural));
@@ -814,9 +815,13 @@ public class ButtonHelper {
         buttons.add(Buttons.gray("showDeck_relic", "Relics", ExploreEmojis.Relic));
         buttons.add(Buttons.gray("showDeck_unscoredSO", "Unscored Secret Objectives", CardEmojis.SecretObjective));
         buttons.add(Buttons.gray("showObjInfo_both", "All Revealed Objectives in Game", CardEmojis.Public1));
+        if (true || game.isAgeOfExplorationMode()) {
+            buttons.add(Buttons.gray("showDeck_tiles", "Remaining Tiles", TileEmojis.TileBlueBack));
+        }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Pick a deck to show:", buttons);
     }
 
+    // Implemented in ShowAgendasButtonHandler for some reason!?
     @ButtonHandler(value = "showDeck_", save = false)
     public static void resolveDeckChoice(Game game, ButtonInteractionEvent event, String buttonID, Player player) {
         String deck = buttonID.replace("showDeck_", "");
@@ -843,6 +848,8 @@ public class ButtonHelper {
                 ExploreService.secondHalfOfExpInfo(types, event, player, game, false);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msg, buttons);
             }
+            default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
+            case "tiles" -> EventHelper.showRemainingTiles(game, event);
             default -> MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Deck Button Not Implemented: " + deck);
         }
         deleteMessage(event);
