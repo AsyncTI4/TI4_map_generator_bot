@@ -59,18 +59,18 @@ class AgendaResolveButtonHandler {
     public static void resolveAgenda(Game game, String buttonID, ButtonInteractionEvent event) {
         MessageChannel actionsChannel = game.getMainGameChannel();
         String winner = buttonID.substring(buttonID.indexOf('_') + 1);
-        String agendaid = game.getCurrentAgendaInfo().split("_")[2];
+        String agendaId = game.getCurrentAgendaInfo().split("_")[2];
         if (game.getStoredValue(
                         "agendaRes" + game.getRound() + game.getDiscardAgendas().size())
-                .equalsIgnoreCase(winner + agendaid)) {
+                .equalsIgnoreCase(winner + agendaId)) {
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(), "Double press suspected, stopping resolution here.");
             return;
         }
         game.setStoredValue(
-                "agendaRes" + game.getRound() + game.getDiscardAgendas().size(), winner + agendaid);
+                "agendaRes" + game.getRound() + game.getDiscardAgendas().size(), winner + agendaId);
         int aID;
-        if ("CL".equalsIgnoreCase(agendaid)) {
+        if ("CL".equalsIgnoreCase(agendaId)) {
             String id2 = game.revealAgenda(false);
             Map<String, Integer> discardAgendas = game.getDiscardAgendas();
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
@@ -82,7 +82,7 @@ class AgendaResolveButtonHandler {
                     game.getMainGameChannel(), "Hidden Agenda", agendaDetails.getRepresentationEmbed());
             aID = discardAgendas.get(id2);
         } else {
-            aID = Integer.parseInt(agendaid);
+            aID = Integer.parseInt(agendaId);
         }
         Map<String, Integer> discardAgendas = game.getDiscardAgendas();
         String agID = "";
@@ -1077,7 +1077,6 @@ class AgendaResolveButtonHandler {
         }
 
         if (!"miscount".equalsIgnoreCase(agID) && !"absol_miscount".equalsIgnoreCase(agID)) {
-
             MessageHelper.sendMessageToChannel(event.getChannel(), resMes);
             if (!game.getPhaseOfGame().equalsIgnoreCase("action")) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, buttons);
@@ -1093,27 +1092,27 @@ class AgendaResolveButtonHandler {
 
     private static void handleMutiny(Game game, String winner) {
         boolean agendaWentFor = "for".equalsIgnoreCase(winner);
-        List<Player> winOrLose = agendaWentFor
+        List<Player> winningOrLosingPlayers = agendaWentFor
                 ? AgendaHelper.getWinningVoters(winner, game)
                 : AgendaHelper.getLosingVoters(winner, game);
-        if (winOrLose.isEmpty()) {
+        if (winningOrLosingPlayers.isEmpty()) {
             return;
         }
 
-        Integer poIndex = game.addCustomPO("Mutiny", 1);
+        Integer poIndex = game.addCustomPO("Mutiny", agendaWentFor ? 1 : -1);
 
         StringBuilder message = new StringBuilder();
         message.append("Custom objective _Mutiny_ has been added.\n");
-        for (Player playerWL : winOrLose) {
-            if (playerWL.getTotalVictoryPoints() < 1 && !agendaWentFor) {
+        for (var winningOrLosingPlayer : winningOrLosingPlayers) {
+            if (winningOrLosingPlayer.getTotalVictoryPoints() < 1 && !agendaWentFor) {
                 continue;
             }
-            game.scorePublicObjective(playerWL.getUserID(), poIndex);
+            game.scorePublicObjective(winningOrLosingPlayer.getUserID(), poIndex);
             if (!game.isFowMode()) {
-                message.append(playerWL.getRepresentation()).append(" scored _Mutiny_.\n");
+                message.append(winningOrLosingPlayer.getRepresentation()).append(" scored _Mutiny_.\n");
             }
-            Helper.checkEndGame(game, playerWL);
-            if (playerWL.getTotalVictoryPoints() >= game.getVp()) {
+            Helper.checkEndGame(game, winningOrLosingPlayer);
+            if (winningOrLosingPlayer.getTotalVictoryPoints() >= game.getVp()) {
                 break;
             }
         }
