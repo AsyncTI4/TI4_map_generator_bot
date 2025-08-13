@@ -9,12 +9,12 @@ import ti4.message.MessageHelper;
 
 public class GrantReallocationAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "grant_reallocation";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         Player player2 = game.getPlayerFromColorOrFaction(winner);
         if (player2 == null) return;
         MessageHelper.sendMessageToChannelWithButtons(

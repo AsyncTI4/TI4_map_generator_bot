@@ -8,12 +8,12 @@ import ti4.map.Player;
 
 public class PlowsharesAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "plowshares";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if ("for".equalsIgnoreCase(winner)) {
             for (Player playerB : game.getRealPlayers()) {
                 AgendaHelper.doSwords(playerB, event, game);

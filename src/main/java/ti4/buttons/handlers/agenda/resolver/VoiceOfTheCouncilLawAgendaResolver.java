@@ -8,12 +8,12 @@ import ti4.map.Player;
 
 public class VoiceOfTheCouncilLawAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return Constants.VOICE_OF_THE_COUNCIL_ID;
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         Player player2 = game.getPlayerFromColorOrFaction(winner);
         if (player2 == null) return;
         VoiceOfTheCouncilHelper.ElectVoiceOfTheCouncil(game, player2);

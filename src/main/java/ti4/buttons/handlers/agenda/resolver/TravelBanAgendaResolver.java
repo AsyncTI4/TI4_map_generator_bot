@@ -17,12 +17,12 @@ import ti4.service.unit.DestroyUnitService;
 
 public class TravelBanAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "travel_ban";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if (!"for".equalsIgnoreCase(winner)) {
             Set<String> wormholesAndAdj = new HashSet<>();
             for (Tile tile : ButtonHelper.getAllWormholeTiles(game)) {

@@ -13,12 +13,12 @@ import ti4.service.emoji.MiscEmojis;
 
 public class EconomicEqualityAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "economic_equality";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         int finalTG = "for".equalsIgnoreCase(winner) ? 5 : 0;
         int maxLoss = 12;
         List<Player> comrades = new ArrayList<>();

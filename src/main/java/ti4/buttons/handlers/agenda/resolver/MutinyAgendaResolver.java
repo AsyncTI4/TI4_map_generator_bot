@@ -10,12 +10,12 @@ import ti4.message.MessageHelper;
 
 public class MutinyAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "mutiny";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         boolean agendaWentFor = "for".equalsIgnoreCase(winner);
         List<Player> winningOrLosingPlayers = agendaWentFor
                 ? AgendaHelper.getWinningVoters(winner, game)

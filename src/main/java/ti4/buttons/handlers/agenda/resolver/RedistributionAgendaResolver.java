@@ -18,12 +18,12 @@ import ti4.service.unit.DestroyUnitService;
 
 public class RedistributionAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "redistribution";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         for (Player player : game.getRealPlayers()) {
             if (player.getPlanets().contains(winner.toLowerCase())) {
                 Planet uH = ButtonHelper.getUnitHolderFromPlanetName(winner, game);

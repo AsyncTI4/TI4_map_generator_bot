@@ -9,12 +9,12 @@ import ti4.message.MessageHelper;
 
 public class NexusAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "nexus";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if (!"for".equalsIgnoreCase(winner)) {
             Tile tile = game.getMecatolTile();
             if (tile != null) {

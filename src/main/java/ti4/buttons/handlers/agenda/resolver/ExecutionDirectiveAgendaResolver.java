@@ -8,12 +8,12 @@ import ti4.message.MessageHelper;
 
 public class ExecutionDirectiveAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "execution";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         Player player2 = game.getPlayerFromColorOrFaction(winner);
         if (player2 == null) return;
         String message =

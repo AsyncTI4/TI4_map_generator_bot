@@ -11,12 +11,12 @@ import ti4.message.MessageHelper;
 
 public class AbsolMeasuresAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "absol_measures";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if ("for".equalsIgnoreCase(winner)) {
             for (Player playerWL : AgendaHelper.getWinningVoters(winner, game)) {
                 if (playerWL.hasAbility("autonetic_memory")) {

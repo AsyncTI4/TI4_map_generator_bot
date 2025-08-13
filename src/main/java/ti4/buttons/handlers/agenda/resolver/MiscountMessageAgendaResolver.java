@@ -7,7 +7,7 @@ import ti4.message.MessageHelper;
 
 public class MiscountMessageAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return agId;
     }
 
@@ -22,7 +22,7 @@ public class MiscountMessageAgendaResolver implements AgendaResolver {
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
                 "# Repealed the " + Mapper.getAgendaTitleNoCap(winner)

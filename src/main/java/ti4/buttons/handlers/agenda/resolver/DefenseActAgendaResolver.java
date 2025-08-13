@@ -10,12 +10,12 @@ import ti4.message.MessageHelper;
 
 public class DefenseActAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "defense_act";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
         if (!"for".equalsIgnoreCase(winner)) {
             for (Player player : game.getRealPlayers()) {
                 if (!ButtonHelper.getTilesOfPlayersSpecificUnits(game, player, UnitType.Pds)

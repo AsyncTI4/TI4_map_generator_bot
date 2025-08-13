@@ -11,21 +11,21 @@ import ti4.message.MessageHelper;
 
 public class ArticlesOfWarAgendaResolver implements AgendaResolver {
     @Override
-    public String getAgID() {
+    public String getAgendaId() {
         return "articles_war";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int aID, String winner) {
-        if (!"for".equalsIgnoreCase(winner)) {
-            List<Player> winOrLose = AgendaHelper.getLosingVoters(winner, game);
-            for (Player playerWL : winOrLose) {
-                playerWL.setTg(playerWL.getTg() + 3);
-                ButtonHelperAbilities.pillageCheck(playerWL, game);
-                ButtonHelperAgents.resolveArtunoCheck(playerWL, 3);
-            }
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Given 3 trade goods to those who voted \"For\".");
+    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
+        if("for".equalsIgnoreCase(winner)) return;
+        List<Player> winOrLose = AgendaHelper.getLosingVoters(winner, game);
+        for (Player playerWL : winOrLose) {
+            playerWL.setTg(playerWL.getTg() + 3);
+            ButtonHelperAbilities.pillageCheck(playerWL, game);
+            ButtonHelperAgents.resolveArtunoCheck(playerWL, 3);
         }
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(), "Given 3 trade goods to those who voted \"For\".");
     }
+
 }
