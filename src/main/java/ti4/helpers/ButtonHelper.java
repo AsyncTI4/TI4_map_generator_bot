@@ -6928,6 +6928,9 @@ public class ButtonHelper {
     }
 
     public static void sendMessageToRightStratThread(Player player, Game game, String message, String stratName) {
+        if (message.contains("please choose the planets you wish to exhaust.")) {
+            return;
+        }
         sendMessageToRightStratThread(player, game, message, stratName, null);
     }
 
