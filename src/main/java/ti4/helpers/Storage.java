@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -294,8 +293,8 @@ public class Storage {
     @NotNull
     public static Path getGamePath(String gameName) {
         return Path.of(getStoragePath() + GAMES_PATH + gameName)
-            .toAbsolutePath()
-            .normalize();
+                .toAbsolutePath()
+                .normalize();
     }
 
     @NotNull
