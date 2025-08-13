@@ -1,13 +1,33 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.*;
+import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.TILE;
+import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +50,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.milty.MiltyDraftManager;
@@ -48,6 +69,31 @@ class GameSaveService {
     }
 
     private static boolean save(Game game) {
+        updateBeforeSave(game);
+
+        Path gameSavePath = Storage.getGamePath(game.getName() + Constants.TXT);
+        Path gameSaveDirectory = gameSavePath.getParent();
+        Path temporarySavePath = null;
+        try {
+            temporarySavePath = Files.createTempFile(gameSaveDirectory, game.getName(), ".tmp");
+
+            saveGame(game, temporarySavePath);
+
+            Files.move(temporarySavePath, gameSavePath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not save map: " + game.getName(), e);
+            MessageHelper.sendMessageToChannel(
+                    game.getActionsChannel(), "Failed to save the game during the last command.");
+            return false;
+        } finally {
+            deleteTemporaryFileIfNeeded(temporarySavePath);
+        }
+
+        GameUndoService.createUndoCopy(game.getName());
+        return true;
+    }
+
+    private static void updateBeforeSave(Game game) {
         TransientGameInfoUpdater.update(game);
 
         // Ugly fix to update seen tiles data for fog since doing it in
@@ -57,9 +103,19 @@ class GameSaveService {
                 FoWHelper.updateFog(game, player);
             }
         }
+    }
 
-        File gameFile = Storage.getGameFile(game.getName() + Constants.TXT);
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(gameFile))) {
+    private static void deleteTemporaryFileIfNeeded(Path temporarySavePath) {
+        if (temporarySavePath == null) return;
+        try {
+            Files.deleteIfExists(temporarySavePath);
+        } catch (IOException e) {
+            BotLogger.error("Failed to delete temporary file: " + temporarySavePath, e);
+        }
+    }
+
+    private static void saveGame(Game game, Path path) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             Map<String, Tile> tileMap = game.getTileMap();
             writer.write(game.getOwnerID());
             writer.write(System.lineSeparator());
@@ -73,13 +129,7 @@ class GameSaveService {
                 Tile tile = tileEntry.getValue();
                 saveTile(writer, tile);
             }
-        } catch (Exception e) {
-            BotLogger.error(new BotLogger.LogMessageOrigin(game), "Could not save map: " + game.getName(), e);
-            return false;
         }
-
-        GameUndoService.createUndoCopy(game.getName());
-        return true;
     }
 
     private static void saveGameInfo(Writer writer, Game game) throws IOException {
