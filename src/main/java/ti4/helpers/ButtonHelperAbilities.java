@@ -48,6 +48,7 @@ import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.MoveUnitService;
 import ti4.service.unit.RemoveUnitService;
+import ti4.settings.users.UserSettingsManager;
 
 public class ButtonHelperAbilities {
 
@@ -824,9 +825,18 @@ public class ButtonHelperAbilities {
                         ", so your trade goods went from " + pillaged.getTg() + " to " + (pillaged.getTg() - 1) + ".";
                 pillaged.setTg(pillaged.getTg() - 1);
             }
-            pillagedMessage +=
-                    " This number of times your gold has been forcefully liberated from your grasping hands for the benefit of the needy this game is "
-                            + pillaged.getPillageCounter() + ".";
+
+            var userSettings = UserSettingsManager.get(player.getUserID());
+            if (!userSettings.isPrefersPillageMsg()) {
+                pillagerMessage = player.getRepresentationUnfogged()
+                        + " you succesfully **Pillage**'d, so your ~~doubloons~~ trade goods have gone from "
+                        + player.getTg() + " to "
+                        + (player.getTg() + 1) + ".";
+            } else {
+                pillagedMessage +=
+                        " This number of times your gold has been forcefully liberated from your grasping hands for the benefit of the needy this game is "
+                                + pillaged.getPillageCounter() + ".";
+            }
             player.setTg(player.getTg() + 1);
             if (game.isFowMode()) {
                 MessageHelper.sendMessageToChannel(player.getCorrectChannel(), pillagerMessage);

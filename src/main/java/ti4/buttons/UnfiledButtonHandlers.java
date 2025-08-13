@@ -100,6 +100,7 @@ import ti4.service.turn.PassService;
 import ti4.service.turn.StartTurnService;
 import ti4.service.unit.AddUnitService;
 import ti4.service.unit.DestroyUnitService;
+import ti4.settings.users.UserSettingsManager;
 
 /**
  * TODO: move all of these methods to a better location, closer to the original button call and/or other related code
@@ -481,6 +482,9 @@ public class UnfiledButtonHandlers {
         int median = Integer.parseInt(hours);
         player.setAutoSaboPassMedian(median);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours");
+        var userSettings = UserSettingsManager.get(player.getUserID());
+        userSettings.setAutoNoSaboInterval(median);
+        UserSettingsManager.save(userSettings);
         if (median > 0) {
             if (!player.hasAbility("quash")
                     && !player.ownsPromissoryNote("rider")
@@ -492,16 +496,21 @@ public class UnfiledButtonHandlers {
                     && !player.ownsPromissoryNote("riderm")
                     && !player.ownsPromissoryNote("ridera")
                     && !player.hasTechReady("gr")) {
-                List<Button> buttons = new ArrayList<>();
-                String msg = player.getRepresentation()
-                        + ", the bot may also auto react for you when you have no \"when\"s or \"after\"s."
-                        + " Default for this is off. This will only apply to this game."
-                        + " If you have any \"when\"s or \"after\"s or related \"when\"/\"after\" abilities, it will not do anything. ";
-                buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
-                buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
-                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+                if (!userSettings.isPrefersPassOnWhensAfters()) {
+                    List<Button> buttons = new ArrayList<>();
+                    String msg = player.getRepresentation()
+                            + ", the bot may also auto react for you when you have no \"when\"s or \"after\"s."
+                            + " Default for this is off. This will only apply to this game."
+                            + " If you have any \"when\"s or \"after\"s or related \"when\"/\"after\" abilities, it will not do anything. ";
+                    buttons.add(Buttons.green("playerPrefDecision_true_agenda", "Turn on"));
+                    buttons.add(Buttons.green("playerPrefDecision_false_agenda", "Turn off"));
+                    MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(), msg, buttons);
+                } else {
+                    player.setAutoPassOnWhensAfters(true);
+                }
             }
         }
+
         ButtonHelper.deleteMessage(event);
     }
 
@@ -624,39 +633,43 @@ public class UnfiledButtonHandlers {
                         player.getFactionEmoji() + " has used _Sarween Tools_ to save " + player.getSarweenCounter()
                                 + " resource" + (player.getSarweenCounter() == 1 ? "" : "s") + " in this game so far. ";
                 int result = ThreadLocalRandom.current().nextInt(0, 5);
-                if (player.getSarweenCounter() < 6) {
+                var userSettings = UserSettingsManager.get(player.getUserID());
 
-                    List<String> lameMessages = Arrays.asList(
-                            "Not too impressive.",
-                            "The technology has not yet proven its worth.",
-                            "There better be more savings to come.",
-                            "Your faction's stockholders are so far unimpressed.",
-                            "Perhaps _AI Development Algorithm_ or _Scanlink Drone Network_ might have been more useful?");
-                    msg += lameMessages.get(result);
-                } else if (player.getSarweenCounter() < 11) {
-                    List<String> lameMessages = Arrays.asList(
-                            "Not too shabby.",
-                            "The technology is finally starting to justify its existence.",
-                            "Hopefully there are still even more savings to come.",
-                            "Your faction's stockholders are satisfied with the results of this technology.",
-                            "Some folks still think _Scanlink Drone Network_ might have been more useful.");
-                    msg += lameMessages.get(result);
-                } else if (player.getSarweenCounter() < 16) {
-                    List<String> lameMessages = Arrays.asList(
-                            "Very impressive.",
-                            "If only all technology was this productive.",
-                            "Surely there can't be even more savings to come?",
-                            "Your faction's stockholders are ecstatic.",
-                            "The _Scanlink Drone Network_ stans have been thoroughly shamed.");
-                    msg += lameMessages.get(result);
-                } else {
-                    List<String> lameMessages = Arrays.asList(
-                            "Words cannot adequately express how impressive this is.",
-                            "Is _Sarween Tools_ the best technology‽",
-                            "Is this much saving even legal? The international IRS will be doing an audit on your paperwork sometime soon.",
-                            "Your faction's stockholders have erected a statue of you in the city center.",
-                            "Keep this up and we'll have to make a new channel, called \"Sarween Streaks\", just for your numbers.");
-                    msg += lameMessages.get(result);
+                if (userSettings.isPrefersSarweenMsg()) {
+                    if (player.getSarweenCounter() < 6) {
+
+                        List<String> lameMessages = Arrays.asList(
+                                "Not too impressive.",
+                                "The technology has not yet proven its worth.",
+                                "There better be more savings to come.",
+                                "Your faction's stockholders are so far unimpressed.",
+                                "Perhaps _AI Development Algorithm_ or _Scanlink Drone Network_ might have been more useful?");
+                        msg += lameMessages.get(result);
+                    } else if (player.getSarweenCounter() < 11) {
+                        List<String> lameMessages = Arrays.asList(
+                                "Not too shabby.",
+                                "The technology is finally starting to justify its existence.",
+                                "Hopefully there are still even more savings to come.",
+                                "Your faction's stockholders are satisfied with the results of this technology.",
+                                "Some folks still think _Scanlink Drone Network_ might have been more useful.");
+                        msg += lameMessages.get(result);
+                    } else if (player.getSarweenCounter() < 16) {
+                        List<String> lameMessages = Arrays.asList(
+                                "Very impressive.",
+                                "If only all technology was this productive.",
+                                "Surely there can't be even more savings to come?",
+                                "Your faction's stockholders are ecstatic.",
+                                "The _Scanlink Drone Network_ stans have been thoroughly shamed.");
+                        msg += lameMessages.get(result);
+                    } else {
+                        List<String> lameMessages = Arrays.asList(
+                                "Words cannot adequately express how impressive this is.",
+                                "Is _Sarween Tools_ the best technology‽",
+                                "Is this much saving even legal? The international IRS will be doing an audit on your paperwork sometime soon.",
+                                "Your faction's stockholders have erected a statue of you in the city center.",
+                                "Keep this up and we'll have to make a new channel, called \"Sarween Streaks\", just for your numbers.");
+                        msg += lameMessages.get(result);
+                    }
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), msg);
                 event.getMessage().editMessage(exhaustedMessage).queue();
@@ -1830,6 +1843,10 @@ public class UnfiledButtonHandlers {
                                             + ", heads up, bot thinks you should have gained " + properGain
                                             + " command token" + (properGain == 1 ? "" : "s") + " due to " + reasons
                                             + ".");
+                        } else {
+                            if (netGain == properGain && netGain > 2 && cyber) {
+                                PromissoryNoteHelper.resolvePNPlay("ce", player, game, event);
+                            }
                         }
                     }
                     if (game.isFowMode()) {
