@@ -8,6 +8,7 @@ import ti4.helpers.ButtonHelperAbilities;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.service.leader.CommanderUnlockCheckService;
 
 public class AbsolMeasuresAgendaResolver implements AgendaResolver {
     @Override
@@ -35,7 +36,7 @@ public class AbsolMeasuresAgendaResolver implements AgendaResolver {
                         ActionCardHelper.sendActionCardInfo(game, playerWL, event);
                     }
                 }
-                ti4.service.leader.CommanderUnlockCheckService.checkPlayer(playerWL, "yssaril");
+                CommanderUnlockCheckService.checkPlayer(playerWL, "yssaril");
                 ButtonHelper.checkACLimit(game, playerWL);
             }
             for (Player p2 : AgendaHelper.getLosingVoters(winner, game)) {

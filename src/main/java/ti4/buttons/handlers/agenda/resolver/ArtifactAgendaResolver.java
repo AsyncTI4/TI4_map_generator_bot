@@ -12,9 +12,16 @@ import ti4.message.MessageHelper;
 import ti4.service.emoji.PlanetEmojis;
 
 public class ArtifactAgendaResolver implements AgendaResolver {
+
+    private final String agendaId;
+
+    public ArtifactAgendaResolver(String agendaId) {
+        this.agendaId = agendaId;
+    }
+
     @Override
     public String getAgendaId() {
-        return "artifact";
+        return agendaId;
     }
 
     @Override
