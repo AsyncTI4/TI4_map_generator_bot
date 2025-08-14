@@ -1078,7 +1078,12 @@ public class UnfiledButtonHandlers {
             AgendaHelper.reverseRider("reverse_" + acName, event, game, player);
         }
         if (sendReact) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(), game.getPing() + ", an action card has been cancelled.");
+            } else {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+            }
         }
     }
 
