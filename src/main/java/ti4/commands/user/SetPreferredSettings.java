@@ -12,11 +12,14 @@ class SetPreferredSettings extends Subcommand {
 
     public SetPreferredSettings() {
         super("set_preferred_settings", "Set your preferred settings to various questions");
-        addOptions(new OptionData(OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre-decline on strategy cards"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre-decline on strategy cards"));
         addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the Pillage flavor text"));
         addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the Sarween Tools flavor text"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, "pass_on_agenda_stuff", "True to pass on \"when\"s and \"after\"s if you have none"));
+                OptionType.BOOLEAN,
+                "pass_on_agenda_stuff",
+                "True to pass on \"when\"s and \"after\"s if you have none"));
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 "sabo_decline_median",
