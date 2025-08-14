@@ -4437,7 +4437,7 @@ public class AgendaHelper {
             AgendaModel agenda = Mapper.getAgenda(mandateID);
             MessageHelper.sendMessageToChannelWithEmbed(
                     game.getSpeaker().getCardsInfoThread(),
-                    game.getSpeaker().getRepresentation() + " the mandate on top is attached",
+                    game.getSpeaker().getRepresentation() + " the Mandate on top is attached.",
                     agenda.getRepresentationEmbed());
         } else {
             AgendaHelper.revealAgenda(event, false, game, event.getChannel());
@@ -4467,9 +4467,9 @@ public class AgendaHelper {
         }
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + " please "
-                        + "select the amount of influence you wish to spend bidding on being one of the two people who propose agendas. You will be "
-                        + "prompted to exhaust planets later. Please ensure the value you submit is one that your planets can add up to.",
+                player.getRepresentation() + ", please "
+                        + "choose how much influence you wish to spend bidding on being one of the two people who propose agendas. You will be"
+                        + " prompted to exhaust planets later. Please ensure the value you submit is one that your planets can add up to.",
                 buttons);
     }
 
@@ -4501,8 +4501,8 @@ public class AgendaHelper {
         buttons.add(Buttons.gray("reviseBid", "Revise Bid"));
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCardsInfoThread(),
-                player.getRepresentation() + " you successfully " + "bid " + influence
-                        + " influence. Use this button to revise your bid if neccessary. ",
+                player.getRepresentation() + ", you successfully " + "bid " + influence
+                        + " influence. Use this button to revise your bid if necessary.",
                 buttons);
 
         if (amount == game.getRealPlayers().size()) {
@@ -4523,7 +4523,7 @@ public class AgendaHelper {
                                         + player2.getFaction(),
                                 player2.getDisplayName()));
                     }
-                    String msg = game.getSpeaker() + " please break the tie for second place using these buttons";
+                    String msg = game.getSpeaker() + ", please break the tie for second place using these buttons.";
                     MessageHelper.sendMessageToChannelWithButtons(
                             game.getSpeaker().getCorrectChannel(), msg, buttons);
                 }
@@ -4537,7 +4537,7 @@ public class AgendaHelper {
                                     + player2.getFaction(),
                             player2.getDisplayName()));
                 }
-                String msg = game.getSpeaker() + " please break the tie for first place using these buttons";
+                String msg = game.getSpeaker() + ", please break the tie for first place using these buttons.";
                 MessageHelper.sendMessageToChannelWithButtons(game.getSpeaker().getCorrectChannel(), msg, buttons);
                 buttons = new ArrayList<>();
                 for (Player player2 : second) {
@@ -4546,7 +4546,7 @@ public class AgendaHelper {
                                     + player2.getFaction(),
                             player2.getDisplayName()));
                 }
-                msg = game.getSpeaker() + " please break the tie for second place using these buttons";
+                msg = game.getSpeaker() + ", please break the tie for second place using these buttons.";
                 MessageHelper.sendMessageToChannelWithButtons(game.getSpeaker().getCorrectChannel(), msg, buttons);
             }
 
@@ -4564,7 +4564,7 @@ public class AgendaHelper {
         MessageHelper.sendMessageToChannel(
                 game.getMainGameChannel(),
                 "The Speaker broke the tie for place #" + pos + " in favor of "
-                        + game.getPlayerFromColorOrFaction(faction).getRepresentation());
+                        + game.getPlayerFromColorOrFaction(faction).getRepresentation() + ".");
 
         if (!game.getStoredValue("docketSpace1").isEmpty()
                 && !game.getStoredValue("docketSpace2").isEmpty()) {
@@ -4651,7 +4651,7 @@ public class AgendaHelper {
     @ButtonHandler("hack_election")
     public static void hackElection(ButtonInteractionEvent event, Game game) {
         game.setHasHackElectionBeenPlayed(false);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set Order Back To Normal.");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Set Order Back To Normal");
         ButtonHelper.deleteMessage(event);
     }
 
@@ -4711,7 +4711,7 @@ public class AgendaHelper {
         String votes = buttonID.replace("refreshVotes_", "");
         List<Button> voteActionRow = Helper.getPlanetRefreshButtons(player, game);
         Button concludeRefreshing =
-                Buttons.red(player.getFinsFactionCheckerPrefix() + "votes_" + votes, "Done Readying Planets.");
+                Buttons.red(player.getFinsFactionCheckerPrefix() + "votes_" + votes, "Done Readying Planets");
         voteActionRow.add(concludeRefreshing);
         String voteMessage2 =
                 "Use the buttons to ready planets. When you're done it will prompt the next player to vote.";
@@ -4747,7 +4747,7 @@ public class AgendaHelper {
                 player.getFinsFactionCheckerPrefix() + "resolveAgendaVote_0",
                 player.getFlexibleDisplayName() + " Choose To Abstain");
         Button forcedAbstain =
-                Buttons.gray("forceAbstainForPlayer_" + player.getFaction(), "(For Others) Abstain for this player");
+                Buttons.gray("forceAbstainForPlayer_" + player.getFaction(), "(For Others) Abstain For This Player");
 
         String buttonMsg =
                 "Use buttons to vote again. Reminder that this erasing of old votes did not ready any exhausted planets.";

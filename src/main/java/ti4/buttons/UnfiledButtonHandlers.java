@@ -481,7 +481,7 @@ public class UnfiledButtonHandlers {
         String hours = buttonID.split("_")[1];
         int median = Integer.parseInt(hours);
         player.setAutoSaboPassMedian(median);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Set median time to " + median + " hours.");
         var userSettings = UserSettingsManager.get(player.getUserID());
         userSettings.setAutoNoSaboInterval(median);
         UserSettingsManager.save(userSettings);
@@ -1078,7 +1078,12 @@ public class UnfiledButtonHandlers {
             AgendaHelper.reverseRider("reverse_" + acName, event, game, player);
         }
         if (sendReact) {
-            MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+            if (game.isFowMode()) {
+                MessageHelper.sendMessageToChannel(
+                        game.getActionsChannel(), game.getPing() + ", an action card has been cancelled.");
+            } else {
+                MessageHelper.sendMessageToChannel(game.getActionsChannel(), message);
+            }
         }
     }
 

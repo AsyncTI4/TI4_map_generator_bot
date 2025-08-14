@@ -12,15 +12,18 @@ class SetPreferredSettings extends Subcommand {
 
     public SetPreferredSettings() {
         super("set_preferred_settings", "Set your preferred settings to various questions");
-        addOptions(new OptionData(OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre decline on SCs"));
-        addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the pillage flavor text"));
-        addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the sarween flavor text"));
         addOptions(new OptionData(
-                OptionType.BOOLEAN, "pass_on_agenda_stuff", "True to pass on whens/afters if you have none"));
+                OptionType.BOOLEAN, "pre_decline_sc", "True to be prompted to pre-decline on strategy cards"));
+        addOptions(new OptionData(OptionType.BOOLEAN, "pillage_msg", "True to get the Pillage flavor text"));
+        addOptions(new OptionData(OptionType.BOOLEAN, "sarween_msg", "True to get the Sarween Tools flavor text"));
+        addOptions(new OptionData(
+                OptionType.BOOLEAN,
+                "pass_on_agenda_stuff",
+                "True to pass on \"when\"s and \"after\"s if you have none"));
         addOptions(new OptionData(
                 OptionType.INTEGER,
                 "sabo_decline_median",
-                "Your median hours that the bot will wait for auto no sabo. Enter 0 to turn off."));
+                "Your median hours that the bot will wait for auto \"No Sabo\". Enter 0 to turn off."));
     }
 
     @Override
