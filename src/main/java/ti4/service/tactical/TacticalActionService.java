@@ -112,68 +112,73 @@ public class TacticalActionService {
     public void moveAllFromTile(
             ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
-
         List<UnitType> movableFromPlanets = new ArrayList<>(List.of(UnitType.Infantry, UnitType.Mech));
-        for (UnitHolder uh : tile.getUnitHolders().values()) {
-            String uhKey = tile.getPosition() + "-" + uh.getName();
-
-            Map<UnitKey, List<Integer>> movement = displaced.getOrDefault(uhKey, new HashMap<>());
-            for (UnitKey unitKey : new HashSet<>(uh.getUnitsByState().keySet())) {
-                boolean movableFromPlanet = movableFromPlanets.contains(unitKey.getUnitType());
-                if (!player.unitBelongsToPlayer(unitKey)) {
-                    boolean belongsToUnlockedAlly = false;
-                    UnitType uT = unitKey.getUnitType();
-                    if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
-                        for (Player p2 : game.getRealPlayers()) {
-                            if (p2.unitBelongsToPlayer(unitKey)
-                                    && player.getAllianceMembers().contains(p2.getFaction())
-                                    && !tile.hasPlayerCC(p2)) {
-                                belongsToUnlockedAlly = true;
-                            }
-                        }
-                    }
-                    if (!belongsToUnlockedAlly) {
-                        continue;
-                    }
-                }
-                if (uh instanceof Planet && !movableFromPlanet) continue;
-
-                List<Integer> states = uh.removeUnit(unitKey, uh.getUnitCount(unitKey));
-                movement.put(unitKey, states);
-            }
-            displaced.put(uhKey, movement);
+        Set<Player> allowedAllies = resolveAllowedAllies(game, player, tile);
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            processUnitHolderMovement(game, player, allowedAllies, tile, unitHolder, displaced, movableFromPlanets);
         }
 
         TacticalActionOutputService.refreshButtonsAndMessageForTile(event, game, player, tile, moveOrRemove);
+    }
+
+    private void processUnitHolderMovement(
+            Game game,
+            Player player,
+            Set<Player> allowedAllies,
+            Tile tile,
+            UnitHolder unitHolder,
+            Map<String, Map<UnitKey, List<Integer>>> displaced,
+            List<UnitType> movableFromPlanets) {
+        String uhKey = tile.getPosition() + "-" + unitHolder.getName();
+        Map<UnitKey, List<Integer>> movement = displaced.getOrDefault(uhKey, new HashMap<>());
+
+        for (UnitKey unitKey : new HashSet<>(unitHolder.getUnitsByState().keySet())) {
+            if (!canMoveUnit(player, allowedAllies, unitKey)) continue;
+            if (unitHolder instanceof Planet && !movableFromPlanets.contains(unitKey.getUnitType())) continue;
+
+            List<Integer> states = unitHolder.removeUnit(unitKey, unitHolder.getUnitCount(unitKey));
+            movement.put(unitKey, states);
+        }
+        displaced.put(uhKey, movement);
+    }
+
+    private boolean canMoveUnit(Player player, Set<Player> allowedAllies, UnitKey unitKey) {
+        if (player.unitBelongsToPlayer(unitKey)) return true;
+
+        UnitType unitType = unitKey.getUnitType();
+        boolean eligibleType =
+                unitType == UnitType.Infantry || unitType == UnitType.Fighter || unitType == UnitType.Mech;
+        if (!eligibleType) return false;
+
+        for (Player ally : allowedAllies) {
+            if (ally.unitBelongsToPlayer(unitKey)) return true;
+        }
+        return false;
+    }
+
+    private Set<Player> resolveAllowedAllies(Game game, Player player, Tile tile) {
+        Set<Player> allowed = new HashSet<>();
+        for (Player p2 : game.getRealPlayers()) {
+            if (p2 == player) continue;
+            if (!player.getAllianceMembers().contains(p2.getFaction())) continue;
+            if (tile.hasPlayerCC(p2)) continue;
+            allowed.add(p2);
+        }
+        return allowed;
     }
 
     public void moveAllShipsFromTile(
             ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
         Map<String, Map<UnitKey, List<Integer>>> displaced = game.getTacticalActionDisplacement();
 
-        UnitHolder uh = tile.getSpaceUnitHolder();
-        String uhKey = tile.getPosition() + "-" + uh.getName();
+        UnitHolder space = tile.getSpaceUnitHolder();
+        String uhKey = tile.getPosition() + "-" + space.getName();
 
+        Set<Player> allowedAllies = resolveAllowedAllies(game, player, tile);
         Map<UnitKey, List<Integer>> movement = displaced.getOrDefault(uhKey, new HashMap<>());
-        for (UnitKey unitKey : new HashSet<>(uh.getUnitsByState().keySet())) {
-            if (!player.unitBelongsToPlayer(unitKey)) {
-                boolean belongsToUnlockedAlly = false;
-                UnitType uT = unitKey.getUnitType();
-                if (uT == UnitType.Infantry || uT == UnitType.Fighter || uT == UnitType.Mech) {
-                    for (Player p2 : game.getRealPlayers()) {
-                        if (p2.unitBelongsToPlayer(unitKey)
-                                && player.getAllianceMembers().contains(p2.getFaction())
-                                && !tile.hasPlayerCC(p2)) {
-                            belongsToUnlockedAlly = true;
-                        }
-                    }
-                }
-                if (!belongsToUnlockedAlly) {
-                    continue;
-                }
-            }
-
-            List<Integer> states = uh.removeUnit(unitKey, uh.getUnitCount(unitKey));
+        for (UnitKey unitKey : new HashSet<>(space.getUnitsByState().keySet())) {
+            if (!canMoveUnit(player, allowedAllies, unitKey)) continue;
+            List<Integer> states = space.removeUnit(unitKey, space.getUnitCount(unitKey));
             movement.put(unitKey, states);
         }
         displaced.put(uhKey, movement);
