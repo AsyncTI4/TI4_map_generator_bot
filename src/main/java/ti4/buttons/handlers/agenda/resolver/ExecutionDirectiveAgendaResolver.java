@@ -2,6 +2,7 @@ package ti4.buttons.handlers.agenda.resolver;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.helpers.ActionCardHelper;
+import ti4.helpers.Helper;
 import ti4.map.Game;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -21,15 +22,11 @@ public class ExecutionDirectiveAgendaResolver implements AgendaResolver {
         ActionCardHelper.discardRandomAC(event, game, player2, player2.getAc());
         game.setStoredValue("PublicExecution", player2.getFaction());
         if (game.getSpeakerUserID().equalsIgnoreCase(player2.getUserID())) {
-            boolean foundSpeaker = false;
-            for (Player p4 : game.getRealPlayers()) {
-                if (foundSpeaker) {
+            for (Player p4 : Helper.getSpeakerOrFullPriorityOrderFromPlayer(player2, game)) {
+                if (p4 != player2) {
                     game.setSpeakerUserID(p4.getUserID());
                     message += " Also passed the Speaker token to " + p4.getRepresentation() + ".";
                     break;
-                }
-                if (p4 == player2) {
-                    foundSpeaker = true;
                 }
             }
         }

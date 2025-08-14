@@ -8,17 +8,17 @@ import ti4.message.MessageHelper;
 public class MiscountMessageAgendaResolver implements AgendaResolver {
     @Override
     public String getAgendaId() {
-        return agId;
+        return agendaId;
     }
 
-    private final String agId;
+    private final String agendaId;
 
     public MiscountMessageAgendaResolver() {
         this("miscount");
     }
 
-    public MiscountMessageAgendaResolver(String agId) {
-        this.agId = agId;
+    public MiscountMessageAgendaResolver(String agendaId) {
+        this.agendaId = agendaId;
     }
 
     @Override
