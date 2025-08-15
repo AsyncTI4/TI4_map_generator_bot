@@ -21,7 +21,7 @@ public class FOWOptionService {
         OTHER;
 
         static FOWOptionCategory fromString(String string) {
-            for (FOWOptionCategory category : FOWOptionCategory.values()) {
+            for (FOWOptionCategory category : values()) {
                 if (category.name().equalsIgnoreCase(string)) {
                     return category;
                 }
@@ -96,7 +96,7 @@ public class FOWOptionService {
         }
 
         public static FOWOption fromString(String value) {
-            for (FOWOption option : FOWOption.values()) {
+            for (FOWOption option : values()) {
                 if (option.name().equalsIgnoreCase(value)) {
                     return option;
                 }
@@ -131,7 +131,7 @@ public class FOWOptionService {
 
         List<Button> optionButtons = new ArrayList<>();
         for (FOWOption option : FOWOption.values()) {
-            if (!option.isVisible() || !option.getCategory().equals(selectedCategory)) continue;
+            if (!option.isVisible() || option.getCategory() != selectedCategory) continue;
 
             boolean currentValue = game.getFowOption(option);
             sb.append(valueRepresentation(currentValue))
@@ -172,7 +172,7 @@ public class FOWOptionService {
 
         FOWOption fowOption = FOWOption.fromString(option);
         boolean newValue = Boolean.parseBoolean(value);
-        if (FOWOption.FOW_PLUS.equals(fowOption)) {
+        if (FOWOption.FOW_PLUS == fowOption) {
             FOWPlusService.toggleTag(game, newValue);
             if (newValue) {
                 game.setFowOption(FOWOption.ALLOW_AGENDA_COMMS, false);

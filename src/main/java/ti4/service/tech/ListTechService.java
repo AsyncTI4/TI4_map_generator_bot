@@ -119,7 +119,7 @@ public class ListTechService {
         String techType = buttonID.replace("getAllTechOfType_", "");
         String payType = null;
         if (techType.contains("_")) {
-            final String[] split = techType.split("_");
+            String[] split = techType.split("_");
             techType = split[0];
             payType = split[1];
         }
@@ -194,25 +194,25 @@ public class ListTechService {
                     if (game.playerHasLeaderUnlockedOrAlliance(player, "zealotscommander")) {
                         wilds++;
                     } else {
-                        if (type.equalsIgnoreCase("propulsion")) {
+                        if ("propulsion".equalsIgnoreCase(type)) {
                             requirements = requirements.replaceFirst("B", "");
                             if (player.hasAbility("ancient_knowledge")) {
                                 requirements = requirements.replaceFirst("B", "");
                             }
                         }
-                        if (type.equalsIgnoreCase("biotic")) {
+                        if ("biotic".equalsIgnoreCase(type)) {
                             requirements = requirements.replaceFirst("G", "");
                             if (player.hasAbility("ancient_knowledge")) {
                                 requirements = requirements.replaceFirst("G", "");
                             }
                         }
-                        if (type.equalsIgnoreCase("warfare")) {
+                        if ("warfare".equalsIgnoreCase(type)) {
                             requirements = requirements.replaceFirst("R", "");
                             if (player.hasAbility("ancient_knowledge")) {
                                 requirements = requirements.replaceFirst("R", "");
                             }
                         }
-                        if (type.equalsIgnoreCase("cybernetic")) {
+                        if ("cybernetic".equalsIgnoreCase(type)) {
                             requirements = requirements.replaceFirst("Y", "");
                             if (player.hasAbility("ancient_knowledge")) {
                                 requirements = requirements.replaceFirst("Y", "");
@@ -265,13 +265,13 @@ public class ListTechService {
             }
         }
         if (ButtonHelper.isLawInPlay(game, "schematics")
-                && (tech.getAlias().equalsIgnoreCase("ws")
-                        || tech.getBaseUpgrade().orElse("beh").equalsIgnoreCase("ws"))) {
+                && ("ws".equalsIgnoreCase(tech.getAlias())
+                        || "ws".equalsIgnoreCase(tech.getBaseUpgrade().orElse("beh")))) {
             for (Player p2 : game.getRealPlayers()) {
                 for (String t2 : p2.getTechs()) {
                     TechnologyModel tech2 = Mapper.getTech(t2);
-                    if (tech2.getAlias().equalsIgnoreCase("ws")
-                            || tech2.getBaseUpgrade().orElse("beh").equalsIgnoreCase("ws")) {
+                    if ("ws".equalsIgnoreCase(tech2.getAlias())
+                            || "ws".equalsIgnoreCase(tech2.getBaseUpgrade().orElse("beh"))) {
                         return true;
                     }
                 }

@@ -38,7 +38,7 @@ public class TacticalActionOutputService {
 
     public void refreshButtonsAndMessageForTile(
             ButtonInteractionEvent event, Game game, Player player, Tile tile, String moveOrRemove) {
-        String message = TacticalActionOutputService.buildMessageForSingleSystem(game, player, tile);
+        String message = buildMessageForSingleSystem(game, player, tile);
         List<Button> systemButtons =
                 ButtonHelperTacticalAction.getButtonsForAllUnitsInSystem(player, game, tile, moveOrRemove);
         MessageHelper.editMessageWithButtons(event, message, systemButtons);

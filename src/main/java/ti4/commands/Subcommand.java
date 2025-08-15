@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class Subcommand extends SubcommandData implements Command {
 
-    public Subcommand(@NotNull String name, @NotNull String description) {
+    protected Subcommand(@NotNull String name, @NotNull String description) {
         super(name, description);
     }
 

@@ -60,7 +60,7 @@ class SampleColors extends Subcommand {
             LINEHEIGHT = 20;
             bigFont = Storage.getFont16();
             smallFont = Storage.getFont12();
-            if (input.getAsString().equals("MULTI")) {
+            if ("MULTI".equals(input.getAsString())) {
                 hues = Arrays.asList("MULTI1", "MULTI2");
             } else {
                 hues.add(input.getAsString());
@@ -132,14 +132,14 @@ class SampleColors extends Subcommand {
                         Color.BLACK);
 
                 String file = ResourceHelper.getInstance()
-                        .getUnitFile((alias.equals("lgy") ? "orca" : "split" + alias) + "_dn.png");
+                        .getUnitFile(("lgy".equals(alias) ? "orca" : "split" + alias) + "_dn.png");
                 if (file != null) {
                     dread = ImageHelper.read(file);
                     graphic.drawImage(dread, x + SPACING, y + SPACING + DREADTEXHIGHT, null);
                     graphic.setFont(bigFont);
                     DrawingUtil.superDrawString(
                             graphic,
-                            (alias.equals("lgy") ? "orca" : "split" + c.getName()),
+                            ("lgy".equals(alias) ? "orca" : "split" + c.getName()),
                             x + DREADWIDTH / 2,
                             y + DREADTEXHIGHT + DREADSUBHIGHT + SPACING,
                             Color.WHITE,
@@ -150,7 +150,7 @@ class SampleColors extends Subcommand {
                     graphic.setFont(smallFont);
                     DrawingUtil.superDrawString(
                             graphic,
-                            (alias.equals("lgy") ? "orca" : "split" + alias),
+                            ("lgy".equals(alias) ? "orca" : "split" + alias),
                             x + DREADWIDTH / 2,
                             y + DREADTEXHIGHT + DREADSUBHIGHT + LINEHEIGHT + SPACING,
                             Color.WHITE,

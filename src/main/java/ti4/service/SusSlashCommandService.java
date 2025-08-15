@@ -86,7 +86,7 @@ public class SusSlashCommandService {
                 && !event.getMessageChannel().getName().contains("bot-map-updates");
 
         if ((event.getInteraction().getSubcommandName() != null
-                        && event.getInteraction().getSubcommandName().equalsIgnoreCase("replace"))
+                        && "replace".equalsIgnoreCase(event.getInteraction().getSubcommandName()))
                 || (!managedGame.isFowMode() && (isPrivateThread || isNotGameChannel) && !isPublicThread)) {
             reportSusSlashCommand(event, jumpUrl);
         }
@@ -114,6 +114,6 @@ public class SusSlashCommandService {
         String sb = event.getUser().getEffectiveName() + " " + "`" + event.getCommandString() + "` " + jumpUrl;
         MessageHelper.sendMessageToChannel(moderationLogChannel, sb);
         if (event.getInteraction().getSubcommandName() != null
-                && event.getInteraction().getSubcommandName().equalsIgnoreCase("replace")) {}
+                && "replace".equalsIgnoreCase(event.getInteraction().getSubcommandName())) {}
     }
 }

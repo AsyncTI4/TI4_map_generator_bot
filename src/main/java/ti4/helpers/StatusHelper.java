@@ -215,7 +215,7 @@ public class StatusHelper {
                 if (ListPlayerInfoService.getObjectiveThreshold(soID, game) > 0
                         && ListPlayerInfoService.getPlayerProgressOnObjective(soID, game, player)
                                 > (ListPlayerInfoService.getObjectiveThreshold(soID, game) - 1)
-                        && !soID.equalsIgnoreCase("dp")) {
+                        && !"dp".equalsIgnoreCase(soID)) {
                     message3a += "\n" + Mapper.getSecretObjective(soID).getRepresentation(false);
                     count++;
                 }

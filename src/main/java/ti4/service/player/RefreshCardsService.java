@@ -25,7 +25,7 @@ public class RefreshCardsService {
             List<Leader> leads = new ArrayList<>(player.getLeaders());
             for (Leader leader : leads) {
                 if (!leader.isLocked()) {
-                    if (leader.isActive() && !leader.getId().equalsIgnoreCase("zealotshero")) {
+                    if (leader.isActive() && !"zealotshero".equalsIgnoreCase(leader.getId())) {
                         player.removeLeader(leader.getId());
                     } else {
                         RefreshLeaderService.refreshLeader(player, leader, game);

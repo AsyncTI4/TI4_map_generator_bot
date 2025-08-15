@@ -35,9 +35,9 @@ public class BannerGenerator {
 
         bannerG.drawImage(backgroundImage, 0, 0, null);
         Graphics2D bannerG2d = (Graphics2D) bannerG;
-        bannerG2d.rotate(Math.toRadians(-90));
+        bannerG2d.rotate(-1.5707963267948966);
         bannerG2d.drawImage(colorImage, -60, 0, null);
-        bannerG2d.rotate(Math.toRadians(90));
+        bannerG2d.rotate(1.5707963267948966);
         bannerG2d.drawImage(gradientImage, 0, 0, null);
         bannerG2d.drawImage(smallFactionImage, 2, 24, null);
         bannerG.drawImage(largeFactionImage, 180, -42, null);
@@ -95,9 +95,9 @@ public class BannerGenerator {
         bannerG.drawImage(backgroundImage, 0, 0, null);
 
         Graphics2D bannerG2d = (Graphics2D) bannerG;
-        bannerG2d.rotate(Math.toRadians(-90));
+        bannerG2d.rotate(-1.5707963267948966);
         bannerG2d.drawImage(colorImage, -60, 0, null);
-        bannerG2d.rotate(Math.toRadians(90));
+        bannerG2d.rotate(1.5707963267948966);
         bannerG2d.drawImage(gradientImage, 0, 0, null);
         bannerG.drawImage(agendaImage, 0, 0, null);
         bannerG.setFont(Storage.getFont28());

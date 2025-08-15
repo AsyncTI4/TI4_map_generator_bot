@@ -29,7 +29,7 @@ public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver
             counter--;
             String id2 = game.revealAgenda(false);
             AgendaModel agendaDetails = Mapper.getAgenda(id2);
-            if (agendaDetails.getType().equalsIgnoreCase("law")) {
+            if ("law".equalsIgnoreCase(agendaDetails.getType())) {
                 lawFound = true;
                 game.putAgendaBackIntoDeckOnTop(id2);
                 AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());

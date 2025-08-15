@@ -118,7 +118,7 @@ class FactionWinPercentStatisticsService {
     private static boolean usedRelicsOrEmphidia(Player winner, boolean emphidiaScored) {
         return emphidiaScored
                 || winner.getRelics().stream()
-                        .anyMatch(relic -> relic.equalsIgnoreCase("shard") || relic.equalsIgnoreCase("obsidian"));
+                        .anyMatch(relic -> "shard".equalsIgnoreCase(relic) || "obsidian".equalsIgnoreCase(relic));
     }
 
     private static void incrementMapValue(Map<String, Integer> map, String key) {
