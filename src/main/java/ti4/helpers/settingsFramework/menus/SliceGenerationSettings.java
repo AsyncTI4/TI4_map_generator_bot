@@ -29,7 +29,7 @@ import ti4.service.milty.MiltyDraftSlice;
 
 // This is a sub-menu
 @Getter
-@JsonIgnoreProperties("messageId")
+@JsonIgnoreProperties({"messageId"})
 public class SliceGenerationSettings extends SettingsMenu {
     // ---------------------------------------------------------------------------------------------------------------------------------
     // Settings & Submenus
@@ -43,7 +43,7 @@ public class SliceGenerationSettings extends SettingsMenu {
     private final IntegerRangeSetting numLegends;
 
     // This is handled fully manually as there's a lot of validation to do
-    private String presetSlices;
+    private String presetSlices = null;
 
     @JsonIgnore
     private List<MiltyDraftSlice> parsedSlices;
@@ -302,8 +302,8 @@ public class SliceGenerationSettings extends SettingsMenu {
             sources.addAll(mparent.getSourceSettings().getTileSources());
         }
 
-        parsedSlices = MiltyDraftHelper.parseSlicesFromString(sliceString, sources);
-        if (parsedSlices == null) {
+        this.parsedSlices = MiltyDraftHelper.parseSlicesFromString(sliceString, sources);
+        if (this.parsedSlices == null) {
             presetSlices = null;
             return "Invalid slice string";
         } else if (parsedSlices.size() < players) {

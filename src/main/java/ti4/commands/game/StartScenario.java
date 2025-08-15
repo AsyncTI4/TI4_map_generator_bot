@@ -66,7 +66,7 @@ public class StartScenario extends GameStateSubcommand {
             if (game.getPlayerFromColorOrFaction(faction) == null) {
                 int face = ThreadLocalRandom.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
-                if ("ghost".equalsIgnoreCase(faction)) {
+                if (faction.equalsIgnoreCase("ghost")) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
                 boolean speakerAlreadyExist = game.getSpeaker() != null;
@@ -129,10 +129,10 @@ public class StartScenario extends GameStateSubcommand {
             if (game.getPlayerFromColorOrFaction(faction) == null) {
                 int face = ThreadLocalRandom.current().nextInt(0, players.size());
                 Tile tile = game.getTileFromPositionOrAlias(faction);
-                if ("ghost".equalsIgnoreCase(faction)) {
+                if (faction.equalsIgnoreCase("ghost")) {
                     tile = game.getTileFromPositionOrAlias("creussgate");
                 }
-                boolean speaker = "nekro".equalsIgnoreCase(faction);
+                boolean speaker = faction.equalsIgnoreCase("nekro");
                 String color = players.get(face).getNextAvailableColour();
                 color = switch (faction.toLowerCase()) {
                     case "ghost" -> RandomHelper.isOneInX(2) ? "ruby" : "bloodred";

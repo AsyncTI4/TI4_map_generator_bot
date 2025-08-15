@@ -1,7 +1,6 @@
 package ti4.service.game;
 
 import java.awt.image.BufferedImage;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -218,7 +217,7 @@ public class CreateGameService {
 
         // AUTOCLOSE LAUNCH THREAD AFTER RUNNING COMMAND
         if (event.getChannel() instanceof ThreadChannel thread
-                && "making-new-games".equals(thread.getParentChannel().getName())) {
+                && thread.getParentChannel().getName().equals("making-new-games")) {
             newGame.setLaunchPostThreadID(thread.getId());
             ThreadChannelManager manager = thread.getManager()
                     .setName(StringUtils.left(newGame.getName() + "-launched [FULL] - " + thread.getName(), 100))
@@ -678,7 +677,7 @@ public class CreateGameService {
     public static String getNewPlayerInfoText() {
         String path = ResourceHelper.getInstance().getHelpFile("NewPlayerIntro.txt");
         try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            return new String(Files.readAllBytes(Paths.get(path)));
         } catch (Exception e) {
             return "NewPlayerIntro HELP FILE IS BLANK";
         }

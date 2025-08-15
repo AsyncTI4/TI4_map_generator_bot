@@ -51,11 +51,11 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return ID;
+        return getID();
     }
 
     public String getShortName() {
-        return Optional.ofNullable(shortName).orElse(name);
+        return Optional.ofNullable(shortName).orElse(getName());
     }
 
     public boolean getShrinkName() {
@@ -66,7 +66,7 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         if (getHomebrewReplacesID().isPresent()) {
             return LeaderEmojis.getLeaderEmoji(getHomebrewReplacesID().get());
         }
-        return LeaderEmojis.getLeaderEmoji(ID);
+        return LeaderEmojis.getLeaderEmoji(getID());
     }
 
     public Optional<String> getAbilityName() {
@@ -83,18 +83,22 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
 
     public String getRepresentation(boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
         StringBuilder representation = new StringBuilder();
-        representation.append(getLeaderEmoji()).append(" **").append(name).append("**");
+        representation.append(getLeaderEmoji()).append(" **").append(getName()).append("**");
 
-        if (includeTitle) representation.append(": ").append(title); // add title
-        if (includeAbility && Constants.HERO.equals(type))
+        if (includeTitle) representation.append(": ").append(getTitle()); // add title
+        if (includeAbility && Constants.HERO.equals(getType()))
             representation
                     .append(" - ")
                     .append("__**")
                     .append(getAbilityName())
                     .append("**__"); // add hero ability name
         if (includeAbility)
-            representation.append(" - *").append(abilityWindow).append("* ").append(abilityText); // add ability
-        if (includeUnlockCondition) representation.append(" *Unlock:* ").append(unlockCondition);
+            representation
+                    .append(" - *")
+                    .append(getAbilityWindow())
+                    .append("* ")
+                    .append(getAbilityText()); // add ability
+        if (includeUnlockCondition) representation.append(" *Unlock:* ").append(getUnlockCondition());
 
         return representation.toString();
     }
@@ -106,17 +110,17 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     public MessageEmbed getRepresentationEmbed(
             boolean includeID, boolean includeFactionType, boolean showUnlockConditions, boolean includeFlavourText) {
         EmbedBuilder eb = new EmbedBuilder();
-        FactionModel factionModel = Mapper.getFaction(faction);
-        String factionEmoji = FactionEmojis.getFactionIcon(faction).toString();
+        FactionModel factionModel = Mapper.getFaction(getFaction());
+        String factionEmoji = FactionEmojis.getFactionIcon(getFaction()).toString();
         if (factionModel != null)
             factionEmoji = FactionEmojis.getFactionIcon(factionModel.getAlias()).toString();
 
-        String factionName = faction;
+        String factionName = getFaction();
         if (factionModel != null) factionName = factionModel.getFactionName();
 
         // TITLE
-        String title = factionEmoji + " __**" + name + "**__ " + LeaderEmojis.getLeaderTypeEmoji(type) + " "
-                + this.title + source.emoji();
+        String title = factionEmoji + " __**" + getName() + "**__ " + LeaderEmojis.getLeaderTypeEmoji(type) + " "
+                + getTitle() + getSource().emoji();
         eb.setTitle(title);
 
         Emoji emoji = getLeaderEmoji().asEmoji();
@@ -128,22 +132,22 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
         StringBuilder description = new StringBuilder();
         if (includeFactionType) {
             description.append(factionEmoji).append(" ").append(factionName).append(" ");
-            description.append(" ").append(StringUtils.capitalize(type));
+            description.append(" ").append(StringUtils.capitalize(getType()));
         }
-        if (showUnlockConditions && !"agent".equals(type))
-            description.append("\n*Unlock: ").append(unlockCondition).append("*");
+        if (showUnlockConditions && !"agent".equals(getType()))
+            description.append("\n*Unlock: ").append(getUnlockCondition()).append("*");
         eb.setDescription(description.toString());
 
         // FIELDS
-        String fieldTitle = getAbilityName().orElse(" ") + "\n**" + abilityWindow + "**";
-        String fieldContent = abilityText;
+        String fieldTitle = getAbilityName().orElse(" ") + "\n**" + getAbilityWindow() + "**";
+        String fieldContent = getAbilityText();
         eb.addField(fieldTitle, fieldContent, false);
         if (includeFlavourText && getFlavourText().isPresent()) eb.addField(" ", "*" + getFlavourText() + "*", false);
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(source);
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
@@ -151,27 +155,28 @@ public class LeaderModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return FactionEmojis.getFactionIcon(faction) + " " + LeaderEmojis.getLeaderTypeEmoji(type)
-                + getLeaderEmoji() + " " + name + " " + " (" + title + ") "
-                + source.emoji();
+        return FactionEmojis.getFactionIcon(getFaction()) + " " + LeaderEmojis.getLeaderTypeEmoji(getType())
+                + getLeaderEmoji() + " " + getName() + " " + " (" + getTitle() + ") "
+                + getSource().emoji();
     }
 
     public boolean search(String searchString) {
         if (searchString == null) return true;
         searchString = searchString.toLowerCase();
-        return ID.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || title.toLowerCase().contains(searchString)
+        return getID().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getTitle().toLowerCase().contains(searchString)
                 || getAbilityName().orElse("").toLowerCase().contains(searchString)
-                || abilityWindow.toLowerCase().contains(searchString)
-                || abilityText.toLowerCase().contains(searchString)
-                || unlockCondition.toLowerCase().contains(searchString)
+                || getAbilityWindow().toLowerCase().contains(searchString)
+                || getAbilityText().toLowerCase().contains(searchString)
+                || getUnlockCondition().toLowerCase().contains(searchString)
                 || getAutoCompleteName().toLowerCase().contains(searchString)
-                || source.toString().toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+                || getSource().toString().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return name + " (" + faction + " " + type + ") [" + source.toString() + "]";
+        return getName() + " (" + getFaction() + " " + getType() + ") ["
+                + getSource().toString() + "]";
     }
 }

@@ -85,7 +85,7 @@ public class FOWPlusService {
     // Hide all 0b tiles from FoW map
     public static boolean hideFogTile(String tileID, String label, Game game) {
         return (isActive(game) || game.getFowOption(FOWOption.HIDE_MAP))
-                && "0b".equals(tileID)
+                && tileID.equals("0b")
                 && StringUtils.isEmpty(label);
     }
 
@@ -172,7 +172,7 @@ public class FOWPlusService {
                         + " never to be seen again...");
 
         Map<String, Map<UnitKey, List<Integer>>> unitsGoingToVoid = game.getTacticalActionDisplacement();
-        float valueOfUnitsLost = 0.0f;
+        float valueOfUnitsLost = 0f;
         String unitEmojis = "";
         for (var unitHolder : unitsGoingToVoid.values()) {
             for (var unit : unitHolder.entrySet()) {

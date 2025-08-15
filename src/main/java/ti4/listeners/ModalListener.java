@@ -18,7 +18,7 @@ import ti4.service.game.GameNameService;
 
 public class ModalListener extends ListenerAdapter {
 
-    public static ModalListener instance;
+    public static ModalListener instance = null;
 
     private final Map<String, Consumer<ModalContext>> knownModals = new HashMap<>();
 

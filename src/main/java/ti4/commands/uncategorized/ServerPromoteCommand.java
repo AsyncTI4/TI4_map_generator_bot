@@ -90,23 +90,23 @@ public class ServerPromoteCommand implements ParentCommand {
             }
             Member member = event.getMember();
             boolean allowed = false;
-            if ("admin".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
+            if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("admin")) {
                 for (Role r : member.getRoles()) {
-                    if ("943596173896323072".equals(r.getId())) {
+                    if (r.getId().equals("943596173896323072")) {
                         allowed = true;
                     }
                 }
-            } else if ("developer".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
+            } else if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("developer")) {
                 for (Role r : member.getRoles()) {
-                    if ("943596173896323072".equals(r.getId()) || "947648366056185897".equals(r.getId())) {
+                    if (r.getId().equals("943596173896323072") || r.getId().equals("947648366056185897")) {
                         allowed = true;
                     }
                 }
-            } else if ("bothelper".equalsIgnoreCase(Ranks.get(rankOpt.getAsString()))) {
+            } else if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("bothelper")) {
                 for (Role r : member.getRoles()) {
-                    if ("943596173896323072".equals(r.getId())
-                            || "947648366056185897".equals(r.getId())
-                            || "1166011604488425482".equals(r.getId())) {
+                    if (r.getId().equals("943596173896323072")
+                            || r.getId().equals("947648366056185897")
+                            || r.getId().equals("1166011604488425482")) {
                         allowed = true;
                     }
                 }
@@ -139,7 +139,7 @@ public class ServerPromoteCommand implements ParentCommand {
         if (target.startsWith("Emoji Farm")) {
             Guild guild = event.getJDA().getGuildById(Long.parseLong(target));
             guild.getRoles().forEach(r -> {
-                if ("admin".equalsIgnoreCase(r.getName())) {
+                if (r.getName().equalsIgnoreCase("admin")) {
                     if (demote) {
                         guild.removeRoleFromMember(user, r);
                     } else {

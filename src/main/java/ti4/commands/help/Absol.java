@@ -1,6 +1,5 @@
 package ti4.commands.help;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -23,7 +22,7 @@ class Absol extends Subcommand {
     public static void showAbsolStuff(GenericInteractionCreateEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("Absol.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            String message = new String(Files.readAllBytes(Paths.get(path)));
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "ABSOL HELP FILE IS BLANK");

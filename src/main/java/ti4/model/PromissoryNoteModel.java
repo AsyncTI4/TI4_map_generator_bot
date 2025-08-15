@@ -41,25 +41,25 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public boolean isColorable() {
-        return color.equals("<color>");
+        return color != null && color.equals("<color>");
     }
 
     @Override
     public PromissoryNoteModel duplicateAndSetColor(ColorModel newColor) {
         PromissoryNoteModel pn = new PromissoryNoteModel();
-        pn.setAlias(alias.replace("<color>", newColor.getName()));
-        pn.setName(name);
-        pn.setShortName(shortName);
-        pn.setShrinkName(shrinkName);
-        pn.setFaction(faction);
+        pn.setAlias(this.alias.replace("<color>", newColor.getName()));
+        pn.setName(this.name);
+        pn.setShortName(this.shortName);
+        pn.setShrinkName(this.shrinkName);
+        pn.setFaction(this.faction);
         pn.setColor(newColor.getName());
-        pn.setPlayArea(playArea);
-        pn.setPlayImmediately(playImmediately);
-        pn.setAttachment(attachment);
-        pn.setSource(source);
-        String newText = text.replace("<color>", "<" + newColor.getName() + ">");
+        pn.setPlayArea(this.playArea);
+        pn.setPlayImmediately(this.playImmediately);
+        pn.setAttachment(this.attachment);
+        pn.setSource(this.source);
+        String newText = getText().replace("<color>", "<" + newColor.getName() + ">");
         pn.setText(newText);
-        pn.setHomebrewReplacesID(homebrewReplacesID);
+        pn.setHomebrewReplacesID(this.homebrewReplacesID);
         pn.setSearchTags(new ArrayList<>(searchTags));
         pn.setSourcePNModel(this);
         return pn;
@@ -70,12 +70,12 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public String getID() {
-        return alias;
+        return getAlias();
     }
 
     public String getShortName() {
         if (getHomebrewReplacesID().isEmpty()) {
-            return Optional.ofNullable(shortName).orElse(name);
+            return Optional.ofNullable(shortName).orElse(getName());
         }
         return Optional.ofNullable(shortName)
                 .orElse(Mapper.getPromissoryNote(getHomebrewReplacesID().get()).getShortName());
@@ -100,7 +100,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     public String getFactionOrColor() {
         if (!StringUtils.isBlank(getFaction().orElse(""))) return faction;
         if (!StringUtils.isBlank(getColor().orElse(""))) {
-            if ("<color>".equals(color)) return "generic";
+            if (color.equals("<color>")) return "generic";
             return color;
         }
         return faction + "_" + color;
@@ -144,23 +144,23 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         title.append(CardEmojis.PN);
         if (!StringUtils.isBlank(getFaction().orElse("")))
             title.append(FactionEmojis.getFactionIcon(getFaction().get()));
-        title.append("_").append(name).append("_");
+        title.append("_").append(getName()).append("_");
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             title.append(" (");
-            if ("<color>".equals(color)) {
+            if (color.equals("<color>")) {
                 title.append("generic");
             } else {
                 title.append(color);
             }
             title.append(")");
         }
-        title.append(source.emoji());
+        title.append(getSource().emoji());
         eb.setTitle(title.toString());
 
         if (justShowName) return eb.build();
 
         // DESCRIPTION
-        eb.setDescription(text);
+        eb.setDescription(getText());
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
@@ -179,9 +179,9 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         }
         if (includeID) {
             footer.append("ID: ")
-                    .append(alias)
+                    .append(getAlias())
                     .append("    Source: ")
-                    .append(source)
+                    .append(getSource())
                     .append("\n");
         }
         eb.setFooter(footer.toString());
@@ -195,22 +195,22 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
         if (!StringUtils.isBlank(getFaction().orElse("")))
             sb.append(FactionEmojis.getFactionIcon(getFaction().get()));
         sb.append(CardEmojis.PN);
-        sb.append(" ").append(name);
+        sb.append(" ").append(getName());
         if (!StringUtils.isBlank(getColor().orElse(""))) {
             sb.append(" (");
-            if ("<color>".equals(color)) {
+            if (color.equals("<color>")) {
                 sb.append("generic");
             } else {
                 sb.append(color);
             }
             sb.append(")");
         }
-        sb.append(source.emoji());
+        sb.append(getSource().emoji());
         return sb.toString();
     }
 
     public String getTextFormatted(Game game) {
-        String formattedText = text;
+        String formattedText = getText();
         formattedText = formattedText.replace("\n", "\n> ");
         StringBuilder replaceText = new StringBuilder();
         Player pnOwner = game.getPNOwner(getID());
@@ -223,7 +223,7 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
     }
 
     public boolean isNotWellKnown() {
-        return getFaction().isPresent() || (source != ComponentSource.base && source != ComponentSource.pok);
+        return getFaction().isPresent() || (getSource() != ComponentSource.base && getSource() != ComponentSource.pok);
     }
 
     /**
@@ -231,23 +231,23 @@ public class PromissoryNoteModel implements ColorableModelInterface<PromissoryNo
      */
     @Deprecated
     public String getShortText() {
-        String promStr = text;
+        String promStr = getText();
         // if we would break trying to split the note, just return whatever is there
         if (promStr == null || !promStr.contains(";")) {
             return promStr;
         }
-        return name + ";" + getFaction() + getColor();
+        return getName() + ";" + getFaction() + getColor();
     }
 
     public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
                 || getFactionOrColor().toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return name + " (" + getFactionOrColor() + ") [" + source + "]";
+        return getName() + " (" + getFactionOrColor() + ") [" + getSource() + "]";
     }
 
     public boolean getPlayImmediately() {

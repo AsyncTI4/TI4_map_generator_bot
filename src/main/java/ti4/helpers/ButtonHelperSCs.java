@@ -151,7 +151,7 @@ public class ButtonHelperSCs {
         List<Button> scButtons = new ArrayList<>();
         scButtons.add(Buttons.gray("getPreDeclineSCButtons_" + sc, "Undo Decision"));
         String msg = "";
-        if ("no".equalsIgnoreCase(decision)) {
+        if (decision.equalsIgnoreCase("no")) {
             msg = "Deciding later for **"
                     + game.getStrategyCardModelByInitiative(Integer.parseInt(sc))
                             .get()
@@ -599,7 +599,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("anarchy2secondary")
     public static void secondaryOfAnarchy2(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = getAnarchy2ReadyComponentButtons(game, player);
+        List<Button> buttons = ButtonHelperSCs.getAnarchy2ReadyComponentButtons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to ready something.",
@@ -662,7 +662,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("primaryOfAnarchy1")
     public static void primaryOfAnarchy1(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = getAnarchy1PrimaryButtons(game);
+        List<Button> buttons = ButtonHelperSCs.getAnarchy1PrimaryButtons(game);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true)
@@ -672,7 +672,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("anarchy3secondary")
     public static void anarchy3secondary(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = getAnarchy3SecondaryButtons(game);
+        List<Button> buttons = ButtonHelperSCs.getAnarchy3SecondaryButtons(game);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to resolve the secondary.",
@@ -681,7 +681,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("primaryOfAnarchy7")
     public static void primaryOfAnarchy7(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = getAnarchy7Buttons(game, player);
+        List<Button> buttons = ButtonHelperSCs.getAnarchy7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
@@ -690,7 +690,7 @@ public class ButtonHelperSCs {
 
     @ButtonHandler("primaryOfLumi7")
     public static void primaryOfLumi7(Game game, Player player, ButtonInteractionEvent event, String buttonID) {
-        List<Button> buttons = getLumi7Buttons(game, player);
+        List<Button> buttons = ButtonHelperSCs.getLumi7Buttons(game, player);
         MessageHelper.sendMessageToChannelWithButtons(
                 player.getCorrectChannel(),
                 player.getRepresentation(true, true) + ", use the buttons to build in the desired system.",
@@ -786,7 +786,7 @@ public class ButtonHelperSCs {
         }
         ReactionService.addReaction(event, game, player);
         String unit = buttonID.replace("construction_", "");
-        if ("facility".equalsIgnoreCase(unit)) {
+        if (unit.equalsIgnoreCase("facility")) {
             String message = player.getRepresentationUnfogged() + ", please choose the facility you wish to place.";
             if (!player.getSCs().contains(4)) {
                 message += "\n## __It will place a command token in the system as well.__ ";
@@ -912,7 +912,7 @@ public class ButtonHelperSCs {
                         && !facility.contains("embassy")
                         && !facility.contains("naval")) {
                     planets.add(planet);
-                } else if ("mr".equalsIgnoreCase(planet)
+                } else if (planet.equalsIgnoreCase("mr")
                         && !facility.contains("research")
                         && !facility.contains("logistics")) {
                     planets.add(planet);

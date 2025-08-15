@@ -69,6 +69,6 @@ public class StrategyCardSetModel implements ModelInterface {
     }
 
     public boolean searchSource(ComponentSource searchSource) {
-        return (searchSource == null || (source != null && source == searchSource));
+        return (searchSource == null || (getSource() != null && getSource().equals(searchSource)));
     }
 }

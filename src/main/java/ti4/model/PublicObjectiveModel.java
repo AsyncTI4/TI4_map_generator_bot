@@ -46,10 +46,10 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     public static final Comparator<PublicObjectiveModel> sortByPointsAndName = (po1, po2) -> {
-        if (Objects.equals(po1.points, po2.points)) {
-            return po1.name.compareTo(po2.name);
+        if (Objects.equals(po1.getPoints(), po2.getPoints())) {
+            return po1.getName().compareTo(po2.getName());
         } else {
-            return po1.points < po2.points ? -1 : 1;
+            return po1.getPoints() < po2.getPoints() ? -1 : 1;
         }
     };
 
@@ -61,16 +61,17 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title = getObjectiveEmoji() + "__**" + name + "**__" + source.emoji();
+        String title =
+                getObjectiveEmoji() + "__**" + getName() + "**__" + getSource().emoji();
         eb.setTitle(title);
 
         // DESCRIPTION
-        eb.setDescription(text);
+        eb.setDescription(getText());
 
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(alias).append("    Source: ").append(source);
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(getEmbedColor());
@@ -78,7 +79,7 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     public Color getEmbedColor() {
-        return switch (points) {
+        return switch (getPoints()) {
             case 1 -> Color.ORANGE;
             case 2 -> Color.BLUE;
             default -> Color.WHITE;
@@ -86,13 +87,13 @@ public class PublicObjectiveModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return name + " (" + source + ")";
+        return getName() + " (" + getSource() + ")";
     }
 
     public Optional<String> getHomebrewReplacesID() {

@@ -1,6 +1,5 @@
 package ti4.commands.help;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -23,7 +22,7 @@ public class HowToPlayTI4 extends Subcommand {
     public static void howToPlayTI4(GenericInteractionCreateEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("HowToPlayTI4.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            String message = new String(Files.readAllBytes(Paths.get(path)));
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(event, "TI4 HELP FILE IS BLANK");

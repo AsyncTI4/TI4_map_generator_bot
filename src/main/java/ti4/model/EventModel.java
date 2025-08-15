@@ -47,8 +47,8 @@ public class EventModel implements ModelInterface, EmbeddableModel {
     }
 
     public boolean staysInPlay() {
-        return "permanent".equalsIgnoreCase(getCategoryDescription())
-                || "temporary".equalsIgnoreCase(getCategoryDescription());
+        return getCategoryDescription().equalsIgnoreCase("permanent")
+                || getCategoryDescription().equalsIgnoreCase("temporary");
     }
 
     public String getAlias() {
@@ -95,7 +95,7 @@ public class EventModel implements ModelInterface, EmbeddableModel {
             sb.append("(").append(uniqueID).append(") - ");
         }
         sb.append(name).append("__** ");
-        sb.append(source.emoji());
+        sb.append(getSource().emoji());
         sb.append("\n");
 
         sb.append("> **").append(type).append(":** *").append(target).append("*\n");
@@ -120,22 +120,22 @@ public class EventModel implements ModelInterface, EmbeddableModel {
 
         StringBuilder sb = new StringBuilder();
         if (numericalID != null) sb.append("(").append(numericalID).append(") ");
-        sb.append("__**").append(name).append("**__").append(source.emoji());
+        sb.append("__**").append(getName()).append("**__").append(getSource().emoji());
         eb.setTitle(sb.toString());
 
         eb.setColor(Color.black);
         eb.addField(StringUtils.capitalize(getCategoryDescription()) + " " + getType(), getText(), false);
-        if (includeID) eb.setFooter("ID: " + alias + "  Source: " + source);
+        if (includeID) eb.setFooter("ID: " + getAlias() + "  Source: " + getSource());
         return eb.build();
     }
 
     public boolean search(String searchString) {
-        return alias.toLowerCase().contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+        return getAlias().toLowerCase().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     public String getAutoCompleteName() {
-        return name + " [" + source + "]";
+        return getName() + " [" + getSource() + "]";
     }
 }

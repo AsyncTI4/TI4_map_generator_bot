@@ -66,14 +66,14 @@ public class FastScFollowCron {
                     twenty4 = Integer.parseInt(game.getStoredValue("fastSCFollow"));
                     half = twenty4 / 2;
                 }
-                long twelveHoursInMilliseconds = half * ONE_HOUR_IN_MILLISECONDS;
-                long twentyFourHoursInMilliseconds = twenty4 * ONE_HOUR_IN_MILLISECONDS;
+                long twelveHoursInMilliseconds = (long) half * ONE_HOUR_IN_MILLISECONDS;
+                long twentyFourHoursInMilliseconds = (long) twenty4 * ONE_HOUR_IN_MILLISECONDS;
                 long scPlayTime = Long.parseLong(scTime);
                 long timeDifference = System.currentTimeMillis() - scPlayTime;
                 String timesPinged = game.getStoredValue("scPlayPingCount" + sc + player.getFaction());
                 if (timeDifference > twelveHoursInMilliseconds
                         && timeDifference < twentyFourHoursInMilliseconds
-                        && !"1".equalsIgnoreCase(timesPinged)) {
+                        && !timesPinged.equalsIgnoreCase("1")) {
                     StringBuilder sb = new StringBuilder()
                             .append(player.getRepresentationUnfogged())
                             .append(" You are getting this ping because ")
@@ -84,7 +84,7 @@ public class FastScFollowCron {
                     appendScMessages(game, player, sc, sb);
                     game.setStoredValue("scPlayPingCount" + sc + player.getFaction(), "1");
                 }
-                if (timeDifference > twentyFourHoursInMilliseconds && !"2".equalsIgnoreCase(timesPinged)) {
+                if (timeDifference > twentyFourHoursInMilliseconds && !timesPinged.equalsIgnoreCase("2")) {
                     String message = player.getRepresentationUnfogged() + Helper.getSCName(sc, game)
                             + " has been played and now it has been the allotted time and they haven't reacted, so they have"
                             + " been marked as not following.\n";

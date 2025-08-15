@@ -550,7 +550,7 @@ public class StartPhaseService {
 
         // Pulsar destruction logic
         game.getTileMap().values().stream()
-                .filter(tile -> "sig02".equals(tile.getTileID()))
+                .filter(tile -> tile.getTileID().equals("sig02"))
                 .forEach(pulsar -> {
                     pulsar.getSpaceUnitHolder().getUnitColorsOnHolder().forEach(playerColor -> {
                         pulsar.removeAllUnits(playerColor);

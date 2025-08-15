@@ -34,12 +34,12 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public String getAlias() {
-        return id;
+        return getId();
     }
 
     public String getShortName() {
         if (getHomebrewReplacesID().isEmpty()) {
-            return Optional.ofNullable(shortName).orElse(name);
+            return Optional.ofNullable(shortName).orElse(getName());
         }
         return Optional.ofNullable(shortName)
                 .orElse(Mapper.getAbility(getHomebrewReplacesID().get()).getShortName());
@@ -77,7 +77,8 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         EmbedBuilder eb = new EmbedBuilder();
 
         // TITLE
-        String title = getFactionEmoji() + " __**" + name + "**__" + source.emoji();
+        String title =
+                getFactionEmoji() + " __**" + getName() + "**__" + getSource().emoji();
         eb.setTitle(title);
 
         // DESCRIPTION
@@ -91,7 +92,7 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
         // FOOTER
         StringBuilder footer = new StringBuilder();
         if (includeID)
-            footer.append("ID: ").append(getAlias()).append("    Source: ").append(source);
+            footer.append("ID: ").append(getAlias()).append("    Source: ").append(getSource());
         eb.setFooter(footer.toString());
 
         eb.setColor(Color.black);
@@ -99,12 +100,12 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
     }
 
     public String getNameRepresentation() {
-        return getFactionEmoji() + " " + name + " " + source.emoji();
+        return getFactionEmoji() + " " + getName() + " " + getSource().emoji();
     }
 
     public String getRepresentation() {
-        String abilityName = name;
-        String abilitySourceFaction = faction;
+        String abilityName = getName();
+        String abilitySourceFaction = getFaction();
         String abilityRawModifier = getPermanentEffect().orElse("");
         String abilityWindow = getWindow().orElse("");
         String abilityText = getWindowEffect().orElse("");
@@ -123,19 +124,19 @@ public class AbilityModel implements ModelInterface, EmbeddableModel {
 
     @Override
     public boolean search(String searchString) {
-        return id.contains(searchString)
-                || name.toLowerCase().contains(searchString)
-                || faction.toLowerCase().contains(searchString)
-                || source.toString().toLowerCase().contains(searchString)
-                || searchTags.contains(searchString);
+        return getId().contains(searchString)
+                || getName().toLowerCase().contains(searchString)
+                || getFaction().toLowerCase().contains(searchString)
+                || getSource().toString().toLowerCase().contains(searchString)
+                || getSearchTags().contains(searchString);
     }
 
     @Override
     public String getAutoCompleteName() {
-        return name + " (" + faction + ")" + " [" + source + "]";
+        return getName() + " (" + getFaction() + ")" + " [" + getSource() + "]";
     }
 
     public TI4Emoji getFactionEmoji() {
-        return FactionEmojis.getFactionIcon(faction);
+        return FactionEmojis.getFactionIcon(getFaction());
     }
 }

@@ -1,6 +1,5 @@
 package ti4.commands.help;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,7 +17,7 @@ class WhatsTIGL extends Subcommand {
     public void execute(SlashCommandInteractionEvent event) {
         String path = ResourceHelper.getInstance().getHelpFile("WhatsTIGL.txt");
         try {
-            String message = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+            String message = new String(Files.readAllBytes(Paths.get(path)));
             MessageHelper.sendMessageToEventChannel(event, message);
         } catch (Exception e) {
             MessageHelper.sendMessageToEventChannel(

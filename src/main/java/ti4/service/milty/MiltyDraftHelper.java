@@ -63,7 +63,7 @@ public class MiltyDraftHelper {
         int spanW = (int) Math.ceil(Math.sqrt(sliceCount));
         int spanH = (sliceCount + spanW - 1) / spanW;
 
-        float scale = 1.0f;
+        float scale = 1f;
         int scaled = (int) (mapTemplate.squareSliceImageSize() * scale);
         int width = scaled * spanW;
         int height = scaled * spanH;
@@ -311,9 +311,9 @@ public class MiltyDraftHelper {
         MiltyDraftTile draftTile = new MiltyDraftTile();
         if (wormholes != null) {
             for (WormholeModel.Wormhole wormhole : wormholes) {
-                if (wormhole == WormholeModel.Wormhole.ALPHA) {
+                if (WormholeModel.Wormhole.ALPHA == wormhole) {
                     draftTile.setHasAlphaWH(true);
-                } else if (wormhole == WormholeModel.Wormhole.BETA) {
+                } else if (WormholeModel.Wormhole.BETA == wormhole) {
                     draftTile.setHasBetaWH(true);
                 } else {
                     draftTile.setHasOtherWH(true);
@@ -357,7 +357,7 @@ public class MiltyDraftHelper {
 
     private static boolean isInvalid(TileModel tileModel) {
         TileModel.TileBack back = tileModel.getTileBack();
-        if (TileBack.RED != back && TileBack.BLUE != back) {
+        if (!TileModel.TileBack.RED.equals(back) && !TileModel.TileBack.BLUE.equals(back)) {
             return true;
         }
 

@@ -50,7 +50,7 @@ public abstract class SettingsMenu {
     protected final @JsonIgnore SettingsMenu parent;
 
     protected final String menuId;
-    protected String messageId;
+    protected String messageId = null;
 
     protected SettingsMenu(String menuId, String menuName, String description, SettingsMenu parent) {
         this.menuId = menuId;
@@ -172,7 +172,7 @@ public abstract class SettingsMenu {
 
     private void parseInput(GenericInteractionCreateEvent event, String originalId) {
         // This should only ever be run on the most top-level settings menu
-        if (parent != null) {
+        if (getParent() != null) {
             parent.parseInput(event, originalId);
             return;
         }
@@ -190,7 +190,7 @@ public abstract class SettingsMenu {
     }
 
     protected String navId() {
-        String base = parent != null ? parent.navId() + "." : "";
+        String base = getParent() != null ? getParent().navId() + "." : "";
         return base + menuId;
     }
 
@@ -214,10 +214,10 @@ public abstract class SettingsMenu {
     }
 
     public String getMessageId() {
-        if (parent != null) {
-            return parent.getMessageId();
+        if (this.parent != null) {
+            return this.parent.getMessageId();
         }
-        return messageId;
+        return this.messageId;
     }
 
     public void setMessageId(String messageId) {
@@ -246,7 +246,7 @@ public abstract class SettingsMenu {
                 remainingPath.removeFirst();
                 if (!remainingPath.isEmpty()) {
                     for (SettingsMenu child : categories()) {
-                        if (remainingPath.getFirst().equals(child.menuId)) {
+                        if (remainingPath.getFirst().equals(child.getMenuId())) {
                             // found the path
                             return child.handleButtonPress(event, buttonType, action, remainingPath);
                         }
@@ -297,7 +297,7 @@ public abstract class SettingsMenu {
             }
         }
 
-        if ("reset".equals(action)) {
+        if (action.equals("reset")) {
             err = resetSettings();
             found = true;
         }
@@ -305,7 +305,7 @@ public abstract class SettingsMenu {
         // Check the special buttons
         String special = handleSpecialButtonAction(event, action);
         if (special != null) {
-            if ("success".equals(special)) {
+            if (special.equals("success")) {
                 found = true;
             } else {
                 err = special;
@@ -365,8 +365,8 @@ public abstract class SettingsMenu {
 
     private List<Button> navButtons() {
         List<Button> buttons = new ArrayList<>();
-        if (parent != null) {
-            buttons.add(parent.getNavButton(true));
+        if (getParent() != null) {
+            buttons.add(getParent().getNavButton(true));
         }
         for (SettingsMenu child : categories()) {
             if (child != null) buttons.add(child.getNavButton(false));

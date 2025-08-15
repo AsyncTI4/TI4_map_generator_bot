@@ -12,11 +12,11 @@ public class WebTilePlanet {
     private Integer commodities; // Number of commodities on this planet (Discordant Stars feature)
 
     public WebTilePlanet() {
-        entities = new HashMap<>();
+        this.entities = new HashMap<>();
     }
 
     public WebTilePlanet(String controlledBy) {
         this.controlledBy = controlledBy;
-        entities = new HashMap<>();
+        this.entities = new HashMap<>();
     }
 }

@@ -126,7 +126,7 @@ class WeirdGameSetup extends GameStateSubcommand {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Omega Phase requires the __full__ Priority Track. Priority Track is unchanged.");
-            } else if ("strategy".equals(game.getPhaseOfGame())) {
+            } else if (game.getPhaseOfGame().equals("strategy")) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "Cannot add or remove the Priority Track during the Strategy Phase. Either UNDO out of it or wait for after it. Priority Track is unchanged.");
