@@ -25,7 +25,7 @@ public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver
         MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Removed all laws");
         int counter = 40;
         boolean lawFound = false;
-        var discardedAgendas = new ArrayList<>();
+        var discardedAgendas = new ArrayList<String>();
         while (counter > 0 && !lawFound) {
             counter--;
             String id2 = game.revealAgenda(false);
