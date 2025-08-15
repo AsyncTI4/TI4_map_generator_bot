@@ -165,26 +165,31 @@ public class StartPhaseService {
         if (alreadyQueued.isEmpty()) {
             numQueued = 0;
         }
-        String msg =
+        StringBuilder msg = new StringBuilder(
                 player.getRepresentation() + " you are #" + number + " pick in this Strategy Phase and so can queue "
-                        + number + " strategy cards." + " So far you have queued " + numQueued + " cards. ";
+                        + number + " strategy cards." + " So far you have queued " + numQueued + " cards. ");
         if (game.isFowMode()) {
-            msg = player.getRepresentation() + " you can queue up to 8 cards." + " So far you have queued " + numQueued
-                    + " cards. ";
+            msg = new StringBuilder(player.getRepresentation() + " you can queue up to 8 cards."
+                    + " So far you have queued " + numQueued + " cards. ");
         }
         if (numQueued > 0) {
-            msg +=
-                    "The queued strategy cards are as follows (in the order the bot will attempt to select them for you):\n";
+            msg.append(
+                    "The queued strategy cards are as follows (in the order the bot will attempt to select them for you):\n");
             int count = 1;
             for (String num : alreadyQueued.split("_")) {
                 if (num.isEmpty()) {
                     continue;
                 }
                 TI4Emoji scEmoji = CardEmojis.getSCBackFromInteger(Integer.parseInt(num));
-                msg += count + ". " + Helper.getSCName(Integer.parseInt(num), game) + " " + scEmoji + "\n";
+                msg.append(count)
+                        .append(". ")
+                        .append(Helper.getSCName(Integer.parseInt(num), game))
+                        .append(" ")
+                        .append(scEmoji)
+                        .append("\n");
             }
         }
-        return msg;
+        return msg.toString();
     }
 
     public static void startStrategyPhase(GenericInteractionCreateEvent event, Game game) {
@@ -281,7 +286,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaConstitution").isEmpty()) {
             game.setStoredValue("agendaConstitution", "");
             for (Player player2 : game.getRealPlayers()) {
-                List<String> exhausted = new ArrayList<>();
+                var exhausted = new ArrayList<String>();
                 for (String planet : player2.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -317,7 +322,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaArmsReduction").isEmpty()) {
             game.setStoredValue("agendaArmsReduction", "");
             for (Player player2 : game.getRealPlayers()) {
-                List<String> exhausted = new ArrayList<>();
+                var exhausted = new ArrayList<String>();
                 for (String planet : player2.getPlanets()) {
                     if (planet.contains("custodia") || planet.contains("ghoti")) {
                         continue;
@@ -386,7 +391,7 @@ public class StartPhaseService {
         if (!game.getStoredValue("agendaRepGov").isEmpty()) {
             for (Player player2 : game.getRealPlayers()) {
                 if (game.getStoredValue("agendaRepGov").contains(player2.getFaction())) {
-                    List<String> exhausted = new ArrayList<>();
+                    var exhausted = new ArrayList<String>();
                     for (String planet : player2.getPlanets()) {
                         Planet p = game.getPlanetsInfo().get(planet);
                         if (p != null && p.getPlanetTypes().contains("cultural")) {
@@ -470,7 +475,7 @@ public class StartPhaseService {
                     .filter(Objects::nonNull)
                     .filter(p -> p.getSCs().size() < game.getStrategyCardsPerPlayer())
                     .findFirst();
-            if (!firstInPriorityOrder.isPresent()) {
+            if (firstInPriorityOrder.isEmpty()) {
                 MessageHelper.sendMessageToChannel(
                         event.getMessageChannel(),
                         "No player found on the Priority Track with fewer than the max strategy cards. Can't offer anyone Strategy Cards.");
@@ -843,7 +848,7 @@ public class StartPhaseService {
 
     public static void postSurveyResults(Game game) {
         int completedSurvey = 0;
-        if (game.getRealPlayers().size() > 0) {
+        if (!game.getRealPlayers().isEmpty()) {
             for (Player p2 : game.getRealPlayers()) {
                 var userSettings = UserSettingsManager.get(p2.getUserID());
                 if (userSettings.isHasAnsweredSurvey()) {
@@ -863,13 +868,13 @@ public class StartPhaseService {
                 && completedSurvey > 2
                 && game.getStoredValue("postedSurvey").isEmpty()) {
             String header = "# __Survey Results__\n";
-            String question1 = "## Question #1: Whispers\n";
-            String question2 = "## Question #2: Supports\n";
-            String question4 = "## Question #4: Winmaking\n";
-            String question3 = "## Question #3: How To Handle Rollback Disputes\n";
-            String question5 = "## Question #5: Meta Preferences\n";
+            StringBuilder question1 = new StringBuilder("## Question #1: Whispers\n");
+            StringBuilder question2 = new StringBuilder("## Question #2: Supports\n");
+            StringBuilder question4 = new StringBuilder("## Question #4: Winmaking\n");
+            StringBuilder question3 = new StringBuilder("## Question #3: How To Handle Rollback Disputes\n");
+            StringBuilder question5 = new StringBuilder("## Question #5: Meta Preferences\n");
             List<Player> randomPlayers = new ArrayList<>();
-            if (game.getRealPlayers().size() > 0) {
+            if (!game.getRealPlayers().isEmpty()) {
                 randomPlayers.addAll(game.getRealPlayers());
             } else {
                 randomPlayers.addAll(game.getPlayers().values());
@@ -883,8 +888,8 @@ public class StartPhaseService {
                 if (!userSettings.isHasAnsweredSurvey()) {
                     continue;
                 }
-                question1 += "* " + userSettings.getWhisperPref() + "\n";
-                question2 += "* " + userSettings.getSupportPref() + "\n";
+                question1.append("* ").append(userSettings.getWhisperPref()).append("\n");
+                question2.append("* ").append(userSettings.getSupportPref()).append("\n");
                 if (userSettings.getSupportPref().contains("Purge")) {
                     anyoneWantsToBan = true;
                 }
@@ -894,9 +899,9 @@ public class StartPhaseService {
                 if (userSettings.getWhisperPref().contains("Limited")) {
                     anyoneWantsLimitedWhispers = true;
                 }
-                question4 += "* " + userSettings.getWinmakingPref() + "\n";
-                question3 += "* " + userSettings.getTakebackPref() + "\n";
-                question5 += "* " + userSettings.getMetaPref() + "\n";
+                question4.append("* ").append(userSettings.getWinmakingPref()).append("\n");
+                question3.append("* ").append(userSettings.getTakebackPref()).append("\n");
+                question5.append("* ").append(userSettings.getMetaPref()).append("\n");
             }
             MessageHelper.sendMessageToChannelAndPin(
                     game.getTableTalkChannel(),
@@ -1021,7 +1026,7 @@ public class StartPhaseService {
                     StartTurnService.getStartOfTurnButtons(nextPlayer, game, false, event));
             FowCommunicationThreadService.checkNewNeighbors(game, nextPlayer);
         } else {
-            String hold = "";
+            StringBuilder hold = new StringBuilder();
             MessageHelper.sendMessageToChannel(
                     game.getMainGameChannel(),
                     "All players have picked a strategy card.\n" + nextPlayer.getRepresentation()
@@ -1037,7 +1042,7 @@ public class StartPhaseService {
                             p2.getRepresentationUnfogged()
                                     + ", you have the opportunity to use _Quantum Datahub Node_.",
                             buttons);
-                    hold = "_Quantum Datahub Node_";
+                    hold = new StringBuilder("_Quantum Datahub Node_");
                 }
                 if (ButtonHelper.isPlayerElected(game, p2, "arbiter")) {
                     List<Button> buttons = new ArrayList<>();
@@ -1047,7 +1052,7 @@ public class StartPhaseService {
                             p2.getCorrectChannel(),
                             p2.getRepresentationUnfogged() + ", you have the opportunity to use _Imperial Arbiter_.",
                             buttons);
-                    hold += (hold.isEmpty() ? "" : " or ") + "_Imperial Arbiter_";
+                    hold.append((hold.length() == 0) ? "" : " or ").append("_Imperial Arbiter_");
                 }
             }
             if (game.isShowBanners()) {
@@ -1081,7 +1086,7 @@ public class StartPhaseService {
                             numUnpassed + " other player" + (numUnpassed == 1 ? " is" : "s are") + " still unpassed.";
                 }
             }
-            if (!hold.isEmpty()) {
+            if (hold.length() > 0) {
                 msgExtra += "\nYou may wish to hold your turn until you have confirmation of no " + hold + ".";
             }
             MessageHelper.sendMessageToChannel(game.getMainGameChannel(), msgExtra);

@@ -70,9 +70,6 @@ public class AutoCompleteProvider {
 
     public static void handleAutoCompleteEvent(CommandAutoCompleteInteractionEvent event) {
         try {
-            // System.out.println("\nIn handleAutoCompleteEvent: " + event.getName() + " > " + event.getSubcommandName()
-            // + " -> " + event.getFocusedOption().getName() + " :: " + event.getFocusedOption().getValue()); // Debug
-            // line
             resolveAutoCompleteEvent(event);
         } catch (Exception e) {
             BotLogger.error(new BotLogger.LogMessageOrigin(event), "Error in handleAutoCompleteEvent", e);

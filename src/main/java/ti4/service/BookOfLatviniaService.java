@@ -15,7 +15,7 @@ import ti4.service.emoji.MiscEmojis;
 
 public class BookOfLatviniaService {
 
-    private static String id = "bookoflatvinia";
+    private static final String id = "bookoflatvinia";
 
     private static RelicModel relic() {
         return Mapper.getRelic(id);
