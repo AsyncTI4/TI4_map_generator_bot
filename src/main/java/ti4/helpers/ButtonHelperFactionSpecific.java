@@ -3417,7 +3417,7 @@ public class ButtonHelperFactionSpecific {
             MessageHelper.sendMessageToChannel(
                     event.getMessageChannel(),
                     player.getRepresentation(true, false) + " does not have "
-                            + (count == "1" ? "a commodity" : count + " commodities")
+                            + ("1".equals(count) ? "a commodity" : count + " commodities")
                             + " to remove from _ATS Armaments_. Current count: " + player.getAtsCount() + ".");
             return;
         }
