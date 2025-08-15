@@ -430,9 +430,9 @@ class GameLoadService {
                 case Constants.ACTIVE_SYSTEM -> game.setActiveSystem(info);
                 case Constants.AUTO_PING -> {
                     try {
-                        int pnghrs = Integer.parseInt(info);
-                        game.setAutoPing(pnghrs != 0);
-                        game.setAutoPingSpacer(pnghrs);
+                        int pingHours = Integer.parseInt(info);
+                        game.setAutoPing(pingHours != 0);
+                        game.setAutoPingSpacer(pingHours);
                     } catch (Exception e) {
                     }
                 }
@@ -606,18 +606,6 @@ class GameLoadService {
                     } catch (Exception e) {
                         BotLogger.error(
                                 "Failed to load unit displace map from game save data " + Constants.jazzPing(), e);
-                    }
-                }
-                // TODO: DEPRECATED: Remove after September 1st
-                case Constants.DISPLACED_UNITS_ACTIVATION -> {
-                    StringTokenizer displacedInfo = new StringTokenizer(info, ":");
-                    while (displacedInfo.hasMoreTokens()) {
-                        String token = displacedInfo.nextToken();
-                        String unitOrig = token.split(",")[0];
-                        int amt = Integer.parseInt(token.split(",")[1]);
-                        if (unitOrig != null) {
-                            game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitOrig, amt);
-                        }
                     }
                 }
                 case Constants.FOW_OPTIONS -> {
