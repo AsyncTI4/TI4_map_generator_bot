@@ -12,13 +12,11 @@ public class IncentiveAgendaResolver implements ForAgainstAgendaResolver {
 
     @Override
     public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
-        var actionsChannel = game.getMainGameChannel();
-        RevealPublicObjectiveService.revealS1(game, event, actionsChannel);
+        RevealPublicObjectiveService.revealS1(game, event);
     }
 
     @Override
     public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
-        var actionsChannel = game.getMainGameChannel();
-        RevealPublicObjectiveService.revealS2(game, event, actionsChannel);
+        RevealPublicObjectiveService.revealS2(game, event);
     }
 }
