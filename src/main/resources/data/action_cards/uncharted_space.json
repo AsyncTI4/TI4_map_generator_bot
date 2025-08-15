@@ -7,7 +7,7 @@
         "text": "Place up to 1 ship from your reinforcements whose cost is 4 or less in the active system",
         "flavorText": "The Shipwrights were never late, though they had a habit of straining the meaning of “just in time” fulfillment.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "secured_trove",
@@ -17,7 +17,7 @@
         "text": "Purge any 2 of your relic fragments to gain 1 relic.",
         "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "secured_trove2",
@@ -27,7 +27,7 @@
         "text": "Purge any 2 of your relic fragments to gain 1 relic.",
         "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "free_trade_network",
@@ -37,7 +37,7 @@
         "text": "For each planet trait, if you control a planet of that trait, gain 2 commodities or convert 2 of your commodities to trade goods.",
         "flavorText": "Celdauri trade ports were a sight to behold, boasting goods from across the known galaxy.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "carapace_plating",
@@ -47,7 +47,7 @@
         "text": "Cancel up to 2 of those hits.",
         "flavorText": "Phquaiset clicked delightedly as the plating fell away, it was time for a counterattack.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "psionic_hammer",
@@ -57,7 +57,7 @@
         "text": "Choose 1 player with the most victory points. Look at up to 1 of their unscored secret objectives, at random.",
         "flavorText": "The Cymiaen locked eyes with the diplomat. It didn't move again until the screams had stopped.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "shields_holding_ds",
@@ -67,7 +67,7 @@
         "text": "Cancel up to 2 hits.",
         "flavorText": "Jgin let out a cold, hard laugh as the attack intensified, enemy munitions rocking the ship but unable to penetrate their hull.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "special_session",
@@ -77,7 +77,7 @@
         "text": "Reveal the top card of the agenda deck and resolve that agenda. Then, players who voted on that agenda may ready up to 3 planets they control.",
         "flavorText": "“What is it that you seek?” Kadryn asked the Council. “You yourselves cannot even say.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "diplomatic_pressure_ds",
@@ -88,7 +88,7 @@
         "automationID": "diplo_pressure",
         "flavorText": "“There are more pressing matters for the session ahead.” The Florzen pulsed. “Much more pressing.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "freedom_fighters_ds",
@@ -98,7 +98,7 @@
         "text": "You may place a number of infantry from your reinforcements on that planet equal to half that planet's influence value, rounded down.",
         "flavorText": "Otto's Outlaws were among the galaxy's most feared guerilla groups.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "morale_boost_ds",
@@ -108,7 +108,7 @@
         "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
         "flavorText": "\"Drink deep, be hearty! Tomorrow we die!\" - Ghemina war song",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "abyssal_starpaths",
@@ -118,7 +118,7 @@
         "text": "Choose any 2 systems that do not contain planets; those 2 systems are adjacent to each other until the end of this tactical action.",
         "flavorText": "The calls of the Ghoti all-mother have left many unsuspecting captains lost in the void.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "planetary_rigs",
@@ -129,7 +129,7 @@
         "automationID": "planetary_rigs",
         "flavorText": "Gledge dig deep, and certainly greedily, but they're the best at it.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "planetary_rigs2",
@@ -140,7 +140,7 @@
         "automationID": "planetary_rigs",
         "flavorText": "Gledge dig deep, and certainly greedily, but they're the best at it.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "ai_augury",
@@ -150,7 +150,7 @@
         "text": "Return up to 1 of your unscored secret objectives to the secret objective deck, shuffle that deck, and draw 1 secret objective.",
         "flavorText": "The predictive algorithms of the Ilyxum are magnificent, but at times infuriatingly cryptic.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "direct_hit_ds",
@@ -161,7 +161,7 @@
         "automationID": "direct_hit",
         "flavorText": "Sdallari Tvungovot admired the wreckage as they prepared to leave. They had outdone themselves this time.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "aggressive_broker",
@@ -171,7 +171,7 @@
         "text": "That player must choose to allow you to either gain 2 trade goods or replenish your commodities.",
         "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don't. They brought the money, let's make this quick.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "meditative_firing_cycles",
@@ -181,7 +181,7 @@
         "text": "You may use the SPACE CANNON ability of each of up to 3 of your units in any system against another player's ships in or adjacent to that system.",
         "flavorText": "",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "safety_overrides_ds",
@@ -191,7 +191,7 @@
         "text": "Your opponent must choose and destroy 2 of their own units on that planet.",
         "flavorText": "Surrounded by his flaming exosuit, Sir Chulran made one last charge into fire, into death.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "contagion",
@@ -201,7 +201,7 @@
         "text": "Destroy half of that player's infantry on that planet, rounded up.",
         "flavorText": "The Soladity's Blight has many strains, some more virulent than others.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "remnant_collection",
@@ -211,7 +211,7 @@
         "text": "Purge any number of your relic fragments to draw an equal number of action cards.",
         "flavorText": "Vassa Hagi wasn't entirely certain what would happen next, but the relics would be lost forever, and that was enough.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "sabotage_ds",
@@ -221,7 +221,7 @@
         "text": "Cancel that action card.",
         "flavorText": "The best laid plans are Li-Zho plans, but the second-best are those they choose not to interfere with.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "hostile_world_ds",
@@ -231,7 +231,7 @@
         "text": "Roll a number of dice equal to that planet's resource value, for each result of 6 or greater, produce 1 hit against those ground forces.",
         "flavorText": "“Y'ever fought the Khrask before, lad?” The commander cackled over the roar of the dropship's engines. “We're touching down on a world that wants us dead.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "echo_shielding",
@@ -241,7 +241,7 @@
         "text": "Units you control in the active system gain PLANETARY SHIELD until the end of this tactical action.",
         "flavorText": "The admiral swore as a shimmering veil spread to envelope the planet's critical infrastructure.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "illusory_duplication_ds",
@@ -251,7 +251,7 @@
         "text": "Each of your non-fighter ships in the active system that do not have SUSTAIN DAMAGE gain that unit ability this combat round.",
         "flavorText": "Sensors indicated only one Mortheus ship; it remained unclear which of the visible dozen it actually was.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "confused_sage",
@@ -261,7 +261,7 @@
         "text": "Apply +3 or -3 to the result before resolving the effects of that roll.",
         "flavorText": "“No no no. That can't be right…” the ancient Myko-Mentori sighed, “Ah! Yes, now I remember.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "singularity_charge_ds",
@@ -271,7 +271,7 @@
         "text": "Each unit participating in that combat becomes damaged, if able.",
         "flavorText": "Mosk Graezon knew the time had come, if he couldn't have the system, he'd take as many down with him as he could.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "skilled_retreat_ds",
@@ -281,7 +281,7 @@
         "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships; the space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
         "flavorText": "Jack Hallard hadn't been captured yet, and today would not be the day he was.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "renegotiation",
@@ -291,7 +291,7 @@
         "text": "That player must give you 1 promissory note from their hand, if able.",
         "flavorText": "“You made a deal with the old government.” Rapdr Ironclaw sneered. “If you want a deal, comrade, start talking.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "forbidden_knowledge",
@@ -301,7 +301,7 @@
         "text": "You may ignore 1 of that technologys prerequisites. If that technology is not a unit upgrade technology, you may ignore 2 of that technology's prerequisites.",
         "flavorText": "The Zealots knew many secrets long forgotten.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "war_machine_ds",
@@ -312,7 +312,7 @@
         "automationID": "war_machine",
         "flavorText": "The Mechatronics machinery whirred into a frenzy, assembling a new vessel in record time.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "bounty_contracts",
@@ -322,7 +322,7 @@
         "text": "Choose 1 revealed public objective; during this status phase, when a player scores that objective, gain 1 trade good.",
         "flavorText": "Turra closed the case and rose from the table. \"It's been a pleasure.\"",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "flank_speed_ds",
@@ -332,7 +332,7 @@
         "text": "Apply +1 to the move value of each of your ships during this tactical action.",
         "flavorText": "\"The minimum fee has been paid.\" The Vaden said. \"Don't squander the opportunity.\"",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "maneuvering_jets_ds",
@@ -342,7 +342,7 @@
         "text": "Cancel 1 hit.",
         "flavorText": "The Vaylerian cruisers entered the system too fast, overwhelming the planetary defense network.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "arbitrage",
@@ -352,7 +352,7 @@
         "text": "Gain 4 commodities; for each commodity you would gain in excess of your commodity value, gain 1 trade good instead.",
         "flavorText": "The Sovereignty's Corporations have mastered the art of using money to make money.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "micrometeoroid_storm_ds",
@@ -363,7 +363,7 @@
         "automationID": "micrometeoroid_storm",
         "flavorText": "“Invaders. Destruction. Pain.” The stone churned angrily. “Hatred. Judgment. Fear.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "professional_archeologists",
@@ -373,7 +373,7 @@
         "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
         "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "professional_archeologists2",
@@ -383,7 +383,7 @@
         "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
         "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "professional_archeologists3",
@@ -393,7 +393,7 @@
         "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
         "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "professional_archeologists4",
@@ -403,7 +403,7 @@
         "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise discard that card and gain 1 commodity.",
         "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "emergency_meeting",
@@ -413,7 +413,7 @@
         "text": "Shuffle all discarded agendas into the agenda deck and look at the top 3 cards of that deck. Place each of those cards on the top or bottom of that deck in any order.",
         "flavorText": "Given the palpable Edyn interest, the next council session was sure to be an interesting one.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "escape_clause",
@@ -423,7 +423,7 @@
         "text": "You do not give that player your commodities; that player returns your Trade Agreement promissory note.",
         "flavorText": "“What do you mean?” The Vaden smiled, baring rows upon rows of teeth. “You read the contract, right?”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "personnel_writ",
@@ -433,7 +433,7 @@
         "text": "Ready your agent or spend 1 command token from your strategy pool to unlock your commander.",
         "flavorText": "\"Come,\" Allant's voice softly carried like distant thunder, \"you have been chosen.\"",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "preparation",
@@ -443,7 +443,7 @@
         "text": "Draw 1 action card.",
         "flavorText": "The choice was an illusion, the game decided from the first move.",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     },
     {
         "alias": "classified_weapons",
@@ -453,6 +453,6 @@
         "text": "Apply +4 to the result of each of those rolls. Hits produced by that roll cannot be canceled.",
         "flavorText": "Dr. Morden stood still, in awe. “They're… beautiful.”",
         "source": "ds",
-        "actual_source": "uncharted_space"
+        "actualSource": "uncharted_space"
     }
 ]
