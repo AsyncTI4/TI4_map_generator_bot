@@ -51,7 +51,8 @@ public class DiscordOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
                 CACHE.put(token, principal);
                 return principal;
             } else {
-                BotLogger.error(String.format("Discord did not indicate success getting the user token.   %s", response.body()));
+                BotLogger.error(String.format(
+                        "Discord did not indicate success getting the user token.   %s", response.body()));
             }
         } catch (Exception e) {
             BotLogger.error("Error retrieving Discord user id from token", e);
