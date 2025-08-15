@@ -1,10 +1,6 @@
 package ti4.map.persistence;
 
-import static ti4.map.persistence.GamePersistenceKeys.*;
-
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -27,7 +23,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -56,6 +55,27 @@ import ti4.model.BorderAnomalyHolder;
 import ti4.model.TemporaryCombatModifierModel;
 import ti4.service.map.CustomHyperlaneService;
 import ti4.service.option.FOWOptionService.FOWOption;
+
+import static ti4.map.persistence.GamePersistenceKeys.ENDGAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDMAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDPLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTILE;
+import static ti4.map.persistence.GamePersistenceKeys.ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITDAMAGE;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.ENDUNITS;
+import static ti4.map.persistence.GamePersistenceKeys.GAMEINFO;
+import static ti4.map.persistence.GamePersistenceKeys.MAPINFO;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_ENDTOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLANET_TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYER;
+import static ti4.map.persistence.GamePersistenceKeys.PLAYERINFO;
+import static ti4.map.persistence.GamePersistenceKeys.TILE;
+import static ti4.map.persistence.GamePersistenceKeys.TOKENS;
+import static ti4.map.persistence.GamePersistenceKeys.UNITDAMAGE;
+import static ti4.map.persistence.GamePersistenceKeys.UNITHOLDER;
+import static ti4.map.persistence.GamePersistenceKeys.UNITS;
 
 @UtilityClass
 class GameLoadService {
@@ -497,84 +517,79 @@ class GameLoadService {
                 case Constants.SC_PLAYED -> {
                     StringTokenizer scPlayed = new StringTokenizer(info, ";");
                     while (scPlayed.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(scPlayed.nextToken(), ",");
-                        Integer scID = Integer.parseInt(dataInfo.nextToken());
-                        Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
+                        StringTokenizer dataInfoTokens = new StringTokenizer(scPlayed.nextToken(), ",");
+                        Integer scID = Integer.parseInt(dataInfoTokens.nextToken());
+                        Boolean status = Boolean.parseBoolean(dataInfoTokens.nextToken());
                         game.setSCPlayed(scID, status);
                     }
                 }
                 case Constants.AGENDA_VOTE_INFO -> {
-                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
-                    while (voteInfo.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(voteInfo.nextToken(), ",");
+                    StringTokenizer voteInfoTokens = new StringTokenizer(info, ":");
+                    while (voteInfoTokens.hasMoreTokens()) {
+                        StringTokenizer dataInfoTokens = new StringTokenizer(voteInfoTokens.nextToken(), ",");
                         String outcome = null;
-                        String voteInfo;
-                        if (dataInfo.hasMoreTokens()) {
-                            outcome = dataInfo.nextToken();
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            outcome = dataInfoTokens.nextToken();
                         }
-                        if (dataInfo.hasMoreTokens()) {
-                            voteInfo = dataInfo.nextToken();
-                            game.setCurrentAgendaVote(outcome, voteInfo);
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            String dataInfo = dataInfoTokens.nextToken();
+                            game.setCurrentAgendaVote(outcome, dataInfo);
                         }
                     }
                 }
                 case Constants.CHECK_REACTS_INFO -> {
-                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
-                    while (voteInfo.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(voteInfo.nextToken(), ",");
+                    StringTokenizer reactInfoTokens = new StringTokenizer(info, ":");
+                    while (reactInfoTokens.hasMoreTokens()) {
+                        StringTokenizer dataInfoTokens = new StringTokenizer(reactInfoTokens.nextToken(), ",");
                         String outcome = null;
-                        String voteInfo;
-                        if (dataInfo.hasMoreTokens()) {
-                            outcome = dataInfo.nextToken();
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            outcome = dataInfoTokens.nextToken();
                         }
-                        if (dataInfo.hasMoreTokens()) {
-                            voteInfo = dataInfo.nextToken();
-                            game.setStoredValue(outcome, voteInfo);
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            String dataInfo = dataInfoTokens.nextToken();
+                            game.setStoredValue(outcome, dataInfo);
                         }
                     }
                 }
                 case Constants.THALNOS_UNITS -> {
-                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
-                    while (voteInfo.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(voteInfo.nextToken(), ",");
+                    StringTokenizer thalnosInfoTokens = new StringTokenizer(info, ":");
+                    while (thalnosInfoTokens.hasMoreTokens()) {
+                        StringTokenizer dataInfoTokens = new StringTokenizer(thalnosInfoTokens.nextToken(), ",");
                         String outcome = null;
-                        String voteInfo;
-                        if (dataInfo.hasMoreTokens()) {
-                            outcome = dataInfo.nextToken();
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            outcome = dataInfoTokens.nextToken();
                         }
-                        if (dataInfo.hasMoreTokens()) {
-                            voteInfo = dataInfo.nextToken();
-                            game.setSpecificThalnosUnit(outcome, Integer.parseInt(voteInfo));
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            String dataInfo = dataInfoTokens.nextToken();
+                            game.setSpecificThalnosUnit(outcome, Integer.parseInt(dataInfo));
                         }
                     }
                 }
                 case Constants.SLASH_COMMAND_STRING -> {
                     StringTokenizer commandCounts = new StringTokenizer(info, ":");
                     while (commandCounts.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(commandCounts.nextToken(), ",");
+                        StringTokenizer dataInfoTokens = new StringTokenizer(commandCounts.nextToken(), ",");
                         String commandName = null;
-                        String commandCount;
-                        if (dataInfo.hasMoreTokens()) {
-                            commandName = dataInfo.nextToken();
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            commandName = dataInfoTokens.nextToken();
                         }
-                        if (dataInfo.hasMoreTokens()) {
-                            commandCount = dataInfo.nextToken();
-                            game.setSpecificSlashCommandCount(commandName, Integer.parseInt(commandCount));
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            String dataInfo = dataInfoTokens.nextToken();
+                            game.setSpecificSlashCommandCount(commandName, Integer.parseInt(dataInfo));
                         }
                     }
                 }
                 case Constants.ACS_SABOD -> {
                     StringTokenizer voteInfo = new StringTokenizer(info, ":");
                     while (voteInfo.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(voteInfo.nextToken(), ",");
+                        StringTokenizer dataInfoTokens = new StringTokenizer(voteInfo.nextToken(), ",");
                         String outcome = null;
-                        String voteInfo;
-                        if (dataInfo.hasMoreTokens()) {
-                            outcome = dataInfo.nextToken();
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            outcome = dataInfoTokens.nextToken();
                         }
-                        if (dataInfo.hasMoreTokens()) {
-                            voteInfo = dataInfo.nextToken();
-                            game.setSpecificActionCardSaboCount(outcome, Integer.parseInt(voteInfo));
+                        if (dataInfoTokens.hasMoreTokens()) {
+                            String dataInfo = dataInfoTokens.nextToken();
+                            game.setSpecificActionCardSaboCount(outcome, Integer.parseInt(dataInfo));
                         }
                     }
                 }
@@ -582,10 +597,10 @@ class GameLoadService {
                     try {
                         TypeFactory factory = mapper.getTypeFactory();
                         JavaType states = factory.constructParametricType(List.class, Integer.class);
-                        JavaType unitholder = factory.constructMapLikeType(
+                        JavaType unitHolder = factory.constructMapLikeType(
                                 HashMap.class, factory.constructType(UnitKey.class), states);
                         JavaType reference = factory.constructMapLikeType(
-                                HashMap.class, factory.constructType(String.class), unitholder);
+                                HashMap.class, factory.constructType(String.class), unitHolder);
                         Map<String, Map<UnitKey, List<Integer>>> displacedUnits = mapper.readValue(info, reference);
                         game.setTacticalActionDisplacement(displacedUnits);
                     } catch (Exception e) {
@@ -599,8 +614,8 @@ class GameLoadService {
                     while (displacedInfo.hasMoreTokens()) {
                         String token = displacedInfo.nextToken();
                         String unitOrig = token.split(",")[0];
-                        Integer amt = Integer.parseInt(token.split(",")[1]);
-                        if (unitOrig != null && amt != null) {
+                        int amt = Integer.parseInt(token.split(",")[1]);
+                        if (unitOrig != null) {
                             game.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitOrig, amt);
                         }
                     }
@@ -608,9 +623,9 @@ class GameLoadService {
                 case Constants.FOW_OPTIONS -> {
                     StringTokenizer fowOptions = new StringTokenizer(info, ";");
                     while (fowOptions.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(fowOptions.nextToken(), ",");
-                        String optionName = dataInfo.nextToken();
-                        String optionValue = dataInfo.nextToken();
+                        StringTokenizer dataInfoTokens = new StringTokenizer(fowOptions.nextToken(), ",");
+                        String optionName = dataInfoTokens.nextToken();
+                        String optionValue = dataInfoTokens.nextToken();
                         game.setFowOption(FOWOption.fromString(optionName), Boolean.parseBoolean(optionValue));
                     }
                 }
