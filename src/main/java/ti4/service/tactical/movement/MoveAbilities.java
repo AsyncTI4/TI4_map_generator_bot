@@ -282,6 +282,4 @@ public final class MoveAbilities {
                     "Use Eko's Ability To Ignore Anomalies"));
         }
     }
-
-
 }
