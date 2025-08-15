@@ -40,23 +40,23 @@ public class PickStrategyCardService {
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext()) {
-            Player player_ = players.poll();
-            if (player_ == null || !player_.isRealPlayer()) {
+            Player currentPlayer = players.poll();
+            if (currentPlayer == null || !currentPlayer.isRealPlayer()) {
                 continue;
             }
-            int player_SCCount = player_.getSCs().size();
-            if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += player_.getRepresentationUnfogged() + " is up to pick their strategy card.";
+            int playerScCount = currentPlayer.getSCs().size();
+            if (nextCorrectPing && playerScCount < maxSCsPerPlayer && currentPlayer.getFaction() != null) {
+                msgExtra += currentPlayer.getRepresentationUnfogged() + " is up to pick their strategy card.";
                 game.setPhaseOfGame("strategy");
-                privatePlayer = player_;
+                privatePlayer = currentPlayer;
                 allPicked = false;
                 break;
             }
-            if (player_ == player) {
+            if (currentPlayer == player) {
                 nextCorrectPing = true;
             }
-            if (player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                players.add(player_);
+            if (playerScCount < maxSCsPerPlayer && currentPlayer.getFaction() != null) {
+                players.add(currentPlayer);
             }
         }
 

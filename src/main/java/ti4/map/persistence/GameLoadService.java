@@ -504,9 +504,9 @@ class GameLoadService {
                     }
                 }
                 case Constants.AGENDA_VOTE_INFO -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ":");
-                    while (vote_info.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
+                    while (voteInfo.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(voteInfo.nextToken(), ",");
                         String outcome = null;
                         String voteInfo;
                         if (dataInfo.hasMoreTokens()) {
@@ -519,9 +519,9 @@ class GameLoadService {
                     }
                 }
                 case Constants.CHECK_REACTS_INFO -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ":");
-                    while (vote_info.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
+                    while (voteInfo.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(voteInfo.nextToken(), ",");
                         String outcome = null;
                         String voteInfo;
                         if (dataInfo.hasMoreTokens()) {
@@ -534,9 +534,9 @@ class GameLoadService {
                     }
                 }
                 case Constants.THALNOS_UNITS -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ":");
-                    while (vote_info.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
+                    while (voteInfo.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(voteInfo.nextToken(), ",");
                         String outcome = null;
                         String voteInfo;
                         if (dataInfo.hasMoreTokens()) {
@@ -564,9 +564,9 @@ class GameLoadService {
                     }
                 }
                 case Constants.ACS_SABOD -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ":");
-                    while (vote_info.hasMoreTokens()) {
-                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                    StringTokenizer voteInfo = new StringTokenizer(info, ":");
+                    while (voteInfo.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(voteInfo.nextToken(), ",");
                         String outcome = null;
                         String voteInfo;
                         if (dataInfo.hasMoreTokens()) {
@@ -1033,9 +1033,9 @@ class GameLoadService {
                 }
                 case Constants.FOW_SYSTEMS -> {
                     try {
-                        StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
-                        while (fow_systems.hasMoreTokens()) {
-                            String[] system = fow_systems.nextToken().split(",");
+                        StringTokenizer fowSystems = new StringTokenizer(tokenizer.nextToken(), ";");
+                        while (fowSystems.hasMoreTokens()) {
+                            String[] system = fowSystems.nextToken().split(",");
                             String position = system[0];
                             String tileID = system[1];
                             String label = system[2];

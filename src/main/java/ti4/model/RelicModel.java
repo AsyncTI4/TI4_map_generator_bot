@@ -23,7 +23,8 @@ public class RelicModel implements ModelInterface, EmbeddableModel {
     private Boolean isFakeRelic;
     private String imageURL;
     private ComponentSource source;
-    private ComponentSource actual_source;
+    @com.fasterxml.jackson.annotation.JsonProperty("actual_source")
+    private ComponentSource actualSource;
     private List<String> searchTags = new ArrayList<>();
     private String homebrewReplacesID;
 

@@ -71,8 +71,8 @@ public class Mapper {
     private static final Properties decals = new Properties();
     private static final Properties general = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
-    private static final Properties special_case = new Properties();
-    private static final Properties tokens_fromProperties = new Properties();
+    private static final Properties specialCase = new Properties();
+    private static final Properties tokensFromProperties = new Properties();
 
     // TODO: Finish moving all files over from properties to json
     private static final Map<String, AbilityModel> abilities = new HashMap<>();
@@ -141,8 +141,8 @@ public class Mapper {
         readData("decals.properties", decals);
         readData("general.properties", general);
         readData("hyperlanes.properties", hyperlaneAdjacencies);
-        readData("special_case.properties", special_case);
-        readData("tokens.properties", tokens_fromProperties);
+        readData("special_case.properties", specialCase);
+        readData("tokens.properties", tokensFromProperties);
 
         duplicateObjectsForAllColors(promissoryNotes);
         duplicateObjectsForAllColors(secretObjectives);
@@ -1040,7 +1040,7 @@ public class Mapper {
     }
 
     public static List<String> getTokensFromProperties() {
-        return Stream.of(attachments.keySet(), tokens_fromProperties.keySet(), tokens.keySet())
+        return Stream.of(attachments.keySet(), tokensFromProperties.keySet(), tokens.keySet())
                 .flatMap(Collection::stream)
                 .filter(String.class::isInstance)
                 .map(String.class::cast)
@@ -1073,7 +1073,7 @@ public class Mapper {
             tokensToName.put(value, key);
         }
 
-        for (Map.Entry<Object, Object> tokens : tokens_fromProperties.entrySet()) {
+        for (Map.Entry<Object, Object> tokens : tokensFromProperties.entrySet()) {
             String key = (String) tokens.getKey();
             String value = (String) tokens.getValue();
             tokensToName.put(value, key);
@@ -1086,7 +1086,7 @@ public class Mapper {
     }
 
     public static String getTokenID(String tokenID) {
-        return tokens_fromProperties.getProperty(tokenID);
+        return tokensFromProperties.getProperty(tokenID);
     }
 
     public static String getTokenKey(String tokenID) {
@@ -1248,7 +1248,7 @@ public class Mapper {
     // Special cases from .properties
 
     public static String getSpecialCaseValues(String id) {
-        String property = special_case.getProperty(id);
+        String property = specialCase.getProperty(id);
         return property != null ? property : "";
     }
 

@@ -105,11 +105,11 @@ public class Player extends PlayerProperties {
     private final Map<String, Integer> secretsScored = new LinkedHashMap<>();
     private final Map<String, Integer> unitCaps = new HashMap<>();
     private final Map<String, String> trapCardsPlanets = new LinkedHashMap<>();
-    private final Map<String, String> fow_seenTiles = new HashMap<>();
-    private final Map<String, String> fow_customLabels = new HashMap<>();
+    private final Map<String, String> fowSeenTiles = new HashMap<>();
+    private final Map<String, String> fowCustomLabels = new HashMap<>();
     private Map<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private @Getter Map<String, Integer> currentProducedUnits = new HashMap<>();
-    private Map<String, Integer> debt_tokens = new LinkedHashMap<>(); // color, count
+    private Map<String, Integer> debtTokens = new LinkedHashMap<>(); // color, count
 
     public Player(String userID, String userName, Game game) {
         setUserID(userID);
@@ -2147,33 +2147,33 @@ public class Player extends PlayerProperties {
     }
 
     public void updateFogTile(@NotNull Tile tile, String label) {
-        fow_seenTiles.put(tile.getPosition(), tile.getTileID());
+        fowSeenTiles.put(tile.getPosition(), tile.getTileID());
         if (label == null) {
-            fow_customLabels.remove(tile.getPosition());
+            fowCustomLabels.remove(tile.getPosition());
         } else {
-            fow_customLabels.put(tile.getPosition(), label);
+            fowCustomLabels.put(tile.getPosition(), label);
         }
     }
 
     public void addFogTile(String tileID, String position, String label) {
-        fow_seenTiles.put(position, tileID);
+        fowSeenTiles.put(position, tileID);
         if (label != null && !".".equals(label) && !label.isEmpty()) {
-            fow_customLabels.put(position, label);
+            fowCustomLabels.put(position, label);
         }
     }
 
     public void removeFogTile(String position) {
-        fow_seenTiles.remove(position);
-        fow_customLabels.remove(position);
+        fowSeenTiles.remove(position);
+        fowCustomLabels.remove(position);
     }
 
     @JsonIgnore
     public Tile buildFogTile(String position, Player player) {
 
-        String tileID = fow_seenTiles.get(position);
+        String tileID = fowSeenTiles.get(position);
         if (tileID == null) tileID = "0b";
 
-        String label = fow_customLabels.get(position);
+        String label = fowCustomLabels.get(position);
         if (label == null) label = "";
 
         if (FOWPlusService.hideFogTile(tileID, label, game)) {
@@ -2184,11 +2184,11 @@ public class Player extends PlayerProperties {
     }
 
     public Map<String, String> getFogTiles() {
-        return fow_seenTiles;
+        return fowSeenTiles;
     }
 
     public Map<String, String> getFogLabels() {
-        return fow_customLabels;
+        return fowCustomLabels;
     }
 
     @JsonIgnore
@@ -2243,33 +2243,33 @@ public class Player extends PlayerProperties {
     }
 
     public Map<String, Integer> getDebtTokens() {
-        return debt_tokens;
+        return debtTokens;
     }
 
-    public void setDebtTokens(Map<String, Integer> debt_tokens) {
-        this.debt_tokens = debt_tokens;
+    public void setDebtTokens(Map<String, Integer> debtTokens) {
+        this.debtTokens = debtTokens;
     }
 
     public void addDebtTokens(String tokenColor, int count) {
-        if (debt_tokens.containsKey(tokenColor)) {
-            debt_tokens.put(tokenColor, debt_tokens.get(tokenColor) + count);
+        if (debtTokens.containsKey(tokenColor)) {
+            debtTokens.put(tokenColor, debtTokens.get(tokenColor) + count);
         } else {
-            debt_tokens.put(tokenColor, count);
+            debtTokens.put(tokenColor, count);
         }
     }
 
     public void removeDebtTokens(String tokenColor, int count) {
-        if (debt_tokens.containsKey(tokenColor)) {
-            debt_tokens.put(tokenColor, Math.max(debt_tokens.get(tokenColor) - count, 0));
+        if (debtTokens.containsKey(tokenColor)) {
+            debtTokens.put(tokenColor, Math.max(debtTokens.get(tokenColor) - count, 0));
         }
     }
 
     public void clearAllDebtTokens(String tokenColor) {
-        debt_tokens.remove(tokenColor);
+        debtTokens.remove(tokenColor);
     }
 
     public int getDebtTokenCount(String tokenColor) {
-        return debt_tokens.getOrDefault(tokenColor, 0);
+        return debtTokens.getOrDefault(tokenColor, 0);
     }
 
     public boolean hasOlradinPolicies() {

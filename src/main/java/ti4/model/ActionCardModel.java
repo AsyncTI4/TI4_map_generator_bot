@@ -22,7 +22,8 @@ public class ActionCardModel implements ModelInterface, EmbeddableModel {
     private String imageURL;
     private String automationID;
     private ComponentSource source;
-    private ComponentSource actual_source;
+    @com.fasterxml.jackson.annotation.JsonProperty("actual_source")
+    private ComponentSource actualSource;
     private List<String> searchTags = new ArrayList<>();
 
     public boolean isValid() {
