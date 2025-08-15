@@ -17,9 +17,9 @@ public class MiltyDraftTile {
     private boolean hasOtherWH;
     private boolean isLegendary;
 
-    private int milty_res;
-    private int milty_inf;
-    private int milty_flex;
+    private int miltyRes;
+    private int miltyInf;
+    private int miltyFlex;
 
     @JsonIgnore
     public boolean hasAnyWormhole() {
@@ -27,7 +27,7 @@ public class MiltyDraftTile {
     }
 
     public double abstractValue() {
-        double value = milty_res * 0.8 + milty_inf * 0.9 + milty_flex;
+        double value = miltyRes * 0.8 + miltyInf * 0.9 + miltyFlex;
         value += isLegendary ? 1.5 : 0.0;
         if (tierList.isBlue()) {
             value += (hasAlphaWH || hasBetaWH) ? 0.5 : 0.0;
@@ -48,9 +48,9 @@ public class MiltyDraftTile {
         resources += r;
         influence += i;
 
-        if (r > i) milty_res += r;
-        else if (i > r) milty_inf += i;
-        else milty_flex += r;
+        if (r > i) miltyRes += r;
+        else if (i > r) miltyInf += i;
+        else miltyFlex += r;
 
         if (planet.isLegendary()) isLegendary = true;
     }

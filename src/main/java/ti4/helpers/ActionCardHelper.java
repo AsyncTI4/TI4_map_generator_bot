@@ -166,10 +166,10 @@ public class ActionCardHelper {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
-                if (ac_name != null) {
+                String acName = Mapper.getActionCard(key).getName();
+                if (acName != null) {
                     acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, CardEmojis.ActionCard));
+                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
                 }
             }
         }
@@ -210,12 +210,12 @@ public class ActionCardHelper {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
+                String acName = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (ac_name != null && "action".equalsIgnoreCase(actionCardWindow)) {
+                if (acName != null && "action".equalsIgnoreCase(actionCardWindow)) {
                     acButtons.add(Buttons.red(
-                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name, CardEmojis.ActionCard));
+                            Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + acName, CardEmojis.ActionCard));
                 }
             }
         }
@@ -229,16 +229,16 @@ public class ActionCardHelper {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
+                String acName = Mapper.getActionCard(key).getName();
                 ActionCardModel actionCard = Mapper.getActionCard(key);
                 String actionCardWindow = actionCard.getWindow();
-                if (ac_name != null) {
+                if (acName != null) {
                     if (actionCardWindow.contains("combat")
                             || actionCardWindow.contains("roll")
                             || actionCardWindow.contains("hit")) {
                         acButtons.add(Buttons.red(
                                 Constants.AC_PLAY_FROM_HAND + value,
-                                "(" + value + ") " + ac_name,
+                                "(" + value + ") " + acName,
                                 CardEmojis.ActionCard));
                     }
                 }
@@ -272,11 +272,11 @@ public class ActionCardHelper {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
-                if (ac_name != null) {
+                String acName = Mapper.getActionCard(key).getName();
+                if (acName != null) {
                     acButtons.add(Buttons.blue(
                             "ac_discard_from_hand_" + value + suffix,
-                            "(" + value + ") " + ac_name,
+                            "(" + value + ") " + acName,
                             CardEmojis.ActionCard));
                 }
             }
@@ -291,10 +291,10 @@ public class ActionCardHelper {
             for (Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                String ac_name = Mapper.getActionCard(key).getName();
-                if (ac_name != null) {
+                String acName = Mapper.getActionCard(key).getName();
+                if (acName != null) {
                     acButtons.add(
-                            Buttons.red("takeAC_" + value + "_" + player.getFaction(), ac_name, CardEmojis.ActionCard));
+                            Buttons.red("takeAC_" + value + "_" + player.getFaction(), acName, CardEmojis.ActionCard));
                 }
             }
         }

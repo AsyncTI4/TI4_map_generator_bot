@@ -659,11 +659,11 @@ public class ConvertTTPGtoAsync {
                 attachments = matcherAttachments.group(2);
                 for (char attachment : attachments.toCharArray()) {
                     if (!validAttachments.contains(String.valueOf(attachment))) {
-                        String attachment_proper = attachment
+                        String attachmentProper = attachment
                                 + (Character.isUpperCase(attachment)
                                         ? "_cap"
                                         : ""); // bypass AliasHandler's toLowercase'ing
-                        String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachment_proper);
+                        String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachmentProper);
                         System.out.println("          - " + attachment + ": " + attachmentResolved);
 
                         String attachmentFileName = Mapper.getAttachmentImagePath(attachmentResolved);

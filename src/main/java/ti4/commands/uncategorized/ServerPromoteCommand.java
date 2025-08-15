@@ -71,38 +71,38 @@ public class ServerPromoteCommand implements ParentCommand {
             return false;
         }
 
-        OptionMapping target_opt = event.getOption(Constants.PROMOTE_TARGET);
-        if (target_opt == null || !Servers.containsKey(target_opt.getAsString())) {
+        OptionMapping targetOpt = event.getOption(Constants.PROMOTE_TARGET);
+        if (targetOpt == null || !Servers.containsKey(targetOpt.getAsString())) {
             MessageHelper.replyToMessage(event, "Server does not exist.");
             return false;
         }
 
-        OptionMapping rank_opt = event.getOption(Constants.PROMOTE_RANK);
-        if (rank_opt != null && !Ranks.containsKey(rank_opt.getAsString())) {
+        OptionMapping rankOpt = event.getOption(Constants.PROMOTE_RANK);
+        if (rankOpt != null && !Ranks.containsKey(rankOpt.getAsString())) {
             MessageHelper.replyToMessage(event, "Rank does not exist.");
             return false;
         }
 
-        if (!Servers.get(target_opt.getAsString()).startsWith("Emoji Farm")) {
-            if (rank_opt == null || rank_opt.getAsString().isEmpty()) {
+        if (!Servers.get(targetOpt.getAsString()).startsWith("Emoji Farm")) {
+            if (rankOpt == null || rankOpt.getAsString().isEmpty()) {
                 MessageHelper.replyToMessage(event, "Rank required (for non Emoji Farm servers).");
                 return false;
             }
             Member member = event.getMember();
             boolean allowed = false;
-            if (Ranks.get(rank_opt.getAsString()).equalsIgnoreCase("admin")) {
+            if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("admin")) {
                 for (Role r : member.getRoles()) {
                     if (r.getId().equals("943596173896323072")) {
                         allowed = true;
                     }
                 }
-            } else if (Ranks.get(rank_opt.getAsString()).equalsIgnoreCase("developer")) {
+            } else if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("developer")) {
                 for (Role r : member.getRoles()) {
                     if (r.getId().equals("943596173896323072") || r.getId().equals("947648366056185897")) {
                         allowed = true;
                     }
                 }
-            } else if (Ranks.get(rank_opt.getAsString()).equalsIgnoreCase("bothelper")) {
+            } else if (Ranks.get(rankOpt.getAsString()).equalsIgnoreCase("bothelper")) {
                 for (Role r : member.getRoles()) {
                     if (r.getId().equals("943596173896323072")
                             || r.getId().equals("947648366056185897")
@@ -123,13 +123,13 @@ public class ServerPromoteCommand implements ParentCommand {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping target_opt = event.getOption(Constants.PROMOTE_TARGET);
-        OptionMapping rank_opt = event.getOption(Constants.PROMOTE_RANK);
-        OptionMapping demote_opt = event.getOption(Constants.PROMOTE_DEMOTE);
+        OptionMapping targetOpt = event.getOption(Constants.PROMOTE_TARGET);
+        OptionMapping rankOpt = event.getOption(Constants.PROMOTE_RANK);
+        OptionMapping demoteOpt = event.getOption(Constants.PROMOTE_DEMOTE);
 
-        String target = target_opt.getAsString();
-        String rank = rank_opt == null ? "" : rank_opt.getAsString();
-        boolean demote = demote_opt != null && demote_opt.getAsBoolean();
+        String target = targetOpt.getAsString();
+        String rank = rankOpt == null ? "" : rankOpt.getAsString();
+        boolean demote = demoteOpt != null && demoteOpt.getAsBoolean();
         User user = event.getUser();
 
         MessageHelper.replyToMessage(
