@@ -4,19 +4,21 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.map.Game;
 import ti4.service.objectives.RevealPublicObjectiveService;
 
-public class IncentiveAgendaResolver implements AgendaResolver {
+public class IncentiveAgendaResolver implements ForAgainstAgendaResolver {
     @Override
     public String getAgendaId() {
         return "incentive";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
+    public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         var actionsChannel = game.getMainGameChannel();
-        if ("for".equalsIgnoreCase(winner)) {
-            RevealPublicObjectiveService.revealS1(game, event, actionsChannel);
-        } else {
-            RevealPublicObjectiveService.revealS2(game, event, actionsChannel);
-        }
+        RevealPublicObjectiveService.revealS1(game, event, actionsChannel);
+    }
+
+    @Override
+    public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
+        var actionsChannel = game.getMainGameChannel();
+        RevealPublicObjectiveService.revealS2(game, event, actionsChannel);
     }
 }

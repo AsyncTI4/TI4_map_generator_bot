@@ -9,42 +9,43 @@ import ti4.map.Game;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
-public class AbsolConstitutionAgendaResolver implements AgendaResolver {
+public class AbsolConstitutionAgendaResolver implements ForAgainstAgendaResolver {
     @Override
     public String getAgendaId() {
         return "absol_constitution";
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
-        if ("for".equalsIgnoreCase(winner)) {
-            List<String> laws = new ArrayList<>(game.getLaws().keySet());
-            for (String law : laws) {
-                game.removeLaw(law);
-            }
-            MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Removed all laws");
-            int counter = 40;
-            boolean lawFound = false;
-            ArrayList<String> discardedAgendas = new ArrayList<>();
-            while (counter > 0 && !lawFound) {
-                counter--;
-                String id2 = game.revealAgenda(false);
-                AgendaModel agendaDetails = Mapper.getAgenda(id2);
-                if (agendaDetails.getType().equalsIgnoreCase("law")) {
-                    lawFound = true;
-                    game.putAgendaBackIntoDeckOnTop(id2);
-                    AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
-                    MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Shuffled the found agendas back in");
-                    for (String id3 : discardedAgendas) {
-                        game.putAgendaBackIntoDeckOnTop(id3);
-                    }
-                    game.shuffleAgendas();
-                } else {
-                    discardedAgendas.add(id2);
-                    MessageHelper.sendMessageToChannel(
-                            game.getMainGameChannel(), "Found the non-law agenda: " + agendaDetails.getName());
+    public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
+        List<String> laws = new ArrayList<>(game.getLaws().keySet());
+        for (String law : laws) {
+            game.removeLaw(law);
+        }
+        MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "# Removed all laws");
+        int counter = 40;
+        boolean lawFound = false;
+        ArrayList<String> discardedAgendas = new ArrayList<>();
+        while (counter > 0 && !lawFound) {
+            counter--;
+            String id2 = game.revealAgenda(false);
+            AgendaModel agendaDetails = Mapper.getAgenda(id2);
+            if (agendaDetails.getType().equalsIgnoreCase("law")) {
+                lawFound = true;
+                game.putAgendaBackIntoDeckOnTop(id2);
+                AgendaHelper.revealAgenda(event, false, game, game.getMainGameChannel());
+                MessageHelper.sendMessageToChannel(game.getMainGameChannel(), "Shuffled the found agendas back in");
+                for (String id3 : discardedAgendas) {
+                    game.putAgendaBackIntoDeckOnTop(id3);
                 }
+                game.shuffleAgendas();
+            } else {
+                discardedAgendas.add(id2);
+                MessageHelper.sendMessageToChannel(
+                        game.getMainGameChannel(), "Found the non-law agenda: " + agendaDetails.getName());
             }
         }
     }
+
+    @Override
+    public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {}
 }

@@ -11,7 +11,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 import ti4.service.emoji.PlanetEmojis;
 
-public class ArtifactAgendaResolver implements AgendaResolver {
+public class ArtifactAgendaResolver implements ForAgainstAgendaResolver {
 
     private final String agendaId;
 
@@ -25,7 +25,7 @@ public class ArtifactAgendaResolver implements AgendaResolver {
     }
 
     @Override
-    public void handle(Game game, ButtonInteractionEvent event, int agendaNumericId, String winner) {
+    public void handleFor(Game game, ButtonInteractionEvent event, int agendaNumericId) {
         TextChannel watchParty = AgendaHelper.watchPartyChannel(game);
         String watchPartyPing = AgendaHelper.watchPartyPing(game);
         if (watchParty != null && !game.isFowMode()) {
@@ -40,13 +40,28 @@ public class ArtifactAgendaResolver implements AgendaResolver {
                         watchParty, systemWithContext, "Surrounding Mecatol Rex In " + game.getName(), false);
             }
         }
-        if ("for".equalsIgnoreCase(winner)) {
-            var ixthianButton = Buttons.green("rollIxthian", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
-            String msg = game.getPing() + "Click this button to roll for _Ixthian Artifact_! 🥁";
-            MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(), msg, ixthianButton);
-        } else {
-            MessageHelper.sendMessageToChannel(
-                    game.getMainGameChannel(), "Against on _Ixthian Artifact_‽ Disgraceful.");
+        var ixthianButton = Buttons.green("rollIxthian", "Roll Ixthian Artifact", PlanetEmojis.Mecatol);
+        String msg = game.getPing() + "Click this button to roll for _Ixthian Artifact_! 🥁";
+        MessageHelper.sendMessageToChannelWithButton(game.getMainGameChannel(), msg, ixthianButton);
+    }
+
+    @Override
+    public void handleAgainst(Game game, ButtonInteractionEvent event, int agendaNumericId) {
+        TextChannel watchParty = AgendaHelper.watchPartyChannel(game);
+        String watchPartyPing = AgendaHelper.watchPartyPing(game);
+        if (watchParty != null && !game.isFowMode()) {
+            Tile tile = game.getMecatolTile();
+            if (tile != null) {
+                FileUpload systemWithContext =
+                        new TileGenerator(game, event, null, 1, tile.getPosition()).createFileUpload();
+                String message = "# Ixthian Artifact has resolved! " + watchPartyPing + "\n"
+                        + AgendaHelper.getSummaryOfVotes(game, true);
+                MessageHelper.sendMessageToChannel(watchParty, message);
+                MessageHelper.sendMessageWithFile(
+                        watchParty, systemWithContext, "Surrounding Mecatol Rex In " + game.getName(), false);
+            }
         }
+        MessageHelper.sendMessageToChannel(
+                game.getMainGameChannel(), "Against on _Ixthian Artifact_‽ Disgraceful.");
     }
 }
