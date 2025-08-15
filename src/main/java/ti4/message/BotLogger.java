@@ -1,9 +1,11 @@
 package ti4.message;
 
-import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.concurrent.TimeUnit;
+
 import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -31,11 +33,12 @@ import ti4.map.Player;
 import ti4.selections.SelectionMenuProcessor;
 import ti4.settings.GlobalSettings;
 
+@UtilityClass
 public class BotLogger {
 
     private static volatile long lastScheduledWebhook;
     private static final Object lastScheduledWebhookLock = new Object();
-    public static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
+    private static final long DISCORD_RATE_LIMIT = 50; // Min time in millis between discord webhook messages
 
     /**
      * Sends a message to #bot-log-info in the offending server, else resorting to #bot-log and finally webhook.
@@ -228,7 +231,7 @@ public class BotLogger {
             @Nonnull String message,
             @Nullable Throwable err,
             @Nonnull LogSeverity severity) {
-        TextChannel channel = null;
+        TextChannel channel;
         StringBuilder msg = new StringBuilder();
 
         // **__`2025-01-01 xx:xx:xx.xxx`__** user pressed button blahblahblah
@@ -269,19 +272,22 @@ public class BotLogger {
                 else channel.sendMessage(msgChunk).queue(); // Send message on channel
 
             } else { // Handle error on last send
-                if (origin != null
-                        && origin.getGuild() != null) // Second check may not be necessary but this is a hotfix.
-                ThreadArchiveHelper.checkThreadLimitAndArchive(origin.getGuild());
-                else ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+                if (origin.getGuild() != null) { // Second check may not be necessary but this is a hotfix.
+                    ThreadArchiveHelper.checkThreadLimitAndArchive(origin.getGuild());
+                } else {
+                    ThreadArchiveHelper.checkThreadLimitAndArchive(AsyncTI4DiscordBot.guildPrimary);
+                }
 
-                if (channel == null) scheduleWebhookMessage(msgChunk); // Send message on webhook
-                else
+                if (channel == null) {
+                    scheduleWebhookMessage(msgChunk); // Send message on webhook
+                } else {
                     channel.sendMessage(msgChunk).queue(m -> m.createThreadChannel("Stack Trace")
-                            .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
-                            .queue(t -> {
-                                MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
-                                t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
-                            }));
+                        .setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+                        .queue(t -> {
+                            MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(err));
+                            t.getManager().setArchived(true).queueAfter(15, TimeUnit.SECONDS);
+                        }));
+                }
             }
         }
     }
